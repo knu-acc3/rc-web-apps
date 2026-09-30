@@ -1,13 +1,13 @@
 import Link from "next/link";
 import { BRAND } from "@/config/brand";
-import { href, LOCALES, LOCALE_LABEL, tr, type Locale } from "@/i18n/config";
+import { href, LOCALES, LOCALE_LABEL, type Locale } from "@/i18n/config";
 import { ui } from "@/i18n/ui";
-import { sectionsByCategory } from "@/registry";
+import { navigation } from "@/registry";
 import { LogoMark } from "./logo";
 
 export function Footer({ locale }: { locale: Locale }) {
   const t = ui(locale);
-  const groups = sectionsByCategory(locale);
+  const groups = navigation(locale, 6);
   return (
     <footer className="mt-auto border-t border-line bg-surface">
       <div className="container-page py-10">
@@ -16,10 +16,10 @@ export function Footer({ locale }: { locale: Locale }) {
             <nav key={g.id} aria-label={g.label}>
               <p className="mb-2.5 text-sm font-semibold text-fg">{g.label}</p>
               <ul className="flex flex-col gap-1.5">
-                {g.sections.map((s) => (
-                  <li key={s.id}>
-                    <Link href={href(locale, [s.id])} className="text-sm text-fg-2 hover:text-accent">
-                      {tr(s.name, locale)}
+                {g.items.map((l) => (
+                  <li key={l.path.join("/")}>
+                    <Link href={href(locale, l.path)} className="text-sm text-fg-2 hover:text-accent">
+                      {l.label}
                     </Link>
                   </li>
                 ))}

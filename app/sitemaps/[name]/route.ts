@@ -1,11 +1,11 @@
-import { allSections, getSection } from "@/registry";
+import { getSection, liveSections, sectionPaths } from "@/registry";
 import { urlsetXml, XML_HEADERS } from "@/site/sitemap";
 
 export const dynamic = "force-static";
 export const dynamicParams = false;
 
 export function generateStaticParams() {
-  return [{ name: "core.xml" }, ...allSections().map((s) => ({ name: `${s.id}.xml` }))];
+  return [{ name: "core.xml" }, ...liveSections().map((s) => ({ name: `${s.id}.xml` }))];
 }
 
 export async function GET(_req: Request, { params }: { params: Promise<{ name: string }> }) {
@@ -14,6 +14,6 @@ export async function GET(_req: Request, { params }: { params: Promise<{ name: s
   if (id === "core") return new Response(urlsetXml([[]]), { headers: XML_HEADERS });
   const section = getSection(id);
   if (!section) return new Response("Not found", { status: 404 });
-  const paths = section.paths().map((p) => [section.id, ...p]);
+  const paths = sectionPaths(section);
   return new Response(urlsetXml(paths), { headers: XML_HEADERS });
 }

@@ -1,34 +1,42 @@
 import { tr, type L10n, type Locale } from "@/i18n/config";
 import { ui } from "@/i18n/ui";
-import type { Block, CategoryId, LinkItem, PageModel, SearchEntry, SectionDef, ToolDef, VariantDef } from "./types";
+import type { Block, CategoryId, Crumb, LinkItem, PageModel, SearchEntry, SectionDef, ToolDef, VariantDef } from "./types";
 
 interface ToolSectionInput {
   id: string;
+  /** Group name used in navigation ("PDF", "Тесты устройств"). */
   name: L10n;
   description: L10n;
-  /** <title> of the hub page (defaults to name). */
+  /**
+   * Title of the group landing page `/{id}`. The page is published only when this is set and no
+   * tool has slug "" — give it only when the group name itself is a real search query
+   * ("PDF онлайн", "Эмодзи"); otherwise the group exists in navigation only.
+   */
   title?: L10n;
   h1?: L10n;
+  /** Meta description of the landing page (defaults to `description`). */
+  hubDescription?: L10n;
   icon: string;
   hue: number;
   category: CategoryId;
   order?: number;
   hidden?: boolean;
   tools: ToolDef[];
-  /** Extra blocks for the hub page. */
+  /** Extra blocks for the landing page. */
   hubBlocks?: (locale: Locale) => Block[];
 }
 
 const VARIANT_CHIP_LIMIT = 48;
 
 /**
- * Build a section from declarative tool definitions.
- * URL scheme: /{locale}/{section}            → hub (or the tool with slug "")
- *             /{locale}/{section}/{tool}     → tool
- *             /{locale}/{section}/{tool}/{v} → tool variant
+ * Build a group of tools. Every tool is a top-level page:
+ *   /{locale}/{tool slug}             → tool
+ *   /{locale}/{tool slug}/{variant}   → tool variant
+ *   /{locale}/{section id}            → tool with slug "" or the group landing page (opt-in)
  */
 export function defineToolSection(input: ToolSectionInput): SectionDef {
   const bySlug = new Map(input.tools.map((t) => [t.slug, t]));
+  const rootTool = bySlug.get("");
   const variantCache = new Map<string, VariantDef[]>();
   const variantsOf = (t: ToolDef): VariantDef[] => {
     if (!t.variants) return [];
@@ -39,7 +47,11 @@ export function defineToolSection(input: ToolSectionInput): SectionDef {
     }
     return v;
   };
-  const toolPath = (t: ToolDef) => (t.slug ? [input.id, t.slug] : [input.id]);
+  const toolPath = (t: ToolDef) => [t.slug || input.id];
+  // A section without tools is not published at all: no pages, no nav entry, no search entries.
+  const empty = input.tools.length === 0;
+  const hasHub = !empty && !rootTool && !!input.title;
+  const hubPath = rootTool ? [input.id] : hasHub ? [input.id] : null;
 
   const section: SectionDef = {
     id: input.id,
@@ -49,19 +61,29 @@ export function defineToolSection(input: ToolSectionInput): SectionDef {
     hue: input.hue,
     category: input.category,
     order: input.order,
-    hidden: input.hidden,
+    hidden: input.hidden || empty,
+    absolute: true,
+    hubPath: empty ? null : hubPath,
+
+    mounts() {
+      if (empty) return [];
+      return [...(hubPath ? [input.id] : []), ...input.tools.filter((t) => t.slug).map((t) => t.slug)];
+    },
 
     paths() {
+      if (empty) return [];
       const out: string[][] = [];
-      if (!bySlug.has("")) out.push([]);
+      if (hasHub) out.push([input.id]);
       for (const t of input.tools) {
-        out.push(t.slug ? [t.slug] : []);
-        for (const v of variantsOf(t)) out.push(t.slug ? [t.slug, v.slug] : [v.slug]);
+        const base = toolPath(t);
+        out.push(base);
+        for (const v of variantsOf(t)) out.push([...base, v.slug]);
       }
       return out;
     },
 
     search(locale) {
+      if (empty) return [];
       const entries: SearchEntry[] = [];
       const secName = tr(input.name, locale);
       for (const t of input.tools) {
@@ -84,7 +106,7 @@ export function defineToolSection(input: ToolSectionInput): SectionDef {
           });
         }
       }
-      if (!bySlug.has("")) entries.push({ path: [input.id], title: secName, hint: ui(locale).allTools, weight: 2 });
+      if (hasHub) entries.push({ path: [input.id], title: tr(input.h1 ?? input.name, locale), hint: ui(locale).allTools, weight: 2 });
       return entries;
     },
 
@@ -93,34 +115,30 @@ export function defineToolSection(input: ToolSectionInput): SectionDef {
       return (tools.length ? tools : input.tools).map((t) => toolLink(t, locale));
     },
 
-    resolve(locale, rest) {
-      const t = ui(locale);
-      const secCrumb = { name: tr(input.name, locale), path: [input.id] };
-      const home = { name: t.home, path: [] as string[] };
+    tools(locale) {
+      return input.tools.map((t) => toolLink(t, locale));
+    },
 
-      // Section root
-      if (rest.length === 0) {
-        const rootTool = bySlug.get("");
-        if (rootTool) return toolPage(rootTool, locale, [home]);
-        return hubPage(locale, [home]);
+    resolve(locale, segs) {
+      if (empty || segs.length === 0 || segs.length > 2) return null;
+      const home: Crumb = { name: ui(locale).home, path: [] };
+      const groupCrumbs: Crumb[] = hasHub ? [home, { name: tr(input.h1 ?? input.name, locale), path: [input.id] }] : [home];
+      const [first, second] = segs;
+
+      if (first === input.id && !bySlug.has(first)) {
+        if (rootTool) {
+          if (!second) return toolPage(rootTool, locale, [home]);
+          const v = variantsOf(rootTool).find((x) => x.slug === second);
+          return v ? variantPage(rootTool, v, locale, [home, { name: tr(rootTool.name, locale), path: [input.id] }]) : null;
+        }
+        return hasHub && !second ? hubPage(locale, [home]) : null;
       }
 
-      // Variant of the root tool: /section/{variant}
-      const rootTool = bySlug.get("");
-      if (rest.length === 1 && rootTool && !bySlug.has(rest[0])) {
-        const v = variantsOf(rootTool).find((x) => x.slug === rest[0]);
-        return v ? variantPage(rootTool, v, locale, [home, secCrumb]) : null;
-      }
-
-      const tool = bySlug.get(rest[0]);
+      const tool = first ? bySlug.get(first) : undefined;
       if (!tool || !tool.slug) return null;
-      const toolCrumb = { name: tr(tool.name, locale), path: toolPath(tool) };
-      if (rest.length === 1) return toolPage(tool, locale, [home, secCrumb]);
-      if (rest.length === 2) {
-        const v = variantsOf(tool).find((x) => x.slug === rest[1]);
-        return v ? variantPage(tool, v, locale, [home, secCrumb, toolCrumb]) : null;
-      }
-      return null;
+      if (!second) return toolPage(tool, locale, groupCrumbs);
+      const v = variantsOf(tool).find((x) => x.slug === second);
+      return v ? variantPage(tool, v, locale, [...groupCrumbs, { name: tr(tool.name, locale), path: toolPath(tool) }]) : null;
     },
   };
 
@@ -144,21 +162,19 @@ export function defineToolSection(input: ToolSectionInput): SectionDef {
     return input.tools.filter((x) => x !== tool).map((x) => toolLink(x, locale));
   }
 
-  function hubPage(locale: Locale, crumbs: PageModel["breadcrumbs"]): PageModel {
-    const blocks: Block[] = [
-      { type: "links", title: ui(locale).allTools, style: "cards", items: input.tools.map((x) => toolLink(x, locale)) },
-    ];
+  function hubPage(locale: Locale, crumbs: Crumb[]): PageModel {
+    const blocks: Block[] = [{ type: "links", title: ui(locale).allTools, style: "cards", items: input.tools.map((x) => toolLink(x, locale)) }];
     for (const tool of input.tools) {
       const vs = variantLinks(tool, locale);
-      if (vs.length) blocks.push({ type: "links", title: `${tr(tool.name, locale)}: ${tr(tool.variants!.title, locale).toLowerCase()}`, style: "chips", items: vs });
+      if (vs.length) blocks.push({ type: "links", title: tr(tool.variants!.title, locale), style: "chips", items: vs.slice(0, tool.variants!.limit ?? VARIANT_CHIP_LIMIT) });
     }
     return {
       path: [input.id],
       sectionId: input.id,
       kind: "hub",
-      title: input.title ? tr(input.title, locale) : locale === "ru" ? `${tr(input.name, locale)} онлайн — бесплатные инструменты` : `${tr(input.name, locale)} online — free tools`,
+      title: tr(input.title!, locale),
       h1: tr(input.h1 ?? input.name, locale),
-      description: tr(input.description, locale),
+      description: tr(input.hubDescription ?? input.description, locale),
       lead: tr(input.description, locale),
       breadcrumbs: crumbs,
       topBlocks: blocks,
@@ -170,7 +186,7 @@ export function defineToolSection(input: ToolSectionInput): SectionDef {
     };
   }
 
-  function toolPage(tool: ToolDef, locale: Locale, crumbs: PageModel["breadcrumbs"]): PageModel {
+  function toolPage(tool: ToolDef, locale: Locale, crumbs: Crumb[]): PageModel {
     const vs = variantLinks(tool, locale);
     const limit = tool.variants?.limit ?? VARIANT_CHIP_LIMIT;
     const topBlocks: Block[] = [];
@@ -191,7 +207,7 @@ export function defineToolSection(input: ToolSectionInput): SectionDef {
       blocks,
       howTo: tool.howTo?.[locale],
       faq: tool.faq?.[locale],
-      related: [...relatedLinks(tool, locale), ...siblingTools(tool, locale)].slice(0, 8),
+      related: dedupe([...relatedLinks(tool, locale), ...siblingTools(tool, locale)]).slice(0, 8),
       schemaType: "WebApplication",
       icon: tool.icon,
       hue: input.hue,
@@ -199,8 +215,9 @@ export function defineToolSection(input: ToolSectionInput): SectionDef {
     };
   }
 
-  function variantPage(tool: ToolDef, v: VariantDef, locale: Locale, crumbs: PageModel["breadcrumbs"]): PageModel {
+  function variantPage(tool: ToolDef, v: VariantDef, locale: Locale, crumbs: Crumb[]): PageModel {
     const siblings = variantLinks(tool, locale, v.slug);
+    const limit = tool.variants?.limit ?? VARIANT_CHIP_LIMIT;
     return {
       path: [...toolPath(tool), v.slug],
       sectionId: input.id,
@@ -211,11 +228,11 @@ export function defineToolSection(input: ToolSectionInput): SectionDef {
       lead: v.lead ? tr(v.lead, locale) : undefined,
       breadcrumbs: crumbs,
       tool: { id: tool.component, props: { ...tool.props, ...v.props } },
-      topBlocks: siblings.length ? [{ type: "links", title: tr(tool.variants!.title, locale), style: "chips", items: siblings }] : [],
+      topBlocks: siblings.length ? [{ type: "links", title: tr(tool.variants!.title, locale), style: "chips", items: siblings.slice(0, Math.max(limit, 24)) }] : [],
       blocks: v.blocks?.(locale) ?? [],
       howTo: tool.howTo?.[locale],
       faq: v.faq?.[locale] ?? tool.faq?.[locale],
-      related: [toolLink(tool, locale), ...relatedLinks(tool, locale)].slice(0, 8),
+      related: dedupe([toolLink(tool, locale), ...relatedLinks(tool, locale)]).slice(0, 8),
       schemaType: "WebApplication",
       icon: tool.icon,
       hue: input.hue,
@@ -224,10 +241,32 @@ export function defineToolSection(input: ToolSectionInput): SectionDef {
   }
 
   function relatedLinks(tool: ToolDef, locale: Locale): LinkItem[] {
-    return (tool.related ?? []).map((key) => relatedResolver(key, locale)).filter((x): x is LinkItem => !!x);
+    const out: LinkItem[] = [];
+    for (const key of tool.related ?? []) {
+      const link = relatedResolver(key, locale);
+      if (link) out.push(link);
+      else unresolved.add(`${tool.slug || input.id} → ${key}`);
+    }
+    return out;
   }
 
   return section;
+}
+
+const unresolved = new Set<string>();
+/** Related keys that did not resolve to a page (checked by the registry test). */
+export function unresolvedRelated(): string[] {
+  return [...unresolved];
+}
+
+function dedupe(items: LinkItem[]): LinkItem[] {
+  const seen = new Set<string>();
+  return items.filter((i) => {
+    const k = i.path.join("/");
+    if (seen.has(k)) return false;
+    seen.add(k);
+    return true;
+  });
 }
 
 /* Cross-section related links are resolved lazily through a late-bound resolver
