@@ -370,6 +370,7 @@ export function DataTable({
   className,
   alignRight = true,
   highlight,
+  align,
 }: {
   head: ReactNode[];
   rows: ReactNode[][];
@@ -382,8 +383,10 @@ export function DataTable({
   alignRight?: boolean;
   /** Index of a row to highlight. */
   highlight?: number;
+  /** Per-column alignment, overrides `alignRight`. */
+  align?: ("left" | "right")[];
 }) {
-  const al = (j: number) => (alignRight && j > 0 ? "text-right" : undefined);
+  const al = (j: number) => (align ? (align[j] === "right" ? "text-right" : undefined) : alignRight && j > 0 ? "text-right" : undefined);
   return (
     <div className={cn("tbl", className)} style={maxHeight ? { maxHeight, overflowY: "auto" } : undefined}>
       <table>

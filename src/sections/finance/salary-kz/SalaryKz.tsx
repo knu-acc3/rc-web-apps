@@ -128,6 +128,7 @@ export default function SalaryKz({ locale, gross = 500_000, year = 2026 }: ToolP
             head={[t.item, t.how, t.amount]}
             rows={emp.map((l) => [l.label, <span key="h" className="whitespace-normal text-fg-2">{l.how}</span>, t2(l.value)])}
             foot={[t.totalWithheld, "", t2(withheld)]}
+            align={["left", "left", "right"]}
           />
         </section>
       )}
@@ -139,6 +140,7 @@ export default function SalaryKz({ locale, gross = 500_000, year = 2026 }: ToolP
             head={[t.item, t.how, t.amount]}
             rows={[...empr.map((l) => [l.label, <span key="h" className="whitespace-normal text-fg-2">{l.how}</span>, t2(l.value)]), [t.cost, "", t2(b.employerTotal)]]}
             foot={[t.burden, "", `${t2(b.burden)} (${fmtPct(locale, b.employerTotal ? (b.burden / b.employerTotal) * 100 : 0, 1)})`]}
+            align={["left", "left", "right"]}
           />
         </section>
       )}
