@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "@/ui/link";
 import { buttonClass } from "@/ui/button";
 
 /** 404 inside a locale. not-found.tsx has no params, so the page is bilingual. */

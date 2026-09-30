@@ -1,7 +1,7 @@
 "use client";
 
 import { Search, X } from "lucide-react";
-import Link from "next/link";
+import Link from "@/ui/link";
 import { useEffect, useId, useMemo, useRef, useState, type MouseEvent, type ReactNode } from "react";
 import { href, type Locale } from "@/i18n/config";
 import { copyText } from "@/lib/clipboard";

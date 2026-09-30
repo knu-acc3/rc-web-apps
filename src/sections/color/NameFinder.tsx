@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import Link from "@/ui/link";
 import { useState } from "react";
 import { href, type Locale } from "@/i18n/config";
 import { Notice, Panel, PanelHeader } from "@/ui/panel";

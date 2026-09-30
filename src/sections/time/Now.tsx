@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import Link from "@/ui/link";
 import { Maximize2 } from "lucide-react";
 import { href } from "@/i18n/config";
 import { isoWeek } from "@/sections/calendar/lib/dates";

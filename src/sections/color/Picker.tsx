@@ -1,7 +1,7 @@
 "use client";
 
 import { Pipette } from "lucide-react";
-import Link from "next/link";
+import Link from "@/ui/link";
 import { useRef, useState, type PointerEvent } from "react";
 import { href, type Locale } from "@/i18n/config";
 import { Button } from "@/ui/button";

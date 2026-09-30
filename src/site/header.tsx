@@ -1,10 +1,8 @@
-import Link from "next/link";
 import { LayoutGrid, X } from "lucide-react";
 import { href, type Locale } from "@/i18n/config";
 import { ui } from "@/i18n/ui";
 import { navigation } from "@/registry";
 import { buttonClass } from "@/ui/button";
-import { IconTile } from "@/ui/icon";
 import { LangSwitch } from "./lang-switch";
 import { Logo } from "./logo";
 import { SearchButton } from "./search";
@@ -63,17 +61,16 @@ function AllToolsMenu({ locale }: { locale: Locale }) {
               <ul className="flex flex-col gap-0.5">
                 {g.items.map((l) => (
                   <li key={l.path.join("/")}>
-                    <Link href={href(locale, l.path)} className="flex items-center gap-2.5 rounded-[8px] px-2 py-1.5 text-[15px] hover:bg-surface-2 hover:text-accent">
-                      <IconTile name={l.icon} hue={l.hue} size="sm" />
-                      <span className="truncate">{l.label}</span>
-                    </Link>
+                    <a href={href(locale, l.path)} className="nav-link">
+                      {l.label}
+                    </a>
                   </li>
                 ))}
                 {g.total > g.items.length && (
                   <li>
-                    <Link href={`${href(locale)}#cat-${g.id}`} className="block px-2 py-1.5 text-sm text-fg-3 hover:text-accent">
+                    <a href={`${href(locale)}#cat-${g.id}`} className="nav-link text-fg-3">
                       {t.showAll} · {g.total}
-                    </Link>
+                    </a>
                   </li>
                 )}
               </ul>

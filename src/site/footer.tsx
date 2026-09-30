@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "@/ui/link";
 import { BRAND } from "@/config/brand";
 import { href, LOCALES, LOCALE_LABEL, type Locale } from "@/i18n/config";
 import { ui } from "@/i18n/ui";
@@ -18,9 +18,9 @@ export function Footer({ locale }: { locale: Locale }) {
               <ul className="flex flex-col gap-1.5">
                 {g.items.map((l) => (
                   <li key={l.path.join("/")}>
-                    <Link href={href(locale, l.path)} className="text-sm text-fg-2 hover:text-accent">
+                    <a href={href(locale, l.path)} className="text-sm text-fg-2 hover:text-accent">
                       {l.label}
-                    </Link>
+                    </a>
                   </li>
                 ))}
               </ul>

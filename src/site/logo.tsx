@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "@/ui/link";
 import { BRAND, BRAND_MARK } from "@/config/brand";
 import { href, type Locale } from "@/i18n/config";
 

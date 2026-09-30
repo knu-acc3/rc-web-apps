@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import Link from "@/ui/link";
 import { notFound } from "next/navigation";
 import { BRAND, SITE_URL } from "@/config/brand";
 import { href, isLocale, tr, type Locale } from "@/i18n/config";
@@ -108,9 +108,9 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
                     <ul className="mt-3 flex flex-col gap-1.5 border-t border-line pt-3">
                       {sectionTools(s, locale).map((f) => (
                         <li key={f.path.join("/")}>
-                          <Link href={href(locale, f.path)} className="text-[15px] text-fg-2 hover:text-accent">
+                          <a href={href(locale, f.path)} className="cat-link">
                             {f.label}
-                          </Link>
+                          </a>
                         </li>
                       ))}
                     </ul>

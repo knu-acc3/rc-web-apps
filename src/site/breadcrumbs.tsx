@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "@/ui/link";
 import { ChevronRight } from "lucide-react";
 import { href, type Locale } from "@/i18n/config";
 import type { Crumb } from "@/registry/types";

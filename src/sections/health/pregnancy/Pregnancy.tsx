@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import Link from "@/ui/link";
 import { useId } from "react";
 import { href } from "@/i18n/config";
 import { plural } from "@/i18n/format";

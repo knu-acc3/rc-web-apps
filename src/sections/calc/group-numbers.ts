@@ -1,5 +1,4 @@
 import type { ToolDef } from "@/registry/types";
-import type { ComponentMap } from "../types";
 import { averageTool } from "./average/def";
 import { combinatoricsTool } from "./combinatorics/def";
 import { factorialTool } from "./factorial/def";
@@ -26,16 +25,3 @@ export const tools: ToolDef[] = [
   factorialTool,
   combinatoricsTool,
 ];
-
-export const components: ComponentMap = {
-  "calc/multiplication": () => import("./multiplication/MultiplicationTable"),
-  "calc/gcd-lcm": () => import("./gcd-lcm/GcdLcm"),
-  "calc/prime": () => import("./prime/Prime"),
-  "calc/proportion": () => import("./proportion/Proportion"),
-  "calc/average": () => import("./average/Average"),
-  "calc/rounding": () => import("./rounding/Rounding"),
-  "calc/ratio": () => import("./ratio/Ratio"),
-  "calc/rpl": () => import("./rpl/Rpl"),
-  "calc/factorial": () => import("./factorial/Factorial"),
-  "calc/combinatorics": () => import("./combinatorics/Combinatorics"),
-};

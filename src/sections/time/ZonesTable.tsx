@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import Link from "@/ui/link";
 import { cn } from "@/lib/cn";
 import { Panel } from "@/ui/panel";
 import { BigTime } from "./BigTime";

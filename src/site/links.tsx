@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "@/ui/link";
 import { href, type Locale } from "@/i18n/config";
 import { cn } from "@/lib/cn";
 import type { LinkItem } from "@/registry/types";
@@ -9,10 +9,10 @@ export function LinkChips({ items, locale, className }: { items: LinkItem[]; loc
     <ul className={cn("flex flex-wrap gap-2", className)}>
       {items.map((it) => (
         <li key={it.path.join("/")}>
-          <Link href={href(locale, it.path)} className="chip" title={it.hint}>
+          <a href={href(locale, it.path)} className="chip" title={it.hint}>
             {it.glyph && <span className="text-base leading-none">{it.glyph}</span>}
             {it.label}
-          </Link>
+          </a>
         </li>
       ))}
     </ul>
@@ -68,9 +68,9 @@ export function GlyphGrid({
         return (
           <li key={i}>
             {it.path ? (
-              <Link href={href(locale, it.path)} className="glyph" title={it.label}>
+              <a href={href(locale, it.path)} className="glyph" title={it.label}>
                 {inner}
-              </Link>
+              </a>
             ) : (
               <div className="glyph">{inner}</div>
             )}

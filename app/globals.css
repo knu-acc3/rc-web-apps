@@ -271,6 +271,27 @@
     border-color: var(--err);
   }
 
+  .nav-link {
+    display: block;
+    border-radius: 8px;
+    padding: 6px 8px;
+    font-size: 15px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .nav-link:hover {
+    background: var(--surface-2);
+    color: var(--accent);
+  }
+  .cat-link {
+    font-size: 15px;
+    color: var(--fg-2);
+  }
+  .cat-link:hover {
+    color: var(--accent);
+  }
+
   .chip {
     display: inline-flex;
     height: 36px;

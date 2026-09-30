@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import Link from "@/ui/link";
 import { useSyncExternalStore } from "react";
 import type { Locale } from "@/i18n/config";
 import { formatNumber } from "@/i18n/format";

@@ -1,7 +1,7 @@
 "use client";
 
 import { CircleCheck, TriangleAlert, X } from "lucide-react";
-import Link from "next/link";
+import Link from "@/ui/link";
 import { useState, type ReactNode } from "react";
 import { href, type Locale } from "@/i18n/config";
 import { formatNumber } from "@/i18n/format";

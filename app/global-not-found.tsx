@@ -1,6 +1,6 @@
 import "./globals.css";
 import type { Metadata } from "next";
-import Link from "next/link";
+import Link from "@/ui/link";
 
 export const metadata: Metadata = { title: "404", robots: { index: false } };
 
