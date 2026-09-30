@@ -89,7 +89,7 @@ async function buildChain(ctx: AudioContext, color: NoiseColor): Promise<Chain> 
   };
 }
 
-export default function NoiseGenerator({ locale, color: color0 = "white" }: { locale: Locale; color?: NoiseColor }) {
+function NoiseGeneratorInner({ locale, color: color0 = "white" }: { locale: Locale; color?: NoiseColor }) {
   const t = T[locale];
   const id = useId();
   const [color, setColor] = useState<NoiseColor>(color0);
@@ -202,4 +202,9 @@ export default function NoiseGenerator({ locale, color: color0 = "white" }: { lo
       <p className="text-sm text-fg-3">{t.note}</p>
     </div>
   );
+}
+
+/** Remount when the page preset changes (client-side navigation between variant pages). */
+export default function NoiseGenerator(props: { locale: Locale; color?: NoiseColor }) {
+  return <NoiseGeneratorInner key={props.color ?? ""} {...props} />;
 }

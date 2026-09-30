@@ -23,7 +23,7 @@ export const NOISES: NoiseInfo[] = [
     title: { ru: "Белый шум онлайн — слушать без рекламы и петель", en: "White noise online — no ads, no loops" },
     description: {
       ru: "Белый шум онлайн: одинаковая мощность на всех частотах, звучит как шипение ненастроенного радио. Непрерывная генерация без щелчков, таймер сна до 8 часов.",
-      en: "White noise online: equal power at every frequency, sounding like the hiss of an untuned radio. Continuous generation without clicks and a sleep timer of up to 8 hours.",
+      en: "White noise online: equal power at every frequency, like the hiss of an untuned radio. Generated continuously without clicks, with a sleep timer up to 8 hours.",
     },
     lead: { ru: "Белый шум — ровное шипение, которое маскирует посторонние звуки.", en: "White noise is an even hiss that masks distracting sounds." },
     sounds: { ru: "шипение ненастроенного радио или телевизора", en: "the hiss of an untuned radio or TV" },
@@ -46,7 +46,7 @@ export const NOISES: NoiseInfo[] = [
     title: { ru: "Розовый шум онлайн — мягкий шум для сна и работы", en: "Pink noise online — a soft noise for sleep and focus" },
     description: {
       ru: "Розовый шум онлайн: мощность падает на 3 дБ на октаву, поэтому он мягче белого и похож на ровный дождь. Эталонный сигнал для настройки акустики, таймер сна.",
-      en: "Pink noise online: power falls by 3 dB per octave, so it's softer than white noise and sounds like steady rain. A reference signal for tuning speakers, with a sleep timer.",
+      en: "Pink noise online: power falls 3 dB per octave, so it's softer than white noise and sounds like steady rain. Used to tune speakers; has a sleep timer.",
     },
     lead: { ru: "Розовый шум — равная энергия в каждой октаве, звучит как ровный дождь.", en: "Pink noise has equal energy in every octave and sounds like steady rain." },
     sounds: { ru: "ровный дождь или шелест листвы", en: "steady rain or rustling leaves" },
@@ -68,8 +68,8 @@ export const NOISES: NoiseInfo[] = [
     name: { ru: "Коричневый шум", en: "Brown noise" },
     title: { ru: "Коричневый шум онлайн — глубокий гул без щелчков", en: "Brown noise online — a deep rumble without clicks" },
     description: {
-      ru: "Коричневый шум онлайн: −6 дБ на октаву, низкий гул как у водопада или прибоя. Генерируется непрерывно, без повторяющейся петли и щелчков; таймер сна и регулировка громкости.",
-      en: "Brown noise online: −6 dB per octave, a low rumble like a waterfall or surf. Generated continuously with no repeating loop or clicks; sleep timer and live volume control.",
+      ru: "Коричневый шум онлайн: −6 дБ на октаву, низкий гул как у водопада или прибоя. Непрерывная генерация без петли и щелчков, таймер сна и регулировка громкости.",
+      en: "Brown noise online: −6 dB per octave, a low rumble like a waterfall or surf. Generated continuously with no loop or clicks, with a sleep timer and live volume.",
     },
     lead: { ru: "Коричневый шум — глубокий низкий гул, мягче белого и розового.", en: "Brown noise is a deep, low rumble — softer than white or pink." },
     sounds: { ru: "водопад, прибой, гул в салоне самолёта", en: "a waterfall, surf, an aircraft cabin" },
@@ -114,8 +114,8 @@ export const NOISES: NoiseInfo[] = [
     name: { ru: "Фиолетовый шум", en: "Violet noise" },
     title: { ru: "Фиолетовый шум онлайн — самый «яркий» шум, +6 дБ", en: "Violet noise online — the brightest noise, +6 dB" },
     description: {
-      ru: "Фиолетовый шум онлайн: мощность растёт на 6 дБ на октаву, почти вся энергия в самых высоких частотах. Тонкое шипение для маскировки высокого звона в ушах и тестов.",
-      en: "Violet noise online: power rises by 6 dB per octave, so nearly all the energy is in the highest frequencies. A thin hiss for masking high tinnitus and for tests.",
+      ru: "Фиолетовый шум онлайн: мощность растёт на 6 дБ на октаву, почти вся энергия — в самых высоких частотах. Тонкое шипение для маскировки звона в ушах и тестов.",
+      en: "Violet noise online: power rises by 6 dB per octave, so nearly all the energy is in the highest frequencies. A thin hiss for masking high tinnitus and tests.",
     },
     lead: { ru: "Фиолетовый шум — тонкое высокое шипение, противоположность коричневому.", en: "Violet noise is a thin, high hiss — the opposite of brown noise." },
     sounds: { ru: "очень тонкое высокое шипение", en: "a very thin, high hiss" },
@@ -179,8 +179,8 @@ export const INSTRUMENT_TEXTS: InstrumentText[] = [
     title: { ru: "Тюнер для гитары онлайн — через микрофон", en: "Guitar tuner online — using your microphone" },
     h1: { ru: "Тюнер для гитары", en: "Guitar tuner" },
     description: {
-      ru: "Тюнер для шестиструнной гитары онлайн: стандартный строй E-A-D-G-B-E (ми-ля-ре-соль-си-ми), определение ноты через микрофон, отклонение в центах, эталонные тоны струн.",
-      en: "Online tuner for a six-string guitar: standard E-A-D-G-B-E tuning, note detection through the microphone, deviation in cents and reference tones for each string.",
+      ru: "Тюнер для шестиструнной гитары онлайн: строй E-A-D-G-B-E (ми-ля-ре-соль-си-ми), определение ноты через микрофон, отклонение в центах и эталонные тоны.",
+      en: "Online tuner for a six-string guitar: standard E-A-D-G-B-E tuning, note detection through the microphone, cents deviation and reference tones for each string.",
     },
     lead: { ru: "Сыграйте открытую струну — тюнер покажет ноту и насколько её подтянуть или ослабить.", en: "Play an open string — the tuner shows the note and whether to tighten or loosen it." },
     about: {
@@ -203,7 +203,7 @@ export const INSTRUMENT_TEXTS: InstrumentText[] = [
     h1: { ru: "Тюнер для бас-гитары", en: "Bass guitar tuner" },
     description: {
       ru: "Тюнер для четырёхструнной бас-гитары онлайн: строй E-A-D-G от 41,2 Гц, определение ноты через микрофон, отклонение в центах и эталонные тоны каждой струны.",
-      en: "Online tuner for a four-string bass: E-A-D-G tuning from 41.2 Hz, note detection through the microphone, deviation in cents and reference tones for each string.",
+      en: "Online tuner for a four-string bass: E-A-D-G tuning from 41.2 Hz, note detection through the microphone, cents deviation and reference tones for each string.",
     },
     lead: { ru: "Бас-гитара строится на октаву ниже четырёх нижних струн гитары.", en: "A bass is tuned an octave below a guitar's four lowest strings." },
     about: {
@@ -225,8 +225,8 @@ export const INSTRUMENT_TEXTS: InstrumentText[] = [
     title: { ru: "Тюнер для укулеле онлайн — строй G-C-E-A", en: "Ukulele tuner online — G-C-E-A tuning" },
     h1: { ru: "Тюнер для укулеле", en: "Ukulele tuner" },
     description: {
-      ru: "Тюнер для укулеле онлайн: стандартный строй G-C-E-A (соль-до-ми-ля) с высокой четвёртой струной, определение ноты через микрофон и эталонные тоны для сопрано, концерта и тенора.",
-      en: "Online ukulele tuner: standard G-C-E-A tuning with a high fourth string, note detection through the microphone and reference tones for soprano, concert and tenor ukuleles.",
+      ru: "Тюнер для укулеле онлайн: строй G-C-E-A (соль-до-ми-ля) с высокой четвёртой струной, нота через микрофон и эталонные тоны для сопрано, концерта и тенора.",
+      en: "Online ukulele tuner: G-C-E-A tuning with a high fourth string, note detection through the microphone and reference tones for soprano, concert and tenor.",
     },
     lead: { ru: "Строй укулеле G-C-E-A: четвёртая струна соль выше третьей — это «возвратный» строй.", en: "Ukulele tuning is G-C-E-A: the fourth string, G, is higher than the third — a re-entrant tuning." },
     about: {
@@ -272,7 +272,7 @@ export const INSTRUMENT_TEXTS: InstrumentText[] = [
     h1: { ru: "Тюнер для балалайки", en: "Balalaika tuner" },
     description: {
       ru: "Тюнер для балалайки прима онлайн: академический строй ми-ми-ля (E4-E4-A4), две нижние струны в унисон. Определение ноты через микрофон и эталонные тоны струн.",
-      en: "Online tuner for the prima balalaika: academic E-E-A tuning (E4-E4-A4) with the two lower strings in unison. Note detection through the microphone and reference tones.",
+      en: "Online tuner for the prima balalaika: academic E-E-A tuning (E4-E4-A4) with the two lower strings in unison, microphone note detection and reference tones.",
     },
     lead: { ru: "Балалайка прима строится ми-ми-ля: две струны в унисон и третья на кварту выше.", en: "The prima balalaika is tuned E-E-A: two strings in unison and the third a fourth higher." },
     about: {
@@ -295,7 +295,7 @@ export const INSTRUMENT_TEXTS: InstrumentText[] = [
     h1: { ru: "Тюнер для домбры", en: "Dombra tuner" },
     description: {
       ru: "Тюнер для казахской домбры онлайн: основной квартовый строй ре-соль (D3-G3), определение ноты через микрофон, отклонение в центах и эталонные тоны двух струн.",
-      en: "Online tuner for the Kazakh dombra: the main D-G tuning in fourths (D3-G3), note detection through the microphone, deviation in cents and reference tones for both strings.",
+      en: "Online tuner for the Kazakh dombra: the main D-G tuning in fourths (D3-G3), microphone note detection, cents deviation and reference tones for both strings.",
     },
     lead: { ru: "Домбру чаще всего строят в кварту: ре и соль малой октавы.", en: "The dombra is most often tuned in fourths: D3 and G3." },
     about: {

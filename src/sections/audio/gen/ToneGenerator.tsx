@@ -84,7 +84,7 @@ interface Voice {
   ctx: AudioContext;
 }
 
-export default function ToneGenerator({ locale, freq: freq0 = 440 }: { locale: Locale; freq?: number }) {
+function ToneGeneratorInner({ locale, freq: freq0 = 440 }: { locale: Locale; freq?: number }) {
   const t = T[locale];
   const id = useId();
   const [freq, setFreq] = useState(freq0);
@@ -239,4 +239,9 @@ export default function ToneGenerator({ locale, freq: freq0 = 440 }: { locale: L
       <p className="text-sm text-fg-3">{t.safety}</p>
     </div>
   );
+}
+
+/** Remount when the page preset changes (client-side navigation between variant pages). */
+export default function ToneGenerator(props: { locale: Locale; freq?: number }) {
+  return <ToneGeneratorInner key={String(props.freq ?? "")} {...props} />;
 }

@@ -22,8 +22,8 @@ export const mediaTools: ToolDef[] = [
     title: { ru: "Аудиоконвертер онлайн — MP3, WAV, M4A, FLAC, OGG", en: "Audio converter online — MP3, WAV, M4A, FLAC, OGG" },
     h1: { ru: "Аудиоконвертер онлайн", en: "Online audio converter" },
     description: {
-      ru: "Конвертер аудио в браузере: MP3, WAV, M4A, AAC, FLAC, OGG, Opus, WMA, AMR и звук из видео. Битрейт до 320 кбит/с, частота, моно или стерео, пакетно и без загрузки.",
-      en: "Audio converter in your browser: MP3, WAV, M4A, AAC, FLAC, OGG, Opus, WMA, AMR and audio from video. Up to 320 kbit/s, sample rate, mono or stereo, batches, no uploads.",
+      ru: "Конвертер аудио в браузере: MP3, WAV, M4A, AAC, FLAC, OGG, Opus, WMA, AMR и звук из видео. Битрейт до 320 кбит/с, частота, моно/стерео, пакетно и без загрузки.",
+      en: "Audio converter in your browser: MP3, WAV, M4A, AAC, FLAC, OGG, Opus, WMA, AMR and audio from video. Up to 320 kbit/s, mono or stereo, batches, no uploads.",
     },
     lead: { ru: "Переведите аудио в MP3, WAV, M4A, FLAC, OGG или Opus — или извлеките звук из видео.", en: "Convert audio to MP3, WAV, M4A, FLAC, OGG or Opus — or extract the sound from a video." },
     keywords: { ru: ["аудио конвертер", "конвертировать аудио", "конвертер mp3", "перевести в mp3"], en: ["audio converter", "convert audio", "mp3 converter", "convert to mp3"] },
@@ -112,8 +112,8 @@ export const mediaTools: ToolDef[] = [
     title: { ru: "Склеить аудио онлайн — соединить песни и записи в одну", en: "Merge audio online — join songs into one file" },
     h1: { ru: "Склеить аудио онлайн", en: "Merge audio files online" },
     description: {
-      ru: "Соединить несколько аудиофайлов в один: MP3, WAV, M4A, OGG и звук из видео в любом порядке, встык или с плавным переходом до 8 секунд. Результат в MP3, WAV, M4A, FLAC.",
-      en: "Join several audio files into one: MP3, WAV, M4A, OGG and audio from video in any order, back to back or with a crossfade of up to 8 seconds. Save as MP3, WAV, M4A, FLAC.",
+      ru: "Соединить несколько аудиофайлов в один: MP3, WAV, M4A, OGG и звук из видео в любом порядке, встык или с переходом до 8 секунд. Результат в MP3, WAV, M4A, FLAC.",
+      en: "Join several audio files into one: MP3, WAV, M4A, OGG or audio from video in any order, back to back or crossfaded up to 8 seconds. Save as MP3, WAV, M4A, FLAC.",
     },
     lead: { ru: "Соедините треки, куски записи или голосовые сообщения в один файл.", en: "Join tracks, recording fragments or voice messages into one file." },
     keywords: { ru: ["склеить аудио", "соединить mp3", "объединить песни", "склеить музыку онлайн"], en: ["merge audio", "join mp3", "combine songs", "audio joiner"] },
@@ -155,8 +155,8 @@ export const mediaTools: ToolDef[] = [
     title: { ru: "Увеличить громкость MP3 онлайн — усилить или нормализовать", en: "Increase audio volume online — boost or normalize MP3" },
     h1: { ru: "Увеличить громкость аудио", en: "Increase audio volume" },
     description: {
-      ru: "Сделать тихую запись громче: усиление от −20 до +20 дБ с предпрослушиванием или нормализация по пику до −1 dBFS. Показывает пик до и после и предупреждает о клиппинге.",
-      en: "Make a quiet recording louder: gain from −20 to +20 dB with a preview, or peak normalization to −1 dBFS. Shows the peak before and after and warns about clipping.",
+      ru: "Сделать запись громче: усиление от −20 до +20 дБ с предпрослушиванием или нормализация пика до −1 dBFS. Показывает пик до и после, предупреждает о клиппинге.",
+      en: "Make a quiet recording louder: gain from −20 to +20 dB with a preview, or peak normalization to −1 dBFS. Shows the peak before and after, warns about clipping.",
     },
     lead: { ru: "Усильте тихую запись или выровняйте уровень — без искажений и с предпрослушиванием.", en: "Boost a quiet recording or even out its level — without distortion and with a preview." },
     keywords: { ru: ["увеличить громкость mp3", "усилить звук", "нормализовать звук", "сделать громче аудио"], en: ["increase audio volume", "boost volume mp3", "normalize audio", "make audio louder"] },
@@ -198,7 +198,7 @@ export const mediaTools: ToolDef[] = [
     title: { ru: "Изменить скорость и тональность аудио онлайн", en: "Change audio speed and pitch online" },
     h1: { ru: "Изменить скорость и тональность аудио", en: "Change audio speed and pitch" },
     description: {
-      ru: "Ускорить или замедлить аудио в 0,5–2 раза с сохранением высоты голоса и сдвинуть тональность на ±12 полутонов без изменения темпа. Предпрослушивание скорости сразу.",
+      ru: "Ускорить или замедлить аудио в 0,5–2 раза с сохранением высоты голоса и сдвинуть тональность на ±12 полутонов без изменения темпа. Скорость слышна сразу.",
       en: "Speed audio up or slow it down 0.5–2× keeping the voice pitch, and shift the key by ±12 semitones without changing tempo. The speed preview plays instantly.",
     },
     lead: { ru: "Замедлите песню для разучивания или сдвиньте тональность под свой голос.", en: "Slow a song down to learn it or shift the key to suit your voice." },
@@ -284,8 +284,8 @@ export const mediaTools: ToolDef[] = [
     name: { ru: "Диктофон онлайн", en: "Voice recorder" },
     title: { ru: "Диктофон онлайн — записать голос с микрофона", en: "Online voice recorder — record from your microphone" },
     description: {
-      ru: "Онлайн-диктофон: запись голоса с микрофона в браузере с паузой и осциллограммой, шумоподавление, сохранение в WebM, M4A, MP3 или WAV. Запись не отправляется на сервер.",
-      en: "Online voice recorder: record your voice in the browser with pause and a live waveform, noise suppression, and save as WebM, M4A, MP3 or WAV. Nothing is sent to a server.",
+      ru: "Онлайн-диктофон: запись голоса с микрофона с паузой и осциллограммой, шумоподавление, сохранение в WebM, M4A, MP3 или WAV. Запись не уходит на сервер.",
+      en: "Online voice recorder: record your voice with pause and a live waveform, noise suppression, and save as WebM, M4A, MP3 or WAV. Nothing is sent to a server.",
     },
     lead: { ru: "Запишите голос с микрофона и сохраните в MP3 или WAV — без программ и регистрации.", en: "Record your voice from the microphone and save it as MP3 or WAV — no software or sign-up." },
     keywords: { ru: ["диктофон онлайн", "записать голос", "запись с микрофона", "запись голоса онлайн"], en: ["voice recorder", "record voice online", "microphone recorder", "audio recorder"] },

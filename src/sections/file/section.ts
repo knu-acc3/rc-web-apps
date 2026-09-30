@@ -22,7 +22,7 @@ const tools: ToolDef[] = [
     h1: { ru: "Создать ZIP-архив онлайн", en: "Create a ZIP file online" },
     description: {
       ru: "Заархивируйте файлы и целые папки в ZIP прямо в браузере: четыре уровня сжатия, сохранение структуры папок и дат, имена на кириллице. Без загрузки на сервер.",
-      en: "Zip files and whole folders right in your browser: four compression levels, folder structure and dates preserved, non-Latin file names supported. Nothing is uploaded.",
+      en: "Zip files and whole folders in your browser: four compression levels, folder structure and dates kept, non-Latin file names supported. Nothing is uploaded.",
     },
     lead: { ru: "Соберите файлы и папки в один ZIP-архив — например, чтобы отправить их одним вложением.", en: "Pack files and folders into one ZIP — for example, to send them as a single attachment." },
     keywords: { ru: ["создать zip архив", "заархивировать файлы", "сжать файлы в zip", "zip онлайн"], en: ["create zip file", "zip files online", "compress files to zip", "make a zip"] },
@@ -64,8 +64,8 @@ const tools: ToolDef[] = [
     title: { ru: "Распаковать ZIP онлайн — открыть архив в браузере", en: "Unzip online — open a ZIP archive in your browser" },
     h1: { ru: "Распаковать ZIP-архив онлайн", en: "Unzip files online" },
     description: {
-      ru: "Откройте ZIP в браузере: список файлов с размерами, предпросмотр текста и картинок, скачивание по одному или всё сразу в папку. Правильно читает кириллицу из архивов Windows.",
-      en: "Open a ZIP in your browser: file list with sizes, text and image previews, download files one by one or extract all to a folder. Reads Cyrillic names from Windows archives correctly.",
+      ru: "Откройте ZIP в браузере: список файлов, просмотр текста и картинок, скачивание по одному или всё в папку. Правильно читает кириллицу из архивов Windows.",
+      en: "Open a ZIP in your browser: file list, text and image previews, download files one by one or extract all to a folder. Reads Cyrillic names from Windows ZIPs.",
     },
     lead: { ru: "Посмотрите, что внутри ZIP, и достаньте нужные файлы — без архиватора.", en: "See what's inside a ZIP and take out the files you need — no archiver required." },
     keywords: { ru: ["распаковать zip", "открыть zip онлайн", "разархивировать", "извлечь файлы из архива"], en: ["unzip online", "open zip file", "extract zip", "zip extractor"] },
@@ -106,8 +106,8 @@ const tools: ToolDef[] = [
     title: { ru: "Определить тип файла онлайн — по сигнатуре, не по расширению", en: "File type checker online — by signature, not extension" },
     h1: { ru: "Определить тип файла", en: "Check a file's real type" },
     description: {
-      ru: "Узнайте настоящий формат файла по его первым байтам (сигнатуре): более 100 форматов, проверка расширения, размер, дата изменения, размеры картинок, длительность, MD5 и SHA-256.",
-      en: "Find a file's real format from its first bytes (magic signature): over 100 formats, extension check, size, modification date, image size, duration, MD5 and SHA-256.",
+      ru: "Настоящий формат файла по первым байтам (сигнатуре): более 100 форматов, проверка расширения, размер и дата, размеры картинок, длительность, MD5 и SHA-256.",
+      en: "Find a file's real format from its first bytes (magic signature): 100+ formats, extension check, size, date, image size, duration, MD5 and SHA-256.",
     },
     lead: { ru: "Проверьте, что это за файл на самом деле, — даже если расширение неправильное или его нет.", en: "Find out what a file really is — even if the extension is wrong or missing." },
     keywords: { ru: ["определить тип файла", "узнать формат файла", "чем открыть файл", "сигнатура файла"], en: ["file type checker", "identify file type", "what file is this", "magic bytes"] },
@@ -148,8 +148,8 @@ const tools: ToolDef[] = [
     title: { ru: "Массовое переименование файлов онлайн — по шаблону", en: "Batch rename files online — by pattern" },
     h1: { ru: "Переименовать файлы пачкой", en: "Batch rename files" },
     description: {
-      ru: "Переименуйте сразу много файлов: шаблон с номером и датой, поиск и замена (в том числе regex), регистр, транслитерация кириллицы и пробелы. Предпросмотр и скачивание в ZIP.",
-      en: "Rename many files at once: a pattern with numbers and dates, find and replace (including regex), case, Cyrillic transliteration and spaces. Live preview and ZIP download.",
+      ru: "Переименуйте много файлов сразу: шаблон с номером и датой, поиск и замена (и regex), регистр, транслитерация кириллицы и пробелы. Предпросмотр и скачивание ZIP.",
+      en: "Rename many files at once: pattern with numbers and dates, find and replace (regex too), case, Cyrillic transliteration and spaces. Live preview, ZIP download.",
     },
     lead: { ru: "Приведите имена файлов к порядку — например, «Отпуск 001.jpg», «Отпуск 002.jpg»…", en: "Tidy up file names — for example “Holiday 001.jpg”, “Holiday 002.jpg”…" },
     keywords: { ru: ["переименовать файлы", "массовое переименование", "пакетное переименование", "транслитерация имён файлов"], en: ["batch rename files", "bulk rename", "rename multiple files", "rename files online"] },
@@ -190,7 +190,7 @@ const tools: ToolDef[] = [
     title: { ru: "Разделить файл на части онлайн — .001, .002…", en: "Split a file into parts online — .001, .002…" },
     h1: { ru: "Разделить файл на части", en: "Split a file into parts" },
     description: {
-      ru: "Разрежьте большой файл на части нужного размера или на N равных частей, в формате 7-Zip (.001, .002…). Работает мгновенно даже с гигабайтными файлами, без загрузки.",
+      ru: "Разрежьте большой файл на части нужного размера или на N равных частей в формате 7-Zip (.001, .002…). Мгновенно даже для гигабайтных файлов, без загрузки.",
       en: "Cut a large file into parts of a set size or into N equal parts, 7-Zip style (.001, .002…). Instant even for multi-gigabyte files, with no uploading.",
     },
     lead: { ru: "Разделите файл, который не влезает в лимит почты, флешки или мессенджера.", en: "Split a file that exceeds an email, USB drive or messenger limit." },
@@ -274,8 +274,8 @@ const tools: ToolDef[] = [
     title: { ru: "Файл в Base64 онлайн — и обратно, data URI для картинок", en: "File to Base64 online — and back, data URIs for images" },
     h1: { ru: "Файл в Base64 и обратно", en: "File to Base64 and back" },
     description: {
-      ru: "Кодируйте любой файл в Base64 или data URI — для CSS, HTML, JSON и писем — и декодируйте Base64 обратно в файл с определением его типа. Перенос строк по 76 символов (MIME).",
-      en: "Encode any file as Base64 or a data URI — for CSS, HTML, JSON and email — and decode Base64 back into a file with its type detected. Optional 76-character MIME line wrapping.",
+      ru: "Любой файл в Base64 или data URI для CSS, HTML, JSON и писем — и обратно из Base64 в файл с определением типа. Перенос строк по 76 символов (MIME).",
+      en: "Encode any file as Base64 or a data URI for CSS, HTML, JSON and email — and decode Base64 back into a file with its type detected. Optional MIME line wrapping.",
     },
     lead: { ru: "Превратите картинку или любой файл в текст Base64 — или восстановите файл из Base64.", en: "Turn an image or any file into Base64 text — or restore a file from Base64." },
     keywords: { ru: ["файл в base64", "картинка в base64", "base64 в файл", "data uri"], en: ["file to base64", "image to base64", "base64 to file", "data uri generator"] },

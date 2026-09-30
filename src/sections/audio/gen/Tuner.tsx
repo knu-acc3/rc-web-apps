@@ -67,7 +67,7 @@ interface Reading {
   cents: number;
 }
 
-export default function Tuner({ locale, instrument: inst0 = "chromatic" }: { locale: Locale; instrument?: InstrumentId }) {
+function TunerInner({ locale, instrument: inst0 = "chromatic" }: { locale: Locale; instrument?: InstrumentId }) {
   const t = T[locale];
   const id = useId();
   const [instrument, setInstrument] = useState<InstrumentId>(inst0);
@@ -246,4 +246,9 @@ export default function Tuner({ locale, instrument: inst0 = "chromatic" }: { loc
       <p className="text-sm text-fg-3">{t.privacy}</p>
     </div>
   );
+}
+
+/** Remount when the page preset changes (client-side navigation between variant pages). */
+export default function Tuner(props: { locale: Locale; instrument?: InstrumentId }) {
+  return <TunerInner key={props.instrument ?? ""} {...props} />;
 }

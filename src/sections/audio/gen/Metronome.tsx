@@ -75,7 +75,7 @@ function voice(ctx: AudioContext, dest: AudioNode, time: number, level: 0 | 1 | 
   osc.stop(time + len + 0.01);
 }
 
-export default function Metronome({ locale, bpm: bpm0 = 120 }: { locale: Locale; bpm?: number }) {
+function MetronomeInner({ locale, bpm: bpm0 = 120 }: { locale: Locale; bpm?: number }) {
   const t = T[locale];
   const id = useId();
   const [bpm, setBpm] = useState(bpm0);
@@ -227,4 +227,9 @@ export default function Metronome({ locale, bpm: bpm0 = 120 }: { locale: Locale;
       {error && <Notice tone="err">{t.err}</Notice>}
     </div>
   );
+}
+
+/** Remount when the page preset changes (client-side navigation between variant pages). */
+export default function Metronome(props: { locale: Locale; bpm?: number }) {
+  return <MetronomeInner key={String(props.bpm ?? "")} {...props} />;
 }

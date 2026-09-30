@@ -39,7 +39,7 @@ export const TONES: ToneDef[] = [
     h1: { ru: "Тон 50 Гц", en: "50 Hz tone" },
     description: {
       ru: "Тон 50 Гц — частота электросети в России, Казахстане и Европе: так звучит сетевой гул в колонках. Сравните с фоном в аппаратуре, проверьте басы. Период 20 мс.",
-      en: "A 50 Hz tone — the mains frequency in Europe, Russia and most of Asia; mains hum in speakers sounds like this. Compare it with hum in your gear or test bass. Period 20 ms.",
+      en: "A 50 Hz tone — the mains frequency in Europe, Russia and most of Asia, heard as hum in speakers. Compare it with hum in your gear or test bass. Period 20 ms.",
     },
     lead: { ru: "50 Гц — частота переменного тока в сети: этот низкий гул знаком по фону в колонках.", en: "50 Hz is the AC mains frequency — the low hum familiar from speaker background noise." },
     about: {
@@ -60,7 +60,7 @@ export const TONES: ToneDef[] = [
     h1: { ru: "Тон 60 Гц", en: "60 Hz tone" },
     description: {
       ru: "Тон 60 Гц — частота электросети в США, Канаде, Южной Корее и части Японии. Гул техники из этих стран, проверка сабвуфера. Период 16,7 мс, волна около 5,7 м.",
-      en: "A 60 Hz tone — the mains frequency in the US, Canada, South Korea and part of Japan. Hum from gear made there, subwoofer testing. Period 16.7 ms, wavelength about 5.7 m.",
+      en: "A 60 Hz tone — the mains frequency in the US, Canada, South Korea and part of Japan. Hum from gear made there, subwoofer tests. Period 16.7 ms, wave 5.7 m.",
     },
     lead: { ru: "60 Гц — частота переменного тока в Северной Америке; басовая нота около си контроктавы.", en: "60 Hz is the North American AC frequency — a bass note near B1." },
     about: {
@@ -122,8 +122,8 @@ export const TONES: ToneDef[] = [
     title: { ru: "Частота 432 Гц онлайн — «настройка Верди»", en: "432 Hz frequency online — “Verdi tuning”" },
     h1: { ru: "Тон 432 Гц", en: "432 Hz tone" },
     description: {
-      ru: "Тон 432 Гц — альтернативная настройка ноты ля, на 32 цента ниже стандартных 440 Гц. Послушайте разницу; популярные заявления о «целебности» научно не подтверждены.",
-      en: "A 432 Hz tone — an alternative tuning of A, 32 cents below the standard 440 Hz. Hear the difference; popular claims about healing properties aren't scientifically supported.",
+      ru: "Тон 432 Гц — альтернативная настройка ноты ля, на 32 цента ниже стандарта 440 Гц. Послушайте разницу; заявления о «целебности» научно не подтверждены.",
+      en: "A 432 Hz tone — an A tuned 32 cents below the 440 Hz standard. Hear the difference; claims about its healing properties aren't supported by science.",
     },
     lead: { ru: "432 Гц — нота ля, настроенная на 32 цента ниже стандарта 440 Гц.", en: "432 Hz is an A tuned 32 cents below the 440 Hz standard." },
     about: {
@@ -186,7 +186,7 @@ export const TONES: ToneDef[] = [
     h1: { ru: "Тон 1000 Гц", en: "1000 Hz tone" },
     description: {
       ru: "Тон 1 кГц — стандартный испытательный сигнал: калибровка уровней, проверка каналов, «писк» цензуры в эфире. Период ровно 1 мс, длина волны 34 см.",
-      en: "A 1 kHz tone — the standard test signal: level calibration, channel checks and the broadcast censor “bleep”. The period is exactly 1 ms and the wavelength 34 cm.",
+      en: "A 1 kHz tone — the standard test signal: level calibration, channel checks and the broadcast censor “bleep”. Period exactly 1 ms, wavelength 34 cm.",
     },
     lead: { ru: "1000 Гц — эталонный испытательный тон звукотехники: период ровно одна миллисекунда.", en: "1000 Hz is audio engineering's reference test tone: a period of exactly one millisecond." },
     about: {
@@ -228,7 +228,7 @@ export const TONES: ToneDef[] = [
     h1: { ru: "Тон 8000 Гц", en: "8000 Hz tone" },
     description: {
       ru: "Тон 8 кГц — верхняя частота стандартной аудиометрии (250–8000 Гц). Простая проверка высоких частот наушников и слуха; не заменяет обследование у сурдолога.",
-      en: "An 8 kHz tone — the top frequency of standard audiometry (250–8000 Hz). A simple check of headphone treble and hearing; it doesn't replace a hearing test by a specialist.",
+      en: "An 8 kHz tone — the top frequency of standard audiometry (250–8000 Hz). A simple check of headphone treble and hearing; it doesn't replace a real hearing test.",
     },
     lead: { ru: "8 кГц — высокий писк, который слышит большинство людей любого возраста.", en: "8 kHz is a high whistle most people of any age can hear." },
     about: {
@@ -311,7 +311,7 @@ export const TONES: ToneDef[] = [
     title: { ru: "Звук 17400 Гц — москитный звон, который не слышат взрослые", en: "17400 Hz mosquito tone — what adults can't hear" },
     h1: { ru: "Москитный звук 17 400 Гц", en: "17,400 Hz mosquito tone" },
     description: {
-      ru: "17,4 кГц — «москитный» звук, который обычно слышат подростки и молодые люди примерно до 25 лет, а взрослые — нет. Проверьте свой слух; результат зависит от динамика.",
+      ru: "17,4 кГц — «москитный» звук, который обычно слышат подростки и молодые люди до 25 лет, а взрослые — нет. Проверьте слух; результат зависит от динамика.",
       en: "17.4 kHz — the “mosquito” tone usually heard by teens and young people up to about 25 but not by older adults. Test your hearing; results depend on the speaker.",
     },
     lead: { ru: "17 400 Гц — «звонок, который не слышат учителя»: с возрастом он исчезает из слуха.", en: "17,400 Hz is the “ringtone teachers can't hear” — it fades from hearing with age." },

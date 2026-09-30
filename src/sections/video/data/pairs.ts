@@ -124,7 +124,7 @@ export const VIDEO_PAIRS: Pair[] = [
     h1: { ru: "Конвертировать WMV в MP4", en: "Convert WMV to MP4" },
     description: {
       ru: "WMV в MP4 онлайн: видео WMV и VC-1 перекодируется в H.264, звук WMA — в AAC. Результат открывается на Mac, iPhone и Android. Файл не покидает браузер.",
-      en: "WMV to MP4 online: WMV and VC-1 video is re-encoded to H.264 and WMA audio to AAC. The result opens on Mac, iPhone and Android. Your file never leaves the browser.",
+      en: "WMV to MP4 online: WMV and VC-1 video is re-encoded to H.264 and WMA audio to AAC. The result opens on Mac, iPhone and Android; nothing is uploaded.",
     },
     lead: { ru: "Ролики Windows Media превращаются в MP4, который открывается на любом устройстве.", en: "Windows Media clips become MP4 files that open on any device." },
     note: {
@@ -196,7 +196,7 @@ export const VIDEO_PAIRS: Pair[] = [
     h1: { ru: "Конвертировать MTS в MP4", en: "Convert MTS to MP4" },
     description: {
       ru: "MTS и M2TS в MP4: видео H.264 с камер Sony, Panasonic и Canon копируется без перекодирования, звук Dolby Digital переводится в AAC. Работает в браузере.",
-      en: "MTS and M2TS to MP4: H.264 video from Sony, Panasonic and Canon camcorders is copied without re-encoding and Dolby Digital audio becomes AAC. Runs in your browser.",
+      en: "MTS and M2TS to MP4: H.264 from Sony, Panasonic and Canon camcorders is copied without re-encoding and Dolby Digital audio becomes AAC. Runs in your browser.",
     },
     lead: { ru: "Записи камеры AVCHD превращаются в MP4 без перекодирования видео — картинка остаётся исходной.", en: "AVCHD camcorder clips become MP4 without re-encoding the video — the picture stays original." },
     note: {
@@ -268,7 +268,7 @@ export const VIDEO_PAIRS: Pair[] = [
     h1: { ru: "Конвертировать MPEG в MP4", en: "Convert MPEG to MP4" },
     description: {
       ru: "MPG и MPEG в MP4: видео MPEG-1 и MPEG-2 перекодируется в H.264, файл обычно заметно уменьшается при той же картинке. Обработка идёт в браузере.",
-      en: "MPG and MPEG to MP4: MPEG-1 and MPEG-2 video is re-encoded to H.264, which usually makes the file noticeably smaller at the same quality. Processing stays in the browser.",
+      en: "MPG and MPEG to MP4: MPEG-1 and MPEG-2 video is re-encoded to H.264, usually making the file much smaller at the same quality. Processing stays in the browser.",
     },
     lead: { ru: "Файлы MPG из Video CD и ТВ-тюнеров превращаются в компактный MP4 с H.264.", en: "MPG files from Video CDs and TV tuners become compact H.264 MP4s." },
     note: {
@@ -292,7 +292,7 @@ export const VIDEO_PAIRS: Pair[] = [
     h1: { ru: "Конвертировать VOB в MP4", en: "Convert VOB to MP4" },
     description: {
       ru: "VOB в MP4: фильмы и домашние записи с DVD перекодируются из MPEG-2 в H.264, звук AC-3 — в AAC. Загрузите файлы из папки VIDEO_TS — всё обработается локально.",
-      en: "VOB to MP4: films and home videos from DVDs are re-encoded from MPEG-2 to H.264 and AC-3 audio to AAC. Load files from the VIDEO_TS folder — all processing is local.",
+      en: "VOB to MP4: DVD films and home videos are re-encoded from MPEG-2 to H.264 and AC-3 audio to AAC. Load files from the VIDEO_TS folder — all processing is local.",
     },
     lead: { ru: "Файлы VOB с DVD превращаются в MP4, который можно смотреть на телефоне и телевизоре.", en: "VOB files from a DVD become MP4s you can watch on a phone or TV." },
     note: {
@@ -463,7 +463,7 @@ export const AUDIO_PAIRS: Pair[] = [
     h1: { ru: "Конвертировать WAV в MP3", en: "Convert WAV to MP3" },
     description: {
       ru: "WAV в MP3 онлайн: несжатый звук кодируется в MP3 на 128–320 кбит/с — файл становится в 4–11 раз меньше. Кодирует LAME прямо в браузере, без загрузки.",
-      en: "WAV to MP3 online: uncompressed audio is encoded to 128–320 kbit/s MP3, making the file 4–11 times smaller. LAME encodes right in your browser, nothing is uploaded.",
+      en: "WAV to MP3 online: uncompressed audio is encoded to 128–320 kbit/s MP3, making files 4–11 times smaller. LAME encodes in your browser; nothing is uploaded.",
     },
     lead: { ru: "Перетащите WAV — получите MP3 нужного битрейта, в несколько раз меньше по размеру.", en: "Drop a WAV and get an MP3 at the bitrate you choose — several times smaller." },
     note: {

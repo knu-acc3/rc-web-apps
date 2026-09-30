@@ -213,10 +213,10 @@ const VIDEO_COPY: Record<VideoTarget, string[]> = {
   mkv: ["avc", "hevc", "vp8", "vp9", "av1"],
   webm: ["vp8", "vp9", "av1"],
 };
-// AC-3/DTS/FLAC are allowed in MP4/MOV by the spec but many players and browsers
-// can't play them there, so they are re-encoded to AAC for these containers.
+// AC-3/DTS/FLAC/Opus are allowed in MP4/MOV by the spec but Safari, QuickTime and many
+// TVs can't play them there, so they are re-encoded to AAC for these containers.
 const AUDIO_COPY: Record<VideoTarget, string[]> = {
-  mp4: ["aac", "mp3", "opus"],
+  mp4: ["aac", "mp3"],
   mov: ["aac", "mp3", "pcm-s16", "pcm-s24"],
   mkv: ["aac", "mp3", "opus", "vorbis", "flac", "ac3", "eac3", "dts"],
   webm: ["opus", "vorbis"],

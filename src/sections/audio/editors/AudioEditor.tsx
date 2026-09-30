@@ -97,7 +97,7 @@ const T = {
 const FADES = [0, 0.5, 1, 2, 3, 5, 10];
 const SPEEDS = ["0.5", "0.75", "0.9", "1", "1.1", "1.25", "1.5", "2"] as const;
 
-export default function AudioEditor({ locale, mode }: { locale: Locale; mode: EditorMode }) {
+function AudioEditorInner({ locale, mode }: { locale: Locale; mode: EditorMode }) {
   const t = T[locale];
   const u = UI[locale];
   const id = useId();
@@ -475,4 +475,9 @@ export default function AudioEditor({ locale, mode }: { locale: Locale; mode: Ed
       }
     />
   );
+}
+
+/** Remount when the page preset changes (client-side navigation between variant pages). */
+export default function AudioEditor(props: { locale: Locale; mode: EditorMode }) {
+  return <AudioEditorInner key={props.mode} {...props} />;
 }

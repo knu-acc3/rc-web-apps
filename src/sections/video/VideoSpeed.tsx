@@ -42,7 +42,7 @@ const T = {
 
 const CONTAINER: Record<string, VideoTarget> = { mp4: "mp4", m4v: "mp4", mov: "mov", mkv: "mkv", webm: "webm" };
 
-export default function VideoSpeed({ locale, speed: speed0 = 2 }: { locale: Locale; speed?: number }) {
+function VideoSpeedInner({ locale, speed: speed0 = 2 }: { locale: Locale; speed?: number }) {
   const t = T[locale];
   const [file, setFile] = useState<File | null>(null);
   const probe = useProbe(file);
@@ -130,4 +130,9 @@ export default function VideoSpeed({ locale, speed: speed0 = 2 }: { locale: Loca
       }
     />
   );
+}
+
+/** Remount when the page preset changes (client-side navigation between variant pages). */
+export default function VideoSpeed(props: { locale: Locale; speed?: number }) {
+  return <VideoSpeedInner key={String(props.speed ?? "")} {...props} />;
 }

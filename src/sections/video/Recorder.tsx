@@ -99,7 +99,7 @@ const noop = () => () => {};
 
 type State = { phase: "idle" } | { phase: "starting" } | { phase: "recording"; paused: boolean } | { phase: "finalizing" } | { phase: "done"; blob: Blob; name: string };
 
-export default function Recorder({ locale, mode }: { locale: Locale; mode: Mode }) {
+function RecorderInner({ locale, mode }: { locale: Locale; mode: Mode }) {
   const t = T[locale];
   const u = UI[locale];
   const id = useId();
@@ -434,4 +434,9 @@ function pickTypeLabel(mode: Mode): string {
   if (!type) return "";
   const ext = extOf(type).toUpperCase();
   return type.includes("opus") ? `${ext} (Opus)` : type.includes("avc1") ? `${ext} (H.264)` : ext;
+}
+
+/** Remount when the page preset changes (client-side navigation between variant pages). */
+export default function Recorder(props: { locale: Locale; mode: Mode }) {
+  return <RecorderInner key={props.mode} {...props} />;
 }

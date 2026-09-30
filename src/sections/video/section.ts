@@ -139,7 +139,7 @@ const tools: ToolDef[] = [
     title: { ru: "Конвертер видео онлайн — MP4, MOV, MKV, WebM, AVI", en: "Video converter online — MP4, MOV, MKV, WebM, AVI" },
     h1: { ru: "Конвертер видео онлайн", en: "Online video converter" },
     description: {
-      ru: "Конвертер видео в браузере: MOV, MKV, AVI, WebM, WMV, FLV и другие в MP4, WebM, MOV или GIF. Смена контейнера без перекодирования, пакетная обработка, без загрузки.",
+      ru: "Конвертер видео в браузере: MOV, MKV, AVI, WebM, WMV, FLV в MP4, WebM, MOV или GIF. Смена контейнера без перекодирования, пакетная обработка, без загрузки.",
       en: "Video converter in your browser: MOV, MKV, AVI, WebM, WMV, FLV and more to MP4, WebM, MOV or GIF. Container changes without re-encoding, batches, no uploads.",
     },
     lead: { ru: "Переведите видео в MP4, WebM, MOV, MKV или GIF — когда можно, без перекодирования и потери качества.", en: "Convert video to MP4, WebM, MOV, MKV or GIF — without re-encoding or quality loss whenever possible." },
@@ -186,8 +186,8 @@ const tools: ToolDef[] = [
     name: { ru: "Сжать видео", en: "Compress video" },
     title: { ru: "Сжать видео онлайн — уменьшить размер MP4 без регистрации", en: "Compress video online — reduce MP4 file size" },
     description: {
-      ru: "Сжать видео в браузере: выберите качество и разрешение или нужный размер в МБ — битрейт рассчитается сам. Оценка размера до начала, H.264 MP4, без загрузки файлов.",
-      en: "Compress video in your browser: pick quality and resolution or a target size in MB and the bitrate is calculated for you. Size estimate up front, H.264 MP4, no uploads.",
+      ru: "Сжать видео в браузере: выберите качество и разрешение или нужный размер в МБ — битрейт рассчитается сам. Оценка размера заранее, H.264 MP4, без загрузки.",
+      en: "Compress video in your browser: pick quality and resolution or a target size in MB and the bitrate is set for you. Size estimate first, H.264 MP4, no uploads.",
     },
     lead: { ru: "Уменьшите видео до нужного размера — например, чтобы отправить в мессенджер или по почте.", en: "Shrink a video to the size you need — e.g. to send it by messenger or email." },
     keywords: { ru: ["сжать видео", "уменьшить размер видео", "сжать mp4", "уменьшить вес видео"], en: ["compress video", "reduce video size", "compress mp4", "make video smaller"] },
@@ -228,7 +228,7 @@ const tools: ToolDef[] = [
     name: { ru: "Обрезать видео", en: "Trim video" },
     title: { ru: "Обрезать видео онлайн — вырезать фрагмент без потерь", en: "Trim video online — cut a clip without quality loss" },
     description: {
-      ru: "Обрезать видео по времени онлайн: выберите начало и конец на шкале с кадрами или введите время вида 1:05,5. Быстрый режим без перекодирования или точный до кадра.",
+      ru: "Обрезать видео онлайн: выберите начало и конец на шкале с кадрами или введите время вида 1:05,5. Быстрый режим без перекодирования или точный до кадра.",
       en: "Trim a video online: set the start and end on a filmstrip timeline or type times like 1:05.5. A fast mode without re-encoding or a frame-accurate one.",
     },
     lead: { ru: "Оставьте из видео только нужный фрагмент — без перекодирования и потери качества.", en: "Keep only the part of the video you need — without re-encoding or quality loss." },
@@ -311,7 +311,7 @@ const tools: ToolDef[] = [
     name: { ru: "Склеить видео", en: "Merge videos" },
     title: { ru: "Склеить видео онлайн — соединить несколько роликов в один", en: "Merge videos online — join clips into one" },
     description: {
-      ru: "Склеить видео онлайн: соедините несколько роликов в один в нужном порядке. Клипы одного формата склеиваются без перекодирования, разные — перекодируются в H.264.",
+      ru: "Склеить видео онлайн: соедините несколько роликов в один в любом порядке. Клипы одного формата склеиваются без перекодирования, разные — кодируются в H.264.",
       en: "Merge videos online: join several clips into one in any order. Clips of the same format are joined without re-encoding; different ones are re-encoded to H.264.",
     },
     lead: { ru: "Соедините несколько видео в одно — клипы с одной камеры склеятся без потери качества.", en: "Join several videos into one — clips from the same camera are merged without quality loss." },
@@ -395,7 +395,7 @@ const tools: ToolDef[] = [
     name: { ru: "Повернуть видео", en: "Rotate video" },
     title: { ru: "Повернуть видео онлайн — на 90°, 180° или отразить", en: "Rotate video online — 90°, 180° or flip" },
     description: {
-      ru: "Повернуть видео на 90 или 180 градусов и отразить по горизонтали или вертикали. Поворот метаданными — мгновенно и без потерь, или с перекодированием для любых плееров.",
+      ru: "Повернуть видео на 90° или 180°, отразить по горизонтали или вертикали. Поворот метаданными — мгновенно и без потерь, или перекодирование для любых плееров.",
       en: "Rotate a video by 90 or 180 degrees and flip it horizontally or vertically. Rotate via metadata — instant and lossless — or re-encode for any player.",
     },
     lead: { ru: "Исправьте видео, снятое боком или вверх ногами, — часто мгновенно и без потери качества.", en: "Fix a video shot sideways or upside down — often instantly and without quality loss." },
@@ -436,8 +436,8 @@ const tools: ToolDef[] = [
     name: { ru: "Убрать звук из видео", en: "Remove audio from video" },
     title: { ru: "Убрать звук из видео онлайн — без перекодирования", en: "Remove audio from video online — no re-encoding" },
     description: {
-      ru: "Убрать звук из видео онлайн: звуковая дорожка удаляется, а видео копируется без перекодирования — качество не меняется, обработка занимает секунды. MP4, MOV, MKV, WebM.",
-      en: "Remove audio from a video online: the soundtrack is dropped and the video is copied without re-encoding — quality is unchanged and it takes seconds. MP4, MOV, MKV, WebM.",
+      ru: "Убрать звук из видео онлайн: дорожка звука удаляется, а видео копируется без перекодирования — качество прежнее, это занимает секунды. MP4, MOV, MKV, WebM.",
+      en: "Remove audio from a video online: the soundtrack is dropped and the video copied without re-encoding — same quality, done in seconds. MP4, MOV, MKV, WebM.",
     },
     lead: { ru: "Получите то же видео без звука — за секунды и без потери качества.", en: "Get the same video without sound — in seconds, with no quality loss." },
     keywords: { ru: ["убрать звук из видео", "удалить звук из видео", "видео без звука", "выключить звук в видео"], en: ["remove audio from video", "mute video", "video without sound", "delete sound from video"] },
@@ -478,7 +478,7 @@ const tools: ToolDef[] = [
     title: { ru: "Ускорить или замедлить видео онлайн — от 0,25× до 4×", en: "Speed up or slow down video online — 0.25× to 4×" },
     description: {
       ru: "Ускорить или замедлить видео в 0,25–4 раза, с сохранением высоты голоса или без. Скорость сразу применяется в превью, результат — MP4 или исходный формат.",
-      en: "Speed up or slow down a video from 0.25× to 4×, with or without keeping the voice pitch. The preview plays at the new speed; the result is MP4 or the source format.",
+      en: "Speed up or slow down a video from 0.25× to 4×, with or without keeping the voice pitch. The preview plays at the new speed; output is MP4 or the source format.",
     },
     lead: { ru: "Ускорьте видео для таймлапса или замедлите для slow motion — звук подстроится.", en: "Speed a video up for a timelapse or slow it down for slow motion — the audio follows." },
     keywords: { ru: ["ускорить видео", "замедлить видео", "изменить скорость видео", "ускорить видео в 2 раза"], en: ["speed up video", "slow down video", "change video speed", "video speed changer"] },
@@ -562,8 +562,8 @@ const tools: ToolDef[] = [
     name: { ru: "Запись экрана", en: "Screen recorder" },
     title: { ru: "Запись экрана онлайн — со звуком, без программ", en: "Screen recorder online — with audio, no install" },
     description: {
-      ru: "Запись экрана в браузере без установки программ: весь экран, окно или вкладка, звук вкладки и микрофон, пауза. Сохранение в MP4 или WebM, без водяных знаков и лимита.",
-      en: "Record your screen in the browser with nothing to install: full screen, a window or a tab, tab audio and microphone, pause. Save as MP4 or WebM, no watermark, no limit.",
+      ru: "Запись экрана в браузере без программ: весь экран, окно или вкладка, звук вкладки и микрофон, пауза. Сохранение в MP4 или WebM, без водяных знаков и лимита.",
+      en: "Record your screen in the browser, nothing to install: full screen, window or tab, tab audio and microphone, pause. MP4 or WebM, no watermark, no time limit.",
     },
     lead: { ru: "Запишите экран со звуком прямо в браузере — без регистрации, программ и водяных знаков.", en: "Record your screen with sound right in the browser — no sign-up, software or watermark." },
     keywords: { ru: ["запись экрана", "записать экран", "запись экрана со звуком", "запись экрана онлайн"], en: ["screen recorder", "record screen", "screen recording with audio", "online screen recorder"] },
@@ -603,8 +603,8 @@ const tools: ToolDef[] = [
     name: { ru: "Запись с веб-камеры", en: "Webcam recorder" },
     title: { ru: "Запись видео с веб-камеры онлайн — со звуком", en: "Webcam recorder online — record video with sound" },
     description: {
-      ru: "Записать видео с веб-камеры в браузере: 480p, 720p или 1080p, звук с микрофона, зеркальный предпросмотр и пауза. Сохранение в MP4 или WebM, запись никуда не отправляется.",
-      en: "Record webcam video in the browser: 480p, 720p or 1080p, microphone sound, mirrored preview and pause. Save as MP4 or WebM; the recording is never sent anywhere.",
+      ru: "Записать видео с веб-камеры в браузере: 480p, 720p или 1080p, звук с микрофона, зеркальное превью и пауза. MP4 или WebM, запись никуда не отправляется.",
+      en: "Record webcam video in the browser: 480p, 720p or 1080p, microphone sound, mirrored preview and pause. Save as MP4 or WebM; nothing is sent anywhere.",
     },
     lead: { ru: "Запишите видео с веб-камеры и микрофона — без программ и регистрации.", en: "Record video from your webcam and microphone — no software or sign-up." },
     keywords: { ru: ["запись с веб-камеры", "записать видео с камеры", "запись с вебки", "видео с веб-камеры онлайн"], en: ["webcam recorder", "record webcam video", "webcam video online", "record from camera"] },

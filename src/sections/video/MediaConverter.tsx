@@ -113,7 +113,7 @@ function isAnimatedImage(item: Item): boolean {
   return !!d && (d.ext === "gif" || (d.animated === true && (d.ext === "webp" || d.ext === "png")));
 }
 
-export default function MediaConverter({ locale, kind, to, targets }: MediaConverterProps) {
+function MediaConverterInner({ locale, kind, to, targets }: MediaConverterProps) {
   const t = T[locale];
   const u = UI[locale];
   const id = useId();
@@ -430,4 +430,9 @@ function QueueRow({
       {item.status === "cancelled" && <p className="text-sm text-fg-3">{u.cancelled}</p>}
     </li>
   );
+}
+
+/** Remount when the page preset changes (client-side navigation between variant pages). */
+export default function MediaConverter(props: MediaConverterProps) {
+  return <MediaConverterInner key={`${props.kind}-${props.to}`} {...props} />;
 }

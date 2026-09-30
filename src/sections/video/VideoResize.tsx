@@ -43,7 +43,7 @@ const T = {
   },
 } as const;
 
-export default function VideoResize({ locale, aspect: aspect0 = "9:16" }: { locale: Locale; aspect?: string }) {
+function VideoResizeInner({ locale, aspect: aspect0 = "9:16" }: { locale: Locale; aspect?: string }) {
   const t = T[locale];
   const id = useId();
   const [file, setFile] = useState<File | null>(null);
@@ -161,4 +161,9 @@ export default function VideoResize({ locale, aspect: aspect0 = "9:16" }: { loca
       }
     />
   );
+}
+
+/** Remount when the page preset changes (client-side navigation between variant pages). */
+export default function VideoResize(props: { locale: Locale; aspect?: string }) {
+  return <VideoResizeInner key={props.aspect ?? ""} {...props} />;
 }

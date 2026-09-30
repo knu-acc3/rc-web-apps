@@ -110,7 +110,10 @@ function Encoder({ locale }: { locale: Locale }) {
         <div className="min-w-0 text-sm text-fg-2">
           <span className="font-medium text-fg">{file.name}</span> · {t.grows.replace("{a}", formatBytes(locale, file.size)).replace("{b}", formatBytes(locale, Math.ceil(file.size / 3) * 4))}
         </div>
-        <Dropzone onFiles={(fs) => fs[0] && setFile(fs[0])} title={t.other} compact className="min-h-0! w-auto! flex-row! px-3! py-1.5!" />
+        <label className="cursor-pointer text-sm text-accent hover:underline">
+          {t.other}
+          <input type="file" className="sr-only" onChange={(e) => (e.target.files?.[0] && setFile(e.target.files[0]), (e.target.value = ""))} />
+        </label>
       </div>
       <div className="flex flex-wrap items-center gap-3">
         <Segmented label={t.format} value={fmt} onChange={setFmt} size="sm" options={opts} />

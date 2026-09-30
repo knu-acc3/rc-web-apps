@@ -123,6 +123,9 @@ export async function convertOp(file: Blob, spec: JobSpec, progress: Progress): 
       tracks: "primary",
       showWarnings: false,
       trim: spec.trim ? { start: spec.trim.start, end: spec.trim.end } : undefined,
+      // Allow shifting the timeline so streams with a negative start (AAC priming, B-frame
+      // delay) can still be copied; cross-track sync is preserved either way.
+      copy: { shiftTolerance: Infinity },
       video,
       audio,
     });

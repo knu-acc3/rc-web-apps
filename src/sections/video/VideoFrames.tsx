@@ -3,7 +3,7 @@
 import { Camera, Download, Images } from "lucide-react";
 import { useEffect, useId, useRef, useState } from "react";
 import type { Locale } from "@/i18n/config";
-import { count, formatBytes } from "@/i18n/format";
+import { count, formatBytes, formatNumber } from "@/i18n/format";
 import { downloadBlob } from "@/lib/clipboard";
 import { Button } from "@/ui/button";
 import { Field, Select } from "@/ui/field";
@@ -137,7 +137,7 @@ export default function VideoFrames({ locale }: { locale: Locale }) {
             <Select id={`${id}-s`} size="sm" value={String(step)} onChange={(e) => (setStep(Number(e.target.value)), touch())}>
               {STEPS.map((s) => (
                 <option key={s} value={s}>
-                  {String(s).replace(".", locale === "ru" ? "," : ".")} {t.sec}
+                  {formatNumber(locale, s)} {t.sec}
                 </option>
               ))}
             </Select>
