@@ -15,7 +15,7 @@ export function PageView({ page, locale }: { page: PageModel; locale: Locale }) 
   return (
     <>
       <JsonLd data={pageJsonLd(page, locale)} />
-      <div className="container-page pb-16 pt-4 sm:pt-6">
+      <div className={cn("container-page pb-16 pt-4 sm:pt-6", !page.wide && "lg:max-w-[1088px]")}>
         <Breadcrumbs items={page.breadcrumbs} current={page.h1} locale={locale} />
 
         <header className={cn("mb-5 flex items-start gap-3.5", page.compactHeader && "mb-3")}>
@@ -29,7 +29,7 @@ export function PageView({ page, locale }: { page: PageModel; locale: Locale }) 
         </header>
 
         {page.tool && (
-          <div className={cn("mb-10", !page.wide && "max-w-5xl")}>
+          <div className="mb-10">
             <ToolMount tool={page.tool} locale={locale} />
             {page.kind !== "hub" && <RecentTracker path={page.path} title={page.h1} locale={locale} />}
           </div>
