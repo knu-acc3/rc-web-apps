@@ -186,7 +186,7 @@ export const screenTool: ToolDef = {
       "Many online checkers read the screen size in CSS pixels, so a 4K monitor at 150% scaling gets labelled “QHD”. Here the size is multiplied by devicePixelRatio. Page zoom other than 100% skews the result — reset it with Ctrl+0.",
     ],
   },
-  related: ["convert/inches-to-centimeters"],
+  related: ["screen-resolution", "screen-dpi", "dead-pixel-test", "convert/inches-to-centimeters"],
   variants: { title: { ru: "Популярные разрешения", en: "Popular resolutions" }, list: () => ORDER.map(screenVariant) },
   blocks: (l) => [
     {

@@ -123,8 +123,7 @@ function allTopicChips(locale: Locale, exclude?: string): LinkItem[] {
   }
   return out;
 }
-/* Cross-section links go only to the sibling "symbols" section (both live in this branch);
-   links to other sections are added during integration. */
+/* Links to the neighbouring copy-and-paste sections. */
 const sectionLinks = (locale: Locale): LinkItem[] => [
   {
     path: ["symbols"],
@@ -132,6 +131,20 @@ const sectionLinks = (locale: Locale): LinkItem[] => [
     hint: locale === "ru" ? "Стрелки, звёзды, сердечки, валюты и математические знаки" : "Arrows, stars, hearts, currency and math signs",
     icon: "Asterisk",
     hue: 265,
+  },
+  {
+    path: ["kaomoji"],
+    label: locale === "ru" ? "Каомодзи" : "Kaomoji",
+    hint: locale === "ru" ? "Японские смайлики из символов: (◕‿◕) ¯\_(ツ)_/¯" : "Japanese text faces: (◕‿◕) ¯\_(ツ)_/¯",
+    icon: "Smile",
+    hue: 25,
+  },
+  {
+    path: ["font-generator"],
+    label: locale === "ru" ? "Генератор шрифтов" : "Font generator",
+    hint: locale === "ru" ? "Красивый текст для ника и соцсетей" : "Fancy text for nicknames and social media",
+    icon: "Type",
+    hue: 180,
   },
 ];
 

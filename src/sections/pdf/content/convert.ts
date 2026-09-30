@@ -98,7 +98,7 @@ export const imageToPdfTool = imageTool({
       { q: "Will quality drop?", a: "JPEG and PNG are not re-compressed. Other formats are re-saved as 92% JPEG or PNG — the difference isn't visible." },
     ],
   },
-  related: ["jpg-to-pdf", "merge-pdf", "compress-pdf"],
+  related: ["jpg-to-pdf", "merge-pdf", "compress-pdf", "image-converter", "compress-image"],
 });
 
 export const jpgToPdfTool = imageTool({

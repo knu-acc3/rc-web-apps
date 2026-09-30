@@ -137,7 +137,7 @@ const tools: ToolDef[] = [
         { q: "What does “unknown format” mean?", a: "No signature was found: it may be encrypted or raw data, a rare format, or plain text in an unusual encoding." },
       ],
     },
-    related: ["file-to-base64", "unzip", "create-zip", "batch-rename-files"],
+    related: ["file-checksum", "file-to-base64", "image-converter", "unzip"],
     blocks: (locale) => [local(locale)],
   },
   {
@@ -305,7 +305,7 @@ const tools: ToolDef[] = [
         { q: "Why does the decoder say it isn't Base64?", a: "The pasted text contains characters outside the Base64 alphabet (quotes, say, or a cut-off end). Copy the whole string without quotes." },
       ],
     },
-    related: ["file-type-checker", "create-zip", "unzip", "split-file"],
+    related: ["base64-decode", "image-to-base64", "file-type-checker", "file-checksum"],
     blocks: (locale) => [local(locale)],
   },
 ];

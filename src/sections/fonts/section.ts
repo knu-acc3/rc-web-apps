@@ -289,8 +289,7 @@ const generator: ToolDef = {
   howTo: GENERATOR_HOWTO,
   about: both(GENERATOR_TEXT.ru.about, GENERATOR_TEXT.en.about),
   faq: both(GENERATOR_TEXT.ru.faq, GENERATOR_TEXT.en.faq),
-  // Cross-links inside this branch; symbols/emoji links are added during integration.
-  related: ["kaomoji", "case-converter", "word-counter/instagram", "remove-invisible-characters"],
+  related: ["symbols", "emoji", "kaomoji", "case-converter", "word-counter/instagram", "remove-invisible-characters"],
   popular: true,
   variants: {
     title: L("Стили и шрифты для соцсетей", "Styles and platform fonts"),

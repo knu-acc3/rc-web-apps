@@ -28,6 +28,17 @@ function hubBlocks(locale: Locale): Block[] {
               "Everything runs on your device: lists, names and results are never sent anywhere.",
             ],
     },
+    {
+      type: "links",
+      title: locale === "ru" ? "Другие генераторы" : "More generators",
+      style: "chips",
+      items: [
+        { path: ["password-generator"], label: locale === "ru" ? "Генератор паролей" : "Password generator" },
+        { path: ["uuid-generator"], label: locale === "ru" ? "Генератор UUID" : "UUID generator" },
+        { path: ["lorem-ipsum"], label: "Lorem ipsum" },
+        { path: ["color-palette-generator"], label: locale === "ru" ? "Генератор палитр" : "Color palette generator" },
+      ],
+    },
   ];
 }
 
