@@ -12,13 +12,14 @@ export function Footer({ locale }: { locale: Locale }) {
   return (
     <footer className="mt-auto border-t border-line bg-surface">
       <div className="container-page py-10">
-        <div className="grid grid-cols-2 gap-x-6 gap-y-8 md:grid-cols-3 lg:grid-cols-4">
+        {/* Phones: category names only (the menu and the catalogue have the rest); wider screens: top tools too. */}
+        <div className="grid grid-cols-2 gap-x-6 gap-y-3 sm:gap-y-8 md:grid-cols-3 lg:grid-cols-4">
           {groups.map((g) => (
             <nav key={g.id} aria-label={g.label} className="min-w-0">
-              <a href={`${href(locale, ["all"])}#cat-${g.id}`} className="mb-2 block text-sm font-semibold text-fg hover:text-accent">
+              <a href={`${href(locale, ["all"])}#cat-${g.id}`} className="block py-1 text-sm font-semibold text-fg hover:text-accent sm:mb-2 sm:py-0">
                 {g.label}
               </a>
-              <ul className="flex flex-col gap-1.5">
+              <ul className="flex flex-col gap-1.5 max-sm:hidden">
                 {g.items.map((l) => (
                   <li key={l.path.join("/")}>
                     <a href={href(locale, l.path)} className="text-sm text-fg-2 hover:text-accent">

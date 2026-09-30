@@ -1,6 +1,7 @@
 /*
  * Offline support. Pages and tools you have opened keep working without a connection:
- * - pages (HTML): network first, the cached copy only when the network fails — online you always get the fresh page;
+ * - pages (HTML): network first; the saved copy only when the network fails or takes over 4 s (the fresh page still
+ *   replaces it in the cache);
  * - /_next/static (content-hashed, immutable): cache first;
  * - /vendor, /fonts, search index, icons: served from cache, refreshed in the background.
  * Nothing you type or open is stored here — only the site's own files. Other origins are never touched.

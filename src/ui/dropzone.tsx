@@ -4,6 +4,15 @@ import { Upload } from "lucide-react";
 import { useCallback, useEffect, useId, useRef, useState, type ReactNode } from "react";
 import { cn } from "@/lib/cn";
 
+/** Phones can't drag files: "Перетащите файлы сюда или нажмите, чтобы выбрать" → "Нажмите, чтобы выбрать файлы". */
+export function touchTitle(title: string): string | null {
+  const ru = title.match(/^Перетащите (.+?)(?: сюда| в поле)?(?:, вставьте Ctrl\+V)? или нажмите(?:, чтобы выбрать)?(.*)$/);
+  if (ru) return `Нажмите, чтобы выбрать ${ru[1]}${ru[2]}`;
+  const en = title.match(/^Drop (.+?)(?: here)?(?:, paste [^,]+?)?,? or click to (?:choose|select|browse)(.*)$/);
+  if (en) return `Tap to choose ${en[1]}${en[2]}`;
+  return null;
+}
+
 /**
  * File drop area. Accepts drag & drop, click-to-browse and Ctrl+V paste
  * (paste is handled only by the dropzone that currently has focus or, if none
@@ -103,7 +112,14 @@ export function Dropzone({
         <Upload className={compact ? "size-4" : "size-5"} aria-hidden />
       </span>
       <span id={`${id}-title`} className={cn("font-semibold text-fg", compact ? "text-[0.9375rem]" : "text-base")}>
-        {title}
+        {typeof title === "string" && touchTitle(title) ? (
+          <>
+            <span className="pointer-coarse:hidden">{title}</span>
+            <span className="hidden pointer-coarse:inline">{touchTitle(title)}</span>
+          </>
+        ) : (
+          title
+        )}
       </span>
       {hint && <span className="max-w-md text-sm text-fg-3">{hint}</span>}
       {children}
