@@ -33,13 +33,14 @@ export function JobProgress<R>({ job, locale, onCancel, onRetry }: { job: JobSta
   if (job.status === "running") {
     const downloading = job.stage === "download";
     const value = downloading ? job.download : job.progress;
-    const text = job.stage === "prepare" ? t.preparing : downloading ? t.downloadingEngine : job.engine === "ffmpeg" ? t.ffmpegWork : t.processing;
+    const preparing = job.stage === "prepare" && job.progress === 0;
+    const text = preparing ? t.preparing : downloading ? t.downloadingEngine : job.engine === "ffmpeg" ? t.ffmpegWork : t.processing;
     return (
       <div className="flex flex-col gap-2 rounded-[10px] bg-surface-2 px-4 py-3">
         <div className="flex items-center justify-between gap-3">
           <span className="min-w-0 text-sm font-medium text-fg-2">
             {text}
-            {job.stage !== "prepare" && <span className="tabular text-fg-3"> · {formatNumber(locale, Math.round(value * 100))}%</span>}
+            {!preparing && <span className="tabular text-fg-3"> · {formatNumber(locale, Math.round(value * 100))}%</span>}
           </span>
           <Button size="sm" variant="outline" onClick={onCancel}>
             <X aria-hidden />

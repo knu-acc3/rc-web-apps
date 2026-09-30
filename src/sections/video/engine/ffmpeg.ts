@@ -7,7 +7,7 @@
  * - Inputs are mounted with WORKERFS (no copy of the file into WebAssembly memory).
  */
 import type { FFmpeg } from "@ffmpeg/ffmpeg";
-import { buildArgs, type FfInput } from "./ffargs";
+import { buildArgs, parseProbe, type FfInput } from "./ffargs";
 import { TARGET_MIME, type JobResult, type JobSpec } from "./spec";
 import { parseFfmpegTime } from "./time";
 
@@ -98,6 +98,19 @@ export interface FfRunOptions {
   input?: Omit<FfInput, "path">;
 }
 
+async function probeCodecs(ff: FFmpeg, path: string): Promise<Partial<FfInput>> {
+  try {
+    const out = "/probe.txt";
+    const code = await ff.ffprobe(["-v", "error", "-show_entries", "stream=codec_name,codec_type", "-of", "csv=p=0", path, "-o", out]);
+    if (code !== 0) return {};
+    const text = await ff.readFile(out, "utf8");
+    await ff.deleteFile(out).catch(() => undefined);
+    return typeof text === "string" ? parseProbe(text) : {};
+  } catch {
+    return {};
+  }
+}
+
 /**
  * Run a job with ffmpeg. The input Blob is mounted read-only; the output is read
  * back from memory. Throws AbortError on cancel and Error("FFMPEG_EXIT_n") on failure.
@@ -133,7 +146,12 @@ export async function runFfmpeg(file: Blob, fileName: string, spec: JobSpec, opt
   try {
     await ff.createDir(dir);
     await ff.mount(FFFSType.WORKERFS, { blobs: [{ name: inName, data: file }] }, dir);
-    const args = buildArgs({ ...opts.input, path: `${dir}/${inName}` }, spec, outPath);
+    const path = `${dir}/${inName}`;
+    let input: FfInput = { ...opts.input, path };
+    // Containers the browser can't read (FLV, AVI, MTS…): ask ffprobe for the codecs so
+    // H.264/AAC can be copied instead of re-encoded.
+    if (!input.videoCodec && !input.audioCodec) input = { ...input, ...(await probeCodecs(ff, path)) };
+    const args = buildArgs(input, spec, outPath);
     const code = await ff.exec(args);
     if (signal.aborted) throw abortError();
     if (code !== 0) {
@@ -143,7 +161,10 @@ export async function runFfmpeg(file: Blob, fileName: string, spec: JobSpec, opt
     const data = await ff.readFile(outPath);
     if (typeof data === "string") throw new Error("FFMPEG_BAD_OUTPUT");
     const blob = new Blob([data as BlobPart], { type: TARGET_MIME[spec.target] });
-    return { blob, mode: args.includes("copy") ? "copy" : "transcode", engine: "ffmpeg", duration: duration ?? undefined };
+    const copied = args.includes("copy");
+    const allCopied = args.join(" ").includes("-c copy");
+    const codecs = [input.videoCodec, input.audioCodec].filter((x): x is string => !!x);
+    return { blob, mode: allCopied ? "copy" : copied ? "mixed" : "transcode", engine: "ffmpeg", duration: duration ?? undefined, codecs: allCopied ? codecs : undefined };
   } catch (err) {
     if (signal.aborted || isAbort(err)) throw abortError();
     throw err;

@@ -14,3 +14,5 @@ scope.onmessage = (e) => {
   timer = null;
   if (e.data.cmd === "start") timer = setInterval(() => scope.postMessage("tick"), e.data.interval ?? 25);
 };
+
+export {};

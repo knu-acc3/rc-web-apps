@@ -4,7 +4,7 @@
  * Pure: unit-tested without loading ffmpeg.
  */
 import { ffTime } from "./time";
-import { even, isAudioTarget, type AudioTarget, type JobSpec, type VideoTarget } from "./spec";
+import { canCopyAudio, canCopyVideo, even, isAudioTarget, type AudioTarget, type JobSpec, type VideoTarget } from "./spec";
 
 export interface FfInput {
   /** Path of the input inside the ffmpeg file system. */
@@ -19,13 +19,24 @@ export interface FfInput {
 
 const CRF: Record<string, number> = { high: 20, medium: 23, low: 28 };
 
-/** Codecs a container can hold without re-encoding (ffmpeg names). */
-const COPY_OK: Record<VideoTarget, { v: string[]; a: string[] }> = {
-  mp4: { v: ["avc", "hevc", "av1", "vp9"], a: ["aac", "mp3", "opus", "flac", "ac3", "eac3"] },
-  mov: { v: ["avc", "hevc", "prores"], a: ["aac", "mp3", "pcm-s16", "pcm-s24", "ac3"] },
-  mkv: { v: ["avc", "hevc", "vp8", "vp9", "av1"], a: ["aac", "mp3", "opus", "vorbis", "flac", "ac3", "eac3", "dts"] },
-  webm: { v: ["vp8", "vp9", "av1"], a: ["opus", "vorbis"] },
-};
+/** Map ffprobe codec names to the ids used everywhere else (mediabunny ids). */
+export function fromFfprobeCodec(name: string): string {
+  const map: Record<string, string> = { h264: "avc", hevc: "hevc", vp8: "vp8", vp9: "vp9", av1: "av1", prores: "prores", aac: "aac", mp3: "mp3", opus: "opus", vorbis: "vorbis", flac: "flac", ac3: "ac3", eac3: "eac3", dts: "dts", pcm_s16le: "pcm-s16", pcm_s24le: "pcm-s24" };
+  return map[name] ?? name;
+}
+
+/** Parse `ffprobe -show_entries stream=codec_name,codec_type -of csv=p=0` output. */
+export function parseProbe(text: string): { videoCodec: string | null; audioCodec: string | null; hasVideo: boolean } {
+  let videoCodec: string | null = null;
+  let audioCodec: string | null = null;
+  for (const line of text.split(/\r?\n/)) {
+    const [name, type] = line.trim().split(",");
+    if (!name || !type) continue;
+    if (type === "video" && !videoCodec && name !== "mjpeg" && name !== "png") videoCodec = fromFfprobeCodec(name);
+    if (type === "audio" && !audioCodec) audioCodec = fromFfprobeCodec(name);
+  }
+  return { videoCodec, audioCodec, hasVideo: !!videoCodec };
+}
 
 function videoFilters(spec: JobSpec): string[] {
   const v = spec.video ?? {};
@@ -132,10 +143,16 @@ export function canStreamCopy(input: FfInput, spec: JobSpec): boolean {
   const v = spec.video ?? {};
   if (v.width || v.height || v.crop || v.rotate || v.flip || v.fps || v.bitrate || v.forceTranscode || spec.speed) return false;
   if (spec.audio?.bitrate || spec.audio?.sampleRate || spec.audio?.channels || spec.audio?.forceTranscode) return false;
-  const ok = COPY_OK[t];
-  const vOk = input.hasVideo === false || (!!input.videoCodec && ok.v.includes(input.videoCodec));
-  const aOk = spec.audio?.discard || !input.audioCodec || ok.a.includes(input.audioCodec);
-  return vOk && aOk;
+  return canCopyVideoStream(input, spec) && (!!spec.audio?.discard || !input.audioCodec || canCopyAudio(t, input.audioCodec));
+}
+
+/** Video stream can be copied (codec fits, no picture changes). Audio may still need encoding. */
+function canCopyVideoStream(input: FfInput, spec: JobSpec): boolean {
+  const t = spec.target;
+  if (t === "gif" || isAudioTarget(t)) return false;
+  const v = spec.video ?? {};
+  if (v.width || v.height || v.crop || v.rotate || v.flip || v.fps || v.bitrate || v.forceTranscode || spec.speed) return false;
+  return input.hasVideo === false || canCopyVideo(t, input.videoCodec);
 }
 
 /** Build the ffmpeg argument list for a job. */
@@ -168,6 +185,8 @@ export function buildArgs(input: FfInput, spec: JobSpec, outPath: string): strin
 
   const maps = ["-map", "0:v:0", ...(spec.audio?.discard ? ["-an"] : ["-map", "0:a:0?"]), "-sn", "-dn"];
   if (canStreamCopy(input, spec)) return [...head, ...maps, "-c", "copy", ...MUXER[t], outPath];
+  // Video fits the container: copy it and re-encode only the audio (e.g. AVCHD H.264 + AC-3 → MP4).
+  if (canCopyVideoStream(input, spec) && !spec.audio?.discard) return [...head, ...maps, "-c:v", "copy", ...audioCodecArgs(t, spec), ...MUXER[t], outPath];
 
   const vf = videoFilters(spec);
   const af = spec.audio?.discard ? [] : audioFilters(spec, input.sampleRate);

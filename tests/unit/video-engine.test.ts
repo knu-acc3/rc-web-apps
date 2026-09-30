@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildArgs, canStreamCopy } from "@/sections/video/engine/ffargs";
+import { buildArgs, canStreamCopy, parseProbe } from "@/sections/video/engine/ffargs";
 import { GIF_MIN_DELAY_CS, gifDelays, gifFrameCount, gifSize, gifTimestamps, paletteSampleIndices, subsampleRgba } from "@/sections/video/engine/gif";
 import { bitrateForSize, estimateBytes, even, outputName, suggestedBitrate } from "@/sections/video/engine/spec";
 import { checkRange, ffTime, formatTime, parseFfmpegTime, parseTime } from "@/sections/video/engine/time";
@@ -172,5 +172,22 @@ describe("ffmpeg arguments", () => {
     expect(a).toContain("atempo=2");
     const m = buildArgs({ ...input }, { target: "mp4", audio: { discard: true } }, "/o.mp4");
     expect(m).toContain("-an");
+  });
+});
+
+describe("ffmpeg fallback helpers", () => {
+  it("parses ffprobe stream lists", () => {
+    expect(parseProbe("h264,video\nac3,audio\n")).toEqual({ videoCodec: "avc", audioCodec: "ac3", hasVideo: true });
+    expect(parseProbe("mjpeg,video\nmp3,audio")).toEqual({ videoCodec: null, audioCodec: "mp3", hasVideo: false });
+    expect(parseProbe("")).toEqual({ videoCodec: null, audioCodec: null, hasVideo: false });
+  });
+  it("copies H.264 and re-encodes only AC-3 audio for MP4 (AVCHD)", () => {
+    const mts = { path: "/in/a.mts", videoCodec: "avc", audioCodec: "ac3", hasVideo: true };
+    const args = buildArgs(mts, { target: "mp4" }, "/o.mp4").join(" ");
+    expect(args).toContain("-c:v copy");
+    expect(args).toContain("-c:a aac");
+    expect(args).not.toContain("libx264");
+    // MKV keeps AC-3 as it is
+    expect(buildArgs(mts, { target: "mkv" }, "/o.mkv").join(" ")).toContain("-c copy");
   });
 });
