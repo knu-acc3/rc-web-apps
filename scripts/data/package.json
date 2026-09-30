@@ -4,12 +4,14 @@
   "type": "module",
   "description": "Build-time data sources (Unicode CLDR, emojibase, mime-db). Install with: npm --prefix scripts/data install",
   "dependencies": {
+    "@unicode/unicode-16.0.0": "^2.0.7",
     "cldr-annotations-derived-full": "^48.2.0",
     "cldr-annotations-full": "^48.2.0",
     "cldr-core": "^48.2.0",
     "cldr-dates-full": "^48.2.0",
     "cldr-localenames-full": "^48.2.0",
     "emojibase-data": "^17.0.0",
+    "html-entities": "^2.6.0",
     "mime-db": "^1.54.0"
   }
 }

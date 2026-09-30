@@ -75,7 +75,7 @@ describe("gen-emoji output", () => {
 
   it("writes compact client search indexes", () => {
     for (const locale of LOCALES) {
-      const file = readFileSync(`public/vendor/emoji/index-${locale}.json`, "utf8");
+      const file = readFileSync(`src/sections/emoji/data/client/index-${locale}.json`, "utf8");
       const idx = JSON.parse(file) as { g: string[]; e: [string, string, string, string, number][] };
       expect(idx.e).toHaveLength(EMOJI.length);
       expect(file.length).toBeLessThan(400_000);
