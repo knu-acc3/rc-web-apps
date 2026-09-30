@@ -263,6 +263,21 @@ export function defineToolSection(input: ToolSectionInput): SectionDef {
 
 let relatedDepth = 0;
 const unresolved = new Set<string>();
+
+/** Resolve a related key to a link. Shallow: the target page's own related list is not built. */
+export function resolveRelatedKey(key: string, locale: Locale): LinkItem | null {
+  relatedDepth++;
+  try {
+    return relatedResolver(key, locale);
+  } finally {
+    relatedDepth--;
+  }
+}
+
+/** True while a page is being built only to produce a related link. */
+export function isResolvingRelated(): boolean {
+  return relatedDepth > 0;
+}
 /** Related keys that did not resolve to a page (checked by the registry test). */
 export function unresolvedRelated(): string[] {
   return [...unresolved];

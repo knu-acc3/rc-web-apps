@@ -933,71 +933,6 @@ const MORSE_HOW: LL = {
 
 const otherTools: ToolDef[] = [
   {
-    slug: "image-to-base64",
-    component: "encode/file",
-    icon: "Image",
-    popular: true,
-    props: { mode: "encode" },
-    name: { ru: "Картинка в Base64", en: "Image to Base64" },
-    h1: { ru: "Картинка в Base64 онлайн", en: "Image to Base64 converter" },
-    title: { ru: "Картинка в Base64 онлайн — data URI для HTML и CSS", en: "Image to Base64 online — data URI for HTML and CSS" },
-    description: {
-      ru: "Перевод картинки или любого файла в Base64 и data URI: готовые строки для <img> и CSS url(). Большие файлы кодируются частями в браузере, без загрузки.",
-      en: "Convert an image or any file to Base64 and a data URI: ready snippets for <img> and CSS url(). Large files are encoded in chunks in your browser, never uploaded.",
-    },
-    lead: { ru: "Перетащите PNG, JPG, SVG или любой файл — получите data:image/…;base64,… для вставки в HTML или CSS.", en: "Drop a PNG, JPG, SVG or any file and get data:image/…;base64,… for HTML or CSS." },
-    keywords: { ru: ["картинка в base64", "изображение в base64", "data uri", "файл в base64"], en: ["image to base64", "file to base64", "data uri generator", "png to base64"] },
-    howTo: {
-      ru: ["Перетащите файл или нажмите, чтобы выбрать его.", "Оставьте Data URI включённым для вставки в HTML/CSS или выключите, чтобы получить чистый Base64.", "Скопируйте готовый фрагмент «Для <img>» или «Для CSS» либо скачайте результат в .txt."],
-      en: ["Drop a file or click to choose one.", "Keep Data URI on for HTML/CSS or switch it off for plain Base64.", "Copy the “For <img>” or “For CSS” snippet, or download the result as .txt."],
-    },
-    faq: {
-      ru: [
-        { q: "Когда стоит встраивать картинку в Base64?", a: "Для мелких иконок и фонов до нескольких килобайт — это экономит HTTP-запрос. Большие изображения лучше отдавать файлами: Base64 на треть тяжелее и не кэшируется отдельно." },
-        { q: "Есть ли ограничение по размеру?", a: "Файл кодируется частями в фоновом потоке, поэтому большие файлы не подвешивают страницу. На экране показывается начало результата, целиком его можно скопировать или скачать." },
-        { q: "Отправляется ли файл на сервер?", a: "Нет, всё происходит в вашем браузере." },
-      ],
-      en: [
-        { q: "When should I inline an image as Base64?", a: "For small icons and backgrounds of a few kilobytes — it saves an HTTP request. Serve large images as files: Base64 is a third bigger and isn't cached separately." },
-        { q: "Is there a size limit?", a: "The file is encoded in chunks in a background thread, so large files don't freeze the page. Only the beginning is shown; copy or download the whole result." },
-        { q: "Is the file uploaded?", a: "No, everything happens in your browser." },
-      ],
-    },
-    about: { ru: ["Data URI (RFC 2397) встраивает содержимое файла прямо в адрес: data:image/png;base64,iVBORw0…. Его понимают атрибут src, CSS url() и многие редакторы."], en: ["A data URI (RFC 2397) embeds file content right in the address: data:image/png;base64,iVBORw0…. It works in src attributes, CSS url() and many editors."] },
-  },
-  {
-    slug: "base64-to-image",
-    component: "encode/file",
-    icon: "ImageDown",
-    props: { mode: "decode" },
-    name: { ru: "Base64 в картинку", en: "Base64 to image" },
-    h1: { ru: "Base64 в картинку онлайн", en: "Base64 to image converter" },
-    title: { ru: "Base64 в картинку онлайн — просмотр и скачивание файла", en: "Base64 to image online — preview and download the file" },
-    description: {
-      ru: "Декодирование Base64 или data URI в картинку или файл: превью PNG, JPG, GIF, WebP, SVG, звука и видео, тип определяется по сигнатуре, скачивание в один клик.",
-      en: "Decode Base64 or a data URI into an image or file: preview PNG, JPG, GIF, WebP, SVG, audio and video, type detected from the signature, one-click download.",
-    },
-    lead: { ru: "Вставьте data:image/…;base64,… или просто Base64 — увидите картинку и сможете её скачать.", en: "Paste data:image/…;base64,… or plain Base64 to see the image and download it." },
-    keywords: { ru: ["base64 в картинку", "base64 в изображение", "base64 в файл"], en: ["base64 to image", "base64 to png", "base64 to file", "data uri to image"] },
-    howTo: {
-      ru: ["Вставьте строку Base64 или data URI либо откройте .txt-файл с ней.", "Тип файла определится по data URI или по первым байтам (PNG, JPEG, PDF, ZIP…).", "Посмотрите превью и нажмите «Скачать»."],
-      en: ["Paste a Base64 string or data URI, or open a .txt file with it.", "The file type is detected from the data URI or the first bytes (PNG, JPEG, PDF, ZIP…).", "Check the preview and click Download."],
-    },
-    faq: {
-      ru: [
-        { q: "Как узнать, что внутри Base64?", a: "Инструмент читает первые байты: PNG начинается с 89 50 4E 47 (iVBORw0 в Base64), JPEG — с FF D8 FF (/9j/), PDF — с %PDF (JVBERi0)." },
-        { q: "Картинка не показывается — почему?", a: "Строка могла обрезаться при копировании или это не изображение. Проверьте размер результата и скачайте файл, чтобы открыть его программой." },
-        { q: "Подойдёт ли URL-safe Base64?", a: "Да, символы - и _ и отсутствие знаков = не мешают декодированию." },
-      ],
-      en: [
-        { q: "How do I know what's inside?", a: "The tool reads the first bytes: PNG starts with 89 50 4E 47 (iVBORw0 in Base64), JPEG with FF D8 FF (/9j/), PDF with %PDF (JVBERi0)." },
-        { q: "The image doesn't show — why?", a: "The string may have been cut while copying, or it isn't an image. Check the result size and download the file to open it in an app." },
-        { q: "Does URL-safe Base64 work?", a: "Yes, - and _ characters and missing = padding are fine." },
-      ],
-    },
-    about: { ru: ["Большие строки декодируются частями в фоновом потоке, а превью создаётся через временный адрес blob:, который освобождается при смене данных."], en: ["Large strings are decoded in chunks in a background thread, and the preview uses a temporary blob: URL that is released when the data changes."] },
-  },
-  {
     slug: "html-entities",
     component: "encode/entities",
     icon: "Table",
@@ -1203,8 +1138,6 @@ const tools: ToolDef[] = [
 const RELATED: Record<string, string[]> = {
   "base64-encode": ["base64-decode", "image-to-base64", "url-encode"],
   "base64-decode": ["base64-encode", "base64-to-image"],
-  "image-to-base64": ["base64-to-image", "base64-encode"],
-  "base64-to-image": ["image-to-base64", "base64-decode"],
   "url-encode": ["url-decode", "punycode-converter", "base64-encode"],
   "url-decode": ["url-encode", "punycode-converter"],
   "html-encode": ["html-decode", "html-entities"],

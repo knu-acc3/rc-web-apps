@@ -1,4 +1,5 @@
 import type { L10n, Locale } from "@/i18n/config";
+import { isResolvingRelated, resolveRelatedKey } from "@/registry/tool-section";
 import type { LinkItem, SectionDef, ToolDef } from "@/registry/types";
 
 /**
@@ -41,7 +42,10 @@ export function relatedLinks(keys: readonly string[], locale: Locale): LinkItem[
   for (const k of keys) {
     const m = LINKS.get(k);
     if (!m) {
-      missing.add(k);
+      // Pages of other sections resolve through the registry (shallow, cycle-safe).
+      const link = resolveRelatedKey(k, locale);
+      if (link) out.push(link);
+      else missing.add(k);
       continue;
     }
     out.push({ path: k.split("/"), label: m.label[locale], hint: m.hint?.[locale], icon: m.icon, hue: m.hue });
@@ -59,7 +63,7 @@ export function withRelated(section: SectionDef, keysFor: (segs: string[]) => re
     ...section,
     resolve(locale, segs) {
       const page = section.resolve(locale, segs);
-      if (!page || page.kind === "hub") return page;
+      if (!page || page.kind === "hub" || isResolvingRelated()) return page;
       const own = page.related ?? [];
       const seen = new Set([page.path.join("/")]);
       const extra = relatedLinks(keysFor(page.path), locale).filter((l) => {
