@@ -87,7 +87,7 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
             <h2 id={`cat-${g.id}-h`} className="mb-4 text-xl font-semibold text-fg">
               {g.label}
             </h2>
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid grid-cols-[minmax(0,1fr)] gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {g.sections.map((s) => {
                 const hub = sectionHub(s);
                 const head = (

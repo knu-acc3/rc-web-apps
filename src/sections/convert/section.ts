@@ -48,8 +48,6 @@ const isWord = (u: UnitDef) => u.ru.f[0].toLowerCase() === u.sym.ru.toLowerCase(
 const short = (n: number, u: UnitDef, locale: Locale) => (locale === "ru" && isWord(u) ? qty(n, u, locale) : `${num(n, locale)} ${sym(u, locale)}`);
 /** Unit as a noun in formulas: "км", "мили", "mi". */
 const noun = (u: UnitDef, locale: Locale) => (locale === "ru" && isWord(u) ? u.ru.pl : sym(u, locale));
-/** "в милях" / "в км" */
-const inUnit = (u: UnitDef) => (isWord(u) ? u.ru.loc : u.sym.ru);
 /** genitive plural or symbol: "перевод футов", "перевод км" */
 const ofUnit = (u: UnitDef) => (isWord(u) ? u.ru.f[2] : u.sym.ru);
 
@@ -88,7 +86,7 @@ function quantityLink(q: QuantityDef, locale: Locale): LinkItem {
   return {
     path: [SECTION_ID, q.id],
     label: locale === "ru" ? `Конвертер ${q.gen.ru}` : `${q.name.en} converter`,
-    hint: q.units.slice(0, 6).map((u) => sym(u, locale)).join(", "),
+    hint: titleUnits(q, locale),
     icon: q.icon,
     hue: HUE,
   };
@@ -119,6 +117,12 @@ function hubPage(locale: Locale): PageModel {
   };
 }
 
+/** The most searched units of a quantity (in order of its popular pairs) for the page title. */
+function titleUnits(q: QuantityDef, locale: Locale): string {
+  const slugs = [...new Set(q.pairs.flat())].slice(0, 5);
+  return slugs.map((sl) => sym(unitIndex.get(sl)!.u, locale)).join(", ");
+}
+
 function quantityPage(q: QuantityDef, locale: Locale): PageModel {
   const t = ui(locale);
   const [da, db] = q.def;
@@ -128,10 +132,12 @@ function quantityPage(q: QuantityDef, locale: Locale): PageModel {
   const blocks: Block[] = [
     {
       type: "table",
+      split: true,
       title: locale === "ru" ? `1 ${nameN(base, 1, locale)} в других единицах` : `1 ${base.en[0]} in other units`,
       head: [locale === "ru" ? "Единица" : "Unit", locale === "ru" ? "Значение" : "Value"],
       rows: q.units.filter((u) => u !== base).map((u) => [`${cap(plName(u, locale))} (${sym(u, locale)})`, num(convert(1, base, u), locale)]),
     },
+    { type: "links", title: locale === "ru" ? "Популярные переводы" : "Popular conversions", style: "chips", items: q.pairs.map(([a, b]) => pairLink(unitIndex.get(a)!.u, unitIndex.get(b)!.u, locale)) },
     {
       type: "text",
       title: t.about,
@@ -139,11 +145,11 @@ function quantityPage(q: QuantityDef, locale: Locale): PageModel {
         locale === "ru"
           ? [
               `Конвертер ${q.gen.ru} переводит значения между единицами: ${unitsList}. Введите число в любое поле — результат пересчитывается сразу, в обе стороны.`,
-              "Ниже результата показано то же значение во всех остальных единицах — любое можно скопировать одним нажатием. Расчёт выполняется в браузере по точным коэффициентам.",
+              "Под результатом можно раскрыть список «во всех единицах» — то же значение сразу во всех остальных единицах. Расчёт выполняется в браузере по точным коэффициентам.",
             ]
           : [
               `The ${q.name.en.toLowerCase()} converter translates values between ${unitsList}. Type a number in either field — the result updates instantly in both directions.`,
-              "Below the result the same value is shown in every other unit, each one copyable with a click. Calculations run in your browser using exact conversion factors.",
+              "Under the result, expand the \"in all units\" list to see the same value in every other unit. Calculations run in your browser using exact conversion factors.",
             ],
     },
   ];
@@ -151,7 +157,7 @@ function quantityPage(q: QuantityDef, locale: Locale): PageModel {
     path: [SECTION_ID, q.id],
     sectionId: SECTION_ID,
     kind: "tool",
-    title: locale === "ru" ? `${name} онлайн — ${q.units.slice(0, 4).map((u) => sym(u, locale)).join(", ")} и др.` : `${name} — ${q.units.slice(0, 4).map((u) => sym(u, locale)).join(", ")} and more`,
+    title: locale === "ru" ? `${name} онлайн — ${titleUnits(q, locale)} и др.` : `${name} — ${titleUnits(q, locale)} and more`,
     h1: name,
     description:
       locale === "ru"
@@ -163,9 +169,6 @@ function quantityPage(q: QuantityDef, locale: Locale): PageModel {
       { name: tr(NAME, locale), path: [SECTION_ID] },
     ],
     tool: { id: "convert/units", props: { units: clientUnits(q, locale), from: da, to: db, value: 1, allowNegative: !!q.allowNegative } },
-    topBlocks: [
-      { type: "links", title: locale === "ru" ? "Популярные переводы" : "Popular conversions", style: "chips", items: q.pairs.map(([a, b]) => pairLink(unitIndex.get(a)!.u, unitIndex.get(b)!.u, locale)) },
-    ],
     blocks,
     related: QUANTITIES.filter((x) => x !== q).slice(0, 8).map((x) => quantityLink(x, locale)),
     schemaType: "WebApplication",
@@ -222,12 +225,7 @@ function pairPage(q: QuantityDef, a: UnitDef, b: UnitDef, locale: Locale): PageM
     .filter(([x, y]) => x !== a.slug && y !== b.slug && !(x === b.slug && y === a.slug))
     .map(([x, y]) => pairLink(unitIndex.get(x)!.u, unitIndex.get(y)!.u, locale));
 
-  const topBlocks: Block[] = [];
-  if (rev) topBlocks.push({ type: "links", title: locale === "ru" ? "Обратный перевод" : "Reverse conversion", style: "chips", items: [pairLink(b, a, locale)] });
-  if (sameFrom.length || sameTo.length)
-    topBlocks.push({ type: "links", title: locale === "ru" ? `Другие переводы (${A}, ${B})` : `More conversions (${A}, ${B})`, style: "chips", items: [...sameFrom, ...sameTo] });
-  if (others.length) topBlocks.push({ type: "links", title: locale === "ru" ? `Конвертер ${q.gen.ru}` : `${q.name.en} conversions`, style: "chips", items: others });
-
+  const more = [...(rev ? [pairLink(b, a, locale)] : []), ...sameFrom, ...sameTo, ...others].slice(0, 24);
   return {
     path: [SECTION_ID, pairKey(a.slug, b.slug)],
     sectionId: SECTION_ID,
@@ -245,25 +243,18 @@ function pairPage(q: QuantityDef, a: UnitDef, b: UnitDef, locale: Locale): PageM
       { name: locale === "ru" ? `Конвертер ${q.gen.ru}` : `${q.name.en} converter`, path: [SECTION_ID, q.id] },
     ],
     tool: { id: "convert/units", props: { units: clientUnits(q, locale), from: a.slug, to: b.slug, value: 1, allowNegative: !!q.allowNegative } },
-    topBlocks,
     blocks: [
-      {
-        type: "facts",
-        title: locale === "ru" ? "Коротко" : "Quick facts",
-        rows: [
-          [locale === "ru" ? `1 ${nameN(a, 1, "ru")} в ${inUnit(b)}` : `1 ${a.en[0]} in ${b.en[1]}`, short(one, b, locale)],
-          [locale === "ru" ? `1 ${nameN(b, 1, "ru")} в ${inUnit(a)}` : `1 ${b.en[0]} in ${a.en[1]}`, short(back, a, locale)],
-          [locale === "ru" ? "Формула" : "Formula", formula],
-          [locale === "ru" ? "Величина" : "Quantity", tr(q.name, locale)],
-        ],
-      },
       {
         type: "table",
         title: locale === "ru" ? `Таблица перевода: ${a.ru.pl} в ${b.ru.pl}` : `Conversion table: ${a.en[1]} to ${b.en[1]}`,
         head: [`${cap(plName(a, locale))} (${A})`, `${cap(plName(b, locale))} (${B})`],
         rows: table.map((v) => [short(v, a, locale), short(convert(v, a, b), b, locale)]),
+        split: true,
       },
       { type: "text", title: locale === "ru" ? `Как перевести ${a.ru.pl} в ${b.ru.pl}` : `How to convert ${a.en[1]} to ${b.en[1]}`, paragraphs: howTo },
+      ...(more.length
+        ? [{ type: "links", title: locale === "ru" ? "Другие переводы" : "More conversions", style: "chips", items: more, more: quantityLink(q, locale) } satisfies Block]
+        : []),
     ],
     faq,
     related: [quantityLink(q, locale), ...QUANTITIES.filter((x) => x !== q).slice(0, 5).map((x) => quantityLink(x, locale))],

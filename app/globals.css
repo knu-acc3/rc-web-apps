@@ -179,6 +179,11 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* Display-size numbers use proportional digits: a tabular "1" leaves visible gaps at large sizes. */
+.tabular:is([class*="text-2xl"], [class*="text-3xl"], [class*="text-4xl"], [class*="text-5xl"], [class*="text-6xl"], [class*="text-7xl"], [class*="text-[28px]"], [class*="text-[3"], [class*="text-[4"]) {
+  font-variant-numeric: proportional-nums;
+}
+
 @utility sec-icon {
   background: hsl(var(--hue, 225) var(--sec-s) var(--sec-l-bg));
   color: hsl(var(--hue, 225) var(--sec-s) var(--sec-l-fg));
