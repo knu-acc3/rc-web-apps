@@ -64,7 +64,7 @@ export const EMOJI: Emoji[] = data.emoji.map((r, i) => ({
 }));
 
 export const bySlug = new Map(EMOJI.map((e) => [e.slug, e]));
-const strip = (s: string) => s.replace(/️/g, "");
+const strip = (s: string) => s.replace(/\u{FE0F}/gu, "");
 export const byGlyph = new Map(EMOJI.map((e) => [strip(e.glyph), e]));
 export const findGlyph = (g: string) => byGlyph.get(strip(g));
 

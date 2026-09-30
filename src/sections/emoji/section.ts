@@ -173,7 +173,7 @@ function structureText(e: Emoji, locale: Locale): string[] {
         : `The flag is encoded as a black flag 🏴 followed by invisible Unicode tag characters spelling the region code “${tag}” (ISO 3166-2). Not every platform supports such flags.`,
     );
   } else if (cps.includes(0x200d)) {
-    const parts = e.glyph.split("‍").filter((p) => p && p !== "️");
+    const parts = e.glyph.split("\u{200D}").filter((p) => p && p !== "\u{FE0F}");
     out.push(
       ru
         ? `Это ZWJ-последовательность: эмодзи ${parts.join(" + ")} соединены невидимым символом U+200D (соединитель нулевой ширины). Если система не знает такого сочетания, она покажет составные части по отдельности.`

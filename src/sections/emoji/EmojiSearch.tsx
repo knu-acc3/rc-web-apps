@@ -66,7 +66,7 @@ function loadIndex(locale: Locale): Promise<IndexRow[]> {
   return p;
 }
 
-const norm = (s: string) => s.toLowerCase().replace(/ё/g, "е").replace(/️/g, "").trim();
+const norm = (s: string) => s.toLowerCase().replace(/ё/g, "е").replace(/\u{FE0F}/gu, "").trim();
 
 function score(row: IndexRow, q: string, tokens: string[]): number {
   if (norm(row[0]) === q) return 1000;

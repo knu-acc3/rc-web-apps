@@ -16,9 +16,9 @@ export const htmlHex = (s: string) => codePoints(s).map((c) => `&#x${hex(c, 1)};
 export const htmlDec = (s: string) => codePoints(s).map((c) => `&#${c};`).join("");
 /** CSS `content` escape: "\2764\FE0F" */
 export const cssEscape = (s: string) => codePoints(s).map((c) => `\\${hex(c, 1)}`).join("");
-/** JavaScript string escape: "❤️", astral as "\u{1F600}" */
+/** JavaScript string escape: backslash-u + 4 hex digits for BMP characters, "\u{1F600}" for astral ones */
 export const jsEscape = (s: string) => codePoints(s).map((c) => (c > 0xffff ? `\\u{${hex(c, 1)}}` : `\\u${hex(c)}`)).join("");
-/** Python string escape: "❤️", astral as "\U0001f600" */
+/** Python string escape: backslash-u + 4 hex digits for BMP characters, "\U0001f600" for astral ones */
 export const pyEscape = (s: string) =>
   codePoints(s)
     .map((c) => (c > 0xffff ? `\\U${hex(c, 8).toLowerCase()}` : `\\u${hex(c).toLowerCase()}`))

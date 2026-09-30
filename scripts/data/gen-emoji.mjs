@@ -3,7 +3,7 @@
 // Unicode CLDR 48 annotations (ru/en names and keywords, the authoritative translations).
 // Output:
 //   src/sections/emoji/data/emoji.json        – compact server-side data (never shipped to the client)
-//   public/vendor/emoji/index-{ru,en}.json    – small search index lazily loaded by the /emoji hub search
+//   src/sections/emoji/data/client/index-{ru,en}.json – search index lazily loaded by the /emoji hub (-> public/vendor/emoji)
 //
 // Run: node scripts/data/gen-emoji.mjs
 // Packages are resolved from scripts/data/node_modules (npm --prefix scripts/data install) or from the
@@ -57,14 +57,14 @@ for (const s of load("emojibase-data/en/messages.json").subgroups) SUBGROUP_KEYS
 const HAIR = { 0x1f9b0: "red", 0x1f9b1: "curly", 0x1f9b2: "bald", 0x1f9b3: "white" };
 
 const cps = (s) => [...s].map((c) => c.codePointAt(0));
-const strip = (s) => s.replace(/️/g, "");
+const strip = (s) => s.replace(/\u{FE0F}/gu, "");
 const EP = /^\p{Emoji_Presentation}$/u;
 
 /** Fully-qualified form (UTS #51): drop redundant U+FE0F after characters with emoji presentation. */
 function qualify(s) {
   const out = [];
   for (const c of s) {
-    if (c === "️" && out.length && EP.test(out[out.length - 1])) continue;
+    if (c === "\u{FE0F}" && out.length && EP.test(out[out.length - 1])) continue;
     out.push(c);
   }
   return out.join("");
@@ -204,8 +204,11 @@ const dataDir = join(root, "src", "sections", "emoji", "data");
 mkdirSync(dataDir, { recursive: true });
 writeFileSync(join(dataDir, "emoji.json"), JSON.stringify(data));
 
-/* ── client search index: [glyph, slug, name, search text, group index] ── */
+/* ── client search index: [glyph, slug, name, search text, group index] ──
+   Committed in src/sections/emoji/data/client/ and copied to public/vendor/emoji/ by scripts/vendor-emoji.mjs. */
+const clientDir = join(dataDir, "client");
 const vendor = join(root, "public", "vendor", "emoji");
+mkdirSync(clientDir, { recursive: true });
 mkdirSync(vendor, { recursive: true });
 for (const locale of ["ru", "en"]) {
   const rows = out.map((r) => {
@@ -215,7 +218,9 @@ for (const locale of ["ru", "en"]) {
     const name = locale === "ru" ? r[5] : r[4];
     return [r[0], r[1], name, [...words].join(" ").toLowerCase(), data.subgroups[r[2]][1]];
   });
-  writeFileSync(join(vendor, `index-${locale}.json`), JSON.stringify({ g: data.groups, e: rows }));
+  const json = JSON.stringify({ g: data.groups, e: rows });
+  writeFileSync(join(clientDir, `index-${locale}.json`), json);
+  writeFileSync(join(vendor, `index-${locale}.json`), json);
 }
 
 console.log(`emoji: ${out.length} pages, ${data.groups.length} groups, ${data.subgroups.length} subgroups, ${hairVariants.length} hair variants`);
