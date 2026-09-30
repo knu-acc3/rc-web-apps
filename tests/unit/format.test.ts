@@ -55,3 +55,12 @@ describe("plural", () => {
     expect(plural("en", 2, ["mile", "miles"])).toBe("miles");
   });
 });
+
+describe("parseNumber with locale", () => {
+  it("treats a single comma group as thousands in English only", () => {
+    expect(parseNumber("1,000", "en")).toBe(1000);
+    expect(parseNumber("12,345.5", "en")).toBe(12345.5);
+    expect(parseNumber("1,000", "ru")).toBe(1);
+    expect(parseNumber("1,5", "en")).toBe(1.5);
+  });
+});

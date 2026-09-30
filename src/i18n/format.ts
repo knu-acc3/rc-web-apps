@@ -70,10 +70,10 @@ function toSuperscript(n: number): string {
 }
 
 /**
- * Parse a user-typed number in either locale:
- * "1 000,5", "1,000.5", "1000.5", "−5", "1e3", "12 345" → number | null
+ * Parse a user-typed number: "1 000,5", "1,000.5", "1.000.000", "−5", "1e3".
+ * With `locale: "en"` a lone comma group ("1,000") is a thousands separator; otherwise it is a decimal comma.
  */
-export function parseNumber(input: string): number | null {
+export function parseNumber(input: string, locale?: Locale): number | null {
   let s = input.trim().replace(/[  \s']/g, "").replace(/[−–]/g, "-");
   if (!s) return null;
   const hasDot = s.includes(".");
@@ -84,7 +84,8 @@ export function parseNumber(input: string): number | null {
     else s = s.replace(/,/g, "");
   } else if (hasComma) {
     // "1,000,000" → thousands separators; "1,5" → decimal comma
-    s = /^[-+]?\d{1,3}(,\d{3}){2,}$/.test(s) ? s.replace(/,/g, "") : s.replace(",", ".");
+    const groups = locale === "en" ? /^[-+]?\d{1,3}(,\d{3})+$/ : /^[-+]?\d{1,3}(,\d{3}){2,}$/;
+    s = groups.test(s) ? s.replace(/,/g, "") : s.replace(",", ".");
   } else if (hasDot && /^[-+]?\d{1,3}(\.\d{3}){2,}$/.test(s)) {
     s = s.replace(/\./g, "");
   }

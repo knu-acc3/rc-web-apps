@@ -75,7 +75,7 @@ export default function UnitConverter({ locale, units, from: from0, to: to0, val
   const unitText = (n: number, u: ClientUnit) => (u.word ? plural(locale, clean(n), u.forms) : u.sym);
 
   const srcText = edited === "a" ? aText : bText;
-  const srcNum = parseNumber(srcText);
+  const srcNum = parseNumber(srcText, locale);
   const error = srcText.trim() === "" ? null : srcNum === null ? t.invalid : !allowNegative && srcNum < 0 ? t.negative : null;
   const ok = srcNum !== null && !error;
 
