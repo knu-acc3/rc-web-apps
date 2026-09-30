@@ -445,6 +445,7 @@ export const passwordSection = defineToolSection({
       component: "password/generator",
       icon: "KeyRound",
       popular: true,
+      related: ["qr-code-generator/wifi"],
       name: { ru: "Генератор паролей", en: "Password generator" },
       title: { ru: "Генератор паролей онлайн — надёжный случайный пароль", en: "Password Generator — Strong Random Passwords Online" },
       h1: { ru: "Генератор паролей", en: "Password generator" },
