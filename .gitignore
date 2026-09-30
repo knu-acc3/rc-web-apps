@@ -1,0 +1,26 @@
+# dependencies
+/node_modules
+
+# next.js / build
+/.next/
+/out/
+/build
+next-env.d.ts
+*.tsbuildinfo
+
+# generated at build time (copied from node_modules)
+/public/vendor/
+
+# testing
+/coverage
+/test-results/
+/playwright-report/
+
+# misc
+.DS_Store
+*.pem
+.env*.local
+npm-debug.log*
+
+# local tooling
+.claude/

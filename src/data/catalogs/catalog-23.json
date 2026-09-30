@@ -1,0 +1,902 @@
+[
+  {
+    "id": "c23-1",
+    "slug": "keycap-hash",
+    "path": "/emojis/keycap-hash/",
+    "title": "#️⃣ Символ «Решетка»",
+    "heading": "#️⃣ Символ «Решетка»",
+    "description": "Скопируйте символ «Решетка», посмотрите значение, варианты написания и Unicode-коды для вставки в текст.",
+    "category": "emojis"
+  },
+  {
+    "id": "c23-2",
+    "slug": "keycap-star",
+    "path": "/emojis/keycap-star/",
+    "title": "*️⃣ Клавиша со звездочкой",
+    "heading": "*️⃣ Клавиша со звездочкой",
+    "description": "Скопируйте клавиша со звездочкой, посмотрите значение, варианты написания и Unicode-коды для вставки в текст.",
+    "category": "emojis"
+  },
+  {
+    "id": "c23-3",
+    "slug": "keycap-0",
+    "path": "/emojis/keycap-0/",
+    "title": "0️⃣ Клавиша «0»",
+    "heading": "0️⃣ Клавиша «0»",
+    "description": "Скопируйте клавиша «0», посмотрите значение, варианты написания и Unicode-коды для вставки в текст.",
+    "category": "emojis"
+  },
+  {
+    "id": "c23-4",
+    "slug": "keycap-1",
+    "path": "/emojis/keycap-1/",
+    "title": "1️⃣ Клавиша «1»",
+    "heading": "1️⃣ Клавиша «1»",
+    "description": "Скопируйте клавиша «1», посмотрите значение, варианты написания и Unicode-коды для вставки в текст.",
+    "category": "emojis"
+  },
+  {
+    "id": "c23-5",
+    "slug": "keycap-2",
+    "path": "/emojis/keycap-2/",
+    "title": "2️⃣ Клавиша «2»",
+    "heading": "2️⃣ Клавиша «2»",
+    "description": "Скопируйте клавиша «2», посмотрите значение, варианты написания и Unicode-коды для вставки в текст.",
+    "category": "emojis"
+  },
+  {
+    "id": "c23-6",
+    "slug": "keycap-3",
+    "path": "/emojis/keycap-3/",
+    "title": "3️⃣ Клавиша «3»",
+    "heading": "3️⃣ Клавиша «3»",
+    "description": "Скопируйте клавиша «3», посмотрите значение, варианты написания и Unicode-коды для вставки в текст.",
+    "category": "emojis"
+  },
+  {
+    "id": "c23-7",
+    "slug": "keycap-4",
+    "path": "/emojis/keycap-4/",
+    "title": "4️⃣ Клавиша «4»",
+    "heading": "4️⃣ Клавиша «4»",
+    "description": "Скопируйте клавиша «4», посмотрите значение, варианты написания и Unicode-коды для вставки в текст.",
+    "category": "emojis"
+  },
+  {
+    "id": "c23-8",
+    "slug": "keycap-5",
+    "path": "/emojis/keycap-5/",
+    "title": "5️⃣ Клавиша «5»",
+    "heading": "5️⃣ Клавиша «5»",
+    "description": "Скопируйте клавиша «5», посмотрите значение, варианты написания и Unicode-коды для вставки в текст.",
+    "category": "emojis"
+  },
+  {
+    "id": "c23-9",
+    "slug": "keycap-6",
+    "path": "/emojis/keycap-6/",
+    "title": "6️⃣ Клавиша «6»",
+    "heading": "6️⃣ Клавиша «6»",
+    "description": "Скопируйте клавиша «6», посмотрите значение, варианты написания и Unicode-коды для вставки в текст.",
+    "category": "emojis"
+  },
+  {
+    "id": "c23-10",
+    "slug": "keycap-7",
+    "path": "/emojis/keycap-7/",
+    "title": "7️⃣ Клавиша «7»",
+    "heading": "7️⃣ Клавиша «7»",
+    "description": "Скопируйте клавиша «7», посмотрите значение, варианты написания и Unicode-коды для вставки в текст.",
+    "category": "emojis"
+  },
+  {
+    "id": "c23-11",
+    "slug": "keycap-8",
+    "path": "/emojis/keycap-8/",
+    "title": "8️⃣ Клавиша «8»",
+    "heading": "8️⃣ Клавиша «8»",
+    "description": "Скопируйте клавиша «8», посмотрите значение, варианты написания и Unicode-коды для вставки в текст.",
+    "category": "emojis"
+  },
+  {
+    "id": "c23-12",
+    "slug": "keycap-9",
+    "path": "/emojis/keycap-9/",
+    "title": "9️⃣ Клавиша «9»",
+    "heading": "9️⃣ Клавиша «9»",
+    "description": "Скопируйте клавиша «9», посмотрите значение, варианты написания и Unicode-коды для вставки в текст.",
+    "category": "emojis"
+  },
+  {
+    "id": "c23-13",
+    "slug": "copyright",
+    "path": "/emojis/copyright/",
+    "title": "©️ значок защиты авторского права",
+    "heading": "©️ значок защиты авторского права",
+    "description": "Скопируйте значок защиты авторского права, посмотрите значение, варианты написания и Unicode-коды для вставки в текст.",
+    "category": "emojis"
+  },
+  {
+    "id": "c23-14",
+    "slug": "registered",
+    "path": "/emojis/registered/",
+    "title": "®️ зарегистрированный товарный знак",
+    "heading": "®️ зарегистрированный товарный знак",
+    "description": "Скопируйте зарегистрированный товарный знак, посмотрите значение, варианты написания и Unicode-коды для вставки в текст.",
+    "category": "emojis"
+  },
+  {
+    "id": "c23-15",
+    "slug": "mahjong-red-dragon",
+    "path": "/emojis/mahjong-red-dragon/",
+    "title": "🀄 маджонг",
+    "heading": "🀄 маджонг",
+    "description": "Скопируйте маджонг, посмотрите значение, варианты написания и Unicode-коды для вставки в текст.",
+    "category": "emojis"
+  },
+  {
+    "id": "c23-16",
+    "slug": "joker",
+    "path": "/emojis/joker/",
+    "title": "🃏 джокер",
+    "heading": "🃏 джокер",
+    "description": "Скопируйте джокер, посмотрите значение, варианты написания и Unicode-коды для вставки в текст.",
+    "category": "emojis"
+  },
+  {
+    "id": "c23-17",
+    "slug": "a-button",
+    "path": "/emojis/a-button/",
+    "title": "🅰️ II группа крови",
+    "heading": "🅰️ II группа крови",
+    "description": "Скопируйте iI группа крови, посмотрите значение, варианты написания и Unicode-коды для вставки в текст.",
+    "category": "emojis"
+  },
+  {
+    "id": "c23-18",
+    "slug": "b-button",
+    "path": "/emojis/b-button/",
+    "title": "🅱️ III группа крови",
+    "heading": "🅱️ III группа крови",
+    "description": "Скопируйте iII группа крови, посмотрите значение, варианты написания и Unicode-коды для вставки в текст.",
+    "category": "emojis"
+  },
+  {
+    "id": "c23-19",
+    "slug": "o-button",
+    "path": "/emojis/o-button/",
+    "title": "🅾️ I группа крови",
+    "heading": "🅾️ I группа крови",
+    "description": "Скопируйте i группа крови, посмотрите значение, варианты написания и Unicode-коды для вставки в текст.",
+    "category": "emojis"
+  },
+  {
+    "id": "c23-20",
+    "slug": "p-button",
+    "path": "/emojis/p-button/",
+    "title": "🅿️ парковка",
+    "heading": "🅿️ парковка",
+    "description": "Скопируйте парковка, посмотрите значение, варианты написания и Unicode-коды для вставки в текст.",
+    "category": "emojis"
+  },
+  {
+    "id": "c23-21",
+    "slug": "ab-button",
+    "path": "/emojis/ab-button/",
+    "title": "🆎 IV группа крови",
+    "heading": "🆎 IV группа крови",
+    "description": "Скопируйте iV группа крови, посмотрите значение, варианты написания и Unicode-коды для вставки в текст.",
+    "category": "emojis"
+  },
+  {
+    "id": "c23-22",
+    "slug": "cl-button",
+    "path": "/emojis/cl-button/",
+    "title": "🆑 кнопка «очистить»",
+    "heading": "🆑 кнопка «очистить»",
+    "description": "Скопируйте кнопка «очистить», посмотрите значение, варианты написания и Unicode-коды для вставки в текст.",
+    "category": "emojis"
+  },
+  {
+    "id": "c23-23",
+    "slug": "cool-button",
+    "path": "/emojis/cool-button/",
+    "title": "🆒 значок «круто»",
+    "heading": "🆒 значок «круто»",
+    "description": "Скопируйте значок «круто», посмотрите значение, варианты написания и Unicode-коды для вставки в текст.",
+    "category": "emojis"
+  },
+  {
+    "id": "c23-24",
+    "slug": "free-button",
+    "path": "/emojis/free-button/",
+    "title": "🆓 значок «бесплатно»",
+    "heading": "🆓 значок «бесплатно»",
+    "description": "Скопируйте значок «бесплатно», посмотрите значение, варианты написания и Unicode-коды для вставки в текст.",
+    "category": "emojis"
+  },
+  {
+    "id": "c23-25",
+    "slug": "id-button",
+    "path": "/emojis/id-button/",
+    "title": "🆔 значок «идентификация»",
+    "heading": "🆔 значок «идентификация»",
+    "description": "Скопируйте значок «идентификация», посмотрите значение, варианты написания и Unicode-коды для вставки в текст.",
+    "category": "emojis"
+  },
+  {
+    "id": "c23-26",
+    "slug": "new-button",
+    "path": "/emojis/new-button/",
+    "title": "🆕 значок «новинка»",
+    "heading": "🆕 значок «новинка»",
+    "description": "Скопируйте значок «новинка», посмотрите значение, варианты написания и Unicode-коды для вставки в текст.",
+    "category": "emojis"
+  },
+  {
+    "id": "c23-27",
+    "slug": "ng-button",
+    "path": "/emojis/ng-button/",
+    "title": "🆖 значок «не годится»",
+    "heading": "🆖 значок «не годится»",
+    "description": "Скопируйте значок «не годится», посмотрите значение, варианты написания и Unicode-коды для вставки в текст.",
+    "category": "emojis"
+  },
+  {
+    "id": "c23-28",
+    "slug": "ok-button",
+    "path": "/emojis/ok-button/",
+    "title": "🆗 значок «ОК»",
+    "heading": "🆗 значок «ОК»",
+    "description": "Скопируйте значок «ОК», посмотрите значение, варианты написания и Unicode-коды для вставки в текст.",
+    "category": "emojis"
+  },
+  {
+    "id": "c23-29",
+    "slug": "sos-button",
+    "path": "/emojis/sos-button/",
+    "title": "🆘 значок SOS",
+    "heading": "🆘 значок SOS",
+    "description": "Скопируйте значок SOS, посмотрите значение, варианты написания и Unicode-коды для вставки в текст.",
+    "category": "emojis"
+  },
+  {
+    "id": "c23-30",
+    "slug": "up-button",
+    "path": "/emojis/up-button/",
+    "title": "🆙 значок «обновление»",
+    "heading": "🆙 значок «обновление»",
+    "description": "Скопируйте значок «обновление», посмотрите значение, варианты написания и Unicode-коды для вставки в текст.",
+    "category": "emojis"
+  },
+  {
+    "id": "c23-31",
+    "slug": "vs-button",
+    "path": "/emojis/vs-button/",
+    "title": "🆚 значок «против»",
+    "heading": "🆚 значок «против»",
+    "description": "Скопируйте значок «против», посмотрите значение, варианты написания и Unicode-коды для вставки в текст.",
+    "category": "emojis"
+  },
+  {
+    "id": "c23-32",
+    "slug": "flag-ascension-island",
+    "path": "/emojis/flag-ascension-island/",
+    "title": "🇦🇨 Флаг острова Вознесения",
+    "heading": "🇦🇨 Флаг острова Вознесения",
+    "description": "Скопируйте флаг острова Вознесения, посмотрите значение, варианты написания и Unicode-коды для вставки в текст.",
+    "category": "emojis"
+  },
+  {
+    "id": "c23-33",
+    "slug": "flag-andorra",
+    "path": "/emojis/flag-andorra/",
+    "title": "🇦🇩 Флаг Андорры",
+    "heading": "🇦🇩 Флаг Андорры",
+    "description": "Скопируйте флаг Андорры, посмотрите значение, варианты написания и Unicode-коды для вставки в текст.",
+    "category": "emojis"
+  },
+  {
+    "id": "c23-34",
+    "slug": "flag-united-arab-emirates",
+    "path": "/emojis/flag-united-arab-emirates/",
+    "title": "🇦🇪 Флаг ОАЭ",
+    "heading": "🇦🇪 Флаг ОАЭ",
+    "description": "Скопируйте флаг ОАЭ, посмотрите значение, варианты написания и Unicode-коды для вставки в текст.",
+    "category": "emojis"
+  },
+  {
+    "id": "c23-35",
+    "slug": "flag-afghanistan",
+    "path": "/emojis/flag-afghanistan/",
+    "title": "🇦🇫 Флаг Афганистана",
+    "heading": "🇦🇫 Флаг Афганистана",
+    "description": "Скопируйте флаг Афганистана, посмотрите значение, варианты написания и Unicode-коды для вставки в текст.",
+    "category": "emojis"
+  },
+  {
+    "id": "c23-36",
+    "slug": "flag-antigua-barbuda",
+    "path": "/emojis/flag-antigua-barbuda/",
+    "title": "🇦🇬 Флаг Антигуа и Барбуды",
+    "heading": "🇦🇬 Флаг Антигуа и Барбуды",
+    "description": "Скопируйте флаг Антигуа и Барбуды, посмотрите значение, варианты написания и Unicode-коды для вставки в текст.",
+    "category": "emojis"
+  },
+  {
+    "id": "c23-37",
+    "slug": "flag-anguilla",
+    "path": "/emojis/flag-anguilla/",
+    "title": "🇦🇮 Флаг Ангильи",
+    "heading": "🇦🇮 Флаг Ангильи",
+    "description": "Скопируйте флаг Ангильи, посмотрите значение, варианты написания и Unicode-коды для вставки в текст.",
+    "category": "emojis"
+  },
+  {
+    "id": "c23-38",
+    "slug": "flag-albania",
+    "path": "/emojis/flag-albania/",
+    "title": "🇦🇱 Флаг Албании",
+    "heading": "🇦🇱 Флаг Албании",
+    "description": "Скопируйте флаг Албании, посмотрите значение, варианты написания и Unicode-коды для вставки в текст.",
+    "category": "emojis"
+  },
+  {
+    "id": "c23-39",
+    "slug": "flag-armenia",
+    "path": "/emojis/flag-armenia/",
+    "title": "🇦🇲 Флаг Армении",
+    "heading": "🇦🇲 Флаг Армении",
+    "description": "Скопируйте флаг Армении, посмотрите значение, варианты написания и Unicode-коды для вставки в текст.",
+    "category": "emojis"
+  },
+  {
+    "id": "c23-40",
+    "slug": "flag-angola",
+    "path": "/emojis/flag-angola/",
+    "title": "🇦🇴 Флаг Анголы",
+    "heading": "🇦🇴 Флаг Анголы",
+    "description": "Скопируйте флаг Анголы, посмотрите значение, варианты написания и Unicode-коды для вставки в текст.",
+    "category": "emojis"
+  },
+  {
+    "id": "c23-41",
+    "slug": "flag-antarctica",
+    "path": "/emojis/flag-antarctica/",
+    "title": "🇦🇶 Флаг Антарктиды",
+    "heading": "🇦🇶 Флаг Антарктиды",
+    "description": "Скопируйте флаг Антарктиды, посмотрите значение, варианты написания и Unicode-коды для вставки в текст.",
+    "category": "emojis"
+  },
+  {
+    "id": "c23-42",
+    "slug": "flag-argentina",
+    "path": "/emojis/flag-argentina/",
+    "title": "🇦🇷 Флаг Аргентины",
+    "heading": "🇦🇷 Флаг Аргентины",
+    "description": "Скопируйте флаг Аргентины, посмотрите значение, варианты написания и Unicode-коды для вставки в текст.",
+    "category": "emojis"
+  },
+  {
+    "id": "c23-43",
+    "slug": "flag-american-samoa",
+    "path": "/emojis/flag-american-samoa/",
+    "title": "🇦🇸 Флаг Американского Самоа",
+    "heading": "🇦🇸 Флаг Американского Самоа",
+    "description": "Скопируйте флаг Американского Самоа, посмотрите значение, варианты написания и Unicode-коды для вставки в текст.",
+    "category": "emojis"
+  },
+  {
+    "id": "c23-44",
+    "slug": "flag-austria",
+    "path": "/emojis/flag-austria/",
+    "title": "🇦🇹 Флаг Австрии",
+    "heading": "🇦🇹 Флаг Австрии",
+    "description": "Скопируйте флаг Австрии, посмотрите значение, варианты написания и Unicode-коды для вставки в текст.",
+    "category": "emojis"
+  },
+  {
+    "id": "c23-45",
+    "slug": "flag-australia",
+    "path": "/emojis/flag-australia/",
+    "title": "🇦🇺 Флаг Австралии",
+    "heading": "🇦🇺 Флаг Австралии",
+    "description": "Скопируйте флаг Австралии, посмотрите значение, варианты написания и Unicode-коды для вставки в текст.",
+    "category": "emojis"
+  },
+  {
+    "id": "c23-46",
+    "slug": "flag-aruba",
+    "path": "/emojis/flag-aruba/",
+    "title": "🇦🇼 Флаг Арубы",
+    "heading": "🇦🇼 Флаг Арубы",
+    "description": "Скопируйте флаг Арубы, посмотрите значение, варианты написания и Unicode-коды для вставки в текст.",
+    "category": "emojis"
+  },
+  {
+    "id": "c23-47",
+    "slug": "flag-land-islands",
+    "path": "/emojis/flag-land-islands/",
+    "title": "🇦🇽 Флаг Аландских островов",
+    "heading": "🇦🇽 Флаг Аландских островов",
+    "description": "Скопируйте флаг Аландских островов, посмотрите значение, варианты написания и Unicode-коды для вставки в текст.",
+    "category": "emojis"
+  },
+  {
+    "id": "c23-48",
+    "slug": "flag-azerbaijan",
+    "path": "/emojis/flag-azerbaijan/",
+    "title": "🇦🇿 Флаг Азербайджанской Республики",
+    "heading": "🇦🇿 Флаг Азербайджанской Республики",
+    "description": "Скопируйте флаг Азербайджанской Республики, посмотрите значение, варианты написания и Unicode-коды для вставки в текст.",
+    "category": "emojis"
+  },
+  {
+    "id": "c23-49",
+    "slug": "flag-bosnia-herzegovina",
+    "path": "/emojis/flag-bosnia-herzegovina/",
+    "title": "🇧🇦 Флаг Боснии и Герцеговины",
+    "heading": "🇧🇦 Флаг Боснии и Герцеговины",
+    "description": "Скопируйте флаг Боснии и Герцеговины, посмотрите значение, варианты написания и Unicode-коды для вставки в текст.",
+    "category": "emojis"
+  },
+  {
+    "id": "c23-50",
+    "slug": "flag-barbados",
+    "path": "/emojis/flag-barbados/",
+    "title": "🇧🇧 Флаг Барбадоса",
+    "heading": "🇧🇧 Флаг Барбадоса",
+    "description": "Скопируйте флаг Барбадоса, посмотрите значение, варианты написания и Unicode-коды для вставки в текст.",
+    "category": "emojis"
+  },
+  {
+    "id": "c23-51",
+    "slug": "flag-bangladesh",
+    "path": "/emojis/flag-bangladesh/",
+    "title": "🇧🇩 Флаг Бангладеш",
+    "heading": "🇧🇩 Флаг Бангладеш",
+    "description": "Скопируйте флаг Бангладеш, посмотрите значение, варианты написания и Unicode-коды для вставки в текст.",
+    "category": "emojis"
+  },
+  {
+    "id": "c23-52",
+    "slug": "flag-belgium",
+    "path": "/emojis/flag-belgium/",
+    "title": "🇧🇪 Флаг Бельгии",
+    "heading": "🇧🇪 Флаг Бельгии",
+    "description": "Скопируйте флаг Бельгии, посмотрите значение, варианты написания и Unicode-коды для вставки в текст.",
+    "category": "emojis"
+  },
+  {
+    "id": "c23-53",
+    "slug": "flag-burkina-faso",
+    "path": "/emojis/flag-burkina-faso/",
+    "title": "🇧🇫 Флаг Буркина-Фасо",
+    "heading": "🇧🇫 Флаг Буркина-Фасо",
+    "description": "Скопируйте флаг Буркина-Фасо, посмотрите значение, варианты написания и Unicode-коды для вставки в текст.",
+    "category": "emojis"
+  },
+  {
+    "id": "c23-54",
+    "slug": "flag-bulgaria",
+    "path": "/emojis/flag-bulgaria/",
+    "title": "🇧🇬 Флаг Болгарии",
+    "heading": "🇧🇬 Флаг Болгарии",
+    "description": "Скопируйте флаг Болгарии, посмотрите значение, варианты написания и Unicode-коды для вставки в текст.",
+    "category": "emojis"
+  },
+  {
+    "id": "c23-55",
+    "slug": "flag-bahrain",
+    "path": "/emojis/flag-bahrain/",
+    "title": "🇧🇭 Флаг Бахрейна",
+    "heading": "🇧🇭 Флаг Бахрейна",
+    "description": "Скопируйте флаг Бахрейна, посмотрите значение, варианты написания и Unicode-коды для вставки в текст.",
+    "category": "emojis"
+  },
+  {
+    "id": "c23-56",
+    "slug": "flag-burundi",
+    "path": "/emojis/flag-burundi/",
+    "title": "🇧🇮 Флаг Бурунди",
+    "heading": "🇧🇮 Флаг Бурунди",
+    "description": "Скопируйте флаг Бурунди, посмотрите значение, варианты написания и Unicode-коды для вставки в текст.",
+    "category": "emojis"
+  },
+  {
+    "id": "c23-57",
+    "slug": "flag-benin",
+    "path": "/emojis/flag-benin/",
+    "title": "🇧🇯 Флаг Бенина",
+    "heading": "🇧🇯 Флаг Бенина",
+    "description": "Скопируйте флаг Бенина, посмотрите значение, варианты написания и Unicode-коды для вставки в текст.",
+    "category": "emojis"
+  },
+  {
+    "id": "c23-58",
+    "slug": "flag-st-barthelemy",
+    "path": "/emojis/flag-st-barthelemy/",
+    "title": "🇧🇱 Флаг Сен-Бартелеми",
+    "heading": "🇧🇱 Флаг Сен-Бартелеми",
+    "description": "Скопируйте флаг Сен-Бартелеми, посмотрите значение, варианты написания и Unicode-коды для вставки в текст.",
+    "category": "emojis"
+  },
+  {
+    "id": "c23-59",
+    "slug": "flag-bermuda",
+    "path": "/emojis/flag-bermuda/",
+    "title": "🇧🇲 Флаг Бермуд",
+    "heading": "🇧🇲 Флаг Бермуд",
+    "description": "Скопируйте флаг Бермуд, посмотрите значение, варианты написания и Unicode-коды для вставки в текст.",
+    "category": "emojis"
+  },
+  {
+    "id": "c23-60",
+    "slug": "flag-brunei",
+    "path": "/emojis/flag-brunei/",
+    "title": "🇧🇳 Флаг Брунея",
+    "heading": "🇧🇳 Флаг Брунея",
+    "description": "Скопируйте флаг Брунея, посмотрите значение, варианты написания и Unicode-коды для вставки в текст.",
+    "category": "emojis"
+  },
+  {
+    "id": "c23-61",
+    "slug": "flag-bolivia",
+    "path": "/emojis/flag-bolivia/",
+    "title": "🇧🇴 Флаг Боливии",
+    "heading": "🇧🇴 Флаг Боливии",
+    "description": "Скопируйте флаг Боливии, посмотрите значение, варианты написания и Unicode-коды для вставки в текст.",
+    "category": "emojis"
+  },
+  {
+    "id": "c23-62",
+    "slug": "flag-caribbean-netherlands",
+    "path": "/emojis/flag-caribbean-netherlands/",
+    "title": "🇧🇶 Флаг Карибских Нидерландов",
+    "heading": "🇧🇶 Флаг Карибских Нидерландов",
+    "description": "Скопируйте флаг Карибских Нидерландов, посмотрите значение, варианты написания и Unicode-коды для вставки в текст.",
+    "category": "emojis"
+  },
+  {
+    "id": "c23-63",
+    "slug": "flag-brazil",
+    "path": "/emojis/flag-brazil/",
+    "title": "🇧🇷 Флаг Бразилии",
+    "heading": "🇧🇷 Флаг Бразилии",
+    "description": "Скопируйте флаг Бразилии, посмотрите значение, варианты написания и Unicode-коды для вставки в текст.",
+    "category": "emojis"
+  },
+  {
+    "id": "c23-64",
+    "slug": "flag-bahamas",
+    "path": "/emojis/flag-bahamas/",
+    "title": "🇧🇸 Флаг Багамских Островов",
+    "heading": "🇧🇸 Флаг Багамских Островов",
+    "description": "Скопируйте флаг Багамских Островов, посмотрите значение, варианты написания и Unicode-коды для вставки в текст.",
+    "category": "emojis"
+  },
+  {
+    "id": "c23-65",
+    "slug": "flag-bhutan",
+    "path": "/emojis/flag-bhutan/",
+    "title": "🇧🇹 Флаг Бутана",
+    "heading": "🇧🇹 Флаг Бутана",
+    "description": "Скопируйте флаг Бутана, посмотрите значение, варианты написания и Unicode-коды для вставки в текст.",
+    "category": "emojis"
+  },
+  {
+    "id": "c23-66",
+    "slug": "flag-bouvet-island",
+    "path": "/emojis/flag-bouvet-island/",
+    "title": "🇧🇻 флаг острова Буве",
+    "heading": "🇧🇻 флаг острова Буве",
+    "description": "Скопируйте флаг острова Буве, посмотрите значение, варианты написания и Unicode-коды для вставки в текст.",
+    "category": "emojis"
+  },
+  {
+    "id": "c23-67",
+    "slug": "flag-botswana",
+    "path": "/emojis/flag-botswana/",
+    "title": "🇧🇼 Флаг Ботсваны",
+    "heading": "🇧🇼 Флаг Ботсваны",
+    "description": "Скопируйте флаг Ботсваны, посмотрите значение, варианты написания и Unicode-коды для вставки в текст.",
+    "category": "emojis"
+  },
+  {
+    "id": "c23-68",
+    "slug": "flag-belarus",
+    "path": "/emojis/flag-belarus/",
+    "title": "🇧🇾 Флаг Республики Беларусь",
+    "heading": "🇧🇾 Флаг Республики Беларусь",
+    "description": "Скопируйте флаг Республики Беларусь, посмотрите значение, варианты написания и Unicode-коды для вставки в текст.",
+    "category": "emojis"
+  },
+  {
+    "id": "c23-69",
+    "slug": "flag-belize",
+    "path": "/emojis/flag-belize/",
+    "title": "🇧🇿 Флаг Белиза",
+    "heading": "🇧🇿 Флаг Белиза",
+    "description": "Скопируйте флаг Белиза, посмотрите значение, варианты написания и Unicode-коды для вставки в текст.",
+    "category": "emojis"
+  },
+  {
+    "id": "c23-70",
+    "slug": "flag-canada",
+    "path": "/emojis/flag-canada/",
+    "title": "🇨🇦 Флаг Канады",
+    "heading": "🇨🇦 Флаг Канады",
+    "description": "Скопируйте флаг Канады, посмотрите значение, варианты написания и Unicode-коды для вставки в текст.",
+    "category": "emojis"
+  },
+  {
+    "id": "c23-71",
+    "slug": "flag-cocos-islands",
+    "path": "/emojis/flag-cocos-islands/",
+    "title": "🇨🇨 Флаг Кокосовых островов",
+    "heading": "🇨🇨 Флаг Кокосовых островов",
+    "description": "Скопируйте флаг Кокосовых островов, посмотрите значение, варианты написания и Unicode-коды для вставки в текст.",
+    "category": "emojis"
+  },
+  {
+    "id": "c23-72",
+    "slug": "flag-congo-kinshasa",
+    "path": "/emojis/flag-congo-kinshasa/",
+    "title": "🇨🇩 Флаг Демократической Республики Конго",
+    "heading": "🇨🇩 Флаг Демократической Республики Конго",
+    "description": "Скопируйте флаг Демократической Республики Конго, посмотрите значение, варианты написания и Unicode-коды для вставки в текст.",
+    "category": "emojis"
+  },
+  {
+    "id": "c23-73",
+    "slug": "flag-central-african-republic",
+    "path": "/emojis/flag-central-african-republic/",
+    "title": "🇨🇫 Флаг Центральноафриканской Республики",
+    "heading": "🇨🇫 Флаг Центральноафриканской Республики",
+    "description": "Скопируйте флаг Центральноафриканской Республики, посмотрите значение, варианты написания и Unicode-коды для вставки в текст.",
+    "category": "emojis"
+  },
+  {
+    "id": "c23-74",
+    "slug": "flag-congo-brazzaville",
+    "path": "/emojis/flag-congo-brazzaville/",
+    "title": "🇨🇬 Флаг Республики Конго",
+    "heading": "🇨🇬 Флаг Республики Конго",
+    "description": "Скопируйте флаг Республики Конго, посмотрите значение, варианты написания и Unicode-коды для вставки в текст.",
+    "category": "emojis"
+  },
+  {
+    "id": "c23-75",
+    "slug": "flag-switzerland",
+    "path": "/emojis/flag-switzerland/",
+    "title": "🇨🇭 Флаг Швейцарии",
+    "heading": "🇨🇭 Флаг Швейцарии",
+    "description": "Скопируйте флаг Швейцарии, посмотрите значение, варианты написания и Unicode-коды для вставки в текст.",
+    "category": "emojis"
+  },
+  {
+    "id": "c23-76",
+    "slug": "flag-cote-d-ivoire",
+    "path": "/emojis/flag-cote-d-ivoire/",
+    "title": "🇨🇮 Флаг Кот-д’Ивуара",
+    "heading": "🇨🇮 Флаг Кот-д’Ивуара",
+    "description": "Скопируйте флаг Кот-д’Ивуара, посмотрите значение, варианты написания и Unicode-коды для вставки в текст.",
+    "category": "emojis"
+  },
+  {
+    "id": "c23-77",
+    "slug": "flag-cook-islands",
+    "path": "/emojis/flag-cook-islands/",
+    "title": "🇨🇰 Флаг Островов Кука",
+    "heading": "🇨🇰 Флаг Островов Кука",
+    "description": "Скопируйте флаг Островов Кука, посмотрите значение, варианты написания и Unicode-коды для вставки в текст.",
+    "category": "emojis"
+  },
+  {
+    "id": "c23-78",
+    "slug": "flag-chile",
+    "path": "/emojis/flag-chile/",
+    "title": "🇨🇱 Флаг Чили",
+    "heading": "🇨🇱 Флаг Чили",
+    "description": "Скопируйте флаг Чили, посмотрите значение, варианты написания и Unicode-коды для вставки в текст.",
+    "category": "emojis"
+  },
+  {
+    "id": "c23-79",
+    "slug": "flag-cameroon",
+    "path": "/emojis/flag-cameroon/",
+    "title": "🇨🇲 Флаг Камеруна",
+    "heading": "🇨🇲 Флаг Камеруна",
+    "description": "Скопируйте флаг Камеруна, посмотрите значение, варианты написания и Unicode-коды для вставки в текст.",
+    "category": "emojis"
+  },
+  {
+    "id": "c23-80",
+    "slug": "flag-china",
+    "path": "/emojis/flag-china/",
+    "title": "🇨🇳 Флаг Китая",
+    "heading": "🇨🇳 Флаг Китая",
+    "description": "Скопируйте флаг Китая, посмотрите значение, варианты написания и Unicode-коды для вставки в текст.",
+    "category": "emojis"
+  },
+  {
+    "id": "c23-81",
+    "slug": "flag-colombia",
+    "path": "/emojis/flag-colombia/",
+    "title": "🇨🇴 Флаг Колумбии",
+    "heading": "🇨🇴 Флаг Колумбии",
+    "description": "Скопируйте флаг Колумбии, посмотрите значение, варианты написания и Unicode-коды для вставки в текст.",
+    "category": "emojis"
+  },
+  {
+    "id": "c23-82",
+    "slug": "flag-clipperton-island",
+    "path": "/emojis/flag-clipperton-island/",
+    "title": "🇨🇵 флаг острова Клиппертон",
+    "heading": "🇨🇵 флаг острова Клиппертон",
+    "description": "Скопируйте флаг острова Клиппертон, посмотрите значение, варианты написания и Unicode-коды для вставки в текст.",
+    "category": "emojis"
+  },
+  {
+    "id": "c23-83",
+    "slug": "flag-sark",
+    "path": "/emojis/flag-sark/",
+    "title": "🇨🇶 флаг Сарка",
+    "heading": "🇨🇶 флаг Сарка",
+    "description": "Скопируйте флаг Сарка, посмотрите значение, варианты написания и Unicode-коды для вставки в текст.",
+    "category": "emojis"
+  },
+  {
+    "id": "c23-84",
+    "slug": "flag-costa-rica",
+    "path": "/emojis/flag-costa-rica/",
+    "title": "🇨🇷 Флаг Коста-Рики",
+    "heading": "🇨🇷 Флаг Коста-Рики",
+    "description": "Скопируйте флаг Коста-Рики, посмотрите значение, варианты написания и Unicode-коды для вставки в текст.",
+    "category": "emojis"
+  },
+  {
+    "id": "c23-85",
+    "slug": "flag-cuba",
+    "path": "/emojis/flag-cuba/",
+    "title": "🇨🇺 Флаг Кубы",
+    "heading": "🇨🇺 Флаг Кубы",
+    "description": "Скопируйте флаг Кубы, посмотрите значение, варианты написания и Unicode-коды для вставки в текст.",
+    "category": "emojis"
+  },
+  {
+    "id": "c23-86",
+    "slug": "flag-cape-verde",
+    "path": "/emojis/flag-cape-verde/",
+    "title": "🇨🇻 Флаг Кабо-Верде",
+    "heading": "🇨🇻 Флаг Кабо-Верде",
+    "description": "Скопируйте флаг Кабо-Верде, посмотрите значение, варианты написания и Unicode-коды для вставки в текст.",
+    "category": "emojis"
+  },
+  {
+    "id": "c23-87",
+    "slug": "flag-curacao",
+    "path": "/emojis/flag-curacao/",
+    "title": "🇨🇼 Флаг Кюрасао",
+    "heading": "🇨🇼 Флаг Кюрасао",
+    "description": "Скопируйте флаг Кюрасао, посмотрите значение, варианты написания и Unicode-коды для вставки в текст.",
+    "category": "emojis"
+  },
+  {
+    "id": "c23-88",
+    "slug": "flag-christmas-island",
+    "path": "/emojis/flag-christmas-island/",
+    "title": "🇨🇽 Флаг Острова Рождества",
+    "heading": "🇨🇽 Флаг Острова Рождества",
+    "description": "Скопируйте флаг Острова Рождества, посмотрите значение, варианты написания и Unicode-коды для вставки в текст.",
+    "category": "emojis"
+  },
+  {
+    "id": "c23-89",
+    "slug": "flag-cyprus",
+    "path": "/emojis/flag-cyprus/",
+    "title": "🇨🇾 Флаг Республики Кипр",
+    "heading": "🇨🇾 Флаг Республики Кипр",
+    "description": "Скопируйте флаг Республики Кипр, посмотрите значение, варианты написания и Unicode-коды для вставки в текст.",
+    "category": "emojis"
+  },
+  {
+    "id": "c23-90",
+    "slug": "flag-czechia",
+    "path": "/emojis/flag-czechia/",
+    "title": "🇨🇿 Флаг Чехии",
+    "heading": "🇨🇿 Флаг Чехии",
+    "description": "Скопируйте флаг Чехии, посмотрите значение, варианты написания и Unicode-коды для вставки в текст.",
+    "category": "emojis"
+  },
+  {
+    "id": "c23-91",
+    "slug": "flag-germany",
+    "path": "/emojis/flag-germany/",
+    "title": "🇩🇪 Флаг Германии",
+    "heading": "🇩🇪 Флаг Германии",
+    "description": "Скопируйте флаг Германии, посмотрите значение, варианты написания и Unicode-коды для вставки в текст.",
+    "category": "emojis"
+  },
+  {
+    "id": "c23-92",
+    "slug": "flag-diego-garcia",
+    "path": "/emojis/flag-diego-garcia/",
+    "title": "🇩🇬 флаг Диего-Гарсии",
+    "heading": "🇩🇬 флаг Диего-Гарсии",
+    "description": "Скопируйте флаг Диего-Гарсии, посмотрите значение, варианты написания и Unicode-коды для вставки в текст.",
+    "category": "emojis"
+  },
+  {
+    "id": "c23-93",
+    "slug": "flag-djibouti",
+    "path": "/emojis/flag-djibouti/",
+    "title": "🇩🇯 Флаг Джибути",
+    "heading": "🇩🇯 Флаг Джибути",
+    "description": "Скопируйте флаг Джибути, посмотрите значение, варианты написания и Unicode-коды для вставки в текст.",
+    "category": "emojis"
+  },
+  {
+    "id": "c23-94",
+    "slug": "flag-denmark",
+    "path": "/emojis/flag-denmark/",
+    "title": "🇩🇰 Флаг Дании",
+    "heading": "🇩🇰 Флаг Дании",
+    "description": "Скопируйте флаг Дании, посмотрите значение, варианты написания и Unicode-коды для вставки в текст.",
+    "category": "emojis"
+  },
+  {
+    "id": "c23-95",
+    "slug": "flag-dominica",
+    "path": "/emojis/flag-dominica/",
+    "title": "🇩🇲 Флаг Доминики",
+    "heading": "🇩🇲 Флаг Доминики",
+    "description": "Скопируйте флаг Доминики, посмотрите значение, варианты написания и Unicode-коды для вставки в текст.",
+    "category": "emojis"
+  },
+  {
+    "id": "c23-96",
+    "slug": "flag-dominican-republic",
+    "path": "/emojis/flag-dominican-republic/",
+    "title": "🇩🇴 Флаг Доминиканской Республики",
+    "heading": "🇩🇴 Флаг Доминиканской Республики",
+    "description": "Скопируйте флаг Доминиканской Республики, посмотрите значение, варианты написания и Unicode-коды для вставки в текст.",
+    "category": "emojis"
+  },
+  {
+    "id": "c23-97",
+    "slug": "flag-algeria",
+    "path": "/emojis/flag-algeria/",
+    "title": "🇩🇿 Флаг Алжира",
+    "heading": "🇩🇿 Флаг Алжира",
+    "description": "Скопируйте флаг Алжира, посмотрите значение, варианты написания и Unicode-коды для вставки в текст.",
+    "category": "emojis"
+  },
+  {
+    "id": "c23-98",
+    "slug": "flag-ceuta-melilla",
+    "path": "/emojis/flag-ceuta-melilla/",
+    "title": "🇪🇦 флаг Сеуты и Мелильи",
+    "heading": "🇪🇦 флаг Сеуты и Мелильи",
+    "description": "Скопируйте флаг Сеуты и Мелильи, посмотрите значение, варианты написания и Unicode-коды для вставки в текст.",
+    "category": "emojis"
+  },
+  {
+    "id": "c23-99",
+    "slug": "flag-ecuador",
+    "path": "/emojis/flag-ecuador/",
+    "title": "🇪🇨 Флаг Эквадора",
+    "heading": "🇪🇨 Флаг Эквадора",
+    "description": "Скопируйте флаг Эквадора, посмотрите значение, варианты написания и Unicode-коды для вставки в текст.",
+    "category": "emojis"
+  },
+  {
+    "id": "c23-100",
+    "slug": "flag-estonia",
+    "path": "/emojis/flag-estonia/",
+    "title": "🇪🇪 Флаг Эстонии",
+    "heading": "🇪🇪 Флаг Эстонии",
+    "description": "Скопируйте флаг Эстонии, посмотрите значение, варианты написания и Unicode-коды для вставки в текст.",
+    "category": "emojis"
+  }
+]

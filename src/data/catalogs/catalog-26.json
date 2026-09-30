@@ -1,0 +1,50 @@
+[
+  {
+    "id": "c26-1",
+    "slug": "facebook-text-link",
+    "path": "/facebook/text-link/",
+    "title": "Текстовая ссылка для Facebook",
+    "heading": "Текстовая ссылка для Facebook",
+    "description": "Создайте безопасную HTML- или Markdown-ссылку на публичную страницу Facebook. Адрес проверяется локально, без входа и сетевых запросов."
+  },
+  {
+    "id": "c26-2",
+    "slug": "facebook-friends-list",
+    "path": "/facebook/friends-list/",
+    "title": "Список друзей Facebook из исходного кода",
+    "heading": "Список друзей Facebook",
+    "description": "Локально извлеките найденные профили из собственного HTML или JSON-экспорта Facebook. Данные не покидают браузер."
+  },
+  {
+    "id": "c26-3",
+    "slug": "facebook-favorite-friends",
+    "path": "/facebook/favorite-friends/",
+    "title": "Избранные друзья Facebook в экспорте",
+    "heading": "Мои любимые друзья Facebook",
+    "description": "Разберите собственный HTML или JSON-экспорт Facebook и посмотрите порядок найденных записей. Это не оценка реальной дружбы."
+  },
+  {
+    "id": "c26-4",
+    "slug": "facebook-id",
+    "path": "/facebook/id/",
+    "title": "Как найти числовой Facebook ID",
+    "heading": "Что такое мой Facebook ID? User ID / Page ID",
+    "description": "Найдите числовой Facebook ID в публичной ссылке или фрагменте собственного экспорта. Инструмент не обращается к Facebook."
+  },
+  {
+    "id": "c26-5",
+    "slug": "generator-qr-code-facebook-app",
+    "path": "/generator/qr-code/facebook-app/",
+    "title": "QR-генератор кода для Facebook App",
+    "heading": "QR-генератор кода для Facebook",
+    "description": "Создайте QR-код для ссылки Facebook прямо в браузере и скачайте результат."
+  },
+  {
+    "id": "c26-6",
+    "slug": "facebook-symbols",
+    "path": "/facebook-symbols/",
+    "title": "Facebook-символы и эмодзи",
+    "heading": "Facebook символы",
+    "description": "Выбирайте, копируйте и используйте символы и эмодзи для публикаций Facebook."
+  }
+]

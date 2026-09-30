@@ -1,0 +1,217 @@
+/**
+ * Cross-category related tools map.
+ * Used in ToolPage to suggest tools from different categories
+ * that logically follow the user's current workflow.
+ */
+export const relatedToolsMap: Record<string, string[]> = {
+  'file-converter': ['image-converter', 'image-compressor', 'pdf-to-image', 'jpg-to-pdf'],
+  // ── PDF workflow ──
+  'merge-pdf': ['split-pdf', 'compress-pdf', 'rotate-pdf', 'jpg-to-pdf', 'pdf-to-image', 'watermark-pdf'],
+  'split-pdf': ['merge-pdf', 'rotate-pdf', 'pdf-to-text', 'compress-pdf'],
+  'compress-pdf': ['merge-pdf', 'pdf-to-image', 'split-pdf', 'watermark-pdf'],
+  'rotate-pdf': ['merge-pdf', 'split-pdf', 'pdf-to-image'],
+  'watermark-pdf': ['protect-pdf', 'merge-pdf', 'compress-pdf'],
+  'protect-pdf': ['watermark-pdf', 'merge-pdf', 'pdf-metadata'],
+  'pdf-to-image': ['file-converter', 'compress-pdf', 'image-compressor', 'image-converter', 'jpg-to-pdf'],
+  'jpg-to-pdf': ['merge-pdf', 'compress-pdf', 'image-resizer', 'pdf-to-image'],
+  'pdf-to-text': ['text-analyzer', 'text-cleaner', 'diff-checker'],
+  'pdf-metadata': ['protect-pdf', 'watermark-pdf', 'merge-pdf'],
+  'pdf-studio': ['merge-pdf', 'split-pdf', 'watermark-pdf', 'protect-pdf'],
+  'word-to-pdf': ['merge-pdf', 'compress-pdf', 'pdf-to-word'],
+  'pdf-to-word': ['word-to-pdf', 'pdf-to-text', 'text-cleaner'],
+
+  // ── Developer workflow ──
+  'json-formatter': ['json-csv', 'yaml-json', 'xml-formatter', 'js-beautifier', 'json-data-gen'],
+  'json-csv': ['json-formatter', 'data-converter', 'mockdata-generator'],
+  'json-data-gen': ['mockdata-generator', 'json-formatter', 'json-csv'],
+  'yaml-json': ['json-formatter', 'data-converter', 'xml-formatter'],
+  'xml-formatter': ['json-formatter', 'html-formatter', 'yaml-json'],
+  'js-beautifier': ['css-minifier', 'html-formatter', 'json-formatter'],
+  'css-minifier': ['js-beautifier', 'html-formatter', 'css-animation'],
+  'html-formatter': ['js-beautifier', 'css-minifier', 'xml-formatter', 'markdown-preview'],
+  'sql-formatter': ['json-formatter', 'regex-tester', 'data-converter'],
+  'regex-tester': ['regex-library', 'text-replace', 'diff-checker', 'string-extractor'],
+  'regex-library': ['regex-tester', 'text-replace', 'string-extractor'],
+  'diff-checker': ['text-replace', 'text-cleaner', 'json-formatter'],
+  'hash-generator': ['checksum-calc', 'password-generator', 'base64-encoder', 'uuid-generator'],
+  'checksum-calc': ['hash-generator', 'password-strength'],
+  'uuid-generator': ['hash-generator', 'random-number', 'password-generator'],
+  'jwt-decoder': ['base64-encoder', 'json-formatter', 'hash-generator'],
+  'cron-generator': ['unix-timestamp', 'date-difference'],
+  'mockdata-generator': ['json-data-gen', 'json-formatter', 'lorem-ipsum'],
+  'base64-encoder': ['url-encoder', 'html-encoder', 'jwt-decoder', 'hash-generator'],
+  'url-encoder': ['base64-encoder', 'html-encoder', 'url-validator'],
+  'html-encoder': ['base64-encoder', 'url-encoder', 'html-formatter'],
+  'binary-text': ['morse-code', 'base64-encoder', 'number-system'],
+  'morse-code': ['binary-text', 'transliteration', 'base64-encoder'],
+  'chmod-calc': ['port-list', 'ip-calculator', 'subnet-calc'],
+  'ip-calculator': ['subnet-calc', 'ip-validator', 'port-list'],
+  'subnet-calc': ['ip-calculator', 'ip-validator', 'chmod-calc'],
+
+  // ── Image workflow ──
+  'image-compressor': ['file-converter', 'image-converter', 'image-resizer', 'image-crop'],
+  'image-converter': ['file-converter', 'image-compressor', 'image-resizer', 'image-to-base64'],
+  'image-resizer': ['image-compressor', 'image-crop', 'image-converter'],
+  'image-crop': ['image-resizer', 'image-rotate', 'image-filters'],
+  'image-filters': ['image-crop', 'image-rotate', 'image-colors'],
+  'image-rotate': ['image-crop', 'image-filters', 'image-resizer'],
+  'image-colors': ['color-picker', 'palette-generator', 'image-filters'],
+  'image-to-base64': ['base64-encoder', 'image-converter', 'image-compressor'],
+  'favicon-generator': ['image-resizer', 'pixel-art', 'avatar-generator'],
+  'watermark-image': ['image-compressor', 'image-filters', 'watermark-pdf'],
+  'html-to-image': ['image-converter', 'html-formatter', 'markdown-preview'],
+  'youtube-thumbnail': ['image-resizer', 'image-compressor', 'meme-generator'],
+
+  // ── SEO workflow ──
+  'seo-meta-tool': ['robots-generator', 'sitemap-generator', 'keyword-density'],
+  'sitemap-generator': ['robots-generator', 'seo-meta-tool', 'url-validator'],
+  'robots-generator': ['sitemap-generator', 'seo-meta-tool'],
+  'keyword-density': ['seo-meta-tool', 'text-analyzer', 'text-cleaner'],
+
+  // ── Color workflow ──
+  'color-converter': ['color-picker', 'palette-generator', 'contrast-checker', 'gradient-generator'],
+  'color-picker': ['color-converter', 'palette-generator', 'material-colors', 'tailwind-colors'],
+  'palette-generator': ['color-picker', 'gradient-generator', 'contrast-checker', 'color-blender'],
+  'gradient-generator': ['palette-generator', 'css-animation', 'color-converter'],
+  'contrast-checker': ['color-converter', 'palette-generator', 'color-picker'],
+  'color-blender': ['palette-generator', 'color-converter', 'gradient-generator'],
+  'color-wheel': ['color-picker', 'palette-generator', 'color-converter'],
+  'material-colors': ['tailwind-colors', 'color-picker', 'palette-generator'],
+  'tailwind-colors': ['material-colors', 'color-picker', 'css-animation'],
+  'random-color': ['color-picker', 'palette-generator', 'color-converter'],
+
+  // ── Text workflow ──
+  'text-analyzer': ['text-cleaner', 'keyword-density', 'diff-checker'],
+  'text-cleaner': ['text-replace', 'text-formatter', 'remove-duplicates'],
+  'text-replace': ['regex-tester', 'text-cleaner', 'diff-checker'],
+  'text-formatter': ['case-converter', 'text-cleaner', 'text-sort'],
+  'case-converter': ['text-formatter', 'slug-generator', 'transliteration'],
+  'text-sort': ['remove-duplicates', 'text-cleaner', 'text-formatter'],
+  'text-reverse': ['text-formatter', 'case-converter', 'binary-text'],
+  'remove-duplicates': ['text-sort', 'text-cleaner', 'diff-checker'],
+  'lorem-ipsum': ['mockdata-generator', 'text-formatter', 'markdown-preview'],
+  'symbol-catalog': ['unicode-lookup', 'text-formatter', 'html-encoder'],
+  'unicode-lookup': ['symbol-catalog', 'html-encoder', 'text-formatter'],
+  'slug-generator': ['transliteration', 'case-converter', 'url-encoder'],
+  'transliteration': ['slug-generator', 'case-converter', 'morse-code'],
+  'markdown-preview': ['html-formatter', 'github-readme', 'text-formatter'],
+  'github-readme': ['markdown-preview', 'svg-editor', 'text-formatter'],
+  'string-extractor': ['regex-tester', 'text-replace', 'text-cleaner'],
+  'text-to-speech': ['text-analyzer', 'transliteration'],
+  'text-extractor': ['pdf-to-text', 'text-cleaner', 'text-analyzer'],
+
+  // ── CSS/Design workflow ──
+  'box-shadow': ['css-animation', 'gradient-generator', 'flexbox-playground'],
+  'css-animation': ['box-shadow', 'gradient-generator', 'tailwind-colors'],
+  'flexbox-playground': ['grid-playground', 'box-shadow', 'css-animation'],
+  'grid-playground': ['flexbox-playground', 'css-animation', 'box-shadow'],
+  'svg-editor': ['favicon-generator', 'github-readme', 'gradient-generator'],
+  'pixel-art': ['favicon-generator', 'image-colors', 'svg-editor'],
+  'meme-generator': ['image-crop', 'image-resizer', 'youtube-thumbnail'],
+
+  // ── Math workflow ──
+  'scientific-calc': ['equation-solver', 'statistics-calc', 'matrix-calc', 'graph-plotter'],
+  'equation-solver': ['scientific-calc', 'graph-plotter', 'proportion-calc'],
+  'statistics-calc': ['scientific-calc', 'graph-plotter', 'percentage-calc'],
+  'matrix-calc': ['scientific-calc', 'equation-solver'],
+  'graph-plotter': ['equation-solver', 'scientific-calc', 'statistics-calc'],
+  'percentage-calc': ['discount-calc', 'proportion-calc', 'tip-calc'],
+  'proportion-calc': ['percentage-calc', 'equation-solver', 'fraction-calc'],
+  'fraction-calc': ['proportion-calc', 'gcd-lcm', 'scientific-calc'],
+  'gcd-lcm': ['fraction-calc', 'prime-checker', 'factorial-calc'],
+  'prime-checker': ['gcd-lcm', 'factorial-calc', 'number-system'],
+  'factorial-calc': ['prime-checker', 'gcd-lcm', 'scientific-calc'],
+  'number-system': ['binary-text', 'prime-checker', 'roman-numerals'],
+  'roman-numerals': ['number-system', 'unicode-lookup'],
+
+  // ── Finance workflow ──
+  'budget-planner': ['salary-calc', 'tax-calc', 'investment-calc'],
+  'investment-calc': ['compound-interest', 'deposit-calc', 'inflation-calc'],
+  'compound-interest': ['investment-calc', 'deposit-calc', 'loan-calc'],
+  'loan-calc': ['mortgage-calc', 'compound-interest', 'deposit-calc'],
+  'mortgage-calc': ['loan-calc', 'compound-interest', 'investment-calc'],
+  'deposit-calc': ['compound-interest', 'investment-calc', 'inflation-calc'],
+  'inflation-calc': ['investment-calc', 'deposit-calc', 'salary-calc'],
+  'salary-calc': ['tax-calc', 'budget-planner', 'inflation-calc'],
+  'tax-calc': ['salary-calc', 'discount-calc', 'percentage-calc'],
+  'discount-calc': ['percentage-calc', 'tax-calc', 'tip-calc'],
+  'tip-calc': ['discount-calc', 'percentage-calc'],
+  'retirement-calc': ['investment-calc', 'compound-interest', 'inflation-calc'],
+
+  // ── Health workflow ──
+  'body-metrics': ['heart-rate-zone', 'water-intake', 'sleep-calc'],
+  'heart-rate-zone': ['body-metrics', 'sleep-calc', 'water-intake'],
+  'water-intake': ['body-metrics', 'sleep-calc', 'heart-rate-zone'],
+  'sleep-calc': ['water-intake', 'heart-rate-zone', 'body-metrics', 'pomodoro'],
+  'pregnancy-calc': ['body-metrics', 'age-calculator', 'date-difference'],
+
+  // ── Time/Date workflow ──
+  'age-calculator': ['date-difference', 'countdown', 'week-number'],
+  'date-difference': ['age-calculator', 'countdown', 'unix-timestamp'],
+  'unix-timestamp': ['date-difference', 'timezone-converter', 'cron-generator'],
+  'timezone-converter': ['world-clock', 'unix-timestamp', 'date-difference'],
+  'world-clock': ['timezone-converter', 'countdown', 'pomodoro'],
+  'countdown': ['date-difference', 'timer', 'pomodoro'],
+  'timer': ['countdown', 'pomodoro', 'metronome'],
+  'pomodoro': ['timer', 'countdown', 'todo-list'],
+  'week-number': ['age-calculator', 'date-difference', 'calendar'],
+  'calendar': ['week-number', 'date-difference', 'countdown'],
+
+  // ── Utility workflow ──
+  'random-picker': ['team-generator', 'random-number', 'random-name'],
+  'team-generator': ['random-picker', 'random-name', 'random-number'],
+  'random-number': ['random-picker', 'uuid-generator', 'password-generator'],
+  'random-name': ['random-picker', 'team-generator', 'avatar-generator'],
+  'password-generator': ['password-strength', 'hash-generator', 'random-number'],
+  'password-strength': ['password-generator', 'hash-generator'],
+  'typing-speed': ['text-analyzer', 'pomodoro'],
+
+  // ── Converter workflow ──
+  'length-converter': ['area-converter', 'volume-converter', 'weight-converter'],
+  'area-converter': ['length-converter', 'volume-converter'],
+  'volume-converter': ['cooking-converter', 'length-converter', 'weight-converter'],
+  'weight-converter': ['length-converter', 'cooking-converter', 'body-metrics'],
+  'temperature-converter': ['energy-converter', 'pressure-converter'],
+  'speed-converter': ['length-converter', 'fuel-converter'],
+  'energy-converter': ['power-converter', 'temperature-converter'],
+  'power-converter': ['energy-converter', 'pressure-converter'],
+  'pressure-converter': ['temperature-converter', 'power-converter'],
+  'fuel-converter': ['speed-converter', 'length-converter'],
+  'angle-converter': ['coordinate-converter', 'length-converter'],
+  'cooking-converter': ['volume-converter', 'weight-converter'],
+  'clothing-size': ['shoe-size', 'body-metrics'],
+  'shoe-size': ['clothing-size', 'length-converter'],
+  'data-converter': ['json-csv', 'yaml-json', 'json-formatter'],
+  'paper-size': ['jpg-to-pdf', 'image-resizer'],
+
+  // ── Validators ──
+  'email-validator': ['url-validator', 'phone-validator', 'ip-validator'],
+  'url-validator': ['email-validator', 'url-encoder', 'sitemap-generator'],
+  'phone-validator': ['email-validator', 'iban-validator'],
+  'ip-validator': ['ip-calculator', 'subnet-calc', 'mac-lookup'],
+  'iban-validator': ['phone-validator', 'email-validator'],
+
+  // ── Network ──
+  'mac-lookup': ['ip-validator', 'user-agent-parser', 'port-list'],
+  'port-list': ['ip-calculator', 'subnet-calc', 'chmod-calc'],
+  'http-status': ['user-agent-parser', 'url-validator', 'mime-types'],
+  'user-agent-parser': ['http-status', 'screen-resolution', 'mac-lookup'],
+  'mime-types': ['http-status', 'url-validator'],
+  'screen-resolution': ['user-agent-parser', 'video-aspect', 'image-resizer'],
+  'video-aspect': ['screen-resolution', 'image-resizer'],
+
+  // ── QR/Barcode ──
+  'qr-code-gen': ['barcode-gen', 'url-encoder'],
+  'barcode-gen': ['qr-code-gen', 'uuid-generator'],
+
+  // ── Audio ──
+  'noise-generator': ['metronome', 'speaker-dryer', 'timer'],
+  'metronome': ['noise-generator', 'timer', 'pomodoro'],
+  'speaker-dryer': ['noise-generator', 'metronome'],
+
+  // ── Misc ──
+  'notes': ['todo-list', 'markdown-preview'],
+  'todo-list': ['notes', 'pomodoro', 'calendar'],
+  'avatar-generator': ['favicon-generator', 'random-name', 'image-crop'],
+  'coordinate-converter': ['angle-converter', 'length-converter'],
+};
