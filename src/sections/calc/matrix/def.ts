@@ -39,7 +39,7 @@ const VS: Record<string, VT> = {
     h1: ["Вычисление определителя матрицы", "Matrix determinant calculator"],
     description: [
       "Найдите определитель матрицы 2×2, 3×3 и до 6×6 точно, в обыкновенных дробях. Для 2×2: ad − bc; для больших — приведение к треугольному виду методом Гаусса.",
-      "Find the determinant of a 2×2, 3×3 or up to 6×6 matrix exactly, in fractions. For 2×2 it is ad − bc; larger matrices are reduced to triangular form by Gaussian elimination.",
+      "Find the determinant of a 2×2, 3×3 or up to 6×6 matrix exactly, in fractions. For 2×2 it is ad − bc; larger matrices are reduced to triangular form.",
     ],
     lead: ["det [[2, −3, 1], [2, 0, −1], [1, 4, 5]] = 49; для матрицы 2×2 [[1, 2], [3, 4]] определитель равен −2.", "det [[2, −3, 1], [2, 0, −1], [1, 4, 5]] = 49; for the 2×2 matrix [[1, 2], [3, 4]] the determinant is −2."],
     faq: [

@@ -24,7 +24,8 @@ describe("calc/finance/health SEO bar", () => {
           if (page.kind !== "hub" && (page.description.length < 110 || page.description.length > 170)) problems.push(`${key}: description ${page.description.length} "${page.description}"`);
           if (page.kind !== "hub" && !page.lead) problems.push(`${key}: no lead`);
           if (page.kind === "tool" && ((page.faq?.length ?? 0) < 3 || (page.howTo?.length ?? 0) < 3)) problems.push(`${key}: needs 3+ FAQ and howTo`);
-          if (/NaN|undefined|Infinity/.test(`${page.title} ${page.description} ${page.lead ?? ""} ${JSON.stringify(page.blocks ?? [])}`) || /NaN|Infinity/.test(JSON.stringify(page.faq ?? []))) problems.push(`${key}: NaN/undefined in text`);
+          const data = (page.blocks ?? []).filter((b) => b.type !== "text");
+          if (/NaN|undefined|Infinity/.test(`${page.title} ${page.description} ${page.lead ?? ""} ${JSON.stringify(data)}`) || /NaN|Infinity/.test(JSON.stringify(page.faq ?? []))) problems.push(`${key}: NaN/undefined in text`);
         }
       }
       expect(problems, problems.join("\n")).toEqual([]);

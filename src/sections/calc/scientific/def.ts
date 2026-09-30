@@ -9,8 +9,8 @@ export const scientificTool: ToolDef = {
   title: { ru: "Инженерный калькулятор онлайн — научный, с историей", en: "Scientific calculator online — with history" },
   h1: { ru: "Инженерный калькулятор онлайн", en: "Scientific calculator" },
   description: {
-    ru: "Научный калькулятор онлайн: тригонометрия в градусах и радианах, логарифмы, корни, степени, факториал, скобки и число π. Результат считается при вводе, история сохраняется.",
-    en: "Online scientific calculator: trigonometry in degrees or radians, logarithms, roots, powers, factorials, parentheses and π. Results update as you type and history is saved.",
+    ru: "Научный калькулятор онлайн: тригонометрия в градусах и радианах, логарифмы, корни, степени, факториал и скобки. Ответ считается при вводе, история сохраняется.",
+    en: "Online scientific calculator: trigonometry in degrees or radians, logarithms, roots, powers, factorials and parentheses. Results update as you type; history is saved.",
   },
   lead: {
     ru: "Пишите выражение как на бумаге — 2π × sin(30) + √16 = 7,14159… — ответ появляется сразу.",
