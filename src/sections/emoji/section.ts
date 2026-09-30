@@ -42,6 +42,8 @@ const DESC = {
   en: "Every Unicode 16 emoji with names, meanings and codes: search, categories, curated collections and one-click copy.",
 };
 const PREBUILD_EMOJI = 300;
+/** Emoji in the site-wide search index (the /emoji hub searches all of them). */
+const SEARCH_EMOJI = 150;
 
 /* ───────────── text helpers ───────────── */
 
@@ -713,7 +715,7 @@ export const emojiSection: SectionDef = {
     for (const s of SUB_PAGES)
       out.push({ path: subPath(s), title: `${subName(s, locale)} — ${locale === "ru" ? "эмодзи" : "emoji"}`, hint, keywords: `${tr(SUBGROUPS[s], "en")} ${tr(SUBGROUPS[s], "ru")}`, glyph: bySub.get(s)?.[0]?.glyph, weight: 1 });
     for (const t of TOPICS) out.push({ path: topicPath(t.slug), title: tr(t.h1, locale), hint, keywords: `${t.name.ru} ${t.name.en} ${t.h1.en}`, glyph: topicEmoji(t)[0]?.glyph, weight: 2 });
-    for (const e of popular(PREBUILD_EMOJI))
+    for (const e of popular(SEARCH_EMOJI))
       out.push({ path: emojiPath(e), title: nameOf(e, locale), hint, keywords: locale === "ru" ? e.en : e.ru, glyph: e.glyph, weight: 1 });
     return out;
   },

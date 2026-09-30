@@ -24,6 +24,8 @@ const DESC = {
   en: "Unicode special characters: arrows, stars, hearts, currency, math, invisible characters and the Unicode table",
 };
 const PREBUILD_PAGES = 200;
+/** Symbol pages in the site-wide search index (the /symbols hub searches everything). */
+const SEARCH_PAGES = 120;
 
 /* ───────────── text helpers ───────────── */
 
@@ -585,7 +587,7 @@ export const symbolsSection: SectionDef = {
       { path: [TABLE], title: tableLink(locale).label, hint, keywords: "unicode юникод таблица символов character map charmap", weight: 3 },
     ];
     for (const c of COLLECTIONS) out.push({ path: [ID, c.id], title: tr(colMeta(c.id).h1, locale), hint, keywords: `${colMeta(c.id).name.ru} ${colMeta(c.id).name.en}`, glyph: firstVisible(c), weight: 2 });
-    for (const p of prebuildPages()) out.push({ path: pagePath(p), title: pageName(p, locale), hint, keywords: `${p.sym.name.toLowerCase()} ${locale === "ru" ? "" : p.sym.ru}`.trim(), glyph: p.sym.ext.d ? undefined : p.sym.ch, weight: 1 });
+    for (const p of prebuildPages().slice(0, SEARCH_PAGES)) out.push({ path: pagePath(p), title: pageName(p, locale), hint, keywords: `${p.sym.name.toLowerCase()} ${locale === "ru" ? "" : p.sym.ru}`.trim(), glyph: p.sym.ext.d ? undefined : p.sym.ch, weight: 1 });
     return out;
   },
   tools(locale) {
