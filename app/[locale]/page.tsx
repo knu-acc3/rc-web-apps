@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { ArrowRight, Lock, Smartphone, UserX } from "lucide-react";
+import { ArrowRight, Lock, UserX, WifiOff } from "lucide-react";
 import { notFound } from "next/navigation";
 import { BRAND, SITE_URL } from "@/config/brand";
 import { href, isLocale, type Locale } from "@/i18n/config";
@@ -25,7 +25,7 @@ const HOME = {
     categories: "Все разделы",
     all: "Весь каталог",
     tools: ["инструмент", "инструмента", "инструментов"],
-    trust: ["Файлы не загружаются на сервер", "Без регистрации и лимитов", "Удобно на телефоне"],
+    trust: ["Файлы не загружаются на сервер", "Без регистрации и лимитов", "Открытые инструменты работают без интернета"],
   },
   en: {
     title: "Online tools | PDF, photos, converters, timers and calculators",
@@ -37,7 +37,7 @@ const HOME = {
     categories: "All categories",
     all: "Full catalogue",
     tools: ["tool", "tools"],
-    trust: ["Files are never uploaded", "No sign-up, no limits", "Works great on phones"],
+    trust: ["Files are never uploaded", "No sign-up, no limits", "Tools you have opened work offline"],
   },
 } as const;
 
@@ -145,7 +145,7 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
         </section>
 
         <ul className="grid gap-3 border-t border-line pt-8 text-[0.9375rem] text-fg-2 sm:grid-cols-3">
-          {[Lock, UserX, Smartphone].map((Icon, i) => (
+          {[Lock, UserX, WifiOff].map((Icon, i) => (
             <li key={i} className="flex items-center gap-3">
               <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-accent-soft text-accent">
                 <Icon className="size-[1.125rem]" aria-hidden />

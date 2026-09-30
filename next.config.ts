@@ -54,6 +54,8 @@ const nextConfig: NextConfig = {
       { source: "/fonts/:path*", headers: [{ key: "Cache-Control", value: "public, max-age=31536000, immutable" }] },
       { source: "/vendor/:path*", headers: [{ key: "Cache-Control", value: "public, max-age=2592000" }] },
       { source: "/legacy.css", headers: [{ key: "Cache-Control", value: "public, max-age=3600" }] },
+      // The service worker must be re-checked on every visit so a new version reaches people at once.
+      { source: "/sw.js", headers: [{ key: "Cache-Control", value: "no-cache" }] },
     ];
   },
 };

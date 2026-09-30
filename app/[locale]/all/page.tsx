@@ -70,17 +70,18 @@ export default async function AllTools({ params }: { params: Promise<{ locale: s
           <p className="mt-2 text-base text-fg-2 sm:text-lg">
             {total} {plural(locale, total, t.tools)}
           </p>
-          <nav aria-label={u.categories} className="mt-5 flex flex-wrap gap-2">
+          <div className="mt-5 max-w-xl">
+            <CatalogFilter label={t.filter} placeholder={t.placeholder} empty={t.empty} />
+          </div>
+          {/* Phones: one swipeable row instead of nine rows of chips. */}
+          <nav aria-label={u.categories} className="-mx-4 mt-5 flex gap-2 overflow-x-auto px-4 pb-1 scrollbar-thin sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0">
             {groups.map((g) => (
-              <a key={g.id} href={`#cat-${g.id}`} className="chip pl-1.5">
+              <a key={g.id} href={`#cat-${g.id}`} className="chip shrink-0 pl-1.5">
                 <IconTile name={g.icon} hue={g.hue} size="xs" />
                 {g.label}
               </a>
             ))}
           </nav>
-          <div className="mt-6 max-w-xl">
-            <CatalogFilter label={t.filter} placeholder={t.placeholder} empty={t.empty} />
-          </div>
         </div>
       </section>
 
