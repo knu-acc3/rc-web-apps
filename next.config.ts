@@ -1,5 +1,4 @@
 import type { NextConfig } from "next";
-import { legacyRedirects } from "./src/config/redirects";
 
 const securityHeaders = [
   { key: "X-Content-Type-Options", value: "nosniff" },
@@ -19,7 +18,7 @@ const nextConfig: NextConfig = {
   },
   images: { unoptimized: true },
   async redirects() {
-    return [{ source: "/", destination: "/ru", permanent: true }, ...legacyRedirects];
+    return [{ source: "/", destination: "/ru", permanent: true }];
   },
   async headers() {
     return [
