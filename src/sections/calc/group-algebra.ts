@@ -1,8 +1,16 @@
 import type { ToolDef } from "@/registry/types";
 import type { ComponentMap } from "../types";
+import { equationTool } from "./equation/def";
+import { fractionsTool } from "./fractions/def";
+import { matrixTool } from "./matrix/def";
+import { statisticsTool } from "./statistics/def";
 
-/** Tools of this group, in hub order. */
-export const tools: ToolDef[] = [];
+/** Algebra tools, in hub order. */
+export const tools: ToolDef[] = [fractionsTool, equationTool, matrixTool, statisticsTool];
 
-/** Component loaders of this group: "<section>/<name>": () => import("./<tool>/<Component>"). */
-export const components: ComponentMap = {};
+export const components: ComponentMap = {
+  "calc/fractions": () => import("./fractions/Fractions"),
+  "calc/equation": () => import("./equation/Equation"),
+  "calc/matrix": () => import("./matrix/MatrixCalc"),
+  "calc/statistics": () => import("./statistics/Statistics"),
+};

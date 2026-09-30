@@ -1,8 +1,12 @@
 import type { ToolDef } from "@/registry/types";
 import type { ComponentMap } from "../types";
+import { graphTool } from "./graph/def";
+import { scientificTool } from "./scientific/def";
 
-/** Tools of this group, in hub order. */
-export const tools: ToolDef[] = [];
+/** Expression-based tools, in hub order. */
+export const tools: ToolDef[] = [scientificTool, graphTool];
 
-/** Component loaders of this group: "<section>/<name>": () => import("./<tool>/<Component>"). */
-export const components: ComponentMap = {};
+export const components: ComponentMap = {
+  "calc/scientific": () => import("./scientific/Scientific"),
+  "calc/graph": () => import("./graph/Graph"),
+};
