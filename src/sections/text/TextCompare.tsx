@@ -3,7 +3,6 @@
 import { ArrowLeftRight, Download } from "lucide-react";
 import { useEffect, useId, useRef, useState } from "react";
 import type { Locale } from "@/i18n/config";
-import { formatNumber } from "@/i18n/format";
 import { cn } from "@/lib/cn";
 import { downloadText } from "@/lib/clipboard";
 import { Button, buttonClass } from "@/ui/button";
@@ -11,7 +10,7 @@ import { Checkbox } from "@/ui/field";
 import { Panel, PanelHeader } from "@/ui/panel";
 import { Segmented } from "@/ui/segmented";
 import type { DiffMode, DiffOptions, DiffResult } from "./lib/diff";
-import { InputPanel, OptionsBar, TwoPane, useDebounced } from "./shared";
+import { countLabel, InputPanel, MoreOptions, OptionsBar, TwoPane, useDebounced } from "./shared";
 
 const T = {
   ru: {
@@ -31,11 +30,11 @@ const T = {
     patch: "Скачать .diff",
     same: "Тексты совпадают",
     computing: "Сравниваю…",
-    added: "добавлено",
-    removed: "удалено",
-    unitLines: "строк",
-    unitWords: "слов",
-    unitChars: "символов",
+    added: "Добавлено",
+    removed: "Удалено",
+    unitLines: ["строка", "строки", "строк"],
+    unitWords: ["слово", "слова", "слов"],
+    unitChars: ["символ", "символа", "символов"],
     sampleA: "Транслитерация — это передача букв\nодного алфавита буквами другого.\nНапример, «Щукин» → «Shchukin».\nСтандартов несколько.",
     sampleB: "Транслитерация — это запись букв\nодного алфавита буквами другого.\nНапример, «Щукин» → «Shchukin».\nСтандартов несколько: ICAO, ГОСТ, BGN.\nИ у каждого свои правила.",
   },
@@ -56,11 +55,11 @@ const T = {
     patch: "Download .diff",
     same: "The texts are identical",
     computing: "Comparing…",
-    added: "added",
-    removed: "removed",
-    unitLines: "lines",
-    unitWords: "words",
-    unitChars: "characters",
+    added: "Added",
+    removed: "Removed",
+    unitLines: ["line", "lines"],
+    unitWords: ["word", "words"],
+    unitChars: ["character", "characters"],
     sampleA: "Transliteration is the conversion of letters\nfrom one alphabet into another.\nFor example, “Щукин” → “Shchukin”.\nThere are several standards.",
     sampleB: "Transliteration is the mapping of letters\nfrom one alphabet into another.\nFor example, “Щукин” → “Shchukin”.\nThere are several standards: ICAO, GOST, BGN.\nEach has its own rules.",
   },
@@ -148,18 +147,17 @@ export default function TextCompare({ locale }: { locale: Locale }) {
             ]}
           />
         )}
-        <Checkbox label={t.ignoreCase} checked={ignoreCase} onChange={(e) => setIgnoreCase(e.target.checked)} />
-        {mode === "lines" && <Checkbox label={t.ignoreWs} checked={ignoreWs} onChange={(e) => setIgnoreWs(e.target.checked)} />}
         <Button
-          size="sm"
-          variant="outline"
+          size="icon-sm"
+          variant="ghost"
+          aria-label={t.swap}
+          title={t.swap}
           onClick={() => {
             setA(b);
             setB(a);
           }}
         >
           <ArrowLeftRight aria-hidden />
-          {t.swap}
         </Button>
       </OptionsBar>
 
@@ -183,17 +181,21 @@ export default function TextCompare({ locale }: { locale: Locale }) {
           ) : (
             <>
               <span className="text-ok">
-                +{formatNumber(locale, res.added)} {unit} {t.added}
+                {t.added}: {countLabel(locale, res.added, unit)}
               </span>
               <span className="mx-2 text-fg-3">·</span>
               <span className="text-err">
-                −{formatNumber(locale, res.removed)} {unit} {t.removed}
+                {t.removed}: {countLabel(locale, res.removed, unit)}
               </span>
             </>
           )}
         </p>
         {res && !identical && <DiffView res={res} mode={mode} view={view} />}
       </Panel>
+      <MoreOptions locale={locale}>
+        <Checkbox label={t.ignoreCase} checked={ignoreCase} onChange={(e) => setIgnoreCase(e.target.checked)} />
+        {mode === "lines" && <Checkbox label={t.ignoreWs} checked={ignoreWs} onChange={(e) => setIgnoreWs(e.target.checked)} />}
+      </MoreOptions>
     </div>
   );
 }
@@ -207,11 +209,11 @@ function DiffView({ res, mode, view }: { res: DiffResult; mode: DiffMode; view: 
             {res.rows.map((r, i) => (
               <tr key={i} className="align-top">
                 <td className="w-10 select-none border-r border-line px-2 text-right text-fg-3">{r.leftNo ?? ""}</td>
-                <td className={cn("w-1/2 px-2 whitespace-pre-wrap break-all", (r.kind === "removed" || r.kind === "changed") && "bg-err-soft text-err")}>
+                <td className={cn("w-1/2 px-2 whitespace-pre-wrap [overflow-wrap:anywhere]", (r.kind === "removed" || r.kind === "changed") && "bg-err-soft text-err")}>
                   {r.left ?? ""}
                 </td>
                 <td className="w-10 select-none border-x border-line px-2 text-right text-fg-3">{r.rightNo ?? ""}</td>
-                <td className={cn("w-1/2 px-2 whitespace-pre-wrap break-all", (r.kind === "added" || r.kind === "changed") && "bg-ok-soft text-ok")}>{r.right ?? ""}</td>
+                <td className={cn("w-1/2 px-2 whitespace-pre-wrap [overflow-wrap:anywhere]", (r.kind === "added" || r.kind === "changed") && "bg-ok-soft text-ok")}>{r.right ?? ""}</td>
               </tr>
             ))}
           </tbody>
@@ -224,7 +226,7 @@ function DiffView({ res, mode, view }: { res: DiffResult; mode: DiffMode; view: 
       <div className="overflow-x-auto px-2 py-2 font-mono text-[13px] leading-relaxed">
         {res.parts.flatMap((p, i) =>
           p.value.split("\n").map((line, k) => (
-            <div key={`${i}-${k}`} className={cn("px-2 whitespace-pre-wrap break-all", p.added && "bg-ok-soft text-ok", p.removed && "bg-err-soft text-err")}>
+            <div key={`${i}-${k}`} className={cn("px-2 whitespace-pre-wrap [overflow-wrap:anywhere]", p.added && "bg-ok-soft text-ok", p.removed && "bg-err-soft text-err")}>
               <span className="select-none" aria-hidden>
                 {p.added ? "+ " : p.removed ? "− " : "  "}
               </span>

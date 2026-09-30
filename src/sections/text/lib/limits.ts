@@ -26,24 +26,28 @@ export interface SmsInfo {
   perSegment: number;
   /** Units left before another segment is needed. */
   remaining: number;
-  /** Characters that force UCS-2 (first few, unique). */
+  /** Characters that force UCS-2 (first few, unique), not counting Cyrillic letters. */
   nonGsm: string[];
+  /** The text contains Cyrillic letters (they always force UCS-2). */
+  cyrillic: boolean;
 }
 
 export function smsInfo(text: string): SmsInfo {
   const chars = [...text];
   const nonGsm: string[] = [];
   let gsm = true;
+  let cyrillic = false;
   for (const c of chars) {
     if (!BASIC.has(c) && !EXT.has(c)) {
       gsm = false;
-      if (!nonGsm.includes(c) && nonGsm.length < 12) nonGsm.push(c);
+      if (/\p{Script=Cyrillic}/u.test(c)) cyrillic = true;
+      else if (!nonGsm.includes(c) && nonGsm.length < 12) nonGsm.push(c);
     }
   }
   if (gsm) {
     const costs = chars.map((c) => (EXT.has(c) ? 2 : 1));
     const units = costs.reduce((a, b) => a + b, 0);
-    if (units <= 160) return { encoding: "GSM-7", units, segments: units === 0 ? 0 : 1, perSegment: 160, remaining: 160 - units, nonGsm };
+    if (units <= 160) return { encoding: "GSM-7", units, segments: units === 0 ? 0 : 1, perSegment: 160, remaining: 160 - units, nonGsm, cyrillic };
     // Multipart: 153 septets per part; an escape sequence is never split between parts.
     let segments = 1;
     let used = 0;
@@ -54,11 +58,11 @@ export function smsInfo(text: string): SmsInfo {
       }
       used += c;
     }
-    return { encoding: "GSM-7", units, segments, perSegment: 153, remaining: 153 - used, nonGsm };
+    return { encoding: "GSM-7", units, segments, perSegment: 153, remaining: 153 - used, nonGsm, cyrillic };
   }
   const costs = chars.map((c) => c.length); // 2 for characters outside the BMP (surrogate pair)
   const units = costs.reduce((a, b) => a + b, 0);
-  if (units <= 70) return { encoding: "UCS-2", units, segments: 1, perSegment: 70, remaining: 70 - units, nonGsm };
+  if (units <= 70) return { encoding: "UCS-2", units, segments: 1, perSegment: 70, remaining: 70 - units, nonGsm, cyrillic };
   // 67 code units per part; a surrogate pair is never split.
   let segments = 1;
   let used = 0;
@@ -69,7 +73,7 @@ export function smsInfo(text: string): SmsInfo {
     }
     used += c;
   }
-  return { encoding: "UCS-2", units, segments, perSegment: 67, remaining: 67 - used, nonGsm };
+  return { encoding: "UCS-2", units, segments, perSegment: 67, remaining: 67 - used, nonGsm, cyrillic };
 }
 
 /* ───────────── X (Twitter) ───────────── */

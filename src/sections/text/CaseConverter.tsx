@@ -2,8 +2,8 @@
 
 import { useId, useMemo, useState } from "react";
 import type { Locale } from "@/i18n/config";
-import { cn } from "@/lib/cn";
 import { Checkbox } from "@/ui/field";
+import { Segmented } from "@/ui/segmented";
 import { CASE_IDS, convertCase, type CaseId } from "./lib/case";
 import { InputPanel, OptionsBar, OutputPanel, TwoPane } from "./shared";
 
@@ -56,23 +56,7 @@ export default function CaseConverter({ locale, caseId = "upper" }: CaseConverte
 
   return (
     <div className="flex flex-col gap-4">
-      <div role="radiogroup" aria-label={t.caseLabel} className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">
-        {CASE_IDS.map((c) => (
-          <button
-            key={c}
-            type="button"
-            role="radio"
-            aria-checked={mode === c}
-            onClick={() => setMode(c)}
-            className={cn(
-              "h-10 truncate rounded-[8px] border px-2 text-sm font-medium transition-colors duration-150",
-              mode === c ? "border-accent bg-accent-soft text-accent" : "border-line bg-surface text-fg hover:border-line-strong",
-            )}
-          >
-            {CASE_LABELS[c][locale]}
-          </button>
-        ))}
-      </div>
+      <Segmented label={t.caseLabel} value={mode} onChange={setMode} options={CASE_IDS.map((c) => ({ value: c, label: CASE_LABELS[c][locale] }))} className="self-start" />
       {(mode === "title" || mode === "sentence") && (
         <OptionsBar>
           <Checkbox label={t.acronyms} checked={acronyms} onChange={(e) => setAcronyms(e.target.checked)} />

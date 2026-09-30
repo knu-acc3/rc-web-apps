@@ -47,6 +47,8 @@ const T = {
     segments: "Частей СМС",
     perSegment: "Символов в части",
     nonGsm: "Символы вне GSM-7",
+    cyrillic: "кириллица",
+    leftLabel: "Осталось",
     gsmNote: "Латиница без эмодзи и «ёлочек» — 160 символов в одном СМС, кириллица — 70.",
     weighted: "Взвешенная длина",
     urls: "Ссылок (каждая = 23)",
@@ -91,6 +93,8 @@ const T = {
     segments: "SMS parts",
     perSegment: "Characters per part",
     nonGsm: "Characters outside GSM-7",
+    cyrillic: "Cyrillic letters",
+    leftLabel: "Left",
     gsmNote: "Plain Latin text fits 160 characters in one SMS; Cyrillic or emoji switch to UCS-2 with 70.",
     weighted: "Weighted length",
     urls: "Links (23 each)",
@@ -105,7 +109,7 @@ const T = {
 
 function duration(locale: Locale, seconds: number): string {
   const t = T[locale];
-  if (seconds <= 0) return "0";
+  if (seconds <= 0) return `0 ${t.min}`;
   if (seconds < 1) return t.less;
   const h = Math.floor(seconds / 3600);
   const m = Math.floor((seconds % 3600) / 60);
@@ -284,7 +288,7 @@ function SmsPanel({ locale, text }: { locale: Locale; text: string }) {
           <dd className="tabular font-medium text-fg">{info.encoding}</dd>
           <dt className="text-fg-3">{t.perSegment}</dt>
           <dd className="tabular font-medium text-fg">{info.encoding === "GSM-7" ? "160 / 153" : "70 / 67"}</dd>
-          <dt className="text-fg-3">{t.left}</dt>
+          <dt className="text-fg-3">{t.leftLabel}</dt>
           <dd className="tabular font-medium text-fg">
             {formatNumber(locale, info.remaining)} {plural(locale, info.remaining, unitForms)}
           </dd>
@@ -292,9 +296,10 @@ function SmsPanel({ locale, text }: { locale: Locale; text: string }) {
       </div>
       <div className="flex flex-col gap-2 p-4 text-sm text-fg-2">
         <p>{t.gsmNote}</p>
-        {info.nonGsm.length > 0 && (
+        {(info.cyrillic || info.nonGsm.length > 0) && (
           <p>
             {t.nonGsm}:{" "}
+            {info.cyrillic && <span className="mx-0.5 rounded bg-surface-2 px-1.5 py-0.5 text-fg">{t.cyrillic}</span>}
             {info.nonGsm.map((c) => (
               <code key={c} className="mx-0.5 rounded bg-surface-2 px-1.5 py-0.5 text-fg">
                 {c === " " ? "␣" : c}
