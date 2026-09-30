@@ -1,0 +1,66 @@
+import type { Locale } from "@/i18n/config";
+import type { ZalgoLevel } from "./styles";
+
+/** UI strings of the fonts tool (client components). */
+export const T = {
+  ru: {
+    input: "Ваш текст",
+    clear: "Очистить",
+    sampleHint: "Сейчас показан пример. Напишите свой текст — все стили обновятся сразу.",
+    copy: "Копировать",
+    copied: "Скопировано",
+    allStyles: "Все стили",
+    otherStyles: "Другие стили",
+    goodFor: (p: string) => `Подходят для ${p}`,
+    regenerate: "Сгенерировать заново",
+    intensity: "Сила эффекта",
+    zalgo: { light: "Слабо", medium: "Средне", heavy: "Сильно" } as Record<ZalgoLevel, string>,
+    cyrOnly: "Только стили, которые меняют кириллицу",
+    badgeNone: "кириллица не меняется",
+    badgePartial: "кириллица частично",
+    noticeNone: (digits: boolean) =>
+      `Русские буквы в этом стиле останутся обычными: таких кириллических символов в Unicode нет. Стиль меняет латиницу${digits ? " и цифры" : ""}.`,
+    noticePartial: "Часть русских букв останется без изменений: похожих символов для них в Unicode нет.",
+    xCount: "по правилам X",
+    invisibleTitle: "Невидимые символы",
+    copyCount: "Сколько символов копировать",
+    generatorTitle: "Красивый текст для ника",
+    unicodeLetter: "буква",
+    unicodeSymbol: "символ",
+    unicodeFormat: "служебный",
+    unicodeSpace: "пробел",
+    unicodeMark: "знак",
+    width: "Ширина в вашем браузере",
+  },
+  en: {
+    input: "Your text",
+    clear: "Clear",
+    sampleHint: "A sample is shown. Type your own text — every style updates instantly.",
+    copy: "Copy",
+    copied: "Copied",
+    allStyles: "All styles",
+    otherStyles: "Other styles",
+    goodFor: (p: string) => `Good for ${p}`,
+    regenerate: "Regenerate",
+    intensity: "Intensity",
+    zalgo: { light: "Light", medium: "Medium", heavy: "Heavy" } as Record<ZalgoLevel, string>,
+    cyrOnly: "Only styles that change Cyrillic",
+    badgeNone: "Cyrillic unchanged",
+    badgePartial: "Cyrillic partly",
+    noticeNone: (digits: boolean) =>
+      `Cyrillic letters stay plain in this style: Unicode has no such Cyrillic characters. It changes Latin letters${digits ? " and digits" : ""}.`,
+    noticePartial: "Some Cyrillic letters stay unchanged: Unicode has no look-alikes for them.",
+    xCount: "by X rules",
+    invisibleTitle: "Invisible characters",
+    copyCount: "How many to copy",
+    generatorTitle: "Fancy text for a nickname",
+    unicodeLetter: "letter",
+    unicodeSymbol: "symbol",
+    unicodeFormat: "format",
+    unicodeSpace: "space",
+    unicodeMark: "mark",
+    width: "Width in your browser",
+  },
+} as const;
+
+export type Strings = (typeof T)[Locale];
