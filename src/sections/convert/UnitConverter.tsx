@@ -1,14 +1,11 @@
 "use client";
 
-import { ArrowLeftRight } from "lucide-react";
-import { useId, useMemo, useState } from "react";
+import { ArrowLeftRight, ChevronDown } from "lucide-react";
+import { useId, useMemo, useState, type ReactNode } from "react";
 import type { Locale } from "@/i18n/config";
 import { formatSmart, parseNumber, plural } from "@/i18n/format";
-import { copyText } from "@/lib/clipboard";
-import { Button } from "@/ui/button";
+import { cn } from "@/lib/cn";
 import { CopyButton } from "@/ui/copy-button";
-import { Field, Input, Select } from "@/ui/field";
-import { Panel } from "@/ui/panel";
 import { clean, convert, type ConvUnit } from "./engine";
 
 export interface ClientUnit extends ConvUnit {
@@ -34,38 +31,29 @@ export interface UnitConverterProps {
 const T = {
   ru: {
     value: "Значение",
-    from: "Из",
-    to: "В",
+    result: "Результат",
+    fromUnit: "Исходная единица",
+    toUnit: "Единица результата",
     swap: "Поменять единицы местами",
-    precision: "Точность",
-    auto: "Авто",
-    digits: "зн.",
     all: "во всех единицах",
     invalid: "Введите число",
     negative: "Значение не может быть отрицательным",
     copy: "Копировать",
     copied: "Скопировано",
-    result: "Результат",
   },
   en: {
     value: "Value",
-    from: "From",
-    to: "To",
+    result: "Result",
+    fromUnit: "From unit",
+    toUnit: "To unit",
     swap: "Swap units",
-    precision: "Precision",
-    auto: "Auto",
-    digits: "dp",
     all: "in all units",
     invalid: "Enter a number",
     negative: "Value can't be negative",
     copy: "Copy",
     copied: "Copied",
-    result: "Result",
   },
 } as const;
-
-const PRECISIONS = ["auto", "0", "1", "2", "3", "4", "6", "8", "10"] as const;
-type Precision = (typeof PRECISIONS)[number];
 
 const plainSpaces = (s: string) => s.replace(/[  ]/g, " ");
 
@@ -78,21 +66,13 @@ export default function UnitConverter({ locale, units, from: from0, to: to0, val
   const [edited, setEdited] = useState<"a" | "b">("a");
   const [aText, setAText] = useState(() => plainSpaces(formatSmart(locale, value)));
   const [bText, setBText] = useState("");
-  const [precision, setPrecision] = useState<Precision>("auto");
-  const [copiedRow, setCopiedRow] = useState<string | null>(null);
 
   const U = useMemo(() => new Map(units.map((u) => [u.slug, u])), [units]);
   const uFrom = U.get(from) ?? units[0];
   const uTo = U.get(to) ?? units[1] ?? units[0];
 
-  const fmt = (n: number) => {
-    if (!Number.isFinite(n)) return "—";
-    return plainSpaces(
-      precision === "auto"
-        ? formatSmart(locale, clean(n))
-        : new Intl.NumberFormat(locale === "ru" ? "ru-RU" : "en-US", { maximumFractionDigits: Number(precision) }).format(n),
-    );
-  };
+  const fmt = (n: number) => (Number.isFinite(n) ? plainSpaces(formatSmart(locale, clean(n))) : "—");
+  const unitText = (n: number, u: ClientUnit) => (u.word ? plural(locale, clean(n), u.forms) : u.sym);
 
   const srcText = edited === "a" ? aText : bText;
   const srcNum = parseNumber(srcText);
@@ -116,118 +96,150 @@ export default function UnitConverter({ locale, units, from: from0, to: to0, val
     setEdited("a");
   }
 
-  const unitOptions = units.map((u) => (
+  const options = units.map((u) => (
     <option key={u.slug} value={u.slug}>
       {u.label}
     </option>
   ));
 
   return (
-    <div className="flex flex-col gap-4">
-      <Panel className="p-4 sm:p-5">
-        <div className="grid items-end gap-3 md:grid-cols-[1fr_auto_1fr]">
-          <div className="grid grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] gap-2">
-            <Field label={t.value} htmlFor={`${id}-a`}>
-              <Input
-                id={`${id}-a`}
-                inputMode="decimal"
-                autoComplete="off"
-                value={aShown}
-                aria-invalid={edited === "a" && !!error}
-                onChange={(e) => {
-                  setAText(e.target.value);
-                  setEdited("a");
-                }}
-                size="lg"
-                className="tabular"
-              />
-            </Field>
-            <Field label={t.from} htmlFor={`${id}-fu`}>
-              <Select id={`${id}-fu`} value={uFrom.slug} onChange={(e) => setFrom(e.target.value)} size="lg">
-                {unitOptions}
-              </Select>
-            </Field>
-          </div>
-          <Button variant="outline" size="icon" onClick={swap} aria-label={t.swap} title={t.swap} className="mx-auto mb-1 max-md:rotate-90">
-            <ArrowLeftRight />
-          </Button>
-          <div className="grid grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] gap-2">
-            <Field label={t.result} htmlFor={`${id}-b`}>
-              <Input
-                id={`${id}-b`}
-                inputMode="decimal"
-                autoComplete="off"
-                value={bShown}
-                aria-invalid={edited === "b" && !!error}
-                onChange={(e) => {
-                  setBText(e.target.value);
-                  setEdited("b");
-                }}
-                size="lg"
-                className="tabular"
-              />
-            </Field>
-            <Field label={t.to} htmlFor={`${id}-tu`}>
-              <Select id={`${id}-tu`} value={uTo.slug} onChange={(e) => setTo(e.target.value)} size="lg">
-                {unitOptions}
-              </Select>
-            </Field>
-          </div>
+    <div className="flex flex-col gap-3">
+      <div className="grid gap-2 md:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] md:gap-3">
+        <UnitBox
+          id={`${id}-a`}
+          value={aShown}
+          invalid={edited === "a" && !!error}
+          onValue={(v) => {
+            setAText(v);
+            setEdited("a");
+          }}
+          valueLabel={t.value}
+          unit={uFrom.slug}
+          unitLabel={t.fromUnit}
+          onUnit={setFrom}
+          options={options}
+        />
+        <div className="relative z-10 -my-4 flex justify-center md:my-0 md:items-center">
+          <button
+            type="button"
+            onClick={swap}
+            aria-label={t.swap}
+            title={t.swap}
+            className="grid size-10 place-items-center rounded-full border border-line bg-surface text-fg-2 transition-colors hover:border-accent hover:text-accent focus-visible:border-accent"
+          >
+            <ArrowLeftRight aria-hidden className="size-4 max-md:rotate-90" />
+          </button>
         </div>
+        <UnitBox
+          id={`${id}-b`}
+          primary
+          value={bShown}
+          invalid={edited === "b" && !!error}
+          onValue={(v) => {
+            setBText(v);
+            setEdited("b");
+          }}
+          valueLabel={t.result}
+          unit={uTo.slug}
+          unitLabel={t.toUnit}
+          onUnit={setTo}
+          options={options}
+        />
+      </div>
 
-        <div className="mt-4 flex flex-col gap-3 rounded-[10px] bg-surface-2 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
-          <p className="tabular min-h-7 text-lg font-semibold break-words text-fg sm:text-xl" aria-live="polite">
-            {error ? <span className="text-base font-medium text-err">{error}</span> : sentence}
-          </p>
-          <div className="flex shrink-0 items-center gap-2">
-            <label htmlFor={`${id}-p`} className="text-sm text-fg-3">
-              {t.precision}
-            </label>
-            <Select id={`${id}-p`} value={precision} onChange={(e) => setPrecision(e.target.value as Precision)} size="sm" className="w-28">
-              {PRECISIONS.map((p) => (
-                <option key={p} value={p}>
-                  {p === "auto" ? t.auto : `${p} ${t.digits}`}
-                </option>
-              ))}
-            </Select>
-            <CopyButton value={bShown} label={t.copy} copiedLabel={t.copied} size="sm" />
-          </div>
-        </div>
-      </Panel>
+      <div className="flex min-h-9 items-center justify-between gap-3 pl-1">
+        <p className="tabular min-w-0 text-[15px] break-words text-fg-2" aria-live="polite">
+          {error ? <span className="text-err">{error}</span> : sentence}
+        </p>
+        <CopyButton value={bShown} label={t.copy} copiedLabel={t.copied} variant="ghost" size="icon-sm" className="shrink-0" />
+      </div>
 
-      {aNum !== null && (
-        <Panel>
-          <h2 className="border-b border-line px-4 py-3 text-sm font-semibold text-fg">
-            {fmt(aNum)} {uFrom.sym} — {t.all}
-          </h2>
-          <ul className="rows">
+      {aNum !== null && units.length > 2 && (
+        <details className="group rounded-[12px] border border-line bg-surface">
+          <summary className="flex cursor-pointer list-none items-center justify-between gap-3 rounded-[12px] px-4 py-3 text-[15px] text-fg-2 hover:text-fg [&::-webkit-details-marker]:hidden">
+            <span className="tabular min-w-0 truncate">
+              {fmt(aNum)} {unitText(aNum, uFrom)} {t.all}
+            </span>
+            <ChevronDown aria-hidden className="size-4 shrink-0 text-fg-3 transition-transform group-open:rotate-180" />
+          </summary>
+          <ul className="rows border-t border-line">
             {units
               .filter((u) => u.slug !== uFrom.slug)
               .map((u) => {
-                const text = fmt(convert(aNum, uFrom, u));
+                const v = convert(aNum, uFrom, u);
                 return (
                   <li key={u.slug}>
-                    <span className="min-w-0">
-                      <span className="tabular block font-semibold break-all text-fg">
-                        {text} <span className="font-normal text-fg-2">{u.word ? plural(locale, clean(convert(aNum, uFrom, u)), u.forms) : u.sym}</span>
-                      </span>
-                      <span className="block truncate text-[13px] text-fg-3">{u.label}</span>
+                    <span className="min-w-0 truncate text-sm text-fg-3">{u.label}</span>
+                    <span className="tabular shrink-0 text-right text-[15px] text-fg">
+                      {fmt(v)} <span className="text-fg-3">{unitText(v, u)}</span>
                     </span>
-                    <button
-                      type="button"
-                      className="shrink-0 rounded-[6px] px-2 py-1 text-[13px] text-fg-3 hover:bg-surface-2 hover:text-accent"
-                      onClick={async () => {
-                        if (await copyText(text)) setCopiedRow(u.slug);
-                      }}
-                    >
-                      {copiedRow === u.slug ? t.copied : t.copy}
-                    </button>
                   </li>
                 );
               })}
           </ul>
-        </Panel>
+        </details>
       )}
+    </div>
+  );
+}
+
+function UnitBox({
+  id,
+  value,
+  invalid,
+  onValue,
+  valueLabel,
+  unit,
+  unitLabel,
+  onUnit,
+  options,
+  primary,
+}: {
+  id: string;
+  value: string;
+  invalid: boolean;
+  onValue: (v: string) => void;
+  valueLabel: string;
+  unit: string;
+  unitLabel: string;
+  onUnit: (slug: string) => void;
+  options: ReactNode;
+  primary?: boolean;
+}) {
+  return (
+    <div
+      className={cn(
+        "min-w-0 rounded-[16px] border px-4 pt-3 pb-3.5 transition-colors focus-within:border-accent sm:px-5",
+        primary ? "border-transparent bg-accent-soft" : "border-line bg-surface",
+        invalid && "border-err!",
+      )}
+    >
+      <div className="relative -ml-1 inline-flex max-w-full">
+        <select
+          id={`${id}-u`}
+          aria-label={unitLabel}
+          value={unit}
+          onChange={(e) => onUnit(e.target.value)}
+          className="max-w-full cursor-pointer appearance-none truncate rounded-[6px] bg-transparent py-1 pr-6 pl-1 text-[15px] font-medium text-fg-2 outline-none hover:text-fg focus-visible:ring-2 focus-visible:ring-accent/40"
+        >
+          {options}
+        </select>
+        <ChevronDown aria-hidden className="pointer-events-none absolute top-1/2 right-0.5 size-4 -translate-y-1/2 text-fg-3" />
+      </div>
+      <input
+        id={`${id}-v`}
+        aria-label={valueLabel}
+        aria-invalid={invalid}
+        inputMode="decimal"
+        autoComplete="off"
+        spellCheck={false}
+        value={value}
+        onChange={(e) => onValue(e.target.value)}
+        className={cn(
+          "tabular mt-0.5 block w-full min-w-0 bg-transparent text-[32px] leading-[1.2] font-semibold tracking-tight outline-none sm:text-[36px]",
+          primary ? "text-accent" : "text-fg",
+        )}
+      />
     </div>
   );
 }

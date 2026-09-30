@@ -20,9 +20,9 @@ for (const path of PAGES) {
 
 test("unit converter computes live", async ({ page }) => {
   await page.goto("/ru/convert/kilometers-to-miles");
-  const input = page.getByLabel("Значение");
+  const input = page.getByLabel("Значение", { exact: true });
   await input.fill("10");
-  await expect(page.getByLabel("Результат")).toHaveValue("6,213712");
+  await expect(page.getByLabel("Результат", { exact: true })).toHaveValue("6,213712");
 });
 
 test("search palette finds a page", async ({ page, isMobile }) => {
