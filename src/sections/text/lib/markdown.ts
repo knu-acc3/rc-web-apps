@@ -51,7 +51,8 @@ export function loadMarkdownRenderer(imagePlaceholder: string): Promise<Markdown
       const parse = (md: string) => marked.parse(md, { async: false }) as string;
 
       return {
-        preview: (md) => sanitize(parse(md)),
+        // The page already has its own <h1>; in the preview a level-1 heading is an ARIA heading.
+        preview: (md) => sanitize(parse(md)).replace(/<h1(\s[^>]*)?>/g, '<div role="heading" aria-level="1" class="md-h1"$1>').replace(/<\/h1>/g, "</div>"),
         exportHtml: (md) => {
           replaceImages = false;
           try {

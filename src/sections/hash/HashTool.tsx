@@ -189,9 +189,9 @@ export default function HashTool({ locale, algo, hmac = false, sample = "" }: Ha
             </Select>
           </label>
         )}
-        <label className="flex min-w-0 flex-1 items-center gap-2" htmlFor={`${id}-exp`}>
+        <label className="flex min-w-0 flex-1 basis-64 items-center gap-2" htmlFor={`${id}-exp`}>
           <span className="shrink-0">{t.expected}</span>
-          <Input id={`${id}-exp`} size="sm" value={expected} onChange={(e) => setExpected(e.target.value)} placeholder={t.expectedPh} className="min-w-40 font-mono" spellCheck={false} autoComplete="off" />
+          <Input id={`${id}-exp`} size="sm" value={expected} onChange={(e) => setExpected(e.target.value)} placeholder={t.expectedPh} className="min-w-0 flex-1 font-mono" spellCheck={false} autoComplete="off" />
         </label>
         {verdict !== null && (
           <span className={`flex items-center gap-1 font-semibold ${verdict ? "text-ok" : "text-err"}`} aria-live="polite">

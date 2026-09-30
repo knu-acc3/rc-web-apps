@@ -133,6 +133,12 @@
     line-height: 1.55;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    /* Long tokens (hashes, identifiers, alphabets) wrap instead of widening the page. */
+    overflow-wrap: break-word;
+  }
+  /* A grid without explicit columns gets one shrinkable column: min-content never widens the page. */
+  .grid:not([class*="grid-flow-col"]) {
+    grid-template-columns: minmax(0, 1fr);
   }
   h1, h2, h3, h4 {
     line-height: 1.2;
@@ -208,6 +214,7 @@
 
 /* Long-form text blocks (articles under tools). */
 @utility prose-lite {
+  overflow-wrap: anywhere;
   max-width: 72ch;
   color: var(--fg-2);
   & p + p {

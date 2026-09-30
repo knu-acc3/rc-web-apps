@@ -1,7 +1,7 @@
 "use client";
 
 import { Bold, Code, Download, Heading2, Italic, Link2, List, ListChecks, Quote, RotateCcw, Strikethrough, Table } from "lucide-react";
-import { useEffect, useId, useMemo, useRef, useState } from "react";
+import { useEffect, useId, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import type { Locale } from "@/i18n/config";
 import { cn } from "@/lib/cn";
 import { downloadText } from "@/lib/clipboard";
@@ -143,6 +143,8 @@ const ACTIONS: Action[] = [
   { key: "tb", icon: Table, label: "table", block: "\n| A | B |\n|---|---|\n| 1 | 2 |\n" },
 ];
 
+const noopSubscribe = () => () => {};
+
 export default function MarkdownEditor({ locale }: { locale: Locale }) {
   const t = T[locale];
   const id = useId();
@@ -199,7 +201,9 @@ export default function MarkdownEditor({ locale }: { locale: Locale }) {
 
   const exportHtml = () => (renderer ? renderer.exportHtml(text) : "");
   const title = (text.match(/^#\s+(.+)$/m)?.[1] ?? "document").trim();
-  const stats = `${countLabel(locale, wordCount(text, locale), TX[locale].words)} · ${countLabel(locale, graphemeCount(text), TX[locale].chars)}`;
+  // Word segmentation (Intl.Segmenter) can differ between the server's ICU and the browser's, so counts render after hydration.
+  const hydrated = useSyncExternalStore(noopSubscribe, () => true, () => false);
+  const stats = hydrated ? `${countLabel(locale, wordCount(text, locale), TX[locale].words)} · ${countLabel(locale, graphemeCount(text), TX[locale].chars)}` : " ";
 
   return (
     <div className="flex flex-col gap-3">
