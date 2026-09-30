@@ -8,6 +8,9 @@ import { fmtOffset } from "./tz";
  * Accepts Russian and English names, countries, IANA ids, "MSK", "UTC+5", "GMT-3:30".
  */
 export interface PlaceEntry extends Place {
+  /** Normalised names (Russian, English, abbreviation) — matched first. */
+  names: string[];
+  /** Everything else searchable: country names, IANA id. */
   hay: string;
   rank: number;
 }
@@ -66,7 +69,8 @@ export function loadPlaces(locale: Locale): Promise<PlaceEntry[]> {
           offset: null,
           lat: c.lat,
           lon: c.lon,
-          hay: norm(`${c.ru} ${c.en} ${k?.ru ?? ""} ${k?.en ?? ""} ${c.tz}`),
+          names: [norm(c.ru), norm(c.en)],
+          hay: norm(`${k?.ru ?? ""} ${k?.en ?? ""} ${c.tz}`),
           rank: c.pop * (c.capital ? 2 : 1),
         };
       });
@@ -79,7 +83,8 @@ export function loadPlaces(locale: Locale): Promise<PlaceEntry[]> {
           sub: locale === "ru" ? (z.ru ?? z.full ?? "") : (z.full ?? ""),
           tz: z.tz ?? null,
           offset: z.tz ? null : z.offset,
-          hay: norm(`${z.slug} ${label} ${z.full ?? ""} ${z.ru ?? ""} ${fmtOffset(z.offset)} ${z.slug === "msk" ? "мск москва" : ""} ${z.slug === "utc" ? "universal coordinated всемирное" : ""}`),
+          names: [norm(label), norm(z.slug), ...(z.slug === "msk" ? ["мск"] : [])],
+          hay: norm(`${z.full ?? ""} ${z.ru ?? ""} ${fmtOffset(z.offset)} ${z.slug === "msk" ? "москва" : ""} ${z.slug === "utc" ? "universal coordinated всемирное" : ""}`),
           rank: 5e7,
         });
       }
@@ -112,12 +117,12 @@ export function searchPlaces(list: PlaceEntry[], query: string, locale: Locale, 
   const off = parseOffsetQuery(query, locale);
   if (off) out.push({ p: off, s: 1e12 });
   for (const e of list) {
-    const name = norm(e.name);
     let s = 0;
-    if (name === q) s = 4;
-    else if (name.startsWith(q)) s = 3;
+    if (e.names.some((n) => n === q)) s = 5;
+    else if (e.names.some((n) => n.startsWith(q))) s = 4;
+    else if (e.names.some((n) => n.split(" ").some((w) => w.startsWith(q)))) s = 3;
     else if (e.hay.split(" ").some((w) => w.startsWith(q))) s = 2;
-    else if (e.hay.includes(q)) s = 1;
+    else if (e.names.some((n) => n.includes(q)) || e.hay.includes(q)) s = 1;
     if (s) out.push({ p: e, s: s * 1e10 + e.rank });
   }
   out.sort((a, b) => b.s - a.s);

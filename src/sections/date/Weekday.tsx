@@ -4,7 +4,7 @@ import { useId, useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { Field, Input } from "@/ui/field";
 import { Panel } from "@/ui/panel";
-import { dayOfYear, daysInYear, fmtDate, isoWeek, isValidYmd, parseYmd, WEEKDAYS, type Ymd } from "@/sections/calendar/lib/dates";
+import { cap, dayOfYear, daysInYear, fmtDate, isoWeek, isValidYmd, parseYmd, WEEKDAYS, type Ymd } from "@/sections/calendar/lib/dates";
 import { weekdayOf } from "./lib/engine";
 import { BigResult, useToday } from "./ui";
 
@@ -41,7 +41,7 @@ export default function Weekday({ locale }: { locale: Locale }) {
         <div className="mt-4 border-t border-line pt-6">
           <BigResult
             caption={x ? fmtDate(locale, x) : " "}
-            value={x ? names[weekdayOf(x) - 1] : "—"}
+            value={x ? cap(names[weekdayOf(x) - 1]) : "—"}
             sub={x ? t.info(dayOfYear(x), daysInYear(x.y), isoWeek(x).week) : " "}
           />
         </div>

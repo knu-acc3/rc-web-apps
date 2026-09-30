@@ -64,13 +64,13 @@ export default function DateDiff({ locale }: { locale: Locale }) {
     <div className="flex flex-col gap-4">
       <Panel className="p-4 sm:p-5">
         <div className="grid items-end gap-3 sm:grid-cols-[1fr_auto_1fr]">
-          <Field label={t.from} htmlFor={`${id}-a`} hint={!fromText ? t.today : undefined}>
+          <Field label={t.from} htmlFor={`${id}-a`}>
             <Input id={`${id}-a`} type="date" value={fromText} onChange={(e) => setFrom(e.target.value)} placeholder={today ? ymdStr(today) : ""} />
           </Field>
           <Button
             variant="outline"
             size="icon"
-            className="mx-auto sm:mb-7"
+            className="mx-auto"
             aria-label={t.swap}
             title={t.swap}
             onClick={() => {
@@ -85,6 +85,7 @@ export default function DateDiff({ locale }: { locale: Locale }) {
             <Input id={`${id}-b`} type="date" value={toText} onChange={(e) => setTo(e.target.value)} />
           </Field>
         </div>
+        {!fromText && <p className="mt-2 text-[13px] text-fg-3">{t.from}: {t.today}</p>}
         <div className="mt-4 border-t border-line pt-6">
           <BigResult
             caption={t.between}

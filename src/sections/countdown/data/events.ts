@@ -207,7 +207,7 @@ export const EVENTS: EventDef[] = [
   },
   {
     slug: "kazakhstan-unity-day",
-    glyph: "🇰🇿",
+    glyph: "🤝",
     name: { ru: "День единства народа Казахстана", en: "Kazakhstan Unity Day" },
     to: { ru: "до Дня единства народа Казахстана", en: "until Kazakhstan Unity Day" },
     md: [5, 1],
@@ -276,7 +276,7 @@ export const EVENTS: EventDef[] = [
   },
   {
     slug: "russia-day",
-    glyph: "🇷🇺",
+    glyph: "🎉",
     name: { ru: "День России", en: "Russia Day" },
     to: { ru: "до Дня России", en: "until Russia Day" },
     md: [6, 12],
@@ -345,7 +345,7 @@ export const EVENTS: EventDef[] = [
   },
   {
     slug: "kazakhstan-republic-day",
-    glyph: "🇰🇿",
+    glyph: "🏛️",
     name: { ru: "День Республики", en: "Republic Day" },
     to: { ru: "до Дня Республики", en: "until Republic Day" },
     md: [10, 25],
@@ -414,7 +414,7 @@ export const EVENTS: EventDef[] = [
   },
   {
     slug: "kazakhstan-independence-day",
-    glyph: "🇰🇿",
+    glyph: "🌟",
     name: { ru: "День Независимости Казахстана", en: "Kazakhstan Independence Day" },
     to: { ru: "до Дня Независимости Казахстана", en: "until Kazakhstan Independence Day" },
     md: [12, 16],
