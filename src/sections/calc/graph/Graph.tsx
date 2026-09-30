@@ -8,9 +8,25 @@ import { compile, errorText } from "../expr/parser";
 import { fmtN } from "../kit/fmt";
 import { Explain, Stack } from "../kit/ui";
 import { useQueryState } from "../kit/url-state";
-import { DEFAULT_VIEW, gridStep, pan, parseView, sample, serializeView, zoomAt, type View } from "./sampling";
+import {
+  DEFAULT_VIEW,
+  gridStep,
+  pan,
+  parseView,
+  sample,
+  serializeView,
+  zoomAt,
+  type View,
+} from "./sampling";
 
-const COLORS = ["#2f6bff", "#e5484d", "#12a150", "#e08a00", "#8e4ec6", "#0891b2"];
+const COLORS = [
+  "#2f6bff",
+  "#e5484d",
+  "#12a150",
+  "#e08a00",
+  "#8e4ec6",
+  "#0891b2",
+];
 const KEYS = ["f1", "f2", "f3", "f4", "f5", "f6"] as const;
 type FKey = (typeof KEYS)[number];
 
@@ -45,7 +61,15 @@ export default function Graph({ locale }: ToolProps) {
   const t = T[locale];
   const id = useId();
   const ru = locale === "ru";
-  const q = useQueryState({ f1: "sin(x)", f2: "x^2/4 - 2", f3: "", f4: "", f5: "", f6: "", v: serializeView(DEFAULT_VIEW) });
+  const q = useQueryState({
+    f1: "sin(x)",
+    f2: "x^2/4 - 2",
+    f3: "",
+    f4: "",
+    f5: "",
+    f6: "",
+    v: serializeView(DEFAULT_VIEW),
+  });
   const [viewEdit, setViewEdit] = useState<View | null>(null);
   const view = viewEdit ?? parseView(q.v.v) ?? DEFAULT_VIEW;
   const [size, setSize] = useState({ w: 800, h: 480 });
@@ -54,12 +78,23 @@ export default function Graph({ locale }: ToolProps) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const viewRef = useRef(view);
-  const drag = useRef<{ x: number; y: number; view: View; pointers: Map<number, { x: number; y: number }>; dist: number | null } | null>(null);
+  const drag = useRef<{
+    x: number;
+    y: number;
+    view: View;
+    pointers: Map<number, { x: number; y: number }>;
+    dist: number | null;
+  } | null>(null);
 
   const active = KEYS.filter((k) => q.v[k].trim() !== "" || k === "f1");
   const compiled = KEYS.map((k) => {
     const src = q.v[k].trim();
-    if (!src) return { key: k, f: null as ((x: number) => number) | null, err: null as string | null };
+    if (!src)
+      return {
+        key: k,
+        f: null as ((x: number) => number) | null,
+        err: null as string | null,
+      };
     try {
       return { key: k, f: compile(src, { decimalComma: ru }), err: null };
     } catch (e) {
@@ -77,7 +112,10 @@ export default function Graph({ locale }: ToolProps) {
     if (!el) return;
     const ro = new ResizeObserver((entries) => {
       const r = entries[0].contentRect;
-      setSize({ w: Math.max(200, Math.round(r.width)), h: Math.max(240, Math.round(Math.min(560, r.width * 0.62))) });
+      setSize({
+        w: Math.max(200, Math.round(r.width)),
+        h: Math.max(240, Math.round(Math.min(560, r.width * 0.62))),
+      });
     });
     ro.observe(el);
     return () => ro.disconnect();
@@ -86,7 +124,10 @@ export default function Graph({ locale }: ToolProps) {
   // Redraw when the theme (class on <html>) changes.
   useEffect(() => {
     const mo = new MutationObserver(() => setThemeTick((n) => n + 1));
-    mo.observe(document.documentElement, { attributes: true, attributeFilter: ["class", "style", "data-theme"] });
+    mo.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class", "style", "data-theme"],
+    });
     return () => mo.disconnect();
   }, []);
 
@@ -122,7 +163,7 @@ export default function Graph({ locale }: ToolProps) {
   useEffect(() => {
     const c = canvasRef.current;
     if (!c) return;
-    const raf = requestAnimationFrame(() => {
+    {
       const dpr = window.devicePixelRatio || 1;
       const { w, h } = size;
       c.width = Math.round(w * dpr);
@@ -131,7 +172,8 @@ export default function Graph({ locale }: ToolProps) {
       if (!ctx) return;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       const css = getComputedStyle(document.documentElement);
-      const col = (name: string, fb: string) => css.getPropertyValue(name).trim() || fb;
+      const col = (name: string, fb: string) =>
+        css.getPropertyValue(name).trim() || fb;
       const bg = col("--surface", "#fff");
       const line = col("--line", "#e3e3de");
       const strong = col("--fg-3", "#71737b");
@@ -193,7 +235,11 @@ export default function Graph({ locale }: ToolProps) {
       compiled.forEach((cf, i) => {
         if (!cf.f) return;
         ctx.strokeStyle = COLORS[i];
-        for (const seg of sample(cf.f, v, Math.min(2000, Math.max(400, w * 2)))) {
+        for (const seg of sample(
+          cf.f,
+          v,
+          Math.min(2000, Math.max(400, w * 2)),
+        )) {
           ctx.beginPath();
           seg.forEach(([x, y], j) => {
             const py = Math.max(-1e4, Math.min(1e4, Y(y)));
@@ -214,22 +260,42 @@ export default function Graph({ locale }: ToolProps) {
         ctx.stroke();
         ctx.setLineDash([]);
       }
-    });
-    return () => cancelAnimationFrame(raf);
+    }
     // compiled is derived from fnKey
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [view.x0, view.x1, view.y0, view.y1, size, fnKey, hoverX, themeTick, locale]);
+  }, [
+    view.x0,
+    view.x1,
+    view.y0,
+    view.y1,
+    size,
+    fnKey,
+    hoverX,
+    themeTick,
+    locale,
+  ]);
 
   const toWorld = (clientX: number, clientY: number) => {
     const c = canvasRef.current!;
     const r = c.getBoundingClientRect();
-    return { x: view.x0 + ((clientX - r.left) / r.width) * (view.x1 - view.x0), y: view.y1 - ((clientY - r.top) / r.height) * (view.y1 - view.y0), r };
+    return {
+      x: view.x0 + ((clientX - r.left) / r.width) * (view.x1 - view.x0),
+      y: view.y1 - ((clientY - r.top) / r.height) * (view.y1 - view.y0),
+      r,
+    };
   };
 
-  const zoomBy = (f: number) => setViewEdit(zoomAt(view, f, (view.x0 + view.x1) / 2, (view.y0 + view.y1) / 2));
-  const panBy = (fx: number, fy: number) => setViewEdit(pan(view, (view.x1 - view.x0) * fx, (view.y1 - view.y0) * fy));
+  const zoomBy = (f: number) =>
+    setViewEdit(
+      zoomAt(view, f, (view.x0 + view.x1) / 2, (view.y0 + view.y1) / 2),
+    );
+  const panBy = (fx: number, fy: number) =>
+    setViewEdit(pan(view, (view.x1 - view.x0) * fx, (view.y1 - view.y0) * fy));
 
-  const described = compiled.filter((c) => c.f).map((c) => `y = ${q.v[c.key]}`).join("; ");
+  const described = compiled
+    .filter((c) => c.f)
+    .map((c) => `y = ${q.v[c.key]}`)
+    .join("; ");
   const readout =
     hoverX !== null
       ? compiled
@@ -237,7 +303,10 @@ export default function Graph({ locale }: ToolProps) {
           .filter(({ c }) => c.f)
           .map(({ c, i }) => {
             const y = c.f!(hoverX);
-            return { i, text: `${q.v[c.key]} = ${Number.isFinite(y) ? fmtN(locale, Number(y.toPrecision(8)), 6) : "—"}` };
+            return {
+              i,
+              text: `${q.v[c.key]} = ${Number.isFinite(y) ? fmtN(locale, Number(y.toPrecision(8)), 6) : "—"}`,
+            };
           })
       : [];
 
@@ -251,17 +320,28 @@ export default function Graph({ locale }: ToolProps) {
             return (
               <div key={k} className="flex flex-col gap-1">
                 <div className="flex items-center gap-2">
-                  <span aria-hidden className="inline-block h-1 w-5 shrink-0 rounded-full" style={{ background: COLORS[i] }} />
+                  <span
+                    aria-hidden
+                    className="inline-block h-1 w-5 shrink-0 rounded-full"
+                    style={{ background: COLORS[i] }}
+                  />
                   <label htmlFor={`${id}-${k}`} className="sr-only">
                     {t.fn(i + 1)}
                   </label>
-                  <span aria-hidden className="shrink-0 font-mono text-sm text-fg-3">
+                  <span
+                    aria-hidden
+                    className="shrink-0 font-mono text-sm text-fg-3"
+                  >
                     y =
                   </span>
                   <input
                     id={`${id}-${k}`}
                     value={q.v[k]}
-                    onChange={(e) => q.set({ [k]: e.target.value } as Partial<Record<FKey, string>>)}
+                    onChange={(e) =>
+                      q.set({ [k]: e.target.value } as Partial<
+                        Record<FKey, string>
+                      >)
+                    }
                     autoComplete="off"
                     spellCheck={false}
                     aria-invalid={!!cf.err}
@@ -269,12 +349,22 @@ export default function Graph({ locale }: ToolProps) {
                     className="control h-10 min-w-0 flex-1 font-mono text-[15px]"
                   />
                   {k !== "f1" && (
-                    <Button variant="ghost" size="icon-sm" onClick={() => q.set({ [k]: "" } as Partial<Record<FKey, string>>)} aria-label={`${t.remove} ${i + 1}`} title={t.remove}>
+                    <Button
+                      variant="ghost"
+                      size="icon-sm"
+                      onClick={() =>
+                        q.set({ [k]: "" } as Partial<Record<FKey, string>>)
+                      }
+                      aria-label={`${t.remove} ${i + 1}`}
+                      title={t.remove}
+                    >
                       <X aria-hidden />
                     </Button>
                   )}
                 </div>
-                {cf.err && <p className="pl-7 text-[13px] text-err">{cf.err}</p>}
+                {cf.err && (
+                  <p className="pl-7 text-[13px] text-err">{cf.err}</p>
+                )}
               </div>
             );
           })}
@@ -285,7 +375,8 @@ export default function Graph({ locale }: ToolProps) {
               className="self-start"
               onClick={() => {
                 const free = KEYS.find((k) => k !== "f1" && !q.v[k].trim());
-                if (free) q.set({ [free]: "x" } as Partial<Record<FKey, string>>);
+                if (free)
+                  q.set({ [free]: "x" } as Partial<Record<FKey, string>>);
               }}
             >
               <Plus aria-hidden />
@@ -295,13 +386,22 @@ export default function Graph({ locale }: ToolProps) {
           <p className="text-[13px] text-fg-3">{t.logHint}</p>
         </section>
         <section className="min-w-0">
-          <div ref={wrapRef} className="relative overflow-hidden rounded-[12px] border border-line">
+          <div
+            ref={wrapRef}
+            className="relative overflow-hidden rounded-[12px] border border-line"
+          >
             <canvas
               ref={canvasRef}
               role="img"
               aria-label={t.canvas(described)}
               tabIndex={0}
-              style={{ width: size.w, height: size.h, touchAction: "none", display: "block", maxWidth: "100%" }}
+              style={{
+                width: size.w,
+                height: size.h,
+                touchAction: "none",
+                display: "block",
+                maxWidth: "100%",
+              }}
               onKeyDown={(e) => {
                 const map: Record<string, () => void> = {
                   ArrowLeft: () => panBy(-0.1, 0),
@@ -321,7 +421,13 @@ export default function Graph({ locale }: ToolProps) {
               }}
               onPointerDown={(e) => {
                 e.currentTarget.setPointerCapture(e.pointerId);
-                const d = drag.current ?? { x: e.clientX, y: e.clientY, view, pointers: new Map(), dist: null };
+                const d = drag.current ?? {
+                  x: e.clientX,
+                  y: e.clientY,
+                  view,
+                  pointers: new Map(),
+                  dist: null,
+                };
                 d.pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
                 if (d.pointers.size === 1) {
                   d.x = e.clientX;
@@ -349,8 +455,10 @@ export default function Graph({ locale }: ToolProps) {
                   d.dist = dist;
                   return;
                 }
-                const dx = ((e.clientX - d.x) / w.r.width) * (d.view.x1 - d.view.x0);
-                const dy = ((e.clientY - d.y) / w.r.height) * (d.view.y1 - d.view.y0);
+                const dx =
+                  ((e.clientX - d.x) / w.r.width) * (d.view.x1 - d.view.x0);
+                const dy =
+                  ((e.clientY - d.y) / w.r.height) * (d.view.y1 - d.view.y0);
                 setViewEdit(pan(d.view, -dx, dy));
               }}
               onPointerUp={(e) => {
@@ -372,13 +480,31 @@ export default function Graph({ locale }: ToolProps) {
               onPointerLeave={() => setHoverX(null)}
             />
             <div className="absolute right-2 top-2 flex flex-col gap-1">
-              <Button variant="outline" size="icon-sm" onClick={() => zoomBy(0.7)} aria-label={t.zoomIn} title={t.zoomIn}>
+              <Button
+                variant="outline"
+                size="icon-sm"
+                onClick={() => zoomBy(0.7)}
+                aria-label={t.zoomIn}
+                title={t.zoomIn}
+              >
                 <ZoomIn aria-hidden />
               </Button>
-              <Button variant="outline" size="icon-sm" onClick={() => zoomBy(1 / 0.7)} aria-label={t.zoomOut} title={t.zoomOut}>
+              <Button
+                variant="outline"
+                size="icon-sm"
+                onClick={() => zoomBy(1 / 0.7)}
+                aria-label={t.zoomOut}
+                title={t.zoomOut}
+              >
                 <ZoomOut aria-hidden />
               </Button>
-              <Button variant="outline" size="icon-sm" onClick={() => setViewEdit(DEFAULT_VIEW)} aria-label={t.reset} title={t.reset}>
+              <Button
+                variant="outline"
+                size="icon-sm"
+                onClick={() => setViewEdit(DEFAULT_VIEW)}
+                aria-label={t.reset}
+                title={t.reset}
+              >
                 <Maximize aria-hidden />
               </Button>
             </div>
@@ -391,7 +517,11 @@ export default function Graph({ locale }: ToolProps) {
                 </span>
                 {readout.map((r) => (
                   <span key={r.i} className="inline-flex items-center gap-1.5">
-                    <span aria-hidden className="inline-block size-2 rounded-full" style={{ background: COLORS[r.i] }} />
+                    <span
+                      aria-hidden
+                      className="inline-block size-2 rounded-full"
+                      style={{ background: COLORS[r.i] }}
+                    />
                     {r.text}
                   </span>
                 ))}
@@ -405,7 +535,9 @@ export default function Graph({ locale }: ToolProps) {
       {ru ? (
         <Explain
           locale={locale}
-          formula={["y = sin(x), y = x^2 − 4, y = 2x + 1, y = √x, y = ln(x), y = 1/x"]}
+          formula={[
+            "y = sin(x), y = x^2 − 4, y = 2x + 1, y = √x, y = ln(x), y = 1/x",
+          ]}
           notes={[
             "Записывайте функции от x: умножение можно не писать (2x, 3sin(x)), степень — через ^, десятичный разделитель — запятая или точка.",
             "log — десятичный логарифм, ln — натуральный, sqrt или √ — корень, abs — модуль. Углы в радианах.",
@@ -415,7 +547,9 @@ export default function Graph({ locale }: ToolProps) {
       ) : (
         <Explain
           locale={locale}
-          formula={["y = sin(x), y = x^2 − 4, y = 2x + 1, y = √x, y = ln(x), y = 1/x"]}
+          formula={[
+            "y = sin(x), y = x^2 − 4, y = 2x + 1, y = √x, y = ln(x), y = 1/x",
+          ]}
           notes={[
             "Write functions of x: you can omit the multiplication sign (2x, 3sin(x)) and use ^ for powers.",
             "log is base 10, ln is natural, sqrt or √ is the square root, abs the absolute value. Angles are in radians.",
@@ -426,4 +560,3 @@ export default function Graph({ locale }: ToolProps) {
     </Stack>
   );
 }
-
