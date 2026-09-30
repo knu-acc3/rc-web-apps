@@ -1,4 +1,6 @@
 import { defineToolSection } from "@/registry/tool-section";
+import { generatorTools } from "./generators";
+import { mediaTools } from "./media-tools";
 
 export const audioSection = defineToolSection({
   id: "audio",
@@ -11,5 +13,5 @@ export const audioSection = defineToolSection({
   hue: 320,
   category: "files",
   order: 4,
-  tools: [],
+  tools: [...mediaTools, ...generatorTools],
 });
