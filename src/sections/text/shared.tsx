@@ -22,6 +22,7 @@ export const TX = {
     lines: ["строка", "строки", "строк"],
     words: ["слово", "слова", "слов"],
     options: "Настройки",
+    more: "Дополнительные настройки",
     placeholder: "Вставьте или введите текст…",
   },
   en: {
@@ -36,6 +37,7 @@ export const TX = {
     lines: ["line", "lines"],
     words: ["word", "words"],
     options: "Options",
+    more: "More options",
     placeholder: "Paste or type your text…",
   },
 } as const;
@@ -179,9 +181,24 @@ export function TwoPane({ children, className }: { children: ReactNode; classNam
   return <div className={cn("grid gap-4 lg:grid-cols-2", className)}>{children}</div>;
 }
 
-/** Options bar under/above the editors. */
+/** One quiet row of the most important options. */
 export function OptionsBar({ children, className }: { children: ReactNode; className?: string }) {
-  return <div className={cn("flex flex-wrap items-center gap-x-5 gap-y-3 rounded-[12px] border border-line bg-surface px-4 py-3", className)}>{children}</div>;
+  return <div className={cn("flex flex-wrap items-center gap-x-5 gap-y-2.5 text-sm", className)}>{children}</div>;
+}
+
+/** Secondary options, collapsed by default so the tool has one focal point. */
+export function MoreOptions({ locale, children, className }: { locale: Locale; children: ReactNode; className?: string }) {
+  return (
+    <details className={cn("group rounded-[12px] border border-line bg-surface", className)}>
+      <summary className="flex cursor-pointer list-none items-center gap-2 px-4 py-2.5 text-sm font-medium text-fg-2 hover:text-fg">
+        <svg aria-hidden viewBox="0 0 24 24" className="size-4 transition-transform duration-150 group-open:rotate-90" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="m9 6 6 6-6 6" />
+        </svg>
+        {TX[locale].more}
+      </summary>
+      <div className="flex flex-wrap items-center gap-x-5 gap-y-3 border-t border-line px-4 py-3 text-sm">{children}</div>
+    </details>
+  );
 }
 
 /** Small uncontrolled-label select row for options bars. */

@@ -135,11 +135,13 @@ export default function WordCounter({ locale, platform, initialText = "" }: Word
   const top = useMemo(() => wordFrequency(deferred, { locale: lang, excludeStopWords: noStop, minLength: 2 }).rows.slice(0, 10), [deferred, noStop, lang]);
   const p = platform ? PLATFORM_BY_ID.get(platform) : undefined;
 
-  const main: [string, string, string?][] = [
+  const main: [string, string][] = [
     [t.chars, formatNumber(locale, stats.chars)],
     [t.noSpaces, formatNumber(locale, stats.charsNoSpaces)],
     [t.words, formatNumber(locale, stats.words)],
     [t.sentences, formatNumber(locale, stats.sentences)],
+  ];
+  const secondary: [string, string, string?][] = [
     [t.paragraphs, formatNumber(locale, stats.paragraphs)],
     [t.lines, formatNumber(locale, stats.lines)],
     [t.reading, duration(locale, stats.readingSeconds), t.readingSub],
@@ -154,20 +156,30 @@ export default function WordCounter({ locale, platform, initialText = "" }: Word
       {p && platform === "x-twitter" && <XPanel locale={locale} text={deferred} />}
       {p && platform !== "sms" && platform !== "x-twitter" && (
         <Panel>
-          <PanelHeader title={`${t.limits}: ${p.name[locale]}`} />
           <ul className="flex flex-col divide-y divide-line">
-            {p.limits.map((l) => (
-              <LimitRow key={l.key} locale={locale} limit={l} text={deferred} />
+            {p.limits.map((l, i) => (
+              <LimitRow key={l.key} locale={locale} limit={l} text={deferred} big={i === 0} />
             ))}
           </ul>
+          {platform === "instagram-caption" && (
+            <p className="tabular border-t border-line px-4 py-2.5 text-sm text-fg-2">{countLabel(locale, extractHashtags(deferred).length, t.hashtags)}</p>
+          )}
         </Panel>
       )}
 
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-        {main.map(([label, value, sub]) => (
-          <Stat key={label} label={label} value={value} sub={sub} size="md" />
+        {main.map(([label, value]) => (
+          <Stat key={label} label={label} value={value} size="lg" />
         ))}
       </div>
+      <dl className="flex flex-wrap gap-x-6 gap-y-2 px-1 text-sm">
+        {secondary.map(([label, value, sub]) => (
+          <div key={label} className="flex items-baseline gap-1.5" title={sub}>
+            <dt className="text-fg-3">{label}:</dt>
+            <dd className="tabular font-medium text-fg">{value}</dd>
+          </div>
+        ))}
+      </dl>
 
       <div className="grid gap-4 md:grid-cols-2">
         <Panel>
@@ -231,25 +243,27 @@ function Meter({ value, max, soft, min }: { value: number; max: number; soft?: b
   );
 }
 
-function LimitRow({ locale, limit, text }: { locale: Locale; limit: PlatformLimit; text: string }) {
+function LimitRow({ locale, limit, text, big }: { locale: Locale; limit: PlatformLimit; text: string; big?: boolean }) {
   const t = T[locale];
   const value = limit.method === "hashtags" ? extractHashtags(text).length : limit.method === "codeUnits" ? text.length : graphemeCount(text);
   const left = limit.max - value;
   const unit = limit.method === "hashtags" ? T[locale].hashtags : TX[locale].chars;
+  const tone = left < 0 ? (limit.soft ? "text-warn" : "text-err") : "text-fg-2";
   return (
-    <li className="flex flex-col gap-1.5 px-4 py-3">
-      <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1 text-sm">
-        <span className="font-medium text-fg">
+    <li className={cn("flex flex-col gap-2 px-4", big ? "py-4" : "py-3")}>
+      <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+        <span className={cn("text-fg", big ? "font-semibold" : "text-sm font-medium")}>
           {limit.label[locale]}
-          {limit.soft && <span className="ml-1.5 text-fg-3">({t.guideline})</span>}
+          {limit.soft && <span className="ml-1.5 font-normal text-fg-3">({t.guideline})</span>}
         </span>
-        <span className={cn("tabular", left < 0 ? (limit.soft ? "text-warn" : "text-err") : "text-fg-2")}>
-          {formatNumber(locale, value)} {t.of} {formatNumber(locale, limit.max)}
-          {" · "}
-          {left >= 0 ? `${t.left} ${countLabel(locale, left, unit)}` : `${t.over} ${countLabel(locale, -left, unit)}`}
+        <span className={cn("tabular", big ? "text-2xl font-semibold text-fg sm:text-3xl" : "text-sm text-fg")}>
+          {formatNumber(locale, value)} <span className="text-base font-normal text-fg-3">/ {formatNumber(locale, limit.max)}</span>
         </span>
       </div>
       <Meter value={value} max={limit.max} soft={limit.soft} min={limit.min} />
+      <span className={cn("tabular text-sm", tone)}>
+        {left >= 0 ? `${t.left} ${countLabel(locale, left, unit)}` : `${t.over} ${countLabel(locale, -left, unit)}`}
+      </span>
     </li>
   );
 }
@@ -260,14 +274,23 @@ function SmsPanel({ locale, text }: { locale: Locale; text: string }) {
   const unitForms = TX[locale].chars;
   return (
     <Panel>
-      <PanelHeader title={t.sms} />
-      <div className="grid grid-cols-2 gap-3 p-4 md:grid-cols-4">
-        <Stat label={t.encoding} value={info.encoding} size="md" />
-        <Stat label={t.segments} value={formatNumber(locale, info.segments)} size="md" />
-        <Stat label={t.perSegment} value={formatNumber(locale, info.perSegment)} size="md" sub={`${info.encoding === "GSM-7" ? "160 / 153" : "70 / 67"}`} />
-        <Stat label={t.left} value={formatNumber(locale, info.remaining)} size="md" sub={plural(locale, info.remaining, unitForms)} />
+      <div className="flex flex-wrap items-end justify-between gap-4 px-4 pt-4">
+        <div>
+          <div className="text-sm font-medium text-fg-2">{t.segments}</div>
+          <div className="tabular text-4xl font-semibold tracking-tight text-fg">{formatNumber(locale, info.segments)}</div>
+        </div>
+        <dl className="grid grid-cols-[auto_auto] gap-x-4 gap-y-1 text-sm">
+          <dt className="text-fg-3">{t.encoding}</dt>
+          <dd className="tabular font-medium text-fg">{info.encoding}</dd>
+          <dt className="text-fg-3">{t.perSegment}</dt>
+          <dd className="tabular font-medium text-fg">{info.encoding === "GSM-7" ? "160 / 153" : "70 / 67"}</dd>
+          <dt className="text-fg-3">{t.left}</dt>
+          <dd className="tabular font-medium text-fg">
+            {formatNumber(locale, info.remaining)} {plural(locale, info.remaining, unitForms)}
+          </dd>
+        </dl>
       </div>
-      <div className="flex flex-col gap-2 px-4 pb-4 text-sm text-fg-2">
+      <div className="flex flex-col gap-2 p-4 text-sm text-fg-2">
         <p>{t.gsmNote}</p>
         {info.nonGsm.length > 0 && (
           <p>
@@ -289,17 +312,20 @@ function XPanel({ locale, text }: { locale: Locale; text: string }) {
   const x = xWeightedLength(text);
   return (
     <Panel>
-      <PanelHeader title="X (Twitter)" />
-      <div className="flex flex-col gap-3 p-4">
-        <div className="flex flex-wrap items-baseline justify-between gap-2 text-sm">
-          <span className="font-medium text-fg">{t.weighted}</span>
-          <span className={cn("tabular", x.remaining < 0 ? "text-err" : "text-fg-2")}>
-            {formatNumber(locale, x.weighted)} {t.of} 280 · {x.remaining >= 0 ? `${t.left} ${formatNumber(locale, x.remaining)}` : `${t.over} ${formatNumber(locale, -x.remaining)}`}
+      <div className="flex flex-col gap-2 p-4">
+        <div className="flex flex-wrap items-baseline justify-between gap-2">
+          <span className="font-semibold text-fg">{t.weighted}</span>
+          <span className="tabular text-2xl font-semibold text-fg sm:text-3xl">
+            {formatNumber(locale, x.weighted)} <span className="text-base font-normal text-fg-3">/ 280</span>
           </span>
         </div>
         <Meter value={x.weighted} max={280} />
-        <p className="text-sm text-fg-2">
-          {t.urls}: {formatNumber(locale, x.urls)}
+        <p className={cn("tabular text-sm", x.remaining < 0 ? "text-err" : "text-fg-2")}>
+          {x.remaining >= 0 ? `${t.left} ${formatNumber(locale, x.remaining)}` : `${t.over} ${formatNumber(locale, -x.remaining)}`}
+          <span className="text-fg-3">
+            {" · "}
+            {t.urls}: {formatNumber(locale, x.urls)}
+          </span>
         </p>
       </div>
     </Panel>

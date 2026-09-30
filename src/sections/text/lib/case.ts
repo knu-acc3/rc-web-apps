@@ -46,10 +46,24 @@ const capW = (w: string, loc?: string) => {
   return chars.length ? upperW(chars[0], loc) + lowerW(chars.slice(1).join(""), loc) : w;
 };
 
-/** A word written in capitals (≥ 2 letters), e.g. NASA, США, HTML5. */
-function isAcronym(w: string): boolean {
+/** A word written in capitals (2–6 letters), e.g. NASA, США, HTML5. */
+function isCaps(w: string): boolean {
   const letters = w.replace(/[^\p{L}]/gu, "");
   return letters.length >= 2 && letters === letters.toUpperCase() && letters !== letters.toLowerCase();
+}
+
+/**
+ * Indexes of words that look like acronyms: short all-caps words that are not
+ * part of a run of all-caps words ("КАК ДЕЛА" is shouting, "NASA и США" are acronyms).
+ */
+function acronymSet(words: string[]): Set<number> {
+  const caps = words.map(isCaps);
+  const out = new Set<number>();
+  words.forEach((w, i) => {
+    const letters = w.replace(/[^\p{L}]/gu, "").length;
+    if (caps[i] && letters <= 6 && !caps[i - 1] && !caps[i + 1]) out.add(i);
+  });
+  return out;
 }
 
 /** Text is (almost) entirely in capitals — acronyms can't be told apart then. */
@@ -78,6 +92,7 @@ export function toTitleCase(s: string, opts: CaseOptions = {}): string {
   const { locale, smallWords = false, keepAcronyms = true } = opts;
   const shouting = isShouting(s);
   const matches = [...s.matchAll(WORD_RE)];
+  const acr = acronymSet(matches.map((m) => m[0]));
   let out = "";
   let last = 0;
   matches.forEach((m, i) => {
@@ -90,7 +105,7 @@ export function toTitleCase(s: string, opts: CaseOptions = {}): string {
     const boundary = i === 0 || /[:.!?—–]\s*$|\n\s*$/.test(prevChunk);
     const isLast = i === matches.length - 1;
     const lw = lowerW(w, locale);
-    if (keepAcronyms && !shouting && isAcronym(w)) out += w;
+    if (keepAcronyms && !shouting && acr.has(i)) out += w;
     else if (smallWords && !boundary && !isLast && EN_SMALL_WORDS.has(lw)) out += lw;
     else out += capW(w, locale);
   });
@@ -100,7 +115,9 @@ export function toTitleCase(s: string, opts: CaseOptions = {}): string {
 export function toSentenceCase(s: string, opts: CaseOptions = {}): string {
   const { locale, keepAcronyms = true } = opts;
   const shouting = isShouting(s);
-  let out = s.replace(WORD_RE, (w) => (keepAcronyms && !shouting && isAcronym(w) ? w : lowerW(w, locale)));
+  const acr = acronymSet([...s.matchAll(WORD_RE)].map((m) => m[0]));
+  let k = 0;
+  let out = s.replace(WORD_RE, (w) => (keepAcronyms && !shouting && acr.has(k++) ? w : lowerW(w, locale)));
   // English pronoun "I" (i, i'm, i've, i'd, i'll)
   out = out.replace(/(^|[^\p{L}\p{N}])i(?=$|[^\p{L}\p{N}'’]|['’](?:m|ve|d|ll)\b)/gu, "$1I");
   // Capitalise the first letter of the text and of every sentence.

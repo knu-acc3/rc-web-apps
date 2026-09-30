@@ -6,7 +6,7 @@ import type { Locale } from "@/i18n/config";
 import { downloadText } from "@/lib/clipboard";
 import { Button, buttonClass } from "@/ui/button";
 import { CopyButton } from "@/ui/copy-button";
-import { Checkbox, Field, Input } from "@/ui/field";
+import { Checkbox, Input } from "@/ui/field";
 import { Panel, PanelHeader } from "@/ui/panel";
 import { Segmented } from "@/ui/segmented";
 import { textStats } from "./lib/textOps";
@@ -102,13 +102,14 @@ export default function LoremGenerator({ locale, lang: lang0 = "latin", unit: un
           size="sm"
           options={(["paragraphs", "sentences", "words", "list"] as const).map((v) => ({ value: v, label: t[v] }))}
         />
-        <Field label={t.count} htmlFor={`${id}-n`} className="w-28">
-          <Input id={`${id}-n`} inputMode="numeric" value={countText} onChange={(e) => setCountText(e.target.value)} size="sm" autoComplete="off" />
-        </Field>
+        <label className="flex items-center gap-2">
+          <span className="text-fg-2">{t.count}</span>
+          <Input id={`${id}-n`} inputMode="numeric" value={countText} onChange={(e) => setCountText(e.target.value)} size="sm" autoComplete="off" className="w-20" />
+        </label>
         <Checkbox label={t.html} checked={html} onChange={(e) => setHtml(e.target.checked)} />
         {(lang === "latin" || lang === "cyrillic") && unit !== "list" && <Checkbox label={t.classic} checked={classic} onChange={(e) => setClassic(e.target.checked)} />}
         {unit === "list" && <Checkbox label={t.numbered} checked={numbered} onChange={(e) => setNumbered(e.target.checked)} />}
-        <Button variant="primary" size="sm" onClick={() => setSeed(randomSeed())}>
+        <Button variant="ghost" size="sm" onClick={() => setSeed(randomSeed())}>
           <RefreshCw aria-hidden />
           {t.again}
         </Button>

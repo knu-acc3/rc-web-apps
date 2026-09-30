@@ -6,7 +6,7 @@ import type { Locale } from "@/i18n/config";
 import { Button } from "@/ui/button";
 import { Checkbox } from "@/ui/field";
 import { prepareLines, shuffle, sortLines, type SortMode } from "./lib/textOps";
-import { InlineSelect, InputPanel, OptionsBar, OutputPanel, TwoPane } from "./shared";
+import { InlineSelect, InputPanel, MoreOptions, OptionsBar, OutputPanel, TwoPane } from "./shared";
 
 const T = {
   ru: {
@@ -58,16 +58,17 @@ const T = {
 export interface SortLinesProps {
   locale: Locale;
   mode?: SortMode;
+  descending?: boolean;
 }
 
 const range = (n: number) => Array.from({ length: n }, (_, i) => i);
 
-export default function SortLines({ locale, mode: mode0 = "alpha" }: SortLinesProps) {
+export default function SortLines({ locale, mode: mode0 = "alpha", descending = false }: SortLinesProps) {
   const t = T[locale];
   const id = useId();
   const [text, setText] = useState<string>(t.sample);
   const [mode, setMode] = useState<SortMode>(mode0);
-  const [desc, setDesc] = useState(false);
+  const [desc, setDesc] = useState(descending);
   const [ignoreCase, setIgnoreCase] = useState(true);
   const [collation, setCollation] = useState<"ru" | "en" | "kk">(locale === "ru" ? "ru" : "en");
   const [removeEmpty, setRemoveEmpty] = useState(true);
@@ -107,6 +108,23 @@ export default function SortLines({ locale, mode: mode0 = "alpha" }: SortLinesPr
           </Button>
         )}
         {sortable && <Checkbox label={t.desc} checked={desc} onChange={(e) => setDesc(e.target.checked)} />}
+      </OptionsBar>
+      <TwoPane>
+        <InputPanel
+          id={`${id}-in`}
+          locale={locale}
+          value={text}
+          onChange={(v) => {
+            setText(v);
+            if (mode === "random") reshuffle(v);
+          }}
+          mono
+        />
+        <OutputPanel locale={locale} value={out} filename="sorted.txt" />
+      </TwoPane>
+      {mode === "numeric" && <p className="text-sm text-fg-3">{t.numericNote}</p>}
+      {mode === "random" && !shuffled && <p className="text-sm text-fg-3">{t.shuffleHint}</p>}
+      <MoreOptions locale={locale}>
         {sortable && <Checkbox label={t.ignoreCase} checked={ignoreCase} onChange={(e) => setIgnoreCase(e.target.checked)} />}
         {sortable && (
           <InlineSelect
@@ -124,22 +142,7 @@ export default function SortLines({ locale, mode: mode0 = "alpha" }: SortLinesPr
         <Checkbox label={t.removeEmpty} checked={removeEmpty} onChange={(e) => setRemoveEmpty(e.target.checked)} />
         <Checkbox label={t.trim} checked={trim} onChange={(e) => setTrim(e.target.checked)} />
         <Checkbox label={t.unique} checked={unique} onChange={(e) => setUnique(e.target.checked)} />
-      </OptionsBar>
-      <TwoPane>
-        <InputPanel
-          id={`${id}-in`}
-          locale={locale}
-          value={text}
-          onChange={(v) => {
-            setText(v);
-            if (mode === "random") reshuffle(v);
-          }}
-          mono
-        />
-        <OutputPanel locale={locale} value={out} filename="sorted.txt" />
-      </TwoPane>
-      {mode === "numeric" && <p className="text-sm text-fg-3">{t.numericNote}</p>}
-      {mode === "random" && !shuffled && <p className="text-sm text-fg-3">{t.shuffleHint}</p>}
+      </MoreOptions>
     </div>
   );
 }

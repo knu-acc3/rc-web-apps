@@ -7,12 +7,12 @@ import { cn } from "@/lib/cn";
 import { Button } from "@/ui/button";
 import { CopyButton } from "@/ui/copy-button";
 import { Field, Switch, Textarea } from "@/ui/field";
-import { Notice, Panel, PanelHeader } from "@/ui/panel";
+import { Panel } from "@/ui/panel";
 import { Segmented } from "@/ui/segmented";
-import { InvisiblePanel } from "./InvisiblePanel";
+import { InvisibleTool } from "./InvisibleTool";
 import { PLATFORMS, SAMPLE, STYLE_NAMES, type PlatformId } from "./names";
-import { CyrBadge, StyleRow } from "./StyleRow";
-import { T } from "./strings";
+import { StyleList } from "./StyleList";
+import { T, type Strings } from "./strings";
 import {
   cyrillicNotice,
   DEFAULT_SEED,
@@ -27,12 +27,13 @@ import {
   type StyleId,
   type ZalgoLevel,
 } from "./styles";
+import { useCopyFlash } from "./use-flash";
 
 export interface FancyTextProps {
   locale: Locale;
-  /** Variant page of one style: shown large at the top. */
+  /** Style variant page: this style is the selected result. */
   style?: StyleId;
-  /** Platform page: recommended styles first. */
+  /** Platform page: recommended styles listed first. */
   platform?: PlatformId;
   /** Invisible-character page. */
   invisible?: boolean;
@@ -40,11 +41,19 @@ export interface FancyTextProps {
 
 export default function FancyText({ locale, style, platform, invisible = false }: FancyTextProps) {
   const t = T[locale];
+  if (invisible) return <InvisibleTool locale={locale} t={t} />;
+  return <Generator locale={locale} style={style} platform={platform} t={t} />;
+}
+
+function Generator({ locale, style, platform, t }: { locale: Locale; style?: StyleId; platform?: PlatformId; t: Strings }) {
   const id = useId();
+  const pf = platform ? PLATFORMS[platform] : null;
   const [text, setText] = useState("");
+  const [selected, setSelected] = useState<StyleId>(style ?? pf?.styles[0] ?? "bold");
   const [seed, setSeed] = useState(DEFAULT_SEED);
   const [zalgo, setZalgo] = useState<ZalgoLevel>("medium");
   const [cyrOnly, setCyrOnly] = useState(false);
+  const [copied, copy] = useCopyFlash<StyleId>();
 
   const deferred = useDeferredValue(text);
   const src = deferred || SAMPLE[locale];
@@ -56,87 +65,80 @@ export default function FancyText({ locale, style, platform, invisible = false }
     return out;
   }, [src, seed, zalgo]);
 
-  const regenerate = () => setSeed(randomSeed());
-  const pf = platform ? PLATFORMS[platform] : null;
-  const firstIds = pf ? pf.styles : style ? [style] : [];
-  const visible = (s: StyleId) => !(cyr && cyrOnly && STYLES[s].cyr === "none");
-  const rest = STYLE_IDS.filter((s) => !firstIds.includes(s) && visible(s));
+  const pick = (s: StyleId) => {
+    setSelected(s);
+    void copy(s, outputs[s]);
+  };
+  const shown = (s: StyleId) => !(cyr && cyrOnly && STYLES[s].cyr === "none");
+  const first = pf ? pf.styles.filter(shown) : [];
+  const rest = STYLE_IDS.filter((s) => !first.includes(s) && shown(s));
 
-  const row = (s: StyleId) => (
-    <StyleRow
-      key={s}
-      id={s}
-      locale={locale}
-      text={outputs[s]}
-      t={t}
-      cyr={cyr}
-      onRegenerate={STYLES[s].random ? regenerate : undefined}
-      extra={pf?.xCounter ? <XCount text={outputs[s]} label={t.xCount} /> : undefined}
-    />
-  );
-
-  const input = (
-    <Panel className="p-4 sm:p-5">
-      <Field
-        label={t.input}
-        htmlFor={`${id}-in`}
-        hint={text ? undefined : t.sampleHint}
-        aside={
-          text ? (
-            <Button variant="ghost" size="sm" onClick={() => setText("")} className="-my-1 h-7!">
-              {t.clear}
-            </Button>
-          ) : undefined
-        }
-      >
-        <Textarea
-          id={`${id}-in`}
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          placeholder={SAMPLE[locale]}
-          rows={3}
-          maxLength={3000}
-          autoComplete="off"
-          className="min-h-24! font-sans! text-base!"
-        />
-      </Field>
-      {cyr && (
-        <Switch label={t.cyrOnly} checked={cyrOnly} onChange={(e) => setCyrOnly(e.target.checked)} className="mt-3 text-sm!" />
-      )}
-    </Panel>
-  );
+  const info = STYLES[selected];
+  const result = outputs[selected];
+  const notice = cyrillicNotice(selected, src);
+  const listProps = { outputs, selected, copied, onPick: pick, locale, t, cyr, xCounter: pf?.xCounter };
+  const cyrSwitch = cyr ? (
+    <Switch label={t.cyrOnly} checked={cyrOnly} onChange={(e) => setCyrOnly(e.target.checked)} className="text-[13px]! text-fg-2!" />
+  ) : undefined;
 
   return (
-    <div className="flex flex-col gap-4">
-      {invisible && <InvisiblePanel locale={locale} t={t} />}
-      {invisible && <h2 className="mt-2 text-lg font-semibold text-fg">{t.generatorTitle}</h2>}
-      {input}
+    <div className="flex flex-col gap-6">
+      <Panel className="p-4 sm:p-5">
+        <Field
+          label={t.input}
+          htmlFor={`${id}-in`}
+          hint={text ? undefined : t.sampleHint}
+          aside={
+            text ? (
+              <Button variant="ghost" size="sm" onClick={() => setText("")} className="-my-1 h-7!">
+                {t.clear}
+              </Button>
+            ) : undefined
+          }
+        >
+          <Textarea
+            id={`${id}-in`}
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            placeholder={SAMPLE[locale]}
+            rows={2}
+            maxLength={3000}
+            autoComplete="off"
+            className="min-h-20! font-sans! text-base!"
+          />
+        </Field>
 
-      {style && (
-        <FocusCard
-          id={style}
-          locale={locale}
-          text={outputs[style]}
-          notice={cyrillicNotice(style, src)}
-          zalgo={zalgo}
-          onZalgo={setZalgo}
-          onRegenerate={regenerate}
-        />
-      )}
+        <div className={cn("mt-4 rounded-[10px] bg-surface-2 px-4 sm:px-5", info.random ? "overflow-hidden py-6" : "py-4")}>
+          <div className="flex flex-wrap items-baseline justify-between gap-x-3 text-[13px] text-fg-2">
+            <span className="font-medium">{STYLE_NAMES[selected][locale]}</span>
+            {pf?.xCounter && <XCount text={result} label={t.xCount} />}
+          </div>
+          <p className="mt-1 min-h-10 text-2xl leading-relaxed font-medium whitespace-pre-wrap text-fg [overflow-wrap:anywhere] sm:text-3xl" aria-live="polite">
+            {result}
+          </p>
+          {notice && <p className="mt-2 text-[13px] text-warn">{notice === "none" ? t.noticeNone(info.digits !== "none") : t.noticePartial}</p>}
+          <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+            <div className="flex flex-wrap items-center gap-2">
+              {selected === "zalgo" && (
+                <Segmented label={t.intensity} value={zalgo} onChange={setZalgo} options={ZALGO_LEVELS.map((z) => ({ value: z, label: t.zalgo[z] }))} size="sm" />
+              )}
+              {info.random && (
+                <Button variant="ghost" size="sm" onClick={() => setSeed(randomSeed())} aria-label={t.regenerateLabel} title={t.regenerateLabel}>
+                  <RefreshCw aria-hidden />
+                  {t.regenerate}
+                </Button>
+              )}
+            </div>
+            <CopyButton value={result} label={t.copy} copiedLabel={t.copied} variant="primary" size="md" />
+          </div>
+        </div>
+      </Panel>
 
-      {pf && (
-        <Panel>
-          <PanelHeader title={t.goodFor(pf.forName[locale])} />
-          <ul>{pf.styles.filter(visible).map(row)}</ul>
-        </Panel>
-      )}
-
-      {rest.length > 0 && (
-        <Panel>
-          <PanelHeader title={firstIds.length ? t.otherStyles : t.allStyles} />
-          <ul>{rest.map(row)}</ul>
-        </Panel>
-      )}
+      {pf && <StyleList title={t.goodFor(pf.forName[locale])} ids={first} aside={cyrSwitch} {...listProps} />}
+      <StyleList title={pf ? t.otherStyles : t.allStyles} ids={rest} aside={pf ? undefined : cyrSwitch} {...listProps} />
+      <p className="sr-only" aria-live="polite">
+        {copied ? `${t.copied}: ${STYLE_NAMES[copied][locale]}` : ""}
+      </p>
     </div>
   );
 }
@@ -147,72 +149,5 @@ function XCount({ text, label }: { text: string; label: string }) {
     <span className={cn("tabular", n > X_LIMIT ? "font-medium text-err" : "text-fg-3")}>
       {n}/{X_LIMIT} {label}
     </span>
-  );
-}
-
-function FocusCard({
-  id,
-  locale,
-  text,
-  notice,
-  zalgo,
-  onZalgo,
-  onRegenerate,
-}: {
-  id: StyleId;
-  locale: Locale;
-  text: string;
-  notice: "partial" | "none" | null;
-  zalgo: ZalgoLevel;
-  onZalgo: (z: ZalgoLevel) => void;
-  onRegenerate: () => void;
-}) {
-  const t = T[locale];
-  const info = STYLES[id];
-  const name = STYLE_NAMES[id][locale];
-  return (
-    <Panel className={cn(info.random && "overflow-hidden")}>
-      <PanelHeader
-        title={
-          <span className="flex items-center gap-2">
-            {name}
-            <CyrBadge id={id} show={notice !== null} t={t} />
-          </span>
-        }
-        actions={
-          info.random ? (
-            <Button variant="ghost" size="sm" onClick={onRegenerate}>
-              <RefreshCw aria-hidden />
-              <span className="hidden sm:inline">{t.regenerate}</span>
-              <span className="sr-only sm:hidden">{t.regenerate}</span>
-            </Button>
-          ) : undefined
-        }
-      />
-      <div className={cn("px-4 sm:px-5", info.random ? "py-6" : "py-4")}>
-        <p className="text-2xl leading-relaxed font-medium whitespace-pre-wrap text-fg [overflow-wrap:anywhere] sm:text-3xl" aria-live="polite">
-          {text}
-        </p>
-      </div>
-      <div className="flex flex-col gap-3 border-t border-line px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-5">
-        {id === "zalgo" ? (
-          <Segmented
-            label={t.intensity}
-            value={zalgo}
-            onChange={onZalgo}
-            options={ZALGO_LEVELS.map((z) => ({ value: z, label: t.zalgo[z] }))}
-            size="sm"
-          />
-        ) : (
-          <span />
-        )}
-        <CopyButton value={text} label={t.copy} copiedLabel={t.copied} variant="primary" size="md" className="self-start sm:self-auto" />
-      </div>
-      {notice && (
-        <Notice tone="warn" className="mx-4 mb-4 sm:mx-5">
-          {notice === "none" ? t.noticeNone(info.digits !== "none") : t.noticePartial}
-        </Notice>
-      )}
-    </Panel>
   );
 }

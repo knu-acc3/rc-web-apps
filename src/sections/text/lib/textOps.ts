@@ -44,7 +44,7 @@ export function graphemes(s: string): string[] {
 
 export function graphemeCount(s: string): number {
   let n = 0;
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
   for (const _ of segmenter("grapheme").segment(s)) n++;
   return n;
 }
@@ -187,7 +187,7 @@ export function textStats(s: string, locale = "ru"): TextStats {
   }
   const ls = splitLines(s);
   let codePoints = 0;
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
   for (const _ of s) codePoints++;
   return {
     chars,

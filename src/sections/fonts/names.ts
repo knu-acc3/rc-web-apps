@@ -1,6 +1,9 @@
 import type { L10n } from "@/i18n/config";
 import type { StyleId } from "./styles";
 
+/** URL of the generator: /font-generator and /font-generator/{variant}. */
+export const TOOL_SLUG = "font-generator";
+
 /** Short style names (chips, result rows). Shared by the client component and section.ts. */
 export const STYLE_NAMES: Record<StyleId, L10n> = {
   bold: { ru: "Жирный", en: "Bold" },
@@ -45,7 +48,7 @@ export interface PlatformDef {
   name: L10n;
   /** Genitive after «для»: «для Инстаграма» */
   forName: L10n;
-  /** Styles shown first on the platform page. */
+  /** Styles listed first on the platform page; the first one is selected. */
   styles: StyleId[];
   /** Show the twitter-text weighted counter. */
   xCounter?: boolean;

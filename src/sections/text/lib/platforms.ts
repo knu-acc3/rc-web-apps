@@ -48,7 +48,6 @@ export const PLATFORMS: Platform[] = [
     limits: [
       { key: "caption", label: { ru: "Подпись к посту", en: "Post caption" }, max: 2200, method: "chars" },
       { key: "fold", label: { ru: "Примерно видно до «ещё»", en: "Roughly visible before “more”" }, max: 125, method: "chars", soft: true },
-      { key: "tags", label: { ru: "Хештеги", en: "Hashtags" }, max: 30, method: "hashtags" },
       { key: "bio", label: { ru: "Описание профиля", en: "Profile bio" }, max: 150, method: "chars" },
     ],
   },
@@ -81,7 +80,7 @@ export const PLATFORMS: Platform[] = [
   {
     id: "vk-post",
     name: { ru: "ВКонтакте", en: "VK" },
-    limits: [{ key: "post", label: { ru: "Пост на стене", en: "Wall post" }, max: 16384, method: "chars" }],
+    limits: [{ key: "post", label: { ru: "Пост на стене (на практике)", en: "Wall post (in practice)" }, max: 16384, method: "chars", soft: true }],
   },
 ];
 

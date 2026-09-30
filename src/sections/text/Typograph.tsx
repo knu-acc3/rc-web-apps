@@ -5,7 +5,7 @@ import type { Locale } from "@/i18n/config";
 import { Checkbox, Switch } from "@/ui/field";
 import { Panel, PanelHeader } from "@/ui/panel";
 import { toHtmlEntities, typograph, type TypoLang } from "./lib/typograph";
-import { InputPanel, OptionsBar, OutputPanel, TwoPane } from "./shared";
+import { InputPanel, MoreOptions, OutputPanel, TwoPane } from "./shared";
 
 const T = {
   ru: {
@@ -54,15 +54,6 @@ export default function Typograph({ locale, lang = "ru" }: { locale: Locale; lan
 
   return (
     <div className="flex flex-col gap-4">
-      <OptionsBar>
-        <Checkbox label={t.quotes} checked={o.quotes} onChange={flag("quotes")} />
-        <Checkbox label={t.dashes} checked={o.dashes} onChange={flag("dashes")} />
-        <Checkbox label={t.nbsp} checked={o.nbsp} onChange={flag("nbsp")} />
-        {lang === "ru" && <Checkbox label={t.digits} checked={o.digits} onChange={flag("digits")} />}
-        <Checkbox label={t.symbols} checked={o.symbols} onChange={flag("symbols")} />
-        <Checkbox label={t.spaces} checked={o.spaces} onChange={flag("spaces")} />
-        <Checkbox label={t.entities} checked={entities} onChange={(e) => setEntities(e.target.checked)} />
-      </OptionsBar>
       <TwoPane>
         <InputPanel id={`${id}-in`} locale={locale} value={text} onChange={setText} />
         <OutputPanel locale={locale} value={entities ? toHtmlEntities(out) : out} filename={entities ? "typograph.html" : "typograph.txt"} />
@@ -88,6 +79,15 @@ export default function Typograph({ locale, lang = "ru" }: { locale: Locale; lan
         </div>
         {visible && <p className="border-t border-line px-4 py-2 text-[13px] text-fg-3">{t.legend}</p>}
       </Panel>
+      <MoreOptions locale={locale}>
+        <Checkbox label={t.entities} checked={entities} onChange={(e) => setEntities(e.target.checked)} />
+        <Checkbox label={t.quotes} checked={o.quotes} onChange={flag("quotes")} />
+        <Checkbox label={t.dashes} checked={o.dashes} onChange={flag("dashes")} />
+        <Checkbox label={t.nbsp} checked={o.nbsp} onChange={flag("nbsp")} />
+        {lang === "ru" && <Checkbox label={t.digits} checked={o.digits} onChange={flag("digits")} />}
+        <Checkbox label={t.symbols} checked={o.symbols} onChange={flag("symbols")} />
+        <Checkbox label={t.spaces} checked={o.spaces} onChange={flag("spaces")} />
+      </MoreOptions>
     </div>
   );
 }

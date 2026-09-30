@@ -1,23 +1,23 @@
 "use client";
 
-import { useId, useMemo, useState } from "react";
+import { useId, useMemo, useState, type ReactNode } from "react";
 import type { Locale } from "@/i18n/config";
 import { formatNumber } from "@/i18n/format";
 import { Checkbox } from "@/ui/field";
 import { cleanText, countInvisible, type CleanOptions } from "./lib/clean";
-import { InlineSelect, InputPanel, OptionsBar, OutputPanel, TwoPane } from "./shared";
+import { InlineSelect, InputPanel, MoreOptions, OptionsBar, OutputPanel, TwoPane } from "./shared";
 
-export type CleanPreset = "default" | "line-breaks" | "spaces" | "html" | "invisible" | "quotes" | "yo";
+export type CleanPreset = "default" | "line-breaks" | "spaces" | "html" | "invisible";
 
 const T = {
   ru: {
     trimLines: "Обрезать пробелы по краям строк",
-    collapse: "Убрать лишние пробелы",
+    collapseSpaces: "Убрать лишние пробелы",
     lineBreaks: "Переносы строк",
     lbKeep: "оставить",
     lbPara: "склеить строки внутри абзацев",
     lbAll: "удалить все",
-    empty: "Пустые строки",
+    emptyLines: "Пустые строки",
     emptyKeep: "оставить",
     emptyCollapse: "не больше одной подряд",
     emptyRemove: "удалить",
@@ -26,9 +26,9 @@ const T = {
     tabsSpaces: "в пробелы",
     tabsRemove: "в один пробел",
     tabWidth: "Ширина табуляции",
-    html: "Удалить HTML-теги",
+    stripHtml: "Удалить HTML-теги",
     invisible: "Удалить невидимые символы",
-    special: "Неразрывные и узкие пробелы → обычные",
+    specialSpaces: "Неразрывные и узкие пробелы → обычные",
     quotes: "Кавычки",
     qKeep: "не менять",
     qStraight: "прямые \" '",
@@ -38,20 +38,26 @@ const T = {
     yo: "Заменить ё на е",
     punctuation: "Удалить знаки препинания и спецсимволы",
     emoji: "Удалить эмодзи",
-    diacritics: "Удалить диакритику (é → e), ё и й сохраняются",
-    invisibleFound: "Невидимых символов в тексте",
-    punctNote: "Буквы любых алфавитов (кириллица, казахские, латиница с диакритикой, греческий…) и цифры сохраняются.",
-    sample:
-      "  Этот   текст скопирован\nиз PDF-файла и разбит\nна строки.  \n\n\n\n<p>В нём есть <b>HTML-теги</b>,&nbsp;лишние пробелы​ и невидимые символы.</p>\n\t\"Кавычки\" — прямые, а эмодзи 👨‍👩‍👧 должны остаться целыми.",
+    diacritics: "Удалить диакритику (é → e; ё и й остаются)",
+    invisibleFound: "Невидимых символов в исходном тексте",
+    punctNote: "Буквы любых алфавитов (кириллица, казахские буквы, латиница с диакритикой, греческий…) и цифры сохраняются.",
+    samples: {
+      default:
+        "  Этот   текст скопирован\nиз PDF-файла и разбит\nна строки.  \n\n\n\nВ нём есть лишние   пробелы,​ невидимые­ символы и\tтабуляция.\nЭмодзи 👨‍👩‍👧 должны остаться целыми.",
+      "line-breaks": "Этот текст скопирован из PDF-\nфайла, поэтому каждая строка\nобрывается посередине\nпредложения.\n\nВторой абзац тоже разбит\nна несколько коротких строк.",
+      spaces: "  Слишком    много   пробелов  между   словами.  Неразрывные  пробелы тоже  здесь.  \n\tСтрока с табуляцией   в начале.",
+      html: '<h2>Заголовок</h2>\n<p>Абзац с <b>жирным</b> текстом и <a href="https://example.com">ссылкой</a>.</p>\n<ul><li>Первый пункт</li><li>Второй&nbsp;пункт</li></ul>\n<script>alert(1)</script>',
+      invisible: "Этот​ текст­ выглядит⁠ обычным,﻿ но‎ содержит⠀ невидимые символы. Эмодзи 👨‍👩‍👧 и 🏳️‍🌈 не пострадают.",
+    },
   },
   en: {
     trimLines: "Trim spaces at line edges",
-    collapse: "Remove extra spaces",
+    collapseSpaces: "Remove extra spaces",
     lineBreaks: "Line breaks",
     lbKeep: "keep",
     lbPara: "join lines within paragraphs",
     lbAll: "remove all",
-    empty: "Empty lines",
+    emptyLines: "Empty lines",
     emptyKeep: "keep",
     emptyCollapse: "at most one in a row",
     emptyRemove: "remove",
@@ -60,9 +66,9 @@ const T = {
     tabsSpaces: "to spaces",
     tabsRemove: "to a single space",
     tabWidth: "Tab width",
-    html: "Strip HTML tags",
+    stripHtml: "Strip HTML tags",
     invisible: "Remove invisible characters",
-    special: "Non-breaking and thin spaces → regular",
+    specialSpaces: "Non-breaking and thin spaces → regular",
     quotes: "Quotes",
     qKeep: "don’t change",
     qStraight: "straight \" '",
@@ -73,114 +79,117 @@ const T = {
     punctuation: "Remove punctuation and symbols",
     emoji: "Remove emoji",
     diacritics: "Remove accents (é → e)",
-    invisibleFound: "Invisible characters in the text",
+    invisibleFound: "Invisible characters in the source text",
     punctNote: "Letters of every alphabet (Latin with accents, Cyrillic, Greek…) and digits are kept.",
-    sample:
-      "  This   text was copied\nfrom a PDF file and broken\ninto lines.  \n\n\n\n<p>It has <b>HTML tags</b>,&nbsp;extra spaces​ and invisible characters.</p>\n\t\"Quotes\" are straight, and emoji 👨‍👩‍👧 must stay intact.",
+    samples: {
+      default:
+        "  This   text was copied\nfrom a PDF file and broken\ninto lines.  \n\n\n\nIt has extra   spaces,​ invisible­ characters and\ttabs.\nEmoji 👨‍👩‍👧 must stay intact.",
+      "line-breaks": "This text was copied from a PDF\nfile, so every line breaks in\nthe middle of a sentence.\n\nThe second paragraph is also\nsplit into short lines.",
+      spaces: "  Far    too   many  spaces   between   words.  Non-breaking  spaces are  here  too.  \n\tA line with a tab   at the start.",
+      html: '<h2>Heading</h2>\n<p>A paragraph with <b>bold</b> text and a <a href="https://example.com">link</a>.</p>\n<ul><li>First item</li><li>Second&nbsp;item</li></ul>\n<script>alert(1)</script>',
+      invisible: "This​ text­ looks⁠ normal,﻿ but‎ contains⠀ invisible characters. Emoji 👨‍👩‍👧 and 🏳️‍🌈 stay intact.",
+    },
   },
 } as const;
 
-const PRESETS: Record<CleanPreset, CleanOptions> = {
-  default: { trimLines: true, collapseSpaces: true, emptyLines: "collapse", invisible: true, stripHtml: false, tabs: "keep", tabWidth: 4, lineBreaks: "keep", quotes: "keep" },
-  "line-breaks": { trimLines: true, collapseSpaces: true, lineBreaks: "paragraphs", emptyLines: "collapse", tabs: "keep", tabWidth: 4, quotes: "keep" },
-  spaces: { trimLines: true, collapseSpaces: true, specialSpaces: true, tabs: "remove", tabWidth: 4, lineBreaks: "keep", emptyLines: "keep", quotes: "keep" },
-  html: { stripHtml: true, trimLines: true, collapseSpaces: true, emptyLines: "collapse", tabs: "keep", tabWidth: 4, lineBreaks: "keep", quotes: "keep" },
-  invisible: { invisible: true, specialSpaces: true, tabs: "keep", tabWidth: 4, lineBreaks: "keep", emptyLines: "keep", quotes: "keep" },
-  quotes: { quotes: "straight", tabs: "keep", tabWidth: 4, lineBreaks: "keep", emptyLines: "keep" },
-  yo: { yo: true, tabs: "keep", tabWidth: 4, lineBreaks: "keep", emptyLines: "keep", quotes: "keep" },
-};
+type Key = "trimLines" | "collapseSpaces" | "lineBreaks" | "emptyLines" | "tabs" | "stripHtml" | "invisible" | "specialSpaces" | "quotes" | "dashes" | "yo" | "emoji" | "diacritics" | "punctuation";
+const ALL_KEYS: Key[] = ["trimLines", "collapseSpaces", "lineBreaks", "emptyLines", "stripHtml", "invisible", "specialSpaces", "tabs", "quotes", "dashes", "yo", "emoji", "diacritics", "punctuation"];
 
-const YO_SAMPLE = {
-  ru: "Ёлка стоит в зелёном лесу, а ещё ёж нашёл жёлудь.\nВсё, что пришлось учесть, — буква «ё» в 12 словах.",
-  en: "Ёлка, ёж и жёлудь — Russian words with the letter ё.",
+const PRESETS: Record<CleanPreset, { primary: Key[]; options: CleanOptions }> = {
+  default: {
+    primary: ["collapseSpaces", "trimLines", "emptyLines", "invisible"],
+    options: { trimLines: true, collapseSpaces: true, emptyLines: "collapse", invisible: true, tabs: "keep", tabWidth: 4, lineBreaks: "keep", quotes: "keep" },
+  },
+  "line-breaks": {
+    primary: ["lineBreaks", "emptyLines"],
+    options: { trimLines: true, collapseSpaces: true, lineBreaks: "paragraphs", emptyLines: "collapse", tabs: "keep", tabWidth: 4, quotes: "keep" },
+  },
+  spaces: {
+    primary: ["collapseSpaces", "trimLines", "specialSpaces", "tabs"],
+    options: { trimLines: true, collapseSpaces: true, specialSpaces: true, tabs: "remove", tabWidth: 4, lineBreaks: "keep", emptyLines: "keep", quotes: "keep" },
+  },
+  html: {
+    primary: ["stripHtml", "emptyLines"],
+    options: { stripHtml: true, trimLines: true, collapseSpaces: true, emptyLines: "collapse", tabs: "keep", tabWidth: 4, lineBreaks: "keep", quotes: "keep" },
+  },
+  invisible: {
+    primary: ["invisible", "specialSpaces"],
+    options: { invisible: true, specialSpaces: true, tabs: "keep", tabWidth: 4, lineBreaks: "keep", emptyLines: "keep", quotes: "keep" },
+  },
 };
 
 export default function TextCleaner({ locale, preset = "default" }: { locale: Locale; preset?: CleanPreset }) {
   const t = T[locale];
   const id = useId();
-  const [text, setText] = useState<string>(preset === "yo" ? YO_SAMPLE[locale] : t.sample);
-  const [o, setO] = useState<CleanOptions>(PRESETS[preset]);
+  const [text, setText] = useState<string>(t.samples[preset]);
+  const [o, setO] = useState<CleanOptions>(PRESETS[preset].options);
   const out = useMemo(() => cleanText(text, o), [text, o]);
   const invisible = useMemo(() => countInvisible(text), [text]);
-  const flag = (k: keyof CleanOptions) => (e: React.ChangeEvent<HTMLInputElement>) => setO((p) => ({ ...p, [k]: e.target.checked }));
-  const pick = <K extends keyof CleanOptions>(k: K) => (v: CleanOptions[K]) => setO((p) => ({ ...p, [k]: v }));
+  const primary = PRESETS[preset].primary;
+
+  const flag = (k: Key) => <Checkbox key={k} label={t[k as "yo"]} checked={!!o[k as "yo"]} onChange={(e) => setO((p) => ({ ...p, [k]: e.target.checked }))} />;
+  const select = <K extends "lineBreaks" | "emptyLines" | "quotes" | "tabs">(k: K, options: { value: NonNullable<CleanOptions[K]>; label: string }[]) => (
+    <InlineSelect key={k} id={`${id}-${k}`} label={t[k]} value={(o[k] ?? "keep") as NonNullable<CleanOptions[K]>} onChange={(v) => setO((p) => ({ ...p, [k]: v }))} options={options} />
+  );
+  const render = (k: Key): ReactNode => {
+    switch (k) {
+      case "lineBreaks":
+        return select("lineBreaks", [
+          { value: "keep", label: t.lbKeep },
+          { value: "paragraphs", label: t.lbPara },
+          { value: "all", label: t.lbAll },
+        ]);
+      case "emptyLines":
+        return select("emptyLines", [
+          { value: "keep", label: t.emptyKeep },
+          { value: "collapse", label: t.emptyCollapse },
+          { value: "remove", label: t.emptyRemove },
+        ]);
+      case "quotes":
+        return select("quotes", [
+          { value: "keep", label: t.qKeep },
+          { value: "straight", label: t.qStraight },
+          { value: "curly", label: t.qCurly },
+          { value: "guillemets", label: t.qGuil },
+        ]);
+      case "tabs":
+        return (
+          <span key="tabs" className="flex flex-wrap items-center gap-3">
+            {select("tabs", [
+              { value: "keep", label: t.tabsKeep },
+              { value: "spaces", label: t.tabsSpaces },
+              { value: "remove", label: t.tabsRemove },
+            ])}
+            {o.tabs === "spaces" && (
+              <InlineSelect
+                id={`${id}-tw`}
+                label={t.tabWidth}
+                value={String(o.tabWidth ?? 4) as "2" | "3" | "4" | "8"}
+                onChange={(v) => setO((p) => ({ ...p, tabWidth: Number(v) }))}
+                options={(["2", "3", "4", "8"] as const).map((v) => ({ value: v, label: v }))}
+              />
+            )}
+          </span>
+        );
+      default:
+        return flag(k);
+    }
+  };
 
   return (
     <div className="flex flex-col gap-4">
-      <OptionsBar className="grid! gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        <Checkbox label={t.trimLines} checked={!!o.trimLines} onChange={flag("trimLines")} />
-        <Checkbox label={t.collapse} checked={!!o.collapseSpaces} onChange={flag("collapseSpaces")} />
-        <Checkbox label={t.html} checked={!!o.stripHtml} onChange={flag("stripHtml")} />
-        <Checkbox label={t.invisible} checked={!!o.invisible} onChange={flag("invisible")} />
-        <Checkbox label={t.special} checked={!!o.specialSpaces} onChange={flag("specialSpaces")} />
-        <Checkbox label={t.dashes} checked={!!o.dashes} onChange={flag("dashes")} />
-        <Checkbox label={t.yo} checked={!!o.yo} onChange={flag("yo")} />
-        <Checkbox label={t.emoji} checked={!!o.emoji} onChange={flag("emoji")} />
-        <Checkbox label={t.diacritics} checked={!!o.diacritics} onChange={flag("diacritics")} />
-        <Checkbox label={t.punctuation} checked={!!o.punctuation} onChange={flag("punctuation")} />
-        <InlineSelect
-          id={`${id}-lb`}
-          label={t.lineBreaks}
-          value={o.lineBreaks ?? "keep"}
-          onChange={pick("lineBreaks")}
-          options={[
-            { value: "keep", label: t.lbKeep },
-            { value: "paragraphs", label: t.lbPara },
-            { value: "all", label: t.lbAll },
-          ]}
-        />
-        <InlineSelect
-          id={`${id}-el`}
-          label={t.empty}
-          value={o.emptyLines ?? "keep"}
-          onChange={pick("emptyLines")}
-          options={[
-            { value: "keep", label: t.emptyKeep },
-            { value: "collapse", label: t.emptyCollapse },
-            { value: "remove", label: t.emptyRemove },
-          ]}
-        />
-        <InlineSelect
-          id={`${id}-q`}
-          label={t.quotes}
-          value={o.quotes ?? "keep"}
-          onChange={pick("quotes")}
-          options={[
-            { value: "keep", label: t.qKeep },
-            { value: "straight", label: t.qStraight },
-            { value: "curly", label: t.qCurly },
-            { value: "guillemets", label: t.qGuil },
-          ]}
-        />
-        <InlineSelect
-          id={`${id}-tabs`}
-          label={t.tabs}
-          value={o.tabs ?? "keep"}
-          onChange={pick("tabs")}
-          options={[
-            { value: "keep", label: t.tabsKeep },
-            { value: "spaces", label: t.tabsSpaces },
-            { value: "remove", label: t.tabsRemove },
-          ]}
-        />
-        {o.tabs === "spaces" && (
-          <InlineSelect
-            id={`${id}-tw`}
-            label={t.tabWidth}
-            value={String(o.tabWidth ?? 4) as "2" | "4" | "8"}
-            onChange={(v) => setO((p) => ({ ...p, tabWidth: Number(v) }))}
-            options={(["2", "3", "4", "8"] as const).map((v) => ({ value: v, label: v }))}
-          />
-        )}
-      </OptionsBar>
-      {o.punctuation && <p className="text-sm text-fg-3">{t.punctNote}</p>}
+      <OptionsBar>{primary.map(render)}</OptionsBar>
       <TwoPane>
         <InputPanel id={`${id}-in`} locale={locale} value={text} onChange={setText} />
         <OutputPanel locale={locale} value={out} filename="clean.txt" />
       </TwoPane>
-      <p className="tabular text-sm text-fg-2">
-        {t.invisibleFound}: {formatNumber(locale, invisible)}
-      </p>
+      {(preset === "invisible" || invisible > 0) && (
+        <p className="tabular text-sm text-fg-2">
+          {t.invisibleFound}: <span className="font-semibold text-fg">{formatNumber(locale, invisible)}</span>
+        </p>
+      )}
+      {o.punctuation && <p className="text-sm text-fg-3">{t.punctNote}</p>}
+      <MoreOptions locale={locale}>{ALL_KEYS.filter((k) => !primary.includes(k)).map(render)}</MoreOptions>
     </div>
   );
 }

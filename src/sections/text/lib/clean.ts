@@ -213,7 +213,13 @@ export function cleanText(input: string, o: CleanOptions): string {
   else if (o.lineBreaks === "paragraphs") {
     s = s
       .split(/\n[^\S\n]*\n\s*/)
-      .map((p) => p.replace(/-\n(?=\p{Ll})/gu, "").replace(/[^\S\n]*\n[^\S\n]*/g, " "))
+      .map((p) =>
+        p
+          // "обры-\nвается" → "обрывается" (hyphenation); "PDF-\nфайла" → "PDF-файла"
+          .replace(/(\p{Ll})-[^\S\n]*\n[^\S\n]*(\p{Ll})/gu, "$1$2")
+          .replace(/-[^\S\n]*\n[^\S\n]*/g, "-")
+          .replace(/[^\S\n]*\n[^\S\n]*/g, " "),
+      )
       .join("\n\n");
   }
   if (o.emptyLines === "remove") s = s.split("\n").filter((l) => l.trim() !== "").join("\n");

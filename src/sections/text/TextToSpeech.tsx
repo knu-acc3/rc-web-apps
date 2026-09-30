@@ -8,7 +8,7 @@ import { Button } from "@/ui/button";
 import { Checkbox, Field, Select, Slider } from "@/ui/field";
 import { Notice } from "@/ui/panel";
 import { sentences } from "./lib/textOps";
-import { InputPanel } from "./shared";
+import { InputPanel, MoreOptions } from "./shared";
 
 const T = {
   ru: {
@@ -169,53 +169,25 @@ export default function TextToSpeech({ locale }: { locale: Locale }) {
   return (
     <div className="flex flex-col gap-4">
       <InputPanel id={`${id}-in`} locale={locale} value={text} onChange={setText} rows={7} />
-      <div className="grid gap-4 rounded-[12px] border border-line bg-surface p-4 md:grid-cols-2">
-        <div className="flex flex-col gap-3">
-          <div className="grid grid-cols-[auto_1fr] gap-3">
-            <Field label={t.langFilter} htmlFor={`${id}-lf`}>
-              <Select id={`${id}-lf`} value={langFilter} onChange={(e) => setLangFilter(e.target.value)} size="sm">
-                <option value="all">{t.all}</option>
-                {[...new Set([locale, ...langs])].map((l) => (
-                  <option key={l} value={l}>
-                    {l.toUpperCase()}
-                  </option>
-                ))}
-              </Select>
-            </Field>
-            <Field label={t.voice} htmlFor={`${id}-v`}>
-              <Select id={`${id}-v`} value={voice?.voiceURI ?? ""} onChange={(e) => setVoiceURI(e.target.value)} size="sm" disabled={!filtered.length}>
-                {!voices.length && <option value="">{t.loading}</option>}
-                {filtered.map((v) => (
-                  <option key={v.voiceURI} value={v.voiceURI}>
-                    {v.name} · {v.lang} · {v.localService ? t.localTag : t.onlineTag}
-                  </option>
-                ))}
-              </Select>
-            </Field>
-          </div>
-          <Checkbox label={t.online} checked={showOnline} onChange={(e) => setShowOnline(e.target.checked)} />
-          {voices.length > 0 && !hasLocalForLang && !showOnline && <Notice tone="warn">{t.noLocal}</Notice>}
-          {voice && !voice.localService && <Notice tone="warn">{t.onlineWarn}</Notice>}
-        </div>
-        <div className="flex flex-col gap-3">
-          {(
-            [
-              [t.rate, rate, setRate, 0.5, 2, 0.1],
-              [t.pitch, pitch, setPitch, 0, 2, 0.1],
-              [t.volume, volume, setVolume, 0, 1, 0.05],
-            ] as [string, number, (n: number) => void, number, number, number][]
-          ).map(([label, v, setV, min, max, step]) => (
-            <Field key={label} label={label} htmlFor={`${id}-${label}`} aside={<span className="tabular text-sm text-fg-2">{formatNumber(locale, v, { maximumFractionDigits: 2 })}</span>}>
-              <Slider id={`${id}-${label}`} min={min} max={max} step={step} value={v} onChange={(e) => setV(Number(e.target.value))} />
-            </Field>
-          ))}
-        </div>
-      </div>
-      <div className="flex flex-wrap items-center gap-2">
-        <Button variant="primary" onClick={speak} disabled={!text.trim() || !voice}>
+      <div className="flex flex-wrap items-end gap-3">
+        <Button variant="primary" size="lg" onClick={speak} disabled={!text.trim() || !voice}>
           <Play aria-hidden />
           {t.play}
         </Button>
+        <Field label={t.voice} htmlFor={`${id}-v`} className="min-w-56 flex-1">
+          <Select id={`${id}-v`} value={voice?.voiceURI ?? ""} onChange={(e) => setVoiceURI(e.target.value)} disabled={!filtered.length}>
+            {!voices.length && <option value="">{t.loading}</option>}
+            {filtered.map((v) => (
+              <option key={v.voiceURI} value={v.voiceURI}>
+                {v.name} · {v.lang} · {v.localService ? t.localTag : t.onlineTag}
+              </option>
+            ))}
+          </Select>
+        </Field>
+      </div>
+      {voices.length > 0 && !hasLocalForLang && !showOnline && <Notice tone="warn">{t.noLocal}</Notice>}
+      {voice && !voice.localService && <Notice tone="warn">{t.onlineWarn}</Notice>}
+      <div className="flex flex-wrap items-center gap-2">
         <Button
           variant="outline"
           disabled={state === "idle"}
@@ -247,6 +219,32 @@ export default function TextToSpeech({ locale }: { locale: Locale }) {
         </Button>
         {progress && <span className="tabular text-sm text-fg-2">{t.progress(progress[0], progress[1])}</span>}
       </div>
+      <MoreOptions locale={locale}>
+        <div className="grid w-full gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <Field label={t.langFilter} htmlFor={`${id}-lf`}>
+            <Select id={`${id}-lf`} value={langFilter} onChange={(e) => setLangFilter(e.target.value)} size="sm">
+              <option value="all">{t.all}</option>
+              {[...new Set([locale, ...langs])].map((l) => (
+                <option key={l} value={l}>
+                  {l.toUpperCase()}
+                </option>
+              ))}
+            </Select>
+          </Field>
+          {(
+            [
+              [t.rate, rate, setRate, 0.5, 2, 0.1],
+              [t.pitch, pitch, setPitch, 0, 2, 0.1],
+              [t.volume, volume, setVolume, 0, 1, 0.05],
+            ] as [string, number, (n: number) => void, number, number, number][]
+          ).map(([label, v, setV, min, max, step], i) => (
+            <Field key={label} label={label} htmlFor={`${id}-s${i}`} aside={<span className="tabular text-sm text-fg-2">{formatNumber(locale, v, { maximumFractionDigits: 2 })}</span>}>
+              <Slider id={`${id}-s${i}`} min={min} max={max} step={step} value={v} onChange={(e) => setV(Number(e.target.value))} />
+            </Field>
+          ))}
+        </div>
+        <Checkbox label={t.online} checked={showOnline} onChange={(e) => setShowOnline(e.target.checked)} />
+      </MoreOptions>
     </div>
   );
 }

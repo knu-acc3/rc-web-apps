@@ -6,7 +6,7 @@ import { formatNumber, plural } from "@/i18n/format";
 import { cn } from "@/lib/cn";
 import { Checkbox, Field, Input } from "@/ui/field";
 import { replaceText, type ReplaceRequest, type ReplaceResult } from "./lib/replace";
-import { InputPanel, OptionsBar, OutputPanel, TwoPane, useDebounced } from "./shared";
+import { InlineSelect, InputPanel, MoreOptions, OptionsBar, OutputPanel, TwoPane, useDebounced } from "./shared";
 
 const T = {
   ru: {
@@ -150,31 +150,10 @@ export default function FindReplace({ locale, find: find0, replace: replace0 = "
         </Field>
       </div>
       <OptionsBar>
-        <Checkbox label={t.regex} checked={flags.regex} onChange={set("regex")} />
         <Checkbox label={t.caseSensitive} checked={flags.caseSensitive} onChange={set("caseSensitive")} />
         <Checkbox label={t.wholeWord} checked={flags.wholeWord} onChange={set("wholeWord")} />
-        <Checkbox label={t.all} checked={flags.all} onChange={set("all")} />
-        <Checkbox label={t.escapes} checked={flags.escapes} onChange={set("escapes")} />
-        {flags.regex && <Checkbox label={t.multiline} checked={flags.multiline} onChange={set("multiline")} />}
-        {flags.regex && <Checkbox label={t.dotAll} checked={flags.dotAll} onChange={set("dotAll")} />}
+        <Checkbox label={t.regex} checked={flags.regex} onChange={set("regex")} />
       </OptionsBar>
-      <div className="flex flex-wrap items-center gap-2">
-        <span className="text-sm text-fg-2">{t.presets}:</span>
-        {PRESETS.map((p) => (
-          <button
-            key={p.key}
-            type="button"
-            className="chip h-8! text-[13px]!"
-            onClick={() => {
-              setFind(p.find);
-              setReplacement(p.replace);
-              setFlags((f) => ({ ...f, regex: true, multiline: true, all: true, wholeWord: false }));
-            }}
-          >
-            {t[p.key]}
-          </button>
-        ))}
-      </div>
       <TwoPane>
         <InputPanel id={`${id}-in`} locale={locale} value={text} onChange={setText} />
         <OutputPanel locale={locale} value={output} filename="replaced.txt" />
@@ -182,6 +161,25 @@ export default function FindReplace({ locale, find: find0, replace: replace0 = "
       <p className="tabular min-h-5 text-sm text-fg-2" aria-live="polite">
         {pending ? t.working : status}
       </p>
+      <MoreOptions locale={locale}>
+        <Checkbox label={t.all} checked={flags.all} onChange={set("all")} />
+        <Checkbox label={t.escapes} checked={flags.escapes} onChange={set("escapes")} />
+        {flags.regex && <Checkbox label={t.multiline} checked={flags.multiline} onChange={set("multiline")} />}
+        {flags.regex && <Checkbox label={t.dotAll} checked={flags.dotAll} onChange={set("dotAll")} />}
+        <InlineSelect
+          id={`${id}-preset`}
+          label={t.presets}
+          value={"" as string}
+          onChange={(key) => {
+            const p = PRESETS.find((x) => x.key === key);
+            if (!p) return;
+            setFind(p.find);
+            setReplacement(p.replace);
+            setFlags((f) => ({ ...f, regex: true, multiline: true, all: true, wholeWord: false }));
+          }}
+          options={[{ value: "", label: "—" }, ...PRESETS.map((p) => ({ value: p.key as string, label: t[p.key] }))]}
+        />
+      </MoreOptions>
     </div>
   );
 }

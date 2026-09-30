@@ -358,7 +358,7 @@ const ZALGO_DOWN = [
 const GLITCH_OVERLAY = [0x0334, 0x0335, 0x0336, 0x0337, 0x0338, 0x20d2, 0x20d3, 0x20e5, 0x20d8];
 
 /** Marks per grapheme: [up, mid, down] as [min, max] ranges. */
-const ZALGO_AMOUNT: Record<ZalgoLevel, [number, number][]> = {
+export const ZALGO_AMOUNT: Record<ZalgoLevel, [number, number][]> = {
   light: [[1, 2], [0, 0], [1, 2]],
   medium: [[2, 5], [0, 1], [2, 5]],
   heavy: [[6, 12], [1, 2], [6, 12]],
