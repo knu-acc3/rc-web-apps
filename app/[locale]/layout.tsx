@@ -20,7 +20,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   const l = (isLocale(locale) ? locale : "ru") as Locale;
   return {
     metadataBase: new URL(SITE_URL),
-    title: { default: BRAND.name, template: `%s — ${BRAND.name}` },
+    title: { default: BRAND.name, template: "%s" },
     description: BRAND.tagline[l],
     applicationName: BRAND.name,
     manifest: `/manifest.webmanifest`,

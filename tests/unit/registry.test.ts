@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { LOCALES } from "@/i18n/config";
+import { BRAND } from "@/config/brand";
 import { allPaths, allSections, resolvePage, searchEntries } from "@/registry";
+import { unresolvedRelated } from "@/registry/tool-section";
 import { COMPONENTS } from "@/sections/components";
 import type { Block, PageModel } from "@/registry/types";
 
@@ -62,9 +64,15 @@ describe("registry", () => {
           const lk = l.join("/");
           if (lk && !known.has(lk)) problems.push(`${key}: broken link /${lk}`);
         }
+        if (/бесплатные инструменты|free tools/i.test(page.title) || (page.kind !== "static" && page.title.includes(BRAND.name))) problems.push(`${key}: boilerplate title "${page.title}"`);
         if (locale === "ru" && /\b(the|and|with|for|your)\b/i.test(`${page.h1} ${page.lead ?? ""}`)) problems.push(`${key}: english words in ru h1/lead`);
       }
       expect(problems.slice(0, 50), problems.join("\n")).toEqual([]);
+    });
+
+    it(`related links resolve (${locale})`, () => {
+      for (const p of paths) resolvePage(locale, p);
+      expect(unresolvedRelated()).toEqual([]);
     });
 
     it(`search index entries point to existing pages (${locale})`, () => {
