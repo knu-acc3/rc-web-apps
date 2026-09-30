@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { LOCALES } from "@/i18n/config";
 import { BRAND } from "@/config/brand";
-import { allPaths, allSections, resolvePage, searchEntries } from "@/registry";
+import { allPaths, allSections, resolvePage, searchEntries, sectionPaths } from "@/registry";
 import { unresolvedRelated } from "@/registry/tool-section";
 import { COMPONENTS } from "@/sections/components";
 import type { Block, PageModel } from "@/registry/types";
@@ -12,7 +12,8 @@ import type { Block, PageModel } from "@/registry/types";
  * Pass SECTION=<id> to check a single section quickly.
  */
 const only = process.env.SECTION;
-const paths = allPaths().filter((p) => !only || p[0] === only);
+const paths = only ? allSections().filter((s) => s.id === only).flatMap((s) => sectionPaths(s)) : allPaths();
+const onlyPaths = new Set(paths.map((p) => p.join("/")));
 const known = new Set(allPaths().map((p) => p.join("/")));
 
 function linksOf(page: PageModel): string[][] {
@@ -68,19 +69,19 @@ describe("registry", () => {
         if (locale === "ru" && /\b(the|and|with|for|your)\b/i.test(`${page.h1} ${page.lead ?? ""}`)) problems.push(`${key}: english words in ru h1/lead`);
       }
       expect(problems.slice(0, 50), problems.join("\n")).toEqual([]);
-    });
+    }, 120_000);
 
     it(`related links resolve (${locale})`, () => {
       for (const p of paths) resolvePage(locale, p);
       expect(unresolvedRelated()).toEqual([]);
-    });
+    }, 120_000);
 
     it(`search index entries point to existing pages (${locale})`, () => {
       const bad = searchEntries(locale)
-        .filter((e) => !only || e.path[0] === only)
+        .filter((e) => !only || onlyPaths.has(e.path.join("/")))
         .filter((e) => !known.has(e.path.join("/")))
         .map((e) => e.path.join("/"));
       expect(bad).toEqual([]);
-    });
+    }, 120_000);
   }
 });

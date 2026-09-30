@@ -41,7 +41,7 @@ export type Block =
   | { type: "text"; title?: string; paragraphs: string[] }
   | { type: "list"; title?: string; ordered?: boolean; items: string[] }
   | { type: "facts"; title?: string; rows: [string, string][] }
-  | { type: "table"; title?: string; head: string[]; rows: string[][]; caption?: string; mono?: boolean }
+  | { type: "table"; title?: string; head: string[]; rows: string[][]; caption?: string; mono?: boolean; /** Two half-tables side by side on wide screens. */ split?: boolean }
   | { type: "links"; title: string; items: LinkItem[]; style?: "chips" | "cards" | "glyphs"; more?: LinkItem }
   | { type: "glyphs"; title?: string; items: { glyph: string; label: string; path?: string[] }[] };
 

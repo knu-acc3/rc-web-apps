@@ -9,7 +9,6 @@ import { Header } from "@/site/header";
 import { THEME_SCRIPT } from "@/site/theme";
 import { Analytics } from "@/site/analytics";
 
-export const dynamicParams = false;
 
 export function generateStaticParams() {
   return LOCALES.map((locale) => ({ locale }));
