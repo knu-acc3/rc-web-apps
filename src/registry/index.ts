@@ -97,11 +97,20 @@ export function navigation(locale: Locale, limit: number) {
 
 /* Related keys are page paths without locale ("merge-pdf", "timer/5-minutes").
    Legacy "section/tool" keys are accepted too and fall back to the tool's own top-level path. */
+const relatedCache = new Map<string, LinkItem | null>();
 setRelatedResolver((key, locale) => {
+  const ck = `${locale}:${key}`;
+  if (relatedCache.has(ck)) return relatedCache.get(ck)!;
+  const link = resolveRelated(key, locale);
+  relatedCache.set(ck, link);
+  return link;
+});
+
+function resolveRelated(key: string, locale: Locale): LinkItem | null {
   const segs = key.split("/").filter(Boolean);
   let page = resolvePage(locale, segs);
   if (!page && segs.length > 1 && byId.has(segs[0])) page = resolvePage(locale, segs.slice(1));
   if (!page) return null;
   const s = byId.get(page.sectionId);
   return { path: page.path, label: page.h1, hint: page.lead ?? page.description, icon: page.icon ?? s?.icon, hue: s?.hue };
-});
+}

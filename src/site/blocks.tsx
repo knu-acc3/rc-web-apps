@@ -48,35 +48,42 @@ export function BlockView({ block, locale }: { block: Block; locale: Locale }) {
           </dl>
         </section>
       );
-    case "table":
+    case "table": {
+      const half = Math.ceil(block.rows.length / 2);
+      const parts = block.split && block.rows.length > 8 ? [block.rows.slice(0, half), block.rows.slice(half)] : [block.rows];
       return (
         <section>
           {block.title && <SectionTitle>{block.title}</SectionTitle>}
-          <div className="tbl">
-            <table className={block.mono ? "font-mono" : undefined}>
-              {block.caption && <caption className="sr-only">{block.caption}</caption>}
-              <thead>
-                <tr>
-                  {block.head.map((h, i) => (
-                    <th key={i} scope="col">
-                      {h}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {block.rows.map((r, i) => (
-                  <tr key={i}>
-                    {r.map((c, j) => (
-                      <td key={j}>{c}</td>
+          <div className={cn(parts.length > 1 && "grid sm:grid-cols-2 sm:gap-3")}>
+            {parts.map((rows, k) => (
+              <div key={k} className={cn("tbl", parts.length > 1 && (k === 0 ? "max-sm:rounded-b-none max-sm:border-b-0" : "max-sm:rounded-t-none"))}>
+                <table className={block.mono ? "font-mono" : undefined}>
+                  {block.caption && k === 0 && <caption className="sr-only">{block.caption}</caption>}
+                  <thead className={cn(k > 0 && "max-sm:hidden")}>
+                    <tr>
+                      {block.head.map((h, i) => (
+                        <th key={i} scope="col">
+                          {h}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {rows.map((r, i) => (
+                      <tr key={i}>
+                        {r.map((c, j) => (
+                          <td key={j}>{c}</td>
+                        ))}
+                      </tr>
                     ))}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                  </tbody>
+                </table>
+              </div>
+            ))}
           </div>
         </section>
       );
+    }
     case "links":
       return (
         <section>

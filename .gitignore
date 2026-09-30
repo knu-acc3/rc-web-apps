@@ -25,3 +25,5 @@ npm-debug.log*
 # local tooling
 .claude/
 /scripts/data/node_modules/
+/AGENTS.md
+/CLAUDE.md

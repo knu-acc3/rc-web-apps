@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { LOCALES } from "@/i18n/config";
 import { BRAND } from "@/config/brand";
-import { allPaths, allSections, resolvePage, searchEntries } from "@/registry";
+import { allPaths, allSections, resolvePage, searchEntries, sectionPaths } from "@/registry";
 import { unresolvedRelated } from "@/registry/tool-section";
 import { COMPONENTS } from "@/sections/components";
 import type { Block, PageModel } from "@/registry/types";
@@ -12,7 +12,8 @@ import type { Block, PageModel } from "@/registry/types";
  * Pass SECTION=<id> to check a single section quickly.
  */
 const only = process.env.SECTION;
-const paths = allPaths().filter((p) => !only || p[0] === only);
+const paths = only ? allSections().filter((s) => s.id === only).flatMap((s) => sectionPaths(s)) : allPaths();
+const onlyPaths = new Set(paths.map((p) => p.join("/")));
 const known = new Set(allPaths().map((p) => p.join("/")));
 
 function linksOf(page: PageModel): string[][] {
@@ -77,7 +78,7 @@ describe("registry", () => {
 
     it(`search index entries point to existing pages (${locale})`, () => {
       const bad = searchEntries(locale)
-        .filter((e) => !only || e.path[0] === only)
+        .filter((e) => !only || onlyPaths.has(e.path.join("/")))
         .filter((e) => !known.has(e.path.join("/")))
         .map((e) => e.path.join("/"));
       expect(bad).toEqual([]);

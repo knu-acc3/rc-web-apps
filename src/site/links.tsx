@@ -21,9 +21,9 @@ export function LinkChips({ items, locale, className }: { items: LinkItem[]; loc
 
 export function LinkCards({ items, locale, className }: { items: LinkItem[]; locale: Locale; className?: string }) {
   return (
-    <ul className={cn("grid gap-3 sm:grid-cols-2 lg:grid-cols-3", className)}>
+    <ul className={cn("grid grid-cols-[minmax(0,1fr)] gap-3 sm:grid-cols-2 lg:grid-cols-3", className)}>
       {items.map((it) => (
-        <li key={it.path.join("/")}>
+        <li key={it.path.join("/")} className="min-w-0">
           <ToolCard item={it} locale={locale} />
         </li>
       ))}
