@@ -14,7 +14,7 @@ Every tool and every variant is its own statically generated, indexable page (ru
 
 ## Folder layout
 ```
-app/[locale]/…                 generic routes: /[section], /[section]/[slug], /[section]/[slug]/[variant]
+app/[locale]/…                 generic routes for 1–3 path segments (/[section]/[slug]/[variant] are just segment names)
 src/config/brand.ts            site name, domain, verification ids
 src/i18n/                      locales, formatting (formatNumber, formatSmart, parseNumber, plural), UI dictionary
 src/registry/                  types, section registry, generic tool-section builder
@@ -30,18 +30,27 @@ legacy/                        the previous version of the site — READ-ONLY re
 ```
 
 ## How a page is produced
-`resolvePage(locale, [section, ...rest])` → `SectionDef.resolve()` returns a `PageModel` (`src/registry/types.ts`):
-title (without brand), h1, description (meta, ≤160 chars), lead (one line with the answer), breadcrumbs, `tool` (component id + serializable props),
+`resolvePage(locale, segments)` finds the section that owns the first segment and calls `SectionDef.resolve()`, which returns a `PageModel` (`src/registry/types.ts`):
+title (the complete `<title>`; no brand suffix is appended), h1, description (meta, ≤160 chars), lead (one line with the answer), breadcrumbs, `tool` (component id + serializable props),
 `topBlocks` (variant/sibling chips right under the tool), `blocks` (facts, tables, text), `howTo`, `faq`, `related`.
 `src/site/page-view.tsx` renders it, `src/site/seo.tsx` builds metadata, canonical, hreflang (ru, en, x-default) and JSON-LD.
 Sitemaps (`/sitemap.xml` → `/sitemaps/<section>.xml`) and the search index (`/<locale>/search.json`) are generated from `SectionDef.paths()` / `search()`.
 
 ## Two ways to write a section
 1. **Declarative tools** — `defineToolSection({...tools: ToolDef[]})` from `src/registry/tool-section.ts`.
-   URLs: `/section` (hub, or the tool with `slug: ""`), `/section/tool`, `/section/tool/variant`.
+   **Every tool is a top-level page**: `/{tool slug}` and `/{tool slug}/{variant}`. The slug is globally unique and is the
+   English form of the main search query (`microphone-test`, `merge-pdf`, `word-counter`, `percentage-calculator`).
+   `slug: ""` puts the tool at `/{section id}` (when the id itself is the query: `timer`, `emoji`).
+   The section is a navigation group. Its landing page `/{section id}` is published only when `title` is set and no tool
+   has `slug: ""` — set it only if the group name is a real search query; otherwise the group has no page.
    Variants come from `variants.list()` and override the tool's props (e.g. `/timer/5-minutes` → `{ seconds: 300 }`).
 2. **Custom SectionDef** — for entity catalogs (emoji, cities, units…): implement `paths()`, `resolve()`, `search()`, `featured()` yourself.
    Reference implementation: `src/sections/convert/section.ts` (hub → quantity pages → pair pages with tables, facts, FAQ).
+
+## Tool design: one focal point
+Every tool has one obvious place to look: the primary input and a prominent result (large type, accent where it helps).
+Restrained minimalism: at most one quiet row of secondary options; extra data (tables, lists in other units) sits below,
+visually quiet; no walls of equal-weight controls, no rows of per-item buttons. If a screen needs explaining, simplify it.
 
 ## Tool components
 - File `src/sections/<id>/<Name>.tsx`, `"use client"`, **default export**, props `{ locale, ...preset }` (`ToolProps` in `src/sections/types.ts`). Props must be JSON-serializable.
@@ -57,6 +66,9 @@ Sitemaps (`/sitemap.xml` → `/sitemaps/<section>.xml`) and the search index (`/
 - Randomness: `crypto.getRandomValues` with rejection sampling (no `Math.random` for anything user-facing).
 
 ## SEO requirements for every page
+- Title/h1 = what people actually type into a search engine ("Проверка микрофона онлайн", "Таймер на 5 минут"). Never generic group
+  names or boilerplate ("… — бесплатные инструменты", "free tools", brand name) — the registry test rejects them.
+- `related` keys are page paths without locale (`merge-pdf`, `timer/5-minutes`, `convert/km-to-miles`); unresolved keys fail the registry test.
 - Unique `title` (≤ 60 chars where possible, key phrase first), unique `description` (120–160 chars, contains concrete numbers/facts), `h1` = main search phrase, `lead` = the direct answer.
 - Variant pages: 20–50 chip links to sibling variants (`topBlocks`), a facts block and/or table with data specific to the variant, 2–4 FAQ entries with real answers, breadcrumbs.
 - Tool pages: 3–5 `howTo` steps, 3–5 FAQ, `about` text (2–3 short paragraphs, no filler), `related` tools.
