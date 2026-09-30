@@ -1,24 +1,34 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore, type RefObject } from "react";
 import { sniffFile, type Detected } from "@/sections/file/lib/magic";
 import { probeMedia, type Hooks, type Stage } from "../engine/client";
 import { isAbort } from "../engine/ffmpeg";
 import type { MediaInfo } from "../engine/spec";
 
-/** Object URL for a Blob, revoked when the blob changes or the component unmounts. */
-export function useObjectUrl(blob: Blob | null | undefined): string | null {
-  const [url, setUrl] = useState<string | null>(null);
+/**
+ * Attach a Blob to a media/img element via an object URL that is revoked when the
+ * blob changes or the component unmounts. Returns a ref callback for the element.
+ */
+export function useBlobSrc<E extends HTMLMediaElement | HTMLImageElement>(blob: Blob | null | undefined) {
+  const el = useRef<E | null>(null);
+  useAttachBlob(el, blob);
+  return el;
+}
+
+/** Same as useBlobSrc for an element ref owned by the caller. */
+export function useAttachBlob(el: RefObject<HTMLMediaElement | HTMLImageElement | null>, blob: Blob | null | undefined) {
   useEffect(() => {
-    if (!blob) {
-      setUrl(null);
-      return;
-    }
-    const u = URL.createObjectURL(blob);
-    setUrl(u);
-    return () => URL.revokeObjectURL(u);
-  }, [blob]);
-  return url;
+    const node = el.current;
+    if (!node || !blob) return;
+    const url = URL.createObjectURL(blob);
+    node.setAttribute("src", url);
+    return () => {
+      node.removeAttribute("src");
+      if ("load" in node) (node as HTMLMediaElement).load();
+      URL.revokeObjectURL(url);
+    };
+  }, [el, blob]);
 }
 
 export type JobStatus = "idle" | "running" | "done" | "error" | "cancelled";
@@ -98,27 +108,28 @@ export interface Probe {
 
 /** Container/codec information and magic-byte type of a file (read in a worker). */
 export function useProbe(file: File | null): Probe {
-  const [state, setState] = useState<Probe>({ info: null, detected: null, loading: false });
+  const [state, setState] = useState<{ file: File | null; info: MediaInfo | null; detected: Detected | null }>({ file: null, info: null, detected: null });
   useEffect(() => {
-    if (!file) {
-      setState({ info: null, detected: null, loading: false });
-      return;
-    }
+    if (!file) return;
     const c = new AbortController();
-    setState({ info: null, detected: null, loading: true });
-    Promise.all([probeMedia(file, c.signal), sniffFile(file).catch(() => null)])
-      .then(([info, detected]) => !c.signal.aborted && setState({ info, detected, loading: false }))
-      .catch(() => !c.signal.aborted && setState({ info: null, detected: null, loading: false }));
+    Promise.all([probeMedia(file, c.signal).catch(() => null), sniffFile(file).catch(() => null)]).then(([info, detected]) => {
+      if (!c.signal.aborted) setState({ file, info, detected });
+    });
     return () => c.abort();
   }, [file]);
-  return state;
+  // Derived: results belong to the current file only.
+  if (!file) return { info: null, detected: null, loading: false };
+  if (state.file !== file) return { info: null, detected: null, loading: true };
+  return { info: state.info, detected: state.detected, loading: false };
 }
 
-/** Whether the browser has WebCodecs (read after mount; SSR-safe). */
+const noop = () => () => {};
+
+/** Whether the browser has WebCodecs (null during SSR/hydration). */
 export function useWebCodecs(): boolean | null {
-  const [ok, setOk] = useState<boolean | null>(null);
-  useEffect(() => {
-    setOk(typeof window !== "undefined" && "VideoEncoder" in window && "AudioDecoder" in window);
-  }, []);
-  return ok;
+  return useSyncExternalStore(
+    noop,
+    () => "VideoEncoder" in window && "AudioDecoder" in window,
+    () => null,
+  );
 }

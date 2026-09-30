@@ -11,7 +11,7 @@ import { abortError, runFfmpeg } from "./ffmpeg";
 import type { AudioOps, LoadedInfo } from "./ops-audio";
 import type { FramesSpec } from "./ops-image";
 import type { ClipCheck } from "./ops-video";
-import type { AudioTarget, FallbackReason, GifSpec, JobResult, JobSpec, MediaInfo, VideoTarget } from "./spec";
+import type { AudioTarget, FallbackReason, JobResult, JobSpec, MediaInfo, VideoTarget } from "./spec";
 
 export type Stage = "prepare" | "download" | "work";
 

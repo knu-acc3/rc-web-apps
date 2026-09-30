@@ -1,9 +1,9 @@
 "use client";
 
-import { CheckCircle2, Download, FileArchive, Loader2, Play, X } from "lucide-react";
+import { CheckCircle2, ChevronDown, Download, FileArchive, Loader2, Play, X } from "lucide-react";
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
 import type { Locale } from "@/i18n/config";
-import { count, formatBytes } from "@/i18n/format";
+import { count, formatBytes, formatNumber } from "@/i18n/format";
 import { downloadBlob } from "@/lib/clipboard";
 import { sniffFile, type Detected } from "@/sections/file/lib/magic";
 import { Button } from "@/ui/button";
@@ -52,6 +52,11 @@ const T = {
     waiting: "В очереди",
     ffmpegNote: "Для MP3, FLAC и OGG (Vorbis), а также для форматов, которые браузер не читает (AVI, WMV, FLV…), используется модуль ffmpeg: при первом запуске он загружается с этого сайта (до 31 МБ), затем берётся из кэша.",
     gifIn: "GIF-анимация",
+    settings: "Настройки",
+    compat: "Максимальная совместимость (H.264)",
+    lossless: "без потерь",
+    palGlobal: "общая палитра",
+    palFrame: "палитра на кадр",
     inputsAudio: "MP3, WAV, M4A, AAC, FLAC, OGG, OPUS, WMA, AIFF, AMR, а также видео MP4, MOV, MKV, WEBM, AVI",
     inputsVideo: "MP4, MOV, MKV, WEBM, AVI, WMV, FLV, 3GP, TS, MPEG и GIF",
   },
@@ -75,6 +80,11 @@ const T = {
     waiting: "Queued",
     ffmpegNote: "MP3, FLAC and OGG (Vorbis) output, and formats the browser can't read (AVI, WMV, FLV…), use the ffmpeg module: it is downloaded from this site on first use (up to 31 MB) and cached afterwards.",
     gifIn: "GIF animation",
+    settings: "Settings",
+    compat: "Maximum compatibility (H.264)",
+    lossless: "lossless",
+    palGlobal: "global palette",
+    palFrame: "per-frame palette",
     inputsAudio: "MP3, WAV, M4A, AAC, FLAC, OGG, OPUS, WMA, AIFF, AMR, plus video MP4, MOV, MKV, WEBM, AVI",
     inputsVideo: "MP4, MOV, MKV, WEBM, AVI, WMV, FLV, 3GP, TS, MPEG and GIF",
   },
@@ -113,6 +123,7 @@ export default function MediaConverter({ locale, kind, to, targets }: MediaConve
   const [gif, setGif] = useState<GifSpec>(GIF_DEFAULT);
   const [height, setHeight] = useState(0);
   const [mute, setMute] = useState(false);
+  const [compat, setCompat] = useState(false);
   const [items, setItems] = useState<Item[]>([]);
   const [busy, setBusy] = useState(false);
   const itemsRef = useRef<Item[]>([]);
@@ -159,10 +170,12 @@ export default function MediaConverter({ locale, kind, to, targets }: MediaConve
         if (height && (!v || v.height > height)) {
           spec.video = v ? { height: even(height), width: even((v.width * height) / v.height) } : { height: even(height) };
         }
+        // H.264 plays everywhere; HEVC/VP9/AV1 sources are re-encoded when asked.
+        if (compat && target !== "webm" && v?.codec && v.codec !== "avc") spec.video = { ...spec.video, forceTranscode: true };
       }
       return spec;
     },
-    [target, gif, audio, mute, height],
+    [target, gif, audio, mute, height, compat],
   );
 
   const runOne = useCallback(
@@ -227,7 +240,7 @@ export default function MediaConverter({ locale, kind, to, targets }: MediaConve
   const cancel = (itemId: number) => ctrls.current.get(itemId)?.abort();
 
   // Reset finished items when the output settings change, so the list never shows stale results.
-  const settingsKey = JSON.stringify([target, audio, gif, height, mute]);
+  const settingsKey = JSON.stringify([target, audio, gif, height, mute, compat]);
   const prevKey = useRef(settingsKey);
   useEffect(() => {
     if (prevKey.current === settingsKey) return;
@@ -252,39 +265,53 @@ export default function MediaConverter({ locale, kind, to, targets }: MediaConve
     downloadBlob(await zip.generateAsync({ type: "blob", compression: "STORE" }), `converted-${target}.zip`);
   };
 
+  const settingsSummary =
+    target === "gif"
+      ? `${gif.fps} ${u.fps} · ${gif.width} px · ${gif.palette === "global" ? t.palGlobal : t.palFrame}`
+      : isAudioTarget(target)
+        ? [target === "wav" || target === "flac" ? t.lossless : `${Math.round((audio.bitrate ?? 192000) / 1000)} ${u.kbps}`, audio.sampleRate ? `${formatNumber(locale, audio.sampleRate)} ${u.hz}` : null, audio.channels === 1 ? u.mono : audio.channels === 2 ? u.stereo : null].filter(Boolean).join(" · ")
+        : [height ? `${height}p` : t.original.toLowerCase(), compat ? "H.264" : null, mute ? t.mute.toLowerCase() : null].filter(Boolean).join(" · ");
+
   const accept = kind === "audio" ? MEDIA_ACCEPT : `${VIDEO_ACCEPT},.gif,image/gif,image/webp,image/apng`;
   const inputs = kind === "audio" ? t.inputsAudio : t.inputsVideo;
   const options = useMemo(() => targets.map((x) => ({ value: x, label: FORMAT_LABEL[x] })), [targets]);
 
   return (
     <div className="flex flex-col gap-4">
-      <Panel className="flex flex-col gap-4 p-4">
-        <div className="flex flex-col gap-1.5">
-          <span className="text-sm font-medium text-fg-2">
-            {t.format}
-          </span>
+      <div className="flex flex-col gap-2">
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+          <span className="text-sm font-medium text-fg-2">{t.format}</span>
           <Segmented label={t.format} value={target} onChange={setTarget} options={options} wrap />
         </div>
-        {target === "gif" ? (
-          <GifOptions locale={locale} value={gif} onChange={setGif} disabled={busy} />
-        ) : isAudioTarget(target) ? (
-          <AudioOptions locale={locale} target={target} value={audio} onChange={setAudio} disabled={busy} />
-        ) : (
-          <div className="grid items-end gap-3 sm:grid-cols-2">
-            <Field label={t.resolution} htmlFor={`${id}-res`}>
-              <Select id={`${id}-res`} value={String(height)} disabled={busy} onChange={(e) => setHeight(Number(e.target.value))}>
-                <option value="0">{t.original}</option>
-                {RESOLUTIONS.map((r) => (
-                  <option key={r} value={r}>
-                    {r === 2160 ? "4K (2160p)" : `${r}p`}
-                  </option>
-                ))}
-              </Select>
-            </Field>
-            <Checkbox label={t.mute} checked={mute} disabled={busy} onChange={(e) => setMute(e.target.checked)} className="pb-2" />
+        <details className="group">
+          <summary className="inline-flex cursor-pointer items-center gap-1 text-sm text-fg-3 hover:text-fg">
+            <ChevronDown className="size-4 transition-transform group-open:rotate-180" aria-hidden />
+            {t.settings}: {settingsSummary}
+          </summary>
+          <div className="mt-3">
+            {target === "gif" ? (
+              <GifOptions locale={locale} value={gif} onChange={setGif} disabled={busy} />
+            ) : isAudioTarget(target) ? (
+              <AudioOptions locale={locale} target={target} value={audio} onChange={setAudio} disabled={busy} />
+            ) : (
+              <div className="flex flex-wrap items-end gap-x-5 gap-y-3">
+                <Field label={t.resolution} htmlFor={`${id}-res`} className="w-48">
+                  <Select id={`${id}-res`} size="sm" value={String(height)} disabled={busy} onChange={(e) => setHeight(Number(e.target.value))}>
+                    <option value="0">{t.original}</option>
+                    {RESOLUTIONS.map((r) => (
+                      <option key={r} value={r}>
+                        {r === 2160 ? "4K (2160p)" : `${r}p`}
+                      </option>
+                    ))}
+                  </Select>
+                </Field>
+                <Checkbox label={t.compat} checked={compat} disabled={busy} onChange={(e) => setCompat(e.target.checked)} className="pb-1.5" />
+                <Checkbox label={t.mute} checked={mute} disabled={busy} onChange={(e) => setMute(e.target.checked)} className="pb-1.5" />
+              </div>
+            )}
           </div>
-        )}
-      </Panel>
+        </details>
+      </div>
 
       <Dropzone onFiles={addFiles} accept={accept} multiple title={u.chooseFiles} hint={`${inputs}. ${u.localNote}.`} compact={items.length > 0} />
 
@@ -308,10 +335,6 @@ export default function MediaConverter({ locale, kind, to, targets }: MediaConve
                     {t.clear}
                   </Button>
                 )}
-                <Button size="sm" variant="primary" onClick={runAll} disabled={busy || pending.length === 0}>
-                  {busy ? <Loader2 className="animate-spin" aria-hidden /> : <Play aria-hidden />}
-                  {items.length > 1 ? t.convertAll : t.convert}
-                </Button>
               </>
             }
           />
@@ -321,6 +344,12 @@ export default function MediaConverter({ locale, kind, to, targets }: MediaConve
             ))}
           </ul>
         </Panel>
+      )}
+      {pending.length > 0 && (
+        <Button variant="primary" size="lg" onClick={runAll} disabled={busy} className="w-full sm:w-auto sm:self-start">
+          {busy ? <Loader2 className="animate-spin" aria-hidden /> : <Play aria-hidden />}
+          {pending.length > 1 ? `${t.convertAll} (${pending.length})` : t.convert} → {FORMAT_LABEL[target]}
+        </Button>
       )}
     </div>
   );
@@ -362,12 +391,12 @@ function QueueRow({
           </div>
         </div>
         {item.status === "done" && item.result ? (
-          <Button size="sm" variant="primary" onClick={() => downloadBlob(item.result!.blob, item.name)}>
+          <Button size="sm" variant="ghost" className="text-accent" onClick={() => downloadBlob(item.result!.blob, item.name)}>
             <Download aria-hidden />
             <span className="hidden sm:inline">{u.download}</span>
           </Button>
         ) : running ? (
-          <Button size="sm" variant="outline" onClick={onCancel}>
+          <Button size="sm" variant="ghost" onClick={onCancel}>
             {u.cancel}
           </Button>
         ) : null}

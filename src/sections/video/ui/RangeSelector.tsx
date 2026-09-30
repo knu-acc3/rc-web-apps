@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useRef, useState, type KeyboardEvent, type PointerEvent, type ReactNode } from "react";
+import { useId, useRef, useState, type KeyboardEvent, type PointerEvent, type ReactNode } from "react";
 import { cn } from "@/lib/cn";
 import { Input } from "@/ui/field";
 import { formatTime, parseTime } from "../engine/time";
@@ -51,7 +51,7 @@ export function RangeSelector({
     onChange(Math.round(s * 1000) / 1000, Math.round(e * 1000) / 1000);
   };
 
-  const down = (handle: Handle) => (ev: PointerEvent) => {
+  const down = (handle: Handle, ev: PointerEvent) => {
     ev.preventDefault();
     ev.stopPropagation();
     (ev.currentTarget as HTMLElement).setPointerCapture(ev.pointerId);
@@ -73,7 +73,7 @@ export function RangeSelector({
     drag.current = null;
   };
 
-  const key = (handle: "start" | "end") => (ev: KeyboardEvent) => {
+  const key = (handle: "start" | "end", ev: KeyboardEvent) => {
     const k = ev.shiftKey ? step * 10 : step;
     const cur = handle === "start" ? start : end;
     let next: number | null = null;
@@ -118,7 +118,7 @@ export function RangeSelector({
         <div
           className="absolute inset-y-0 z-10 cursor-grab border-y-2 border-accent active:cursor-grabbing"
           style={{ left: pct(start), width: `calc(${pct(end)} - ${pct(start)})` }}
-          onPointerDown={down("both")}
+          onPointerDown={(ev) => down("both", ev)}
           aria-hidden
         />
         {playhead != null && playhead >= 0 && (
@@ -134,8 +134,8 @@ export function RangeSelector({
           aria-valuetext={formatTime(start, 1)}
           className={handleCls}
           style={{ left: pct(start) }}
-          onPointerDown={down("start")}
-          onKeyDown={key("start")}
+          onPointerDown={(ev) => down("start", ev)}
+          onKeyDown={(ev) => key("start", ev)}
         >
           <span className="h-10 w-2 rounded-full bg-accent shadow-[0_0_0_2px_var(--surface)]" />
         </div>
@@ -149,8 +149,8 @@ export function RangeSelector({
           aria-valuetext={formatTime(end, 1)}
           className={handleCls}
           style={{ left: pct(end) }}
-          onPointerDown={down("end")}
-          onKeyDown={key("end")}
+          onPointerDown={(ev) => down("end", ev)}
+          onKeyDown={(ev) => key("end", ev)}
         >
           <span className="h-10 w-2 rounded-full bg-accent shadow-[0_0_0_2px_var(--surface)]" />
         </div>
@@ -179,16 +179,14 @@ export function TimeInput({
   className?: string;
 }) {
   const id = useId();
-  const [text, setText] = useState(formatTime(value, digits));
-  const [focused, setFocused] = useState(false);
-  useEffect(() => {
-    if (!focused) setText(formatTime(value, digits));
-  }, [value, digits, focused]);
+  // Text being edited; null = show the formatted value.
+  const [editing, setEditing] = useState<string | null>(null);
+  const text = editing ?? formatTime(value, digits);
   const parsed = parseTime(text);
   const invalid = parsed === null || (max !== undefined && parsed > max + 0.001);
   const commit = () => {
-    if (!invalid && parsed !== null) onCommit(parsed);
-    else setText(formatTime(value, digits));
+    if (editing !== null && !invalid && parsed !== null) onCommit(parsed);
+    setEditing(null);
   };
   return (
     <div className={cn("flex min-w-0 flex-col gap-1.5", className)}>
@@ -203,12 +201,8 @@ export function TimeInput({
         spellCheck={false}
         aria-invalid={invalid}
         className="tabular"
-        onFocus={() => setFocused(true)}
-        onChange={(e) => setText(e.target.value)}
-        onBlur={() => {
-          setFocused(false);
-          commit();
-        }}
+        onChange={(e) => setEditing(e.target.value)}
+        onBlur={commit}
         onKeyDown={(e) => {
           if (e.key === "Enter") commit();
         }}

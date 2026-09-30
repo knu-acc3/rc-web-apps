@@ -9,7 +9,7 @@ import { Button } from "@/ui/button";
 import { Badge, Panel } from "@/ui/panel";
 import { codecLabel, type JobResult } from "../engine/spec";
 import { formatTime } from "../engine/time";
-import { useObjectUrl } from "./hooks";
+import { useBlobSrc } from "./hooks";
 import { UI } from "./strings";
 
 export function sizeChange(locale: Locale, out: number, input: number): string {
@@ -45,19 +45,19 @@ export function ResultCard({
   children?: ReactNode;
 }) {
   const t = UI[locale];
-  const url = useObjectUrl(blob);
+  const video = useBlobSrc<HTMLVideoElement>(kind === "video" ? blob : null);
+  const audio = useBlobSrc<HTMLAudioElement>(kind === "audio" ? blob : null);
+  const img = useBlobSrc<HTMLImageElement>(kind === "image" ? blob : null);
   const modeLabel = result?.mode === "copy" ? t.copyMode : result?.mode === "mixed" ? t.mixedMode : result ? t.transcodeMode : null;
   return (
     <Panel className="overflow-hidden">
-      {url && kind === "video" && (
-        <video src={url} controls playsInline preload="metadata" className="max-h-[60vh] w-full bg-black" aria-label={name} />
-      )}
-      {url && kind === "image" && (
+      {kind === "video" && <video ref={video} controls playsInline preload="metadata" className="max-h-[60vh] w-full bg-black" aria-label={name} />}
+      {kind === "image" && (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={url} alt={name} className="mx-auto max-h-[60vh] w-auto max-w-full bg-[repeating-conic-gradient(#8882_0_25%,transparent_0_50%)] bg-[length:16px_16px]" />
+        <img ref={img} alt={name} className="mx-auto max-h-[60vh] w-auto max-w-full bg-[repeating-conic-gradient(#8882_0_25%,transparent_0_50%)] bg-[length:16px_16px]" />
       )}
       <div className="flex flex-col gap-3 p-4">
-        {url && kind === "audio" && <audio src={url} controls preload="metadata" className="w-full" aria-label={name} />}
+        {kind === "audio" && <audio ref={audio} controls preload="metadata" className="w-full" aria-label={name} />}
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div className="min-w-0">
             <div className="truncate font-semibold text-fg" title={name}>
