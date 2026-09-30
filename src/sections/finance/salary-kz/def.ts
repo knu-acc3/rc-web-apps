@@ -109,6 +109,7 @@ const EX = salaryKz(500_000, 2026);
 
 export const salaryKzTool: ToolDef = {
   slug: "kazakhstan-salary-calculator",
+  seoAlt: { ru: ["зарплата на руки после налогов", "на руки после налогов"], en: ["take-home pay after tax", "take-home pay"] },
   component: "finance/salary-kz",
   icon: "Wallet",
   popular: true,

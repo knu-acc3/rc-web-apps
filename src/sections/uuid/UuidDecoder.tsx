@@ -161,11 +161,11 @@ export default function UuidDecoder({ locale, sample = SAMPLE }: { locale: Local
             <tbody>
               {rows.map(({ line, info }, i) => (
                 <tr key={i}>
-                  <td className="max-w-[16rem] font-mono text-[13px] break-all">{line}</td>
+                  <td className="max-w-[16rem] font-mono text-[0.8125rem] break-all">{line}</td>
                   <td className="whitespace-nowrap">
                     <Badge tone={info.type === "invalid" ? "err" : info.type === "nanoid" ? "warn" : "ok"}>{typeLabel(info, locale)}</Badge>
                   </td>
-                  <td className="text-[13px]">
+                  <td className="text-[0.8125rem]">
                     {details(info).map((d, j) => (
                       <div key={j}>{d}</div>
                     ))}

@@ -730,14 +730,17 @@ const BANKNOTES: ObjDef[] = [
     en: "First series: no longer issued since 2019, but it remains legal tender.",
   }),
   note("100-rubles-note", "rub", CBR, "Купюра 100 рублей", "100 ruble banknote", { ru: "100 рублей", en: "100 rubles" }, "100 ₽", 150, 65, {
-    ru: "Размер одинаков у банкнот 10, 50, 100, 200, 500 и 2000 рублей.",
-    en: "The 10, 50, 100, 200, 500 and 2000 ruble notes all share this size.",
+    ru: "Размер одинаков у банкнот 10, 50, 100, 200, 500 и 2000 рублей. На сторублёвке образца 1997 года — Большой театр, на модификации 2022 года — Ржевский мемориал Советскому солдату.",
+    en: "The 10, 50, 100, 200, 500 and 2000 ruble notes all share this size. The 1997 design shows the Bolshoi Theatre, the 2022 update the Rzhev Memorial to the Soviet Soldier.",
   }),
   note("200-rubles-note", "rub", CBR, "Купюра 200 рублей", "200 ruble banknote", { ru: "200 рублей", en: "200 rubles" }, "200 ₽", 150, 65, {
-    ru: "Банкнота образца 2017 года с видами Севастополя.",
-    en: "The 2017 design showing Sevastopol.",
+    ru: "Банкнота образца 2017 года: памятник затопленным кораблям в Севастополе, на обороте — Херсонес Таврический.",
+    en: "The 2017 design: the Monument to the Scuttled Ships in Sevastopol on the front and ancient Chersonesus on the back.",
   }),
-  note("500-rubles-note", "rub", CBR, "Купюра 500 рублей", "500 ruble banknote", { ru: "500 рублей", en: "500 rubles" }, "500 ₽", 150, 65),
+  note("500-rubles-note", "rub", CBR, "Купюра 500 рублей", "500 ruble banknote", { ru: "500 рублей", en: "500 rubles" }, "500 ₽", 150, 65, {
+    ru: "Сиреневая банкнота образца 1997 года: памятник Петру I в Архангельске, на обороте — Соловецкий монастырь.",
+    en: "The lilac 1997 design: the Peter the Great monument in Arkhangelsk, with the Solovetsky Monastery on the back.",
+  }),
   note("1000-rubles-note", "rub", CBR, "Купюра 1000 рублей", "1000 ruble banknote", { ru: "1000 рублей", en: "1000 rubles" }, "1000 ₽", 157, 69, {
     ru: "Банкноты 1000 и 5000 рублей крупнее остальных: 157 × 69 мм.",
     en: "The 1000 and 5000 ruble notes are larger than the rest: 157 × 69 mm.",
@@ -999,12 +1002,33 @@ const IPHONES: ObjDef[] = [
   iphone("iphone-11-pro", "iPhone 11 Pro", 71.4, 144, 8.1, 5.8, 2019, "11", "notch"),
   iphone("iphone-11-pro-max", "iPhone 11 Pro Max", 77.8, 158, 8.1, 6.5, 2019, "11", "notch"),
   iphone("iphone-12-mini", "iPhone 12 mini", 64.2, 131.5, 7.4, 5.4, 2020, "12", "notch"),
-  iphone("iphone-12", "iPhone 12", 71.5, 146.7, 7.4, 6.1, 2020, "12", "notch"),
-  iphone("iphone-12-pro", "iPhone 12 Pro", 71.5, 146.7, 7.4, 6.1, 2020, "12", "notch"),
+  iphone("iphone-12", "iPhone 12", 71.5, 146.7, 7.4, 6.1, 2020, "12", "notch", {
+    note: {
+      ru: "Корпус того же размера, что у iPhone 12 Pro, поэтому чехлы подходят от обеих моделей. iPhone 12 легче — 164 г: алюминиевая рамка и две камеры.",
+      en: "The body is the same size as the iPhone 12 Pro, so cases fit both. The iPhone 12 is lighter at 164 g, with an aluminium frame and two cameras.",
+    },
+  }),
+  iphone("iphone-12-pro", "iPhone 12 Pro", 71.5, 146.7, 7.4, 6.1, 2020, "12", "notch", {
+    note: {
+      ru: "Габариты те же, что у iPhone 12, и чехлы у них общие. iPhone 12 Pro тяжелее — 189 г: у него рамка из нержавеющей стали, три камеры и сканер LiDAR.",
+      en: "Same dimensions as the iPhone 12, and the two share cases. The 12 Pro is heavier at 189 g: stainless steel frame, three cameras and a LiDAR scanner.",
+    },
+  }),
   iphone("iphone-12-pro-max", "iPhone 12 Pro Max", 78.1, 160.8, 7.4, 6.7, 2020, "12", "notch"),
   iphone("iphone-13-mini", "iPhone 13 mini", 64.2, 131.5, 7.65, 5.4, 2021, "13", "notch"),
-  iphone("iphone-13", "iPhone 13", 71.5, 146.7, 7.65, 6.1, 2021, "13", "notch", { popular: true }),
-  iphone("iphone-13-pro", "iPhone 13 Pro", 71.5, 146.7, 7.65, 6.1, 2021, "13", "notch"),
+  iphone("iphone-13", "iPhone 13", 71.5, 146.7, 7.65, 6.1, 2021, "13", "notch", {
+    popular: true,
+    note: {
+      ru: "Размеры как у iPhone 13 Pro, но чехлы у них разные: камеры iPhone 13 стоят по диагонали и занимают меньше места. Вес 173 г, рамка алюминиевая.",
+      en: "Same dimensions as the iPhone 13 Pro, but the cases differ: the iPhone 13's cameras sit diagonally in a smaller block. It weighs 173 g with an aluminium frame.",
+    },
+  }),
+  iphone("iphone-13-pro", "iPhone 13 Pro", 71.5, 146.7, 7.65, 6.1, 2021, "13", "notch", {
+    note: {
+      ru: "Габариты как у iPhone 13, но блок из трёх камер намного крупнее — чехол от iPhone 13 не подойдёт. Вес 204 г, рамка из нержавеющей стали.",
+      en: "Same dimensions as the iPhone 13, but the three-camera block is much larger, so an iPhone 13 case won't fit. It weighs 204 g and has a stainless steel frame.",
+    },
+  }),
   iphone("iphone-13-pro-max", "iPhone 13 Pro Max", 78.1, 160.8, 7.65, 6.7, 2021, "13", "notch"),
   iphone("iphone-14", "iPhone 14", 71.5, 146.7, 7.8, 6.1, 2022, "14", "notch"),
   iphone("iphone-14-plus", "iPhone 14 Plus", 78.1, 160.8, 7.8, 6.7, 2022, "14", "notch"),
@@ -1047,7 +1071,7 @@ const galaxy = (slug: string, model: string, w: number, h: number, d: number, di
   ...extra,
 });
 
-const pixel = (slug: string, model: string, w: number, h: number, d: number, diag: number, year: number, group: string): ObjDef => ({
+const pixel = (slug: string, model: string, w: number, h: number, d: number, diag: number, year: number, group: string, extra: Partial<ObjDef> = {}): ObjDef => ({
   slug,
   cat: "android",
   group,
@@ -1062,6 +1086,7 @@ const pixel = (slug: string, model: string, w: number, h: number, d: number, dia
   shape: "phone",
   notch: "hole",
   src: GOOGLE,
+  ...extra,
 });
 
 const ANDROID: ObjDef[] = [
@@ -1102,8 +1127,18 @@ const ANDROID: ObjDef[] = [
   pixel("pixel-8", "Pixel 8", 70.8, 150.5, 8.9, 6.2, 2023, "pixel"),
   pixel("pixel-8-pro", "Pixel 8 Pro", 76.5, 162.6, 8.8, 6.7, 2023, "pixel"),
   pixel("pixel-8a", "Pixel 8a", 72.7, 152.1, 8.9, 6.1, 2024, "pixel-a"),
-  pixel("pixel-9", "Pixel 9", 72, 152.8, 8.5, 6.3, 2024, "pixel"),
-  pixel("pixel-9-pro", "Pixel 9 Pro", 72, 152.8, 8.5, 6.3, 2024, "pixel"),
+  pixel("pixel-9", "Pixel 9", 72, 152.8, 8.5, 6.3, 2024, "pixel", {
+    note: {
+      ru: "Корпус такой же, как у Pixel 9 Pro, но сзади две камеры вместо трёх, фронтальная — 10,5 Мп, экран Actua с частотой 60–120 Гц и 12 ГБ оперативной памяти. Вес 198 г.",
+      en: "Same body as the Pixel 9 Pro, but with two rear cameras instead of three, a 10.5 MP selfie camera, a 60–120 Hz Actua display and 12 GB of RAM. It weighs 198 g.",
+    },
+  }),
+  pixel("pixel-9-pro", "Pixel 9 Pro", 72, 152.8, 8.5, 6.3, 2024, "pixel", {
+    note: {
+      ru: "Габариты как у Pixel 9, но три камеры сзади, включая телеобъектив с 5-кратным зумом, фронтальная камера 42 Мп, экран Super Actua LTPO 1–120 Гц и 16 ГБ оперативной памяти. Вес 199 г.",
+      en: "Same dimensions as the Pixel 9, but three rear cameras including a 5× telephoto, a 42 MP selfie camera, a 1–120 Hz Super Actua LTPO display and 16 GB of RAM. It weighs 199 g.",
+    },
+  }),
   pixel("pixel-9-pro-xl", "Pixel 9 Pro XL", 76.6, 162.8, 8.5, 6.8, 2024, "pixel"),
   pixel("pixel-9a", "Pixel 9a", 73.3, 154.7, 8.9, 6.3, 2025, "pixel-a"),
 ];
@@ -1143,7 +1178,7 @@ const aw = (slug: string, size: number, series: L10n, w: number, h: number, d: n
   },
 });
 
-const gw = (slug: string, model: string, size: number, w: number, h: number, d: number): ObjDef => ({
+const gw = (slug: string, model: string, size: number, w: number, h: number, d: number, extra?: L10n): ObjDef => ({
   slug,
   cat: "gadgets",
   group: "watch",
@@ -1154,7 +1189,7 @@ const gw = (slug: string, model: string, size: number, w: number, h: number, d: 
   d,
   shape: "watch-round",
   src: SAMSUNG,
-  note: { ru: "Размеры корпуса без ремешка.", en: "Case size without the band." },
+  note: { ru: `Размеры корпуса без ремешка.${extra ? ` ${extra.ru}` : ""}`, en: `Case size without the band.${extra ? ` ${extra.en}` : ""}` },
 });
 
 const console_ = (slug: string, model: string, w: number, h: number, d: number, side: number, n: L10n, extra: Partial<ObjDef> = {}): ObjDef => ({
@@ -1230,8 +1265,14 @@ const GADGETS: ObjDef[] = [
   { ...aw("apple-watch-42mm", 42, { ru: "Series 10, 11", en: "Series 10, 11" }, 36, 42, 9.7), popular: true },
   aw("apple-watch-46mm", 46, { ru: "Series 10, 11", en: "Series 10, 11" }, 39, 46, 9.7),
   { ...aw("apple-watch-ultra", 49, { ru: "Ultra, Ultra 2", en: "Ultra, Ultra 2" }, 44, 49, 14.4), slug: "apple-watch-ultra", short: same("Apple Watch Ultra"), chip: same("Apple Watch Ultra") },
-  gw("galaxy-watch7-40mm", "Galaxy Watch7", 40, 40.4, 40.4, 9.7),
-  gw("galaxy-watch7-44mm", "Galaxy Watch7", 44, 44.4, 44.4, 9.7),
+  gw("galaxy-watch7-40mm", "Galaxy Watch7", 40, 40.4, 40.4, 9.7, {
+    ru: "Экран 1,3″ (432 × 432 пикселя), аккумулятор 300 мА·ч, вес 28,8 г — версия для тонкого запястья.",
+    en: "1.3″ screen (432 × 432 pixels), 300 mAh battery, 28.8 g — the size for slimmer wrists.",
+  }),
+  gw("galaxy-watch7-44mm", "Galaxy Watch7", 44, 44.4, 44.4, 9.7, {
+    ru: "Экран 1,5″ (480 × 480 пикселей), аккумулятор 425 мА·ч — примерно на 40% больше, чем у 40 мм, вес 33,8 г.",
+    en: "1.5″ screen (480 × 480 pixels), a 425 mAh battery — about 40% more than the 40 mm — and 33.8 g.",
+  }),
   gw("galaxy-watch6-40mm", "Galaxy Watch6", 40, 38.8, 40.4, 9),
   gw("galaxy-watch6-44mm", "Galaxy Watch6", 44, 42.8, 44.4, 9),
   {

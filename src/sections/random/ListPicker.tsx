@@ -112,8 +112,8 @@ export default function ListPicker({ locale, items = DEFAULT }: ListPickerProps)
   return (
     <div className="grid gap-4 lg:grid-cols-2">
       <Panel className="flex flex-col gap-4 p-4 sm:p-5">
-        <Field label={t.list} htmlFor={`${id}-l`} aside={<span className="tabular text-[13px] text-fg-3">{count(locale, list.length, t.itemForms)}</span>} hint={t.limit}>
-          <Textarea id={`${id}-l`} value={text} rows={10} onChange={(e) => setText(e.target.value)} className="font-sans! text-[15px]!" />
+        <Field label={t.list} htmlFor={`${id}-l`} aside={<span className="tabular text-[0.8125rem] text-fg-3">{count(locale, list.length, t.itemForms)}</span>} hint={t.limit}>
+          <Textarea id={`${id}-l`} value={text} rows={10} onChange={(e) => setText(e.target.value)} className="font-sans! text-[0.9375rem]!" />
         </Field>
         <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
           <Field label={t.pickCount} htmlFor={`${id}-k`} className="sm:w-40">
@@ -156,7 +156,7 @@ export default function ListPicker({ locale, items = DEFAULT }: ListPickerProps)
                 (result.kind === "pick" && result.items.length === 1 ? (
                   <p className="text-center text-3xl font-semibold break-words text-fg">{result.items[0]}</p>
                 ) : (
-                  <ol className="max-h-96 list-decimal overflow-y-auto pl-7 text-[15px] leading-relaxed text-fg scrollbar-thin">
+                  <ol className="max-h-96 list-decimal overflow-y-auto pl-7 text-[0.9375rem] leading-relaxed text-fg scrollbar-thin">
                     {result.items.map((x, i) => (
                       <li key={i} className="break-words">
                         {x}

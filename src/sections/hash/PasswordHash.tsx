@@ -224,7 +224,7 @@ export default function PasswordHash({ locale, kind }: { locale: Locale; kind: K
           )}
         </div>
       )}
-      <p className="mt-4 text-[13px] text-fg-3">{t.note}</p>
+      <p className="mt-4 text-[0.8125rem] text-fg-3">{t.note}</p>
     </Panel>
   );
 }

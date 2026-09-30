@@ -1,6 +1,6 @@
 "use client";
 
-import { Pause, Play, RotateCcw, SkipForward } from "lucide-react";
+import { Maximize2, Minimize2, Pause, Play, RotateCcw, SkipForward } from "lucide-react";
 import { useEffect, useId, useRef, useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { cn } from "@/lib/cn";
@@ -28,6 +28,7 @@ type Status = "idle" | "running" | "paused";
 
 const T = {
   ru: {
+    full: "На весь экран",
     work: "Работа",
     short: "Короткий перерыв",
     long: "Длинный перерыв",
@@ -49,6 +50,7 @@ const T = {
     toWorkBody: (m: number) => `Следующий помидор — ${m} мин.`,
   },
   en: {
+    full: "Full screen",
     work: "Focus",
     short: "Short break",
     long: "Long break",
@@ -192,31 +194,34 @@ export default function Pomodoro({ locale, work: w0 = 25, short: s0 = 5, long: l
 
   return (
     <div className="flex flex-col gap-4">
-      <div ref={ref} className={cn("flex flex-col items-center justify-center gap-5 rounded-[12px] border border-line bg-surface px-3 py-8 sm:py-10", full && "min-h-screen rounded-none border-0", phase !== "work" && "bg-ok-soft")}>
+      <div ref={ref} className={cn("flex flex-col items-center justify-center gap-5 rounded-[0.75rem] border border-line bg-surface px-3 py-8 sm:py-10", full && "min-h-screen rounded-none border-0", phase !== "work" && "bg-ok-soft")}>
         <p className={cn("text-lg font-semibold", phase === "work" ? "text-accent" : "text-ok")}>{phaseLabel}</p>
-        <div className={cn("tabular font-semibold leading-none tracking-tight", full ? "text-[min(24vw,40vh)]" : "text-[min(20vw,128px)]", status === "paused" ? "text-fg-2" : "text-fg")}>{clock(left)}</div>
+        <div className={cn("tabular font-semibold leading-none tracking-tight", full ? "text-[min(24vw,40vh)]" : "text-[min(20vw,8rem)]", status === "paused" ? "text-fg-2" : "text-fg")}>{clock(left)}</div>
         <div className="flex items-center gap-1.5" aria-label={t.done(count)} role="img">
           {dots.map((on, i) => (
             <span key={i} className={cn("size-2.5 rounded-full", on ? "bg-accent" : "bg-line-strong")} />
           ))}
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex w-full max-w-md items-center justify-center gap-2">
           {status === "running" ? (
-            <Button variant="primary" size="lg" onClick={pause} className="min-w-36">
+            <Button variant="primary" size="lg" onClick={pause} className="min-w-0 flex-1 sm:max-w-52">
               <Pause aria-hidden />
               {t.pause}
             </Button>
           ) : (
-            <Button variant="primary" size="lg" onClick={start} className="min-w-36">
+            <Button variant="primary" size="lg" onClick={start} className="min-w-0 flex-1 sm:max-w-52">
               <Play aria-hidden />
               {status === "paused" ? t.resume : t.start}
             </Button>
           )}
-          <Button variant="secondary" size="lg" onClick={() => advance(nowMs(), true)} aria-label={t.skip} title={t.skip}>
+          <Button variant="secondary" size="lg" onClick={() => advance(nowMs(), true)} aria-label={t.skip} title={t.skip} className="w-12 px-0">
             <SkipForward aria-hidden />
           </Button>
-          <Button variant="ghost" size="lg" onClick={reset} aria-label={t.reset} title={t.reset}>
+          <Button variant="ghost" size="lg" onClick={reset} aria-label={t.reset} title={t.reset} className="w-12 px-0">
             <RotateCcw aria-hidden />
+          </Button>
+          <Button variant="ghost" size="lg" onClick={toggle} aria-label={t.full} title={t.full} className="w-12 px-0">
+            {full ? <Minimize2 aria-hidden /> : <Maximize2 aria-hidden />}
           </Button>
         </div>
         <p className="text-sm text-fg-3" aria-live="polite">
@@ -233,7 +238,7 @@ export default function Pomodoro({ locale, work: w0 = 25, short: s0 = 5, long: l
             ["cycles", t.cyclesLabel],
           ] as const
         ).map(([k, label]) => (
-          <label key={k} htmlFor={`${id}-${k}`} className="flex flex-col gap-1 text-[13px] text-fg-3">
+          <label key={k} htmlFor={`${id}-${k}`} className="flex flex-col gap-1 text-[0.8125rem] text-fg-3">
             {label}
             <input
               id={`${id}-${k}`}
@@ -248,7 +253,7 @@ export default function Pomodoro({ locale, work: w0 = 25, short: s0 = 5, long: l
         ))}
         <Switch label={t.auto} checked={auto} onChange={(e) => setAuto(e.target.checked)} className="mb-1.5" />
       </div>
-      <TimerOptions locale={locale} options={opts} onChange={setOpts} onFullscreen={toggle} />
+      <TimerOptions locale={locale} options={opts} onChange={setOpts} />
     </div>
   );
 }

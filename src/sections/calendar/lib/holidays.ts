@@ -96,16 +96,26 @@ const RU_DECREES: Record<number, Decree> = {
       ["2025-11-01", "2025-11-03"],
     ],
   },
+  // Постановление Правительства РФ от 24.09.2025 № 1466.
   2026: {
     transfers: [
       ["2026-01-03", "2026-01-09"],
       ["2026-01-04", "2026-12-31"],
     ],
   },
+  // Постановление Правительства РФ от 17.09.2026 № 1187.
+  2027: {
+    transfers: [
+      ["2027-01-02", "2027-11-05"],
+      ["2027-01-03", "2027-12-31"],
+      ["2027-02-20", "2027-02-22"],
+    ],
+    short: ["2027-02-20", "2027-04-30", "2027-06-11", "2027-11-03"],
+  },
 };
 
-/** Kazakhstan: no government transfer decrees are included (see ProdYear.decree). */
-const KZ_DECREES: Record<number, Decree> = {};
+/** Kazakhstan: years whose government transfers are verified (2026: none — only the automatic rule applies). */
+const KZ_DECREES: Record<number, Decree> = { 2026: { transfers: [] } };
 
 /* ───────────── holidays by law ───────────── */
 
@@ -140,8 +150,11 @@ export function holidaysByLaw(country: HolidayCountry, y: number): Holiday[] {
     h(y, 5, 7, "kz-defender", N.kzDefender),
     h(y, 5, 9, "victory", N.victory),
     h(y, 7, 6, "capital", N.capital),
-    h(y, 8, 30, "constitution", N.constitution),
   ];
+  // Constitution Day: August 30 until 2025. Law No. 306-VIII of 11.06.2026 (in force from 1 July 2026) moved it to
+  // March 15, the day the new Constitution was adopted — so 2026 has no Constitution Day at all.
+  if (y <= 2025) out.push(h(y, 8, 30, "constitution", N.constitution));
+  if (y >= 2027) out.push(h(y, 3, 15, "constitution", N.constitution));
   // Republic Day became a public holiday again in 2022; Dec 17 stopped being a holiday the same year.
   if (y >= 2022) out.push(h(y, 10, 25, "republic", N.republic));
   out.push(h(y, 12, 16, "independence", N.independence));

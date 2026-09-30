@@ -34,22 +34,22 @@ export function InvisibleTool({ locale, t }: { locale: Locale; t: Strings }) {
   return (
     <div className="flex flex-col gap-6">
       <Panel className="p-4 sm:p-5">
-        <div className="text-[13px] font-medium text-fg-2">
+        <div className="text-[0.8125rem] font-medium text-fg-2">
           {cur.label[locale]} · {codePoint(curCh)}
         </div>
-        <div className="mt-3 flex min-h-24 items-center justify-center rounded-[10px] bg-surface-2 font-mono text-4xl text-fg-3" title={t.width}>
+        <div className="mt-3 flex min-h-24 items-center justify-center rounded-[0.625rem] bg-surface-2 font-mono text-4xl text-fg-3" title={t.width}>
           <span aria-hidden>[</span>
           <span className="inline-block h-10 bg-accent-soft whitespace-pre">{curCh.repeat(n)}</span>
           <span aria-hidden>]</span>
         </div>
-        <p className="mt-2 text-[13px] text-fg-3">{cur.use[locale]}</p>
+        <p className="mt-2 text-[0.8125rem] text-fg-3">{cur.use[locale]}</p>
         <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
           <Segmented label={t.copyCount} value={count} onChange={setCount} options={COUNTS.map((c) => ({ value: c, label: `×${c}` }))} size="sm" />
           <CopyButton value={curCh.repeat(n)} label={t.copy} copiedLabel={t.copied} variant="primary" size="md" />
         </div>
       </Panel>
 
-      <ul className="divide-y divide-line overflow-hidden rounded-[12px] border border-line bg-surface">
+      <ul className="divide-y divide-line overflow-hidden rounded-[0.75rem] border border-line bg-surface">
         {INVISIBLE.map((c, i) => {
           const ch = String.fromCodePoint(c.cp);
           return (
@@ -72,8 +72,8 @@ export function InvisibleTool({ locale, t }: { locale: Locale; t: Strings }) {
                 </span>
                 <span className="min-w-0 flex-1">
                   <span className="sr-only">{t.copy}: </span>
-                  <span className="block truncate text-[15px] text-fg">{c.label[locale]}</span>
-                  <span className="block text-[12px] text-fg-3">
+                  <span className="block truncate text-[0.9375rem] text-fg">{c.label[locale]}</span>
+                  <span className="block text-[0.75rem] text-fg-3">
                     {codePoint(ch)} · {cls[charFacts(c.cp).cls]}
                   </span>
                 </span>

@@ -15,10 +15,10 @@ export function MouseDiagram({ down, tested, wheel, labels }: { down: readonly b
       <line x1="75" y1="60" x2="85" y2="60" className="stroke-fg-3" strokeWidth="1.5" strokeLinecap="round" />
       <rect x="11" y="110" width="11" height="30" rx="4" className={cls(4)} />
       <rect x="11" y="146" width="11" height="30" rx="4" className={cls(3)} />
-      <text x="2" y="106" className="fill-fg-3 text-[9px]">
+      <text x="2" y="106" className="fill-fg-3 text-[0.5625rem]">
         4
       </text>
-      <text x="2" y="190" className="fill-fg-3 text-[9px]">
+      <text x="2" y="190" className="fill-fg-3 text-[0.5625rem]">
         3
       </text>
     </svg>

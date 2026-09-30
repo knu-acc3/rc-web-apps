@@ -187,7 +187,7 @@ export default function Ruler({ locale, unit = "cm" }: { locale: Locale; unit?: 
           aria-valuenow={marker === null ? 0 : unit === "cm" ? Math.round(marker * 10) / 10 : Math.round(inches * 10000) / 10000}
           aria-valuetext={reading ? `${reading.main} (${reading.sub})` : undefined}
           onKeyDown={onKey}
-          className="inline-block rounded-[4px] align-top"
+          className="inline-block rounded-[0.25rem] align-top"
         >
           <svg
             width={W}

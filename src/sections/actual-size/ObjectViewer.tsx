@@ -186,7 +186,7 @@ export default function ObjectViewer({ locale, items, initial, fixed = false, re
         </div>
       )}
 
-      <div ref={stageRef} className="scrollbar-thin overflow-x-auto rounded-[12px] border border-line bg-bg">
+      <div ref={stageRef} className="scrollbar-thin overflow-x-auto rounded-[0.75rem] border border-line bg-bg">
         <svg role="img" aria-label={`${name}: ${size(main)}`} viewBox={`0 0 ${TW} ${TH}`} width={naturalW * scale} height={naturalH * scale} className="mx-auto block max-w-none">
           <g transform={place(a)}>
             <ObjectArt o={main} />

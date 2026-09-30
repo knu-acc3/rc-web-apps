@@ -15,14 +15,14 @@ export function RecentList({ locale, title }: { locale: Locale; title: string })
 
   if (items.length === 0) return null;
   return (
-    <section className="mb-12">
-      <h2 className="mb-3 text-xl font-semibold text-fg">{title}</h2>
+    <section>
+      <h2 className="mb-3 text-xl font-semibold tracking-tight text-fg sm:text-2xl">{title}</h2>
       <ul className="flex flex-wrap gap-2">
         {items.map((it) => (
           <li key={it.path.join("/")}>
             <Link
               href={`/${locale}/${it.path.join("/")}`}
-              className="inline-flex h-9 items-center rounded-full border border-line bg-surface px-3.5 text-sm text-fg hover:border-accent hover:text-accent"
+              className="chip"
             >
               {it.title}
             </Link>

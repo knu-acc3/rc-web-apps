@@ -68,7 +68,7 @@ export default function KeywordDensity({ locale }: { locale: Locale }) {
 
   return (
     <div className="flex flex-col gap-5">
-      <Field label={t.text} htmlFor={`${id}-t`} aside={deferred ? <span className="text-[13px] text-fg-3">{t.chars(fmt(a.chars), fmt(a.charsNoSpaces))}</span> : undefined}>
+      <Field label={t.text} htmlFor={`${id}-t`} aside={deferred ? <span className="text-[0.8125rem] text-fg-3">{t.chars(fmt(a.chars), fmt(a.charsNoSpaces))}</span> : undefined}>
         <Textarea id={`${id}-t`} value={text} onChange={(e) => setText(e.target.value)} rows={10} placeholder={t.ph} />
       </Field>
 
@@ -81,8 +81,8 @@ export default function KeywordDensity({ locale }: { locale: Locale }) {
             [t.nausea, fmt(a.nausea, 2)],
           ] as const
         ).map(([k, v]) => (
-          <div key={k} className="rounded-[12px] bg-surface-2 px-4 py-3">
-            <div className="text-[13px] text-fg-3">{k}</div>
+          <div key={k} className="rounded-[0.75rem] bg-surface-2 px-4 py-3">
+            <div className="text-[0.8125rem] text-fg-3">{k}</div>
             <div className="text-2xl font-semibold text-fg tabular-nums">{v}</div>
           </div>
         ))}
@@ -104,9 +104,9 @@ export default function KeywordDensity({ locale }: { locale: Locale }) {
       </div>
 
       {!deferred.trim() ? (
-        <p className="text-[15px] text-fg-3">{t.empty}</p>
+        <p className="text-[0.9375rem] text-fg-3">{t.empty}</p>
       ) : rows.length === 0 ? (
-        <p className="text-[15px] text-fg-3">{t.none}</p>
+        <p className="text-[0.9375rem] text-fg-3">{t.none}</p>
       ) : (
         <div tabIndex={0} className="tbl">
           <table>

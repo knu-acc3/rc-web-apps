@@ -304,7 +304,7 @@ export default function Codec({ locale, codec, dir: dir0, samples, outputs, opti
       )}
       <CodeEditor id={`${id}-in`} locale={locale} label={inName} value={text} onChange={setText} rows={5} wrap invalid={!!res?.error && !res.bytes} fileAccept="" />
 
-      <div className="mt-4 rounded-[10px] bg-surface-2 p-4">
+      <div className="mt-4 rounded-[0.625rem] bg-surface-2 p-4">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <span className="text-sm font-medium text-fg-2">{outName}</span>
           <div className="flex items-center gap-1">
@@ -326,7 +326,7 @@ export default function Codec({ locale, codec, dir: dir0, samples, outputs, opti
         {res?.bytes ? (
           <div className="mt-2 text-sm text-fg-2">
             <p>{t.binary}</p>
-            <code className="mt-1 block font-mono text-[13px] break-all text-fg">{bytesToHex(res.bytes.slice(0, 64)).replace(/(..)/g, "$1 ")}</code>
+            <code className="mt-1 block font-mono text-[0.8125rem] break-all text-fg">{bytesToHex(res.bytes.slice(0, 64)).replace(/(..)/g, "$1 ")}</code>
             <Button className="mt-2" size="sm" variant="outline" onClick={() => downloadBlob(new Blob([res.bytes as BlobPart]), "decoded.bin")}>
               <Download aria-hidden />
               {t.downloadBin} ({formatNumber(locale, res.bytes.length)} {plural(locale, res.bytes.length, t.bytes)})
@@ -340,7 +340,7 @@ export default function Codec({ locale, codec, dir: dir0, samples, outputs, opti
           <pre className={`mt-2 max-h-[45vh] min-h-8 overflow-auto font-mono break-all whitespace-pre-wrap text-fg ${out.length < 240 ? "text-lg font-semibold" : "text-sm"} ${big && live.pending ? "opacity-60" : ""}`}>{shown || (big && live.pending ? t.loading : "")}</pre>
         )}
         {out && (
-          <p className="mt-2 text-[13px] text-fg-3" aria-live="polite">
+          <p className="mt-2 text-[0.8125rem] text-fg-3" aria-live="polite">
             {formatNumber(locale, count)} {plural(locale, count, t.chars)}
             {out.length > SHOW_MAX ? ` · ${t.truncated(formatNumber(locale, SHOW_MAX))}` : ""}
           </p>
@@ -360,9 +360,9 @@ function AllShifts({ locale, text, alphabet }: { locale: Locale; text: string; a
   const n = alphabet === "latin" ? 26 : 33;
   const sample = text.slice(0, 160);
   return (
-    <details className="mt-4 rounded-[10px] border border-line">
+    <details className="mt-4 rounded-[0.625rem] border border-line">
       <summary className="cursor-pointer px-3 py-2 text-sm font-medium text-fg-2">{t.allShifts}</summary>
-      <ol className="divide-y divide-line border-t border-line font-mono text-[13px]">
+      <ol className="divide-y divide-line border-t border-line font-mono text-[0.8125rem]">
         {Array.from({ length: n - 1 }, (_, i) => i + 1).map((s) => (
           <li key={s} className="flex gap-3 px-3 py-1.5">
             <span className="w-6 shrink-0 text-right text-fg-3">{s}</span>

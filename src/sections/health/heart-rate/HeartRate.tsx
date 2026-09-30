@@ -71,7 +71,7 @@ export default function HeartRate({ locale }: ToolProps) {
         <NumField id={`${id}-a`} label={t.age} value={q.v.a} onChange={(a) => q.set({ a })} error={A.message} inputMode="numeric" size="lg" />
         <NumField id={`${id}-r`} label={t.rest} value={q.v.r} onChange={(r) => q.set({ r })} error={R.message} suffix={t.bpm} inputMode="numeric" size="lg" placeholder="60" />
       </FieldRow>
-      <p className="text-[13px] text-fg-3">{t.restHint}</p>
+      <p className="text-[0.8125rem] text-fg-3">{t.restHint}</p>
       <OptionsRow>
         <InlineSelect id={`${id}-m`} label={t.method} value={q.v.m} onChange={(m) => q.set({ m })} options={[{ value: "tanaka", label: t.tanaka }, { value: "fox", label: t.fox }]} />
       </OptionsRow>

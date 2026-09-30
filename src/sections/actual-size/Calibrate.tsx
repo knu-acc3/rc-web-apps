@@ -163,7 +163,7 @@ export default function Calibrate({ locale }: { locale: Locale }) {
                 <button
                   key={d}
                   type="button"
-                  className="chip h-8! px-3! text-[13px]!"
+                  className="chip h-8! px-3! text-[0.8125rem]!"
                   onClick={() => {
                     setDiagText(nf(d, 1));
                     setDiagSaved(false);

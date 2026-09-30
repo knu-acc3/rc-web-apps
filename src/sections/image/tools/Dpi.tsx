@@ -115,7 +115,7 @@ export default function Dpi({ locale }: { locale: Locale }) {
           </span>
         </p>
       )}
-      extra={(it) => (it.result ? <p className="text-[13px] text-ok">{t.note}</p> : null)}
+      extra={(it) => (it.result ? <p className="text-[0.8125rem] text-ok">{t.note}</p> : null)}
     />
   );
 }

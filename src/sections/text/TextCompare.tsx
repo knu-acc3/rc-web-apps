@@ -204,7 +204,7 @@ function DiffView({ res, mode, view }: { res: DiffResult; mode: DiffMode; view: 
   if (mode === "lines" && view === "split") {
     return (
       <div className="overflow-x-auto">
-        <table className="w-full border-collapse font-mono text-[13px] leading-relaxed">
+        <table className="w-full border-collapse font-mono text-[0.8125rem] leading-relaxed">
           <tbody>
             {res.rows.map((r, i) => (
               <tr key={i} className="align-top">
@@ -223,7 +223,7 @@ function DiffView({ res, mode, view }: { res: DiffResult; mode: DiffMode; view: 
   }
   if (mode === "lines") {
     return (
-      <div className="overflow-x-auto px-2 py-2 font-mono text-[13px] leading-relaxed">
+      <div className="overflow-x-auto px-2 py-2 font-mono text-[0.8125rem] leading-relaxed">
         {res.parts.flatMap((p, i) =>
           p.value.split("\n").map((line, k) => (
             <div key={`${i}-${k}`} className={cn("px-2 whitespace-pre-wrap [overflow-wrap:anywhere]", p.added && "bg-ok-soft text-ok", p.removed && "bg-err-soft text-err")}>
@@ -238,14 +238,14 @@ function DiffView({ res, mode, view }: { res: DiffResult; mode: DiffMode; view: 
     );
   }
   return (
-    <div className="px-4 py-3 text-[15px] leading-relaxed whitespace-pre-wrap break-words text-fg">
+    <div className="px-4 py-3 text-[0.9375rem] leading-relaxed whitespace-pre-wrap break-words text-fg">
       {res.parts.map((p, i) =>
         p.added ? (
-          <ins key={i} className="rounded-[3px] bg-ok-soft text-ok no-underline">
+          <ins key={i} className="rounded-[0.1875rem] bg-ok-soft text-ok no-underline">
             {p.value}
           </ins>
         ) : p.removed ? (
-          <del key={i} className="rounded-[3px] bg-err-soft text-err">
+          <del key={i} className="rounded-[0.1875rem] bg-err-soft text-err">
             {p.value}
           </del>
         ) : (

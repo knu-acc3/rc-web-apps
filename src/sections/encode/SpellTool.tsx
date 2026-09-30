@@ -23,7 +23,7 @@ export default function SpellTool({ locale, alphabet, sample }: { locale: Locale
       <Field label={t.input} htmlFor={`${id}-in`}>
         <Input id={`${id}-in`} size="lg" value={text} onChange={(e) => setText(e.target.value)} autoComplete="off" spellCheck={false} />
       </Field>
-      <div className="mt-4 flex flex-col gap-2 rounded-[10px] bg-surface-2 p-4 sm:flex-row sm:items-start sm:justify-between">
+      <div className="mt-4 flex flex-col gap-2 rounded-[0.625rem] bg-surface-2 p-4 sm:flex-row sm:items-start sm:justify-between">
         <div className="min-w-0">
           <div className="text-sm font-medium text-fg-2">{alphabet === "nato" ? t.nato : t.russian}</div>
           <output className="mt-1 block text-xl font-semibold break-words text-fg" aria-live="polite">

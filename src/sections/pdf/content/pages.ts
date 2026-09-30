@@ -251,6 +251,7 @@ const splitVariants = (): VariantDef[] => [
 
 export const splitTool: ToolDef = {
   slug: "split-pdf",
+  seoAlt: { ru: ["разбить PDF на части", "разбить PDF"], en: ["split a PDF into parts", "split a PDF"] },
   component: "pdf/split",
   icon: "Scissors",
   popular: true,
@@ -495,6 +496,7 @@ const rotateVariant = (deg: 90 | 180 | 270): VariantDef => {
 
 export const rotateTool: ToolDef = {
   slug: "rotate-pdf",
+  seoAlt: { ru: ["перевернуть страницы PDF", "перевернуть PDF", "онлайн"], en: ["turn PDF pages", "turn PDF"] },
   component: "pdf/pages",
   icon: "RotateCw",
   popular: true,

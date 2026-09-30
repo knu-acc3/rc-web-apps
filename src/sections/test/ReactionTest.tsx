@@ -144,12 +144,12 @@ export default function ReactionTest({ locale }: { locale: Locale }) {
             press(e.timeStamp);
           }
         }}
-        className={cn("flex min-h-80 w-full touch-manipulation select-none flex-col items-center justify-center gap-3 rounded-[16px] px-6 py-10 text-center sm:min-h-96", tone)}
+        className={cn("flex min-h-80 w-full touch-manipulation select-none flex-col items-center justify-center gap-3 rounded-[1rem] px-6 py-10 text-center sm:min-h-96", tone)}
       >
         {phase === "idle" && (
           <>
             <span className="text-3xl font-bold sm:text-4xl">{t.idle}</span>
-            <span className="max-w-md text-[15px] opacity-80">{t.idleSub}</span>
+            <span className="max-w-md text-[0.9375rem] opacity-80">{t.idleSub}</span>
           </>
         )}
         {phase === "waiting" && <span className="text-3xl font-bold sm:text-4xl">{t.waiting}</span>}
@@ -157,7 +157,7 @@ export default function ReactionTest({ locale }: { locale: Locale }) {
         {phase === "early" && (
           <>
             <span className="text-3xl font-bold sm:text-4xl">{t.early}</span>
-            <span className="max-w-md text-[15px]">{t.earlySub}</span>
+            <span className="max-w-md text-[0.9375rem]">{t.earlySub}</span>
           </>
         )}
         {(phase === "shown" || phase === "done") && last !== undefined && (
@@ -166,7 +166,7 @@ export default function ReactionTest({ locale }: { locale: Locale }) {
             <span className="tabular text-6xl font-bold tracking-tight sm:text-7xl">
               {ms(phase === "done" && stats ? stats.average : last)} <span className="text-3xl font-semibold opacity-70">{t.ms}</span>
             </span>
-            <span className="text-[15px] opacity-80">{phase === "done" ? t.doneSub : t.next}</span>
+            <span className="text-[0.9375rem] opacity-80">{phase === "done" ? t.doneSub : t.next}</span>
           </>
         )}
       </button>
@@ -182,7 +182,7 @@ export default function ReactionTest({ locale }: { locale: Locale }) {
         ))}
       </div>
 
-      <div aria-live="polite" className="flex min-h-10 flex-wrap items-center justify-center gap-x-6 gap-y-2 text-[15px] text-fg-2">
+      <div aria-live="polite" className="flex min-h-10 flex-wrap items-center justify-center gap-x-6 gap-y-2 text-[0.9375rem] text-fg-2">
         {phase === "done" && stats && (
           <>
             <span>

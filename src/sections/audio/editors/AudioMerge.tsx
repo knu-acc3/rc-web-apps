@@ -115,7 +115,7 @@ export default function AudioMerge({ locale }: { locale: Locale }) {
                   <span className="block truncate text-fg" title={c.file.name}>
                     {c.file.name}
                   </span>
-                  <span className="text-[13px] text-fg-3">{formatBytes(locale, c.file.size)}</span>
+                  <span className="text-[0.8125rem] text-fg-3">{formatBytes(locale, c.file.size)}</span>
                 </span>
                 <Button size="icon-sm" variant="ghost" onClick={() => move(i, -1)} disabled={i === 0 || job.running} aria-label={`${t.up}: ${c.file.name}`} title={t.up}>
                   <ArrowUp aria-hidden />

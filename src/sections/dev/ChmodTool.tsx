@@ -121,7 +121,7 @@ export default function ChmodTool({ locale, mode: mode0 = "755" }: { locale: Loc
                     <td key={b} className="px-2 py-2 text-center">
                       <input
                         type="checkbox"
-                        className="size-[18px] cursor-pointer accent-[var(--accent)]"
+                        className="size-[1.125rem] cursor-pointer accent-[var(--accent)]"
                         aria-label={`${t.who[w]}: ${t.perm[(["r", "w", "x"] as const)[i]]}`}
                         checked={!!(mode & bit)}
                         onChange={(e) => update(e.target.checked ? mode | bit : mode & ~bit)}
@@ -149,10 +149,10 @@ export default function ChmodTool({ locale, mode: mode0 = "755" }: { locale: Loc
         ))}
       </div>
 
-      <div className="mt-5 flex flex-col gap-2 rounded-[10px] bg-surface-2 p-3">
+      <div className="mt-5 flex flex-col gap-2 rounded-[0.625rem] bg-surface-2 p-3">
         {[cmd1, cmd2].map((c) => (
           <div key={c} className="flex items-center justify-between gap-2">
-            <code className="min-w-0 font-mono text-[15px] break-all text-fg">{c}</code>
+            <code className="min-w-0 font-mono text-[0.9375rem] break-all text-fg">{c}</code>
             <CopyButton value={c} size="icon-sm" variant="ghost" />
           </div>
         ))}
@@ -172,7 +172,7 @@ export default function ChmodTool({ locale, mode: mode0 = "755" }: { locale: Loc
         <Field label={t.apply} htmlFor={`${id}-e`} error={applyErr ? t.applyBad : undefined} hint={applied !== null ? `${octal} → ${toOctal(applied)} (${toSymbolic(applied)})` : undefined}>
           <div className="flex gap-2">
             <Input id={`${id}-e`} size="sm" value={expr} onChange={(e) => setExpr(e.target.value)} placeholder={t.applyPh} className="font-mono" spellCheck={false} autoComplete="off" />
-            <button type="button" className="shrink-0 rounded-[8px] border border-line px-3 text-fg-2 hover:bg-surface-2 disabled:opacity-50" disabled={applied === null}
+            <button type="button" className="shrink-0 rounded-[0.5rem] border border-line px-3 text-fg-2 hover:bg-surface-2 disabled:opacity-50" disabled={applied === null}
               onClick={() => {
                 if (applied === null) return;
                 update(applied);

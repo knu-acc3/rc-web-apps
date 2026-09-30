@@ -107,7 +107,7 @@ function Details({ idx, cp, locale }: { idx: Index; cp: number; locale: Locale }
   ];
   return (
     <Panel className="flex flex-col gap-4 p-4 sm:flex-row sm:p-5">
-      <div className="flex size-32 shrink-0 items-center justify-center self-center rounded-[12px] bg-surface-2 text-[72px] leading-none text-fg sm:self-start">
+      <div className="flex size-32 shrink-0 items-center justify-center self-center rounded-[0.75rem] bg-surface-2 text-[4.5rem] leading-none text-fg sm:self-start">
         {f.label ? <span className="font-mono text-lg text-fg-3">{f.label}</span> : f.text}
       </div>
       <div className="flex min-w-0 flex-1 flex-col gap-3">
@@ -202,7 +202,7 @@ export default function UnicodeTable({ locale, mode, popular }: UnicodeTableProp
 
   return (
     <div className="flex flex-col gap-4">
-      <div className={mode === "table" ? "grid gap-3 sm:grid-cols-[1fr_260px]" : ""}>
+      <div className={mode === "table" ? "grid gap-3 sm:grid-cols-[1fr_16.25rem]" : ""}>
         <Field label={t.search} htmlFor={`${id}-q`}>
           <div className="relative">
             <Search className="pointer-events-none absolute left-3 top-1/2 size-5 -translate-y-1/2 text-fg-3" aria-hidden />
@@ -249,7 +249,7 @@ export default function UnicodeTable({ locale, mode, popular }: UnicodeTableProp
       </div>
 
       {mode === "table" && idx && selected !== null && <Details idx={idx} cp={selected} locale={locale} />}
-      {mode === "hub" && <div className="rounded-[12px] border border-line bg-surface p-3">{panel}</div>}
+      {mode === "hub" && <div className="rounded-[0.75rem] border border-line bg-surface p-3">{panel}</div>}
 
       <div>
         <h2 className="mb-2 text-base font-semibold text-fg" aria-live="polite">
@@ -263,7 +263,7 @@ export default function UnicodeTable({ locale, mode, popular }: UnicodeTableProp
               const f = face(cp);
               return (
                 <button key={cp} type="button" title={`${idx ? nameOf(idx, cp, locale) : ""} U+${hex(cp)}`.trim()} aria-pressed={selected === cp} onClick={() => setSelected(cp)}>
-                  {f.label ? <span className="font-mono text-[10px] text-fg-3">{f.label}</span> : f.text}
+                  {f.label ? <span className="font-mono text-[0.625rem] text-fg-3">{f.label}</span> : f.text}
                 </button>
               );
             })}

@@ -235,11 +235,11 @@ export default function QrScanner({ locale, source = "camera", all = false }: { 
       />
 
       {mode === "camera" ? (
-        <div className={cn("relative mx-auto aspect-[4/3] w-full max-w-[560px] overflow-hidden rounded-[12px] bg-surface-2", result && cam === "off" && "hidden")}>
+        <div className={cn("relative mx-auto aspect-[4/3] w-full max-w-[35rem] overflow-hidden rounded-[0.75rem] bg-surface-2", result && cam === "off" && "hidden")}>
           <video ref={video} playsInline muted className={cn("size-full object-cover", cam !== "on" && "invisible")} />
           {cam === "on" && (
             <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-              <div className="aspect-square w-3/5 max-w-[260px] rounded-[16px] border-[3px] border-white/85 shadow-[0_0_0_9999px_rgb(0_0_0/0.25)]" />
+              <div className="aspect-square w-3/5 max-w-[16.25rem] rounded-[1rem] border-[3px] border-white/85 shadow-[0_0_0_9999px_rgb(0_0_0/0.25)]" />
               <span className="absolute bottom-3 rounded-full bg-black/55 px-3 py-1 text-sm text-white">{t.aim}</span>
             </div>
           )}
@@ -268,7 +268,7 @@ export default function QrScanner({ locale, source = "camera", all = false }: { 
         {img === "reading" && <Notice>{t.reading}</Notice>}
         {img === "none" && <Notice tone="warn">{t.none}</Notice>}
         {result && parsed && (
-          <section className="rounded-[12px] border border-line bg-surface p-4 sm:p-5">
+          <section className="rounded-[0.75rem] border border-line bg-surface p-4 sm:p-5">
             <div className="flex flex-wrap items-center gap-2 text-sm text-fg-3">
               <span className="font-medium text-fg-2">{t.kind[parsed.kind]}</span>
               <span aria-hidden>·</span>
@@ -283,7 +283,7 @@ export default function QrScanner({ locale, source = "camera", all = false }: { 
             <div className="mt-4 flex flex-wrap gap-2">
               <CopyButton value={result.text} label={t.copy} copiedLabel={t.copied} variant="primary" showLabel />
               {url && (
-                <a href={url.href} target="_blank" rel="noopener noreferrer nofollow" className="inline-flex h-10 items-center gap-2 rounded-[10px] border border-line bg-surface px-4 text-[15px] text-fg hover:border-line-strong hover:bg-surface-2">
+                <a href={url.href} target="_blank" rel="noopener noreferrer nofollow" className="inline-flex h-10 items-center gap-2 rounded-[0.625rem] border border-line bg-surface px-4 text-[0.9375rem] text-fg hover:border-line-strong hover:bg-surface-2">
                   <ExternalLink className="size-4" aria-hidden />
                   {t.open}
                 </a>
@@ -304,8 +304,8 @@ export default function QrScanner({ locale, source = "camera", all = false }: { 
               <dl className="mt-4 grid gap-x-8 border-t border-line pt-3 sm:grid-cols-2">
                 {parsed.fields.map(([k, v], i) => (
                   <div key={`${k}-${i}`} className="flex min-w-0 flex-col py-1.5">
-                    <dt className="text-[13px] text-fg-3">{t.field[k] ?? k}</dt>
-                    <dd className="text-[15px] break-all text-fg select-all">{parsed.kind === "gost" && k === "Sum" && /^\d+$/.test(v) ? t.rub(v) : v}</dd>
+                    <dt className="text-[0.8125rem] text-fg-3">{t.field[k] ?? k}</dt>
+                    <dd className="text-[0.9375rem] break-all text-fg select-all">{parsed.kind === "gost" && k === "Sum" && /^\d+$/.test(v) ? t.rub(v) : v}</dd>
                   </div>
                 ))}
               </dl>

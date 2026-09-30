@@ -19,7 +19,7 @@ export function Swatch({ color, className, label }: { color: string; className?:
       role={label ? "img" : undefined}
       aria-label={label}
       aria-hidden={label ? undefined : true}
-      className={cn("relative inline-block overflow-hidden rounded-[8px] border border-line", className)}
+      className={cn("relative inline-block overflow-hidden rounded-[0.5rem] border border-line", className)}
       style={CHECKER_STYLE}
     >
       <span className="absolute inset-0" style={{ background: color }} />

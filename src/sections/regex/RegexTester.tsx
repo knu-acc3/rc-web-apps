@@ -185,7 +185,7 @@ export default function RegexTester({ locale, pattern: p0 = "(?<user>[\\w.+-]+)@
                 disabled={!ok}
                 title={ok ? t.flag[f] : `${t.flag[f]} — ${t.unsupported}`}
                 onClick={() => toggle(f)}
-                className={cn("h-8 min-w-9 rounded-[7px] border px-2.5 font-mono text-sm transition-colors duration-150 disabled:opacity-40", on ? "border-accent bg-accent-soft text-accent" : "border-line text-fg-2 hover:border-line-strong hover:text-fg")}
+                className={cn("h-8 min-w-9 rounded-[0.4375rem] border px-2.5 font-mono text-sm transition-colors duration-150 disabled:opacity-40", on ? "border-accent bg-accent-soft text-accent" : "border-line text-fg-2 hover:border-line-strong hover:text-fg")}
               >
                 {f}
               </button>
@@ -225,7 +225,7 @@ export default function RegexTester({ locale, pattern: p0 = "(?<user>[\\w.+-]+)@
               {t.replacement}
             </label>
             <Input id={`${id}-r`} value={replacement} onChange={(e) => setReplacement(e.target.value)} className="font-mono" spellCheck={false} autoComplete="off" />
-            <p className="text-[13px] text-fg-3">{t.replaceHint}</p>
+            <p className="text-[0.8125rem] text-fg-3">{t.replaceHint}</p>
           </div>
           <CodeOutput value={rep.value ?? rep.stale ?? ""} title={t.result} labels={outputLabels(locale)} minRows={6} />
         </>
@@ -270,14 +270,14 @@ function Highlight({ text, matches, empty, cut, dim }: { text: string; matches: 
     if (m.index > pos) nodes.push(shown.slice(pos, m.index));
     if (m.index < pos) continue;
     if (m.end === m.index) nodes.push(<mark key={k++} className="mx-px inline-block h-[1.1em] w-0.5 translate-y-0.5 rounded-sm bg-accent" aria-label="∅" />);
-    else nodes.push(<mark key={k++} className={cn("rounded-[3px] px-px text-fg", i % 2 ? "bg-warn-soft" : "bg-accent-soft")}>{shown.slice(m.index, Math.min(m.end, shown.length))}</mark>);
+    else nodes.push(<mark key={k++} className={cn("rounded-[0.1875rem] px-px text-fg", i % 2 ? "bg-warn-soft" : "bg-accent-soft")}>{shown.slice(m.index, Math.min(m.end, shown.length))}</mark>);
     pos = Math.min(m.end, shown.length);
   }
   if (pos < shown.length) nodes.push(shown.slice(pos));
   return (
-    <div className={cn("rounded-[12px] border border-line bg-surface", dim && "opacity-70")}>
+    <div className={cn("rounded-[0.75rem] border border-line bg-surface", dim && "opacity-70")}>
       <div className="max-h-[50vh] overflow-auto px-3 py-2.5 font-mono text-sm leading-relaxed break-words whitespace-pre-wrap text-fg">{text ? nodes : <span className="text-fg-3">{empty}</span>}</div>
-      {text.length > PREVIEW_CHARS && <p className="border-t border-line px-3 py-1.5 text-[13px] text-fg-3">{cut}</p>}
+      {text.length > PREVIEW_CHARS && <p className="border-t border-line px-3 py-1.5 text-[0.8125rem] text-fg-3">{cut}</p>}
     </div>
   );
 }
@@ -306,7 +306,7 @@ function MatchTable({ locale, matches }: { locale: Locale; matches: Match[] }) {
             ))}
           </tr>
         </thead>
-        <tbody className="font-mono text-[13px]">
+        <tbody className="font-mono text-[0.8125rem]">
           {matches.slice(0, 200).map((m, i) => (
             <tr key={i}>
               <td className="text-fg-3">{i + 1}</td>

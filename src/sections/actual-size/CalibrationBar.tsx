@@ -61,10 +61,10 @@ export function CalibrationBar({ locale, state, hideLink = false }: { locale: Lo
 
   let bar: ReactNode;
   if (!state.ready) {
-    bar = <div className="min-h-[52px] rounded-[10px] bg-surface-2 px-4 py-3 text-sm text-fg-2">{t.pending}</div>;
+    bar = <div className="min-h-[3.25rem] rounded-[0.625rem] bg-surface-2 px-4 py-3 text-sm text-fg-2">{t.pending}</div>;
   } else if (!state.calibrated) {
     bar = (
-      <div className="flex flex-col gap-2 rounded-[10px] bg-warn-soft px-4 py-3 text-sm text-warn sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-2 rounded-[0.625rem] bg-warn-soft px-4 py-3 text-sm text-warn sm:flex-row sm:items-center sm:justify-between">
         <div className="flex gap-2">
           <TriangleAlert className="mt-0.5 size-4 shrink-0" aria-hidden />
           <p>
@@ -83,7 +83,7 @@ export function CalibrationBar({ locale, state, hideLink = false }: { locale: Lo
     const method = state.cal?.method === "diagonal" ? t.diagonal : t.card;
     bar = (
       <div className="flex flex-col gap-2">
-        <div className="flex flex-col gap-2 rounded-[10px] bg-surface-2 px-4 py-2.5 text-sm text-fg-2 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-2 rounded-[0.625rem] bg-surface-2 px-4 py-2.5 text-sm text-fg-2 sm:flex-row sm:items-center sm:justify-between">
           <p className="flex items-center gap-2">
             <CircleCheck className="size-4 shrink-0 text-ok" aria-hidden />
             <span>
@@ -98,7 +98,7 @@ export function CalibrationBar({ locale, state, hideLink = false }: { locale: Lo
           </div>
         </div>
         {state.zoomChanged && state.dprAtCalibration && (
-          <p className="rounded-[10px] bg-warn-soft px-4 py-2.5 text-sm text-warn">{t.zoom(nf(state.dprAtCalibration), nf(state.dpr))}</p>
+          <p className="rounded-[0.625rem] bg-warn-soft px-4 py-2.5 text-sm text-warn">{t.zoom(nf(state.dprAtCalibration), nf(state.dpr))}</p>
         )}
       </div>
     );

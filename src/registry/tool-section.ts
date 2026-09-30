@@ -27,6 +27,8 @@ interface ToolSectionInput {
 }
 
 const VARIANT_CHIP_LIMIT = 48;
+/** Longest title we build automatically (search engines show about 60–65 characters). */
+const TITLE_MAX = 60;
 
 /**
  * Build a group of tools. Every tool is a top-level page:
@@ -142,6 +144,22 @@ export function defineToolSection(input: ToolSectionInput): SectionDef {
     },
   };
 
+  /**
+   * "<title> | <alternative query>" — titles written without a second half get the first of the tool's
+   * `seoAlt` phrases that keeps the whole title within TITLE_MAX; a title that is already long stays as it is.
+   */
+  function seoTitleOf(title: string, tool: ToolDef, locale: Locale): string {
+    if (/ \| | — |: /.test(title)) return title;
+    // Preferred phrases, then the tool's search synonyms (real queries), then its name.
+    const alts = [...(tool.seoAlt ? ([] as string[]).concat(tool.seoAlt[locale]) : []), ...(tool.keywords?.[locale] ?? []), tr(tool.name, locale)];
+    for (const alt of alts) {
+      const cand = /^[A-ZА-ЯЁ]{2}/.test(alt) ? alt : alt.charAt(0).toLowerCase() + alt.slice(1);
+      if (title.toLowerCase().includes(cand.toLowerCase())) continue;
+      if (title.length + 3 + cand.length <= TITLE_MAX) return `${title} | ${cand}`;
+    }
+    return title;
+  }
+
   function toolLink(tool: ToolDef, locale: Locale): LinkItem {
     return {
       path: toolPath(tool),
@@ -192,12 +210,12 @@ export function defineToolSection(input: ToolSectionInput): SectionDef {
     const topBlocks: Block[] = [];
     if (vs.length) topBlocks.push({ type: "links", title: tr(tool.variants!.title, locale), style: "chips", items: vs.slice(0, limit) });
     const blocks: Block[] = [...(tool.blocks?.(locale) ?? [])];
-    if (tool.about?.[locale]?.length) blocks.push({ type: "text", title: ui(locale).about, paragraphs: tool.about[locale] });
+    if (tool.about?.[locale]?.length) blocks.push({ type: "text", title: ui(locale).about, paragraphs: tool.about[locale], fold: true });
     return {
       path: toolPath(tool),
       sectionId: input.id,
       kind: "tool",
-      title: tr(tool.title, locale),
+      title: seoTitleOf(tr(tool.title, locale), tool, locale),
       h1: tr(tool.h1 ?? tool.name, locale),
       description: tr(tool.description, locale),
       lead: tool.lead ? tr(tool.lead, locale) : undefined,
@@ -222,7 +240,7 @@ export function defineToolSection(input: ToolSectionInput): SectionDef {
       path: [...toolPath(tool), v.slug],
       sectionId: input.id,
       kind: "variant",
-      title: tr(v.title, locale),
+      title: seoTitleOf(tr(v.title, locale), tool, locale),
       h1: tr(v.h1 ?? v.title, locale),
       description: tr(v.description, locale),
       lead: v.lead ? tr(v.lead, locale) : undefined,

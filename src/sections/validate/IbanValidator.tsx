@@ -24,13 +24,13 @@ const T = {
       empty: "Введите IBAN",
       chars: "Допустимы только латинские буквы и цифры",
       country: "Первые две буквы — не код страны, использующей IBAN",
-      ru: "Российские банки на практике не выдают клиентам IBAN: для перевода в Россию нужны БИК, корреспондентский счёт банка и 20-значный номер счёта получателя, а из-за рубежа ещё и SWIFT-код банка",
       length: "Неверная длина для этой страны",
       structure: "Буквы или цифры стоят не на своих местах для формата этой страны",
       checksum: "Контрольная сумма не сходится — вероятно, опечатка",
     } as Record<IbanError, string>,
     expected: (d: string) => `При таком номере счёта контрольные цифры должны быть ${d}. Проверьте, в каком символе опечатка.`,
     note: "Проверяется формат и контрольная сумма ISO 13616. Существование счёта и название банка проверить без запроса в банк нельзя.",
+    ruNote: "Россия есть в реестре IBAN с 2023 года: 33 символа — RU, контрольные цифры, БИК банка и 20-значный номер счёта. Но российские банки IBAN клиентам почти не выдают: для перевода в Россию обычно указывают БИК, корреспондентский счёт и номер счёта, а из-за рубежа ещё и SWIFT-код банка.",
   },
   en: {
     label: "IBAN",
@@ -49,13 +49,13 @@ const T = {
       empty: "Enter an IBAN",
       chars: "Only Latin letters and digits are allowed",
       country: "The first two letters aren't a country that uses IBAN",
-      ru: "Russian banks don't issue IBANs to customers in practice: payments to Russia need the bank's BIK, its correspondent account and the 20-digit account number, plus the bank's SWIFT code from abroad",
       length: "Wrong length for this country",
       structure: "Letters or digits are in the wrong places for this country's format",
       checksum: "The checksum doesn't match — probably a typo",
     } as Record<IbanError, string>,
     expected: (d: string) => `For this account number the check digits would be ${d}. Look for the mistyped character.`,
     note: "The format and ISO 13616 checksum are checked. Whether the account exists or which bank holds it can't be checked without asking the bank.",
+    ruNote: "Russia has been in the IBAN registry since 2023: 33 characters — RU, check digits, the bank's BIK and the 20-digit account number. Russian banks rarely give customers an IBAN, though: payments to Russia usually need the BIK, the correspondent account and the account number, plus the bank's SWIFT code from abroad.",
   },
 } as const;
 
@@ -90,6 +90,7 @@ export default function IbanValidator({ locale, country, value }: { locale: Loca
         </Verdict>
       )}
       <Details rows={rows} locale={locale} />
+      {c?.code === "RU" && <p className="rounded-[0.75rem] bg-warn-soft px-4 py-3 text-sm text-warn">{t.ruNote}</p>}
       <p className="text-sm text-fg-3">{t.note}</p>
     </div>
   );

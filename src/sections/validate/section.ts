@@ -60,25 +60,25 @@ export const validateSection = defineToolSection({
         ru: [
           { q: "Что проверяет валидатор IBAN?", a: "Что код страны использует IBAN, длина совпадает с форматом этой страны, буквы и цифры стоят на своих местах, а контрольная сумма по модулю 97 (ISO 13616) равна 1. Одна опечатка или перестановка соседних символов почти всегда ломает контрольную сумму." },
           { q: "Какой длины IBAN в Казахстане?", a: "20 символов: KZ, две контрольные цифры, трёхзначный код банка и 13 символов номера счёта. Пример: KZ86 125K ZT50 0410 0100." },
-          { q: "Есть ли IBAN в России?", a: "На практике российские банки не присваивают клиентам IBAN. Для перевода в Россию нужны БИК банка, его корреспондентский счёт и 20-значный номер счёта получателя, а из-за рубежа — ещё SWIFT-код банка. Поэтому номер, начинающийся на RU, мы как IBAN не проверяем." },
+          { q: "Есть ли IBAN в России?", a: "Формально да: с 2023 года Россия есть в реестре IBAN, номер из 33 символов включает БИК и 20-значный счёт — такой номер здесь тоже проверяется. Но на практике российские банки IBAN клиентам почти не выдают: для перевода в Россию указывают БИК, корреспондентский счёт и номер счёта, а из-за рубежа — ещё SWIFT-код банка." },
           { q: "Можно ли узнать, что счёт существует?", a: "Нет. Корректный IBAN означает только, что номер записан без ошибок. Существует ли счёт и чей он, знает только банк." },
           { q: "Номер куда-нибудь отправляется?", a: "Нет, проверка идёт в браузере, сетевых запросов инструмент не делает." },
         ],
         en: [
           { q: "What does the IBAN validator check?", a: "That the country uses IBAN, the length matches that country's format, letters and digits are in the right places and the mod-97 checksum (ISO 13616) equals 1. A single typo or swapped pair almost always breaks the checksum." },
           { q: "How long is a Kazakhstan IBAN?", a: "20 characters: KZ, two check digits, a 3-digit bank code and a 13-character account number, e.g. KZ86 125K ZT50 0410 0100." },
-          { q: "Does Russia use IBAN?", a: "Russian banks don't issue IBANs to customers. Payments to Russia need the bank's BIK, its correspondent account and the 20-digit account number, plus the bank's SWIFT code from abroad, so RU numbers aren't validated as IBANs here." },
+          { q: "Does Russia use IBAN?", a: "Formally yes: Russia joined the IBAN registry in 2023 with a 33-character format holding the BIK and the 20-digit account, and such numbers are validated here too. In practice Russian banks rarely issue IBANs: payments to Russia use the BIK, the correspondent account and the account number, plus the bank's SWIFT code from abroad." },
           { q: "Can it tell whether the account exists?", a: "No. A valid IBAN only means the number is well-formed. Only the bank knows whether the account exists and whose it is." },
           { q: "Is the number sent anywhere?", a: "No, the check runs in your browser and makes no network requests." },
         ],
       },
       about: {
         ru: [
-          "IBAN (International Bank Account Number) — международный номер банковского счёта: код страны, две контрольные цифры и национальный номер счёта (BBAN) по формату, который утвердила страна. Длина — от 15 символов в Норвегии до 32 в Сент-Люсии.",
+          "IBAN (International Bank Account Number) — международный номер банковского счёта: код страны, две контрольные цифры и национальный номер счёта (BBAN) по формату, который утвердила страна. Длина — от 15 символов в Норвегии до 33 в России.",
           "Инструмент знает форматы всех стран из реестра SWIFT, поэтому находит не только неверную контрольную сумму, но и лишний символ, букву на месте цифры или код страны, где IBAN не используют. Для каждой страны есть страница со структурой номера и примером.",
         ],
         en: [
-          "An IBAN (International Bank Account Number) is a country code, two check digits and the national account number (BBAN) in that country's format — from 15 characters in Norway to 32 in Saint Lucia.",
+          "An IBAN (International Bank Account Number) is a country code, two check digits and the national account number (BBAN) in that country's format — from 15 characters in Norway to 33 in Russia.",
           "The tool knows every country format in the SWIFT registry, so it catches not just a bad checksum but an extra character, a letter where a digit belongs or a country that doesn't use IBAN. Each country has a page with the number structure and an example.",
         ],
       },
@@ -125,6 +125,7 @@ export const validateSection = defineToolSection({
     },
     {
       slug: "phone-number-validator",
+      seoAlt: { ru: ["проверка формата номера", "проверка номера"], en: ["check a phone number format", "phone number check", "format check"] },
       component: "validate/phone",
       icon: "Phone",
       popular: true,

@@ -159,6 +159,7 @@ function pairVariant(p: (typeof PAIRS)[number]): VariantDef {
 
 export const baseTool: ToolDef = {
   slug: "number-base-converter",
+  seoAlt: { ru: "калькулятор систем счисления", en: "number base calculator" },
   component: "numbers/base-converter",
   icon: "Binary",
   popular: true,

@@ -37,6 +37,7 @@ interface Spec {
   name: L;
   h1: L;
   title: L;
+  seoAlt?: ToolDef["seoAlt"];
   description: L;
   lead: L;
   keywords: LL;
@@ -69,6 +70,26 @@ function dialectVariant(d: (typeof DIALECT_PAGES)[number]): VariantDef {
       en: `The formatter knows ${d.label} syntax: keywords, identifier quoting and${d.params ? ` ${d.params}-style` : ""} parameters.`,
     },
     props: { lang: "sql", dialect: d.id, sample: d.example },
+    blocks: (locale) => [
+      {
+        type: "facts",
+        title: locale === "ru" ? `Синтаксис ${short}` : `${short} syntax`,
+        rows:
+          locale === "ru"
+            ? [
+                ["Диалект", d.label],
+                ["Распознаётся", d.features.ru],
+                ["Параметры", d.params ? `${d.params} — остаются как есть` : "строки и имена в кавычках не меняются"],
+                ["Пример запроса", d.example],
+              ]
+            : [
+                ["Dialect", d.label],
+                ["Understands", d.features.en],
+                ["Parameters", d.params ? `${d.params} — kept as written` : "strings and quoted names are kept"],
+                ["Sample query", d.example],
+              ],
+      },
+    ],
     keywords: { ru: [`${short} форматирование`, `форматирование ${short} запросов`, `${short} formatter`], en: [`${short} formatter`, `format ${short} query`, `${short} beautifier`] },
     faq: {
       ru: [
@@ -716,6 +737,7 @@ const SPECS: Spec[] = [
   },
   {
     slug: "sql-formatter",
+    seoAlt: { ru: ["форматтер SQL-запросов", "SQL форматтер", "форматтер"], en: ["SQL query formatter", "SQL formatter", "formatter"] },
     ...fmt("sql"),
     icon: "Database",
     popular: true,
@@ -792,6 +814,7 @@ const tools: ToolDef[] = SPECS.map((s) => ({
   name: s.name,
   h1: s.h1,
   title: s.title,
+  seoAlt: s.seoAlt,
   description: s.description,
   lead: s.lead,
   keywords: s.keywords,

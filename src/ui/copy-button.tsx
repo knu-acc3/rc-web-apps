@@ -15,6 +15,7 @@ export function CopyButton({
   size = "sm",
   className,
   onCopied,
+  compact = false,
 }: {
   value: string | (() => string);
   label?: string;
@@ -24,6 +25,8 @@ export function CopyButton({
   size?: "sm" | "md" | "icon" | "icon-sm";
   className?: string;
   onCopied?: () => void;
+  /** Icon only on phones (the label stays for screen readers), icon + label from 640px. */
+  compact?: boolean;
 }) {
   const [copied, setCopied] = useState(false);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -48,11 +51,11 @@ export function CopyButton({
       type="button"
       onClick={handle}
       aria-label={iconOnly ? (copied ? copiedLabel : label) : undefined}
-      title={iconOnly ? label : undefined}
+      title={iconOnly || compact ? label : undefined}
       className={cn(buttonClass(variant, size), copied && "text-ok", className)}
     >
       {copied ? <Check aria-hidden /> : <Copy aria-hidden />}
-      {!iconOnly && <span>{copied ? copiedLabel : label}</span>}
+      {!iconOnly && <span className={compact ? "max-sm:sr-only" : undefined}>{copied ? copiedLabel : label}</span>}
       <span role="status" className="sr-only">
         {copied ? copiedLabel : ""}
       </span>

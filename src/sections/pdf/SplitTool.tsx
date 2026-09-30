@@ -173,7 +173,7 @@ function SplitBody({ locale, mode0, chunk0, file, job, onClear }: { locale: Loca
         )}
       </OptionsRow>
 
-      <div className="rounded-[12px] bg-surface-2 px-4 py-3">
+      <div className="rounded-[0.75rem] bg-surface-2 px-4 py-3">
         <p className="text-xl font-semibold text-fg">{valid.length ? t.will(valid.length) : mode === "select" ? t.selectHint : "—"}</p>
         {summary && <p className="tabular mt-0.5 truncate text-sm text-fg-3">{summary}</p>}
       </div>

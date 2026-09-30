@@ -106,7 +106,7 @@ export default function AddDays({ locale, days = 30 }: AddDaysProps) {
         {unit === "workdays" && (
           <div className="mt-5 flex flex-col items-center gap-2">
             <CountryChoice locale={locale} value={choice} onChange={setChoice} />
-            <p className="max-w-xl text-center text-[13px] text-fg-3">{t.note}</p>
+            <p className="max-w-xl text-center text-[0.8125rem] text-fg-3">{t.note}</p>
           </div>
         )}
       </Panel>

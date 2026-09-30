@@ -276,7 +276,7 @@ export default function Favicon({ locale }: { locale: Locale }) {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="rounded-[12px] border border-line bg-surface">
+      <div className="rounded-[0.75rem] border border-line bg-surface">
         <div className="flex flex-wrap items-end gap-x-4 gap-y-3 px-4 py-3">
           <Field label={t.source}>
             <Segmented
@@ -411,7 +411,7 @@ export default function Favicon({ locale }: { locale: Locale }) {
         </div>
       </Panel>
 
-      <div className="overflow-hidden rounded-[12px] border border-line bg-surface">
+      <div className="overflow-hidden rounded-[0.75rem] border border-line bg-surface">
         <div className="flex items-center justify-between gap-2 border-b border-line px-3 py-1.5">
           <label htmlFor={`${id}-html`} className="text-sm font-semibold text-fg">
             {t.html}

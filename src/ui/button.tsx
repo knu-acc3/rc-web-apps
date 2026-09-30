@@ -6,7 +6,7 @@ type Variant = "primary" | "secondary" | "ghost" | "outline" | "danger";
 type Size = "sm" | "md" | "lg" | "icon" | "icon-sm";
 
 const base =
-  "inline-flex shrink-0 select-none items-center justify-center gap-2 whitespace-nowrap rounded-[8px] font-medium transition-colors duration-150 disabled:pointer-events-none disabled:opacity-50 [&_svg]:size-[18px] [&_svg]:shrink-0";
+  "inline-flex shrink-0 select-none items-center justify-center gap-2 whitespace-nowrap rounded-[0.5rem] font-medium transition-colors duration-150 disabled:pointer-events-none disabled:opacity-50 [&_svg]:size-[1.125rem] [&_svg]:shrink-0";
 
 const variants: Record<Variant, string> = {
   primary: "bg-accent text-accent-fg hover:bg-accent-hover",
@@ -16,12 +16,13 @@ const variants: Record<Variant, string> = {
   danger: "bg-err-soft text-err hover:bg-err hover:text-white",
 };
 
+/** Touch screens get finger-sized targets (40–44px); a mouse keeps the compact sizes. */
 const sizes: Record<Size, string> = {
-  sm: "h-8 px-3 text-sm",
-  md: "h-10 px-4 text-[15px]",
+  sm: "h-8 px-3 text-sm pointer-coarse:h-10",
+  md: "h-10 px-4 text-[0.9375rem] pointer-coarse:h-11",
   lg: "h-12 px-5 text-base",
-  icon: "size-10",
-  "icon-sm": "size-8 [&_svg]:size-4",
+  icon: "size-10 pointer-coarse:size-11",
+  "icon-sm": "size-8 [&_svg]:size-4 pointer-coarse:size-10",
 };
 
 export function buttonClass(variant: Variant = "secondary", size: Size = "md", className?: string): string {

@@ -152,7 +152,7 @@ export default function Svg({ locale }: { locale: Locale }) {
   if (!src) {
     return (
       <div className="flex flex-col gap-3">
-        <Dropzone onFiles={loadFile} accept="image/svg+xml,.svg" title={t.drop} className="min-h-48" />
+        <Dropzone onFiles={loadFile} accept="image/svg+xml,.svg" title={t.drop} />
         <Field label={t.or} htmlFor={`${id}-paste`}>
           <textarea
             id={`${id}-paste`}
@@ -169,7 +169,7 @@ export default function Svg({ locale }: { locale: Locale }) {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex flex-wrap items-end gap-x-4 gap-y-3 rounded-[12px] border border-line bg-surface px-4 py-3">
+      <div className="flex flex-wrap items-end gap-x-4 gap-y-3 rounded-[0.75rem] border border-line bg-surface px-4 py-3">
         <Field label={t.view}>
           <Segmented
             wrap
@@ -232,7 +232,7 @@ export default function Svg({ locale }: { locale: Locale }) {
               {t.downloadSvg}
             </Button>
           </div>
-          <p className="border-t border-line px-4 py-2.5 text-[13px] text-fg-3">
+          <p className="border-t border-line px-4 py-2.5 text-[0.8125rem] text-fg-3">
             {t.report(ok.report)}. {t.safe}.
           </p>
         </Panel>
@@ -240,7 +240,7 @@ export default function Svg({ locale }: { locale: Locale }) {
 
       {ok && (
         <>
-          <div className="flex flex-wrap items-end gap-x-4 gap-y-3 rounded-[12px] border border-line bg-surface px-4 py-3">
+          <div className="flex flex-wrap items-end gap-x-4 gap-y-3 rounded-[0.75rem] border border-line bg-surface px-4 py-3">
             <span className="flex items-center gap-2 self-center text-sm font-semibold text-fg">
               <ImageDown className="size-4 text-accent" aria-hidden />
               {t.export}
@@ -261,7 +261,7 @@ export default function Svg({ locale }: { locale: Locale }) {
             </Button>
           </div>
           {exportError ? <Notice tone="err">{errorText(locale, exportError)}</Notice> : null}
-          <div className="overflow-hidden rounded-[12px] border border-line bg-surface">
+          <div className="overflow-hidden rounded-[0.75rem] border border-line bg-surface">
             <div className="flex items-center justify-between gap-2 border-b border-line px-3 py-1.5">
               <label htmlFor={`${id}-code`} className="flex items-center gap-2 text-sm font-semibold text-fg">
                 <FileCode className="size-4" aria-hidden />

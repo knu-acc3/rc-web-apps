@@ -339,7 +339,7 @@ function AudioEditorInner({ locale, mode }: { locale: Locale; mode: EditorMode }
               </span>
             </div>
             <Checkbox label={t.keepPitch} checked={keepPitch} onChange={(e) => (setKeepPitch(e.target.checked), touch())} />
-            {semis !== 0 && <p className="text-[13px] text-fg-3">{t.pitchNote}</p>}
+            {semis !== 0 && <p className="text-[0.8125rem] text-fg-3">{t.pitchNote}</p>}
           </div>
         );
       case "reverse":
@@ -361,7 +361,7 @@ function AudioEditorInner({ locale, mode }: { locale: Locale; mode: EditorMode }
           <div className="flex flex-col gap-3">
             <audio ref={audio} preload="auto" className="hidden" />
             {load.running ? (
-              <div className="flex flex-col gap-2 rounded-[10px] bg-surface-2 px-4 py-3">
+              <div className="flex flex-col gap-2 rounded-[0.625rem] bg-surface-2 px-4 py-3">
                 <span className="text-sm text-fg-2">
                   {t.decoding} {Math.round(load.progress * 100)}%
                 </span>
@@ -398,7 +398,7 @@ function AudioEditorInner({ locale, mode }: { locale: Locale; mode: EditorMode }
                 </>
               ) : (
                 <>
-                  <div className="relative h-24 overflow-hidden rounded-[10px] border border-line bg-surface-2">
+                  <div className="relative h-24 overflow-hidden rounded-[0.625rem] border border-line bg-surface-2">
                     <Waveform peaks={info.peaks} />
                     {playing && playhead !== null && <div className="absolute inset-y-0 w-0.5 bg-fg" style={{ left: `${(playhead / duration) * 100}%` }} aria-hidden />}
                   </div>
@@ -453,7 +453,7 @@ function AudioEditorInner({ locale, mode }: { locale: Locale; mode: EditorMode }
                 </Select>
               </Field>
             )}
-            {copyTrim && <p className="w-full text-[13px] text-fg-3">{t.lossless}</p>}
+            {copyTrim && <p className="w-full text-[0.8125rem] text-fg-3">{t.lossless}</p>}
           </>
         ) : null
       }

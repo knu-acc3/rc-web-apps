@@ -241,8 +241,8 @@ export default function MouseTest({ locale }: { locale: Locale }) {
             className="flex min-h-72 cursor-crosshair select-none flex-col items-center justify-center gap-2 bg-surface-2/60 px-6 py-10 text-center"
           >
             <MousePointerClick className="size-8 text-accent" aria-hidden />
-            <p className="max-w-sm text-[15px] font-medium text-fg">{t.areaHint}</p>
-            <p className="max-w-sm text-[13px] text-fg-3">{t.areaNote}</p>
+            <p className="max-w-sm text-[0.9375rem] font-medium text-fg">{t.areaHint}</p>
+            <p className="max-w-sm text-[0.8125rem] text-fg-3">{t.areaNote}</p>
           </div>
           <div className="flex flex-col items-center gap-3 border-t border-line p-4 md:border-l md:border-t-0">
             <MouseDiagram down={s.btn.map((b) => b.down)} tested={s.btn.map((b) => b.count > 0)} wheel={!!w} labels={t.buttons} />
@@ -290,7 +290,7 @@ export default function MouseTest({ locale }: { locale: Locale }) {
             {w ? (
               <>
                 ↑ {w.up} · ↓ {w.down} · ← {w.left} · → {w.right}
-                <span className="block text-[13px] font-normal text-fg-3">
+                <span className="block text-[0.8125rem] font-normal text-fg-3">
                   {t.delta}: deltaY {formatNumber(locale, w.dy, { maximumFractionDigits: 2 })}, deltaX {formatNumber(locale, w.dx, { maximumFractionDigits: 2 })}, deltaMode {w.mode} ({t.mode[w.mode] ?? "?"})
                 </span>
               </>
@@ -305,7 +305,7 @@ export default function MouseTest({ locale }: { locale: Locale }) {
             {s.pollMax ? (
               <>
                 {t.pollNow}: {s.pollNow ? `${hz(s.pollNow)} ${t.hz}` : "—"} · {t.pollMax}: {hz(s.pollMax)} {t.hz}
-                <span className="block text-[13px] font-normal text-fg-3">{t.pollNear(nearestPollingRate(s.pollMax))}</span>
+                <span className="block text-[0.8125rem] font-normal text-fg-3">{t.pollNear(nearestPollingRate(s.pollMax))}</span>
               </>
             ) : (
               <span className="font-normal text-fg-3">{t.pollHint}</span>
@@ -315,7 +315,7 @@ export default function MouseTest({ locale }: { locale: Locale }) {
       </dl>
 
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <p className="min-w-0 flex-1 basis-64 text-[13px] text-fg-3">{!coalesced && t.pollNoCoalesced}</p>
+        <p className="min-w-0 flex-1 basis-64 text-[0.8125rem] text-fg-3">{!coalesced && t.pollNoCoalesced}</p>
         <Button variant="ghost" size="sm" onClick={() => dispatch({ type: "reset" })}>
           <RotateCcw aria-hidden />
           {t.reset}

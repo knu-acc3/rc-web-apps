@@ -174,7 +174,7 @@ export default function RomanConverter({ locale, value = 2024 }: RomanConverterP
       <div className="mt-5 min-h-24" aria-live="polite">
         {out.kind === "error" ? (
           <div className="flex flex-col items-start gap-2">
-            <p className="text-[15px] text-err">{out.message}</p>
+            <p className="text-[0.9375rem] text-err">{out.message}</p>
             {out.clock && <p className="text-sm text-fg-3">{t.clock}</p>}
             {out.fix && (
               <button type="button" className="text-sm font-medium text-accent hover:underline" onClick={() => setText(out.fix!)}>
@@ -188,7 +188,7 @@ export default function RomanConverter({ locale, value = 2024 }: RomanConverterP
               <div className="text-5xl leading-tight font-semibold break-all text-fg sm:text-6xl">
                 {out.kind === "toRoman" ? <Numeral text={out.roman} lower={lower} /> : <span className="tabular">{num(out.n, locale)}</span>}
               </div>
-              <p className="mt-2 text-[15px] text-fg-2">
+              <p className="mt-2 text-[0.9375rem] text-fg-2">
                 {parts.length > 1 || out.kind === "toArabic" ? (
                   <>
                     {out.kind === "toArabic" && (
@@ -227,12 +227,12 @@ export default function RomanConverter({ locale, value = 2024 }: RomanConverterP
                 title={`${t.insert} ${l} (×1000)`}
                 aria-label={`${t.insert} ${l}`}
                 onClick={() => insertBar(l)}
-                className="h-8 min-w-8 rounded-[6px] px-1.5 text-fg-2 hover:bg-surface-2 hover:text-fg"
+                className="h-8 min-w-8 rounded-[0.375rem] px-1.5 text-fg-2 hover:bg-surface-2 hover:text-fg"
               >
                 <Numeral text={l + BAR} />
               </button>
             ))}
-            <span className="text-[13px] text-fg-3">{t.barHint}</span>
+            <span className="text-[0.8125rem] text-fg-3">{t.barHint}</span>
           </div>
         )}
       </div>

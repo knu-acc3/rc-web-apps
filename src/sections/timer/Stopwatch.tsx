@@ -117,9 +117,9 @@ export default function Stopwatch({ locale }: { locale: Locale }) {
     <div className="flex flex-col gap-4">
       <div
         ref={ref}
-        className={cn("flex flex-col items-center justify-center gap-6 rounded-[12px] border border-line bg-surface px-3 py-8 sm:py-10", full && "min-h-screen rounded-none border-0")}
+        className={cn("flex flex-col items-center justify-center gap-6 rounded-[0.75rem] border border-line bg-surface px-3 py-8 sm:py-10", full && "min-h-screen rounded-none border-0")}
       >
-        <div className={cn("tabular font-semibold leading-none tracking-tight text-fg", full ? "text-[min(16vw,34vh)]" : "text-[min(15vw,112px)]")}>
+        <div className={cn("tabular font-semibold leading-none tracking-tight text-fg", full ? "text-[min(16vw,34vh)]" : "text-[min(15vw,7rem)]")}>
           {clock(elapsed, { up: true })}
           <span className="text-[0.55em] text-fg-3">.{String(Math.floor((elapsed % 1000) / 10)).padStart(2, "0")}</span>
         </div>
@@ -150,7 +150,7 @@ export default function Stopwatch({ locale }: { locale: Locale }) {
       </div>
 
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <p className="hidden flex-wrap gap-x-4 text-[13px] text-fg-3 sm:flex">
+        <p className="hidden flex-wrap gap-x-4 text-[0.8125rem] text-fg-3 sm:flex">
           {t.keys.map(([k, label]) => (
             <span key={k}>
               <Kbd>{k}</Kbd> {label}
@@ -164,7 +164,7 @@ export default function Stopwatch({ locale }: { locale: Locale }) {
       </div>
 
       {laps.length > 0 && (
-        <section className="overflow-hidden rounded-[12px] border border-line bg-surface">
+        <section className="overflow-hidden rounded-[0.75rem] border border-line bg-surface">
           <div className="flex items-center justify-between gap-2 border-b border-line px-4 py-2">
             <h2 className="text-sm font-semibold text-fg">
               {t.laps}: {laps.length}
@@ -181,8 +181,8 @@ export default function Stopwatch({ locale }: { locale: Locale }) {
             </div>
           </div>
           <div className="max-h-96 overflow-auto">
-            <table className="w-full text-left text-[15px]">
-              <thead className="sticky top-0 bg-surface-2 text-[13px] text-fg-2">
+            <table className="w-full text-left text-[0.9375rem]">
+              <thead className="sticky top-0 bg-surface-2 text-[0.8125rem] text-fg-2">
                 <tr>
                   <th scope="col" className="px-4 py-2 font-medium">
                     {t.n}
@@ -201,8 +201,8 @@ export default function Stopwatch({ locale }: { locale: Locale }) {
                     <td className="px-4 py-2 text-fg-3">{l.n}</td>
                     <td className={cn("px-4 py-2 font-semibold", l.lap === best ? "text-ok" : l.lap === worst ? "text-err" : "text-fg")}>
                       {fmt(l.lap)}
-                      {l.lap === best && <span className="ml-2 text-[12px] font-normal">{t.best}</span>}
-                      {l.lap === worst && <span className="ml-2 text-[12px] font-normal">{t.worst}</span>}
+                      {l.lap === best && <span className="ml-2 text-[0.75rem] font-normal">{t.best}</span>}
+                      {l.lap === worst && <span className="ml-2 text-[0.75rem] font-normal">{t.worst}</span>}
                     </td>
                     <td className="px-4 py-2 text-fg-2">{fmt(l.total)}</td>
                   </tr>

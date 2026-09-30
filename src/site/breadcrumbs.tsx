@@ -1,11 +1,12 @@
 import Link from "@/ui/link";
 import { ChevronRight } from "lucide-react";
 import { href, type Locale } from "@/i18n/config";
+import { cn } from "@/lib/cn";
 import type { Crumb } from "@/registry/types";
 
-export function Breadcrumbs({ items, current, locale }: { items: Crumb[]; current: string; locale: Locale }) {
+export function Breadcrumbs({ items, current, locale, className }: { items: Crumb[]; current: string; locale: Locale; className?: string }) {
   return (
-    <nav aria-label="breadcrumbs" className="mb-3 overflow-x-auto scrollbar-thin">
+    <nav aria-label="breadcrumbs" className={cn("mb-3 overflow-x-auto scrollbar-thin", className)}>
       <ol className="flex items-center gap-1 text-sm whitespace-nowrap text-fg-3">
         {items.map((c) => (
           <li key={c.path.join("/") || "home"} className="flex items-center gap-1">

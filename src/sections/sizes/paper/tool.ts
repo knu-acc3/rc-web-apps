@@ -181,7 +181,7 @@ function paperVariant(p: PaperFormat): VariantDef {
           ? tt(l, " Стандарт США и Канады.", " US and Canadian standard.")
           : "";
     return {
-      title: tt(l, `Размер ${kindWord(l, p)} ${p.name} в мм, см, дюймах и пикселях`, `${p.name} ${isEnvelope(p) ? "envelope" : "paper"} size in mm, cm, inches and pixels`),
+      title: tt(l, `Размер ${kindWord(l, p)} ${p.name} | ${p.name} в мм, см, дюймах и пикселях`, `${p.name} ${isEnvelope(p) ? "envelope" : "paper"} size | ${p.name} in mm, cm, inches and pixels`),
       h1: tt(l, `Размер ${kindWord(l, p)} ${p.name}`, `${p.name} ${kindWord(l, p)} size`),
       description: tt(
         l,
@@ -222,6 +222,7 @@ function seriesTable(l: Locale, title: string, list: PaperFormat[]): Block {
 
 export const paperTool: ToolDef = {
   slug: "paper-sizes",
+  seoAlt: { ru: ["таблица форматов бумаги в мм и пикселях", "размеры в мм и пикселях", "таблица размеров", "формат листа"], en: ["paper size chart in mm and pixels", "size in mm and pixels", "size chart"] },
   component: "sizes/paper",
   icon: "FileText",
   popular: true,

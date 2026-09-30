@@ -118,7 +118,7 @@ export default function SitemapGenerator({ locale }: { locale: Locale }) {
 
   return (
     <div className="flex flex-col gap-5">
-      <Field label={t.urls} htmlFor={`${id}-u`} aside={c.urls.length ? <span className="text-[13px] text-fg-3">{t.stats(c.urls.length, built?.files.length ?? 0)}</span> : undefined}>
+      <Field label={t.urls} htmlFor={`${id}-u`} aside={c.urls.length ? <span className="text-[0.8125rem] text-fg-3">{t.stats(c.urls.length, built?.files.length ?? 0)}</span> : undefined}>
         <Textarea id={`${id}-u`} value={text} onChange={(e) => setText(e.target.value)} rows={8} className="font-mono text-sm" spellCheck={false} placeholder={"https://example.com/\nhttps://example.com/about\nhttps://example.com/blog/post-1"} />
       </Field>
       <Dropzone compact accept=".txt,.csv,text/plain,text/csv" onFiles={(fs) => fs[0] && readFile(fs[0])} title={t.drop} hint={t.dropHint} />

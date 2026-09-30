@@ -163,7 +163,7 @@ export default function PaletteGenerator({ locale, mode: mode0 = "analogous", ba
       </Panel>
 
       <div>
-        <ul className="grid overflow-hidden rounded-[12px] border border-line" style={{ gridTemplateColumns: `repeat(${colors.length}, minmax(0, 1fr))` }}>
+        <ul className="grid overflow-hidden rounded-[0.75rem] border border-line" style={{ gridTemplateColumns: `repeat(${colors.length}, minmax(0, 1fr))` }}>
           {colors.map((c, i) => {
             const hex = toHex(c);
             const fg = readableTextColor(c);

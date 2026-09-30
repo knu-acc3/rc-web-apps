@@ -91,7 +91,7 @@ function parseGrid(g: string[][]): { m: M | null; bad: boolean } {
 function MatrixView({ m, decimals, locale }: { m: M; decimals: boolean; locale: Locale }) {
   const cell = (x: Q) => (decimals ? num(locale, toNumber(x), 6) : toText(x));
   return (
-    <div className="inline-grid max-w-full overflow-x-auto rounded-[6px] border-x-2 border-fg px-2 py-1 text-lg" style={{ gridTemplateColumns: `repeat(${m[0]?.length ?? 1}, minmax(0, auto))` }}>
+    <div className="inline-grid max-w-full overflow-x-auto rounded-[0.375rem] border-x-2 border-fg px-2 py-1 text-lg" style={{ gridTemplateColumns: `repeat(${m[0]?.length ?? 1}, minmax(0, auto))` }}>
       {m.flatMap((r, i) =>
         r.map((x, j) => (
           <span key={`${i}-${j}`} className="tabular px-2 py-0.5 text-right">
@@ -225,7 +225,7 @@ export default function MatrixCalc({ locale, op = "det" }: ToolProps<{ op?: Matr
   return (
     <Stack>
       <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] lg:gap-6">
-        <section className="flex min-w-0 flex-col gap-4 rounded-[12px] border border-line bg-surface p-4 sm:p-5">
+        <section className="flex min-w-0 flex-col gap-4 rounded-[0.75rem] border border-line bg-surface p-4 sm:p-5">
           <SelectField id={`${id}-o`} label={t.op} value={o} onChange={(v) => q.set({ o: v })} options={MATRIX_OPS.map((x) => ({ value: x, label: t.ops[x] }))} />
           <div className="flex flex-col gap-2">
             <OptionsRow>
@@ -243,13 +243,13 @@ export default function MatrixCalc({ locale, op = "det" }: ToolProps<{ op?: Matr
                 <span className="text-sm font-semibold text-fg">B</span>
                 {o === "multiply" ? (
                   <>
-                    <span className="text-[13px] text-fg-3">
+                    <span className="text-[0.8125rem] text-fg-3">
                       {t.rows}: {rb}
                     </span>
                     <InlineSelect id={`${id}-cb`} label={t.cols} value={q.v.cb} onChange={(v) => q.set({ cb: v })} options={sizeOpts} />
                   </>
                 ) : (
-                  <span className="text-[13px] text-fg-3">
+                  <span className="text-[0.8125rem] text-fg-3">
                     {ra}×{ca}
                   </span>
                 )}
@@ -278,7 +278,7 @@ export default function MatrixCalc({ locale, op = "det" }: ToolProps<{ op?: Matr
             />
           </OptionsRow>
           <Advanced title={t.paste}>
-            <p className="text-[13px] text-fg-3">{t.pasteHint}</p>
+            <p className="text-[0.8125rem] text-fg-3">{t.pasteHint}</p>
             {pasteArea("a", "A")}
             {TWO.has(o) && pasteArea("b", "B")}
           </Advanced>

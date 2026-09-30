@@ -50,9 +50,9 @@ export default function ZoneTime({ locale, label, offset, tz, candidates }: Zone
           {label}
           {p && tz ? ` · ${fmtOffset(p.off)}` : ""}
         </p>
-        <BigTime parts={p} className="text-[60px] sm:text-[104px]" />
+        <BigTime parts={p} className="text-[3.75rem] sm:text-[6.5rem]" />
         <p className="min-h-7 text-lg text-fg-2 sm:text-xl">{p ? longDate(locale, p) : " "}</p>
-        <p className="min-h-6 text-[15px] text-fg-3">{rel ? rel.charAt(0).toUpperCase() + rel.slice(1) : " "}</p>
+        <p className="min-h-6 text-[0.9375rem] text-fg-3">{rel ? rel.charAt(0).toUpperCase() + rel.slice(1) : " "}</p>
       </Panel>
       {current.length > 0 && (
         <p className="text-sm text-fg-3">

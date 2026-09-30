@@ -12,7 +12,7 @@ export function generateStaticParams() {
 export async function GET(_req: Request, { params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   if (!isLocale(locale)) return new Response("Not found", { status: 404 });
-  const packed: PackedEntry[] = searchEntries(locale).map((e) => [e.title, href(locale, e.path), e.hint, e.keywords ?? "", e.glyph ?? "", e.weight ?? 0]);
+  const packed: PackedEntry[] = searchEntries(locale).map((e) => [e.title, href(locale, e.path), e.hint, e.keywords ?? "", e.glyph ?? "", e.weight ?? 0, e.hue]);
   return new Response(JSON.stringify(packed), {
     headers: { "Content-Type": "application/json; charset=utf-8", "Cache-Control": "public, max-age=3600" },
   });

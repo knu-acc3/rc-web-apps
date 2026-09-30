@@ -92,7 +92,7 @@ export default function PxRemConverter({ locale, from: from0 = "px", to: to0 = "
                 ))}
               </Select>
             </div>
-            <div className="flex min-h-12 items-center justify-between gap-2 rounded-[8px] bg-surface-2 px-3">
+            <div className="flex min-h-12 items-center justify-between gap-2 rounded-[0.5rem] bg-surface-2 px-3">
               <output className="tabular min-w-0 font-mono text-2xl font-bold break-all text-fg" aria-live="polite">
                 {main || <span className="text-base font-normal text-fg-3">{t.invalid}</span>}
               </output>
@@ -122,7 +122,7 @@ export default function PxRemConverter({ locale, from: from0 = "px", to: to0 = "
                 <li key={u}>
                   <button
                     type="button"
-                    className="group flex w-full items-center justify-between gap-2 rounded-[8px] px-3 py-2 text-left hover:bg-surface-2"
+                    className="group flex w-full items-center justify-between gap-2 rounded-[0.5rem] px-3 py-2 text-left hover:bg-surface-2"
                     onClick={async () => {
                       if (await copyText(v)) {
                         setCopied(u);
@@ -132,7 +132,7 @@ export default function PxRemConverter({ locale, from: from0 = "px", to: to0 = "
                     }}
                     title={`${t.copy} ${v}`}
                   >
-                    <code className="tabular font-mono text-[15px] text-fg">{v}</code>
+                    <code className="tabular font-mono text-[0.9375rem] text-fg">{v}</code>
                     <span className={copied === u ? "text-ok" : "text-fg-3 opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100"}>
                       {copied === u ? <Check className="size-4" aria-hidden /> : <Copy className="size-4" aria-hidden />}
                       <span className="sr-only">{copied === u ? t.copied : t.copy}</span>

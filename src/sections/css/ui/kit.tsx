@@ -47,7 +47,7 @@ export function Stage({
   const t = STAGE_T[locale];
   const [bg, setBg] = useState<StageBg>(defaultBg);
   return (
-    <div className={cn("relative overflow-hidden rounded-[12px] border border-line", className)} style={surface ? { background: surface } : STAGE_BG[bg]}>
+    <div className={cn("relative overflow-hidden rounded-[0.75rem] border border-line", className)} style={surface ? { background: surface } : STAGE_BG[bg]}>
       {switcher && !surface && (
         <div className="absolute top-2 right-2 z-10">
           <Segmented

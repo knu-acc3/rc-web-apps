@@ -84,7 +84,7 @@ export default function VideoRotate({ locale }: { locale: Locale }) {
       busy={job.running}
       preview={
         file && (
-          <div className="overflow-hidden rounded-[12px] bg-black">
+          <div className="overflow-hidden rounded-[0.75rem] bg-black">
             <div className="transition-transform duration-200" style={{ transform: `rotate(${rot}deg) scale(${flipH ? -scale : scale}, ${flipV ? -scale : scale})` }}>
               <VideoPreview file={file} label={t.preview} />
             </div>
@@ -116,7 +116,7 @@ export default function VideoRotate({ locale }: { locale: Locale }) {
           {!flip && (
             <div className="flex flex-col gap-1">
               <Checkbox label={t.bake} checked={bake} onChange={(e) => (setBake(e.target.checked), touch())} />
-              <p className="text-[13px] text-fg-3">{t.bakeHint}</p>
+              <p className="text-[0.8125rem] text-fg-3">{t.bakeHint}</p>
             </div>
           )}
         </div>

@@ -74,9 +74,9 @@ export default function WorkHours({ locale }: { locale: Locale }) {
           sub={`${t.decimal(formatNumber(locale, total / 60, { maximumFractionDigits: 2 }))}${rateNum ? ` · ${t.pay}: ${formatNumber(locale, (total / 60) * rateNum, { maximumFractionDigits: 2 })}` : ""}`}
         />
       </Panel>
-      <div className="overflow-x-auto rounded-[12px] border border-line bg-surface">
+      <div className="overflow-x-auto rounded-[0.75rem] border border-line bg-surface">
         <table className="w-full text-left text-sm">
-          <thead className="bg-surface-2 text-[13px] text-fg-2">
+          <thead className="bg-surface-2 text-[0.8125rem] text-fg-2">
             <tr>
               <th scope="col" className="px-3 py-2 font-medium">
                 {t.day}
@@ -114,7 +114,7 @@ export default function WorkHours({ locale }: { locale: Locale }) {
                   {mins[i] ? (
                     <>
                       {formatDuration(mins[i]!.m * 60, false)}
-                      {mins[i]!.night && <span className="block text-[11px] text-fg-3">{t.night}</span>}
+                      {mins[i]!.night && <span className="block text-[0.6875rem] text-fg-3">{t.night}</span>}
                     </>
                   ) : (
                     <span className="text-fg-3">{t.off}</span>
@@ -129,7 +129,7 @@ export default function WorkHours({ locale }: { locale: Locale }) {
         <Field label={t.rate} htmlFor={`${id}-r`} className="w-56">
           <Input id={`${id}-r`} inputMode="decimal" value={rate} onChange={(e) => setRate(e.target.value)} />
         </Field>
-        <p className="max-w-md text-[13px] text-fg-3">{t.hint}</p>
+        <p className="max-w-md text-[0.8125rem] text-fg-3">{t.hint}</p>
       </div>
     </div>
   );

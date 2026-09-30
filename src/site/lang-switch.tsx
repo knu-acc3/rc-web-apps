@@ -3,21 +3,22 @@
 import Link from "@/ui/link";
 import { usePathname } from "next/navigation";
 import { LOCALES, LOCALE_LABEL, LOCALE_SHORT, type Locale } from "@/i18n/config";
+import { cn } from "@/lib/cn";
 import { buttonClass } from "@/ui/button";
 
 /** Links to the same page in the other locale(s). */
-export function LangSwitch({ locale }: { locale: Locale }) {
+export function LangSwitch({ locale, className }: { locale: Locale; className?: string }) {
   const pathname = usePathname() || `/${locale}`;
   const rest = pathname.replace(/^\/(ru|en)(?=\/|$)/, "");
   return (
-    <div className="flex items-center">
+    <div className={cn("flex items-center", className)}>
       {LOCALES.filter((l) => l !== locale).map((l) => (
         <Link
           key={l}
           href={`/${l}${rest}`}
           hrefLang={l}
           lang={l}
-          className={buttonClass("ghost", "sm", "px-2.5 font-semibold")}
+          className={buttonClass("ghost", "sm", "h-10! px-2.5 font-semibold")}
           aria-label={LOCALE_LABEL[l]}
           title={LOCALE_LABEL[l]}
           prefetch={false}

@@ -162,9 +162,9 @@ export default function WatermarkTool({ locale, preset = "confidential" }: { loc
                   <Input id={`${id}-t`} size="lg" value={text} maxLength={120} onChange={(e) => change(setText)(e.target.value)} autoComplete="off" />
                 </Field>
               ) : image ? (
-                <div className="flex items-center gap-3 rounded-[10px] border border-line bg-surface p-2">
+                <div className="flex items-center gap-3 rounded-[0.625rem] border border-line bg-surface p-2">
                   {/* eslint-disable-next-line @next/next/no-img-element -- local blob preview */}
-                  <img src={image.url} alt="" className="size-14 rounded-[6px] bg-surface-2 object-contain" />
+                  <img src={image.url} alt="" className="size-14 rounded-[0.375rem] bg-surface-2 object-contain" />
                   <span className="min-w-0 flex-1 truncate text-sm">{image.file.name}</span>
                   <Button size="icon-sm" variant="ghost" aria-label={t.removeImage} onClick={() => setImage(null)}>
                     <X />
@@ -236,7 +236,7 @@ export default function WatermarkTool({ locale, preset = "confidential" }: { loc
                 </Field>
                 {kind === "text" && (
                   <Field label={t.color} htmlFor={`${id}-c`} className="w-16">
-                    <input id={`${id}-c`} type="color" value={color} onChange={(e) => change(setColor)(e.target.value)} className="h-10 w-full cursor-pointer rounded-[8px] border border-line bg-surface p-1" />
+                    <input id={`${id}-c`} type="color" value={color} onChange={(e) => change(setColor)(e.target.value)} className="h-10 w-full cursor-pointer rounded-[0.5rem] border border-line bg-surface p-1" />
                   </Field>
                 )}
                 <RangeField locale={locale} value={range} onChange={change(setRange)} result={pages} pageCount={count} placeholder={`${t.all} (1-${count})`} size="sm" className="w-full sm:w-56" />

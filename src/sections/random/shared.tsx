@@ -47,7 +47,7 @@ export function HistoryPanel({
       ) : render === "inline" ? (
         <ol className="flex flex-wrap gap-1.5 px-4 py-3">
           {items.map((it) => (
-            <li key={it.id} className="tabular rounded-[6px] bg-surface-2 px-2 py-0.5 text-sm text-fg-2">
+            <li key={it.id} className="tabular rounded-[0.375rem] bg-surface-2 px-2 py-0.5 text-sm text-fg-2">
               {it.text}
             </li>
           ))}
@@ -55,8 +55,8 @@ export function HistoryPanel({
       ) : (
         <ol className="max-h-72 overflow-y-auto scrollbar-thin">
           {items.map((it, i) => (
-            <li key={it.id} className={cn("flex items-baseline gap-3 border-b border-line px-4 py-2 text-[15px] last:border-b-0", i === 0 && "font-semibold")}>
-              <span className="tabular w-8 shrink-0 text-right text-[13px] font-normal text-fg-3">{items.length - i}.</span>
+            <li key={it.id} className={cn("flex items-baseline gap-3 border-b border-line px-4 py-2 text-[0.9375rem] last:border-b-0", i === 0 && "font-semibold")}>
+              <span className="tabular w-8 shrink-0 text-right text-[0.8125rem] font-normal text-fg-3">{items.length - i}.</span>
               <span className="min-w-0 break-words text-fg">{it.text}</span>
             </li>
           ))}

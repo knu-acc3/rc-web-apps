@@ -138,7 +138,7 @@ export default function DateGen({ locale, from: from0 = "", to: to0 = "" }: Date
               (dates.length === 1 ? (
                 <p className="text-center text-2xl font-semibold text-balance first-letter:uppercase text-fg sm:text-3xl">{format(dates[0])}</p>
               ) : (
-                <ol className="flex flex-col gap-1 text-[17px] text-fg">
+                <ol className="flex flex-col gap-1 text-[1.0625rem] text-fg">
                   {dates.map((d, i) => (
                     <li key={i} className="flex gap-3">
                       <span className="tabular w-6 shrink-0 text-right text-sm leading-7 text-fg-3">{i + 1}.</span>

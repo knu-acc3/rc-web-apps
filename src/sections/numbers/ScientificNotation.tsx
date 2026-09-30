@@ -116,7 +116,7 @@ export default function ScientificNotation({ locale, value = "0.000123" }: Scien
 
       <div className="mt-5 min-h-16" aria-live="polite">
         {error ? (
-          <p className="text-[15px] text-err">{error}</p>
+          <p className="text-[0.9375rem] text-err">{error}</p>
         ) : x ? (
           <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
             <div className="min-w-0">

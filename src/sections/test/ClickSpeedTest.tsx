@@ -169,7 +169,7 @@ export default function ClickSpeedTest({ locale, seconds = DEFAULT_CPS_DURATION 
           }
         }}
         className={cn(
-          "relative flex min-h-72 w-full touch-manipulation select-none flex-col items-center justify-center gap-2 rounded-[16px] border-2 px-4 py-8 text-center transition-colors duration-100 sm:min-h-80",
+          "relative flex min-h-72 w-full touch-manipulation select-none flex-col items-center justify-center gap-2 rounded-[1rem] border-2 px-4 py-8 text-center transition-colors duration-100 sm:min-h-80",
           running ? "border-accent bg-accent-soft" : showResult ? "border-line bg-surface-2" : "border-dashed border-line-strong bg-surface hover:border-accent",
         )}
       >
@@ -187,17 +187,17 @@ export default function ClickSpeedTest({ locale, seconds = DEFAULT_CPS_DURATION 
         ) : (
           <>
             <span className="text-2xl font-semibold text-fg sm:text-3xl">{t.start}</span>
-            <span className="text-[15px] text-fg-3">{t.startSub}</span>
+            <span className="text-[0.9375rem] text-fg-3">{t.startSub}</span>
           </>
         )}
         {running && (
-          <span className="absolute inset-x-0 bottom-0 h-1.5 overflow-hidden rounded-b-[14px] bg-line" aria-hidden>
+          <span className="absolute inset-x-0 bottom-0 h-1.5 overflow-hidden rounded-b-[0.875rem] bg-line" aria-hidden>
             <span className="block h-full bg-accent" style={{ width: `${(leftS / duration) * 100}%` }} />
           </span>
         )}
       </button>
 
-      <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-1 text-[15px] text-fg-2 tabular">
+      <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-1 text-[0.9375rem] text-fg-2 tabular">
         <span>
           <span className="font-semibold text-fg">{fmt(leftS, 1)}</span> {t.secShort} {t.timeLeft}
         </span>
@@ -212,7 +212,7 @@ export default function ClickSpeedTest({ locale, seconds = DEFAULT_CPS_DURATION 
       <div aria-live="polite" className="flex min-h-10 flex-wrap items-center justify-center gap-3">
         {showResult && (
           <>
-            <span className="text-[15px] text-fg">{t.result(result.clicks, result.seconds, fmt(result.cps))}</span>
+            <span className="text-[0.9375rem] text-fg">{t.result(result.clicks, result.seconds, fmt(result.cps))}</span>
             <Badge tone="accent">{CPS_RANK_LABELS[locale][cpsRank(result.cps)]}</Badge>
             {result.record && <Badge tone="ok">{t.newBest}</Badge>}
             {phase === "done" && (

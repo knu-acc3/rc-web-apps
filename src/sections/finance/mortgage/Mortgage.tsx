@@ -245,11 +245,11 @@ export default function Mortgage({
               <button type="button" className="text-left text-sm text-accent hover:underline" onClick={() => applyPreset(r, d, y)}>
                 {label}
               </button>
-              <span className="text-[13px] text-fg-3"> — {hint}</span>
+              <span className="text-[0.8125rem] text-fg-3"> — {hint}</span>
             </li>
           ))}
         </ul>
-        <p className="text-[13px] text-fg-3">{t.presetsNote}</p>
+        <p className="text-[0.8125rem] text-fg-3">{t.presetsNote}</p>
       </Advanced>
     </>
   );

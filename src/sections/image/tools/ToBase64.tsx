@@ -142,7 +142,7 @@ export default function ToBase64({ locale }: { locale: Locale }) {
           accept={IMAGE_ACCEPT}
           title={s.dropOne}
           hint={s.dropHint}
-          className="min-h-64"
+         
         />
         {error ? <Notice tone="err">{errorText(locale, error)}</Notice> : null}
       </div>
@@ -151,7 +151,7 @@ export default function ToBase64({ locale }: { locale: Locale }) {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex flex-wrap items-end gap-x-4 gap-y-3 rounded-[12px] border border-line bg-surface px-4 py-3">
+      <div className="flex flex-wrap items-end gap-x-4 gap-y-3 rounded-[0.75rem] border border-line bg-surface px-4 py-3">
         <Segmented
           wrap
           label={t.as}
@@ -170,7 +170,7 @@ export default function ToBase64({ locale }: { locale: Locale }) {
       <Panel className="overflow-hidden">
         <div className="flex flex-col gap-4 p-4 sm:flex-row">
           {url && (
-            <div className={`flex size-32 shrink-0 items-center justify-center overflow-hidden rounded-[8px] border border-line ${checker}`}>
+            <div className={`flex size-32 shrink-0 items-center justify-center overflow-hidden rounded-[0.5rem] border border-line ${checker}`}>
               <img
                 src={url}
                 alt={alt}
@@ -216,7 +216,7 @@ export default function ToBase64({ locale }: { locale: Locale }) {
             spellCheck={false}
             className="block min-h-32 w-full resize-y border-t border-line bg-transparent px-3 py-2.5 font-mono text-xs leading-relaxed text-fg-2 focus:outline-none"
           />
-          {value.length > PREVIEW_LIMIT && <p className="border-t border-line px-3 py-2 text-[13px] text-fg-3">{t.truncated}</p>}
+          {value.length > PREVIEW_LIMIT && <p className="border-t border-line px-3 py-2 text-[0.8125rem] text-fg-3">{t.truncated}</p>}
         </div>
       </Panel>
       <Dropzone

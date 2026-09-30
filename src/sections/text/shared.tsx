@@ -113,13 +113,13 @@ export function InputPanel({
   const t = TX[locale];
   const n = graphemeCount(value);
   return (
-    <div className={cn("flex min-w-0 flex-col overflow-hidden rounded-[12px] border border-line bg-surface", className)}>
+    <div className={cn("flex min-w-0 flex-col overflow-hidden rounded-[0.75rem] border border-line bg-surface", className)}>
       <div className="flex min-h-11 items-center justify-between gap-2 border-b border-line px-3 py-1.5">
         <label htmlFor={id} className="min-w-0 truncate text-sm font-semibold text-fg">
           {label ?? t.input}
         </label>
         <div className="flex items-center gap-1">
-          <span className="tabular hidden text-[13px] text-fg-3 sm:inline">{countLabel(locale, n, t.chars)}</span>
+          <span className="tabular hidden text-[0.8125rem] text-fg-3 sm:inline">{countLabel(locale, n, t.chars)}</span>
           {actions}
           {allowFile && <FileOpenButton locale={locale} onText={(text) => onChange(text)} />}
           <button type="button" className={buttonClass("ghost", "sm")} onClick={() => onChange("")} disabled={!value} title={t.clear}>
@@ -137,7 +137,7 @@ export function InputPanel({
         onChange={(e) => onChange(e.target.value)}
         className={cn(
           "min-h-40 w-full resize-y bg-transparent px-3 py-2.5 leading-relaxed text-fg placeholder:text-fg-3 focus:outline-none",
-          mono ? "font-mono text-sm" : "text-[15px]",
+          mono ? "font-mono text-sm" : "text-[0.9375rem]",
         )}
       />
       {footer}
@@ -189,7 +189,7 @@ export function OptionsBar({ children, className }: { children: ReactNode; class
 /** Secondary options, collapsed by default so the tool has one focal point. */
 export function MoreOptions({ locale, children, className }: { locale: Locale; children: ReactNode; className?: string }) {
   return (
-    <details className={cn("group rounded-[12px] border border-line bg-surface", className)}>
+    <details className={cn("group rounded-[0.75rem] border border-line bg-surface", className)}>
       <summary className="flex cursor-pointer list-none items-center gap-2 px-4 py-2.5 text-sm font-medium text-fg-2 hover:text-fg">
         <svg aria-hidden viewBox="0 0 24 24" className="size-4 transition-transform duration-150 group-open:rotate-90" fill="none" stroke="currentColor" strokeWidth="2">
           <path d="m9 6 6 6-6 6" />

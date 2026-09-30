@@ -188,7 +188,7 @@ export default function PdfToImagesTool({ locale, format: format0 = "jpg", choos
               {previews.length > 1 && (
                 <ul className="grid grid-cols-4 gap-2 border-t border-line p-3 sm:grid-cols-6 lg:grid-cols-8">
                   {previews.map((u, i) => (
-                    <li key={u} className="flex aspect-square items-center justify-center overflow-hidden rounded-[6px] bg-surface-2">
+                    <li key={u} className="flex aspect-square items-center justify-center overflow-hidden rounded-[0.375rem] bg-surface-2">
                       {/* eslint-disable-next-line @next/next/no-img-element -- local blob preview */}
                       <img src={u} alt={result[i]?.name ?? ""} className="max-h-full max-w-full object-contain" />
                     </li>

@@ -60,8 +60,8 @@ function CardFace({ card, locale, size = "lg" }: { card: Card; locale: Locale; s
       role="img"
       aria-label={cardName(card, locale)}
       className={cn(
-        "relative flex shrink-0 flex-col justify-between rounded-[10px] border font-semibold select-none",
-        size === "lg" ? "h-44 w-32 p-2.5 sm:h-52 sm:w-36" : "h-20 w-14 rounded-[7px] p-1",
+        "relative flex shrink-0 flex-col justify-between rounded-[0.625rem] border font-semibold select-none",
+        size === "lg" ? "h-44 w-32 p-2.5 sm:h-52 sm:w-36" : "h-20 w-14 rounded-[0.4375rem] p-1",
       )}
       style={{ background: "#ffffff", borderColor: "#c9c9c2", color: red ? "#c62828" : "#15161a" }}
     >

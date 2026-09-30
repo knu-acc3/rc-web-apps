@@ -1,6 +1,8 @@
 /* Variant page texts for the barcode generator and check-digit calculator. */
 
-import type { VariantDef } from "@/registry/types";
+import type { Locale } from "@/i18n/config";
+import type { Block, VariantDef } from "@/registry/types";
+import { gs1Check, isbn10Check, upcEToA } from "./checkdigits";
 import { variant } from "./texts";
 
 const GS1_PREFIXES = {
@@ -406,7 +408,7 @@ export const BARCODE_VARIANTS: VariantDef[] = [
   ),
 ];
 
-export const CHECK_VARIANTS: VariantDef[] = [
+const CHECK_VARIANTS_BASE: VariantDef[] = [
   variant(
     "ean-13",
     { kind: "ean13" },
@@ -630,3 +632,38 @@ export const CHECK_VARIANTS: VariantDef[] = [
     },
   ),
 ];
+
+/** Worked examples for every check-digit page, computed with the calculator's own functions. */
+const CHECK_EXAMPLES: Record<string, { bodies: string[]; check: (body: string) => string }> = {
+  "ean-13": { bodies: ["400638133393", "460123456789", "978030640615", "590123412345"], check: (b) => String(gs1Check(b)) },
+  "ean-8": { bodies: ["9638507", "4007630", "5512345", "2012345"], check: (b) => String(gs1Check(b)) },
+  "upc-a": { bodies: ["03600029145", "01234567890", "04210000526", "07203660010"], check: (b) => String(gs1Check(b)) },
+  "upc-e": { bodies: ["0123456", "0654321", "1123453", "0425261"], check: (b) => String(gs1Check(upcEToA(b[0], b.slice(1)) ?? "")) },
+  "gtin-14": { bodies: ["1400638133393", "0001234560001", "5012345678900", "1061414100001"], check: (b) => String(gs1Check(b)) },
+  "isbn-10": { bodies: ["030640615", "080442957", "059035342", "019853453"], check: isbn10Check },
+};
+
+function examplesBlock(slug: string, l: Locale): Block | null {
+  const ex = CHECK_EXAMPLES[slug];
+  if (!ex) return null;
+  const ru = l === "ru";
+  return {
+    type: "table",
+    title: ru ? "Примеры расчёта" : "Worked examples",
+    head: ru ? ["Цифры без контрольной", "Контрольная цифра", "Полный код"] : ["Digits without check", "Check digit", "Full code"],
+    rows: ex.bodies.map((b) => {
+      const c = ex.check(b);
+      return [b, c, b + c];
+    }),
+    mono: true,
+  };
+}
+
+export const CHECK_VARIANTS: VariantDef[] = CHECK_VARIANTS_BASE.map((v) => ({
+  ...v,
+  blocks: (l: Locale) => {
+    const own = v.blocks?.(l) ?? [];
+    const ex = examplesBlock(v.slug, l);
+    return ex ? [...own, ex] : own;
+  },
+}));

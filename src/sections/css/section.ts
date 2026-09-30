@@ -64,6 +64,7 @@ const BOX_SHADOW: ToolDef = {
 
 const TEXT_SHADOW: ToolDef = {
   slug: "text-shadow-generator",
+  seoAlt: { ru: ["генератор text-shadow", "text-shadow"], en: ["text-shadow generator", "CSS text-shadow", "code"] },
   component: "css/shadow",
   icon: "Type",
   wide: true,
@@ -236,6 +237,7 @@ const ANIMATION: ToolDef = {
 
 const FLEXBOX: ToolDef = {
   slug: "flexbox-generator",
+  seoAlt: { ru: ["генератор flexbox с кодом CSS", "flexbox-генератор", "CSS flexbox"], en: ["flexbox generator with CSS code", "flexbox generator", "CSS flexbox"] },
   component: "css/flexbox",
   icon: "Columns3",
   popular: true,
@@ -280,6 +282,7 @@ const FLEXBOX: ToolDef = {
 
 const GRID: ToolDef = {
   slug: "css-grid-generator",
+  seoAlt: { ru: ["генератор CSS Grid с кодом", "генератор CSS Grid", "CSS Grid"], en: ["CSS Grid generator with code", "CSS Grid generator", "CSS Grid code"] },
   component: "css/grid",
   icon: "LayoutGrid",
   popular: true,

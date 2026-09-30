@@ -123,7 +123,7 @@ export default function Checksum({ locale }: { locale: Locale }) {
       <Dropzone multiple onFiles={start} title={t.drop} hint={t.dropHint} className="mt-4" compact={rows.length > 0} />
 
       {rows.length > 0 && (
-        <div className="mt-4 overflow-hidden rounded-[10px] border border-line">
+        <div className="mt-4 overflow-hidden rounded-[0.625rem] border border-line">
           {done.length > 0 && !busy && (
             <p className={`border-b border-line px-3 py-2.5 text-lg font-semibold ${matched === done.length ? "text-ok" : "text-err"}`} aria-live="polite">
               {t.summary(matched, done.length)}
@@ -136,7 +136,7 @@ export default function Checksum({ locale }: { locale: Locale }) {
                 <li key={i} className="flex flex-col gap-1 px-3 py-2.5">
                   <div className="flex items-center justify-between gap-2 text-sm">
                     <span className="min-w-0 truncate text-fg-2">{r.file.name}</span>
-                    <span className="shrink-0 text-[13px] text-fg-3">
+                    <span className="shrink-0 text-[0.8125rem] text-fg-3">
                       {r.algo ? ALGO_BY_ID.get(r.algo)?.name : ""} · {formatBytes(locale, r.file.size)}
                     </span>
                   </div>
@@ -146,10 +146,10 @@ export default function Checksum({ locale }: { locale: Locale }) {
                     <div className={`flex items-center gap-1.5 text-sm ${verdict === "ok" ? "text-ok" : verdict === "bad" ? "text-err" : "text-fg-3"}`}>
                       {verdict === "ok" ? <CircleCheck className="size-4 shrink-0" aria-hidden /> : verdict === "bad" ? <CircleX className="size-4 shrink-0" aria-hidden /> : <CircleHelp className="size-4 shrink-0" aria-hidden />}
                       <span className="font-semibold">{verdict === "ok" ? t.ok : verdict === "bad" ? t.bad : r.algo ? t.computed : t.missing}</span>
-                      {r.digest && <code className="min-w-0 font-mono text-[13px] break-all text-fg">{r.digest}</code>}
+                      {r.digest && <code className="min-w-0 font-mono text-[0.8125rem] break-all text-fg">{r.digest}</code>}
                     </div>
                   ) : (
-                    <span className="text-[13px] text-fg-3">{r.state === "wait" ? t.waiting : r.state === "cancel" ? t.cancelled : r.error}</span>
+                    <span className="text-[0.8125rem] text-fg-3">{r.state === "wait" ? t.waiting : r.state === "cancel" ? t.cancelled : r.error}</span>
                   )}
                 </li>
               );

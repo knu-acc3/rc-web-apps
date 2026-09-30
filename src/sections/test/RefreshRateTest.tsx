@@ -176,14 +176,14 @@ export default function RefreshRateTest({ locale }: { locale: Locale }) {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex flex-col items-center gap-2 rounded-[12px] border border-line bg-surface px-4 py-8 text-center sm:py-10">
+      <div className="flex flex-col items-center gap-2 rounded-[0.75rem] border border-line bg-surface px-4 py-8 text-center sm:py-10">
         <div aria-live="polite" className="flex flex-col items-center gap-2">
           {stats && snap ? (
             <>
               <div className="tabular text-6xl font-bold tracking-tight text-fg sm:text-7xl">
                 {snap.close ? snap.rate : nf(stats.medianHz)} <span className="text-3xl font-semibold text-fg-2 sm:text-4xl">{t.hz}</span>
               </div>
-              <div className="text-[15px] text-fg-2">{snap.close ? t.measured(nf(stats.medianHz, 2)) : t.notStandard}</div>
+              <div className="text-[0.9375rem] text-fg-2">{snap.close ? t.measured(nf(stats.medianHz, 2)) : t.notStandard}</div>
               {stab && <Badge tone={stab === "stable" ? "ok" : stab === "ok" ? "neutral" : "warn"}>{t.stability[stab]}</Badge>}
             </>
           ) : (
@@ -191,7 +191,7 @@ export default function RefreshRateTest({ locale }: { locale: Locale }) {
               <div className="tabular text-6xl font-bold tracking-tight text-fg-3 sm:text-7xl">
                 {live ? Math.round(live) : "—"} <span className="text-3xl font-semibold sm:text-4xl">{t.hz}</span>
               </div>
-              <div className="text-[15px] text-fg-2">
+              <div className="text-[0.9375rem] text-fg-2">
                 {t.measuring} {t.keep}
               </div>
             </>
@@ -220,7 +220,7 @@ export default function RefreshRateTest({ locale }: { locale: Locale }) {
             {t.live}: {live ? `${nf(live)} ${t.hz}` : "—"}
           </span>
         </div>
-        <canvas ref={canvasRef} className="block h-24 w-full rounded-[10px] bg-surface-2" aria-hidden />
+        <canvas ref={canvasRef} className="block h-24 w-full rounded-[0.625rem] bg-surface-2" aria-hidden />
       </div>
 
       {stats && (

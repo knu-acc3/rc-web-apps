@@ -148,7 +148,7 @@ export default function VideoCompress({ locale }: { locale: Locale }) {
           <div className="flex flex-col gap-3">
             <VideoPreview file={file} label={t.preview} />
             {estimate > 0 && !error && (
-              <div className="rounded-[12px] bg-surface-2 px-4 py-3" aria-live="polite">
+              <div className="rounded-[0.75rem] bg-surface-2 px-4 py-3" aria-live="polite">
                 <div className="text-sm text-fg-2">{t.estimate}</div>
                 <div className="tabular text-3xl font-semibold text-fg">
                   ≈ {formatBytes(locale, estimate)}
@@ -156,7 +156,7 @@ export default function VideoCompress({ locale }: { locale: Locale }) {
                     {outW}×{outH}
                   </span>
                 </div>
-                <p className="mt-1 text-[13px] text-fg-3">{t.estimateNote.replace("{v}", rate(locale, videoBps)).replace("{a}", rate(locale, audioBps))}</p>
+                <p className="mt-1 text-[0.8125rem] text-fg-3">{t.estimateNote.replace("{v}", rate(locale, videoBps)).replace("{a}", rate(locale, audioBps))}</p>
               </div>
             )}
           </div>

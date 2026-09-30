@@ -259,7 +259,7 @@ export default function Exif({ locale }: { locale: Locale }) {
   if (!items.length) {
     return (
       <div className="flex flex-col gap-3">
-        <Dropzone onFiles={add} accept={IMAGE_ACCEPT} multiple title={s.dropMany} hint={s.dropHint} className="min-h-64" />
+        <Dropzone onFiles={add} accept={IMAGE_ACCEPT} multiple title={s.dropMany} hint={s.dropHint} />
         {loading && (
           <p className="flex items-center gap-2 text-sm text-fg-2">
             <Loader2 className="size-4 animate-spin" aria-hidden />
@@ -302,7 +302,7 @@ export default function Exif({ locale }: { locale: Locale }) {
   return (
     <div className="flex flex-col gap-4">
       {items.length > 1 && (
-        <div className="flex flex-wrap items-end gap-3 rounded-[12px] border border-line bg-surface px-4 py-3">
+        <div className="flex flex-wrap items-end gap-3 rounded-[0.75rem] border border-line bg-surface px-4 py-3">
           <Field label={t.file} htmlFor={`${id}-f`} className="min-w-56 flex-1">
             <Select
               id={`${id}-f`}
@@ -340,7 +340,7 @@ export default function Exif({ locale }: { locale: Locale }) {
           </Button>
         </div>
         {done && (
-          <p className="border-t border-line px-4 py-2.5 text-[13px] text-ok">
+          <p className="border-t border-line px-4 py-2.5 text-[0.8125rem] text-ok">
             {done.lossless ? t.lossless : t.reencoded} · {formatBytes(locale, done.size)}
           </p>
         )}
@@ -397,20 +397,20 @@ export default function Exif({ locale }: { locale: Locale }) {
       </Panel>
 
       {count > 0 && (
-        <details className="rounded-[12px] border border-line bg-surface">
+        <details className="rounded-[0.75rem] border border-line bg-surface">
           <summary className="cursor-pointer px-4 py-3 text-sm font-semibold text-fg">
             {t.all} ({count})
           </summary>
           {Object.entries(tags).map(([group, values]) =>
             values && typeof values === "object" && Object.keys(values).length ? (
               <div key={group} className="border-t border-line">
-                <h3 className="bg-surface-2 px-4 py-2 text-[13px] font-semibold text-fg-2">{t.group[group] ?? group}</h3>
+                <h3 className="bg-surface-2 px-4 py-2 text-[0.8125rem] font-semibold text-fg-2">{t.group[group] ?? group}</h3>
                 <div tabIndex={0} className="tbl rounded-none! border-0!">
                   <table>
                     <tbody>
                       {Object.entries(values).map(([k, v]) => (
                         <tr key={k}>
-                          <td className="w-1/3 font-mono text-[13px] text-fg-2">{k}</td>
+                          <td className="w-1/3 font-mono text-[0.8125rem] text-fg-2">{k}</td>
                           <td className="break-all">{show(locale, v)}</td>
                         </tr>
                       ))}

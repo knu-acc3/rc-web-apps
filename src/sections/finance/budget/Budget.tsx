@@ -122,7 +122,7 @@ export default function Budget({ locale }: ToolProps) {
   return (
     <Stack>
       <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)] lg:gap-6">
-        <section className="flex min-w-0 flex-col gap-4 rounded-[12px] border border-line bg-surface p-4 sm:p-5">
+        <section className="flex min-w-0 flex-col gap-4 rounded-[0.75rem] border border-line bg-surface p-4 sm:p-5">
           <NumField
             id={`${id}-inc`}
             label={t.income}

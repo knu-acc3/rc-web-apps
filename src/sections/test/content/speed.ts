@@ -202,6 +202,7 @@ function cpsBlocks(v: CpsVariant, locale: Locale): Block[] {
 
 export const clickSpeedTool: ToolDef = {
   slug: "click-speed-test",
+  seoAlt: { ru: ["тест CPS онлайн", "CPS тест"], en: ["CPS test online", "CPS test"] },
   component: "test/click-speed",
   icon: "MousePointerClick",
   popular: true,

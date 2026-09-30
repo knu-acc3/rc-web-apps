@@ -36,7 +36,7 @@ export function SwatchStrip({
     [],
   );
   return (
-    <ul className={cn("grid auto-cols-fr grid-flow-col overflow-hidden rounded-[10px] border border-line", className)}>
+    <ul className={cn("grid auto-cols-fr grid-flow-col overflow-hidden rounded-[0.625rem] border border-line", className)}>
       {items.map((it, i) => {
         const hex = toHex(it.color);
         const fg = readableTextColor(it.color);
@@ -56,8 +56,8 @@ export function SwatchStrip({
                 }
               }}
             >
-              {it.caption && <span className="text-[11px] leading-none">{it.caption}</span>}
-              <span className="font-mono text-[11px] leading-tight font-medium break-all sm:text-xs">
+              {it.caption && <span className="text-[0.6875rem] leading-none">{it.caption}</span>}
+              <span className="font-mono text-[0.6875rem] leading-tight font-medium break-all sm:text-xs">
                 {copied === i ? (
                   <span className="inline-flex items-center gap-0.5">
                     <Check className="size-3" aria-hidden />

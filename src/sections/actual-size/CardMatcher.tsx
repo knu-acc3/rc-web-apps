@@ -106,7 +106,7 @@ export function CardMatcher({
           style={{ width: w, height: h, borderRadius: CARD.r * pxPerMm, boxSizing: "border-box" }}
         >
           <span
-            className="absolute rounded-[3px] border border-warn bg-warn-soft"
+            className="absolute rounded-[0.1875rem] border border-warn bg-warn-soft"
             style={
               portrait
                 ? { width: 9 * pxPerMm, height: 11.5 * pxPerMm, right: 18 * pxPerMm, top: 10 * pxPerMm }

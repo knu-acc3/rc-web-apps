@@ -83,7 +83,7 @@ export function FieldGrid({ specs, f, set, locale, id }: { specs: FieldSpec[]; f
 /** Secondary fields tucked under a disclosure. */
 export function More({ label, children }: { label: string; children: ReactNode }) {
   return (
-    <details className="rounded-[12px] border border-line">
+    <details className="rounded-[0.75rem] border border-line">
       <summary className="cursor-pointer px-4 py-2.5 text-sm font-medium text-fg-2 select-none hover:text-fg">{label}</summary>
       <div className="px-4 pt-1 pb-4">{children}</div>
     </details>
@@ -113,7 +113,7 @@ export function Meter({ value, max, label, unit }: { value: number; max: number;
   const tone = value > max ? "bg-err" : value > max * 0.9 ? "bg-warn" : "bg-ok";
   return (
     <div className="flex min-w-0 flex-col gap-1">
-      <div className="flex items-baseline justify-between gap-2 text-[13px] text-fg-3">
+      <div className="flex items-baseline justify-between gap-2 text-[0.8125rem] text-fg-3">
         <span>{label}</span>
         <span className={cn("tabular-nums", value > max && "font-semibold text-err")}>
           {Math.round(value)} / {max} {unit}

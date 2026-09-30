@@ -235,7 +235,7 @@ export default function Orient({ locale, mode = "rotate" }: OrientProps) {
       more={hasJpeg || mode === "rotate" ? more : undefined}
       zipName={mode === "flip" ? "flipped-images.zip" : "rotated-images.zip"}
       stage={(it) => <LiveStage locale={locale} prepared={it.prepared} ops={ops} />}
-      extra={(it) => (it.result?.lossless ? <p className="text-[13px] text-ok">{t.losslessNote(it.result.quality ?? 1)}</p> : null)}
+      extra={(it) => (it.result?.lossless ? <p className="text-[0.8125rem] text-ok">{t.losslessNote(it.result.quality ?? 1)}</p> : null)}
     />
   );
 }

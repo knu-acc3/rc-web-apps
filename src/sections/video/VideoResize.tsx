@@ -84,7 +84,7 @@ function VideoResizeInner({ locale, aspect: aspect0 = "9:16" }: { locale: Locale
       preview={
         file && (
           <div className="flex flex-col items-center gap-3">
-            <div className="relative w-full overflow-hidden rounded-[12px]" style={v ? { maxWidth: `calc(55vh * ${v.width} / ${v.height})`, aspectRatio: `${v.width} / ${v.height}` } : undefined}>
+            <div className="relative w-full overflow-hidden rounded-[0.75rem]" style={v ? { maxWidth: `calc(55vh * ${v.width} / ${v.height})`, aspectRatio: `${v.width} / ${v.height}` } : undefined}>
               <VideoPreview file={file} label={t.preview} className="h-full w-full" style={{ width: "100%", height: "100%", maxHeight: "none" }} />
               {overlay && (
                 <div

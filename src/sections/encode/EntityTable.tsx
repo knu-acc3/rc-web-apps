@@ -44,11 +44,11 @@ export default function EntityTable({ locale }: { locale: Locale }) {
       <Field label={t.search} htmlFor={`${id}-q`}>
         <Input id={`${id}-q`} size="lg" value={q} onChange={(e) => setQ(e.target.value)} placeholder={t.ph} autoComplete="off" spellCheck={false} />
       </Field>
-      <p className="mt-2 text-[13px] text-fg-3" aria-live="polite">
+      <p className="mt-2 text-[0.8125rem] text-fg-3" aria-live="polite">
         {rows ? `${t.found}: ${formatNumber(locale, found.length)} · ${t.hint}` : t.loading}
       </p>
       {rows && (
-        <ul className="mt-3 grid gap-px overflow-hidden rounded-[10px] border border-line bg-line sm:grid-cols-2">
+        <ul className="mt-3 grid gap-px overflow-hidden rounded-[0.625rem] border border-line bg-line sm:grid-cols-2">
           {found.slice(0, LIMIT).map(([n, c]) => (
             <li key={n} className="bg-surface">
               <button
@@ -60,8 +60,8 @@ export default function EntityTable({ locale }: { locale: Locale }) {
               >
                 <span className="w-10 shrink-0 text-center text-2xl text-fg">{c}</span>
                 <span className="min-w-0 flex-1">
-                  <span className="block truncate font-mono text-[14px] text-fg">&amp;{n};</span>
-                  <span className="block font-mono text-[12px] text-fg-3">
+                  <span className="block truncate font-mono text-[0.875rem] text-fg">&amp;{n};</span>
+                  <span className="block font-mono text-[0.75rem] text-fg-3">
                     {cpOf(c)} · &amp;#{c.codePointAt(0)};{copied === n && <span className="ml-2 font-sans text-ok">{t.copied}</span>}
                   </span>
                 </span>
@@ -70,7 +70,7 @@ export default function EntityTable({ locale }: { locale: Locale }) {
           ))}
         </ul>
       )}
-      {found.length > LIMIT && <p className="mt-2 text-[13px] text-fg-3">{t.more}</p>}
+      {found.length > LIMIT && <p className="mt-2 text-[0.8125rem] text-fg-3">{t.more}</p>}
     </Panel>
   );
 }

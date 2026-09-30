@@ -212,6 +212,7 @@ function nameVariant(p: NamePreset): VariantDef {
 
 export const nameTool: ToolDef = {
   slug: "random-name-generator",
+  seoAlt: { ru: ["случайные имена и фамилии", "случайные имена", "имена"], en: ["random first and last names", "random names", "names"] },
   component: "random/name",
   icon: "Contact",
   name: { ru: "Генератор имён", en: "Random name generator" },

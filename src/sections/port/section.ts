@@ -256,8 +256,8 @@ function portPage(p: PortDef, l: Locale): PageModel {
     );
 
   const title = ru
-    ? fit([`Порт ${p.port} — ${s}: для чего нужен и как проверить`, `Порт ${p.port} — ${s}: для чего нужен`, `Порт ${p.port} (${s})`, `Порт ${p.port} — для чего нужен и как проверить`])
-    : fit([`Port ${p.port} — ${s}: What It Is and How to Check`, `Port ${p.port} — ${s}: What It Is Used For`, `Port ${p.port} (${s})`, `Port ${p.port} — What It Is and How to Check`]);
+    ? fit([`Порт ${p.port} — ${s} | для чего нужен и как проверить`, `Порт ${p.port} — ${s} | для чего нужен`, `Порт ${p.port} | ${s}`, `Порт ${p.port} | для чего нужен и как проверить`])
+    : fit([`Port ${p.port} — ${s} | What It Is and How to Check`, `Port ${p.port} — ${s} | What It Is Used For`, `Port ${p.port} | ${s}`, `Port ${p.port} | What It Is and How to Check`]);
   const intro = leadText(d);
   const ruIntro = intro.replace(/^Порт \d+ — /, "").replace(/^Порты? [\d–]+ /, "").replace(/^[А-ЯЁ](?=[а-яё])/, (c) => c.toLowerCase());
   const base = ru ? `Порт ${p.port} (${proto}) — ${ruIntro}` : `Port ${p.port} (${proto}) — ${intro.replace(/^Port \d+ is /, "").replace(/^Ports? [\d–]+ (is |are )?/, "")}`;

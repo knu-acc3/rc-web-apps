@@ -114,11 +114,11 @@ export default function ToTextTool({ locale, format: format0 = "txt" }: { locale
               </Button>
             </div>
           </div>
-          <div className="overflow-hidden rounded-[12px] border border-line bg-surface">
+          <div className="overflow-hidden rounded-[0.75rem] border border-line bg-surface">
             <p className="tabular border-b border-line px-4 py-2 text-sm text-fg-2" aria-live="polite">
               {t.stats(current.length, plain.length, words)}
             </p>
-            <textarea readOnly value={shown} aria-label={t.label} rows={16} spellCheck={false} className="block min-h-72 w-full resize-y bg-transparent px-4 py-3 text-[15px] leading-relaxed text-fg focus:outline-none" />
+            <textarea readOnly value={shown} aria-label={t.label} rows={16} spellCheck={false} className="block min-h-72 w-full resize-y bg-transparent px-4 py-3 text-[0.9375rem] leading-relaxed text-fg focus:outline-none" />
           </div>
           <p className="text-sm text-fg-3">{t.honest}</p>
         </>

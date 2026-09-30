@@ -91,11 +91,11 @@ function Item({ locale, label, value, slug }: { locale: Locale; label: string; v
   return (
     <div className="flex min-w-0 flex-col gap-0.5 border-b border-line py-3">
       <dt>
-        <Link href={`/${locale}/${slug}`} className="text-[13px] text-fg-3 hover:text-accent">
+        <Link href={`/${locale}/${slug}`} className="text-[0.8125rem] text-fg-3 hover:text-accent">
           {label}
         </Link>
       </dt>
-      <dd className="text-[17px] font-semibold break-words text-fg">{value ?? <Pending locale={locale} />}</dd>
+      <dd className="text-[1.0625rem] font-semibold break-words text-fg">{value ?? <Pending locale={locale} />}</dd>
     </div>
   );
 }
@@ -143,7 +143,7 @@ export default function Summary({ locale }: ToolProps) {
           <Item key={x.slug} locale={locale} label={x.label} value={x.value} slug={x.slug} />
         ))}
       </dl>
-      <p className="px-5 py-3 text-[13px] text-fg-3 sm:px-7">{c.local}</p>
+      <p className="px-5 py-3 text-[0.8125rem] text-fg-3 sm:px-7">{c.local}</p>
       <noscript>
         <p className="border-t border-line bg-warn-soft px-5 py-3 text-sm text-warn sm:px-7">{c.noscript}</p>
       </noscript>

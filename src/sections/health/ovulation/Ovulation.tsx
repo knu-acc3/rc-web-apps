@@ -81,7 +81,7 @@ function MonthGrid({ locale, year, month, cs, today }: { locale: Locale; year: n
       <thead>
         <tr>
           {t.week.map((d) => (
-            <th key={d} scope="col" className="text-[12px] font-medium text-fg-3">
+            <th key={d} scope="col" className="text-[0.75rem] font-medium text-fg-3">
               {d}
             </th>
           ))}
@@ -100,7 +100,7 @@ function MonthGrid({ locale, year, month, cs, today }: { locale: Locale; year: n
                   title={label}
                   aria-label={label ? `${fmtDay(locale, d)} — ${label}` : undefined}
                   className={cn(
-                    "tabular h-8 rounded-[8px]",
+                    "tabular h-8 rounded-[0.5rem]",
                     k === "ovulation" && "bg-ok font-bold text-white",
                     k === "fertile" && "bg-ok-soft font-medium text-ok",
                     k === "period" && "bg-err-soft text-err",
@@ -170,14 +170,14 @@ export default function Ovulation({ locale }: ToolProps) {
             actions={<ToolActions locale={locale} onReset={q.reset} shareUrl={q.shareUrl} />}
             size="md"
           >
-            <p className="mt-3 text-[13px] text-fg-2">{t.notContraception}</p>
+            <p className="mt-3 text-[0.8125rem] text-fg-2">{t.notContraception}</p>
           </ResultMain>
         }
       />
       {cs && (
         <section>
           <SubHeading>{t.calendar}</SubHeading>
-          <ul className="mb-3 flex flex-wrap gap-x-4 gap-y-1 text-[13px] text-fg-2">
+          <ul className="mb-3 flex flex-wrap gap-x-4 gap-y-1 text-[0.8125rem] text-fg-2">
             <li className="inline-flex items-center gap-1.5">
               <span aria-hidden className="inline-block size-3 rounded bg-err-soft" /> {t.period}
             </li>
@@ -190,7 +190,7 @@ export default function Ovulation({ locale }: ToolProps) {
           </ul>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {months.slice(0, 6).map(({ y, m }) => (
-              <div key={`${y}-${m}`} className="rounded-[12px] border border-line bg-surface p-3">
+              <div key={`${y}-${m}`} className="rounded-[0.75rem] border border-line bg-surface p-3">
                 <MonthGrid locale={locale} year={y} month={m} cs={cs} today={todayDay} />
               </div>
             ))}

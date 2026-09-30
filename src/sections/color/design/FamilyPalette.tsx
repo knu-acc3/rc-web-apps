@@ -88,7 +88,7 @@ export default function FamilyPalette({ locale, kind, families, single = false }
     <div className="flex flex-col gap-4">
       <Segmented label={t.format} value={fmt} onChange={setFmt} options={options} size="sm" className="self-start" />
       {single ? (
-        <ul className="overflow-hidden rounded-[12px] border border-line">
+        <ul className="overflow-hidden rounded-[0.75rem] border border-line">
           {families[0].rows.map((r) => {
             const v = valueOf(r, fmt, kind);
             const key = `${families[0].slug}-${r.step}`;
@@ -126,7 +126,7 @@ export default function FamilyPalette({ locale, kind, families, single = false }
                         title={`${r.token} · ${v}`}
                         aria-label={`${t.copy} ${v}`}
                         onClick={() => copy(key, v)}
-                        className={cn("flex h-9 w-full items-center justify-center rounded-[4px] text-[10px] font-medium sm:h-11")}
+                        className={cn("flex h-9 w-full items-center justify-center rounded-[0.25rem] text-[0.625rem] font-medium sm:h-11")}
                         style={{ background: r.hex, color: r.fg }}
                       >
                         {copied === key ? "✓" : <span className="hidden md:inline">{r.step}</span>}

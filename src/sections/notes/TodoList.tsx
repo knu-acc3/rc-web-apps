@@ -251,7 +251,7 @@ export default function TodoList({ locale, template }: { locale: Locale; templat
         </Button>
       </form>
 
-      <div className="rounded-[12px] border border-line bg-surface">
+      <div className="rounded-[0.75rem] border border-line bg-surface">
         {items.length === 0 ? (
           <p className="px-4 py-6 text-center text-sm text-fg-3">{t.empty}</p>
         ) : shown.length === 0 ? (
@@ -278,7 +278,7 @@ export default function TodoList({ locale, template }: { locale: Locale; templat
                     type="button"
                     aria-label={t.move(item.text)}
                     title={t.move(item.text)}
-                    className="flex size-8 shrink-0 cursor-grab touch-none items-center justify-center rounded-[6px] text-fg-3 hover:bg-surface-2 hover:text-fg active:cursor-grabbing"
+                    className="flex size-8 shrink-0 cursor-grab touch-none items-center justify-center rounded-[0.375rem] text-fg-3 hover:bg-surface-2 hover:text-fg active:cursor-grabbing"
                     onKeyDown={(e) => {
                       if (e.key === "ArrowUp" || e.key === "ArrowDown") {
                         e.preventDefault();
@@ -312,14 +312,14 @@ export default function TodoList({ locale, template }: { locale: Locale; templat
                     checked={item.done}
                     aria-label={t.doneLabel(item.text)}
                     onChange={(e) => update((xs) => xs.map((x) => (x.id === item.id ? { ...x, done: e.target.checked } : x)))}
-                    className="size-[18px] shrink-0 cursor-pointer accent-[var(--accent)]"
+                    className="size-[1.125rem] shrink-0 cursor-pointer accent-[var(--accent)]"
                   />
                   <input
                     value={item.text}
                     aria-label={t.edit(item.text)}
                     onChange={(e) => update((xs) => xs.map((x) => (x.id === item.id ? { ...x, text: e.target.value } : x)))}
                     className={cn(
-                      "min-w-0 flex-1 rounded-[6px] bg-transparent px-2 py-1.5 text-[15px] focus:bg-surface-2 focus:outline-none",
+                      "min-w-0 flex-1 rounded-[0.375rem] bg-transparent px-2 py-1.5 text-[0.9375rem] focus:bg-surface-2 focus:outline-none",
                       item.done ? "text-fg-3 line-through" : "text-fg",
                     )}
                   />
@@ -329,17 +329,17 @@ export default function TodoList({ locale, template }: { locale: Locale; templat
                     aria-label={t.dueLabel(item.text)}
                     onChange={(e) => update((xs) => xs.map((x) => (x.id === item.id ? { ...x, due: e.target.value } : x)))}
                     className={cn(
-                      "hidden w-36 shrink-0 rounded-[6px] bg-transparent px-1.5 py-1 text-[13px] sm:block",
+                      "hidden w-36 shrink-0 rounded-[0.375rem] bg-transparent px-1.5 py-1 text-[0.8125rem] sm:block",
                       item.due ? (overdue ? "text-err" : "text-fg-2") : "text-fg-3 opacity-0 group-focus-within:opacity-100 group-hover:opacity-100 focus:opacity-100",
                     )}
                   />
-                  {overdue && <span className="shrink-0 text-[12px] text-err sm:hidden">{t.overdue}</span>}
+                  {overdue && <span className="shrink-0 text-[0.75rem] text-err sm:hidden">{t.overdue}</span>}
                   <button
                     type="button"
                     aria-label={t.remove(item.text)}
                     title={t.remove(item.text)}
                     onClick={() => update((xs) => xs.filter((x) => x.id !== item.id))}
-                    className="flex size-8 shrink-0 items-center justify-center rounded-[6px] text-fg-3 opacity-60 hover:bg-err-soft hover:text-err hover:opacity-100 focus:opacity-100"
+                    className="flex size-8 shrink-0 items-center justify-center rounded-[0.375rem] text-fg-3 opacity-60 hover:bg-err-soft hover:text-err hover:opacity-100 focus:opacity-100"
                   >
                     <X className="size-4" aria-hidden />
                   </button>
@@ -413,7 +413,7 @@ export default function TodoList({ locale, template }: { locale: Locale; templat
             {confirmDel ? t.confirmDelete : t.deleteList}
           </button>
         )}
-        <p className="w-full text-[13px] text-fg-3">{lastWriteFailed() ? t.notSaved : t.saved}</p>
+        <p className="w-full text-[0.8125rem] text-fg-3">{lastWriteFailed() ? t.notSaved : t.saved}</p>
       </MoreOptions>
       <p className="sr-only">{countLabel(locale, items.length, t.tasks)}</p>
     </div>

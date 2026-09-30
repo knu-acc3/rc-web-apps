@@ -29,12 +29,12 @@ export default function MorseChart({ locale }: { locale: Locale }) {
       {ordered.map(([title, rows]) => (
         <section key={title}>
           <h2 className="mb-2 text-base font-semibold text-fg">{title}</h2>
-          <ul className="grid grid-cols-2 gap-px overflow-hidden rounded-[12px] border border-line bg-line sm:grid-cols-4 lg:grid-cols-6">
+          <ul className="grid grid-cols-2 gap-px overflow-hidden rounded-[0.75rem] border border-line bg-line sm:grid-cols-4 lg:grid-cols-6">
             {rows.map(([ch, code]) => (
               <li key={ch} className="bg-surface">
                 <button type="button" className="flex w-full items-baseline justify-between gap-2 px-3 py-2 text-left hover:bg-surface-2" onClick={() => player.play(code, { wpm: 15, freq: 600 })}>
                   <span className="font-semibold text-fg">{ch}</span>
-                  <span className="font-mono text-[15px] tracking-wider text-fg-2">{pretty(code)}</span>
+                  <span className="font-mono text-[0.9375rem] tracking-wider text-fg-2">{pretty(code)}</span>
                 </button>
               </li>
             ))}

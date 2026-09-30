@@ -161,7 +161,7 @@ export default function CubicBezierEditor({ locale, value = [0.25, 0.1, 0.25, 1]
 
         <div className="flex min-w-0 flex-col gap-4">
           <Panel className="flex flex-col gap-3 p-4 sm:p-5">
-            <div className="flex items-center justify-between gap-2 rounded-[10px] bg-surface-2 px-4 py-3">
+            <div className="flex items-center justify-between gap-2 rounded-[0.625rem] bg-surface-2 px-4 py-3">
               <code className="min-w-0 font-mono text-lg font-semibold break-all text-fg sm:text-xl">{css}</code>
               <CopyButton value={css} label={t.copy} copiedLabel={t.copied} size="sm" variant="ghost" />
             </div>

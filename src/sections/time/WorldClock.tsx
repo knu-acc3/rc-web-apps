@@ -32,7 +32,7 @@ export default function WorldClock({ locale, defaults }: WorldClockProps) {
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 px-1">
-        <p className="text-[15px] text-fg-2">
+        <p className="text-[0.9375rem] text-fg-2">
           {t.you}:{" "}
           <span className="tabular text-xl font-semibold text-fg">{me ? hms(me) : "--:--:--"}</span>
           <span className="text-fg-3"> {me && tz ? `· ${longDate(locale, me)} · ${modernZone(tz)}, ${fmtOffset(me.off)}` : ""}</span>
@@ -54,7 +54,7 @@ export default function WorldClock({ locale, defaults }: WorldClockProps) {
                     <button
                       type="button"
                       onClick={() => setPlaces(places.filter((x) => x.key !== p.key))}
-                      className="rounded-[6px] p-1 text-fg-3 hover:bg-surface-2 hover:text-err"
+                      className="rounded-[0.375rem] p-1 text-fg-3 hover:bg-surface-2 hover:text-err"
                       aria-label={`${t.remove}: ${p.name}`}
                     >
                       <X className="size-4" aria-hidden />
@@ -66,7 +66,7 @@ export default function WorldClock({ locale, defaults }: WorldClockProps) {
                   )}
                 </div>
                 <span className="tabular text-4xl font-semibold tracking-tight text-fg">{q ? hms(q, false) : "--:--"}</span>
-                <span className="text-[13px] text-fg-3">
+                <span className="text-[0.8125rem] text-fg-3">
                   {q ? (
                     <>
                       {shortDate(locale, q)}

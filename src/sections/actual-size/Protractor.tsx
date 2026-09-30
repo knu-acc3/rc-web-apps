@@ -108,7 +108,7 @@ export default function Protractor({ locale }: { locale: Locale }) {
         <svg
           ref={svgRef}
           viewBox={`0 0 ${W} ${H}`}
-          className="mx-auto block w-full max-w-[760px] select-none"
+          className="mx-auto block w-full max-w-[47.5rem] select-none"
           role="group"
           aria-label={t.label}
           onClick={(e) => {

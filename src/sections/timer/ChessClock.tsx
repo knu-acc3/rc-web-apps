@@ -163,14 +163,14 @@ export default function ChessClock({ locale, minutes = 5, increment = 0 }: Chess
         disabled={status === "flag" || status === "paused" || (status === "running" && active !== side)}
         aria-label={`${t.player(side + 1)}: ${clock(left)}. ${t.tap}`}
         className={cn(
-          "flex min-h-[34vh] flex-1 flex-col items-center justify-center gap-2 rounded-[12px] border-2 transition-colors sm:min-h-[46vh]",
+          "flex min-h-[34vh] flex-1 flex-col items-center justify-center gap-2 rounded-[0.75rem] border-2 transition-colors sm:min-h-[46vh]",
           side === 0 && "max-sm:rotate-180",
           lost ? "border-err bg-err-soft text-err" : isActive ? "border-accent bg-accent text-accent-fg" : "border-line bg-surface text-fg disabled:opacity-70",
         )}
       >
         <span className="text-sm font-medium opacity-80">{t.player(side + 1)}</span>
-        <span className="tabular text-[min(18vw,120px)] leading-none font-semibold tracking-tight">{left < 10000 && left > 0 ? `${Math.floor(left / 1000)}.${Math.floor((left % 1000) / 100)}` : clock(left)}</span>
-        <span className="text-[13px] opacity-80">{lost ? t.flag : t.moves(moves[side])}</span>
+        <span className="tabular text-[min(18vw,7.5rem)] leading-none font-semibold tracking-tight">{left < 10000 && left > 0 ? `${Math.floor(left / 1000)}.${Math.floor((left % 1000) / 100)}` : clock(left)}</span>
+        <span className="text-[0.8125rem] opacity-80">{lost ? t.flag : t.moves(moves[side])}</span>
       </button>
     );
   };
@@ -219,7 +219,7 @@ export default function ChessClock({ locale, minutes = 5, increment = 0 }: Chess
             ))}
           </Select>
         </div>
-        <p className="text-[13px] text-fg-3">{status === "idle" ? t.startHint : t.keys}</p>
+        <p className="text-[0.8125rem] text-fg-3">{status === "idle" ? t.startHint : t.keys}</p>
       </div>
     </div>
   );

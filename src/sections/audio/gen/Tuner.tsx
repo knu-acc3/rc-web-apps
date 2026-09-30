@@ -180,7 +180,7 @@ function TunerInner({ locale, instrument: inst0 = "chromatic" }: { locale: Local
           <span className="h-5 text-sm text-fg-3">{on && reading ? `${locale === "ru" ? `${ru} · ` : ""}${formatNumber(locale, reading.freq, { maximumFractionDigits: 1 })} Hz` : ""}</span>
         </div>
         <div className="w-full max-w-md" aria-hidden>
-          <div className="relative h-10 rounded-[10px] bg-surface-2">
+          <div className="relative h-10 rounded-[0.625rem] bg-surface-2">
             <div className="absolute inset-y-1 left-1/2 w-0.5 -translate-x-1/2 bg-ok" />
             {[-40, -30, -20, -10, 10, 20, 30, 40].map((c) => (
               <div key={c} className="absolute bottom-1 h-2 w-px bg-line-strong" style={{ left: `${50 + c}%` }} />
@@ -192,7 +192,7 @@ function TunerInner({ locale, instrument: inst0 = "chromatic" }: { locale: Local
               />
             )}
           </div>
-          <div className="mt-1 flex justify-between text-[12px] text-fg-3">
+          <div className="mt-1 flex justify-between text-[0.75rem] text-fg-3">
             <span>−50 ¢</span>
             <span>0</span>
             <span>+50 ¢</span>

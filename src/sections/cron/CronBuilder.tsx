@@ -53,7 +53,7 @@ export function CronBuilder({ locale, expr, onChange }: { locale: Locale; expr: 
     onChange(next.join(" "));
   };
   return (
-    <details className="rounded-[12px] border border-line bg-surface">
+    <details className="rounded-[0.75rem] border border-line bg-surface">
       <summary className="cursor-pointer px-4 py-3 text-sm font-semibold text-fg">{t.title}</summary>
       <div className="grid gap-3 border-t border-line p-4 sm:grid-cols-2 lg:grid-cols-3">
         {parts.map((raw, i) => {

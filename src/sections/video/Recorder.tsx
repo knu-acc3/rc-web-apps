@@ -326,12 +326,12 @@ function RecorderInner({ locale, mode }: { locale: Locale; mode: Mode }) {
     <div className="flex flex-col gap-4">
       <Panel className="flex flex-col items-center gap-4 p-5">
         {mode !== "voice" ? (
-          <div className="w-full overflow-hidden rounded-[10px] bg-black">
+          <div className="w-full overflow-hidden rounded-[0.625rem] bg-black">
             <video ref={live} muted playsInline aria-label={t.live} className={`aspect-video w-full object-contain ${mode === "webcam" && mirror ? "-scale-x-100" : ""} ${recording ? "" : "hidden"}`} />
             {!recording && <div className="flex aspect-video w-full items-center justify-center text-sm text-white/70">{t.note[mode]}</div>}
           </div>
         ) : (
-          <canvas ref={scope} className="h-24 w-full rounded-[10px] bg-surface-2" aria-hidden />
+          <canvas ref={scope} className="h-24 w-full rounded-[0.625rem] bg-surface-2" aria-hidden />
         )}
         <div className="flex flex-col items-center gap-1" aria-live="polite">
           <span className="tabular text-5xl font-semibold tracking-tight text-fg">{formatTime(recording ? elapsed : 0, 1)}</span>
@@ -388,7 +388,7 @@ function RecorderInner({ locale, mode }: { locale: Locale; mode: Mode }) {
           </div>
         )}
         {fmt && idle && (
-          <p className="text-[13px] text-fg-3">
+          <p className="text-[0.8125rem] text-fg-3">
             {t.format}: {fmt} · {u.localNote}
           </p>
         )}

@@ -1,7 +1,7 @@
 /* IBAN validation (ISO 13616): country format + mod-97 checksum. */
 import { IBAN_BY_CODE, type IbanCountry } from "../data/iban-countries";
 
-export type IbanError = "empty" | "chars" | "country" | "ru" | "length" | "structure" | "checksum";
+export type IbanError = "empty" | "chars" | "country" | "length" | "structure" | "checksum";
 
 export interface IbanResult {
   /** Upper-case, no spaces */
@@ -57,7 +57,6 @@ export function validateIban(input: string): IbanResult {
   if (!iban) return { ...base, errors: ["empty"] };
   if (!/^[A-Z0-9]+$/.test(iban)) return { ...base, errors: ["chars"] };
   const cc = iban.slice(0, 2);
-  if (cc === "RU") return { ...base, errors: ["ru"] };
   const country = IBAN_BY_CODE.get(cc);
   if (!/^[A-Z]{2}\d{2}/.test(iban) || !country) return { ...base, errors: ["country"] };
   const out: IbanResult = { ...base, country };

@@ -167,7 +167,7 @@ export default function Collage({ locale }: { locale: Locale }) {
   if (!list.items.length) {
     return (
       <div className="flex flex-col gap-3">
-        <Dropzone onFiles={add} accept={IMAGE_ACCEPT} multiple title={s.dropMany} hint={t.need} className="min-h-64" />
+        <Dropzone onFiles={add} accept={IMAGE_ACCEPT} multiple title={s.dropMany} hint={t.need} />
         {list.loading && <Loader2 className="size-5 animate-spin text-accent" aria-label={s.reading} />}
       </div>
     );
@@ -175,7 +175,7 @@ export default function Collage({ locale }: { locale: Locale }) {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="rounded-[12px] border border-line bg-surface">
+      <div className="rounded-[0.75rem] border border-line bg-surface">
         <div className="flex flex-wrap items-end gap-x-4 gap-y-3 px-4 py-3">
           <div className="flex flex-col gap-1.5">
             <span className="text-sm font-medium text-fg-2">{t.layout}</span>
@@ -190,7 +190,7 @@ export default function Collage({ locale }: { locale: Locale }) {
                   title={t.layoutN(i + 1)}
                   onClick={() => setLayoutId(l.id)}
                   className={cn(
-                    "flex size-10 items-center justify-center rounded-[8px] border",
+                    "flex size-10 items-center justify-center rounded-[0.5rem] border",
                     l === layout ? "border-accent bg-accent-soft text-accent" : "border-line text-fg-3 hover:text-fg",
                   )}
                 >
@@ -239,7 +239,7 @@ export default function Collage({ locale }: { locale: Locale }) {
 
       <Panel className="overflow-hidden">
         <div className={`flex justify-center p-3 sm:p-4 ${checker}`}>
-          <canvas ref={canvasRef} role="img" aria-label={t.photos} className="block h-auto max-h-[62vh] w-auto max-w-full rounded-[4px]" />
+          <canvas ref={canvasRef} role="img" aria-label={t.photos} className="block h-auto max-h-[62vh] w-auto max-w-full rounded-[0.25rem]" />
         </div>
         <div className="flex flex-col gap-3 border-t border-line px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
           <div aria-live="polite">

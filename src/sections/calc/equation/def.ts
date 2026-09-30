@@ -45,6 +45,93 @@ function cubicTable(locale: Locale): Block {
   };
 }
 
+/** "2x + 3y − z" from coefficients and variable names. */
+function lin(locale: Locale, coeffs: number[], vars: string[]): string {
+  const parts: string[] = [];
+  coeffs.forEach((c, i) => {
+    if (c === 0) return;
+    const abs = Math.abs(c);
+    const term = `${abs === 1 ? "" : num(locale, abs)}${vars[i]}`;
+    if (parts.length === 0) parts.push(c < 0 ? `−${term}` : term);
+    else parts.push(c < 0 ? `− ${term}` : `+ ${term}`);
+  });
+  return parts.join(" ") || "0";
+}
+
+function det2(a: number, b: number, c: number, d: number): number {
+  return a * d - b * c;
+}
+
+function det3(m: number[][]): number {
+  return m[0][0] * det2(m[1][1], m[1][2], m[2][1], m[2][2]) - m[0][1] * det2(m[1][0], m[1][2], m[2][0], m[2][2]) + m[0][2] * det2(m[1][0], m[1][1], m[2][0], m[2][1]);
+}
+
+function linearTable(locale: Locale): Block {
+  const ru = locale === "ru";
+  const ex: [number, number, number][] = [
+    [2, 3, 11],
+    [5, -7, 18],
+    [3, -9, 12],
+    [-4, 10, 2],
+    [0.5, 1, 4],
+    [7, 2, 2],
+    [6, -3, 0],
+    [1.5, -4.5, 3],
+  ];
+  return {
+    type: "table",
+    title: ru ? "Примеры линейных уравнений" : "Linear equation examples",
+    head: ru ? ["Уравнение", "Шаг", "Ответ"] : ["Equation", "Step", "Answer"],
+    rows: ex.map(([a, b, c]) => [`${poly(locale, [a, b])} = ${num(locale, c)}`, `${poly(locale, [a, 0])} = ${num(locale, c - b)}`, `x = ${num(locale, (c - b) / a, 4)}`]),
+  };
+}
+
+function system2Table(locale: Locale): Block {
+  const ru = locale === "ru";
+  const ex: [number, number, number, number, number, number][] = [
+    [2, 3, 13, 1, -1, -1],
+    [1, 1, 10, 1, -1, 2],
+    [3, -2, 4, 5, 1, 11],
+    [4, 1, 9, 2, 3, 7],
+    [1, 2, 4, 2, 4, 8],
+    [1, 2, 4, 2, 4, 9],
+  ];
+  return {
+    type: "table",
+    title: ru ? "Примеры систем 2×2" : "2×2 system examples",
+    head: ru ? ["Система", "Δ", "Решение"] : ["System", "Δ", "Solution"],
+    rows: ex.map(([a1, b1, c1, a2, b2, c2]) => {
+      const d = det2(a1, b1, a2, b2);
+      const sys = `${lin(locale, [a1, b1], ["x", "y"])} = ${num(locale, c1)}; ${lin(locale, [a2, b2], ["x", "y"])} = ${num(locale, c2)}`;
+      if (d !== 0) return [sys, num(locale, d), `x = ${num(locale, det2(c1, b1, c2, b2) / d, 4)}, y = ${num(locale, det2(a1, c1, a2, c2) / d, 4)}`];
+      const same = det2(a1, c1, a2, c2) === 0 && det2(c1, b1, c2, b2) === 0;
+      return [sys, "0", same ? (ru ? "бесконечно много" : "infinitely many") : ru ? "нет решений" : "no solution"];
+    }),
+  };
+}
+
+function system3Table(locale: Locale): Block {
+  const ru = locale === "ru";
+  const ex: [number[][], number[]][] = [
+    [[[1, 1, 1], [0, 2, 5], [2, 5, -1]], [6, -4, 27]],
+    [[[2, 1, -1], [-3, -1, 2], [-2, 1, 2]], [8, -11, -3]],
+    [[[1, 2, 3], [2, -1, 1], [3, 0, -1]], [14, 3, 0]],
+    [[[1, 1, 0], [0, 1, 1], [1, 0, 1]], [3, 5, 4]],
+  ];
+  const V = ["x", "y", "z"];
+  return {
+    type: "table",
+    title: ru ? "Примеры систем 3×3" : "3×3 system examples",
+    head: ru ? ["Система", "Δ", "Решение"] : ["System", "Δ", "Solution"],
+    rows: ex.map(([m, c]) => {
+      const d = det3(m);
+      const sys = m.map((row, i) => `${lin(locale, row, V)} = ${num(locale, c[i])}`).join("; ");
+      const sol = V.map((v, k) => `${v} = ${num(locale, det3(m.map((row, i) => row.map((x, j) => (j === k ? c[i] : x)))) / d, 4)}`).join(", ");
+      return [sys, num(locale, d), sol];
+    }),
+  };
+}
+
 interface VText {
   name: [string, string];
   title: [string, string];
@@ -75,6 +162,7 @@ const V: Record<string, VText> = {
         { q: "When does a linear equation have no solution?", a: "When the coefficient of x is zero and the two sides differ: 0·x + 3 = 5. If they are equal, every x works." },
       ],
     ],
+    blocks: (locale) => [linearTable(locale)],
   },
   quadratic: {
     name: ["Квадратное уравнение", "Quadratic equation"],
@@ -139,6 +227,7 @@ const V: Record<string, VText> = {
         { q: "What if the determinant is zero?", a: "The lines are parallel (no solution) or the same line (infinitely many). The calculator decides using the matrix rank." },
       ],
     ],
+    blocks: (locale) => [system2Table(locale)],
   },
   "system-3x3": {
     name: ["Система 3×3", "3×3 system"],
@@ -159,6 +248,7 @@ const V: Record<string, VText> = {
         { q: "Can I enter fractions?", a: "Yes: 1/2, 0.75, −3. The arithmetic is exact, so the answer may be a fraction too." },
       ],
     ],
+    blocks: (locale) => [system3Table(locale)],
   },
 };
 
@@ -178,6 +268,7 @@ function variants(): VariantDef[] {
 
 export const equationTool: ToolDef = {
   slug: "equation-solver",
+    seoAlt: { ru: ["калькулятор уравнений", "калькулятор"], en: ["equation calculator", "calculator"] },
   component: "calc/equation",
   icon: "Sigma",
   popular: true,

@@ -148,15 +148,15 @@ export default function UnitConverter({ locale, units, from: from0, to: to0, val
       </div>
 
       <div className="flex min-h-9 items-center justify-between gap-3 pl-1">
-        <p className="tabular min-w-0 text-[15px] break-words text-fg-2" aria-live="polite">
+        <p className="tabular min-w-0 text-[0.9375rem] break-words text-fg-2" aria-live="polite">
           {error ? <span className="text-err">{error}</span> : sentence}
         </p>
         <CopyButton value={bShown} label={t.copy} copiedLabel={t.copied} variant="ghost" size="icon-sm" className="shrink-0" />
       </div>
 
       {aNum !== null && units.length > 2 && (
-        <details className="group rounded-[12px] border border-line bg-surface">
-          <summary className="flex cursor-pointer list-none items-center justify-between gap-3 rounded-[12px] px-4 py-3 text-[15px] text-fg-2 hover:text-fg [&::-webkit-details-marker]:hidden">
+        <details className="group rounded-[0.75rem] border border-line bg-surface">
+          <summary className="flex cursor-pointer list-none items-center justify-between gap-3 rounded-[0.75rem] px-4 py-3 text-[0.9375rem] text-fg-2 hover:text-fg [&::-webkit-details-marker]:hidden">
             <span className="tabular min-w-0 truncate">
               {fmt(aNum)} {unitText(aNum, uFrom)} {t.all}
             </span>
@@ -170,7 +170,7 @@ export default function UnitConverter({ locale, units, from: from0, to: to0, val
                 return (
                   <li key={u.slug}>
                     <span className="min-w-0 truncate text-sm text-fg-3">{u.label}</span>
-                    <span className="tabular shrink-0 text-right text-[15px] text-fg">
+                    <span className="tabular shrink-0 text-right text-[0.9375rem] text-fg">
                       {fmt(v)} <span className="text-fg-3">{unitText(v, u)}</span>
                     </span>
                   </li>
@@ -209,7 +209,7 @@ function UnitBox({
   return (
     <div
       className={cn(
-        "min-w-0 rounded-[16px] border px-4 pt-3 pb-3.5 transition-colors focus-within:border-accent sm:px-5",
+        "min-w-0 rounded-[1rem] border px-4 pt-3 pb-3.5 transition-colors focus-within:border-accent sm:px-5",
         primary ? "border-transparent bg-accent-soft" : "border-line bg-surface",
         invalid && "border-err!",
       )}
@@ -220,7 +220,7 @@ function UnitBox({
           aria-label={unitLabel}
           value={unit}
           onChange={(e) => onUnit(e.target.value)}
-          className="max-w-full cursor-pointer appearance-none truncate rounded-[6px] bg-transparent py-1 pr-6 pl-1 text-[15px] font-medium text-fg-2 outline-none hover:text-fg focus-visible:ring-2 focus-visible:ring-accent/40"
+          className="max-w-full cursor-pointer appearance-none truncate rounded-[0.375rem] bg-transparent py-1 pr-6 pl-1 text-[0.9375rem] font-medium text-fg-2 outline-none hover:text-fg focus-visible:ring-2 focus-visible:ring-accent/40"
         >
           {options}
         </select>
@@ -236,7 +236,7 @@ function UnitBox({
         value={value}
         onChange={(e) => onValue(e.target.value)}
         className={cn(
-          "tabular mt-0.5 block w-full min-w-0 bg-transparent text-[32px] leading-[1.2] font-semibold tracking-tight outline-none sm:text-[36px]",
+          "tabular mt-0.5 block w-full min-w-0 bg-transparent text-[2rem] leading-[1.2] font-semibold tracking-tight outline-none sm:text-[2.25rem]",
           primary ? "text-accent" : "text-fg",
         )}
       />

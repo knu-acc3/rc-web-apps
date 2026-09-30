@@ -25,8 +25,8 @@ export default function ZonesTable({ locale, rows }: ZonesTableProps) {
       <Panel className="flex flex-col items-center gap-2 px-4 py-6 text-center sm:py-8">
         <p className="text-sm font-medium text-fg-3">{t.yours}</p>
         <p className="min-h-8 text-2xl font-semibold text-fg sm:text-3xl">{me && tz ? `${modernZone(tz)} · ${fmtOffset(me.off)}` : " "}</p>
-        <BigTime parts={me} className="text-[44px] sm:text-[64px]" />
-        <p className="min-h-6 text-[15px] text-fg-2">{me ? longDate(locale, me) : " "}</p>
+        <BigTime parts={me} className="text-[2.75rem] sm:text-[4rem]" />
+        <p className="min-h-6 text-[0.9375rem] text-fg-2">{me ? longDate(locale, me) : " "}</p>
       </Panel>
       <div tabIndex={0} className="tbl">
         <table>
@@ -55,8 +55,8 @@ export default function ZonesTable({ locale, rows }: ZonesTableProps) {
                   </td>
                   <td className="whitespace-nowrap">
                     <span className="tabular font-semibold">{p ? hms(p, false) : "--:--"}</span>
-                    {shift && <span className="ml-1.5 text-[13px] text-fg-3">{shift}</span>}
-                    {mine && <span className="ml-1.5 text-[13px] text-accent">· {t.you}</span>}
+                    {shift && <span className="ml-1.5 text-[0.8125rem] text-fg-3">{shift}</span>}
+                    {mine && <span className="ml-1.5 text-[0.8125rem] text-accent">· {t.you}</span>}
                   </td>
                   <td className="text-fg-2">{r.cities}</td>
                 </tr>

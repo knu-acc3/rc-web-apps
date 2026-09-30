@@ -115,7 +115,7 @@ export default function JavascriptInfo({ locale }: ToolProps) {
               {ES_FEATURES.map((f) => (
                 <tr key={f.id}>
                   <td className="whitespace-nowrap">{f.year ? `ES${f.year}` : `ES2026+ (${t.newer})`}</td>
-                  <td className="font-mono text-[13px]">{f.name}</td>
+                  <td className="font-mono text-[0.8125rem]">{f.name}</td>
                   <td>
                     {d ? (
                       d.es[f.id] ? (

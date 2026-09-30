@@ -58,7 +58,7 @@ export function Thumb({ thumbs, index, rotate = 0, className, dim }: { thumbs: T
 
   const src = cached ?? url;
   return (
-    <div ref={ref} className={cn("relative flex aspect-square items-center justify-center overflow-hidden rounded-[8px] bg-surface-2", className)}>
+    <div ref={ref} className={cn("relative flex aspect-square items-center justify-center overflow-hidden rounded-[0.5rem] bg-surface-2", className)}>
       {src ? (
         // eslint-disable-next-line @next/next/no-img-element -- blob: URL of a rendered page
         <img
@@ -69,7 +69,7 @@ export function Thumb({ thumbs, index, rotate = 0, className, dim }: { thumbs: T
           style={rotate ? { transform: `rotate(${rotate}deg)` } : undefined}
         />
       ) : (
-        <span className="h-3/4 w-1/2 animate-pulse rounded-[4px] bg-line" aria-hidden />
+        <span className="h-3/4 w-1/2 animate-pulse rounded-[0.25rem] bg-line" aria-hidden />
       )}
     </div>
   );

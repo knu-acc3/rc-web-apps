@@ -52,7 +52,7 @@ export const seoSection = defineToolSection({
       icon: "Tags",
       popular: true,
       name: { ru: "Генератор мета-тегов", en: "Meta tag generator" },
-      title: { ru: "Генератор мета-тегов title и description с превью в Google", en: "Meta Tag Generator with Google SERP Preview" },
+      title: { ru: "Генератор мета-тегов title и description с превью в Google", en: "Meta Tag Generator | Google SERP preview" },
       h1: { ru: "Генератор мета-тегов с превью сниппета", en: "Meta tag generator with SERP preview" },
       description: {
         ru: "Напишите title и description и сразу увидите сниппет, как в Google: ширина в пикселях, место обрезки, готовый HTML с canonical и robots. Для компьютера и телефона.",
@@ -327,7 +327,7 @@ export const seoSection = defineToolSection({
       icon: "Braces",
       popular: true,
       name: { ru: "Генератор микроразметки", en: "Schema markup generator" },
-      title: { ru: "Генератор микроразметки Schema.org в JSON-LD", en: "Schema Markup Generator — JSON-LD for Rich Results" },
+      title: { ru: "Генератор микроразметки Schema.org | JSON-LD онлайн", en: "Schema Markup Generator — JSON-LD for Rich Results" },
       h1: { ru: "Генератор микроразметки Schema.org", en: "Schema markup generator" },
       description: {
         ru: "Микроразметка JSON-LD для статьи, товара, FAQ, организации, компании, крошек, события, рецепта, видео, вакансии и приложения с проверкой полей.",

@@ -113,7 +113,8 @@ const kw = (list, name) => (list ?? []).filter((k) => k && k !== name && !/^[,\s
 function names(e) {
   const glyph = qualify(e.emoji);
   const en = cldr("en", glyph)?.tts?.[0] ?? e.label;
-  const cldrRu = cldr("ru", glyph)?.tts?.[0] ?? ruByHex.get(e.hexcode)?.label;
+  // CLDR 48 derives "facing right" names with an empty slot: "человек идет: , направленные вправо".
+  const cldrRu = (cldr("ru", glyph)?.tts?.[0] ?? ruByHex.get(e.hexcode)?.label)?.replace(/: , направленн\S* вправо$/, ", лицом вправо");
   if (!cldrRu) throw new Error(`No Russian name for ${glyph} ${e.label}`);
   const ru = RU_OVERRIDE[glyph] ?? cldrRu;
   return { glyph, en, ru, ruAlt: ru !== cldrRu ? cldrRu : undefined };

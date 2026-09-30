@@ -406,12 +406,12 @@ function QueueRow({
       </div>
       {running && (
         <div className="flex flex-col gap-1">
-          <span className="text-[13px] text-fg-3">{item.stage === "prepare" ? u.preparing : stageText}</span>
+          <span className="text-[0.8125rem] text-fg-3">{item.stage === "prepare" ? u.preparing : stageText}</span>
           <ProgressBar value={item.progress} label={`${u.progress}: ${item.file.name}`} />
         </div>
       )}
       {item.status === "ready" && plan !== "unknown" && (
-        <div className="flex flex-wrap items-center gap-2 text-[13px] text-fg-3">
+        <div className="flex flex-wrap items-center gap-2 text-[0.8125rem] text-fg-3">
           <Badge tone={plan === "copy" ? "ok" : "neutral"}>{planText[plan]}</Badge>
           <span>{waiting}</span>
         </div>

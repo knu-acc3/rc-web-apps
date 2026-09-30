@@ -23,7 +23,7 @@ export function JobStatus({ locale, state, onCancel }: { locale: Locale; state: 
   if (state.status === "running") {
     const pct = Math.round(state.progress * 100);
     return (
-      <div className="flex items-center gap-3 rounded-[10px] bg-surface-2 px-4 py-3">
+      <div className="flex items-center gap-3 rounded-[0.625rem] bg-surface-2 px-4 py-3">
         <Loader2 className="size-4 shrink-0 animate-spin text-accent" aria-hidden />
         <div className="min-w-0 flex-1">
           <div className="flex justify-between gap-2 text-sm text-fg-2">

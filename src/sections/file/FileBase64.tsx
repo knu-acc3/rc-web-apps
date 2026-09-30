@@ -130,9 +130,9 @@ function Encoder({ locale }: { locale: Locale }) {
             <CopyButton value={() => output} label={t.copy} copiedLabel={t.copied} variant="primary" />
           </div>
         </div>
-        <textarea readOnly value={shown} aria-label="Base64" spellCheck={false} className="block h-64 w-full resize-y bg-transparent px-3 py-2 font-mono text-[13px] break-all text-fg focus:outline-none" />
+        <textarea readOnly value={shown} aria-label="Base64" spellCheck={false} className="block h-64 w-full resize-y bg-transparent px-3 py-2 font-mono text-[0.8125rem] break-all text-fg focus:outline-none" />
       </Panel>
-      {output.length > PREVIEW && <p className="text-[13px] text-fg-3">{t.preview.replace("{n}", formatBytes(locale, PREVIEW)).replace("{total}", formatBytes(locale, output.length))}</p>}
+      {output.length > PREVIEW && <p className="text-[0.8125rem] text-fg-3">{t.preview.replace("{n}", formatBytes(locale, PREVIEW)).replace("{total}", formatBytes(locale, output.length))}</p>}
     </div>
   );
 }
@@ -189,7 +189,7 @@ function Decoder({ locale }: { locale: Locale }) {
           </div>
           {isImage && (
             // eslint-disable-next-line @next/next/no-img-element
-            <img ref={img} alt="" className="max-h-72 w-auto max-w-full self-start rounded-[8px] bg-[repeating-conic-gradient(#8882_0_25%,transparent_0_50%)] bg-[length:16px_16px]" />
+            <img ref={img} alt="" className="max-h-72 w-auto max-w-full self-start rounded-[0.5rem] bg-[repeating-conic-gradient(#8882_0_25%,transparent_0_50%)] bg-[length:16px_16px]" />
           )}
         </Panel>
       )}

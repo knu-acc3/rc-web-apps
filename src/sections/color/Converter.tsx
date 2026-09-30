@@ -64,7 +64,7 @@ export default function ColorConverter({ locale, from, to, sample, reverse }: Co
           )}
           <div className="flex min-w-0 flex-col gap-1.5 md:mb-7">
             <div className="text-sm font-medium text-fg-2">{t.result(CONV_LABEL[to])}</div>
-            <div className="flex min-h-12 items-center gap-2 rounded-[8px] bg-surface-2 px-3">
+            <div className="flex min-h-12 items-center gap-2 rounded-[0.5rem] bg-surface-2 px-3">
               <output className="min-w-0 flex-1 font-mono text-lg font-semibold break-all text-fg" aria-live="polite">
                 {out || <span className="text-base font-normal text-fg-3">{t.empty}</span>}
               </output>

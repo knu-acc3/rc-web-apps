@@ -230,7 +230,7 @@ export default function MarkdownEditor({ locale }: { locale: Locale }) {
 
       <div className={cn("grid gap-4", view === "split" && "lg:grid-cols-2")}>
         {view !== "show" && (
-          <div className="flex min-w-0 flex-col overflow-hidden rounded-[12px] border border-line bg-surface">
+          <div className="flex min-w-0 flex-col overflow-hidden rounded-[0.75rem] border border-line bg-surface">
             <label htmlFor={`${id}-md`} className="border-b border-line px-3 py-2 text-sm font-semibold text-fg">
               {t.editor}
             </label>
@@ -246,7 +246,7 @@ export default function MarkdownEditor({ locale }: { locale: Locale }) {
           </div>
         )}
         {view !== "edit" && (
-          <section aria-label={t.preview} className="min-w-0 overflow-hidden rounded-[12px] border border-line bg-surface">
+          <section aria-label={t.preview} className="min-w-0 overflow-hidden rounded-[0.75rem] border border-line bg-surface">
             <div className="border-b border-line px-3 py-2 text-sm font-semibold text-fg">{t.preview}</div>
             {renderer ? (
               <div className={cn(MD_PROSE, "max-h-[40rem] overflow-auto px-4 py-3")} dangerouslySetInnerHTML={{ __html: html }} />

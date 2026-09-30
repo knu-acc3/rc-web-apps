@@ -111,7 +111,7 @@ export default function MorseTool({ locale, dir: dir0 = "encode", sample }: { lo
       />
       <CodeEditor id={`${id}-in`} locale={locale} label={dir === "encode" ? t.text : t.code} value={text} onChange={setText} rows={4} wrap />
 
-      <div className="mt-4 rounded-[10px] bg-surface-2 p-4">
+      <div className="mt-4 rounded-[0.625rem] bg-surface-2 p-4">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <span className="flex items-center gap-2 text-sm font-medium text-fg-2">
             <span className={`inline-block size-3 rounded-full transition-colors duration-75 ${player.light ? "bg-accent" : "bg-line-strong"}`} role="img" aria-label={t.light} />

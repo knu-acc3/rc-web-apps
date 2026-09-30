@@ -1,11 +1,10 @@
 "use client";
 
-import { Pause, Play, Plus, RotateCcw, Square } from "lucide-react";
+import { Maximize2, Minimize2, Pause, Play, Plus, RotateCcw, Square } from "lucide-react";
 import { useEffect, useId, useRef, useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { cn } from "@/lib/cn";
 import { Button } from "@/ui/button";
-import { Kbd } from "@/ui/panel";
 import { useFullscreen, useWakeLock } from "@/sections/time/lib/use-fullscreen";
 import { TimerOptions, useAlertOptions } from "./TimerOptions";
 import { hasPlayed, schedule, unlockAudio, type Scheduled } from "./lib/audio";
@@ -34,7 +33,7 @@ const T = {
     done: "Время вышло!",
     doneFor: (d: string) => `Таймер на ${d} завершён`,
     presets: "Быстрый выбор",
-    keys: [["Space", "старт/пауза"], ["R", "сброс"], ["F", "весь экран"]],
+    full: "На весь экран",
     title: "Таймер",
   },
   en: {
@@ -50,7 +49,7 @@ const T = {
     done: "Time's up!",
     doneFor: (d: string) => `${d} timer finished`,
     presets: "Quick picks",
-    keys: [["Space", "start/pause"], ["R", "reset"], ["F", "full screen"]],
+    full: "Full screen",
     title: "Timer",
   },
 } as const;
@@ -181,7 +180,7 @@ export default function Timer({ locale, seconds = 300 }: TimerProps) {
 
   const editable = status === "idle" || status === "done";
   const shown = clock(status === "done" ? 0 : left, { forceHours: true, padHours: true });
-  const big = full ? "text-[min(22vw,40vh)]" : "text-[min(19vw,128px)]";
+  const big = full ? "text-[min(22vw,40vh)]" : "text-[min(19vw,8rem)]";
   const field = (k: "h" | "m" | "s", label: string) => (
     <input
       id={`${id}-${k}`}
@@ -201,7 +200,7 @@ export default function Timer({ locale, seconds = 300 }: TimerProps) {
       <div
         ref={ref}
         className={cn(
-          "flex flex-col items-center justify-center gap-6 rounded-[12px] border border-line bg-surface px-3 py-8 sm:py-10",
+          "flex flex-col items-center justify-center gap-6 rounded-[0.75rem] border border-line bg-surface px-3 py-8 sm:py-10",
           full && "min-h-screen rounded-none border-0",
           status === "done" && "border-accent",
         )}
@@ -222,49 +221,45 @@ export default function Timer({ locale, seconds = 300 }: TimerProps) {
           {status === "done" ? `${t.done} +${clock(over, { up: true })}` : ""}
         </p>
 
-        <div className="flex items-center gap-2">
+        <div className="flex w-full max-w-md items-center justify-center gap-2">
           {status === "done" ? (
-            <Button variant="primary" size="lg" onClick={reset} className="min-w-40">
+            <Button variant="primary" size="lg" onClick={reset} className="min-w-0 flex-1 sm:max-w-52">
               <Square aria-hidden />
               {t.stop}
             </Button>
           ) : running ? (
-            <Button variant="primary" size="lg" onClick={pause} className="min-w-40">
+            <Button variant="primary" size="lg" onClick={pause} className="min-w-0 flex-1 sm:max-w-52">
               <Pause aria-hidden />
               {t.pause}
             </Button>
           ) : (
-            <Button variant="primary" size="lg" onClick={start} disabled={dur === 0 && status === "idle"} className="min-w-40">
+            <Button variant="primary" size="lg" onClick={start} disabled={dur === 0 && status === "idle"} className="min-w-0 flex-1 sm:max-w-52">
               <Play aria-hidden />
               {status === "paused" ? t.resume : t.start}
             </Button>
           )}
-          <Button variant="secondary" size="lg" onClick={addMinute} aria-label={t.add} title={t.add}>
+          <Button variant="secondary" size="lg" onClick={addMinute} aria-label={t.add} title={t.add} className="w-12 px-0 sm:w-auto sm:px-5">
             <Plus aria-hidden />
             <span className="max-sm:sr-only">1</span>
           </Button>
-          <Button variant="ghost" size="lg" onClick={reset} disabled={status === "idle"} aria-label={t.reset} title={t.reset}>
+          <Button variant="ghost" size="lg" onClick={reset} disabled={status === "idle"} aria-label={t.reset} title={`${t.reset} (R)`} className="w-12 px-0">
             <RotateCcw aria-hidden />
+          </Button>
+          <Button variant="ghost" size="lg" onClick={toggleFull} aria-label={t.full} title={`${t.full} (F)`} className="w-12 px-0">
+            {full ? <Minimize2 aria-hidden /> : <Maximize2 aria-hidden />}
           </Button>
         </div>
       </div>
 
       <div className="flex flex-wrap items-center gap-2" role="group" aria-label={t.presets}>
         {PRESETS.map((p) => (
-          <button key={p} type="button" className={cn("chip h-8! px-3! text-[13px]!", dur === p && editable && "border-accent! text-accent!")} onClick={() => (editable ? setDuration(p) : undefined)} disabled={!editable}>
+          <button key={p} type="button" className={cn("chip h-8! px-3! text-[0.8125rem]!", dur === p && editable && "border-accent! text-accent!")} onClick={() => (editable ? setDuration(p) : undefined)} disabled={!editable}>
             {durationShort(p, locale)}
           </button>
         ))}
       </div>
 
-      <TimerOptions locale={locale} options={opts} onChange={setOpts} onFullscreen={toggleFull} />
-      <p className="hidden flex-wrap gap-x-4 text-[13px] text-fg-3 sm:flex">
-        {t.keys.map(([k, label]) => (
-          <span key={k}>
-            <Kbd>{k}</Kbd> {label}
-          </span>
-        ))}
-      </p>
+      <TimerOptions locale={locale} options={opts} onChange={setOpts} />
     </div>
   );
 }

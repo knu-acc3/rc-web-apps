@@ -116,7 +116,7 @@ export const TOOL_TEXTS_A: Record<string, ToolText> = {
   },
 
   resize: {
-    name: { ru: "Изменить размер", en: "Resize images" },
+    name: { ru: "Изменить размер фото", en: "Resize images" },
     title: {
       ru: "Изменить размер фото онлайн — в пикселях и процентах",
       en: "Resize Image Online — By Pixels, Percent or Long Side",
@@ -589,7 +589,7 @@ export const TOOL_TEXTS_A: Record<string, ToolText> = {
   },
 
   convert: {
-    name: { ru: "Конвертер", en: "Image converter" },
+    name: { ru: "Конвертер изображений", en: "Image converter" },
     title: {
       ru: "Конвертер изображений онлайн — JPG, PNG, WebP, AVIF, ICO",
       en: "Image Converter Online — JPG, PNG, WebP, AVIF, GIF, ICO",
@@ -690,7 +690,7 @@ export const TOOL_TEXTS_A: Record<string, ToolText> = {
   },
 
   filters: {
-    name: { ru: "Фильтры", en: "Photo filters" },
+    name: { ru: "Фильтры для фото", en: "Photo filters" },
     title: {
       ru: "Фильтры для фото онлайн — 20 эффектов с настройкой силы",
       en: "Photo Filters Online — 20 Effects with Adjustable Strength",
@@ -885,7 +885,7 @@ export const TOOL_TEXTS_A: Record<string, ToolText> = {
   },
 
   watermark: {
-    name: { ru: "Водяной знак", en: "Watermark" },
+    name: { ru: "Водяной знак на фото", en: "Watermark photos" },
     title: {
       ru: "Наложить водяной знак на фото онлайн — текст или логотип",
       en: "Add Watermark to Photos Online — Text or Logo, Batch",
@@ -1240,7 +1240,7 @@ export const TOOL_TEXTS_A: Record<string, ToolText> = {
   exif: {
     name: { ru: "EXIF-данные", en: "EXIF viewer" },
     title: {
-      ru: "Посмотреть и удалить EXIF-данные фото онлайн",
+      ru: "EXIF-данные фото онлайн | посмотреть и удалить",
       en: "EXIF Viewer & Remover — See and Strip Photo Metadata",
     },
     h1: { ru: "Посмотреть и удалить EXIF-данные фото", en: "View and Remove EXIF Data from Photos" },

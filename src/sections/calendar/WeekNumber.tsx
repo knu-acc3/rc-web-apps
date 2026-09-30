@@ -31,13 +31,13 @@ export default function WeekNumber({ locale }: { locale: Locale }) {
     <div className="flex flex-col gap-4">
       <Panel className="flex flex-col items-center gap-2 px-4 py-8 text-center sm:py-10">
         <p className="text-sm font-medium text-fg-3">{t.now}</p>
-        <p className="tabular text-[88px] leading-none font-bold tracking-tight text-fg sm:text-[120px]">{cur ? cur.week : "—"}</p>
+        <p className="tabular text-[5.5rem] leading-none font-bold tracking-tight text-fg sm:text-[7.5rem]">{cur ? cur.week : "—"}</p>
         <p className="min-h-7 text-lg text-fg-2">{cur ? range(locale, cur) : " "}</p>
-        <p className="min-h-6 text-[15px] text-fg-3">{cur ? t.of(cur.year, isoWeeksInYear(cur.year)) : " "}</p>
+        <p className="min-h-6 text-[0.9375rem] text-fg-3">{cur ? t.of(cur.year, isoWeeksInYear(cur.year)) : " "}</p>
       </Panel>
       <Panel className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5">
         <div className="flex items-center gap-3">
-          <label htmlFor={`${id}-d`} className="text-[15px] font-medium text-fg-2">
+          <label htmlFor={`${id}-d`} className="text-[0.9375rem] font-medium text-fg-2">
             {t.date}
           </label>
           <input id={`${id}-d`} type="date" className="control h-10 w-44" value={text} onChange={(e) => setText(e.target.value)} />

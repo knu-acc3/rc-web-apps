@@ -3,7 +3,7 @@ import { cn } from "@/lib/cn";
 
 /** Bordered surface. The main building block of tool UIs. */
 export function Panel({ className, ...props }: ComponentProps<"div">) {
-  return <div className={cn("rounded-[12px] border border-line bg-surface", className)} {...props} />;
+  return <div className={cn("rounded-[0.75rem] border border-line bg-surface", className)} {...props} />;
 }
 
 export function PanelHeader({
@@ -40,9 +40,9 @@ export function Stat({
   action?: ReactNode;
 }) {
   return (
-    <div className={cn("min-w-0 rounded-[10px] bg-surface-2 px-4 py-3", className)}>
+    <div className={cn("min-w-0 rounded-[0.625rem] bg-surface-2 px-4 py-3", className)}>
       <div className="flex items-start justify-between gap-2">
-        <div className="text-[13px] font-medium text-fg-2">{label}</div>
+        <div className="text-[0.8125rem] font-medium text-fg-2">{label}</div>
         {action}
       </div>
       <div
@@ -72,7 +72,7 @@ export function Badge({
   } as const;
   return (
     <span
-      className={cn("inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[13px] font-medium", tones[tone], className)}
+      className={cn("inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[0.8125rem] font-medium", tones[tone], className)}
       {...props}
     />
   );
@@ -82,7 +82,7 @@ export function Kbd({ className, ...props }: ComponentProps<"kbd">) {
   return (
     <kbd
       className={cn(
-        "inline-flex h-6 min-w-6 items-center justify-center rounded-[6px] border border-line bg-surface px-1.5 font-sans text-xs font-medium text-fg-2",
+        "inline-flex h-6 min-w-6 items-center justify-center rounded-[0.375rem] border border-line bg-surface px-1.5 font-sans text-xs font-medium text-fg-2",
         className,
       )}
       {...props}
@@ -101,5 +101,5 @@ export function Notice({
     warn: "bg-warn-soft text-warn",
     err: "bg-err-soft text-err",
   } as const;
-  return <div role={tone === "err" ? "alert" : undefined} className={cn("rounded-[10px] px-4 py-3 text-sm", tones[tone], className)} {...props} />;
+  return <div role={tone === "err" ? "alert" : undefined} className={cn("rounded-[0.625rem] px-4 py-3 text-sm", tones[tone], className)} {...props} />;
 }

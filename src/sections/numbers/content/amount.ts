@@ -115,6 +115,7 @@ function currencyVariant(c: CurrencyDef): VariantDef {
 
 export const amountTool: ToolDef = {
   slug: "amount-in-words",
+  seoAlt: { ru: ["сумма прописью", "сумма словами"], en: ["write a sum in words", "sum in words", "spelled out"] },
   component: "numbers/amount-in-words",
   icon: "Banknote",
   popular: true,

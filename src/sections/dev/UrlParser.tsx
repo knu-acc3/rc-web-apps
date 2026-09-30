@@ -103,7 +103,7 @@ export default function UrlParser({ locale, sample }: { locale: Locale; sample: 
             {rows.map(([k, v]) => (
               <div key={k} className="contents">
                 <dt className="text-sm text-fg-3">{k}</dt>
-                <dd className="min-w-0 font-mono text-[15px] break-all text-fg">{v}</dd>
+                <dd className="min-w-0 font-mono text-[0.9375rem] break-all text-fg">{v}</dd>
               </div>
             ))}
             {segments.length > 1 && (
@@ -111,7 +111,7 @@ export default function UrlParser({ locale, sample }: { locale: Locale; sample: 
                 <dt className="text-sm text-fg-3">{t.segments}</dt>
                 <dd className="flex min-w-0 flex-wrap gap-1.5">
                   {segments.map((s, i) => (
-                    <code key={i} className="rounded-[6px] bg-surface-2 px-1.5 py-0.5 font-mono text-[13px] text-fg">
+                    <code key={i} className="rounded-[0.375rem] bg-surface-2 px-1.5 py-0.5 font-mono text-[0.8125rem] text-fg">
                       {s}
                     </code>
                   ))}

@@ -166,10 +166,10 @@ function Results({ fg, bg, t, onFg, onBg }: { fg: Color; bg: Color; t: Dict; onF
               — {t.checks.aaNormal}: {checks.aaNormal ? t.pass : t.fail}
             </span>
           </p>
-          <ul className="mt-4 divide-y divide-line rounded-[10px] border border-line">
+          <ul className="mt-4 divide-y divide-line rounded-[0.625rem] border border-line">
             {CHECKS.map((k) => (
               <li key={k} className="flex items-center justify-between gap-3 px-3 py-2">
-                <span className="min-w-0 text-[15px] text-fg">
+                <span className="min-w-0 text-[0.9375rem] text-fg">
                   {t.checks[k]} <span className="text-sm text-fg-3">· {t.need} {WCAG_THRESHOLDS[k]}:1</span>
                 </span>
                 <Badge tone={checks[k] ? "ok" : "err"}>
@@ -184,7 +184,7 @@ function Results({ fg, bg, t, onFg, onBg }: { fg: Color; bg: Color; t: Dict; onF
         <Panel className="p-4 sm:p-5">
           <div className="text-sm font-medium text-fg-2">{t.apca}</div>
           <div className="tabular mt-1 text-3xl font-bold text-fg">Lc {(Math.round(lc * 10) / 10).toFixed(1)}</div>
-          <p className="mt-1 text-[15px] text-fg">{level[1]}</p>
+          <p className="mt-1 text-[0.9375rem] text-fg">{level[1]}</p>
           <p className="mt-2 text-sm text-fg-3">{t.apcaNote}</p>
         </Panel>
       </div>
@@ -195,8 +195,8 @@ function Results({ fg, bg, t, onFg, onBg }: { fg: Color; bg: Color; t: Dict; onF
             <div className="flex flex-col gap-3 p-4 sm:p-5" style={{ background: toHex(bg), color: toHex(fg) }}>
               <p className="text-base">{t.normal}</p>
               <p className="text-2xl">{t.large}</p>
-              <p className="text-[18.66px] font-bold">{t.bold}</p>
-              <span className="inline-flex w-fit items-center rounded-[8px] border-2 px-4 py-1.5 font-medium" style={{ borderColor: toHex(fg) }}>
+              <p className="text-[1.1663rem] font-bold">{t.bold}</p>
+              <span className="inline-flex w-fit items-center rounded-[0.5rem] border-2 px-4 py-1.5 font-medium" style={{ borderColor: toHex(fg) }}>
                 {t.button}
               </span>
             </div>
@@ -232,7 +232,7 @@ function Fixes({ fg, bg, t, onFg, onBg }: { fg: Color; bg: Color; t: Dict; onFg:
               {r.color ? (
                 <>
                   <Swatch color={toHex(r.color)} className="size-9 shrink-0" />
-                  <span className="min-w-0 flex-1 text-[15px]">
+                  <span className="min-w-0 flex-1 text-[0.9375rem]">
                     <span className="text-fg">
                       {r.label} {lighterOrDarker(orig, r.color)}: <code className="font-mono">{toHex(r.color)}</code>
                     </span>

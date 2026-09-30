@@ -144,7 +144,7 @@ describe("emoji pages", () => {
 
   it("builds a rich emoji page", () => {
     const page = emojiSection.resolve("ru", ["red-heart"])!;
-    expect(page.title).toBe("❤️ Красное сердце — эмодзи: значение, копировать");
+    expect(page.title).toBe("Эмодзи ❤️ Красное сердце | что означает смайлик, скопировать");
     expect(page.h1).toBe("Эмодзи «Красное сердце» ❤️");
     const chips = page.topBlocks![0];
     expect(chips.type === "links" && chips.items.length).toBeGreaterThanOrEqual(30);
@@ -152,7 +152,7 @@ describe("emoji pages", () => {
     const codes = page.blocks!.find((b) => b.type === "table" && b.mono);
     expect(codes && codes.type === "table" && codes.rows.map((r) => r[1])).toContain("&#x2764;&#xFE0F;");
     const en = emojiSection.resolve("en", ["flag-kazakhstan"])!;
-    expect(en.title).toBe("🇰🇿 Flag of Kazakhstan Emoji — Meaning & Copy");
+    expect(en.title).toBe("🇰🇿 Flag of Kazakhstan Emoji | Meaning & Copy");
   });
 
   it("rejects unknown and nested paths", () => {

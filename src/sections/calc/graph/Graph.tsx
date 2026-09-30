@@ -313,7 +313,7 @@ export default function Graph({ locale }: ToolProps) {
   return (
     <Stack>
       <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,2.2fr)] lg:gap-6">
-        <section className="flex min-w-0 flex-col gap-3 rounded-[12px] border border-line bg-surface p-4">
+        <section className="flex min-w-0 flex-col gap-3 rounded-[0.75rem] border border-line bg-surface p-4">
           {active.map((k) => {
             const i = KEYS.indexOf(k);
             const cf = compiled[i];
@@ -346,7 +346,7 @@ export default function Graph({ locale }: ToolProps) {
                     spellCheck={false}
                     aria-invalid={!!cf.err}
                     placeholder="x^2"
-                    className="control h-10 min-w-0 flex-1 font-mono text-[15px]"
+                    className="control h-10 min-w-0 flex-1 font-mono text-[0.9375rem]"
                   />
                   {k !== "f1" && (
                     <Button
@@ -363,7 +363,7 @@ export default function Graph({ locale }: ToolProps) {
                   )}
                 </div>
                 {cf.err && (
-                  <p className="pl-7 text-[13px] text-err">{cf.err}</p>
+                  <p className="pl-7 text-[0.8125rem] text-err">{cf.err}</p>
                 )}
               </div>
             );
@@ -383,12 +383,12 @@ export default function Graph({ locale }: ToolProps) {
               {t.add}
             </Button>
           )}
-          <p className="text-[13px] text-fg-3">{t.logHint}</p>
+          <p className="text-[0.8125rem] text-fg-3">{t.logHint}</p>
         </section>
         <section className="min-w-0">
           <div
             ref={wrapRef}
-            className="relative overflow-hidden rounded-[12px] border border-line"
+            className="relative overflow-hidden rounded-[0.75rem] border border-line"
           >
             <canvas
               ref={canvasRef}
@@ -509,7 +509,7 @@ export default function Graph({ locale }: ToolProps) {
               </Button>
             </div>
           </div>
-          <div className="mt-2 min-h-6 text-[13px] text-fg-2">
+          <div className="mt-2 min-h-6 text-[0.8125rem] text-fg-2">
             {hoverX !== null ? (
               <span className="tabular flex flex-wrap gap-x-4 gap-y-1">
                 <span>

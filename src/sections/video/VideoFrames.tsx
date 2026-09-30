@@ -65,7 +65,7 @@ function Thumb({ blob, name }: { blob: Blob; name: string }) {
     return () => URL.revokeObjectURL(url);
   }, [blob]);
   // eslint-disable-next-line @next/next/no-img-element
-  return <img ref={ref} alt={name} className="aspect-video w-full rounded-[8px] bg-surface-2 object-cover" loading="lazy" />;
+  return <img ref={ref} alt={name} className="aspect-video w-full rounded-[0.5rem] bg-surface-2 object-cover" loading="lazy" />;
 }
 
 export default function VideoFrames({ locale }: { locale: Locale }) {
@@ -185,7 +185,7 @@ export default function VideoFrames({ locale }: { locale: Locale }) {
                 <Thumb key={im.name} blob={im.blob} name={im.name} />
               ))}
             </div>
-            {out.images.length > 24 && <p className="text-[13px] text-fg-3">{t.shown.replace("{n}", "24")}</p>}
+            {out.images.length > 24 && <p className="text-[0.8125rem] text-fg-3">{t.shown.replace("{n}", "24")}</p>}
           </Panel>
         ) : null
       }

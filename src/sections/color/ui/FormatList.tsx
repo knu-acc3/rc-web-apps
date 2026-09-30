@@ -51,7 +51,7 @@ export function FormatList({ color, locale, formats = DEFAULT, className }: { co
           <li key={f} className="min-w-0">
             <button
               type="button"
-              className="group flex w-full items-center justify-between gap-2 rounded-[8px] px-3 py-1.5 text-left hover:bg-surface-2 focus-visible:bg-surface-2"
+              className="group flex w-full items-center justify-between gap-2 rounded-[0.5rem] px-3 py-1.5 text-left hover:bg-surface-2 focus-visible:bg-surface-2"
               title={`${t.copy} ${FORMAT_LABEL[f]}`}
               onClick={async () => {
                 if (await copyText(v)) {
@@ -63,7 +63,7 @@ export function FormatList({ color, locale, formats = DEFAULT, className }: { co
             >
               <span className="min-w-0">
                 <span className="block text-xs text-fg-3">{FORMAT_LABEL[f]}</span>
-                <code className="block font-mono text-[13px] break-all text-fg">{v}</code>
+                <code className="block font-mono text-[0.8125rem] break-all text-fg">{v}</code>
               </span>
               <span className={cn("shrink-0 text-fg-3", done ? "text-ok" : "opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100")}>
                 {done ? <Check className="size-4" aria-hidden /> : <Copy className="size-4" aria-hidden />}

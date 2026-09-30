@@ -25,9 +25,9 @@ export default function NilUuid({ locale }: { locale: Locale }) {
     <Panel className="p-4 sm:p-5">
       <div className="flex flex-col gap-3">
         {rows.map(([label, value]) => (
-          <div key={label} className="flex flex-col gap-2 rounded-[10px] bg-surface-2 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+          <div key={label} className="flex flex-col gap-2 rounded-[0.625rem] bg-surface-2 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="min-w-0">
-              <div className="text-[13px] font-medium text-fg-2">{label}</div>
+              <div className="text-[0.8125rem] font-medium text-fg-2">{label}</div>
               <div className="font-mono text-lg font-semibold break-all text-fg">{value}</div>
             </div>
             <CopyButton value={value} label={t.copy} copiedLabel={t.copied} />

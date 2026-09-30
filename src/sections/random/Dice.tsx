@@ -71,7 +71,7 @@ const T = {
 const PIPS: Record<number, number[]> = { 1: [4], 2: [0, 8], 3: [0, 4, 8], 4: [0, 2, 6, 8], 5: [0, 2, 4, 6, 8], 6: [0, 2, 3, 5, 6, 8] };
 
 function DieFace({ value, sides, negative }: { value: number; sides: number; negative?: boolean }) {
-  const base = "flex size-14 shrink-0 items-center justify-center rounded-[10px] border-2 sm:size-16";
+  const base = "flex size-14 shrink-0 items-center justify-center rounded-[0.625rem] border-2 sm:size-16";
   if (sides === 6) {
     return (
       <span className={cn(base, "grid grid-cols-3 grid-rows-3 gap-0.5 p-2", negative ? "border-err bg-err-soft" : "border-line-strong bg-surface")} role="img" aria-label={String(value)}>
@@ -181,7 +181,7 @@ export default function Dice({ locale, notation: notation0 = "1d6" }: DiceProps)
           <div className="flex max-w-full flex-wrap justify-center gap-2" aria-hidden>
             {roll.groups.flatMap((g, gi) => g.faces.map((f, i) => <DieFace key={`${gi}-${i}`} value={f} sides={g.sides} negative={g.sign < 0} />))}
             {roll.modifier !== 0 && (
-              <span className="flex h-14 items-center rounded-[10px] bg-surface-2 px-3 text-lg font-semibold text-fg-2 sm:h-16">
+              <span className="flex h-14 items-center rounded-[0.625rem] bg-surface-2 px-3 text-lg font-semibold text-fg-2 sm:h-16">
                 {roll.modifier > 0 ? `+${roll.modifier}` : `−${-roll.modifier}`}
               </span>
             )}
@@ -190,7 +190,7 @@ export default function Dice({ locale, notation: notation0 = "1d6" }: DiceProps)
           <p className="py-4 text-sm text-fg-3">{t.idle}</p>
         )}
         <div className="text-center">
-          <div className="text-[13px] font-medium text-fg-2">{t.total}</div>
+          <div className="text-[0.8125rem] font-medium text-fg-2">{t.total}</div>
           <div aria-live="polite" className="tabular min-h-12 text-5xl font-bold tracking-tight text-fg">
             {roll ? formatNumber(locale, roll.total) : ""}
           </div>

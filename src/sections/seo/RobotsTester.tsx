@@ -73,7 +73,7 @@ export default function RobotsTester({ locale }: { locale: Locale }) {
 
   return (
     <div className="flex flex-col gap-5">
-      <div className="grid gap-4 sm:grid-cols-[minmax(0,1fr)_200px]">
+      <div className="grid gap-4 sm:grid-cols-[minmax(0,1fr)_12.5rem]">
         <Field label={t.url} htmlFor={`${id}-u`}>
           <Input id={`${id}-u`} value={url} onChange={(e) => setUrl(e.target.value)} size="lg" className="font-mono" inputMode="url" spellCheck={false} autoComplete="off" />
         </Field>
@@ -94,12 +94,12 @@ export default function RobotsTester({ locale }: { locale: Locale }) {
         </Field>
       )}
 
-      <div aria-live="polite" className={cn("rounded-[12px] px-4 py-4 sm:px-5", v.allowed ? "bg-ok-soft" : "bg-err-soft")}>
+      <div aria-live="polite" className={cn("rounded-[0.75rem] px-4 py-4 sm:px-5", v.allowed ? "bg-ok-soft" : "bg-err-soft")}>
         <div className={cn("flex items-center gap-2 text-2xl font-semibold", v.allowed ? "text-ok" : "text-err")}>
           {v.allowed ? <CircleCheck className="size-7" aria-hidden /> : <CircleX className="size-7" aria-hidden />}
           {v.allowed ? t.allowed : t.blocked}
         </div>
-        <div className="mt-2 flex flex-col gap-0.5 text-[15px] text-fg-2">
+        <div className="mt-2 flex flex-col gap-0.5 text-[0.9375rem] text-fg-2">
           {isRobots ? (
             <span>{t.robotsTxt}</span>
           ) : (

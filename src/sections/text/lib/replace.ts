@@ -1,5 +1,6 @@
 /** Find & replace engine (runs inside a Web Worker for regular expressions). */
-import { literalPattern, unescapeReplacement } from "./textOps";
+import { execAllNotAfter, expandReplacement } from "@/lib/lookbehind";
+import { literalPattern, unescapeReplacement, WORD_CHAR } from "./textOps";
 
 export interface ReplaceRequest {
   text: string;
@@ -20,45 +21,31 @@ export interface ReplaceRequest {
 
 export type ReplaceResult = { ok: true; text: string; count: number } | { ok: false; error: string };
 
-export function buildRegExp(r: Pick<ReplaceRequest, "find" | "regex" | "caseSensitive" | "wholeWord" | "multiline" | "dotAll">, global: boolean): RegExp {
+export function buildRegExp(
+  r: Pick<ReplaceRequest, "find" | "regex" | "caseSensitive" | "wholeWord" | "multiline" | "dotAll">,
+  global: boolean,
+): { re: RegExp; notAfter: RegExp | null } {
   const flags = `${global ? "g" : ""}u${r.caseSensitive ? "" : "i"}${r.regex && r.multiline ? "m" : ""}${r.regex && r.dotAll ? "s" : ""}`;
-  const source = r.regex
-    ? r.wholeWord
-      ? `(?<![\\p{L}\\p{N}\\p{M}_])(?:${r.find})(?![\\p{L}\\p{N}\\p{M}_])`
-      : r.find
-    : literalPattern(r.find, r.wholeWord);
-  return new RegExp(source, flags);
+  const source = r.regex ? (r.wholeWord ? `(?:${r.find})(?![\\p{L}\\p{N}\\p{M}_])` : r.find) : literalPattern(r.find, r.wholeWord);
+  return { re: new RegExp(source, flags), notAfter: r.wholeWord ? WORD_CHAR : null };
 }
 
 export function replaceText(r: ReplaceRequest): ReplaceResult {
   if (!r.find) return { ok: true, text: r.text, count: 0 };
-  let re: RegExp;
+  let built: ReturnType<typeof buildRegExp>;
   try {
-    re = buildRegExp(r, true);
+    built = buildRegExp(r, true);
   } catch (e) {
     return { ok: false, error: e instanceof Error ? e.message : String(e) };
   }
   const rep = r.escapes ? unescapeReplacement(r.replace) : r.replace;
-  let count = 0;
-  let firstDone = false;
-  const text = r.text.replace(re, (...args: unknown[]) => {
-    count++;
-    if (!r.all && firstDone) return args[0] as string;
-    firstDone = true;
-    if (!r.regex) return rep;
-    // Expand $1, $<name>, $&, $$ like String.prototype.replace does.
-    const hasGroups = typeof args[args.length - 1] === "object" && args[args.length - 1] !== null;
-    const groups = (hasGroups ? args[args.length - 1] : undefined) as Record<string, string> | undefined;
-    const caps = args.slice(1, hasGroups ? -3 : -2) as (string | undefined)[];
-    const match = args[0] as string;
-    return rep.replace(/\$(\$|&|`|'|\d{1,2}|<([^>]+)>)/g, (m, tok: string, name?: string) => {
-      if (tok === "$") return "$";
-      if (tok === "&") return match;
-      if (name !== undefined) return groups?.[name] ?? "";
-      if (tok === "`" || tok === "'") return m;
-      const idx = Number(tok);
-      return idx >= 1 && idx <= caps.length ? (caps[idx - 1] ?? "") : m;
-    });
-  });
-  return { ok: true, text, count };
+  const matches = execAllNotAfter(r.text, built.re, built.notAfter);
+  let out = "";
+  let last = 0;
+  for (const [i, m] of matches.entries()) {
+    if (!r.all && i > 0) break;
+    out += r.text.slice(last, m.index) + (r.regex ? expandReplacement(rep, m) : rep);
+    last = m.index + m[0].length;
+  }
+  return { ok: true, text: out + r.text.slice(last), count: matches.length };
 }

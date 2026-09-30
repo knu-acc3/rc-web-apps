@@ -53,9 +53,9 @@ export default function Minifier({ locale, lang }: MinifierProps) {
       {fail && <ErrorBox locale={locale} fail={fail} text={text} editorId={editorId} />}
 
       {res && !fail && (
-        <div className="flex flex-wrap items-end gap-x-6 gap-y-2 rounded-[12px] bg-surface-2 px-5 py-4" aria-live="polite">
+        <div className="flex flex-wrap items-end gap-x-6 gap-y-2 rounded-[0.75rem] bg-surface-2 px-5 py-4" aria-live="polite">
           <div>
-            <div className="text-[13px] font-medium text-fg-2">{t.saved}</div>
+            <div className="text-[0.8125rem] font-medium text-fg-2">{t.saved}</div>
             <div className="tabular text-3xl font-semibold tracking-tight text-fg sm:text-4xl">{formatNumber(locale, saved, { style: "percent", maximumFractionDigits: 1 })}</div>
           </div>
           <div className="tabular pb-1 text-sm text-fg-2">

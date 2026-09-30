@@ -62,7 +62,7 @@ export default function JsonFormatter({ locale, indent: initialIndent = "2" }: J
         {view === "text" ? (
           <CodeOutput value={output} title={t.result} filename="formatted.json" mime="application/json" labels={outputLabels(locale)} minRows={18} className={live.pending ? "[&>textarea]:text-fg-3" : undefined} />
         ) : (
-          <div className="flex min-w-0 flex-col overflow-hidden rounded-[12px] border border-line bg-surface">
+          <div className="flex min-w-0 flex-col overflow-hidden rounded-[0.75rem] border border-line bg-surface">
             <div className="flex min-h-11 items-center justify-between gap-2 border-b border-line px-3 py-1.5">
               <div className="min-w-0 truncate text-sm font-semibold text-fg">{t.result}</div>
               <div className="flex items-center gap-1">
@@ -103,7 +103,7 @@ export default function JsonFormatter({ locale, indent: initialIndent = "2" }: J
         <Switch label={t.sortKeys} checked={sortKeys} onChange={(e) => setSortKeys(e.target.checked)} />
         <Switch label={t.ascii} checked={ascii} onChange={(e) => setAscii(e.target.checked)} />
         {res && !fail && (
-          <span className="tabular ml-auto text-[13px] text-fg-3">
+          <span className="tabular ml-auto text-[0.8125rem] text-fg-3">
             {formatNumber(locale, res.nodes)} {plural(locale, res.nodes, t.nodes)} · {t.depth} {formatNumber(locale, res.depth)} · {formatBytes(locale, res.bytes)}
           </span>
         )}

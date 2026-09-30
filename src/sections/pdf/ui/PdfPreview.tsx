@@ -91,7 +91,7 @@ export function PdfPreview({ bytes, label, busy, className }: { bytes: Uint8Arra
   }, [bytes]);
 
   return (
-    <div className={cn("relative flex min-h-48 items-center justify-center rounded-[12px] bg-surface-2 p-3", className)}>
+    <div className={cn("relative flex min-h-48 items-center justify-center rounded-[0.75rem] bg-surface-2 p-3", className)}>
       <canvas ref={canvasRef} role="img" aria-label={label} className={cn("h-auto max-h-[70vh] w-auto max-w-full bg-white shadow-[0_1px_3px_rgb(0_0_0/0.12)]", !bytes && "hidden")} />
       {(busy || !bytes) && <Loader2 className="absolute top-3 right-3 size-4 animate-spin text-fg-3" aria-hidden />}
     </div>

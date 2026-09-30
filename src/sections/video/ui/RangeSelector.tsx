@@ -90,13 +90,13 @@ export function RangeSelector({
   };
 
   const handleCls =
-    "absolute top-0 z-20 flex h-full w-4 -translate-x-1/2 cursor-ew-resize touch-none items-center justify-center focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-accent/40 rounded-[4px]";
+    "absolute top-0 z-20 flex h-full w-4 -translate-x-1/2 cursor-ew-resize touch-none items-center justify-center focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-accent/40 rounded-[0.25rem]";
 
   return (
     <div className={cn("select-none", className)}>
       <div
         ref={track}
-        className="relative h-20 w-full touch-none overflow-hidden rounded-[10px] border border-line bg-surface-2"
+        className="relative h-20 w-full touch-none overflow-hidden rounded-[0.625rem] border border-line bg-surface-2"
         onPointerDown={(ev) => {
           if (ev.target !== ev.currentTarget && !(ev.target as HTMLElement).dataset.bg) return;
           const t = timeAt(ev.clientX);

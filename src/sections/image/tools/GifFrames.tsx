@@ -109,7 +109,7 @@ export default function GifFrames({ locale }: { locale: Locale }) {
   const fname = (i: number) => `${name}-frame-${String(i + 1).padStart(Math.max(3, pad), "0")}.png`;
 
   if (!file) {
-    return <Dropzone onFiles={(f) => setFile(f[0] ?? null)} accept="image/gif,.gif" title={t.drop} hint={t.hint} className="min-h-64" />;
+    return <Dropzone onFiles={(f) => setFile(f[0] ?? null)} accept="image/gif,.gif" title={t.drop} hint={t.hint} />;
   }
 
   const loopText = info ? (info.loop === null ? t.once : info.loop === 0 ? t.forever : t.times(info.loop)) : "";
@@ -143,23 +143,23 @@ export default function GifFrames({ locale }: { locale: Locale }) {
           </Button>
         </div>
         {busy && <ProgressBar value={progress} className="rounded-none" />}
-        {zeroDelay && <p className="border-t border-line px-4 py-2.5 text-[13px] text-warn">{t.zeroDelay}</p>}
+        {zeroDelay && <p className="border-t border-line px-4 py-2.5 text-[0.8125rem] text-warn">{t.zeroDelay}</p>}
       </Panel>
 
       {frames.length > 0 && (
         <section>
-          <p className="mb-2 text-[13px] text-fg-3">{t.clickHint}</p>
-          <ul className="grid grid-cols-[repeat(auto-fill,minmax(112px,1fr))] gap-2">
+          <p className="mb-2 text-[0.8125rem] text-fg-3">{t.clickHint}</p>
+          <ul className="grid grid-cols-[repeat(auto-fill,minmax(7rem,1fr))] gap-2">
             {frames.map((f, i) => (
               <li key={f.index}>
                 <button
                   type="button"
                   onClick={() => downloadBlob(f.blob, fname(i))}
                   aria-label={t.frame(i + 1, f.delay)}
-                  className={`group flex w-full flex-col overflow-hidden rounded-[8px] border border-line text-left hover:border-accent ${checker}`}
+                  className={`group flex w-full flex-col overflow-hidden rounded-[0.5rem] border border-line text-left hover:border-accent ${checker}`}
                 >
                   <img src={f.url} alt="" loading="lazy" className="aspect-square w-full object-contain" />
-                  <span className="tabular flex justify-between bg-surface px-2 py-1 text-[12px] text-fg-2">
+                  <span className="tabular flex justify-between bg-surface px-2 py-1 text-[0.75rem] text-fg-2">
                     <span>#{i + 1}</span>
                     <span>
                       {f.delay} {locale === "ru" ? "мс" : "ms"}

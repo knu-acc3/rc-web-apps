@@ -98,30 +98,30 @@ export default function CityTime({ locale, city, compare, world }: CityTimeProps
     <div className="flex flex-col gap-4">
       <Panel className="px-4 py-7 sm:px-8 sm:py-10">
         <div className="flex flex-col items-center gap-3 text-center">
-          <BigTime parts={p} className="text-[60px] sm:text-[104px]" />
+          <BigTime parts={p} className="text-[3.75rem] sm:text-[6.5rem]" />
           <p className="min-h-7 text-lg text-fg-2 sm:text-xl">{p ? longDate(locale, p) : " "}</p>
-          <p className="min-h-6 text-[15px] text-fg-3">
+          <p className="min-h-6 text-[0.9375rem] text-fg-3">
             {p ? fmtOffset(p.off) : "UTC"}
             {rel && <> · {rel}</>}
           </p>
         </div>
         <dl className="mx-auto mt-7 grid max-w-2xl grid-cols-3 gap-2 border-t border-line pt-5 text-center">
           <div>
-            <dt className="flex items-center justify-center gap-1.5 text-[13px] text-fg-3">
+            <dt className="flex items-center justify-center gap-1.5 text-[0.8125rem] text-fg-3">
               <Sunrise className="size-4" aria-hidden />
               {t.sunrise}
             </dt>
             <dd className="tabular mt-1 text-lg font-semibold text-fg">{sun ? (sun.sunrise !== null ? hmAt(sun.sunrise, sun.off) : "—") : "—"}</dd>
           </div>
           <div>
-            <dt className="flex items-center justify-center gap-1.5 text-[13px] text-fg-3">
+            <dt className="flex items-center justify-center gap-1.5 text-[0.8125rem] text-fg-3">
               <Sunset className="size-4" aria-hidden />
               {t.sunset}
             </dt>
             <dd className="tabular mt-1 text-lg font-semibold text-fg">{sun ? (sun.sunset !== null ? hmAt(sun.sunset, sun.off) : "—") : "—"}</dd>
           </div>
           <div>
-            <dt className="text-[13px] text-fg-3">{t.day}</dt>
+            <dt className="text-[0.8125rem] text-fg-3">{t.day}</dt>
             <dd className="tabular mt-1 text-lg font-semibold text-fg">{sun ? (sun.polar === "day" ? t.polarDay : sun.polar === "night" ? t.polarNight : hmWords(sun.dayLength, locale)) : "—"}</dd>
           </div>
         </dl>
@@ -140,11 +140,11 @@ export default function CityTime({ locale, city, compare, world }: CityTimeProps
               <li key={x.key}>
                 <span className="flex min-w-0 items-center gap-2">
                   {isDay === null ? <span className="size-4" /> : isDay ? <Sun className="size-4 shrink-0 text-warn" aria-label={t.dayTime} /> : <Moon className="size-4 shrink-0 text-fg-3" aria-label={t.nightTime} />}
-                  <span className="truncate text-[15px] text-fg">{x.name}</span>
+                  <span className="truncate text-[0.9375rem] text-fg">{x.name}</span>
                 </span>
                 <span className="flex shrink-0 items-baseline gap-2">
-                  <span className="tabular text-[15px] font-semibold text-fg">{q ? hms(q, false) : "--:--"}</span>
-                  <span className="tabular min-w-16 text-right text-[13px] text-fg-3">
+                  <span className="tabular text-[0.9375rem] font-semibold text-fg">{q ? hms(q, false) : "--:--"}</span>
+                  <span className="tabular min-w-16 text-right text-[0.8125rem] text-fg-3">
                     {d !== null ? diffShort(d, locale) : ""}
                     {shift && `, ${shift}`}
                   </span>

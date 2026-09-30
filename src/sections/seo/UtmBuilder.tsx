@@ -83,12 +83,12 @@ export default function UtmBuilder({ locale, preset: initial = "" }: { locale: L
         <Input id={`${id}-u`} value={url} onChange={(e) => onUrl(e.target.value)} size="lg" className="font-mono" inputMode="url" placeholder="https://example.com/landing" spellCheck={false} autoComplete="off" />
       </Field>
 
-      <section aria-live="polite" className="rounded-[12px] bg-surface-2 px-4 py-4 sm:px-5">
+      <section aria-live="polite" className="rounded-[0.75rem] bg-surface-2 px-4 py-4 sm:px-5">
         <div className="flex items-center justify-between gap-2">
           <h2 className="text-sm text-fg-2">{t.result}</h2>
           {result && <CopyButton value={result} label={t.copy} copiedLabel={t.copied} variant="primary" showLabel />}
         </div>
-        <p className={result ? "mt-2 font-mono text-[15px] break-all text-fg select-all" : "mt-2 text-[15px] text-fg-3"}>{result || t.empty}</p>
+        <p className={result ? "mt-2 font-mono text-[0.9375rem] break-all text-fg select-all" : "mt-2 text-[0.9375rem] text-fg-3"}>{result || t.empty}</p>
       </section>
 
       <Issues items={warnings} />

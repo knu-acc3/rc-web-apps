@@ -69,7 +69,7 @@ export default function BraSize({ locale, band = 75, cup = "B" }: { locale: Loca
             <>
               <div className="text-sm text-fg-2">{t.yourSize}</div>
               <div className="tabular text-4xl font-semibold tracking-tight text-fg sm:text-5xl">{s.eu}</div>
-              <div className="tabular mt-1 text-[15px] text-fg-2">
+              <div className="tabular mt-1 text-[0.9375rem] text-fg-2">
                 UK {s.uk} · US {s.us} · FR {s.fr}
               </div>
             </>

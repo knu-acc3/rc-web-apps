@@ -98,7 +98,7 @@ export default function Convert({ locale, from, to: to0 = "jpg" }: ConvertProps)
                   aria-pressed={on}
                   onClick={() => setIcoSizes((xs) => (on ? (xs.length > 1 ? xs.filter((x) => x !== n) : xs) : [...xs, n].sort((a, b) => a - b)))}
                   className={cn(
-                    "h-8 rounded-[7px] border px-2.5 text-[13px] font-medium",
+                    "h-8 rounded-[0.4375rem] border px-2.5 text-[0.8125rem] font-medium",
                     on ? "border-accent bg-accent-soft text-accent" : "border-line text-fg-2 hover:text-fg",
                   )}
                 >
@@ -130,7 +130,7 @@ export default function Convert({ locale, from, to: to0 = "jpg" }: ConvertProps)
       more={more}
       zipName={`converted-${to}.zip`}
       dropHint={fromLabel ? `${from === "jfif" ? "JFIF" : fromLabel} → ${OUT_LABEL[to]} · ${s.dropHint}` : undefined}
-      extra={(it) => (it.result?.lossless ? <p className="text-[13px] text-ok">{t.copied}</p> : null)}
+      extra={(it) => (it.result?.lossless ? <p className="text-[0.8125rem] text-ok">{t.copied}</p> : null)}
     />
   );
 }

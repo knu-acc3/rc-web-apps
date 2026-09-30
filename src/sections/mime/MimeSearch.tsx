@@ -119,7 +119,7 @@ export default function MimeSearch({ locale, items, cats, only }: { locale: Loca
                       .{r.e}
                     </Link>
                   </td>
-                  <td className="font-mono text-[13px] break-all text-fg">{r.t}</td>
+                  <td className="font-mono text-[0.8125rem] break-all text-fg">{r.t}</td>
                 </tr>
               ))}
             </tbody>
@@ -135,7 +135,7 @@ export default function MimeSearch({ locale, items, cats, only }: { locale: Loca
             {extra.map(([e, types]) => (
               <li key={e} className="flex min-w-0 gap-2">
                 <span className="w-20 shrink-0 font-mono text-fg">.{e}</span>
-                <span className="min-w-0 font-mono text-[13px] break-all text-fg-2">{types.split("|").join(", ")}</span>
+                <span className="min-w-0 font-mono text-[0.8125rem] break-all text-fg-2">{types.split("|").join(", ")}</span>
               </li>
             ))}
           </ul>

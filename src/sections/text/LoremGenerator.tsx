@@ -130,7 +130,7 @@ export default function LoremGenerator({ locale, lang: lang0 = "latin", unit: un
         {html ? (
           <pre className="max-h-[32rem] overflow-auto px-4 py-3 font-mono text-sm leading-relaxed whitespace-pre-wrap text-fg">{text}</pre>
         ) : (
-          <div className="max-h-[32rem] overflow-auto px-4 py-3 text-[15px] leading-relaxed text-fg" lang={lang === "english" || lang === "latin" ? (lang === "latin" ? "la" : "en") : "ru"}>
+          <div className="max-h-[32rem] overflow-auto px-4 py-3 text-[0.9375rem] leading-relaxed text-fg" lang={lang === "english" || lang === "latin" ? (lang === "latin" ? "la" : "en") : "ru"}>
             {unit === "list" ? (
               numbered ? (
                 <ol className="list-decimal pl-6">{blocks.map((b, i) => <li key={i}>{b}</li>)}</ol>

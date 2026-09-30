@@ -55,11 +55,11 @@ export default function Validator({ locale, lang }: ValidatorProps) {
     <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_22rem]">
       <CodeEditor id={editorId} locale={locale} label={meta.label} value={text} onChange={setText} rows={18} sample={SAMPLES[lang]} fileAccept={`.${meta.ext},.txt${lang === "yaml" ? ",.yml" : ""}`} invalid={!!fail} />
       <div className="flex min-w-0 flex-col gap-3" aria-live="polite">
-        {!text.trim() && <div className="rounded-[10px] bg-surface-2 px-4 py-3 text-sm text-fg-2">{t.empty}</div>}
-        {text.trim() && live.pending && !fail && !res && <div className="rounded-[10px] bg-surface-2 px-4 py-3 text-sm text-fg-3">{t.working}</div>}
+        {!text.trim() && <div className="rounded-[0.625rem] bg-surface-2 px-4 py-3 text-sm text-fg-2">{t.empty}</div>}
+        {text.trim() && live.pending && !fail && !res && <div className="rounded-[0.625rem] bg-surface-2 px-4 py-3 text-sm text-fg-3">{t.working}</div>}
         {fail && <ErrorBox locale={locale} fail={fail} text={text} editorId={editorId} title={t.invalid(meta.label)} />}
         {res && (
-          <div className="rounded-[12px] bg-ok-soft px-5 py-4 text-ok">
+          <div className="rounded-[0.75rem] bg-ok-soft px-5 py-4 text-ok">
             <div className="flex items-center gap-2 text-2xl font-semibold tracking-tight">
               <CircleCheck aria-hidden className="size-7 shrink-0" />
               {t.valid(meta.label)}
@@ -68,7 +68,7 @@ export default function Validator({ locale, lang }: ValidatorProps) {
           </div>
         )}
         {res && res.warnings.length > 0 && (
-          <ul className="flex flex-col gap-2 rounded-[10px] bg-warn-soft px-4 py-3 text-sm text-warn">
+          <ul className="flex flex-col gap-2 rounded-[0.625rem] bg-warn-soft px-4 py-3 text-sm text-warn">
             {[...groupByCode(res.warnings)].map(([code, ws]) => (
               <li key={code}>
                 {t.warns[code] ?? code}

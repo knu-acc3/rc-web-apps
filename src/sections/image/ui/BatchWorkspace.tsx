@@ -101,7 +101,7 @@ function Notes({ it, locale, grewNote }: { it: BatchItem; locale: Locale; grewNo
   if (it.result && !it.result.keptOriginal && it.result.blob.size > it.file.size * 1.02 && grewNote) notes.push(t.grewNote);
   if (!notes.length) return null;
   return (
-    <ul className="flex flex-col gap-1 text-[13px] text-warn">
+    <ul className="flex flex-col gap-1 text-[0.8125rem] text-warn">
       {notes.map((n) => (
         <li key={n} className="flex items-start gap-1.5">
           <AlertTriangle className="mt-0.5 size-3.5 shrink-0" aria-hidden />
@@ -181,7 +181,7 @@ export function BatchWorkspace({
             {options}
           </OptionsBar>
         )}
-        <Dropzone onFiles={add} accept={accept} multiple={!single} title={single ? t.dropOne : t.dropMany} hint={dropHint ?? t.dropHint} className="min-h-64" />
+        <Dropzone onFiles={add} accept={accept} multiple={!single} title={single ? t.dropOne : t.dropMany} hint={dropHint ?? t.dropHint} />
       </div>
     );
   }
@@ -204,11 +204,11 @@ export function BatchWorkspace({
             ) : r && compare && origUrl ? (
               <CompareSlider before={origUrl} after={r.url} locale={locale} beforeLabel={t.original} afterLabel={t.result} />
             ) : r ? (
-              <div className={cn("flex max-h-[70vh] justify-center overflow-auto rounded-[10px] border border-line", checker)}>
+              <div className={cn("flex max-h-[70vh] justify-center overflow-auto rounded-[0.625rem] border border-line", checker)}>
                 <img src={r.url} alt={t.result} className="block h-auto max-w-full object-contain" />
               </div>
             ) : (
-              <div className={cn("flex min-h-56 flex-col items-center justify-center gap-3 rounded-[10px] border border-line text-sm text-fg-2", checker)}>
+              <div className={cn("flex min-h-56 flex-col items-center justify-center gap-3 rounded-[0.625rem] border border-line text-sm text-fg-2", checker)}>
                 {sel.status === "error" ? (
                   <span className="max-w-md px-4 text-center text-err">{errorText(locale, sel.error)}</span>
                 ) : (
@@ -312,7 +312,7 @@ export function BatchWorkspace({
                   aria-pressed={it === sel}
                   aria-label={it.file.name}
                 >
-                  <span className={cn("flex size-11 shrink-0 items-center justify-center overflow-hidden rounded-[6px] border border-line", checker)}>
+                  <span className={cn("flex size-11 shrink-0 items-center justify-center overflow-hidden rounded-[0.375rem] border border-line", checker)}>
                     {it.result ? (
                       <img src={it.result.url} alt="" className="size-full object-cover" />
                     ) : it.status === "error" ? (
@@ -323,7 +323,7 @@ export function BatchWorkspace({
                   </span>
                   <span className="min-w-0 flex-1">
                     <span className="block truncate text-sm font-medium text-fg">{it.file.name}</span>
-                    <span className="block truncate text-[13px] text-fg-3">
+                    <span className="block truncate text-[0.8125rem] text-fg-3">
                       <StatusLine it={it} locale={locale} />
                     </span>
                     {it.status === "working" && <ProgressBar value={it.progress} className="mt-1" />}

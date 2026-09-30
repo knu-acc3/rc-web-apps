@@ -307,12 +307,12 @@ export function monthPage(year: number, month: number, locale: Locale): PageMode
     blocks: [{ type: "facts", title: ru ? "Коротко" : "Quick facts", rows: facts }],
     faq: ru
       ? [
-          { q: `Сколько рабочих дней в ${MONTHS.ruPrep[month - 1]} ${year} года?`, a: `В России — ${workDays(locale, ruN.workDays)} (${formatNumber(locale, ruN.hours40)} ч при 40-часовой неделе), в Казахстане — ${workDays(locale, kzN.workDays)}.${productionYear("ru", year).decree === "known" ? "" : " Для России переносы выходных по постановлению Правительства в расчёт не включены."} Для Казахстана переносы по постановлению Правительства не учитываются.` },
+          { q: `Сколько рабочих дней в ${MONTHS.ruPrep[month - 1]} ${year} года?`, a: `В России — ${workDays(locale, ruN.workDays)} (${formatNumber(locale, ruN.hours40)} ч при 40-часовой неделе), в Казахстане — ${workDays(locale, kzN.workDays)}.${productionYear("ru", year).decree === "known" ? "" : " Для России переносы выходных по постановлению Правительства в расчёт не включены."}${productionYear("kz", year).decree === "known" ? "" : " Для Казахстана переносы по постановлению Правительства не учитываются."}` },
           { q: `Какие праздники в ${MONTHS.ruPrep[month - 1]} ${year} года?`, a: `Россия: ${holText(ruHol)}. Казахстан: ${holText(kzHol)}.` },
           { q: `С какого дня недели начинается ${mLow} ${year} года?`, a: `1 ${MONTHS.ruGen[month - 1]} ${year} года — ${WEEKDAYS.ru[isoWeekday(year, month, 1) - 1]}, последний день месяца — ${WEEKDAYS.ru[isoWeekday(year, month, dim) - 1]}.` },
         ]
       : [
-          { q: `How many working days are in ${mName} ${year}?`, a: `Russia: ${ruN.workDays} (${formatNumber(locale, ruN.hours40)} hours on a 40-hour week); Kazakhstan: ${kzN.workDays}.${productionYear("ru", year).decree === "known" ? "" : " Russian decree transfers are not included."} Kazakh decree transfers are not included.` },
+          { q: `How many working days are in ${mName} ${year}?`, a: `Russia: ${ruN.workDays} (${formatNumber(locale, ruN.hours40)} hours on a 40-hour week); Kazakhstan: ${kzN.workDays}.${productionYear("ru", year).decree === "known" ? "" : " Russian decree transfers are not included."}${productionYear("kz", year).decree === "known" ? "" : " Kazakh decree transfers are not included."}` },
           { q: `What holidays are in ${mName} ${year}?`, a: `Russia: ${holText(ruHol)}. Kazakhstan: ${holText(kzHol)}.` },
           { q: `What day does ${mName} ${year} start on?`, a: `${mName} 1, ${year} is a ${wdLong(locale, first)}; the last day of the month is a ${wdLong(locale, { y: year, m: month, d: dim })}.` },
         ],
@@ -451,7 +451,7 @@ export function productionHub(locale: Locale): PageModel {
     path: ["production-calendar"],
     sectionId: "calendar",
     kind: "tool",
-    title: ru ? "Производственный календарь России и Казахстана" : "Working-day calendar of Russia and Kazakhstan",
+    title: ru ? "Производственный календарь России и Казахстана | рабочие дни и праздники" : "Working-day calendar of Russia and Kazakhstan | holidays and workdays",
     h1: ru ? "Производственный календарь" : "Working-day calendar",
     description: ru
       ? `Производственные календари России на ${PROD_YEARS.ru[0]}–${PROD_YEARS.ru[PROD_YEARS.ru.length - 1]} годы и Казахстана на ${PROD_YEARS.kz[0]}–${PROD_YEARS.kz[PROD_YEARS.kz.length - 1]}: праздники, переносы выходных, сокращённые дни, рабочие дни и нормы часов по месяцам.`
@@ -543,8 +543,8 @@ export function productionPage(country: HolidayCountry, year: number, locale: Lo
         ? `Постановление Правительства о переносе выходных на ${year} год в этот календарь не включено: учтены только праздники по ст. 112 Трудового кодекса и автоматический перенос выходного, совпавшего с праздником (кроме январских). Январские выходные, совпавшие с праздниками, правительство переносит отдельным постановлением — после его учёта число рабочих дней может измениться.`
         : `The government decree moving days off in ${year} is not included: only holidays under Article 112 of the Labour Code and the automatic move of a day off that coincides with a holiday (except in January) are applied. January days off are moved by a separate decree, which can change the number of working days.`
     : ru
-      ? `Учтены праздники по закону «О праздниках в Республике Казахстан» и перенос выходного, совпавшего с праздником, на следующий рабочий день (для религиозных праздников перенос не делается). Дополнительные переносы рабочих дней по постановлению Правительства РК на ${year} год не включены — проверьте постановление перед расчётом зарплаты.${year > 2026 ? " Дата Курбан айта — ожидаемая: её объявляет Духовное управление мусульман Казахстана." : ""}`
-      : `Includes holidays under the Law on Public Holidays of Kazakhstan and the move of a day off that coincides with a holiday to the next working day (not for religious holidays). Additional transfers by government decree for ${year} are not included — check the decree before payroll calculations.${year > 2026 ? " The Kurban Ait date is expected; it is announced by the Spiritual Administration of Muslims of Kazakhstan." : ""}`;
+      ? `Учтены праздники по закону «О праздниках в Республике Казахстан» и перенос выходного, совпавшего с праздником, на следующий рабочий день (для религиозных праздников перенос не делается). ${known ? `Других переносов по постановлению Правительства РК в ${year} году нет.` : `Дополнительные переносы рабочих дней по постановлению Правительства РК на ${year} год не включены — проверьте постановление перед расчётом зарплаты.`}${year === 2026 ? " В 2026 году День Конституции не отмечается: с 1 июля 2026 года он перенесён с 30 августа на 15 марта (Закон РК от 11.06.2026 № 306-VIII), поэтому 31 августа — рабочий день." : year > 2026 ? " День Конституции — 15 марта. Дата Курбан айта — ожидаемая: её объявляет Духовное управление мусульман Казахстана." : ""}`
+      : `Includes holidays under the Law on Public Holidays of Kazakhstan and the move of a day off that coincides with a holiday to the next working day (not for religious holidays). ${known ? `There are no other government transfers in ${year}.` : `Additional transfers by government decree for ${year} are not included — check the decree before payroll calculations.`}${year === 2026 ? " Constitution Day is not observed in 2026: from 1 July 2026 it moved from August 30 to March 15 (Law No. 306-VIII of 11.06.2026), so August 31 is a working day." : year > 2026 ? " Constitution Day is on March 15. The Kurban Ait date is expected; it is announced by the Spiritual Administration of Muslims of Kazakhstan." : ""}`;
 
   const blocks: Block[] = [
     { type: "table", title: ru ? `Нормы рабочего времени на ${year} год` : `Working-time norms for ${year}`, head, rows: normRows },

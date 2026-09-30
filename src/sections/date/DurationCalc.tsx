@@ -64,7 +64,7 @@ export default function DurationCalc({ locale }: { locale: Locale }) {
             {t.label}
           </label>
           <Textarea id={`${id}-t`} rows={8} value={text} onChange={(e) => setText(e.target.value)} className="min-h-48 text-base" />
-          <p className="text-[13px] text-fg-3">{t.hint}</p>
+          <p className="text-[0.8125rem] text-fg-3">{t.hint}</p>
           <div className="flex flex-wrap items-center gap-2 text-sm text-fg-3">
             {t.bare}
             <Segmented
@@ -80,11 +80,11 @@ export default function DurationCalc({ locale }: { locale: Locale }) {
             />
           </div>
         </div>
-        <div className="flex flex-col items-center justify-center gap-3 rounded-[10px] bg-surface-2 p-4">
+        <div className="flex flex-col items-center justify-center gap-3 rounded-[0.625rem] bg-surface-2 p-4">
           <BigResult caption={t.total} value={hasInput ? shown : "—"} />
           {hasInput && <CopyButton value={shown} label={t.copy} copiedLabel={t.copied} variant="ghost" />}
           {hasInput && (
-            <dl className="grid w-full grid-cols-3 gap-2 text-center text-[13px]">
+            <dl className="grid w-full grid-cols-3 gap-2 text-center text-[0.8125rem]">
               <div>
                 <dt className="text-fg-3">{t.hours}</dt>
                 <dd className="tabular font-semibold text-fg">{formatNumber(locale, total / 3600, { maximumFractionDigits: 3 })}</dd>

@@ -110,7 +110,7 @@ export default function StrengthChecker({ locale }: { locale: Locale }) {
         </div>
       </Field>
 
-      <div className="rounded-[12px] bg-surface-2 px-4 py-4 sm:px-5">
+      <div className="rounded-[0.75rem] bg-surface-2 px-4 py-4 sm:px-5">
         {!pw ? (
           <p className="text-fg-2">{t.empty}</p>
         ) : !r ? (
@@ -127,7 +127,7 @@ export default function StrengthChecker({ locale }: { locale: Locale }) {
             </div>
             <p className="mt-2 text-sm text-fg-2">{t.guesses(formatNumber(locale, Math.round(r.guessesLog10 * 10) / 10))}</p>
             {(r.warning || r.suggestions.length > 0) && (
-              <div className="mt-3 text-[15px] text-fg-2">
+              <div className="mt-3 text-[0.9375rem] text-fg-2">
                 {r.warning && <p className="font-medium text-fg">{r.warning}</p>}
                 {r.suggestions.length > 0 && (
                   <ul className="mt-1 list-disc pl-5 marker:text-fg-3">
@@ -143,7 +143,7 @@ export default function StrengthChecker({ locale }: { locale: Locale }) {
       </div>
 
       {r && (
-        <section className="rounded-[12px] border border-line">
+        <section className="rounded-[0.75rem] border border-line">
           <h2 className="border-b border-line px-4 py-2.5 text-sm font-semibold text-fg-2">{t.crack}</h2>
           <dl className="divide-y divide-line">
             {(Object.keys(t.rows) as (keyof StrengthResult["seconds"])[]).map((k) => (

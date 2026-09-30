@@ -81,7 +81,7 @@ export default function NameUuid({ locale, version: v0 = 5, name: name0 = "examp
           <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
             <div className="min-w-0">
               <div className="text-sm font-medium text-fg-2">UUID v{version}</div>
-              <output className="mt-1 block font-mono text-xl font-semibold tracking-tight break-all text-fg sm:text-[26px]" aria-live="polite">
+              <output className="mt-1 block font-mono text-xl font-semibold tracking-tight break-all text-fg sm:text-[1.625rem]" aria-live="polite">
                 {results ? results[0] : <span className="text-base font-normal text-fg-3">{t.badNs}</span>}
               </output>
             </div>

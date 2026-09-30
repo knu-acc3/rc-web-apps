@@ -143,7 +143,7 @@ export default function FormTool({ locale }: { locale: Locale }) {
                 return (
                   <Field key={f.name} label={f.name} htmlFor={fid} className={f.multiline ? "sm:col-span-2" : undefined}>
                     {f.multiline ? (
-                      <Textarea id={fid} value={typeof v === "string" ? v : ""} maxLength={f.maxLength} onChange={(e) => set(f.name, e.target.value)} className="min-h-24 font-sans! text-[15px]!" />
+                      <Textarea id={fid} value={typeof v === "string" ? v : ""} maxLength={f.maxLength} onChange={(e) => set(f.name, e.target.value)} className="min-h-24 font-sans! text-[0.9375rem]!" />
                     ) : (
                       <Input id={fid} value={typeof v === "string" ? v : ""} maxLength={f.maxLength} onChange={(e) => set(f.name, e.target.value)} autoComplete="off" />
                     )}

@@ -177,7 +177,7 @@ export default function GifMaker({ locale }: { locale: Locale }) {
   if (!items.length) {
     return (
       <div className="flex flex-col gap-3">
-        <Dropzone onFiles={list.add} accept={IMAGE_ACCEPT} multiple title={s.dropMany} hint={t.need} className="min-h-64" />
+        <Dropzone onFiles={list.add} accept={IMAGE_ACCEPT} multiple title={s.dropMany} hint={t.need} />
         {list.loading && <Loader2 className="size-5 animate-spin text-accent" aria-label={s.reading} />}
       </div>
     );
@@ -186,7 +186,7 @@ export default function GifMaker({ locale }: { locale: Locale }) {
   const total = delays.reduce((a, b) => a + b, 0);
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex flex-wrap items-end gap-x-4 gap-y-3 rounded-[12px] border border-line bg-surface px-4 py-3">
+      <div className="flex flex-wrap items-end gap-x-4 gap-y-3 rounded-[0.75rem] border border-line bg-surface px-4 py-3">
         <NumberField label={t.delay} value={delay} onChange={setDelay} min={20} max={10000} suffix={t.ms} className="w-36" />
         <Field label={t.loop} htmlFor={`${id}-loop`} className="w-40">
           <Select id={`${id}-loop`} value={loop} onChange={(e) => setLoop(e.target.value as typeof loop)}>
@@ -263,7 +263,7 @@ export default function GifMaker({ locale }: { locale: Locale }) {
             </Button>
           )}
         </div>
-        <p className="border-t border-line px-4 py-2.5 text-[13px] text-fg-3">{items.length < 2 ? t.need : t.note}</p>
+        <p className="border-t border-line px-4 py-2.5 text-[0.8125rem] text-fg-3">{items.length < 2 ? t.need : t.note}</p>
       </Panel>
 
       <FrameStrip

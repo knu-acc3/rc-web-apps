@@ -66,7 +66,7 @@ export default function YearCalendar({ locale, year, follow = false, prev, next 
         {nav(1)}
       </div>
       <CalendarControls locale={locale} choice={choice} onChoice={setChoice} weeks={weeks} onWeeks={setWeeks} />
-      <div className="grid gap-x-6 gap-y-5 rounded-[12px] border border-line bg-surface p-4 sm:grid-cols-2 sm:p-5 lg:grid-cols-3 xl:grid-cols-4 print:grid-cols-3 print:border-0 print:p-0">
+      <div className="grid gap-x-6 gap-y-5 rounded-[0.75rem] border border-line bg-surface p-4 sm:grid-cols-2 sm:p-5 lg:grid-cols-3 xl:grid-cols-4 print:grid-cols-3 print:border-0 print:p-0">
         {MONTHS.map((m) => (
           <MonthGrid key={m} locale={locale} year={y} month={m} mark={mark} today={today} weekNumbers={weeks} />
         ))}

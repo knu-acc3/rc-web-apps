@@ -23,7 +23,7 @@ export function ClockShell({ locale, children, options }: { locale: Locale; chil
       <div
         ref={ref}
         className={cn(
-          "flex min-h-[46vh] flex-col items-center justify-center rounded-[12px] border border-line bg-surface px-3 py-8",
+          "flex min-h-[46vh] flex-col items-center justify-center rounded-[0.75rem] border border-line bg-surface px-3 py-8",
           active && "min-h-screen rounded-none border-0",
         )}
       >

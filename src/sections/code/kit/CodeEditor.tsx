@@ -64,7 +64,7 @@ export function CodeEditor({
   return (
     <div
       className={cn(
-        "flex min-w-0 flex-col overflow-hidden rounded-[12px] border bg-surface transition-colors duration-150 focus-within:border-accent",
+        "flex min-w-0 flex-col overflow-hidden rounded-[0.75rem] border bg-surface transition-colors duration-150 focus-within:border-accent",
         invalid ? "border-err" : "border-line",
         className,
       )}
@@ -131,7 +131,7 @@ export function CodeEditor({
         aria-describedby={describedBy}
         className="min-h-32 w-full resize-y bg-transparent px-3 py-2.5 font-mono text-sm leading-relaxed text-fg placeholder:text-fg-3 focus:outline-none"
       />
-      <div className="flex min-h-8 flex-wrap items-center justify-between gap-2 border-t border-line px-3 py-1 text-[13px] text-fg-3">
+      <div className="flex min-h-8 flex-wrap items-center justify-between gap-2 border-t border-line px-3 py-1 text-[0.8125rem] text-fg-3">
         <span className="tabular">{countsLabel(locale, stats.lines, stats.chars)}</span>
         {footer}
       </div>

@@ -223,6 +223,7 @@ export const qrSection = defineToolSection({
     },
     {
       slug: "barcode-generator",
+      seoAlt: { ru: ["создать штрихкод онлайн", "создать штрихкод", "PNG и SVG"], en: ["create a barcode online", "create a barcode", "PNG and SVG"] },
       component: "qr/barcode",
       icon: "Barcode",
       popular: true,
@@ -259,6 +260,7 @@ export const qrSection = defineToolSection({
     },
     {
       slug: "check-digit-calculator",
+      seoAlt: { ru: ["контрольная цифра штрихкода", "контрольная цифра"], en: ["barcode check digit", "check digit", "online"] },
       component: "qr/check-digit",
       icon: "Calculator",
       name: { ru: "Калькулятор контрольной цифры", en: "Check digit calculator" },

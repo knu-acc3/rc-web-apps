@@ -146,6 +146,18 @@ export const EVENTS: EventDef[] = [
     },
   },
   {
+    slug: "kazakhstan-constitution-day",
+    glyph: "📜",
+    name: { ru: "День Конституции Казахстана", en: "Kazakhstan Constitution Day" },
+    to: { ru: "до Дня Конституции Казахстана", en: "until Kazakhstan Constitution Day" },
+    md: [3, 15],
+    rule: { ru: "15 марта", en: "March 15" },
+    about: {
+      ru: "День Конституции Республики Казахстан с 2027 года отмечают 15 марта — в этот день в 2026 году на референдуме приняли новую Конституцию. Это выходной день. До 2025 года праздник был 30 августа, а в 2026 году не отмечался.",
+      en: "Since 2027 Kazakhstan's Constitution Day is on March 15, the day the new Constitution was adopted by referendum in 2026. It is a public holiday. Until 2025 it was on August 30, and in 2026 it was not observed.",
+    },
+  },
+  {
     slug: "spring-equinox",
     glyph: "🌗",
     name: { ru: "Весеннее равноденствие", en: "Spring equinox" },
@@ -293,18 +305,6 @@ export const EVENTS: EventDef[] = [
     about: {
       ru: "День столицы Казахстана отмечают 6 июля; это государственный праздник и выходной день по всей стране. В этот день в Астане проходят концерты и салют.",
       en: "Kazakhstan's Capital Day is on July 6, a public holiday across the country, with concerts and fireworks in Astana.",
-    },
-  },
-  {
-    slug: "kazakhstan-constitution-day",
-    glyph: "📜",
-    name: { ru: "День Конституции Казахстана", en: "Kazakhstan Constitution Day" },
-    to: { ru: "до Дня Конституции Казахстана", en: "until Kazakhstan Constitution Day" },
-    md: [8, 30],
-    rule: { ru: "30 августа", en: "August 30" },
-    about: {
-      ru: "День Конституции Республики Казахстан отмечают 30 августа — в этот день в 1995 году на референдуме была принята Конституция. Это выходной день.",
-      en: "Constitution Day of Kazakhstan is on August 30 — the Constitution was adopted by referendum on that day in 1995. It is a public holiday.",
     },
   },
   {

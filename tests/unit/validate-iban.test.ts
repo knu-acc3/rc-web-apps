@@ -34,7 +34,11 @@ describe("IBAN", () => {
     expect(validateIban("GB29NWBK6016133192681A").errors).toContain("structure");
     expect(validateIban("FR1420041010050500013M02607").errors).toEqual(["checksum"]);
     expect(validateIban("XX89370400440532013000").errors).toEqual(["country"]);
-    expect(validateIban("RU0204452560040702810412345678901").errors).toEqual(["ru"]);
+    // Russia: in the registry since 2023, 33 characters (BIK + 20-digit account).
+    const ru = validateIban("RU03 0445 2522 5408 1781 0538 0913 1041 9");
+    expect(ru.valid).toBe(true);
+    expect([ru.bank, ru.branch, ru.account]).toEqual(["044525225", "40817", "810538091310419"]);
+    expect(validateIban("RU0304452522540817810538091310418").errors).toEqual(["checksum"]);
     expect(validateIban("DE89 3704 0044 0532 0130 0!").errors).toEqual(["chars"]);
     expect(validateIban("").errors).toEqual(["empty"]);
   });

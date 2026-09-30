@@ -70,7 +70,7 @@ export function FrameStrip({
   const focusLater = (i: number) => requestAnimationFrame(() => refs.current[i]?.focus());
   return (
     <div className="flex flex-col gap-2">
-      <p className="text-[13px] text-fg-3">{t.help}</p>
+      <p className="text-[0.8125rem] text-fg-3">{t.help}</p>
       <ul aria-label={label} className="flex gap-2 overflow-x-auto pb-1 scrollbar-thin">
         {items.map((it, i) => (
           <li
@@ -111,14 +111,14 @@ export function FrameStrip({
               }
             }}
             className={cn(
-              "relative flex size-20 shrink-0 cursor-grab items-center justify-center overflow-hidden rounded-[8px] border",
+              "relative flex size-20 shrink-0 cursor-grab items-center justify-center overflow-hidden rounded-[0.5rem] border",
               checker,
               selected === i ? "border-accent ring-2 ring-accent/30" : "border-line",
               dragFrom === i && "opacity-50",
             )}
           >
             <Thumb bitmap={it.bitmap} />
-            <span className="absolute left-1 top-1 rounded bg-black/60 px-1 text-[11px] font-semibold text-white">{i + 1}</span>
+            <span className="absolute left-1 top-1 rounded bg-black/60 px-1 text-[0.6875rem] font-semibold text-white">{i + 1}</span>
           </li>
         ))}
         <li className="shrink-0">

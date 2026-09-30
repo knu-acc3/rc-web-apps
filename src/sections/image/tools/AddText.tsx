@@ -249,7 +249,7 @@ export default function AddText({ locale }: { locale: Locale }) {
 
   const textField = (
     <Field label={`${t.text}: ${names(sel).toLowerCase()}`} htmlFor={`${id}-text`} className="min-w-56 flex-1">
-      <Textarea id={`${id}-text`} value={cur.text} onChange={(e) => set({ text: e.target.value })} rows={2} className="min-h-0! font-sans! text-[15px]!" />
+      <Textarea id={`${id}-text`} value={cur.text} onChange={(e) => set({ text: e.target.value })} rows={2} className="min-h-0! font-sans! text-[0.9375rem]!" />
     </Field>
   );
   const fontField = (
@@ -424,7 +424,7 @@ function QuoteCard({
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="rounded-[12px] border border-line bg-surface">
+      <div className="rounded-[0.75rem] border border-line bg-surface">
         <div className="flex flex-wrap items-end gap-x-4 gap-y-3 px-4 py-3">
           {modeSwitch}
           {blockTabs}
@@ -464,7 +464,7 @@ function QuoteCard({
             ref={canvasRef}
             role="img"
             aria-label={blocks.map((b) => b.text).join(" ")}
-            className="block h-auto max-h-[65vh] w-auto max-w-full rounded-[6px]"
+            className="block h-auto max-h-[65vh] w-auto max-w-full rounded-[0.375rem]"
           />
         </div>
         <div className="flex flex-col gap-3 border-t border-line px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
@@ -477,7 +477,7 @@ function QuoteCard({
           </Button>
         </div>
         {error ? (
-          <p className="border-t border-line px-4 py-2.5 text-[13px] text-err" role="alert">
+          <p className="border-t border-line px-4 py-2.5 text-[0.8125rem] text-err" role="alert">
             {errorText(locale, error)}
           </p>
         ) : null}

@@ -221,15 +221,15 @@ export default function KeyboardTest({ locale }: { locale: Locale }) {
             <KeyboardVisual down={state.down} ever={state.ever} labels={labels} />
           </div>
         </div>
-        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-line px-4 py-2.5 text-[13px] text-fg-2">
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-line px-4 py-2.5 text-[0.8125rem] text-fg-2">
           <span className="inline-flex items-center gap-1.5">
-            <span className="size-3 rounded-[3px] bg-accent" aria-hidden /> {t.legendDown}
+            <span className="size-3 rounded-[0.1875rem] bg-accent" aria-hidden /> {t.legendDown}
           </span>
           <span className="inline-flex items-center gap-1.5">
-            <span className="size-3 rounded-[3px] border border-ok/50 bg-ok-soft" aria-hidden /> {t.legendEver}
+            <span className="size-3 rounded-[0.1875rem] border border-ok/50 bg-ok-soft" aria-hidden /> {t.legendEver}
           </span>
           <span className="inline-flex items-center gap-1.5">
-            <span className="size-3 rounded-[3px] border border-line-strong bg-surface" aria-hidden /> {t.legendNone}
+            <span className="size-3 rounded-[0.1875rem] border border-line-strong bg-surface" aria-hidden /> {t.legendNone}
           </span>
           {state.locks && (
             <span className="ml-auto inline-flex flex-wrap items-center gap-1.5">
@@ -242,7 +242,7 @@ export default function KeyboardTest({ locale }: { locale: Locale }) {
         </div>
       </Panel>
 
-      <p className="flex flex-wrap items-baseline justify-center gap-x-6 gap-y-1 text-[15px] text-fg-2">
+      <p className="flex flex-wrap items-baseline justify-center gap-x-6 gap-y-1 text-[0.9375rem] text-fg-2">
         <span>
           {t.held}: <span className="tabular text-xl font-semibold text-fg">{state.down.size}</span>
         </span>

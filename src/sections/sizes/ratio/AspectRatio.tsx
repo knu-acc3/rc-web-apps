@@ -85,7 +85,7 @@ export default function AspectRatio({ locale, w = 1920, h = 1080, scale = 1366 }
               <div className="tabular text-4xl font-semibold tracking-tight text-fg sm:text-5xl">
                 {`${a}:${b}`}
               </div>
-              <div className="tabular mt-1 text-[15px] text-fg-2">
+              <div className="tabular mt-1 text-[0.9375rem] text-fg-2">
                 {n(W / H, 4)}:1
                 {match && !match.exact && ` · ${t.nearest(ratioText(match.oriented, locale))}`}
               </div>

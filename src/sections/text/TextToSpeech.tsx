@@ -87,7 +87,7 @@ function chunks(text: string, lang: string): string[] {
     if (s.length <= 220) out.push(s);
     else {
       let cur = "";
-      for (const w of s.split(/(?<=[,;:])\s+|\s+/)) {
+      for (const w of s.split(/\s+/)) {
         if ((cur + " " + w).length > 220 && cur) {
           out.push(cur);
           cur = w;

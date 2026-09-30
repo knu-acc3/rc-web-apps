@@ -85,7 +85,7 @@ export default function DateDiff({ locale }: { locale: Locale }) {
             <Input id={`${id}-b`} type="date" value={toText} onChange={(e) => setTo(e.target.value)} />
           </Field>
         </div>
-        {!fromText && <p className="mt-2 text-[13px] text-fg-3">{t.from}: {t.today}</p>}
+        {!fromText && <p className="mt-2 text-[0.8125rem] text-fg-3">{t.from}: {t.today}</p>}
         <div className="mt-4 border-t border-line pt-6">
           <BigResult
             caption={t.between}

@@ -108,7 +108,7 @@ export default function AmountInWords({ locale, currency: cur0 = "RUB", value = 
 
       <div className="mt-5 min-h-16" aria-live="polite">
         {error ? (
-          <p className="text-[15px] text-err">{error}</p>
+          <p className="text-[0.9375rem] text-err">{error}</p>
         ) : parsed.ok ? (
           <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
             <p lang={locale} className="text-2xl leading-snug font-semibold break-words text-fg">

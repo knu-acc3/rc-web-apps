@@ -167,67 +167,67 @@ export default function OpenGraphGenerator({ locale }: { locale: Locale }) {
             { value: "vk", label: "VK" },
           ]}
         />
-        <div className="w-full max-w-[440px]">
+        <div className="w-full max-w-[27.5rem]">
           {platform === "telegram" && (
-            <div className="rounded-[12px] bg-surface-2 p-3">
+            <div className="rounded-[0.75rem] bg-surface-2 p-3">
               <div className="border-l-[3px] border-accent pl-2.5">
                 <div className="text-sm font-semibold text-accent">{more.siteName?.trim() || host}</div>
                 <div className="text-sm font-semibold text-fg">{shownTitle}</div>
                 <div className="line-clamp-3 text-sm text-fg-2">{shownDesc}</div>
-                <div className="mt-2 aspect-[1.91/1] overflow-hidden rounded-[8px] bg-surface">{picture}</div>
+                <div className="mt-2 aspect-[1.91/1] overflow-hidden rounded-[0.5rem] bg-surface">{picture}</div>
               </div>
             </div>
           )}
           {platform === "whatsapp" && (
-            <div className="overflow-hidden rounded-[12px] bg-surface-2">
+            <div className="overflow-hidden rounded-[0.75rem] bg-surface-2">
               <div className="aspect-[1.91/1] bg-surface">{picture}</div>
               <div className="px-3 py-2">
                 <div className="line-clamp-2 text-sm font-semibold text-fg">{shownTitle}</div>
-                <div className="line-clamp-1 text-[13px] text-fg-2">{shownDesc}</div>
-                <div className="text-[13px] text-fg-3">{host}</div>
+                <div className="line-clamp-1 text-[0.8125rem] text-fg-2">{shownDesc}</div>
+                <div className="text-[0.8125rem] text-fg-3">{host}</div>
               </div>
             </div>
           )}
           {platform === "facebook" && (
-            <div className="overflow-hidden rounded-[8px] border border-line">
+            <div className="overflow-hidden rounded-[0.5rem] border border-line">
               <div className="aspect-[1.91/1] bg-surface-2">{picture}</div>
               <div className="bg-surface-2 px-3 py-2.5">
                 <div className="text-xs text-fg-3 uppercase">{host}</div>
-                <div className="line-clamp-2 text-[15px] font-semibold text-fg">{shownTitle}</div>
+                <div className="line-clamp-2 text-[0.9375rem] font-semibold text-fg">{shownTitle}</div>
                 <div className="line-clamp-1 text-sm text-fg-2">{shownDesc}</div>
               </div>
             </div>
           )}
           {platform === "x" && (
-            <div className={cn("relative overflow-hidden rounded-[16px] border border-line", more.card === "summary" && "flex items-center gap-3 p-0")}>
+            <div className={cn("relative overflow-hidden rounded-[1rem] border border-line", more.card === "summary" && "flex items-center gap-3 p-0")}>
               {more.card === "summary" ? (
                 <>
-                  <div className="size-[120px] shrink-0 bg-surface-2">{picture}</div>
+                  <div className="size-[7.5rem] shrink-0 bg-surface-2">{picture}</div>
                   <div className="min-w-0 py-2 pr-3">
                     <div className="text-sm text-fg-3">{host}</div>
-                    <div className="line-clamp-1 text-[15px] text-fg">{shownTitle}</div>
+                    <div className="line-clamp-1 text-[0.9375rem] text-fg">{shownTitle}</div>
                     <div className="line-clamp-2 text-sm text-fg-2">{shownDesc}</div>
                   </div>
                 </>
               ) : (
                 <>
                   <div className="aspect-[1.91/1] bg-surface-2">{picture}</div>
-                  <span className="absolute bottom-2.5 left-2.5 rounded-[4px] bg-black/60 px-1.5 py-0.5 text-[13px] text-white">{host}</span>
+                  <span className="absolute bottom-2.5 left-2.5 rounded-[0.25rem] bg-black/60 px-1.5 py-0.5 text-[0.8125rem] text-white">{host}</span>
                 </>
               )}
             </div>
           )}
           {platform === "vk" && (
-            <div className="overflow-hidden rounded-[10px] border border-line">
+            <div className="overflow-hidden rounded-[0.625rem] border border-line">
               <div className="aspect-[1.91/1] bg-surface-2">{picture}</div>
               <div className="px-3 py-2.5">
-                <div className="line-clamp-2 text-[15px] font-medium text-fg">{shownTitle}</div>
-                <div className="text-[13px] text-fg-3">{host}</div>
+                <div className="line-clamp-2 text-[0.9375rem] font-medium text-fg">{shownTitle}</div>
+                <div className="text-[0.8125rem] text-fg-3">{host}</div>
               </div>
             </div>
           )}
         </div>
-        {img && <p className="text-[13px] text-fg-3">{t.size(img.w, img.h, Math.round(img.bytes / 1024))}</p>}
+        {img && <p className="text-[0.8125rem] text-fg-3">{t.size(img.w, img.h, Math.round(img.bytes / 1024))}</p>}
       </div>
 
       <Field label={t.title} htmlFor={`${id}-t`}>
@@ -250,7 +250,7 @@ export default function OpenGraphGenerator({ locale }: { locale: Locale }) {
           <ImageIcon className="size-4" aria-hidden />
           {t.pick}
         </Button>
-        <span className="text-[13px] text-fg-3">{t.pickHint}</span>
+        <span className="text-[0.8125rem] text-fg-3">{t.pickHint}</span>
       </div>
 
       <div aria-live="polite">

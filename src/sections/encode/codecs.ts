@@ -42,14 +42,27 @@ export const base64: Codec = {
 
 /* ───────────── URL ───────────── */
 
+/** Index of the first unpaired UTF-16 surrogate, or -1. */
+function loneSurrogate(s: string): number {
+  for (let i = 0; i < s.length; i++) {
+    const c = s.charCodeAt(i);
+    if (c >= 0xd800 && c <= 0xdbff) {
+      const n = s.charCodeAt(i + 1);
+      if (n >= 0xdc00 && n <= 0xdfff) i++;
+      else return i;
+    } else if (c >= 0xdc00 && c <= 0xdfff) return i;
+  }
+  return -1;
+}
+
 const FORM_SAFE = /[A-Za-z0-9*\-._]/;
 
 export const url: Codec = {
   encode(input, o) {
     const mode = (o.mode as string) ?? "component";
     // lone surrogates can't be encoded
-    const bad = /[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?<![\uD800-\uDBFF])[\uDC00-\uDFFF]/.exec(input);
-    if (bad) return fail("url.surrogate", bad.index);
+    const bad = loneSurrogate(input);
+    if (bad >= 0) return fail("url.surrogate", bad);
     if (mode === "uri") return ok(encodeURI(input));
     if (mode === "form") {
       let out = "";

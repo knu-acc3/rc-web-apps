@@ -27,7 +27,7 @@ export default function Now({ locale }: NowProps) {
   return (
     <Panel className="flex flex-col items-center gap-4 px-4 py-8 text-center sm:py-12">
       <p className="text-sm font-medium text-fg-3">{t.device}</p>
-      <BigTime parts={p} className="text-[64px] sm:text-[112px]" />
+      <BigTime parts={p} className="text-[4rem] sm:text-[7rem]" />
       <p className="min-h-7 text-lg text-fg-2 sm:text-xl">
         {p ? (
           <>
@@ -41,7 +41,7 @@ export default function Now({ locale }: NowProps) {
           " "
         )}
       </p>
-      <p className="min-h-6 text-[15px] text-fg-3">
+      <p className="min-h-6 text-[0.9375rem] text-fg-3">
         {p && tz ? (
           <>
             {t.zone}: <span className="font-medium text-fg-2">{modernZone(tz)}</span>, {fmtOffset(p.off)}

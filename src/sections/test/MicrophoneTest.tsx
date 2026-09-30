@@ -440,7 +440,7 @@ export default function MicrophoneTest({ locale }: { locale: Locale }) {
                 <div ref={coverRef} className="absolute inset-y-0 right-0 w-full bg-surface-2" />
                 <div ref={peakRef} className="absolute inset-y-0 left-0 w-0.5 bg-fg" />
               </div>
-              <div className="relative h-4 text-[11px] text-fg-3 tabular" aria-hidden>
+              <div className="relative h-4 text-[0.6875rem] text-fg-3 tabular" aria-hidden>
                 {TICKS.map((d) => (
                   <span key={d} className="absolute -translate-x-1/2 first:translate-x-0 last:-translate-x-full" style={{ left: `${meterFraction(d) * 100}%` }}>
                     {d === 0 ? "0" : `−${-d}`}
@@ -465,8 +465,8 @@ export default function MicrophoneTest({ locale }: { locale: Locale }) {
             </div>
 
             <div>
-              <canvas ref={canvasRef} className="block h-20 w-full rounded-[10px] bg-surface-2" role="img" aria-label={t.spectrum} />
-              <div className="relative mt-1 h-4 text-[11px] text-fg-3 tabular" aria-hidden>
+              <canvas ref={canvasRef} className="block h-20 w-full rounded-[0.625rem] bg-surface-2" role="img" aria-label={t.spectrum} />
+              <div className="relative mt-1 h-4 text-[0.6875rem] text-fg-3 tabular" aria-hidden>
                 {specTicks.map(([f, l]) => (
                   <span key={f} className="absolute -translate-x-1/2 first:translate-x-0 last:-translate-x-full" style={{ left: `${(Math.log(f / 40) / Math.log(16000 / 40)) * 100}%` }}>
                     {l}
@@ -495,7 +495,7 @@ export default function MicrophoneTest({ locale }: { locale: Locale }) {
               }}
             />
           ))}
-          <p className="w-full text-[13px] text-fg-3">{t.procHint}</p>
+          <p className="w-full text-[0.8125rem] text-fg-3">{t.procHint}</p>
         </fieldset>
       )}
 

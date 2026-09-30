@@ -85,8 +85,8 @@ export default function LetterGen({ locale, alphabet: alpha0 }: LetterGenProps) 
               key={i}
               className={
                 single
-                  ? "flex size-28 items-center justify-center rounded-[16px] bg-accent-soft text-7xl font-bold text-accent sm:size-36 sm:text-8xl"
-                  : "flex size-16 items-center justify-center rounded-[12px] bg-accent-soft text-4xl font-bold text-accent sm:size-20 sm:text-5xl"
+                  ? "flex size-28 items-center justify-center rounded-[1rem] bg-accent-soft text-7xl font-bold text-accent sm:size-36 sm:text-8xl"
+                  : "flex size-16 items-center justify-center rounded-[0.75rem] bg-accent-soft text-4xl font-bold text-accent sm:size-20 sm:text-5xl"
               }
             >
               {l}

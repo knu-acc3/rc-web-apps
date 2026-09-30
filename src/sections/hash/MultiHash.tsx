@@ -56,23 +56,23 @@ export default function MultiHash({ locale, sample = "" }: { locale: Locale; sam
         </label>
         <span className="text-fg-3">{"error" in data ? <span className="text-err">{data.error}</span> : t.copyHint}</span>
       </div>
-      <dl className={`mt-4 divide-y divide-line overflow-hidden rounded-[10px] border border-line ${live.pending ? "[&_dd_button]:text-fg-3" : ""}`}>
+      <dl className={`mt-4 divide-y divide-line overflow-hidden rounded-[0.625rem] border border-line ${live.pending ? "[&_dd_button]:text-fg-3" : ""}`}>
         {ORDER.map((a) => {
           const def = ALGOS.find((x) => x.id === a)!;
           const value = digests?.[a] ? formatDigest(digests[a], fmt) : "";
           return (
             <div key={a} className="grid gap-0.5 px-3 py-2 sm:grid-cols-[8.5rem_1fr] sm:gap-3">
-              <dt className="text-[13px] font-medium text-fg-3 sm:pt-0.5">{def.name}</dt>
+              <dt className="text-[0.8125rem] font-medium text-fg-3 sm:pt-0.5">{def.name}</dt>
               <dd className="min-w-0">
                 <button
                   type="button"
-                  className="w-full cursor-copy text-left font-mono text-[14px] break-all text-fg hover:text-accent"
+                  className="w-full cursor-copy text-left font-mono text-[0.875rem] break-all text-fg hover:text-accent"
                   onClick={async () => {
                     if (value && (await copyText(value))) setCopied(a);
                   }}
                 >
                   {value || "…"}
-                  {copied === a && <span className="ml-2 font-sans text-[12px] text-ok">{t.copied}</span>}
+                  {copied === a && <span className="ml-2 font-sans text-[0.75rem] text-ok">{t.copied}</span>}
                 </button>
               </dd>
             </div>

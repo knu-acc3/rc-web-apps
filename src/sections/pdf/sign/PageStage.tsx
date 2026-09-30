@@ -43,7 +43,7 @@ export function PageStage({ doc, index, label, children }: { doc: PDFDocumentPro
 
   const shown = size && size.key === key ? size : null;
   return (
-    <div className="relative mx-auto w-full max-w-[720px]">
+    <div className="relative mx-auto w-full max-w-[45rem]">
       <canvas ref={canvasRef} role="img" aria-label={label} className="block w-full bg-white shadow-[0_1px_3px_rgb(0_0_0/0.15)]" style={shown ? { height: shown.height } : { aspectRatio: "1 / 1.414" }} />
       {shown && <div className="absolute inset-0">{children?.(shown)}</div>}
     </div>
@@ -117,7 +117,7 @@ export function DraggableBox({
       onPointerMove={move}
       onPointerUp={up}
       onPointerCancel={up}
-      className="absolute cursor-move touch-none rounded-[4px] outline-2 outline-offset-2 outline-accent outline-dashed focus-visible:outline-solid"
+      className="absolute cursor-move touch-none rounded-[0.25rem] outline-2 outline-offset-2 outline-accent outline-dashed focus-visible:outline-solid"
       style={{ left: `${box.x * 100}%`, top: `${box.y * 100}%`, width: `${box.w * 100}%`, height: `${hFrac(box.w) * 100}%` }}
     >
       {/* eslint-disable-next-line @next/next/no-img-element -- local blob of the signature */}

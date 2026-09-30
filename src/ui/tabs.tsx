@@ -49,7 +49,7 @@ export function Tabs<T extends string>({
               refs.current[next]?.focus();
             }}
             className={cn(
-              "-mb-px shrink-0 border-b-2 px-3 pb-2.5 pt-2 text-[15px] font-medium whitespace-nowrap transition-colors duration-150",
+              "-mb-px shrink-0 border-b-2 px-3 pb-2.5 pt-2 text-[0.9375rem] font-medium whitespace-nowrap transition-colors duration-150",
               active ? "border-accent text-fg" : "border-transparent text-fg-2 hover:text-fg",
             )}
           >

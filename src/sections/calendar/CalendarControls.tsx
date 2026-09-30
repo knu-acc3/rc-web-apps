@@ -59,10 +59,10 @@ export function Legend({ locale, choice }: { locale: Locale; choice: HolidayChoi
     ["bg-surface-2", t.workSat],
   ];
   return (
-    <ul className="flex flex-wrap gap-x-4 gap-y-1 text-[13px] text-fg-3">
+    <ul className="flex flex-wrap gap-x-4 gap-y-1 text-[0.8125rem] text-fg-3">
       {items.map(([cls, label]) => (
         <li key={label} className="flex items-center gap-1.5">
-          <span className={`inline-block size-3 rounded-[3px] ring-1 ring-line-strong ${cls}`} aria-hidden />
+          <span className={`inline-block size-3 rounded-[0.1875rem] ring-1 ring-line-strong ${cls}`} aria-hidden />
           {label}
         </li>
       ))}

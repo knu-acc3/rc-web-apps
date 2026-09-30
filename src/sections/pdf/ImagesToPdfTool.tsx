@@ -156,7 +156,7 @@ export default function ImagesToPdfTool({ locale, formats = "all" }: { locale: L
         renderThumb={(p) => {
           const it = byKey.get(p.key);
           return (
-            <span className="flex aspect-square items-center justify-center overflow-hidden rounded-[8px] bg-surface-2">
+            <span className="flex aspect-square items-center justify-center overflow-hidden rounded-[0.5rem] bg-surface-2">
               {it?.url ? (
                 // eslint-disable-next-line @next/next/no-img-element -- local blob preview
                 <img src={it.url} alt="" draggable={false} className="max-h-full max-w-full object-contain" />

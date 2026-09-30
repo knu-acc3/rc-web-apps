@@ -107,7 +107,7 @@ export default function FlipClock({ locale }: NowProps) {
       }
     >
       <style>{CSS}</style>
-      <div role="img" aria-label={label} className={o.sec ? "flex items-center gap-[0.18em] text-[min(15vw,170px)]" : "flex items-center gap-[0.22em] text-[min(22vw,230px)]"}>
+      <div role="img" aria-label={label} className={o.sec ? "flex items-center gap-[0.18em] text-[min(15vw,10.625rem)]" : "flex items-center gap-[0.22em] text-[min(22vw,14.375rem)]"}>
         {p ? (
           <>
             <Pair text={pad2(h)} />
@@ -119,7 +119,7 @@ export default function FlipClock({ locale }: NowProps) {
         )}
         {ampm && <span className="self-start text-[0.25em] font-semibold text-fg-2">{ampm}</span>}
       </div>
-      {o.date && <p className="mt-6 min-h-8 text-[min(5vw,30px)] text-fg-2">{p ? longDate(locale, p) : " "}</p>}
+      {o.date && <p className="mt-6 min-h-8 text-[min(5vw,1.875rem)] text-fg-2">{p ? longDate(locale, p) : " "}</p>}
     </ClockShell>
   );
 }

@@ -49,7 +49,7 @@ export default function WaistToHeight({ locale }: ToolProps) {
         <NumField id={`${id}-w`} label={t.waist} value={q.v.w} onChange={(w) => q.set({ w })} suffix={unit} error={W.message} size="lg" />
         <NumField id={`${id}-h`} label={t.height} value={q.v.h} onChange={(h) => q.set({ h })} suffix={unit} error={H.message} size="lg" />
       </FieldRow>
-      <p className="text-[13px] text-fg-3">{t.waistHint}</p>
+      <p className="text-[0.8125rem] text-fg-3">{t.waistHint}</p>
       <OptionsRow>
         <InlineToggle
           label={t.units}

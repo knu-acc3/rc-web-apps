@@ -88,7 +88,7 @@ export default function GradientGenerator({ locale, preset }: { locale: Locale; 
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="overflow-hidden rounded-[12px] border border-line" style={CHECKER_STYLE}>
+      <div className="overflow-hidden rounded-[0.75rem] border border-line" style={CHECKER_STYLE}>
         <div className="h-56 sm:h-72" style={{ background: gradientValue(g) }} role="img" aria-label={gradientValue(g)} />
       </div>
 
@@ -205,12 +205,12 @@ export default function GradientGenerator({ locale, preset }: { locale: Locale; 
 
       <section>
         <h2 className="mb-2 text-sm font-semibold text-fg-2">{t.presets}</h2>
-        <ul className="grid grid-cols-[repeat(auto-fill,minmax(110px,1fr))] gap-2">
+        <ul className="grid grid-cols-[repeat(auto-fill,minmax(6.875rem,1fr))] gap-2">
           {GRADIENT_PRESETS.map((p, i) => {
             const state = { ...DEFAULT_GRADIENT, ...p.state };
             return (
               <li key={i}>
-                <button type="button" className="w-full overflow-hidden rounded-[10px] border border-line text-left hover:border-line-strong" onClick={() => setG(state)}>
+                <button type="button" className="w-full overflow-hidden rounded-[0.625rem] border border-line text-left hover:border-line-strong" onClick={() => setG(state)}>
                   <span className="block h-12" style={{ background: gradientValue(state) }} />
                   <span className="block px-2 py-1 text-xs text-fg-2">{p.name[locale]}</span>
                 </button>

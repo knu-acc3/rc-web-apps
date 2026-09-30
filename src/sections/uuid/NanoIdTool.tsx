@@ -113,7 +113,7 @@ export default function NanoIdTool({ locale, preset: preset0 = "default", size: 
     <div className="flex flex-col gap-4">
       <Panel className="p-4 sm:p-6">
         <div className="text-sm font-medium text-fg-2">NanoID</div>
-        <output className="mt-1 block min-h-9 font-mono text-xl font-semibold tracking-tight break-all text-fg sm:text-[26px]" aria-live="polite">
+        <output className="mt-1 block min-h-9 font-mono text-xl font-semibold tracking-tight break-all text-fg sm:text-[1.625rem]" aria-live="polite">
           {ids?.[0] ?? "…"}
         </output>
         <div className="mt-4 flex flex-wrap items-center gap-2">

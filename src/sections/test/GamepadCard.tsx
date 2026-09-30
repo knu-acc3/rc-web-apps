@@ -100,7 +100,7 @@ export function GamepadCard({
     <Panel className="flex flex-col gap-5 p-4 sm:p-5">
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div className="min-w-0">
-          <h2 className="truncate text-[15px] font-semibold text-fg" title={pad.id}>
+          <h2 className="truncate text-[0.9375rem] font-semibold text-fg" title={pad.id}>
             {t.pad} {pad.index + 1}: {pad.id}
           </h2>
           <p className="text-sm text-fg-3">
@@ -138,7 +138,7 @@ export function GamepadCard({
           <div className="flex items-end gap-4 self-center">
             {triggers.map((i) => (
               <div key={i} className="flex flex-col items-center gap-1.5">
-                <div className="relative h-24 w-7 overflow-hidden rounded-[6px] bg-surface-2" aria-hidden>
+                <div className="relative h-24 w-7 overflow-hidden rounded-[0.375rem] bg-surface-2" aria-hidden>
                   <div className="absolute inset-x-0 bottom-0 bg-accent" style={{ height: `${pad.buttons[i].value * 100}%` }} />
                 </div>
                 <span className="text-sm font-medium text-fg">{label(i)?.[0]}</span>
@@ -158,13 +158,13 @@ export function GamepadCard({
               <div
                 key={i}
                 className={cn(
-                  "relative flex h-14 flex-col items-center justify-center overflow-hidden rounded-[8px] border text-center leading-tight",
+                  "relative flex h-14 flex-col items-center justify-center overflow-hidden rounded-[0.5rem] border text-center leading-tight",
                   b.pressed ? "border-accent bg-accent text-accent-fg" : pad.ever[i] ? "border-ok/50 bg-ok-soft text-ok" : "border-line bg-surface-2 text-fg-2",
                 )}
               >
                 {!b.pressed && b.value > 0.01 && <span className="absolute inset-x-0 bottom-0 bg-accent/30" style={{ height: `${b.value * 100}%` }} aria-hidden />}
                 <span className="relative text-sm font-semibold">{l ? l[0] : i}</span>
-                <span className="relative text-[11px] opacity-80">{l ? l[1] : `#${i}`}</span>
+                <span className="relative text-[0.6875rem] opacity-80">{l ? l[1] : `#${i}`}</span>
               </div>
             );
           })}

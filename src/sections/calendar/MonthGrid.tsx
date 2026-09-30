@@ -41,7 +41,7 @@ export function MonthGrid({
   const lg = size === "lg";
 
   return (
-    <table className={cn("w-full self-start border-separate border-spacing-0.5 text-center", lg ? "text-base" : "text-[13px]", className)}>
+    <table className={cn("w-full self-start border-separate border-spacing-0.5 text-center", lg ? "text-base" : "text-[0.8125rem]", className)}>
       {showTitle && <caption className={cn("pb-1.5 text-left font-semibold text-fg", lg ? "text-lg" : "text-sm")}>{monthName(locale, month)}</caption>}
       <thead>
         <tr>
@@ -62,7 +62,7 @@ export function MonthGrid({
           const firstDay = w.find((d) => d !== null)!;
           return (
             <tr key={wi}>
-              {weekNumbers && <td className="text-[11px] text-fg-3">{isoWeek({ y: year, m: month, d: firstDay }).week}</td>}
+              {weekNumbers && <td className="text-[0.6875rem] text-fg-3">{isoWeek({ y: year, m: month, d: firstDay }).week}</td>}
               {w.map((d, i) => {
                 if (d === null) return <td key={i} />;
                 const ymd = { y: year, m: month, d };
@@ -73,7 +73,7 @@ export function MonthGrid({
                     key={i}
                     title={m?.title}
                     className={cn(
-                      "tabular rounded-[6px]",
+                      "tabular rounded-[0.375rem]",
                       lg ? "h-12 sm:h-14" : "h-7",
                       m?.cls ?? (i >= 5 ? "text-err" : "text-fg"),
                       isToday && "font-bold ring-2 ring-accent ring-inset",

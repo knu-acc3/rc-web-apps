@@ -81,7 +81,7 @@ export default function YesNo({ locale, maybe: maybe0 = false }: YesNoProps) {
         <div
           aria-live="polite"
           className={cn(
-            "flex min-h-32 w-full items-center justify-center rounded-[16px] text-6xl font-bold tracking-tight transition-colors duration-150 sm:min-h-40 sm:text-7xl",
+            "flex min-h-32 w-full items-center justify-center rounded-[1rem] text-6xl font-bold tracking-tight transition-colors duration-150 sm:min-h-40 sm:text-7xl",
             answer ? TONE[answer.a] : "bg-surface-2 text-fg-3",
           )}
         >

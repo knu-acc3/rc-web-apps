@@ -151,7 +151,7 @@ export default function Inflation({ locale }: ToolProps) {
             <NumField id={`${id}-r`} label={t.rate} value={q.v.r} onChange={(r) => q.set({ r })} suffix="%" error={R.message} size="lg" />
             <NumField id={`${id}-y`} label={t.years} value={q.v.y} onChange={(y) => q.set({ y })} error={Y.message} size="lg" />
           </FieldRow>
-          <p className="text-[13px] text-fg-3">{t.rateHint}</p>
+          <p className="text-[0.8125rem] text-fg-3">{t.rateHint}</p>
         </>
       )}
       {mode === "average" && (

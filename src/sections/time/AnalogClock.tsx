@@ -68,7 +68,7 @@ export default function AnalogClock({ locale }: NowProps) {
         </>
       }
     >
-      <svg viewBox="0 0 200 200" className="aspect-square w-[min(80vw,62vh,520px)]" role="img" aria-label={p ? `${t.label}: ${hms(p, false)}` : t.label}>
+      <svg viewBox="0 0 200 200" className="aspect-square w-[min(80vw,62vh,32.5rem)]" role="img" aria-label={p ? `${t.label}: ${hms(p, false)}` : t.label}>
         <circle cx="100" cy="100" r="97" className="fill-surface stroke-line-strong" strokeWidth="2" />
         {TICKS.map((i) => (
           <line
@@ -86,7 +86,7 @@ export default function AnalogClock({ locale }: NowProps) {
         {NUMS.map((n) => {
           const a = (n * 30 * Math.PI) / 180;
           return (
-            <text key={n} x={100 + 67 * Math.sin(a)} y={100 - 67 * Math.cos(a)} textAnchor="middle" dominantBaseline="central" className="fill-fg text-[15px] font-semibold">
+            <text key={n} x={100 + 67 * Math.sin(a)} y={100 - 67 * Math.cos(a)} textAnchor="middle" dominantBaseline="central" className="fill-fg text-[0.9375rem] font-semibold">
               {n}
             </text>
           );

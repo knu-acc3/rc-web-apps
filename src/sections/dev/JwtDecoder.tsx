@@ -182,7 +182,7 @@ export default function JwtDecoder({ locale, sample }: { locale: Locale; sample:
         )}
 
         {jwt && (isHmac || isAsym) && (
-          <details className="mt-4 rounded-[10px] border border-line" open={!!secret || !!keyText}>
+          <details className="mt-4 rounded-[0.625rem] border border-line" open={!!secret || !!keyText}>
             <summary className="cursor-pointer px-3 py-2 text-sm font-medium text-fg-2">{t.verify}</summary>
             <div className="flex flex-col gap-3 border-t border-line p-3">
               {isHmac ? (
@@ -223,12 +223,12 @@ export default function JwtDecoder({ locale, sample }: { locale: Locale; sample:
             [t.header, jwt.headerJson],
             [t.payload, jwt.payloadJson],
           ].map(([title, json]) => (
-            <div key={title} className="min-w-0 overflow-hidden rounded-[12px] border border-line bg-surface">
+            <div key={title} className="min-w-0 overflow-hidden rounded-[0.75rem] border border-line bg-surface">
               <div className="flex items-center justify-between border-b border-line px-3 py-1.5">
                 <span className="text-sm font-semibold text-fg">{title}</span>
                 <CopyButton value={json} size="icon-sm" variant="ghost" />
               </div>
-              <pre className="max-h-80 overflow-auto px-3 py-2 font-mono text-[13px] whitespace-pre-wrap break-all text-fg">{json}</pre>
+              <pre className="max-h-80 overflow-auto px-3 py-2 font-mono text-[0.8125rem] whitespace-pre-wrap break-all text-fg">{json}</pre>
             </div>
           ))}
         </div>
@@ -249,8 +249,8 @@ export default function JwtDecoder({ locale, sample }: { locale: Locale; sample:
                 const isTime = part === "payload" && TIME_CLAIMS.includes(k) && typeof v === "number";
                 return (
                   <tr key={`${part}.${k}`}>
-                    <td className="font-mono text-[13px]">{k}</td>
-                    <td className="max-w-[18rem] text-[13px] break-all">
+                    <td className="font-mono text-[0.8125rem]">{k}</td>
+                    <td className="max-w-[18rem] text-[0.8125rem] break-all">
                       <span className="font-mono">{typeof v === "string" ? v : JSON.stringify(v)}</span>
                       {isTime && (
                         <span className="block text-fg-3">
@@ -259,7 +259,7 @@ export default function JwtDecoder({ locale, sample }: { locale: Locale; sample:
                         </span>
                       )}
                     </td>
-                    <td className="text-[13px] text-fg-2">{CLAIMS[k]?.[locale] ?? ""}</td>
+                    <td className="text-[0.8125rem] text-fg-2">{CLAIMS[k]?.[locale] ?? ""}</td>
                   </tr>
                 );
               })}

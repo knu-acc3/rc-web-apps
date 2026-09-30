@@ -120,7 +120,7 @@ export default function ScreenResolution({ locale, w = 1920, h = 1080, diag = 24
             {valid ? (
               <>
                 <div className="truncate text-3xl font-semibold tracking-tight text-fg sm:text-4xl">{name ?? `${iw} × ${ih}`}</div>
-                <div className="tabular mt-1 text-[15px] text-fg-2">
+                <div className="tabular mt-1 text-[0.9375rem] text-fg-2">
                   {ratioLabel(locale, iw, ih)} · {n(megapixels(iw, ih))} {t.mp}
                   {p !== null && ` · ${n(p, 1)} PPI`}
                 </div>
@@ -151,12 +151,12 @@ export default function ScreenResolution({ locale, w = 1920, h = 1080, diag = 24
         />
       )}
 
-      <section className="rounded-[12px] border border-line px-4 py-3" aria-label={t.yours}>
+      <section className="rounded-[0.75rem] border border-line px-4 py-3" aria-label={t.yours}>
         <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
           <div className="min-w-0 flex-1">
-            <div className="text-[13px] text-fg-3">{t.yours}</div>
+            <div className="text-[0.8125rem] text-fg-3">{t.yours}</div>
             {yours ? (
-              <div className="tabular text-[15px] text-fg">
+              <div className="tabular text-[0.9375rem] text-fg">
                 <span className="font-semibold">
                   {yours.pw} × {yours.ph}
                 </span>{" "}
@@ -168,7 +168,7 @@ export default function ScreenResolution({ locale, w = 1920, h = 1080, diag = 24
                 </span>
               </div>
             ) : (
-              <div className="text-[15px] text-fg-3">{t.detecting}</div>
+              <div className="text-[0.9375rem] text-fg-3">{t.detecting}</div>
             )}
           </div>
           {yours && (
@@ -184,7 +184,7 @@ export default function ScreenResolution({ locale, w = 1920, h = 1080, diag = 24
             </Button>
           )}
         </div>
-        <p className="mt-1 text-[13px] text-fg-3">{t.zoom}</p>
+        <p className="mt-1 text-[0.8125rem] text-fg-3">{t.zoom}</p>
       </section>
     </div>
   );

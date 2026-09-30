@@ -62,6 +62,7 @@ export const removeDuplicateLines: ToolDef = {
 
 export const sortLinesTool: ToolDef = {
   slug: "sort-lines",
+  seoAlt: { ru: ["сортировка строк онлайн", "сортировка строк"], en: ["sort lines online", "line sorter", "A to Z"] },
   component: "text/sort",
   icon: "ArrowDownAZ",
   popular: true,
@@ -231,6 +232,7 @@ export const sortLinesTool: ToolDef = {
 
 export const reverseTextTool: ToolDef = {
   slug: "reverse-text",
+  seoAlt: { ru: "текст наоборот", en: "backwards text" },
   component: "text/reverse",
   icon: "ArrowLeftRight",
   name: L("Текст задом наперёд", "Reverse text"),

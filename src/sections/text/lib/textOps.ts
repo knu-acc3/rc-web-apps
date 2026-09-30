@@ -491,13 +491,16 @@ export function escapeRegExp(s: string): string {
   return s.replace(/[.*+?^${}()|[\]\\/-]/g, "\\$&");
 }
 
+/** A letter, digit, combining mark or underscore — what "whole word" must not touch (works for any script). */
+export const WORD_CHAR = /[\p{L}\p{N}\p{M}_]/u;
+
 /**
- * Pattern for a literal search. "Whole word" uses Unicode-aware lookarounds,
- * so it works for Cyrillic, Kazakh and any other script (unlike \b).
+ * Pattern for a literal search. "Whole word" adds a Unicode-aware lookahead; the "not preceded by a word
+ * character" half is checked with WORD_CHAR by the caller (regex lookbehind breaks old Safari).
  */
 export function literalPattern(find: string, wholeWord: boolean): string {
   const core = escapeRegExp(find);
-  return wholeWord ? `(?<![\\p{L}\\p{N}\\p{M}_])${core}(?![\\p{L}\\p{N}\\p{M}_])` : core;
+  return wholeWord ? `${core}(?![\\p{L}\\p{N}\\p{M}_])` : core;
 }
 
 /** Interpret \n, \t and \\ in a replacement typed by the user. */

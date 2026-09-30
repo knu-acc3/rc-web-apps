@@ -128,7 +128,7 @@ export default function SplitFile({ locale }: { locale: Locale }) {
             <Download aria-hidden />
             {t.all}
           </Button>
-          <p className="-mt-2 text-[13px] text-fg-3">{t.note}</p>
+          <p className="-mt-2 text-[0.8125rem] text-fg-3">{t.note}</p>
           <details className="text-sm">
             <summary className="cursor-pointer text-fg-3 hover:text-fg">{t.each}</summary>
             <ul className="mt-2 flex flex-wrap gap-2">

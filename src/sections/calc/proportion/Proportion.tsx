@@ -132,7 +132,7 @@ export default function Proportion({ locale, mode = "direct" }: ToolProps<{ mode
             <NumField id={`${id}-a2`} label={t.a2} value={q.v.a2} onChange={(a2) => q.set({ a2 })} error={A2.message} size="lg" />
             <div className="flex min-h-12 items-end pb-3 text-sm text-fg-3">→ {t.answer}</div>
           </FieldRow>
-          <p className="text-[13px] text-fg-3">{m === "direct" ? t.directHint : t.inverseHint}</p>
+          <p className="text-[0.8125rem] text-fg-3">{m === "direct" ? t.directHint : t.inverseHint}</p>
         </>
       ) : (
         <>

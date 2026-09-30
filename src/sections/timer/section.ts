@@ -29,9 +29,9 @@ function enAdj(x: TimerVariantSpec): string {
 const n = (locale: Locale, v: number, digits = 3) => formatNumber(locale, v, { maximumFractionDigits: digits });
 const p2 = (v: number) => String(v).padStart(2, "0");
 
-/** If started at 12:00 — when does it ring? (wall-clock arithmetic, a stable fact) */
-function endsAt(sec: number, locale: Locale): string {
-  const total = 12 * 3600 + sec;
+/** If started at `from` (seconds after midnight) — when does it ring? (wall-clock arithmetic, a stable fact) */
+function endsAt(sec: number, locale: Locale, from = 12 * 3600): string {
+  const total = from + sec;
   const days = Math.floor(total / 86400);
   const r = total % 86400;
   const t = `${p2(Math.floor(r / 3600))}:${p2(Math.floor((r % 3600) / 60))}${r % 60 ? `:${p2(r % 60)}` : ""}`;
@@ -61,8 +61,23 @@ function timerVariant(x: TimerVariantSpec, all: TimerVariantSpec[]): VariantDef 
     if (x.sec >= 60) rows.push([ru ? "В минутах" : "In minutes", n(locale, min, 2)]);
     if (x.sec >= 600) rows.push([ru ? "В часах" : "In hours", n(locale, hours, 3)]);
     rows.push([ru ? "Если запустить в 12:00" : "If started at 12:00", ru ? `сигнал в ${endsAt(x.sec, locale)}` : `rings at ${endsAt(x.sec, locale)}`]);
+    // "When will it ring?" for typical start times: minute-style pages use round hours, hour-style pages half hours.
+    const starts = x.style === "min" ? [7, 9, 13, 15, 18, 21] : [8.5, 10.5, 12.5, 14.5, 19.5, 22.5];
+    const clock = (h: number) => `${p2(Math.floor(h))}:${p2(Math.round((h % 1) * 60))}`;
+    const schedule: Block[] =
+      x.sec >= 600
+        ? [
+            {
+              type: "table",
+              title: ru ? `Во сколько сработает таймер на ${ruAcc}` : `When a ${adj} timer goes off`,
+              head: ru ? ["Старт", "Сигнал"] : ["Start", "Alarm"],
+              rows: starts.map((h) => [clock(h), endsAt(x.sec, locale, h * 3600)]),
+            },
+          ]
+        : [];
     return [
       { type: "facts", title: ru ? "Коротко" : "Quick facts", rows },
+      ...schedule,
       { type: "list", title: ru ? `Для чего ставят таймер на ${ruAcc}` : `What a ${adj} timer is used for`, items: usesOf(x.sec, locale) },
       {
         type: "links",

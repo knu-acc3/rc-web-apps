@@ -405,7 +405,7 @@ const tools: ToolDef[] = [
     props: { kind: "objectid" },
     name: { ru: "MongoDB ObjectId", en: "MongoDB ObjectId" },
     h1: { ru: "Генератор MongoDB ObjectId", en: "MongoDB ObjectId generator" },
-    title: { ru: "Генератор MongoDB ObjectId онлайн", en: "MongoDB ObjectId generator online" },
+    title: { ru: "Генератор MongoDB ObjectId онлайн | 24 символа hex", en: "MongoDB ObjectId generator | 24-char hex IDs" },
     description: {
       ru: "Генератор MongoDB ObjectId: 12 байт (24 hex-символа) — 4 байта времени в секундах, 5 случайных байт и 3-байтовый счётчик. До 10 000 штук и расшифровка.",
       en: "MongoDB ObjectId generator: 12 bytes (24 hex characters) — a 4-byte timestamp in seconds, 5 random bytes and a 3-byte counter. Up to 10,000 plus decoding.",

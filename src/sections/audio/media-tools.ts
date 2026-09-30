@@ -195,7 +195,7 @@ export const mediaTools: ToolDef[] = [
     props: { mode: "speed" },
     icon: "Gauge",
     name: { ru: "Скорость и тональность аудио", en: "Audio speed and pitch" },
-    title: { ru: "Изменить скорость и тональность аудио онлайн", en: "Change audio speed and pitch online" },
+    title: { ru: "Изменить скорость аудио онлайн | темп и тональность", en: "Change audio speed online | tempo and pitch" },
     h1: { ru: "Изменить скорость и тональность аудио", en: "Change audio speed and pitch" },
     description: {
       ru: "Ускорить или замедлить аудио в 0,5–2 раза с сохранением высоты голоса и сдвинуть тональность на ±12 полутонов без изменения темпа. Скорость слышна сразу.",

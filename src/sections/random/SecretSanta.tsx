@@ -146,8 +146,8 @@ export default function SecretSanta({ locale }: SecretSantaProps) {
   return (
     <div className="flex flex-col gap-4">
       <Panel className="flex flex-col gap-4 p-4 sm:p-5">
-        <Field label={t.people} htmlFor={`${id}-p`} aside={<span className="tabular text-[13px] text-fg-3">{count(locale, names.length, t.personForms)}</span>}>
-          <Textarea id={`${id}-p`} value={text} rows={7} onChange={(e) => setText(e.target.value)} className="font-sans! text-[15px]!" />
+        <Field label={t.people} htmlFor={`${id}-p`} aside={<span className="tabular text-[0.8125rem] text-fg-3">{count(locale, names.length, t.personForms)}</span>}>
+          <Textarea id={`${id}-p`} value={text} rows={7} onChange={(e) => setText(e.target.value)} className="font-sans! text-[0.9375rem]!" />
         </Field>
 
         <div>
@@ -239,7 +239,7 @@ export default function SecretSanta({ locale }: SecretSantaProps) {
               </Field>
               <div aria-live="polite" className="min-h-8">
                 {whoIndex >= 0 && (
-                  <div className="flex flex-col gap-3 rounded-[10px] bg-accent-soft px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="flex flex-col gap-3 rounded-[0.625rem] bg-accent-soft px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
                     <p className="text-xl font-semibold break-words text-fg">{message(whoIndex)}</p>
                     <CopyButton value={message(whoIndex)} label={t.copy} copiedLabel={t.copied} />
                   </div>
@@ -247,7 +247,7 @@ export default function SecretSanta({ locale }: SecretSantaProps) {
               </div>
               {all && (
                 <div className="flex flex-col gap-2">
-                  <ol className="flex flex-col gap-1 text-[15px] text-fg">
+                  <ol className="flex flex-col gap-1 text-[0.9375rem] text-fg">
                     {result.names.map((n, g) => (
                       <li key={n} className="break-words">
                         {n} <span className="text-fg-3">{t.arrow}</span> {result.names[result.to[g]]}

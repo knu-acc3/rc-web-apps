@@ -116,6 +116,7 @@ function letterVariant(p: LetterPreset): VariantDef {
 
 export const letterTool: ToolDef = {
   slug: "random-letter-generator",
+  seoAlt: { ru: ["генератор случайных букв", "случайная буква", "буквы"], en: ["random letter generator", "random letter"] },
   component: "random/letter",
   icon: "CaseSensitive",
   name: { ru: "Случайная буква", en: "Random letter generator" },

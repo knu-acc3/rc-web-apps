@@ -115,7 +115,7 @@ export function SingleImageShell({
   if (!file.prepared) {
     return (
       <div className="flex flex-col gap-3">
-        <Dropzone onFiles={(f) => f[0] && file.load(f[0])} accept={IMAGE_ACCEPT} title={t.dropOne} hint={t.dropHint} className="min-h-64" />
+        <Dropzone onFiles={(f) => f[0] && file.load(f[0])} accept={IMAGE_ACCEPT} title={t.dropOne} hint={t.dropHint} />
         {file.loading && (
           <p className="flex items-center gap-2 text-sm text-fg-2">
             <Loader2 className="size-4 animate-spin" aria-hidden />
@@ -163,7 +163,7 @@ export function SingleImageShell({
         </div>
         {exp.busy && <ProgressBar value={exp.progress} className="rounded-none" />}
         {(exp.error || extra || file.prepared.animated) && (
-          <div className="flex flex-col gap-1 border-t border-line px-4 py-2.5 text-[13px]">
+          <div className="flex flex-col gap-1 border-t border-line px-4 py-2.5 text-[0.8125rem]">
             {file.prepared.animated && <p className="text-warn">{t.animatedWarn}</p>}
             {exp.error ? (
               <p className="text-err" role="alert">

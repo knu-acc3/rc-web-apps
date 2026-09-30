@@ -53,7 +53,7 @@ export default function IdealWeight({ locale, height = 170, sex = "male" }: Tool
         <SexToggle locale={locale} value={s} onChange={(v) => q.set({ s: v })} />
         <UnitToggle locale={locale} value={q.v.u as "m" | "i"} onChange={(u) => q.set(switchUnits(locale, q.v, u))} />
       </OptionsRow>
-      {cm !== null && cm < 152.4 && <p className="text-[13px] text-fg-3">{t.below}</p>}
+      {cm !== null && cm < 152.4 && <p className="text-[0.8125rem] text-fg-3">{t.below}</p>}
     </>
   );
 

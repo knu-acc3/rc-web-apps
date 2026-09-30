@@ -69,22 +69,22 @@ export default function HeadingChecker({ locale }: { locale: Locale }) {
       {deferred.trim() && (
         <>
           <div aria-live="polite">{issues.length ? <Issues items={[...new Set(issues.map(t.issue))]} /> : hs.length ? <Issues tone="ok" items={[t.ok]} /> : null}</div>
-          <section className="rounded-[12px] border border-line bg-surface">
+          <section className="rounded-[0.75rem] border border-line bg-surface">
             <div className="flex min-h-11 items-center justify-between gap-2 border-b border-line px-4 py-1.5">
               <h2 className="text-sm font-semibold text-fg-2">{t.outline}</h2>
-              <span className="text-[13px] text-fg-3">{t.count(hs.length)}</span>
+              <span className="text-[0.8125rem] text-fg-3">{t.count(hs.length)}</span>
             </div>
             {hs.length ? (
               <ol className="flex flex-col gap-1 px-4 py-3">
                 {hs.map((h, i) => (
                   <li key={i} className="flex items-baseline gap-2" style={{ paddingLeft: `${(h.level - 1) * 18}px` }}>
-                    <span className={cn("shrink-0 rounded-[6px] px-1.5 font-mono text-xs font-semibold", flagged.has(i) ? "bg-warn-soft text-warn" : h.level === 1 ? "bg-accent-soft text-accent" : "bg-surface-2 text-fg-2")}>H{h.level}</span>
-                    <span className={cn("min-w-0 break-words", h.level === 1 ? "text-[17px] font-semibold text-fg" : "text-[15px] text-fg", !h.text && "text-fg-3 italic")}>{h.text || t.empty}</span>
+                    <span className={cn("shrink-0 rounded-[0.375rem] px-1.5 font-mono text-xs font-semibold", flagged.has(i) ? "bg-warn-soft text-warn" : h.level === 1 ? "bg-accent-soft text-accent" : "bg-surface-2 text-fg-2")}>H{h.level}</span>
+                    <span className={cn("min-w-0 break-words", h.level === 1 ? "text-[1.0625rem] font-semibold text-fg" : "text-[0.9375rem] text-fg", !h.text && "text-fg-3 italic")}>{h.text || t.empty}</span>
                   </li>
                 ))}
               </ol>
             ) : (
-              <p className="px-4 py-3 text-[15px] text-fg-3">{t.none}</p>
+              <p className="px-4 py-3 text-[0.9375rem] text-fg-3">{t.none}</p>
             )}
           </section>
         </>

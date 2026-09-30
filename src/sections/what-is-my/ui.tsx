@@ -94,14 +94,14 @@ export function Hero({
         {copy ? <CopyButton value={copy} label={c.copy} copiedLabel={c.copied} size="sm" variant="ghost" className="-mr-2 -mt-1" /> : null}
       </div>
       <div aria-live={live ? "polite" : undefined} className="mt-1.5 min-h-12">
-        <div className="tabular text-[32px] leading-[1.15] font-bold tracking-tight break-words text-fg sm:text-5xl">
+        <div className="tabular text-[2rem] leading-[1.15] font-bold tracking-tight break-words text-fg sm:text-5xl">
           {value === null ? <span className="text-fg-3">{c.detecting}</span> : value}
         </div>
-        {sub ? <div className="mt-2 text-[15px] text-fg-2 sm:text-base">{sub}</div> : null}
+        {sub ? <div className="mt-2 text-[0.9375rem] text-fg-2 sm:text-base">{sub}</div> : null}
       </div>
       {children}
       <noscript>
-        <p className="mt-4 rounded-[10px] bg-warn-soft px-4 py-3 text-sm text-warn">{noscript ?? c.noscript}</p>
+        <p className="mt-4 rounded-[0.625rem] bg-warn-soft px-4 py-3 text-sm text-warn">{noscript ?? c.noscript}</p>
       </noscript>
     </Panel>
   );
@@ -123,7 +123,7 @@ export function Facts({ locale, title, rows, className }: { locale: Locale; titl
         {rows.map((r, i) => (
           <div key={i} className="flex flex-col gap-0.5 py-2.5 sm:flex-row sm:items-baseline sm:gap-6">
             <dt className="text-sm text-fg-3 sm:w-72 sm:shrink-0">{r.k}</dt>
-            <dd className={cn("min-w-0 break-words text-[15px] text-fg", r.mono && "font-mono text-sm")}>{r.v === null ? <Pending locale={locale} /> : r.v}</dd>
+            <dd className={cn("min-w-0 break-words text-[0.9375rem] text-fg", r.mono && "font-mono text-sm")}>{r.v === null ? <Pending locale={locale} /> : r.v}</dd>
           </div>
         ))}
       </dl>

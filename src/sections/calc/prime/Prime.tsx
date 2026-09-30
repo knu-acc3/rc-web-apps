@@ -208,7 +208,7 @@ export default function Prime({ locale }: ToolProps) {
           >
             {t.first(Math.min(1000, list.count))}
           </SubHeading>
-          <p className="tabular max-h-72 overflow-y-auto rounded-[12px] border border-line bg-surface p-4 text-sm leading-relaxed text-fg-2">{list.head.join(", ")}</p>
+          <p className="tabular max-h-72 overflow-y-auto rounded-[0.75rem] border border-line bg-surface p-4 text-sm leading-relaxed text-fg-2">{list.head.join(", ")}</p>
         </section>
       )}
       <PrimeExplain locale={locale} />

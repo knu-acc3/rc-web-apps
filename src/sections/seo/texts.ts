@@ -212,7 +212,7 @@ export const ROBOTS_VARIANTS: VariantDef[] = [
     { preset: "disallowAll" },
     {
       name: "Закрыть весь сайт",
-      title: "Как закрыть сайт от индексации в robots.txt",
+      title: "Как закрыть сайт от индексации | robots.txt",
       h1: "Закрыть сайт от индексации",
       description: "robots.txt, который запрещает обход всего сайта: для тестовой копии, сайта в разработке или staging. Почему одного Disallow недостаточно и как надёжно скрыть сайт.",
       lead: "Две строки — User-agent: * и Disallow: / — просят всех роботов не обходить сайт.",

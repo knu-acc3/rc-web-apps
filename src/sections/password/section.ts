@@ -168,6 +168,86 @@ function keyTable(l: Locale, kind: "hex" | "base64"): Block {
   };
 }
 
+/** Entropy and cracking time of a few shapes of one generator: "how long should mine be?" at a glance. */
+function strengthTable(l: Locale, title: [string, string], head: [string, string], rows: [string, number][]): Block {
+  const ru = l === "ru";
+  return {
+    type: "table",
+    title: ru ? title[0] : title[1],
+    head: ru ? [head[0], "Энтропия", "Перебор (быстрый хеш)"] : [head[1], "Entropy", "Cracking (fast hash)"],
+    rows: rows.map(([label, b]) => [label, `${bitsFmt(l, b)} ${ru ? "бит" : "bits"}`, humanDuration(averageCrackSeconds(b, FAST), l)]),
+  };
+}
+
+function memorableBlocks(l: Locale): Block[] {
+  const shapes: [number, number, number][] = [
+    [2, 2, 2],
+    [2, 3, 2],
+    [3, 2, 2],
+    [3, 3, 2],
+    [4, 3, 2],
+    [4, 3, 4],
+  ];
+  const ru = l === "ru";
+  return [
+    strengthTable(
+      l,
+      ["Надёжность по числу слов и слогов", "Strength by words and syllables"],
+      ["Слова × слоги + цифры", "Words × syllables + digits"],
+      shapes.map(([w, sy, d]) => [`${w} × ${sy} + ${d}`, memorableEntropy({ words: w, syllables: sy, digits: d, separator: "-", capitalize: true })]),
+    ),
+    {
+      type: "list",
+      title: ru ? "Как запомнить такой пароль" : "How to remember it",
+      items: ru
+        ? ["Произнесите его вслух пару раз — слоги складываются в «слова» с ритмом.", "Придумайте образ для каждого слова: Kaletri — «калитка», Tuvome — «туман».", "Цифры в конце держите отдельно, как номер квартиры."]
+        : ["Say it out loud a couple of times — the syllables form rhythmic 'words'.", "Picture an image for each word: Kaletri — a 'kettle tree', Tuvome — 'two homes'.", "Keep the digits at the end separate, like a flat number."],
+    },
+  ];
+}
+
+function apiKeyBlocks(l: Locale): Block[] {
+  const ru = l === "ru";
+  return [
+    strengthTable(
+      l,
+      ["Длина ключа и надёжность", "Key length and strength"],
+      ["Символов base62", "Base62 characters"],
+      [16, 20, 24, 32, 40, 48].map((n) => [String(n), n * Math.log2(62)]),
+    ),
+    {
+      type: "facts",
+      title: ru ? "Как устроены ключи известных сервисов" : "How well-known services shape keys",
+      rows: [
+        ["GitHub", ru ? "ghp_ + 36 символов base62 и контрольная сумма" : "ghp_ + 36 base62 characters with a checksum"],
+        ["Stripe", ru ? "sk_live_ / pk_test_ + случайная часть" : "sk_live_ / pk_test_ + a random part"],
+        ["Slack", ru ? "xoxb- / xoxp- для ботов и пользователей" : "xoxb- / xoxp- for bots and users"],
+        [ru ? "Здесь" : "Here", ru ? "ваш префикс + 32 символа (≈ 190 бит)" : "your prefix + 32 characters (≈ 190 bits)"],
+      ],
+    },
+  ];
+}
+
+function randomStringBlocks(l: Locale): Block[] {
+  const ru = l === "ru";
+  const alphabets: [string, string, number][] = [
+    ["Цифры 0–9", "Digits 0–9", 10],
+    ["Hex 0–9a–f", "Hex 0–9a–f", 16],
+    ["Строчные a–z", "Lowercase a–z", 26],
+    ["Буквы и цифры", "Letters and digits", 62],
+    ["Base64url", "Base64url", 64],
+    ["Все печатные ASCII", "All printable ASCII", 94],
+  ];
+  return [
+    {
+      type: "table",
+      title: ru ? "Сколько бит даёт алфавит" : "Bits per alphabet",
+      head: ru ? ["Алфавит", "Символов", "Бит на символ", "Длина для 128 бит"] : ["Alphabet", "Characters", "Bits per character", "Length for 128 bits"],
+      rows: alphabets.map(([r, e, n]) => [ru ? r : e, String(n), bitsFmt(l, Math.log2(n)), String(Math.ceil(128 / Math.log2(n)))]),
+    },
+  ];
+}
+
 function simpleVariant(slug: string, props: Record<string, unknown>, v: { ru: Omit<VariantTexts, "blocks">; en: Omit<VariantTexts, "blocks"> }, blocks?: (l: Locale) => Block[]): VariantDef {
   return {
     slug,
@@ -302,6 +382,7 @@ function variants(): VariantDef[] {
           ],
         },
       },
+      memorableBlocks,
     ),
     simpleVariant(
       "hex-key",
@@ -394,6 +475,7 @@ function variants(): VariantDef[] {
           ],
         },
       },
+      apiKeyBlocks,
     ),
     simpleVariant(
       "random-string",
@@ -424,6 +506,7 @@ function variants(): VariantDef[] {
           ],
         },
       },
+      randomStringBlocks,
     ),
   ];
 }
@@ -442,6 +525,7 @@ export const passwordSection = defineToolSection({
   tools: [
     {
       slug: "password-generator",
+      seoAlt: { ru: ["надёжный случайный пароль", "сложный пароль"], en: ["strong random password", "strong password"] },
       component: "password/generator",
       icon: "KeyRound",
       popular: true,

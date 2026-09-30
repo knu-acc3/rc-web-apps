@@ -195,7 +195,7 @@ export default function DecibelMeter({ locale }: { locale: Locale }) {
           <span className="tabular text-7xl font-bold tracking-tight text-fg">{on && stats ? fmt(stats.level) : "—"}</span>
           <span className="text-sm text-fg-2">{unit}</span>
         </div>
-        <canvas ref={graph} className="h-24 w-full rounded-[10px] bg-surface-2" aria-hidden />
+        <canvas ref={graph} className="h-24 w-full rounded-[0.625rem] bg-surface-2" aria-hidden />
         <dl className="grid w-full max-w-lg grid-cols-2 gap-2 text-center sm:grid-cols-4">
           {(
             [
@@ -205,8 +205,8 @@ export default function DecibelMeter({ locale }: { locale: Locale }) {
               [t.avg, stats?.leq],
             ] as const
           ).map(([k, v]) => (
-            <div key={k} className="rounded-[10px] bg-surface-2 px-2 py-2">
-              <dt className="text-[12px] text-fg-3">{k}</dt>
+            <div key={k} className="rounded-[0.625rem] bg-surface-2 px-2 py-2">
+              <dt className="text-[0.75rem] text-fg-3">{k}</dt>
               <dd className="tabular text-lg font-semibold text-fg">{on && v !== undefined ? fmt(v) : "—"}</dd>
             </div>
           ))}

@@ -40,13 +40,13 @@ export function BigInput({ id, label, value, onChange, placeholder, hint, invali
 export function Verdict({ tone, title, value, children }: { tone: Tone; title: ReactNode; value?: ReactNode; children?: ReactNode }) {
   const Icon = tone === "ok" ? CircleCheck : tone === "err" ? CircleX : CircleAlert;
   return (
-    <div className={cn("rounded-[12px] px-4 py-4 sm:px-5", tone === "ok" ? "bg-ok-soft" : tone === "err" ? "bg-err-soft" : tone === "warn" ? "bg-warn-soft" : "bg-surface-2")}>
+    <div className={cn("rounded-[0.75rem] px-4 py-4 sm:px-5", tone === "ok" ? "bg-ok-soft" : tone === "err" ? "bg-err-soft" : tone === "warn" ? "bg-warn-soft" : "bg-surface-2")}>
       <div aria-live="polite" className={cn("flex items-center gap-2 text-lg font-semibold sm:text-xl", tone === "ok" ? "text-ok" : tone === "err" ? "text-err" : tone === "warn" ? "text-warn" : "text-fg-2")}>
         {tone !== "idle" && <Icon className="size-6 shrink-0" aria-hidden />}
         <span>{title}</span>
       </div>
       {value && <div className="mt-2 font-mono text-xl font-semibold break-all text-fg sm:text-2xl">{value}</div>}
-      {children && <div className="mt-2 flex flex-col gap-1 text-[15px] text-fg-2">{children}</div>}
+      {children && <div className="mt-2 flex flex-col gap-1 text-[0.9375rem] text-fg-2">{children}</div>}
     </div>
   );
 }
@@ -62,7 +62,7 @@ export function Details({ rows, locale, title }: { rows: Row[]; locale: Locale; 
   const t = L[locale];
   if (!rows.length) return null;
   return (
-    <section className="rounded-[12px] border border-line bg-surface">
+    <section className="rounded-[0.75rem] border border-line bg-surface">
       <div className="flex min-h-11 items-center justify-between gap-2 border-b border-line px-4 py-1.5">
         <h2 className="text-sm font-semibold text-fg-2">{title ?? t.details}</h2>
         <CopyButton value={rows.map((r) => `${r.label}: ${r.value}`).join("\n")} label={t.copyAll} copiedLabel={t.copied} variant="ghost" />
@@ -70,8 +70,8 @@ export function Details({ rows, locale, title }: { rows: Row[]; locale: Locale; 
       <dl className="grid gap-x-8 px-4 py-2.5 sm:grid-cols-2">
         {rows.map((r) => (
           <div key={r.label} className="flex min-w-0 flex-col py-1.5">
-            <dt className="text-[13px] text-fg-3">{r.label}</dt>
-            <dd className={cn("break-all text-fg select-all", r.mono ? "font-mono text-sm" : "text-[15px]")}>{r.value}</dd>
+            <dt className="text-[0.8125rem] text-fg-3">{r.label}</dt>
+            <dd className={cn("break-all text-fg select-all", r.mono ? "font-mono text-sm" : "text-[0.9375rem]")}>{r.value}</dd>
           </div>
         ))}
       </dl>

@@ -197,7 +197,7 @@ export const TOOL_TEXTS_B: Record<string, ToolText> = {
   },
 
   "round-corners": {
-    name: { ru: "Скруглить углы", en: "Round corners" },
+    name: { ru: "Скруглить углы фото", en: "Round image corners" },
     title: {
       ru: "Скруглить углы фото онлайн — PNG с прозрачными углами",
       en: "Round Image Corners Online — Transparent PNG or Colour",
@@ -575,7 +575,7 @@ export const TOOL_TEXTS_B: Record<string, ToolText> = {
   },
 
   colors: {
-    name: { ru: "Цвет с картинки", en: "Color picker" },
+    name: { ru: "Цвет с картинки", en: "Pick a color from an image" },
     title: {
       ru: "Определить цвет на картинке — палитра из фото онлайн",
       en: "Image Color Picker — Palette from Image, HEX and RGB",

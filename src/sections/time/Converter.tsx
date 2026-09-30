@@ -149,7 +149,7 @@ export default function Converter({ locale, rows: initial, withLocal = false, pe
               <li key={r.key} className="flex items-center justify-between gap-3 py-3">
                 <div className="min-w-0">
                   <div className="truncate font-semibold text-fg">{r.name}</div>
-                  <div className="truncate text-[13px] text-fg-3">
+                  <div className="truncate text-[0.8125rem] text-fg-3">
                     {p ? fmtOffset(p.off) : ""}
                     {r.sub ? `${p ? " · " : ""}${r.sub}` : ""}
                   </div>
@@ -163,12 +163,12 @@ export default function Converter({ locale, rows: initial, withLocal = false, pe
                       id={`${id}-t${i}`}
                       type="time"
                       step={60}
-                      className="tabular w-[7.5rem] rounded-[8px] border border-transparent bg-transparent px-1 text-right text-2xl font-semibold text-fg hover:border-line focus:border-accent focus:outline-none sm:w-36 sm:text-3xl"
+                      className="tabular w-[7.5rem] rounded-[0.5rem] border border-transparent bg-transparent px-1 text-right text-2xl font-semibold text-fg hover:border-line focus:border-accent focus:outline-none sm:w-36 sm:text-3xl"
                       value={p ? `${pad2(p.h)}:${pad2(p.mi)}` : ""}
                       onChange={(e) => setWall(r, e.target.value)}
                       disabled={!p}
                     />
-                    <div className="text-[12px] text-fg-3">
+                    <div className="text-[0.75rem] text-fg-3">
                       {p ? shortDate(locale, p) : " "}
                       {shift && `, ${shift}`}
                       {d !== null && d !== 0 && ` · ${diffShort(d, locale)}`}
@@ -177,7 +177,7 @@ export default function Converter({ locale, rows: initial, withLocal = false, pe
                   {editing && r.key !== "local" && (
                     <button
                       type="button"
-                      className="rounded-[6px] p-1 text-fg-3 hover:bg-surface-2 hover:text-err"
+                      className="rounded-[0.375rem] p-1 text-fg-3 hover:bg-surface-2 hover:text-err"
                       aria-label={`${t.remove}: ${r.name}`}
                       onClick={() => setRows(rowsData.filter((x) => x.key !== r.key))}
                     >
@@ -203,9 +203,9 @@ export default function Converter({ locale, rows: initial, withLocal = false, pe
           <h2 id={`${id}-pl`} className="mb-1 text-sm font-semibold text-fg">
             {t.planner}
           </h2>
-          <p className="mb-2 text-[13px] text-fg-3">{planner.some((c) => c.all) ? t.plannerHint : t.noOverlap}</p>
-          <div className="overflow-x-auto rounded-[12px] border border-line bg-surface p-2 scrollbar-thin">
-            <table className="w-full border-separate border-spacing-0.5 text-center text-[12px]">
+          <p className="mb-2 text-[0.8125rem] text-fg-3">{planner.some((c) => c.all) ? t.plannerHint : t.noOverlap}</p>
+          <div className="overflow-x-auto rounded-[0.75rem] border border-line bg-surface p-2 scrollbar-thin">
+            <table className="w-full border-separate border-spacing-0.5 text-center text-[0.75rem]">
               <tbody>
                 {rows.map((r, i) => (
                   <tr key={r.key}>
@@ -219,7 +219,7 @@ export default function Converter({ locale, rows: initial, withLocal = false, pe
                         <td
                           key={c.h}
                           className={cn(
-                            "tabular h-7 min-w-7 rounded-[4px] px-0.5",
+                            "tabular h-7 min-w-7 rounded-[0.25rem] px-0.5",
                             h >= 9 && h < 18 ? (c.all ? "bg-ok-soft font-semibold text-ok" : "bg-accent-soft text-fg") : h >= 7 && h < 22 ? "bg-surface-2 text-fg-2" : "text-fg-3",
                             selected && "outline outline-2 outline-accent",
                           )}

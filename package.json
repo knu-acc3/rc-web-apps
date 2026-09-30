@@ -9,6 +9,7 @@
     "dev": "next dev -p 3000",
     "prebuild": "node scripts/gen-tool-components.mjs && node scripts/vendor.mjs",
     "build": "next build",
+    "postbuild": "node scripts/postbuild.mjs",
     "start": "next start -p 3000",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
@@ -63,6 +64,7 @@
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.13.0",
+    "@csstools/postcss-cascade-layers": "^6.0.1",
     "@fontsource-variable/onest": "^5.3.1",
     "@fontsource/onest": "^5.3.1",
     "@playwright/test": "^1.63.0",
@@ -74,13 +76,25 @@
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "@types/ua-parser-js": "^0.7.39",
+    "acorn": "^8.18.0",
     "eslint": "^9.39.5",
     "eslint-config-next": "^16.3.7",
+    "lightningcss": "^1.33.0",
+    "postcss": "^8.5.28",
+    "postcss-custom-properties": "^15.0.2",
+    "postcss-selector-parser": "^7.1.6",
     "tailwindcss": "^4.3.3",
     "typescript": "^5.9.3",
     "vitest": "^5.0.3"
   },
   "allowScripts": {
     "unrs-resolver": true
-  }
+  },
+  "browserslist": [
+    "chrome >= 87",
+    "edge >= 88",
+    "firefox >= 78",
+    "safari >= 14",
+    "ios_saf >= 14"
+  ]
 }

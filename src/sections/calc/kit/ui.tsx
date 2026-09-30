@@ -169,7 +169,7 @@ export function InlineSelect<T extends string>({
 }) {
   return (
     <div className="flex items-center gap-2">
-      <label htmlFor={id} className="text-[13px] text-fg-3">
+      <label htmlFor={id} className="text-[0.8125rem] text-fg-3">
         {label}
       </label>
       <Select id={id} value={value} onChange={(e) => onChange(e.target.value as T)} size="sm" className="min-w-0">
@@ -199,7 +199,7 @@ export function InlineToggle<T extends string>({
 }) {
   return (
     <div className="flex items-center gap-2">
-      {showLabel && <span className="text-[13px] text-fg-3">{label}</span>}
+      {showLabel && <span className="text-[0.8125rem] text-fg-3">{label}</span>}
       <Segmented size="sm" label={label} value={value} onChange={onChange} options={options} />
     </div>
   );
@@ -269,7 +269,7 @@ export function ResultMain({
   size?: "md" | "lg";
 }) {
   return (
-    <div className={cn("min-w-0 rounded-[12px] bg-accent-soft p-5 sm:p-6", className)}>
+    <div className={cn("min-w-0 rounded-[0.75rem] bg-accent-soft p-5 sm:p-6", className)}>
       <div className="text-sm font-medium text-fg-2">{label}</div>
       <div
         aria-live="polite"
@@ -278,7 +278,7 @@ export function ResultMain({
       >
         {value}
       </div>
-      {sub && <div className="mt-2 text-[15px] text-fg-2">{sub}</div>}
+      {sub && <div className="mt-2 text-[0.9375rem] text-fg-2">{sub}</div>}
       {children}
       {rows && rows.length > 0 && (
         <dl className="mt-4 divide-y divide-[color-mix(in_oklab,var(--accent)_14%,transparent)] border-t border-[color-mix(in_oklab,var(--accent)_14%,transparent)]">
@@ -286,9 +286,9 @@ export function ResultMain({
             <div key={i} className="flex items-baseline justify-between gap-4 py-2">
               <dt className="min-w-0 text-sm text-fg-2">
                 {r.label}
-                {r.hint && <span className="block text-[12px] text-fg-3">{r.hint}</span>}
+                {r.hint && <span className="block text-[0.75rem] text-fg-3">{r.hint}</span>}
               </dt>
-              <dd className="tabular shrink-0 text-right text-[15px] font-semibold text-fg">{r.value}</dd>
+              <dd className="tabular shrink-0 text-right text-[0.9375rem] font-semibold text-fg">{r.value}</dd>
             </div>
           ))}
         </dl>
@@ -303,12 +303,12 @@ export function ResultRows({ rows, title, className }: { rows: ResultRow[]; titl
   return (
     <section className={cn("min-w-0", className)}>
       {title && <h2 className="mb-2 text-base font-semibold text-fg">{title}</h2>}
-      <dl className="divide-y divide-line overflow-hidden rounded-[12px] border border-line bg-surface">
+      <dl className="divide-y divide-line overflow-hidden rounded-[0.75rem] border border-line bg-surface">
         {rows.map((r, i) => (
           <div key={i} className="flex items-baseline justify-between gap-4 px-4 py-2.5">
-            <dt className="min-w-0 text-[15px] text-fg-2">
+            <dt className="min-w-0 text-[0.9375rem] text-fg-2">
               {r.label}
-              {r.hint && <span className="block text-[13px] text-fg-3">{r.hint}</span>}
+              {r.hint && <span className="block text-[0.8125rem] text-fg-3">{r.hint}</span>}
             </dt>
             <dd className="tabular shrink-0 text-right font-semibold text-fg">{r.value}</dd>
           </div>
@@ -340,7 +340,7 @@ export function Explain({
     <section className={cn("min-w-0", className)}>
       <h2 className="text-base font-semibold text-fg">{title ?? K[locale].how}</h2>
       {formula && formula.length > 0 && (
-        <div className="mt-3 overflow-x-auto rounded-[10px] border border-line bg-surface px-4 py-3 font-mono text-[13px] leading-relaxed text-fg sm:text-sm">
+        <div className="mt-3 overflow-x-auto rounded-[0.625rem] border border-line bg-surface px-4 py-3 font-mono text-[0.8125rem] leading-relaxed text-fg sm:text-sm">
           {formula.map((l, i) => (
             <div key={i} className="whitespace-pre">
               {l}
@@ -473,7 +473,7 @@ export function InlineFacts({ items, className }: { items: ReactNode[]; classNam
   return (
     <div className={cn("mt-3 flex flex-wrap gap-2", className)}>
       {items.map((x, i) => (
-        <span key={i} className="inline-flex items-center rounded-full bg-surface px-3 py-1 text-[13px] font-medium text-fg-2">
+        <span key={i} className="inline-flex items-center rounded-full bg-surface px-3 py-1 text-[0.8125rem] font-medium text-fg-2">
           {x}
         </span>
       ))}

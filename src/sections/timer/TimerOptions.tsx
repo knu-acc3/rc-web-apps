@@ -1,10 +1,11 @@
 "use client";
 
-import { Bell, BellOff, Maximize2, Volume2 } from "lucide-react";
+import { Bell, BellOff, Play, Settings2, Volume2 } from "lucide-react";
 import { useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { Button } from "@/ui/button";
 import { Select, Switch } from "@/ui/field";
+import { Fold } from "@/ui/fold";
 import { useStoredJson } from "@/sections/time/lib/storage";
 import { schedule, SOUND_IDS, type SoundId } from "./lib/audio";
 import { requestNotifications, useNotificationsSupported } from "./lib/notify";
@@ -27,6 +28,7 @@ const T = {
     notify: "Уведомление",
     denied: "Уведомления запрещены в настройках браузера",
     full: "На весь экран",
+    settings: "Звук и уведомления",
   },
   en: {
     sound: "Sound",
@@ -39,6 +41,7 @@ const T = {
     notify: "Notification",
     denied: "Notifications are blocked in the browser settings",
     full: "Full screen",
+    settings: "Sound and notifications",
   },
 } as const;
 
@@ -57,12 +60,22 @@ export function soundLabel(locale: Locale, s: SoundChoice): string {
 }
 
 /** One quiet row: sound, notification, full screen. */
-export function TimerOptions({ locale, options, onChange, onFullscreen }: { locale: Locale; options: AlertOptions; onChange: (o: AlertOptions) => void; onFullscreen?: () => void }) {
+/** Sound and notification settings, folded away: the timer itself stays the only thing in focus. */
+export function TimerOptions({ locale, options, onChange }: { locale: Locale; options: AlertOptions; onChange: (o: AlertOptions) => void }) {
   const t = T[locale];
   const supported = useNotificationsSupported();
   const [denied, setDenied] = useState(false);
   return (
-    <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
+    <Fold
+      title={
+        <span className="inline-flex items-center gap-2 text-[0.9375rem]">
+          <Settings2 className="size-4 text-fg-3" aria-hidden />
+          {t.settings}
+        </span>
+      }
+      hint={`${t[options.sound]}${options.notify ? ` · ${t.notify}` : ""}`}
+      bodyClassName="flex flex-wrap items-center gap-x-4 gap-y-3 p-4 text-sm"
+    >
       <div className="flex items-center gap-1.5">
         <Volume2 className="size-4 text-fg-3" aria-hidden />
         <Select aria-label={t.sound} size="sm" className="w-36" value={options.sound} onChange={(e) => onChange({ ...options, sound: e.target.value as SoundChoice })}>
@@ -72,8 +85,8 @@ export function TimerOptions({ locale, options, onChange, onFullscreen }: { loca
             </option>
           ))}
         </Select>
-        <Button variant="ghost" size="sm" disabled={options.sound === "off"} onClick={() => options.sound !== "off" && schedule(options.sound, 0, 1)}>
-          {t.test}
+        <Button variant="ghost" size="icon-sm" aria-label={t.test} title={t.test} disabled={options.sound === "off"} onClick={() => options.sound !== "off" && schedule(options.sound, 0, 1)}>
+          <Play aria-hidden />
         </Button>
       </div>
       {supported && (
@@ -94,13 +107,7 @@ export function TimerOptions({ locale, options, onChange, onFullscreen }: { loca
           }}
         />
       )}
-      {denied && <span className="text-[13px] text-warn">{t.denied}</span>}
-      {onFullscreen && (
-        <Button variant="ghost" size="sm" onClick={onFullscreen} className="ml-auto">
-          <Maximize2 aria-hidden />
-          {t.full}
-        </Button>
-      )}
-    </div>
+      {denied && <span className="text-[0.8125rem] text-warn">{t.denied}</span>}
+    </Fold>
   );
 }

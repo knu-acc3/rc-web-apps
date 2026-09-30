@@ -58,7 +58,7 @@ const T = {
 export function PermissionHelp({ locale, kind, open = false }: { locale: Locale; kind: Kind; open?: boolean }) {
   const t = T[locale];
   return (
-    <details className="group rounded-[10px] border border-line bg-surface" open={open}>
+    <details className="group rounded-[0.625rem] border border-line bg-surface" open={open}>
       <summary className="flex items-center justify-between gap-3 px-4 py-3 text-sm font-medium text-fg">
         {t.title(kind)}
         <ChevronDown className="size-4 shrink-0 text-fg-3 transition-transform duration-150 group-open:rotate-180" aria-hidden />

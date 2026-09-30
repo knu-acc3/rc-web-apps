@@ -234,7 +234,7 @@ export default function TouchTest({ locale }: { locale: Locale }) {
 
   return (
     <div className="flex flex-col gap-3">
-      <div ref={wrapRef} className={cn("relative overflow-hidden rounded-[12px] border border-line bg-surface-2", full && "rounded-none border-0")}>
+      <div ref={wrapRef} className={cn("relative overflow-hidden rounded-[0.75rem] border border-line bg-surface-2", full && "rounded-none border-0")}>
         <canvas
           ref={canvasRef}
           aria-label={t.area}

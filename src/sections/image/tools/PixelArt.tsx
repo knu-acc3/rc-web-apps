@@ -351,7 +351,7 @@ export default function PixelArt({ locale }: { locale: Locale }) {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex flex-wrap items-end gap-x-4 gap-y-3 rounded-[12px] border border-line bg-surface px-4 py-3">
+      <div className="flex flex-wrap items-end gap-x-4 gap-y-3 rounded-[0.75rem] border border-line bg-surface px-4 py-3">
         <div role="group" aria-label={t.tools} className="flex gap-1.5">
           {toolBtn("pencil", Pencil, t.pencil)}
           {toolBtn("eraser", Eraser, t.eraser)}
@@ -378,7 +378,7 @@ export default function PixelArt({ locale }: { locale: Locale }) {
                 aria-label={t.useColor(c)}
                 title={c}
                 onClick={() => setColor(c)}
-                className={cn("size-6 rounded-[5px] border", c === color ? "border-accent ring-2 ring-accent/40" : "border-line")}
+                className={cn("size-6 rounded-[0.3125rem] border", c === color ? "border-accent ring-2 ring-accent/40" : "border-line")}
                 style={{ background: c }}
               />
             ))}
@@ -387,13 +387,13 @@ export default function PixelArt({ locale }: { locale: Locale }) {
       </div>
 
       <Panel className="overflow-hidden">
-        <div className="grid gap-4 p-3 sm:p-4 md:grid-cols-[minmax(0,1fr)_220px]">
+        <div className="grid gap-4 p-3 sm:p-4 md:grid-cols-[minmax(0,1fr)_13.75rem]">
           <canvas
             ref={canvasRef}
             tabIndex={0}
             role="application"
             aria-label={t.canvas}
-            className="mx-auto block aspect-square w-full max-w-[560px] cursor-crosshair touch-none rounded-[8px] border border-line [image-rendering:pixelated]"
+            className="mx-auto block aspect-square w-full max-w-[35rem] cursor-crosshair touch-none rounded-[0.5rem] border border-line [image-rendering:pixelated]"
             onPointerDown={(e) => {
               const p = cellAt(e);
               e.currentTarget.setPointerCapture(e.pointerId);
@@ -515,7 +515,7 @@ export default function PixelArt({ locale }: { locale: Locale }) {
                     aria-label={t.frame(i + 1)}
                     onClick={() => setCur(i)}
                     className={cn(
-                      "h-8 min-w-8 rounded-[6px] border px-2 text-sm font-medium",
+                      "h-8 min-w-8 rounded-[0.375rem] border px-2 text-sm font-medium",
                       i === cur ? "border-accent bg-accent-soft text-accent" : "border-line text-fg-2",
                     )}
                   >

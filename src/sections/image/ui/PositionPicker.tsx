@@ -79,8 +79,8 @@ export function PositionPicker({
           move(i, p === "tile" ? Math.sign(d) : d);
         }}
         className={cn(
-          "flex items-center justify-center rounded-[5px] border transition-colors",
-          p === "tile" ? "h-[76px] w-9" : "size-6",
+          "flex items-center justify-center rounded-[0.3125rem] border transition-colors",
+          p === "tile" ? "h-[4.75rem] w-9" : "size-6",
           on ? "border-accent bg-accent text-accent-fg" : "border-line bg-surface text-fg-3 hover:border-line-strong",
         )}
       >

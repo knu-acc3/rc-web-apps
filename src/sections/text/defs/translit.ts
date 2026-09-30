@@ -339,6 +339,7 @@ const slugVariant: VariantDef = {
 
 export const transliterationTool: ToolDef = {
   slug: "transliteration",
+  seoAlt: { ru: ["перевод кириллицы в латиницу", "латиница"], en: ["Cyrillic to Latin", "romanization"] },
   component: "text/translit",
   icon: "Languages",
   popular: true,
@@ -410,6 +411,7 @@ function layoutTable(locale: Locale): Block {
 
 export const keyboardLayoutConverter: ToolDef = {
   slug: "keyboard-layout-converter",
+  seoAlt: { ru: "исправить раскладку клавиатуры", en: "fix the keyboard layout" },
   component: "text/layout",
   icon: "Keyboard",
   popular: true,

@@ -1,81 +1,94 @@
-import { LayoutGrid, X } from "lucide-react";
-import { href, type Locale } from "@/i18n/config";
+import { LayoutGrid, Menu, X } from "lucide-react";
+import { href, LOCALES, LOCALE_LABEL, type Locale } from "@/i18n/config";
 import { ui } from "@/i18n/ui";
-import { navigation } from "@/registry";
+import { sectionsByCategory } from "@/registry";
+import { CATEGORY_LOOK } from "@/registry/categories";
 import { buttonClass } from "@/ui/button";
+import { IconTile } from "@/ui/icon";
 import { LangSwitch } from "./lang-switch";
 import { Logo } from "./logo";
-import { SearchButton } from "./search";
-import { ThemeToggle } from "./theme";
+import { SearchBox } from "./search";
+import { ThemeSwitch, ThemeToggle } from "./theme";
 
+/**
+ * Site header. Universal icons where words aren't needed (search, menu, theme); words where an icon would
+ * be a guess ("All tools"). Phone: logo · 🔍 · EN · ☰. Desktop: logo · live search · all tools · EN · theme.
+ * The phone menu is a native popover; browsers without it get a small fallback script (see layout).
+ */
 export function Header({ locale }: { locale: Locale }) {
   const t = ui(locale);
+  const themeLabels = { theme: t.theme, system: t.themeSystem, light: t.themeLight, dark: t.themeDark };
+  const searchLabels = { search: t.searchTools, placeholder: t.searchPlaceholder, empty: t.searchEmpty, hint: t.searchHint, close: t.close };
   return (
     <header className="sticky top-0 z-40 border-b border-line bg-bg/95 pt-[env(safe-area-inset-top)] supports-[backdrop-filter]:bg-bg/85 supports-[backdrop-filter]:backdrop-blur">
-      <div className="container-page flex h-14 items-center gap-2 sm:gap-3">
+      <div className="container-page flex h-14 items-center gap-1 sm:gap-2">
         <Logo locale={locale} />
-        <button
-          type="button"
-          popoverTarget="all-tools"
-          className={buttonClass("ghost", "md", "ml-1 gap-2 px-3 max-sm:px-2.5")}
-          aria-label={t.allTools}
-        >
-          <LayoutGrid aria-hidden />
-          <span className="max-sm:sr-only">{t.allTools}</span>
-        </button>
-        <div className="ml-auto flex items-center gap-1">
-          <SearchButton
-            locale={locale}
-            labels={{ search: t.search, placeholder: t.searchPlaceholder, empty: t.searchEmpty, hint: t.searchHint, close: t.close }}
-          />
+        <div className="flex min-w-0 flex-1 items-center justify-end gap-1 sm:gap-2">
+          <SearchBox locale={locale} labels={searchLabels} />
+          <a href={href(locale, ["all"])} className={buttonClass("ghost", "md", "hidden! gap-2 px-3 text-fg sm:inline-flex!")}>
+            <LayoutGrid aria-hidden />
+            <span className="hidden lg:inline">{t.catalog}</span>
+            <span className="lg:hidden">{t.catalogShort}</span>
+          </a>
           <LangSwitch locale={locale} />
-          <ThemeToggle labels={{ theme: t.theme, system: t.themeSystem, light: t.themeLight, dark: t.themeDark }} />
+          <ThemeToggle labels={themeLabels} className="hidden! sm:inline-flex!" />
+          <button type="button" popoverTarget="site-menu" className={buttonClass("ghost", "icon", "sm:hidden!")} aria-label={t.menuOpen} title={t.menu}>
+            <Menu aria-hidden />
+          </button>
         </div>
       </div>
-      <AllToolsMenu locale={locale} />
+      <SiteMenu locale={locale} />
     </header>
   );
 }
 
-/** Tool catalogue by category. Uses the native Popover API — no JavaScript. */
-function AllToolsMenu({ locale }: { locale: Locale }) {
+/** Phone menu: catalogue by category, language and theme with text labels. */
+function SiteMenu({ locale }: { locale: Locale }) {
   const t = ui(locale);
-  const groups = navigation(locale, 8);
+  const groups = sectionsByCategory(locale);
   return (
     <div
-      id="all-tools"
+      id="site-menu"
       popover="auto"
-      className="m-0 mt-[calc(56px+env(safe-area-inset-top))] max-h-[calc(100dvh-56px)] w-screen max-w-none overflow-y-auto border-0 border-b border-line bg-surface p-0 text-fg shadow-[var(--shadow-overlay)] backdrop:bg-black/30"
+      className="fixed inset-x-0 top-[calc(3.5rem+env(safe-area-inset-top))] bottom-0 z-50 m-0 h-auto max-h-none w-full max-w-none overflow-y-auto border-0 border-t border-line bg-bg p-0 text-fg"
     >
-      <div className="container-page py-5">
-        <div className="mb-4 flex items-center justify-between">
-          <p className="text-lg font-semibold">{t.allTools}</p>
-          <button type="button" popoverTarget="all-tools" popoverTargetAction="hide" className={buttonClass("ghost", "icon")} aria-label={t.close}>
+      <div className="container-page flex flex-col gap-6 pb-10 pt-4">
+        <div className="flex items-center justify-between gap-3">
+          <a href={href(locale, ["all"])} className={buttonClass("primary", "lg", "flex-1")}>
+            <LayoutGrid aria-hidden />
+            {t.catalog}
+          </a>
+          <button type="button" popoverTarget="site-menu" popoverTargetAction="hide" className={buttonClass("secondary", "icon", "size-12!")} aria-label={t.close}>
             <X aria-hidden />
           </button>
         </div>
-        <div className="grid gap-x-8 gap-y-6 sm:grid-cols-2 lg:grid-cols-4">
-          {groups.map((g) => (
-            <div key={g.id}>
-              <p className="mb-2 text-[13px] font-semibold tracking-wide text-fg-3 uppercase">{g.label}</p>
-              <ul className="flex flex-col gap-0.5">
-                {g.items.map((l) => (
-                  <li key={l.path.join("/")}>
-                    <a href={href(locale, l.path)} className="nav-link">
-                      {l.label}
-                    </a>
-                  </li>
-                ))}
-                {g.total > g.items.length && (
-                  <li>
-                    <a href={`${href(locale)}#cat-${g.id}`} className="nav-link text-fg-3">
-                      {t.showAll} · {g.total}
-                    </a>
-                  </li>
-                )}
-              </ul>
+        <nav aria-label={t.categories}>
+          <ul className="grid grid-cols-[minmax(0,1fr)] gap-1 min-[420px]:grid-cols-2">
+            {groups.map((g) => (
+              <li key={g.id}>
+                <a href={`${href(locale, ["all"])}#cat-${g.id}`} className="flex min-h-12 items-center gap-3 rounded-[0.75rem] px-2 py-1.5 hover:bg-surface-2">
+                  <IconTile name={CATEGORY_LOOK[g.id].icon} hue={CATEGORY_LOOK[g.id].hue} size="sm" />
+                  <span className="font-medium">{g.label}</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+        <div className="flex flex-col gap-4 border-t border-line pt-5">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <span className="text-sm font-medium text-fg-2">{t.language}</span>
+            <div className="flex gap-1">
+              {LOCALES.map((l) => (
+                <a key={l} href={href(l)} hrefLang={l} lang={l} aria-current={l === locale ? "true" : undefined} className={buttonClass(l === locale ? "secondary" : "ghost", "sm")}>
+                  {LOCALE_LABEL[l]}
+                </a>
+              ))}
             </div>
-          ))}
+          </div>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <span className="text-sm font-medium text-fg-2">{t.theme}</span>
+            <ThemeSwitch labels={{ theme: t.theme, system: t.themeSystem, light: t.themeLight, dark: t.themeDark }} />
+          </div>
         </div>
       </div>
     </div>

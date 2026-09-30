@@ -45,7 +45,7 @@ export function StyleList({
         <h2 className="text-sm font-semibold text-fg-2">{title}</h2>
         {aside}
       </div>
-      <ul className="divide-y divide-line overflow-hidden rounded-[12px] border border-line bg-surface">
+      <ul className="divide-y divide-line overflow-hidden rounded-[0.75rem] border border-line bg-surface">
         {ids.map((id) => {
           const info = STYLES[id];
           const text = outputs[id];
@@ -66,7 +66,7 @@ export function StyleList({
                 )}
               >
                 <span className="min-w-0 flex-1">
-                  <span className="block text-[12px] leading-5 text-fg-3">
+                  <span className="block text-[0.75rem] leading-5 text-fg-3">
                     <span className="sr-only">{t.copy}: </span>
                     {STYLE_NAMES[id][locale]}
                     {note && <span> · {note}</span>}

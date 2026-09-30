@@ -113,7 +113,7 @@ export default function JwtEncoder({ locale }: { locale: Locale }) {
   return (
     <Panel className="p-4 sm:p-6">
       <div className="text-sm font-medium text-fg-2">{t.token}</div>
-      <output className="mt-1 block min-h-16 font-mono text-[15px] break-all text-fg" aria-live="polite">
+      <output className="mt-1 block min-h-16 font-mono text-[0.9375rem] break-all text-fg" aria-live="polite">
         {current?.token ? (
           <>
             <span className="text-err">{current.token.split(".")[0]}</span>.<span className="text-accent">{current.token.split(".")[1]}</span>.<span className="text-ok">{current.token.split(".")[2]}</span>

@@ -164,9 +164,9 @@ export default function MultiplicationTable({ locale, n = 7 }: ToolProps<{ n?: n
 
         {view === "one" && (
           <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
-            <section aria-label={t.title(q.v.n)} className={cn("grid gap-x-8 rounded-[12px] bg-accent-soft p-5 sm:p-6", max === 20 && "sm:grid-cols-2")}>
+            <section aria-label={t.title(q.v.n)} className={cn("grid gap-x-8 rounded-[0.75rem] bg-accent-soft p-5 sm:p-6", max === 20 && "sm:grid-cols-2")}>
               {oneRows.map((i) => (
-                <p key={i} className="tabular py-1 text-2xl font-semibold text-fg sm:text-[28px]">
+                <p key={i} className="tabular py-1 text-2xl font-semibold text-fg sm:text-[1.75rem]">
                   <span className="text-fg-2">
                     {num} × {i} =
                   </span>{" "}
@@ -174,9 +174,9 @@ export default function MultiplicationTable({ locale, n = 7 }: ToolProps<{ n?: n
                 </p>
               ))}
             </section>
-            <section className="rounded-[12px] border border-line bg-surface p-5">
+            <section className="rounded-[0.75rem] border border-line bg-surface p-5">
               <h2 className="text-base font-semibold text-fg">{t.tip}</h2>
-              <p className="mt-2 text-[15px] leading-relaxed text-fg-2">{tableTip(locale, num)}</p>
+              <p className="mt-2 text-[0.9375rem] leading-relaxed text-fg-2">{tableTip(locale, num)}</p>
             </section>
           </div>
         )}
@@ -220,7 +220,7 @@ export default function MultiplicationTable({ locale, n = 7 }: ToolProps<{ n?: n
         )}
 
         {view === "practice" && (
-          <section className="flex flex-col items-center gap-4 rounded-[12px] bg-accent-soft p-6 text-center sm:p-8">
+          <section className="flex flex-col items-center gap-4 rounded-[0.75rem] bg-accent-soft p-6 text-center sm:p-8">
             <OptionsRow className="justify-center">
               <InlineSelect id={`${id}-p`} label={t.practiceOn} value={q.v.p} onChange={(p) => q.set({ p })} options={[{ value: "all", label: t.all }, ...NUMS.map((x) => ({ value: x, label: `× ${x}` }))]} />
             </OptionsRow>
@@ -259,7 +259,7 @@ export default function MultiplicationTable({ locale, n = 7 }: ToolProps<{ n?: n
                 {t.start}
               </Button>
             )}
-            <p className="text-[13px] text-fg-3">{t.practiceHint}</p>
+            <p className="text-[0.8125rem] text-fg-3">{t.practiceHint}</p>
           </section>
         )}
       </div>

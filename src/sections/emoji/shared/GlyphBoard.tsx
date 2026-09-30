@@ -60,10 +60,10 @@ export const hrefOf = (base: string, path: string) => (!path ? "" : path.startsW
 /** Grid cells are styled from the container to keep the HTML small. */
 export const cellGrid = (kind: "emoji" | "symbol") =>
   cn(
-    "grid gap-1 [&>*]:flex [&>*]:aspect-square [&>*]:min-w-0 [&>*]:items-center [&>*]:justify-center [&>*]:rounded-[8px] [&>*]:border [&>*]:border-transparent [&>*]:leading-none [&>*]:transition-colors [&>*:hover]:border-line-strong [&>*:hover]:bg-surface-2 [&>*:focus-visible]:outline-2 [&>*:focus-visible]:outline-accent",
+    "grid gap-1 [&>*]:flex [&>*]:aspect-square [&>*]:min-w-0 [&>*]:items-center [&>*]:justify-center [&>*]:rounded-[0.5rem] [&>*]:border [&>*]:border-transparent [&>*]:leading-none [&>*]:transition-colors [&>*:hover]:border-line-strong [&>*:hover]:bg-surface-2 [&>*:focus-visible]:outline-2 [&>*:focus-visible]:outline-accent",
     kind === "emoji"
-      ? "grid-cols-[repeat(auto-fill,minmax(44px,1fr))] text-[28px] sm:grid-cols-[repeat(auto-fill,minmax(52px,1fr))] sm:text-[32px]"
-      : "grid-cols-[repeat(auto-fill,minmax(44px,1fr))] text-[24px] text-fg sm:grid-cols-[repeat(auto-fill,minmax(52px,1fr))] sm:text-[28px]",
+      ? "grid-cols-[repeat(auto-fill,minmax(2.75rem,1fr))] text-[1.75rem] sm:grid-cols-[repeat(auto-fill,minmax(3.25rem,1fr))] sm:text-[2rem]"
+      : "grid-cols-[repeat(auto-fill,minmax(2.75rem,1fr))] text-[1.5rem] text-fg sm:grid-cols-[repeat(auto-fill,minmax(3.25rem,1fr))] sm:text-[1.75rem]",
   );
 
 export function Cells({ items, base, kind, onPick }: { items: BoardItem[]; base: string; kind: "emoji" | "symbol"; onPick: (e: MouseEvent, item: BoardItem) => void }) {
@@ -71,7 +71,7 @@ export function Cells({ items, base, kind, onPick }: { items: BoardItem[]; base:
     <div className={cellGrid(kind)}>
       {items.map((it, i) => {
         const href = hrefOf(base, it[1]);
-        const content = it[3] ? <span className="text-center font-mono text-[10px] leading-tight text-fg-3">{it[3]}</span> : it[0];
+        const content = it[3] ? <span className="text-center font-mono text-[0.625rem] leading-tight text-fg-3">{it[3]}</span> : it[0];
         return href ? (
           <a key={i} href={href} title={it[2]} onClick={(e) => onPick(e, it)}>
             {content}
@@ -147,7 +147,7 @@ function PickerPanel({
           placeholder={t.trayHint}
           autoComplete="off"
           size="lg"
-          className="min-w-0 flex-1 font-normal! text-xl! placeholder:text-[15px]"
+          className="min-w-0 flex-1 font-normal! text-xl! placeholder:text-[0.9375rem]"
         />
         <div className="flex shrink-0 gap-2">
           <CopyButton value={tray} label={t.copyAll} copiedLabel={t.copied} variant="primary" size="md" />
@@ -192,7 +192,7 @@ export default function GlyphBoard({ locale, base, items, sections, kind = "emoj
   let offset = 0;
   return (
     <div className="flex flex-col gap-4">
-      <div className="z-10 rounded-[12px] border border-line bg-surface p-3 sm:sticky sm:top-16">{panel}</div>
+      <div className="z-10 rounded-[0.75rem] border border-line bg-surface p-3 sm:sticky sm:top-16">{panel}</div>
       {sections?.length ? (
         sections.map(([title, n, href], i) => {
           const slice = items.slice(offset, offset + n);

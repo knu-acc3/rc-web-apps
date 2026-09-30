@@ -224,7 +224,7 @@ export default function TypingTest({ locale, seconds = 60 }: { locale: Locale; s
         </span>
       </div>
 
-      <div className="flex flex-col overflow-hidden rounded-[12px] border border-line bg-surface">
+      <div className="flex flex-col overflow-hidden rounded-[0.75rem] border border-line bg-surface">
         <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 border-b border-line px-4 py-2 text-sm whitespace-nowrap text-fg-2 tabular">
           <span>
             <span className="text-lg font-semibold text-fg">{clockText}</span> {mode > 0 ? t.left : t.elapsed}
@@ -248,12 +248,12 @@ export default function TypingTest({ locale, seconds = 60 }: { locale: Locale; s
           onClick={() => inputRef.current?.focus()}
         >
           {runs.before.map((r, i) => (
-            <span key={i} className={r.state === "ok" ? "text-fg" : "rounded-[3px] bg-err-soft text-err underline decoration-err decoration-2 underline-offset-4"}>
+            <span key={i} className={r.state === "ok" ? "text-fg" : "rounded-[0.1875rem] bg-err-soft text-err underline decoration-err decoration-2 underline-offset-4"}>
               {r.text}
             </span>
           ))}
           {runs.caret && (
-            <span ref={caretRef} className={cn("rounded-[3px] text-fg-3", phase !== "done" && "bg-accent-soft text-fg underline decoration-accent decoration-2 underline-offset-4")}>
+            <span ref={caretRef} className={cn("rounded-[0.1875rem] text-fg-3", phase !== "done" && "bg-accent-soft text-fg underline decoration-accent decoration-2 underline-offset-4")}>
               {runs.caret}
             </span>
           )}
@@ -288,7 +288,7 @@ export default function TypingTest({ locale, seconds = 60 }: { locale: Locale; s
 
       <div aria-live="polite">
         {phase === "done" && result && (
-          <div className="flex flex-col gap-3 rounded-[12px] border border-line bg-surface p-4 sm:p-5">
+          <div className="flex flex-col gap-3 rounded-[0.75rem] border border-line bg-surface p-4 sm:p-5">
             <div className="flex flex-wrap items-end gap-x-8 gap-y-3">
               <div>
                 <div className="tabular text-5xl font-bold tracking-tight text-fg">{nf(locale === "ru" ? result.cpm : result.wpm)}</div>

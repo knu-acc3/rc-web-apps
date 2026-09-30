@@ -78,7 +78,7 @@ function Generator({ locale, style, platform, t }: { locale: Locale; style?: Sty
   const notice = cyrillicNotice(selected, src);
   const listProps = { outputs, selected, copied, onPick: pick, locale, t, cyr, xCounter: pf?.xCounter };
   const cyrSwitch = cyr ? (
-    <Switch label={t.cyrOnly} checked={cyrOnly} onChange={(e) => setCyrOnly(e.target.checked)} className="text-[13px]! text-fg-2!" />
+    <Switch label={t.cyrOnly} checked={cyrOnly} onChange={(e) => setCyrOnly(e.target.checked)} className="text-[0.8125rem]! text-fg-2!" />
   ) : undefined;
 
   return (
@@ -108,15 +108,15 @@ function Generator({ locale, style, platform, t }: { locale: Locale; style?: Sty
           />
         </Field>
 
-        <div className={cn("mt-4 rounded-[10px] bg-surface-2 px-4 sm:px-5", info.random ? "overflow-hidden py-6" : "py-4")}>
-          <div className="flex flex-wrap items-baseline justify-between gap-x-3 text-[13px] text-fg-2">
+        <div className={cn("mt-4 rounded-[0.625rem] bg-surface-2 px-4 sm:px-5", info.random ? "overflow-hidden py-6" : "py-4")}>
+          <div className="flex flex-wrap items-baseline justify-between gap-x-3 text-[0.8125rem] text-fg-2">
             <span className="font-medium">{STYLE_NAMES[selected][locale]}</span>
             {pf?.xCounter && <XCount text={result} label={t.xCount} />}
           </div>
           <p className="mt-1 min-h-10 text-2xl leading-relaxed font-medium whitespace-pre-wrap text-fg [overflow-wrap:anywhere] sm:text-3xl">
             {result}
           </p>
-          {notice && <p className="mt-2 text-[13px] text-warn">{notice === "none" ? t.noticeNone(info.digits !== "none") : t.noticePartial}</p>}
+          {notice && <p className="mt-2 text-[0.8125rem] text-warn">{notice === "none" ? t.noticeNone(info.digits !== "none") : t.noticePartial}</p>}
           <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
             <div className="flex flex-wrap items-center gap-2">
               {selected === "zalgo" && (

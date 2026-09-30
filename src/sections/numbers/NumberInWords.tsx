@@ -120,7 +120,7 @@ export default function NumberInWords({ locale, value = "2024" }: NumberInWordsP
 
         <div className="mt-5 min-h-16" aria-live="polite">
           {error ? (
-            <p className="text-[15px] text-err">{error}</p>
+            <p className="text-[0.9375rem] text-err">{error}</p>
           ) : ok ? (
             <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
               <p lang={locale} className="text-2xl leading-snug font-semibold break-words text-fg sm:text-3xl">
@@ -150,7 +150,7 @@ export default function NumberInWords({ locale, value = "2024" }: NumberInWordsP
       </Panel>
 
       {ok && !d.frac && (
-        <details className="group rounded-[12px] border border-line bg-surface" open={locale === "ru"}>
+        <details className="group rounded-[0.75rem] border border-line bg-surface" open={locale === "ru"}>
           <summary className="px-4 py-3 text-sm font-semibold text-fg">{t.cases}</summary>
           <div tabIndex={0} className="tbl rounded-none! border-0! border-t! border-line!">
             <table>

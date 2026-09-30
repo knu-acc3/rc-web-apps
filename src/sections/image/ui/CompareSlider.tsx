@@ -50,7 +50,7 @@ export function CompareSlider({
   return (
     <div className={cn("flex flex-col gap-2", className)}>
       <div className="flex items-center justify-between gap-2">
-        <span className="text-[13px] text-fg-3">{t.dragHint}</span>
+        <span className="text-[0.8125rem] text-fg-3">{t.dragHint}</span>
         <Segmented
           wrap
           size="sm"
@@ -63,7 +63,7 @@ export function CompareSlider({
           ]}
         />
       </div>
-      <div className={cn("overflow-auto rounded-[10px] border border-line", checker, zoom === "fit" && "max-h-[70vh]")}>
+      <div className={cn("overflow-auto rounded-[0.625rem] border border-line", checker, zoom === "fit" && "max-h-[70vh]")}>
         {side ? (
           <div className="grid grid-cols-2 gap-1">
             <img src={before} alt={beforeLabel ?? t.before} className={cn("block h-auto", zoom === "fit" ? "w-full" : "max-w-none")} />

@@ -140,7 +140,7 @@ export default function WordFrequency({ locale }: { locale: Locale }) {
                 ))}
               </tbody>
             </table>
-            {rows.length > LIMIT && <p className="border-t border-line px-4 py-2 text-[13px] text-fg-3">{t.showAll}</p>}
+            {rows.length > LIMIT && <p className="border-t border-line px-4 py-2 text-[0.8125rem] text-fg-3">{t.showAll}</p>}
           </div>
         )}
       </Panel>

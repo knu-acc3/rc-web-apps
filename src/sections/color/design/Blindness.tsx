@@ -128,10 +128,10 @@ function Strip({ title, colors, big = false }: { title: string; colors: Color[];
   return (
     <section>
       <h2 className="mb-1.5 text-sm font-semibold text-fg-2">{title}</h2>
-      <ul className="grid overflow-hidden rounded-[10px] border border-line" style={{ gridTemplateColumns: `repeat(${Math.max(1, colors.length)}, minmax(0, 1fr))` }}>
+      <ul className="grid overflow-hidden rounded-[0.625rem] border border-line" style={{ gridTemplateColumns: `repeat(${Math.max(1, colors.length)}, minmax(0, 1fr))` }}>
         {colors.map((c, i) => (
           <li key={i} className={big ? "flex h-28 items-end justify-center pb-2" : "flex h-16 items-end justify-center pb-1.5"} style={{ background: toHex(c), color: readableTextColor(c) }}>
-            <span className="font-mono text-[11px] font-medium">{toHex(c).slice(1, 7)}</span>
+            <span className="font-mono text-[0.6875rem] font-medium">{toHex(c).slice(1, 7)}</span>
           </li>
         ))}
       </ul>
@@ -216,11 +216,11 @@ function ImageMode({ type, severity, t }: { type: CvdType; severity: number; t: 
       <div className={size ? "grid gap-3 md:grid-cols-2" : "hidden"}>
         <figure className="min-w-0">
           <figcaption className="mb-1.5 text-sm font-semibold text-fg-2">{t.original}</figcaption>
-          <canvas ref={origRef} className="h-auto w-full rounded-[10px] border border-line" aria-label={t.original} role="img" />
+          <canvas ref={origRef} className="h-auto w-full rounded-[0.625rem] border border-line" aria-label={t.original} role="img" />
         </figure>
         <figure className="min-w-0">
           <figcaption className="mb-1.5 text-sm font-semibold text-fg-2">{t.types[type]}</figcaption>
-          <canvas ref={simRef} className="h-auto w-full rounded-[10px] border border-line" aria-label={t.types[type]} role="img" />
+          <canvas ref={simRef} className="h-auto w-full rounded-[0.625rem] border border-line" aria-label={t.types[type]} role="img" />
         </figure>
       </div>
     </div>

@@ -407,7 +407,7 @@ export default function SpeakerTest({ locale }: { locale: Locale }) {
                 onClick={() => playSide(s)}
                 aria-pressed={playing === s}
                 className={cn(
-                  "flex min-h-28 flex-col items-center justify-center gap-2 rounded-[12px] border px-2 py-4 text-[15px] font-semibold transition-colors duration-150",
+                  "flex min-h-28 flex-col items-center justify-center gap-2 rounded-[0.75rem] border px-2 py-4 text-[0.9375rem] font-semibold transition-colors duration-150",
                   playing === s ? "border-accent bg-accent text-accent-fg" : "border-line bg-surface-2 text-fg hover:border-accent",
                 )}
               >
@@ -470,7 +470,7 @@ export default function SpeakerTest({ locale }: { locale: Locale }) {
               <button
                 key={f}
                 type="button"
-                className={cn("chip h-8! px-3! text-[13px]!", Math.round(freq) === f && "border-accent! text-accent!")}
+                className={cn("chip h-8! px-3! text-[0.8125rem]!", Math.round(freq) === f && "border-accent! text-accent!")}
                 disabled={genMode === "sweep"}
                 onClick={() => {
                   setFreqText(String(f));

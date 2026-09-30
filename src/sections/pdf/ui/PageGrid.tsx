@@ -150,7 +150,7 @@ export function PageGrid({ locale, pages, thumbsOf, renderThumb, label, describe
                 onClick={(e) => onToggle?.(p.key, e.shiftKey)}
                 onKeyDown={(e) => onKey(e, p, i)}
                 className={cn(
-                  "group relative block w-full rounded-[10px] border-2 p-1 transition-colors",
+                  "group relative block w-full rounded-[0.625rem] border-2 p-1 transition-colors",
                   over === i ? "border-accent bg-accent-soft" : del ? "border-err/60" : isSel ? "border-accent" : "border-transparent hover:border-line-strong",
                   !onToggle && "cursor-default",
                 )}

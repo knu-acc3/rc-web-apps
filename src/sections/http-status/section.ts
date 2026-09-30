@@ -46,12 +46,12 @@ function codeTitle(c: HttpCode, l: Locale): string {
   const n = displayName(c);
   if (l === "ru") {
     return isError(c.code)
-      ? fit([`Ошибка ${c.code} ${n} — что значит и как исправить`, `Ошибка ${c.code} ${n} — причины и решение`, `Ошибка ${c.code} ${n}: что значит`, `Ошибка ${c.code} ${n}`])
-      : fit([`Код ${c.code} ${n} — что означает ответ сервера`, `Код ответа ${c.code} ${n}: что означает`, `Код ${c.code} ${n}: что означает`, `HTTP ${c.code} ${n}`]);
+      ? fit([`Ошибка ${c.code} ${n} | что значит и как исправить`, `Ошибка ${c.code} ${n} | причины и решение`, `Ошибка ${c.code} ${n} | что значит`, `Ошибка ${c.code} | ${n}`])
+      : fit([`Код ${c.code} ${n} | что означает ответ сервера`, `Код ответа ${c.code} ${n} | что означает`, `Код ${c.code} ${n} | что означает`, `HTTP ${c.code} | ${n}`]);
   }
   return isError(c.code)
-    ? fit([`HTTP ${c.code} ${n} — Meaning, Causes and Fixes`, `HTTP ${c.code} ${n} — Causes and Fixes`, `HTTP ${c.code} ${n} Error Explained`, `HTTP ${c.code} ${n}`])
-    : fit([`HTTP ${c.code} ${n} — Meaning and Examples`, `HTTP ${c.code} ${n} Status Code Explained`, `HTTP ${c.code} ${n} Explained`, `HTTP ${c.code} ${n}`]);
+    ? fit([`HTTP ${c.code} ${n} | Meaning, Causes and Fixes`, `HTTP ${c.code} ${n} | Causes and Fixes`, `HTTP ${c.code} ${n} | Error Explained`, `HTTP ${c.code} | ${n}`])
+    : fit([`HTTP ${c.code} ${n} | Meaning and Examples`, `HTTP ${c.code} ${n} | Status Code Explained`, `HTTP ${c.code} ${n} | Explained`, `HTTP ${c.code} | ${n}`]);
 }
 
 function codeH1(c: HttpCode, l: Locale): string {

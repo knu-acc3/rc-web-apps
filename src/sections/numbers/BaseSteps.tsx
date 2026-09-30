@@ -54,7 +54,7 @@ export function BaseSteps({ locale, value, from, to, upper }: { locale: Locale; 
         <p>{t.groupTo(n, to)}</p>
         <div className="mt-3 flex flex-wrap gap-2 font-mono">
           {groups.map((g, i) => (
-            <span key={i} className="flex flex-col items-center rounded-[8px] bg-surface-2 px-2 py-1">
+            <span key={i} className="flex flex-col items-center rounded-[0.5rem] bg-surface-2 px-2 py-1">
               <span className="text-fg-2">{g}</span>
               <span className="text-lg font-semibold text-fg">{cs(DIGITS[parseInt(g, 2)])}</span>
             </span>
@@ -69,7 +69,7 @@ export function BaseSteps({ locale, value, from, to, upper }: { locale: Locale; 
         <p>{t.groupFrom(n, from)}</p>
         <div className="mt-3 flex flex-wrap gap-2 font-mono">
           {src.split("").map((d, i) => (
-            <span key={i} className="flex flex-col items-center rounded-[8px] bg-surface-2 px-2 py-1">
+            <span key={i} className="flex flex-col items-center rounded-[0.5rem] bg-surface-2 px-2 py-1">
               <span className="text-lg font-semibold text-fg">{cs(d)}</span>
               <span className="text-fg-2">{parseInt(d, from).toString(2).padStart(n, "0")}</span>
             </span>
@@ -85,7 +85,7 @@ export function BaseSteps({ locale, value, from, to, upper }: { locale: Locale; 
         {terms.length > 0 && (
           <div>
             <p>{t.toDec(from)}</p>
-            <p className="mt-2 font-mono text-[15px] leading-relaxed break-words text-fg">
+            <p className="mt-2 font-mono text-[0.9375rem] leading-relaxed break-words text-fg">
               {terms.map((x, i) => (
                 <span key={i}>
                   {i > 0 && " + "}
@@ -136,14 +136,14 @@ export function BaseSteps({ locale, value, from, to, upper }: { locale: Locale; 
   }
 
   return (
-    <details className="group rounded-[12px] border border-line bg-surface">
+    <details className="group rounded-[0.75rem] border border-line bg-surface">
       <summary className="flex items-center justify-between gap-3 px-4 py-3 text-sm font-semibold text-fg">
         <span>
           {t.title}: {baseName(from, locale)} → {baseName(to, locale)}
         </span>
         <ChevronDown className="size-4 shrink-0 text-fg-3 transition-transform group-open:rotate-180" aria-hidden />
       </summary>
-      <div className="border-t border-line px-4 py-3 text-[15px] text-fg-2">{body}</div>
+      <div className="border-t border-line px-4 py-3 text-[0.9375rem] text-fg-2">{body}</div>
     </details>
   );
 }

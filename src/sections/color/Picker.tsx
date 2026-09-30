@@ -170,7 +170,7 @@ function SVArea({ hsva, onChange, label, valueText }: { hsva: Hsva; onChange: (x
   return (
     <div
       ref={boxRef}
-      className="relative aspect-[4/3] w-full touch-none overflow-hidden rounded-[10px] border border-line select-none"
+      className="relative aspect-[4/3] w-full touch-none overflow-hidden rounded-[0.625rem] border border-line select-none"
       style={{ background: `linear-gradient(to top, #000, transparent), linear-gradient(to right, #fff, hsl(${hsva.h} 100% 50%))` }}
       onPointerDown={(e) => {
         if (e.button !== 0) return;

@@ -1,16 +1,35 @@
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, CircleHelp, ListOrdered, type LucideIcon } from "lucide-react";
 import type { Locale } from "@/i18n/config";
 import { cn } from "@/lib/cn";
 import type { Block, QA } from "@/registry/types";
+import { Fold } from "@/ui/fold";
 import { GlyphGrid, LinkCards, LinkChips } from "./links";
 
-export function SectionTitle({ children, className }: { children: React.ReactNode; className?: string }) {
-  return <h2 className={cn("mb-3 text-lg font-semibold text-fg sm:text-xl", className)}>{children}</h2>;
+export function SectionTitle({ children, className, icon: Ico }: { children: React.ReactNode; className?: string; icon?: LucideIcon }) {
+  return (
+    <h2 className={cn("mb-4 flex items-center gap-2 text-lg font-semibold tracking-tight text-fg sm:text-xl", className)}>
+      {Ico && <Ico className="size-5 shrink-0 text-accent" aria-hidden />}
+      {children}
+    </h2>
+  );
 }
 
 export function BlockView({ block, locale }: { block: Block; locale: Locale }) {
   switch (block.type) {
     case "text":
+      if (block.fold && block.title) {
+        return (
+          <section>
+            <Fold title={<h2 className="text-base font-semibold">{block.title}</h2>} bodyClassName="px-4 pb-5 pt-4">
+              <div className="prose-lite">
+                {block.paragraphs.map((p, i) => (
+                  <p key={i}>{p}</p>
+                ))}
+              </div>
+            </Fold>
+          </section>
+        );
+      }
       return (
         <section>
           {block.title && <SectionTitle>{block.title}</SectionTitle>}
@@ -93,7 +112,7 @@ export function BlockView({ block, locale }: { block: Block; locale: Locale }) {
           ) : block.style === "glyphs" ? (
             <GlyphGrid items={block.items.map((x) => ({ glyph: x.glyph ?? "", label: x.label, path: x.path }))} locale={locale} />
           ) : (
-            <LinkChips items={block.items} locale={locale} />
+            <LinkChips items={block.items} locale={locale} limit={16} />
           )}
           {block.more && <LinkChips items={[block.more]} locale={locale} className="mt-3" />}
         </section>
@@ -108,18 +127,34 @@ export function BlockView({ block, locale }: { block: Block; locale: Locale }) {
   }
 }
 
+export function HowTo({ steps, title }: { steps: string[]; title: string }) {
+  return (
+    <section>
+      <SectionTitle icon={ListOrdered}>{title}</SectionTitle>
+      <ol className={cn("grid gap-x-8 gap-y-4", steps.length === 4 ? "sm:grid-cols-2 xl:grid-cols-4" : steps.length === 2 ? "md:grid-cols-2" : "md:grid-cols-3")}>
+        {steps.map((step, i) => (
+          <li key={i} className="flex gap-3.5">
+            <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-accent-soft text-[0.9375rem] font-bold text-accent">{i + 1}</span>
+            <span className="pt-1 text-[0.9375rem] leading-snug text-fg-2">{step}</span>
+          </li>
+        ))}
+      </ol>
+    </section>
+  );
+}
+
 export function Faq({ items, title }: { items: QA[]; title: string }) {
   return (
     <section>
-      <SectionTitle>{title}</SectionTitle>
-      <div className="divide-y divide-line overflow-hidden rounded-[12px] border border-line bg-surface">
+      <SectionTitle icon={CircleHelp}>{title}</SectionTitle>
+      <div className="divide-y divide-line overflow-hidden rounded-[0.75rem] border border-line bg-surface">
         {items.map((it, i) => (
-          <details key={i} className="group" open={i === 0}>
-            <summary className="flex items-center justify-between gap-4 px-4 py-3.5 font-medium text-fg hover:bg-surface-2">
-              <h3 className="text-[15px] font-medium">{it.q}</h3>
+          <details key={i} className="group">
+            <summary className="flex items-center justify-between gap-4 px-4 py-3.5 text-fg hover:text-accent">
+              <h3 className="text-[0.9375rem] font-medium">{it.q}</h3>
               <ChevronDown className="size-4 shrink-0 text-fg-3 transition-transform duration-150 group-open:rotate-180" aria-hidden />
             </summary>
-            <div className="px-4 pb-4 text-[15px] leading-relaxed text-fg-2">{it.a}</div>
+            <div className="px-4 pb-4 text-[0.9375rem] leading-relaxed text-fg-2">{it.a}</div>
           </details>
         ))}
       </div>

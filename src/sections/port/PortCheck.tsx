@@ -81,7 +81,7 @@ export default function PortCheck({ locale, port, protos, service, status, offic
   const text = commands(os, port, protos, locale);
   return (
     <div className="grid gap-4 md:grid-cols-[minmax(0,14rem)_minmax(0,1fr)]">
-      <div className="flex flex-col justify-center rounded-[12px] bg-surface-2 px-5 py-5">
+      <div className="flex flex-col justify-center rounded-[0.75rem] bg-surface-2 px-5 py-5">
         <div className="font-mono text-6xl font-bold tracking-tight text-accent">{port}</div>
         <div className="mt-2 text-lg font-semibold text-fg">{service}</div>
         <div className="mt-3 flex flex-wrap gap-1.5">
@@ -93,7 +93,7 @@ export default function PortCheck({ locale, port, protos, service, status, offic
           <Badge tone={official ? "ok" : "neutral"}>{status}</Badge>
         </div>
       </div>
-      <section className="flex min-w-0 flex-col overflow-hidden rounded-[12px] border border-line bg-surface">
+      <section className="flex min-w-0 flex-col overflow-hidden rounded-[0.75rem] border border-line bg-surface">
         <div className="flex items-center justify-between gap-2 px-4 pt-2">
           <h2 className="text-sm font-semibold text-fg-2">{t.title}</h2>
           <CopyButton value={text.split("\n").filter((l) => l && !l.startsWith("#")).join("\n")} label={t.copy} copiedLabel={t.copied} variant="ghost" />
@@ -105,10 +105,10 @@ export default function PortCheck({ locale, port, protos, service, status, offic
           className="px-2"
           items={(["linux", "macos", "windows", "remote"] as Os[]).map((v) => ({ value: v, label: t.tabs[v] }))}
         />
-        <pre className="overflow-x-auto px-4 py-3 font-mono text-[13px] leading-relaxed text-fg">
+        <pre className="overflow-x-auto px-4 py-3 font-mono text-[0.8125rem] leading-relaxed text-fg">
           <code>{text}</code>
         </pre>
-        {protos.includes("udp") && <p className="border-t border-line px-4 py-2.5 text-[13px] text-fg-3">{t.udpNote}</p>}
+        {protos.includes("udp") && <p className="border-t border-line px-4 py-2.5 text-[0.8125rem] text-fg-3">{t.udpNote}</p>}
       </section>
     </div>
   );

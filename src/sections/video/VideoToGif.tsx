@@ -113,7 +113,7 @@ export default function VideoToGif({ locale }: { locale: Locale }) {
                         .replace("{h}", String(size.height))
                         .replace("{n}", count(locale, frames, t.frames))
                         .replace("{d}", formatTime(range.end - range.start, 1))}
-                      <span className="block text-[13px] font-normal text-fg-3">
+                      <span className="block text-[0.8125rem] font-normal text-fg-3">
                         {t.maxHint} · {formatNumber(locale, gif.fps)} fps
                       </span>
                     </p>

@@ -166,7 +166,7 @@ export function RectEditor({
               onPointerUp={end}
               onPointerCancel={end}
               onKeyDown={(e) => onKey(h, e)}
-              className={cn("absolute z-10 size-4 touch-none rounded-[3px] border border-black/40 bg-white", POS[h])}
+              className={cn("absolute z-10 size-4 touch-none rounded-[0.1875rem] border border-black/40 bg-white", POS[h])}
             />
           ))}
       </div>

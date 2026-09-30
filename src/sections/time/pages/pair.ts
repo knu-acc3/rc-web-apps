@@ -174,7 +174,7 @@ export function pairPage(key: string, locale: Locale): PageModel | null {
     path: ["time-zone-converter", key],
     sectionId: "time",
     kind: "variant",
-    title: ru ? `${A} — ${B}: разница во времени и перевод` : `${A} to ${B} time — difference & converter`,
+    title: ru ? `Разница во времени ${A} → ${B} | перевод времени и таблица часов` : `${A} to ${B} time | time difference & converter`,
     h1: ru ? `Разница во времени: ${A} → ${B}` : `${A} to ${B} time`,
     description,
     lead,

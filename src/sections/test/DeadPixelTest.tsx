@@ -132,8 +132,8 @@ export default function DeadPixelTest({ locale }: { locale: Locale }) {
 
   return (
     <div className="flex flex-col gap-5">
-      <div className="flex flex-col items-center gap-4 rounded-[12px] border border-line bg-surface px-4 py-10 text-center sm:py-12">
-        <div className="flex h-20 w-36 overflow-hidden rounded-[8px] border border-line-strong" aria-hidden>
+      <div className="flex flex-col items-center gap-4 rounded-[0.75rem] border border-line bg-surface px-4 py-10 text-center sm:py-12">
+        <div className="flex h-20 w-36 overflow-hidden rounded-[0.5rem] border border-line-strong" aria-hidden>
           {COLORS.map((col) => (
             <span key={col.hex} className="flex-1" style={{ background: col.hex }} />
           ))}
@@ -211,7 +211,7 @@ export default function DeadPixelTest({ locale }: { locale: Locale }) {
       >
         <div
           className={cn(
-            "absolute left-1/2 top-4 flex max-w-[calc(100%-32px)] -translate-x-1/2 items-center gap-3 rounded-full px-4 py-2 text-sm shadow-[var(--shadow-overlay)] transition-opacity duration-500",
+            "absolute left-1/2 top-4 flex max-w-[calc(100%-2rem)] -translate-x-1/2 items-center gap-3 rounded-full px-4 py-2 text-sm shadow-[var(--shadow-overlay)] transition-opacity duration-500",
             light ? "bg-black/75 text-white" : "bg-white/85 text-black",
             hint ? "opacity-100" : "pointer-events-none opacity-0",
           )}

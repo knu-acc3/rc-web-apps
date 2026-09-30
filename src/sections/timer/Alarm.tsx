@@ -129,7 +129,7 @@ export default function Alarm({ locale, time = "07:00" }: AlarmProps) {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className={cn("flex flex-col items-center gap-5 rounded-[12px] border border-line bg-surface px-3 py-8 sm:py-10", status === "ringing" && "border-accent bg-accent-soft")}>
+      <div className={cn("flex flex-col items-center gap-5 rounded-[0.75rem] border border-line bg-surface px-3 py-8 sm:py-10", status === "ringing" && "border-accent bg-accent-soft")}>
         <p className="tabular text-sm text-fg-3">
           {t.now}: {nowD ? `${p2(nowD.getHours())}:${p2(nowD.getMinutes())}:${p2(nowD.getSeconds())}` : "--:--:--"}
         </p>
@@ -144,7 +144,7 @@ export default function Alarm({ locale, time = "07:00" }: AlarmProps) {
             setValue(e.target.value);
             if (status === "armed" && /^\d{2}:\d{2}$/.test(e.target.value)) arm(nextOccurrence(e.target.value, nowMs()));
           }}
-          className="tabular rounded-[12px] border border-transparent bg-transparent px-2 text-center text-[min(18vw,112px)] leading-none font-semibold tracking-tight text-fg hover:border-line focus:border-accent focus:outline-none"
+          className="tabular w-full min-w-0 max-w-[26rem] rounded-[0.75rem] border border-transparent bg-transparent px-2 text-center text-[min(18vw,7rem)] leading-none font-semibold tracking-tight text-fg hover:border-line focus:border-accent focus:outline-none"
         />
         <p className="min-h-7 text-lg text-fg-2" aria-live="polite">
           {status === "ringing" ? <span className="font-semibold text-accent">{t.ringing}</span> : info}
@@ -175,10 +175,8 @@ export default function Alarm({ locale, time = "07:00" }: AlarmProps) {
           )}
         </div>
       </div>
-      <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
-        <TimerOptions locale={locale} options={opts} onChange={setOpts} />
-        <Switch label={t.wake} checked={wake} onChange={(e) => setWake(e.target.checked)} />
-      </div>
+      <Switch label={t.wake} checked={wake} onChange={(e) => setWake(e.target.checked)} />
+      <TimerOptions locale={locale} options={opts} onChange={setOpts} />
       <Notice>{t.honest}</Notice>
     </div>
   );

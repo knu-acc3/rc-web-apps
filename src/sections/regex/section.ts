@@ -177,6 +177,7 @@ export const regexSection = withRelated(
     tools: [
       {
         slug: "",
+        seoAlt: { ru: "готовый regex с примерами", en: "ready-made regex with examples" },
         component: "regex/tester",
         icon: "Regex",
         popular: true,

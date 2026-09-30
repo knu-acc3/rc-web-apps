@@ -137,12 +137,12 @@ export default function QrGenerator({ locale, type: initialType = "url" }: { loc
 
   return (
     <div className="flex flex-col gap-5">
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_20rem]">
         <div className="flex min-w-0 flex-col gap-4">
           {typeSelect}
           <FieldGrid specs={primary} f={f} set={set} locale={locale} id={id} />
           {secondary.length > 0 && (
-            <details className="group rounded-[12px] border border-line">
+            <details className="group rounded-[0.75rem] border border-line">
               <summary className="cursor-pointer px-4 py-2.5 text-sm font-medium text-fg-2 select-none hover:text-fg">{t.more}</summary>
               <div className="px-4 pt-1 pb-4">
                 <FieldGrid specs={secondary} f={f} set={set} locale={locale} id={`${id}-m`} />
@@ -152,7 +152,7 @@ export default function QrGenerator({ locale, type: initialType = "url" }: { loc
         </div>
 
         <div className="flex flex-col items-center gap-3 lg:sticky lg:top-20 lg:self-start">
-          <div className={cn("aspect-square w-full max-w-[320px] overflow-hidden rounded-[12px] border border-line", !matrix && "flex items-center justify-center bg-surface-2 p-6 text-center text-sm text-fg-3")}>
+          <div className={cn("aspect-square w-full max-w-[20rem] overflow-hidden rounded-[0.75rem] border border-line", !matrix && "flex items-center justify-center bg-surface-2 p-6 text-center text-sm text-fg-3")}>
             {matrix ? (
               <svg viewBox={`0 0 ${n} ${n}`} shapeRendering="crispEdges" role="img" aria-label={t.alt} className="block size-full">
                 <rect width={n} height={n} fill={look.bg} />
@@ -168,8 +168,8 @@ export default function QrGenerator({ locale, type: initialType = "url" }: { loc
               t.empty
             )}
           </div>
-          {matrix && <p className="text-center text-[13px] text-fg-3">{t.meta(matrix.version, matrix.size, ecc, usedText)}</p>}
-          <div className="flex w-full max-w-[320px] gap-2">
+          {matrix && <p className="text-center text-[0.8125rem] text-fg-3">{t.meta(matrix.version, matrix.size, ecc, usedText)}</p>}
+          <div className="flex w-full max-w-[20rem] gap-2">
             <Button variant="primary" className="flex-1" onClick={savePng} disabled={blocked || busy}>
               <Download className="size-4" aria-hidden />
               {t.png}
@@ -180,7 +180,7 @@ export default function QrGenerator({ locale, type: initialType = "url" }: { loc
             <label className="sr-only" htmlFor={`${id}-png`}>
               {t.pngSize}
             </label>
-            <Select id={`${id}-png`} value={String(pngSize)} onChange={(e) => setPngSize(Number(e.target.value))} className="w-[112px]" title={t.pngSize}>
+            <Select id={`${id}-png`} value={String(pngSize)} onChange={(e) => setPngSize(Number(e.target.value))} className="w-[7rem]" title={t.pngSize}>
               {SIZES.map((s) => (
                 <option key={s} value={s}>
                   {s} px

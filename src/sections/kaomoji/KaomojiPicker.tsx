@@ -140,7 +140,7 @@ export default function KaomojiPicker({ locale, category }: KaomojiPickerProps) 
             <h2 id={`${id}-recent`} className="text-sm font-medium text-fg-3">
               {t.recent}
             </h2>
-            <Button variant="ghost" size="sm" onClick={clearRecent} className="h-7! px-2! text-[13px]! text-fg-3">
+            <Button variant="ghost" size="sm" onClick={clearRecent} className="h-7! px-2! text-[0.8125rem]! text-fg-3">
               {t.clearRecent}
             </Button>
           </div>
@@ -158,7 +158,7 @@ export default function KaomojiPicker({ locale, category }: KaomojiPickerProps) 
               {grid(hits.map((h) => h.k))}
             </section>
           ) : (
-            <p className="rounded-[12px] bg-surface-2 px-4 py-6 text-center text-fg-2">{t.nothing}</p>
+            <p className="rounded-[0.75rem] bg-surface-2 px-4 py-6 text-center text-fg-2">{t.nothing}</p>
           )
         ) : current ? (
           <>
@@ -185,7 +185,7 @@ export default function KaomojiPicker({ locale, category }: KaomojiPickerProps) 
 
       <div role="status" aria-live="polite" className="pointer-events-none fixed inset-x-0 bottom-5 z-50 flex justify-center px-4">
         {status && (
-          <span className="max-w-md rounded-[18px] bg-fg px-4 py-2 text-center text-sm font-medium [overflow-wrap:anywhere] text-bg shadow-[var(--shadow-overlay)]">{status}</span>
+          <span className="max-w-md rounded-[1.125rem] bg-fg px-4 py-2 text-center text-sm font-medium [overflow-wrap:anywhere] text-bg shadow-[var(--shadow-overlay)]">{status}</span>
         )}
       </div>
     </div>

@@ -122,7 +122,7 @@ export function LiveStage({
 
   return (
     <div className={cn("relative", className)}>
-      <div className={cn("flex min-h-56 items-center justify-center overflow-hidden rounded-[10px] border border-line", checker)}>
+      <div className={cn("flex min-h-56 items-center justify-center overflow-hidden rounded-[0.625rem] border border-line", checker)}>
         {error ? (
           <p className="max-w-md px-4 py-10 text-center text-sm text-err">{errorText(locale, error)}</p>
         ) : !bitmap ? (

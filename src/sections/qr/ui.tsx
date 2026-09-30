@@ -62,7 +62,7 @@ export function LookRow({ locale, look, onChange, fixed, allowLogo = true }: { l
           onChange={(v) => !fixed && onChange({ ...look, ecc: v })}
           options={(["L", "M", "Q", "H"] as const).map((v) => ({ value: v, label: v, title: t.eccTitle[v] }))}
         />
-        {fixed && <span className="text-[13px] text-fg-3">{fixed === "H" ? t.fixedH : t.fixedM}</span>}
+        {fixed && <span className="text-[0.8125rem] text-fg-3">{fixed === "H" ? t.fixedH : t.fixedM}</span>}
       </div>
       <label className="flex cursor-pointer items-center gap-2">
         <input type="color" value={look.fg} onChange={(e) => onChange({ ...look, fg: e.target.value })} className="size-7 cursor-pointer rounded border border-line bg-surface p-0.5" />

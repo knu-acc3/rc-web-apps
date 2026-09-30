@@ -183,17 +183,17 @@ export default function UserAgent({ locale, sample }: { locale: Locale; sample: 
               {bot ? <Badge tone="warn">{`${t.bot}: ${bot.name} — ${t.kinds[bot.kind]}`}</Badge> : <Badge tone="ok">{t.notBot}</Badge>}
             </div>
             {res ? table(res) : <p className="text-sm text-fg-3">{t.loading}</p>}
-            {bot && <p className="text-[13px] text-fg-3">{t.spoof}</p>}
+            {bot && <p className="text-[0.8125rem] text-fg-3">{t.spoof}</p>}
           </div>
         )}
       </Panel>
 
       <Panel className="p-4 sm:p-6">
         <h2 className="text-base font-semibold text-fg">{t.yours}</h2>
-        <p className="mt-1 text-[13px] text-fg-3">{t.yoursHint}</p>
+        <p className="mt-1 text-[0.8125rem] text-fg-3">{t.yoursHint}</p>
         {mine && (
           <>
-            <code className="mt-3 block rounded-[8px] bg-surface-2 px-3 py-2 font-mono text-[13px] break-all text-fg">{mine.ua}</code>
+            <code className="mt-3 block rounded-[0.5rem] bg-surface-2 px-3 py-2 font-mono text-[0.8125rem] break-all text-fg">{mine.ua}</code>
             <div className="mt-3">{parser && table(parser(mine.ua))}</div>
             <div className="mt-3 text-sm">
               <span className="text-fg-3">{t.hints}: </span>

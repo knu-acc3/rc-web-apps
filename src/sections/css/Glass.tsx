@@ -50,7 +50,7 @@ export default function GlassGenerator({ locale }: { locale: Locale }) {
     <div className="flex flex-col gap-4">
       <div className="grid gap-4 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
         <div
-          className="relative flex min-h-80 items-center justify-center overflow-hidden rounded-[12px] border border-line p-6"
+          className="relative flex min-h-80 items-center justify-center overflow-hidden rounded-[0.75rem] border border-line p-6"
           style={{ background: "radial-gradient(circle at 20% 30%, #f472b6 0 18%, transparent 19%), radial-gradient(circle at 80% 70%, #38bdf8 0 22%, transparent 23%), radial-gradient(circle at 70% 20%, #facc15 0 12%, transparent 13%), linear-gradient(135deg, #6366f1, #a855f7)" }}
         >
           <div

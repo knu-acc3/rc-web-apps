@@ -7,6 +7,11 @@ import { fit, num } from "./text";
 
 /* ───────────── curated numbers ───────────── */
 
+/** The first title that fits 60 characters, else the shortest. */
+function pickTitle(candidates: string[]): string {
+  return candidates.find((c) => c.length <= 60) ?? candidates[candidates.length - 1];
+}
+
 export const ROMAN_NUMBERS: number[] = (() => {
   const set = new Set<number>();
   for (let n = 1; n <= 100; n++) set.add(n);
@@ -255,7 +260,10 @@ function romanVariant(n: number): VariantDef {
   return {
     slug: String(n),
     name: { ru: fmt(n, "ru"), en: fmt(n, "en") },
-    title: { ru: `${fmt(n, "ru")} римскими цифрами — ${r}`, en: `${fmt(n, "en")} in Roman numerals — ${r}` },
+    title: {
+      ru: pickTitle([`${fmt(n, "ru")} римскими цифрами — ${r} | как записать число`, `${fmt(n, "ru")} римскими цифрами — ${r} | запись числа`, `${fmt(n, "ru")} римскими цифрами | ${r}`]),
+      en: pickTitle([`${fmt(n, "en")} in Roman numerals — ${r} | how to write it`, `${fmt(n, "en")} in Roman numerals — ${r} | spelled out`, `${fmt(n, "en")} in Roman numerals | ${r}`]),
+    },
     h1: { ru: `${fmt(n, "ru")} римскими цифрами`, en: `${fmt(n, "en")} in Roman numerals` },
     description: { ru: descRu, en: descEn },
     lead: {

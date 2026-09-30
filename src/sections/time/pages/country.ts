@@ -97,9 +97,10 @@ export function countryPage(c: Country, locale: Locale): PageModel {
       : `${enSubj} has ${n} time zones, from ${fmtOffset(first.std)} (${groupName(first, locale)}) to ${fmtOffset(last.std)} (${groupName(last, locale)})${anyDst ? "" : "; clocks do not change"}.`;
   }
 
-  const description = ru
+  const capitalNote = capital ? (ru ? ` Столица — ${cityLabel(capital, locale)}.` : ` Capital: ${cityLabel(capital, locale)}.`) : "";
+  const description = (ru
     ? `Точное время ${inName} онлайн: ${n === 1 ? `часовой пояс ${fmtOffset(first.std)}` : `${n} ${zonesWord(n)} от ${fmtOffset(first.std)} до ${fmtOffset(last.std)}`}, текущее время${n > 1 ? " в каждом поясе" : ""}, города${anyDst ? " и даты перевода часов" : ", летнее время не используется"}.`
-    : `Current time ${inName}: ${n === 1 ? `one time zone, ${fmtOffset(first.std)}` : `${n} time zones from ${fmtOffset(first.std)} to ${fmtOffset(last.std)}`}, live clocks${n > 1 ? " for each zone" : ""}, cities${anyDst ? " and daylight saving dates" : "; no daylight saving time"}.`;
+    : `Current time ${inName}: ${n === 1 ? `one time zone, ${fmtOffset(first.std)}` : `${n} time zones from ${fmtOffset(first.std)} to ${fmtOffset(last.std)}`}, live clocks${n > 1 ? " for each zone" : ""}, cities${anyDst ? " and daylight saving dates" : "; no daylight saving time"}.`) + capitalNote;
 
   /* table */
   const rows = groups.map((g) => {

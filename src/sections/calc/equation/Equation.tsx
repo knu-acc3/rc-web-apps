@@ -463,7 +463,7 @@ export default function Equation({
           items={EQ_MODES.map((x) => ({ value: x, label: t.modes[x] }))}
         />
         <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-6">
-          <section className="flex min-w-0 flex-col gap-3 rounded-[12px] border border-line bg-surface p-4 sm:p-5">
+          <section className="flex min-w-0 flex-col gap-3 rounded-[0.75rem] border border-line bg-surface p-4 sm:p-5">
             {inputs}
             {anyBad && <p className="text-sm text-err">{t.bad}</p>}
           </section>

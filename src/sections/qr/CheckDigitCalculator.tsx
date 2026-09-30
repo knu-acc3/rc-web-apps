@@ -133,7 +133,7 @@ export default function CheckDigitCalculator({ locale, kind: initial = "ean13" }
         <Input id={`${id}-v`} value={value} onChange={(e) => setValue(e.target.value)} size="lg" className="font-mono tracking-wider" inputMode="numeric" autoComplete="off" spellCheck={false} aria-invalid={!!r && !calc} />
       </Field>
 
-      <div aria-live="polite" className={cn("rounded-[12px] px-4 py-4 sm:px-5", verdict === "bad" || (r && !calc) ? "bg-err-soft" : verdict === "ok" ? "bg-ok-soft" : "bg-surface-2")}>
+      <div aria-live="polite" className={cn("rounded-[0.75rem] px-4 py-4 sm:px-5", verdict === "bad" || (r && !calc) ? "bg-err-soft" : verdict === "ok" ? "bg-ok-soft" : "bg-surface-2")}>
         {calc ? (
           <>
             <div className="text-sm text-fg-2">{verdict === "ok" ? t.ok : verdict === "bad" ? t.bad(calc.check) : t.result}</div>
@@ -146,19 +146,19 @@ export default function CheckDigitCalculator({ locale, kind: initial = "ean13" }
             </div>
           </>
         ) : r && "error" in r ? (
-          <div className="text-[15px] text-err">{r.error === "digits" ? t.digitsOnly : r.error === "upceNs" ? t.upceNs : t.count(k.body, digits.length)}</div>
+          <div className="text-[0.9375rem] text-err">{r.error === "digits" ? t.digitsOnly : r.error === "upceNs" ? t.upceNs : t.count(k.body, digits.length)}</div>
         ) : (
-          <div className="text-[15px] text-fg-3">{t.need(k.body)}</div>
+          <div className="text-[0.9375rem] text-fg-3">{t.need(k.body)}</div>
         )}
       </div>
 
       {calc && (
-        <details className="rounded-[12px] border border-line">
+        <details className="rounded-[0.75rem] border border-line">
           <summary className="cursor-pointer px-4 py-2.5 text-sm font-medium text-fg-2 select-none hover:text-fg">{t.steps}</summary>
           <div className="flex flex-col gap-3 px-4 pt-1 pb-4 text-sm text-fg-2">
             {calc.expanded && <p>{t.expand(calc.expanded)}</p>}
             <div className="overflow-x-auto">
-              <table className="w-full min-w-max border-collapse text-center font-mono text-[13px]">
+              <table className="w-full min-w-max border-collapse text-center font-mono text-[0.8125rem]">
                 <tbody>
                   {(
                     [

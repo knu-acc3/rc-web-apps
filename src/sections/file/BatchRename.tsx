@@ -206,7 +206,7 @@ export default function BatchRename({ locale }: { locale: Locale }) {
                         </td>
                         <td className={cn("max-w-0 px-4 py-1.5", r.error ? "text-err" : r.name !== f.file.name ? "font-medium text-fg" : "text-fg-2")} title={r.name}>
                           <span className="block truncate">{r.name}</span>
-                          {r.error && <span className="text-[12px]">{t.errors[r.error]}</span>}
+                          {r.error && <span className="text-[0.75rem]">{t.errors[r.error]}</span>}
                         </td>
                       </tr>
                     );
@@ -222,7 +222,7 @@ export default function BatchRename({ locale }: { locale: Locale }) {
               {t.run}
             </Button>
           )}
-          <p className="-mt-2 text-[13px] text-fg-3">{t.note}</p>
+          <p className="-mt-2 text-[0.8125rem] text-fg-3">{t.note}</p>
           <JobProgress job={job} locale={locale} onCancel={job.cancel} onRetry={run} />
           {job.status === "done" && job.result && <ResultCard blob={job.result} name="renamed.zip" locale={locale} kind="file" onReset={job.reset} resetLabel={UI[locale].edit} />}
         </>

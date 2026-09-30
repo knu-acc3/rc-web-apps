@@ -151,13 +151,13 @@ export default function Interval({ locale, work: w0 = 20, rest: r0 = 10, rounds:
 
   return (
     <div className="flex flex-col gap-4">
-      <div ref={ref} className={cn("flex flex-col items-center justify-center gap-4 rounded-[12px] border border-line bg-surface px-3 py-8 sm:py-10", full && "min-h-screen rounded-none border-0")}>
+      <div ref={ref} className={cn("flex flex-col items-center justify-center gap-4 rounded-[0.75rem] border border-line bg-surface px-3 py-8 sm:py-10", full && "min-h-screen rounded-none border-0")}>
         <p className={cn("text-2xl font-bold uppercase tracking-wide", color)}>{label}</p>
-        <div className={cn("tabular font-semibold leading-none tracking-tight", full ? "text-[min(26vw,42vh)]" : "text-[min(22vw,140px)]", status === "paused" ? "text-fg-2" : "text-fg")}>{clock(segLeft)}</div>
+        <div className={cn("tabular font-semibold leading-none tracking-tight", full ? "text-[min(26vw,42vh)]" : "text-[min(22vw,8.75rem)]", status === "paused" ? "text-fg-2" : "text-fg")}>{clock(segLeft)}</div>
         <div className="h-1.5 w-full max-w-md overflow-hidden rounded-full bg-surface-2" aria-hidden>
           <div className={cn("h-full rounded-full", seg?.kind === "rest" ? "bg-ok" : seg?.kind === "prepare" ? "bg-warn" : "bg-err")} style={{ width: `${Math.min(100, Math.max(0, progress * 100))}%` }} />
         </div>
-        <p className="text-[15px] text-fg-2">
+        <p className="text-[0.9375rem] text-fg-2">
           {seg && seg.round > 0 ? t.round(seg.round, cfg.rounds) : " "}
           <span className="text-fg-3">
             {" · "}
@@ -194,7 +194,7 @@ export default function Interval({ locale, work: w0 = 20, rest: r0 = 10, rounds:
             ["prepare", t.prepS],
           ] as const
         ).map(([k, lbl]) => (
-          <label key={k} htmlFor={`${id}-${k}`} className="flex flex-col gap-1 text-[13px] text-fg-3">
+          <label key={k} htmlFor={`${id}-${k}`} className="flex flex-col gap-1 text-[0.8125rem] text-fg-3">
             {lbl}
             <input
               id={`${id}-${k}`}

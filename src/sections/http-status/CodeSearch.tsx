@@ -120,7 +120,7 @@ export default function CodeSearch({ locale, items, only }: { locale: Locale; it
                       {r.n}
                     </Link>
                     {r.u && <span className="ml-2 text-xs text-fg-3">{t.unofficial}</span>}
-                    <span className="block text-[13px] text-fg-3 sm:hidden">{r.t}</span>
+                    <span className="block text-[0.8125rem] text-fg-3 sm:hidden">{r.t}</span>
                   </td>
                   <td className="text-fg-2 max-sm:hidden">{r.t}</td>
                 </tr>

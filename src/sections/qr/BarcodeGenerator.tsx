@@ -118,7 +118,7 @@ export default function BarcodeGenerator({ locale, symbology = "ean13" }: { loca
       lib(el, encoded, renderOptions(sym, Number(bar), showText, 1));
       el.setAttribute("xmlns", "http://www.w3.org/2000/svg");
       el.removeAttribute("style");
-      el.setAttribute("class", "block h-auto w-full max-w-[440px]");
+      el.setAttribute("class", "block h-auto w-full max-w-[27.5rem]");
     } catch {
       // input already validated; ignore renderer edge cases
     }
@@ -169,10 +169,10 @@ export default function BarcodeGenerator({ locale, symbology = "ean13" }: { loca
       </div>
 
       <div className="flex flex-col items-center gap-3">
-        <div className={cn("flex min-h-[160px] w-full items-center justify-center overflow-x-auto rounded-[12px] border border-line bg-white p-4", !r.ok && "opacity-40")}>
-          <svg ref={svg} role="img" aria-label={`${t.alt} ${LABEL[sym]} ${encoded}`} className="block h-auto w-full max-w-[440px]" />
+        <div className={cn("flex min-h-[10rem] w-full items-center justify-center overflow-x-auto rounded-[0.75rem] border border-line bg-white p-4", !r.ok && "opacity-40")}>
+          <svg ref={svg} role="img" aria-label={`${t.alt} ${LABEL[sym]} ${encoded}`} className="block h-auto w-full max-w-[27.5rem]" />
         </div>
-        <p aria-live="polite" className={cn("text-center text-[15px]", status.tone === "err" ? "text-err" : status.tone === "ok" ? "text-ok" : "text-fg-3")}>
+        <p aria-live="polite" className={cn("text-center text-[0.9375rem]", status.tone === "err" ? "text-err" : status.tone === "ok" ? "text-ok" : "text-fg-3")}>
           {status.text}
         </p>
         <div className="flex gap-2">

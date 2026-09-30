@@ -114,8 +114,8 @@ export default function Teams({ locale, teams: teams0 = 2 }: TeamsProps) {
   return (
     <div className="flex flex-col gap-4">
       <Panel className="flex flex-col gap-4 p-4 sm:p-5">
-        <Field label={t.people} htmlFor={`${id}-p`} aside={<span className="tabular text-[13px] text-fg-3">{count(locale, people.length, t.personForms)}</span>}>
-          <Textarea id={`${id}-p`} value={text} rows={8} onChange={(e) => setText(e.target.value)} className="font-sans! text-[15px]!" />
+        <Field label={t.people} htmlFor={`${id}-p`} aside={<span className="tabular text-[0.8125rem] text-fg-3">{count(locale, people.length, t.personForms)}</span>}>
+          <Textarea id={`${id}-p`} value={text} rows={8} onChange={(e) => setText(e.target.value)} className="font-sans! text-[0.9375rem]!" />
         </Field>
         <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
           <Field label={t.teams} htmlFor={`${id}-k`} className="sm:w-48">
@@ -150,18 +150,18 @@ export default function Teams({ locale, teams: teams0 = 2 }: TeamsProps) {
           {result && (
             <ul className="grid gap-3 p-4 sm:grid-cols-2 lg:grid-cols-3">
               {result.teams.map((tm, i) => (
-                <li key={i} className="rounded-[10px] border border-line bg-surface-2 p-3">
+                <li key={i} className="rounded-[0.625rem] border border-line bg-surface-2 p-3">
                   <h3 className="mb-2 flex items-baseline justify-between gap-2 font-semibold text-fg">
                     <span className="min-w-0 break-words">{title(i)}</span>
-                    <span className="tabular shrink-0 text-[13px] font-normal text-fg-3">{count(locale, tm.members.length, t.humanForms)}</span>
+                    <span className="tabular shrink-0 text-[0.8125rem] font-normal text-fg-3">{count(locale, tm.members.length, t.humanForms)}</span>
                   </h3>
-                  <ol className="flex flex-col gap-1 text-[15px] text-fg">
+                  <ol className="flex flex-col gap-1 text-[0.9375rem] text-fg">
                     {tm.members.map((m, j) => (
                       <li key={j} className="flex items-center gap-2 break-words">
-                        <span className="tabular w-5 shrink-0 text-right text-[13px] text-fg-3">{j + 1}.</span>
+                        <span className="tabular w-5 shrink-0 text-right text-[0.8125rem] text-fg-3">{j + 1}.</span>
                         <span className="min-w-0">{m}</span>
                         {j === tm.captain && (
-                          <span className="inline-flex items-center gap-1 rounded-full bg-accent-soft px-2 py-0.5 text-[12px] font-medium text-accent">
+                          <span className="inline-flex items-center gap-1 rounded-full bg-accent-soft px-2 py-0.5 text-[0.75rem] font-medium text-accent">
                             <Crown className="size-3" aria-hidden />
                             {t.captain}
                           </span>

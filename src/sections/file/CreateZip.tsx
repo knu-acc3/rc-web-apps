@@ -205,7 +205,7 @@ export default function CreateZip({ locale }: { locale: Locale }) {
               />
             </div>
           </div>
-          <p className="-mt-2 text-[13px] text-fg-3">{t.hint}</p>
+          <p className="-mt-2 text-[0.8125rem] text-fg-3">{t.hint}</p>
           {job.status !== "done" && (
             <Button variant="primary" size="lg" onClick={run} disabled={job.running} className="w-full sm:w-auto sm:self-start">
               <FileArchive aria-hidden />

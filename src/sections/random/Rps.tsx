@@ -76,7 +76,7 @@ export default function Rps({ locale }: RpsProps) {
         <div className="grid w-full grid-cols-[1fr_auto_1fr] items-center gap-3">
           {(["you", "cpu"] as const).map((who, i) => (
             <div key={who} className={cn("flex flex-col items-center gap-1", i === 1 && "col-start-3")}>
-              <span className="text-[13px] font-medium text-fg-2">{t[who]}</span>
+              <span className="text-[0.8125rem] font-medium text-fg-2">{t[who]}</span>
               <span className="flex size-24 items-center justify-center rounded-full bg-surface-2 text-5xl sm:size-28 sm:text-6xl" aria-hidden>
                 {round ? GLYPH[round[who]] : "?"}
               </span>

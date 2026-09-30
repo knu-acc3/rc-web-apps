@@ -106,7 +106,7 @@ function BoxPlot({ s, locale }: { s: Stats; locale: Locale }) {
           <circle key={i} cx={X(o)} cy={50} r={6} fill="var(--err)" />
         ))}
       </svg>
-      <div className="tabular flex justify-between text-[12px] text-fg-3">
+      <div className="tabular flex justify-between text-[0.75rem] text-fg-3">
         <span>{f(lo)}</span>
         <span>
           Q1 {f(s.q1)} · Me {f(s.median)} · Q3 {f(s.q3)}
@@ -152,7 +152,7 @@ export default function Statistics({ locale }: ToolProps) {
   return (
     <Stack>
       <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-6">
-        <section className="rounded-[12px] border border-line bg-surface p-4 sm:p-5">
+        <section className="rounded-[0.75rem] border border-line bg-surface p-4 sm:p-5">
           <Field label={t.data} htmlFor={`${id}-d`} hint={t.hint}>
             <Textarea id={`${id}-d`} value={q.v.d} onChange={(e) => q.set({ d: e.target.value })} rows={8} className="tabular text-base" />
           </Field>

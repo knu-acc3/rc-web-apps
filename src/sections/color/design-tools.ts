@@ -168,6 +168,7 @@ function harmonyVariant(k: Harmony): VariantDef {
 
 const PALETTE_TOOL: ToolDef = {
   slug: "color-palette-generator",
+  seoAlt: { ru: ["генератор цветовой палитры", "палитра цветов", "HEX-коды"], en: ["color palette generator", "color palette", "HEX codes"] },
   component: "color/palette",
   icon: "SwatchBook",
   popular: true,

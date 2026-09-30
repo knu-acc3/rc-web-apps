@@ -133,8 +133,8 @@ export default function NupTool({ locale, n: n0 = 2 }: { locale: Locale; n?: num
             <Checkbox label={t.border} checked={border} onChange={(e) => change(setBorder)(e.target.checked)} className="pb-2" />
           </OptionsRow>
 
-          <div className="flex flex-col items-center gap-4 rounded-[12px] bg-surface-2 p-4 sm:flex-row">
-            <svg width={grid.sheetWidth * k} height={grid.sheetHeight * k} viewBox={`0 0 ${grid.sheetWidth} ${grid.sheetHeight}`} className="shrink-0 rounded-[2px] bg-surface shadow-[0_1px_3px_rgb(0_0_0/0.15)]" aria-hidden>
+          <div className="flex flex-col items-center gap-4 rounded-[0.75rem] bg-surface-2 p-4 sm:flex-row">
+            <svg width={grid.sheetWidth * k} height={grid.sheetHeight * k} viewBox={`0 0 ${grid.sheetWidth} ${grid.sheetHeight}`} className="shrink-0 rounded-[0.125rem] bg-surface shadow-[0_1px_3px_rgb(0_0_0/0.15)]" aria-hidden>
               {cells.map((c, i) => {
                 const f = fitInto(c, page.width, page.height);
                 const x = f.x;

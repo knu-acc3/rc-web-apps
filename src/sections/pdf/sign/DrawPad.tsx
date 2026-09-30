@@ -43,7 +43,7 @@ export function DrawPad({ color, label, clearLabel, onStroke, onClear }: { color
         ref={ref}
         aria-label={label}
         role="img"
-        className="block h-44 w-full cursor-crosshair touch-none rounded-[12px] border-2 border-dashed border-line-strong bg-white"
+        className="block h-44 w-full cursor-crosshair touch-none rounded-[0.75rem] border-2 border-dashed border-line-strong bg-white"
         onPointerDown={(e) => {
           e.currentTarget.setPointerCapture(e.pointerId);
           drawing.current = true;

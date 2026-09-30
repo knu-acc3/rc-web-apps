@@ -188,7 +188,7 @@ export default function Scientific({ locale }: ToolProps) {
     <Stack>
       <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] lg:gap-6">
         <section
-          className="flex min-w-0 flex-col gap-3 rounded-[12px] border border-line bg-surface p-4 sm:p-5"
+          className="flex min-w-0 flex-col gap-3 rounded-[0.75rem] border border-line bg-surface p-4 sm:p-5"
           onKeyDown={(e) => {
             if (e.key === "Enter") {
               e.preventDefault();
@@ -227,8 +227,8 @@ export default function Scientific({ locale }: ToolProps) {
             aria-describedby={`${id}-err`}
             className="control h-12 font-mono text-lg"
           />
-          <div className="min-h-[76px] rounded-[10px] bg-accent-soft px-4 py-3">
-            <div className="text-[13px] text-fg-2">{t.result}</div>
+          <div className="min-h-[4.75rem] rounded-[0.625rem] bg-accent-soft px-4 py-3">
+            <div className="text-[0.8125rem] text-fg-2">{t.result}</div>
             <div className="flex items-center justify-between gap-2">
               <output aria-live="polite" className="tabular min-w-0 break-all text-3xl font-bold tracking-tight text-fg">
                 {shown ?? "—"}
@@ -247,18 +247,18 @@ export default function Scientific({ locale }: ToolProps) {
                 onClick={() => press(k)}
                 aria-label={k.aria}
                 className={cn(
-                  "h-11 rounded-[8px] text-[15px] font-medium transition-colors duration-100 active:scale-[0.97] sm:h-12",
+                  "h-11 rounded-[0.5rem] text-[0.9375rem] font-medium transition-colors duration-100 active:scale-[0.97] sm:h-12",
                   k.tone === "num" && "bg-surface-2 text-fg hover:bg-line",
                   k.tone === "op" && "bg-surface-2 text-fg-2 hover:bg-line hover:text-fg",
                   k.tone === "fn" && "border border-line bg-surface text-fg-2 hover:border-line-strong hover:text-fg",
                   k.tone === "eq" && "bg-accent text-accent-fg hover:bg-accent-hover",
                 )}
               >
-                {k.action === "back" ? <Delete className="mx-auto size-[18px]" aria-hidden /> : k.label}
+                {k.action === "back" ? <Delete className="mx-auto size-[1.125rem]" aria-hidden /> : k.label}
               </button>
             ))}
           </div>
-          <p className="text-[13px] text-fg-3">{t.hint}</p>
+          <p className="text-[0.8125rem] text-fg-3">{t.hint}</p>
           <ToolActions locale={locale} onReset={q.reset} shareUrl={q.shareUrl} />
         </section>
         <section className="min-w-0">
@@ -277,11 +277,11 @@ export default function Scientific({ locale }: ToolProps) {
           {history.length === 0 ? (
             <p className="text-sm text-fg-3">{t.empty}</p>
           ) : (
-            <ul className="divide-y divide-line overflow-hidden rounded-[12px] border border-line bg-surface">
+            <ul className="divide-y divide-line overflow-hidden rounded-[0.75rem] border border-line bg-surface">
               {history.map((h, i) => (
                 <li key={i}>
                   <button type="button" className="block w-full px-4 py-2.5 text-left hover:bg-surface-2" onClick={() => q.set({ e: h.e })}>
-                    <span className="block truncate font-mono text-[13px] text-fg-3">{h.e}</span>
+                    <span className="block truncate font-mono text-[0.8125rem] text-fg-3">{h.e}</span>
                     <span className="tabular block font-semibold text-fg">= {h.r}</span>
                   </button>
                 </li>

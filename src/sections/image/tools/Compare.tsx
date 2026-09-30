@@ -167,7 +167,7 @@ export default function Compare({ locale }: { locale: Locale }) {
       </div>
       {ready && (
         <>
-          <div className="flex flex-wrap items-end gap-x-4 gap-y-3 rounded-[12px] border border-line bg-surface px-4 py-3">
+          <div className="flex flex-wrap items-end gap-x-4 gap-y-3 rounded-[0.75rem] border border-line bg-surface px-4 py-3">
             <Field label={t.mode}>
               <Segmented
                 wrap
@@ -191,7 +191,7 @@ export default function Compare({ locale }: { locale: Locale }) {
             <div className="p-3 sm:p-4">
               {mode === "diff" ? (
                 diff ? (
-                  <div className={`flex justify-center overflow-auto rounded-[10px] border border-line ${checker}`}>
+                  <div className={`flex justify-center overflow-auto rounded-[0.625rem] border border-line ${checker}`}>
                     {/* eslint-disable-next-line @next/next/no-img-element -- blob: URL */}
                     <img src={diff.url} alt={t.diffHint} className="block h-auto max-h-[70vh] max-w-full" />
                   </div>

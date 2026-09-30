@@ -155,17 +155,17 @@ export default function Countdown({ locale, event: eventRu, eventEn }: Countdown
             {target?.state === "after" && <p className="text-lg font-semibold text-accent">{t.passed(label)}</p>}
             <div className="grid w-full max-w-2xl grid-cols-4 gap-2 sm:gap-4">
               {values.map((v, i) => (
-                <div key={i} className={cn("flex flex-col items-center rounded-[12px] bg-surface-2 px-1 py-3 sm:py-5", i === 0 && "bg-accent-soft")}>
-                  <span className={cn("tabular font-bold leading-none tracking-tight text-fg", i === 0 ? "text-[min(11vw,72px)] text-accent" : "text-[min(9vw,56px)]")}>
+                <div key={i} className={cn("flex flex-col items-center rounded-[0.75rem] bg-surface-2 px-1 py-3 sm:py-5", i === 0 && "bg-accent-soft")}>
+                  <span className={cn("tabular font-bold leading-none tracking-tight text-fg", i === 0 ? "text-[min(11vw,4.5rem)] text-accent" : "text-[min(9vw,3.5rem)]")}>
                     {target ? (i === 0 ? formatNumber(locale, v) : String(v).padStart(2, "0")) : "—"}
                   </span>
-                  <span className="mt-1.5 text-[12px] text-fg-3 sm:text-sm">{target ? unitWord(i, v) : t.units[i][locale === "ru" ? 2 : 1]}</span>
+                  <span className="mt-1.5 text-[0.75rem] text-fg-3 sm:text-sm">{target ? unitWord(i, v) : t.units[i][locale === "ru" ? 2 : 1]}</span>
                 </div>
               ))}
             </div>
           </>
         )}
-        <p className="min-h-6 text-[15px] text-fg-2">{dateText}</p>
+        <p className="min-h-6 text-[0.9375rem] text-fg-2">{dateText}</p>
         {spec?.yearProgress && now !== null && (
           <div className="w-full max-w-md">
             <div className="h-2 overflow-hidden rounded-full bg-surface-2" aria-hidden>
@@ -174,7 +174,7 @@ export default function Countdown({ locale, event: eventRu, eventEn }: Countdown
             <p className="mt-1.5 text-sm text-fg-3">{t.yearDone(formatNumber(locale, yearProgress(now) * 100, { maximumFractionDigits: 1 }))}</p>
           </div>
         )}
-        {spec?.expected && <p className="max-w-xl text-[13px] text-fg-3">{t.expected}</p>}
+        {spec?.expected && <p className="max-w-xl text-[0.8125rem] text-fg-3">{t.expected}</p>}
       </Panel>
 
       {!event && custom.date && (

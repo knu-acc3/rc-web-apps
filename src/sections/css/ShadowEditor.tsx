@@ -92,7 +92,7 @@ export default function ShadowEditor({ locale, kind, value, surface, box = "#FFF
       <div className="grid gap-4 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
         <Stage locale={locale} surface={surface} minHeight={320}>
           {kind === "box" ? (
-            <div className="size-40 rounded-[16px] sm:size-48" style={{ background: boxColor, boxShadow: css }} role="img" aria-label={t.preview} />
+            <div className="size-40 rounded-[1rem] sm:size-48" style={{ background: boxColor, boxShadow: css }} role="img" aria-label={t.preview} />
           ) : (
             <p className="text-center text-6xl font-extrabold tracking-tight break-all sm:text-7xl" style={{ color: textColor, textShadow: css }}>
               {t.sample}
@@ -108,7 +108,7 @@ export default function ShadowEditor({ locale, kind, value, surface, box = "#FFF
                 type="button"
                 aria-pressed={l.id === layer?.id}
                 onClick={() => setSel(l.id)}
-                className={cn("chip h-8! px-3! text-[13px]!", l.id === layer?.id && "border-accent! text-accent!")}
+                className={cn("chip h-8! px-3! text-[0.8125rem]!", l.id === layer?.id && "border-accent! text-accent!")}
               >
                 {t.layer(i + 1)}
               </button>

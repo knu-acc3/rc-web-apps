@@ -7,6 +7,7 @@ import {
   bySlug,
   bySub,
   EMOJI,
+  findGlyph,
   GROUP_KEYS,
   popular,
   SOURCE,
@@ -298,6 +299,68 @@ function emojiPage(e: Emoji, locale: Locale): PageModel {
     { type: "facts", title: ru ? "Коротко" : "Quick facts", rows: facts },
     { type: "table", title: ru ? `Коды ${e.glyph} для HTML, CSS и программ` : `${e.glyph} codes for HTML, CSS and code`, head: ru ? ["Формат", "Код"] : ["Format", "Code"], rows: codes, mono: true },
   ];
+  // A ZWJ sequence: which emoji it is glued from, each with its own name and code.
+  const zwjParts = !e.ext.cc && e.glyph.includes("\u{200D}") ? e.glyph.split("\u{200D}").filter((p) => p && p !== "\u{FE0F}") : [];
+  // Siblings that differ by one part ("one more child"): say how they differ, so similar pages are told apart.
+  if (zwjParts.length > 1) {
+    const key = (x: Emoji) => x.glyph.split("\u{200D}").filter((p) => p && p !== "\u{FE0F}");
+    const mine = zwjParts.join("|");
+    const shorter = (bySub.get(s) ?? []).find((x) => x !== e && key(x).join("|") === zwjParts.slice(0, -1).join("|"));
+    const longer = (bySub.get(s) ?? []).find((x) => x !== e && key(x).slice(0, -1).join("|") === mine);
+    const extra = zwjParts[zwjParts.length - 1];
+    const extraName = findGlyph(extra);
+    const lines: string[] = [];
+    if (shorter)
+      lines.push(
+        ru
+          ? `От ${shorter.glyph} «${shorter.ru}» отличается последней частью: добавлен ${extra}${extraName ? ` «${extraName.ru}»` : ""}.`
+          : `It differs from ${shorter.glyph} “${shorter.en}” by its last part: ${extra}${extraName ? ` “${extraName.en}”` : ""} is added.`,
+      );
+    if (longer) {
+      const more = key(longer)[key(longer).length - 1];
+      const moreName = findGlyph(more);
+      lines.push(
+        ru
+          ? `Если добавить ${more}${moreName ? ` «${moreName.ru}»` : ""}, получится ${longer.glyph} «${longer.ru}».`
+          : `Add ${more}${moreName ? ` “${moreName.en}”` : ""} and it becomes ${longer.glyph} “${longer.en}”.`,
+      );
+    }
+    if (lines.length) meaning.push(lines.join(" "));
+  }
+  if (zwjParts.length > 1) {
+    // "2 взрослых и 2 ребёнка": who is in a family / couple sequence, counted.
+    const counts = new Map<string, number>();
+    for (const part of zwjParts) {
+      const hit = findGlyph(part);
+      if (hit && /^(?:man|woman|adult|child|boy|girl|person)$/.test(hit.en)) counts.set(hit.en, (counts.get(hit.en) ?? 0) + 1);
+    }
+    const RU_FORMS: Record<string, [string, string, string]> = {
+      man: ["мужчина", "мужчины", "мужчин"],
+      woman: ["женщина", "женщины", "женщин"],
+      adult: ["взрослый", "взрослых", "взрослых"],
+      child: ["ребёнок", "ребёнка", "детей"],
+      boy: ["мальчик", "мальчика", "мальчиков"],
+      girl: ["девочка", "девочки", "девочек"],
+      person: ["человек", "человека", "человек"],
+    };
+    const EN_PL: Record<string, string> = { man: "men", woman: "women", adult: "adults", child: "children", boy: "boys", girl: "girls", person: "people" };
+    if ([...counts.values()].reduce((a, b) => a + b, 0) === zwjParts.length) {
+      const who = [...counts].map(([k, n]) => (ru ? `${n} ${plural("ru", n, RU_FORMS[k])}` : `${n} ${n === 1 ? k : EN_PL[k]}`));
+      facts.push([ru ? "Кто изображён" : "Who is shown", who.join(ru ? " и " : " and ")]);
+    }
+    facts.push([ru ? "Состав" : "Structure", ru ? `${zwjParts.length} эмодзи и ${zwjParts.length - 1} ${plural("ru", zwjParts.length - 1, ["соединитель", "соединителя", "соединителей"])} U+200D` : `${zwjParts.length} emoji and ${zwjParts.length - 1} U+200D joiner${zwjParts.length > 2 ? "s" : ""}`]);
+  }
+  if (zwjParts.length > 1)
+    blocks.push({
+      type: "table",
+      title: ru ? `Из чего состоит ${e.glyph}` : `What ${e.glyph} is made of`,
+      head: ru ? ["Часть", "Название", "Код"] : ["Part", "Name", "Code"],
+      rows: zwjParts.map((part, i) => {
+        const hit = findGlyph(part);
+        const name = hit ? (ru ? cap(hit.ru) : hit.en) : part;
+        return [`${i + 1}. ${part}`, name, uPlus(part)];
+      }),
+    });
   if (e.ext.sk?.length)
     blocks.push({
       type: "table",
@@ -345,7 +408,7 @@ function emojiPage(e: Emoji, locale: Locale): PageModel {
         },
         {
           q: `Как скопировать ${e.glyph}?`,
-          a: "Нажмите кнопку «Копировать» — символ окажется в буфере обмена. Затем вставьте его в сообщение: Ctrl+V на компьютере, ⌘V на Mac или долгое нажатие и «Вставить» на телефоне.",
+          a: `Нажмите «Копировать» и вставьте ${e.glyph} куда нужно: Ctrl+V, ⌘V или долгое нажатие на телефоне.`,
         },
         { q: `Какой код у эмодзи ${e.glyph}?`, a: `${code}. В HTML его записывают как ${htmlHex(e.glyph)}, в CSS — ${cssEscape(e.glyph)}, в JavaScript — "${jsEscape(e.glyph)}".` },
         {
@@ -358,7 +421,7 @@ function emojiPage(e: Emoji, locale: Locale): PageModel {
           q: `What does the ${e.glyph} emoji mean?`,
           a: `${e.glyph} is “${e.en}”, an emoji from the “${subName(s, "en")}” subgroup of “${groupName(g, "en")}”.${kw.length ? ` Its Unicode CLDR keywords are: ${kw.slice(0, 6).join(", ")}.` : ""}`,
         },
-        { q: `How do I copy ${e.glyph}?`, a: "Press the Copy button — the emoji goes to your clipboard. Then paste it with Ctrl+V on a computer, ⌘V on a Mac, or long-press and Paste on a phone." },
+        { q: `How do I copy ${e.glyph}?`, a: `Press Copy and paste ${e.glyph} wherever you need it: Ctrl+V, ⌘V or a long press on a phone.` },
         { q: `What is the code of ${e.glyph}?`, a: `${code}. In HTML write ${htmlHex(e.glyph)}, in CSS ${cssEscape(e.glyph)}, in JavaScript "${jsEscape(e.glyph)}".` },
         { q: `When was ${e.glyph} added to Unicode?`, a: `${e.glyph} is part of Emoji ${ver}, released in ${year}${retro ? ` together with Unicode ${uni}` : ""}.` },
       ];
@@ -369,7 +432,10 @@ function emojiPage(e: Emoji, locale: Locale): PageModel {
         : { q: `How do I change the skin tone of ${e.glyph}?`, a: `Pick a tone in the emoji card and press Copy — the variant with the skin tone modifier is copied. There are ${e.ext.sk.length} variants.` },
     );
 
-  const shortTitle = ru ? `${e.glyph} ${title} — эмодзи: значение, копировать` : `${e.glyph} ${title} Emoji — Meaning & Copy`;
+  const titles = ru
+    ? [`Эмодзи ${e.glyph} ${title} | что означает смайлик, скопировать`, `Эмодзи ${e.glyph} ${title} | значение и копировать`, `Эмодзи ${e.glyph} ${title} | значение`, `${e.glyph} ${title} | значение эмодзи`]
+    : [`${e.glyph} ${title} Emoji | Meaning & Copy`, `${e.glyph} ${title} Emoji | Meaning`, `${e.glyph} ${title} | emoji meaning`];
+  const shortTitle = titles.find((x) => x.length <= 75) ?? titles.reduce((a, b) => (b.length < a.length ? b : a));
   return {
     path: emojiPath(e),
     sectionId: ID,

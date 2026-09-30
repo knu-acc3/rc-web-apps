@@ -60,7 +60,7 @@ export default function Typograph({ locale, lang = "ru" }: { locale: Locale; lan
       </TwoPane>
       <Panel>
         <PanelHeader title={t.preview} actions={<Switch label={t.visible} checked={visible} onChange={(e) => setVisible(e.target.checked)} className="text-sm" />} />
-        <div className="px-4 py-3 text-[15px] leading-relaxed whitespace-pre-wrap text-fg" lang={lang}>
+        <div className="px-4 py-3 text-[0.9375rem] leading-relaxed whitespace-pre-wrap text-fg" lang={lang}>
           {visible
             ? out.split(/( | )/).map((part, i) =>
                 part === " " ? (
@@ -77,7 +77,7 @@ export default function Typograph({ locale, lang = "ru" }: { locale: Locale; lan
               )
             : out}
         </div>
-        {visible && <p className="border-t border-line px-4 py-2 text-[13px] text-fg-3">{t.legend}</p>}
+        {visible && <p className="border-t border-line px-4 py-2 text-[0.8125rem] text-fg-3">{t.legend}</p>}
       </Panel>
       <MoreOptions locale={locale}>
         <Checkbox label={t.entities} checked={entities} onChange={(e) => setEntities(e.target.checked)} />

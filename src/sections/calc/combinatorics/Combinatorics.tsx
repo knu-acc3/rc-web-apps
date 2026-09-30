@@ -109,7 +109,7 @@ export default function Combinatorics({ locale, kind = "ncr" }: ToolProps<{ kind
                   <NumField id={`${id}-k`} label={t.k} value={q.v.k} onChange={(v) => q.set({ k: v })} error={K.message ?? err} inputMode="numeric" size="lg" />
                 </FieldRow>
               )}
-              <p className="text-[13px] text-fg-3">{t.desc[k]}</p>
+              <p className="text-[0.8125rem] text-fg-3">{t.desc[k]}</p>
             </>
           }
           result={
@@ -122,7 +122,7 @@ export default function Combinatorics({ locale, kind = "ncr" }: ToolProps<{ kind
           }
         />
       </div>
-      {text && text.length > 60 && <p className="tabular max-h-60 overflow-y-auto rounded-[12px] border border-line bg-surface p-4 font-mono text-sm break-all text-fg-2">{text}</p>}
+      {text && text.length > 60 && <p className="tabular max-h-60 overflow-y-auto rounded-[0.75rem] border border-line bg-surface p-4 font-mono text-sm break-all text-fg-2">{text}</p>}
       {locale === "ru" ? (
         <Explain
           locale={locale}

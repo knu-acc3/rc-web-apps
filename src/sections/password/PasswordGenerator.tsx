@@ -266,7 +266,7 @@ export default function PasswordGenerator({ locale, mode = "password", length: l
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="rounded-[12px] bg-surface-2 px-4 py-4 sm:px-5">
+      <div className="rounded-[0.75rem] bg-surface-2 px-4 py-4 sm:px-5">
         <div className="flex items-start gap-3">
           <output aria-label={t.result} aria-live="polite" className={cn("min-h-9 min-w-0 flex-1 font-mono font-semibold break-all text-fg", main.length > 40 ? "text-lg sm:text-xl" : "text-2xl sm:text-3xl")}>
             {main || (mode === "passphrase" && !list ? <span className="text-base font-normal text-fg-3">{t.loading}</span> : " ")}
@@ -307,7 +307,7 @@ export default function PasswordGenerator({ locale, mode = "password", length: l
               <Checkbox label={t.digits} checked={digits} onChange={(e) => setDigits(e.target.checked)} />
               <Checkbox label={t.symbols} checked={symbols} onChange={(e) => setSymbols(e.target.checked)} />
             </fieldset>
-            <details className="rounded-[10px] border border-line px-4 py-2">
+            <details className="rounded-[0.625rem] border border-line px-4 py-2">
               <summary className="py-1 text-sm font-medium text-fg-2">{t.advanced}</summary>
               <div className="grid gap-3 py-3 sm:grid-cols-2">
                 <Checkbox label={t.ambiguous} checked={ambiguous} onChange={(e) => setAmbiguous(e.target.checked)} />
@@ -402,7 +402,7 @@ export default function PasswordGenerator({ locale, mode = "password", length: l
 
       {out && out.length > 1 && <CodeOutput title={t.more} value={out.join("\n")} labels={{ copy: t.copy, copied: t.copied, download: t.download }} filename="passwords.txt" minRows={Math.min(10, out.length)} />}
 
-      <section className="rounded-[12px] border border-line">
+      <section className="rounded-[0.75rem] border border-line">
         <h2 className="border-b border-line px-4 py-2.5 text-sm font-semibold text-fg-2">{t.crack}</h2>
         <dl className="divide-y divide-line">
           {ATTACKS.map((a) => (

@@ -247,7 +247,7 @@ function FileHasher({ locale, algo, bits, hmacKey, fmt, expected }: { locale: Lo
     <div className="flex flex-col gap-3">
       <Dropzone multiple onFiles={start} title={t.drop} hint={t.dropHint} compact={rows.length > 0} />
       {rows.length > 0 && (
-        <div className="overflow-hidden rounded-[10px] border border-line">
+        <div className="overflow-hidden rounded-[0.625rem] border border-line">
           <ul className="divide-y divide-line" aria-live="polite">
             {rows.map((r, i) => {
               const ok = expected.trim() && r.digest ? digestMatches(r.digest, expected) : null;
@@ -256,17 +256,17 @@ function FileHasher({ locale, algo, bits, hmacKey, fmt, expected }: { locale: Lo
                 <li key={i} className="flex flex-col gap-1 px-3 py-2.5">
                   <div className="flex items-center justify-between gap-2 text-sm">
                     <span className="min-w-0 truncate text-fg-2">{r.file.name}</span>
-                    <span className="shrink-0 text-[13px] text-fg-3">{formatBytes(locale, r.file.size)}</span>
+                    <span className="shrink-0 text-[0.8125rem] text-fg-3">{formatBytes(locale, r.file.size)}</span>
                   </div>
                   {r.state === "done" && r.digest ? (
-                    <code className={`flex items-center gap-1.5 font-mono text-[15px] font-semibold break-all ${ok === null ? "text-fg" : ok ? "text-ok" : "text-err"}`}>
+                    <code className={`flex items-center gap-1.5 font-mono text-[0.9375rem] font-semibold break-all ${ok === null ? "text-fg" : ok ? "text-ok" : "text-err"}`}>
                       {ok !== null && (ok ? <CircleCheck className="size-4 shrink-0" aria-label={t.match} /> : <CircleX className="size-4 shrink-0" aria-label={t.mismatch} />)}
                       {formatDigest(r.digest, fmt)}
                     </code>
                   ) : r.state === "run" ? (
                     <progress className="h-1.5 w-full accent-[var(--accent)]" max={100} value={pct} aria-label={r.file.name} />
                   ) : (
-                    <span className={`text-[13px] ${r.state === "error" ? "text-err" : "text-fg-3"}`}>{r.state === "wait" ? t.waiting : r.state === "cancel" ? t.cancelled : r.error}</span>
+                    <span className={`text-[0.8125rem] ${r.state === "error" ? "text-err" : "text-fg-3"}`}>{r.state === "wait" ? t.waiting : r.state === "cancel" ? t.cancelled : r.error}</span>
                   )}
                 </li>
               );

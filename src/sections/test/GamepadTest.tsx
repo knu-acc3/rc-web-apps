@@ -112,7 +112,7 @@ export default function GamepadTest({ locale }: { locale: Locale }) {
   return (
     <div className="flex flex-col gap-4">
       {pads.length === 0 ? (
-        <div className="flex min-h-72 flex-col items-center justify-center gap-3 rounded-[12px] border-2 border-dashed border-line-strong bg-surface px-6 py-10 text-center">
+        <div className="flex min-h-72 flex-col items-center justify-center gap-3 rounded-[0.75rem] border-2 border-dashed border-line-strong bg-surface px-6 py-10 text-center">
           <Gamepad2 className="size-14 animate-pulse text-accent" strokeWidth={1.5} aria-hidden />
           <p className="text-lg font-semibold text-fg">{t.waiting}</p>
           <p className="max-w-md text-sm text-fg-3">{t.waitingSub}</p>

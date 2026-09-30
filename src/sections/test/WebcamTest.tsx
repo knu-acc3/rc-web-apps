@@ -385,7 +385,7 @@ export default function WebcamTest({ locale }: { locale: Locale }) {
         </div>
       )}
 
-      <div className={cn("relative overflow-hidden rounded-[12px]", live ? "bg-black" : "border border-line bg-surface")}>
+      <div className={cn("relative overflow-hidden rounded-[0.75rem]", live ? "bg-black" : "border border-line bg-surface")}>
         <video ref={videoRef} playsInline muted autoPlay className={cn("mx-auto block max-h-[70vh] w-full object-contain", mirror && "-scale-x-100", !live && "hidden")} />
         {live && settings && (
           <div className="absolute left-3 top-3 flex flex-wrap gap-1.5 text-sm font-semibold text-white tabular">

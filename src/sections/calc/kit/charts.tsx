@@ -33,7 +33,7 @@ const PAD = { l: 60, r: 10, t: 10, b: 26 };
 
 function Legend({ items }: { items: { label: string; tone: Tone; dashed?: boolean }[] }) {
   return (
-    <ul className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-[13px] text-fg-2">
+    <ul className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-[0.8125rem] text-fg-2">
       {items.map((s) => (
         <li key={s.label} className="inline-flex items-center gap-1.5">
           <span
@@ -113,7 +113,7 @@ export function LineChart({
         {yt.values.map((v) => (
           <div
             key={`y${v}`}
-            className="tabular absolute left-0 -translate-y-1/2 truncate pr-2 text-right text-[11px] text-fg-3"
+            className="tabular absolute left-0 -translate-y-1/2 truncate pr-2 text-right text-[0.6875rem] text-fg-3"
             style={{ top: `calc(${PAD.t}px + (100% - ${PAD.t + PAD.b}px) * ${1 - fy(v)})`, width: PAD.l }}
           >
             {yFormat(v)}
@@ -122,7 +122,7 @@ export function LineChart({
         {xt.map((i) => (
           <div
             key={`x${i}`}
-            className="tabular absolute bottom-0 -translate-x-1/2 whitespace-nowrap text-[11px] text-fg-3"
+            className="tabular absolute bottom-0 -translate-x-1/2 whitespace-nowrap text-[0.6875rem] text-fg-3"
             style={{ left: `calc(${PAD.l}px + (100% - ${PAD.l + PAD.r}px) * ${fx(x[i])})` }}
           >
             {xFormat(x[i])}
@@ -180,7 +180,7 @@ export function LineChart({
           </svg>
           {h !== null && (
             <div
-              className="pointer-events-none absolute top-1 z-[2] min-w-36 rounded-[8px] border border-line bg-surface px-2.5 py-1.5 text-[12px] shadow-[var(--shadow-overlay)]"
+              className="pointer-events-none absolute top-1 z-[2] min-w-36 rounded-[0.5rem] border border-line bg-surface px-2.5 py-1.5 text-[0.75rem] shadow-[var(--shadow-overlay)]"
               style={fx(x[h]) > 0.55 ? { right: `${(1 - fx(x[h])) * 100}%`, marginRight: 8 } : { left: `${fx(x[h]) * 100}%`, marginLeft: 8 }}
             >
               <div className="font-semibold text-fg">{xFormat(x[h])}</div>
@@ -236,7 +236,7 @@ export function BarChart({
         {yt.values.map((v) => (
           <div
             key={`y${v}`}
-            className="tabular absolute left-0 -translate-y-1/2 truncate pr-2 text-right text-[11px] text-fg-3"
+            className="tabular absolute left-0 -translate-y-1/2 truncate pr-2 text-right text-[0.6875rem] text-fg-3"
             style={{ top: `calc(${PAD.t}px + (100% - ${PAD.t + PAD.b}px) * ${1 - fy(v)})`, width: PAD.l }}
           >
             {yFormat(v)}
@@ -246,7 +246,7 @@ export function BarChart({
           i % step === 0 ? (
             <div
               key={`x${i}`}
-              className="tabular absolute bottom-0 -translate-x-1/2 whitespace-nowrap text-[11px] text-fg-3"
+              className="tabular absolute bottom-0 -translate-x-1/2 whitespace-nowrap text-[0.6875rem] text-fg-3"
               style={{ left: `calc(${PAD.l}px + (100% - ${PAD.l + PAD.r}px) * ${(i + 0.5) / n})` }}
             >
               {l}
@@ -280,7 +280,7 @@ export function BarChart({
           </svg>
           {hover !== null && (
             <div
-              className="pointer-events-none absolute top-1 z-[2] min-w-36 rounded-[8px] border border-line bg-surface px-2.5 py-1.5 text-[12px] shadow-[var(--shadow-overlay)]"
+              className="pointer-events-none absolute top-1 z-[2] min-w-36 rounded-[0.5rem] border border-line bg-surface px-2.5 py-1.5 text-[0.75rem] shadow-[var(--shadow-overlay)]"
               style={(hover + 0.5) / n > 0.55 ? { right: `${(1 - hover / n) * 100}%`, marginRight: 4 } : { left: `${((hover + 1) / n) * 100}%`, marginLeft: 4 }}
             >
               <div className="font-semibold text-fg">{labels[hover]}</div>
@@ -390,7 +390,7 @@ export function ScaleBar({
       <div className="relative pt-5">
         {value !== null && Number.isFinite(value) && (
           <div className="absolute top-0 -translate-x-1/2" style={{ left: `${f(value) * 100}%` }} aria-hidden>
-            <div className="tabular -mt-0.5 whitespace-nowrap text-center text-[12px] font-semibold text-fg">{format(value)}</div>
+            <div className="tabular -mt-0.5 whitespace-nowrap text-center text-[0.75rem] font-semibold text-fg">{format(value)}</div>
           </div>
         )}
         <div className="flex h-3 overflow-hidden rounded-full">
@@ -402,17 +402,17 @@ export function ScaleBar({
           ))}
         </div>
         {value !== null && Number.isFinite(value) && (
-          <div className="absolute top-[18px] h-4 w-1 -translate-x-1/2 rounded-full border border-surface bg-fg" style={{ left: `${f(value) * 100}%` }} aria-hidden />
+          <div className="absolute top-[1.125rem] h-4 w-1 -translate-x-1/2 rounded-full border border-surface bg-fg" style={{ left: `${f(value) * 100}%` }} aria-hidden />
         )}
       </div>
-      <div className="relative mt-1.5 h-4 text-[11px] text-fg-3" aria-hidden>
+      <div className="relative mt-1.5 h-4 text-[0.6875rem] text-fg-3" aria-hidden>
         {segs.slice(0, -1).map((s) => (
           <span key={s.label} className="tabular absolute -translate-x-1/2" style={{ left: `${f(s.to) * 100}%` }}>
             {format(s.to)}
           </span>
         ))}
       </div>
-      <ul className="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-[12px] text-fg-2">
+      <ul className="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-[0.75rem] text-fg-2">
         {segs.map((s) => (
           <li key={s.label} className="inline-flex items-center gap-1.5">
             <span

@@ -112,7 +112,7 @@ export default function MetaTagGenerator({ locale }: { locale: Locale }) {
 
   return (
     <div className="flex flex-col gap-5">
-      <div className={cn("w-full rounded-[12px] border border-line bg-surface p-4 sm:p-5", device === "mobile" ? "mx-auto max-w-[400px]" : "max-w-[652px]")}>
+      <div className={cn("w-full rounded-[0.75rem] border border-line bg-surface p-4 sm:p-5", device === "mobile" ? "mx-auto max-w-[25rem]" : "max-w-[40.75rem]")}>
         <div className="flex items-center gap-2.5">
           <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-surface-2 text-xs font-semibold text-fg-2" aria-hidden>
             {crumb.site.slice(0, 1).toUpperCase()}
@@ -126,7 +126,7 @@ export default function MetaTagGenerator({ locale }: { locale: Locale }) {
           </div>
         </div>
         <div className={cn("mt-2 text-xl leading-snug break-words [font-family:Arial,sans-serif]", title.trim() ? "text-accent" : "text-fg-3")}>{tt.text}</div>
-        <p className={cn("mt-1 text-sm leading-[22px] [font-family:Arial,sans-serif]", desc.trim() ? "text-fg-2" : "text-fg-3")}>{dd.text}</p>
+        <p className={cn("mt-1 text-sm leading-[1.375rem] [font-family:Arial,sans-serif]", desc.trim() ? "text-fg-2" : "text-fg-3")}>{dd.text}</p>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
@@ -134,10 +134,10 @@ export default function MetaTagGenerator({ locale }: { locale: Locale }) {
         <Meter label={t.descW} value={descW} max={LIMITS.desktop.description} unit={t.px} />
       </div>
 
-      <Field label={t.title} htmlFor={`${id}-t`} aside={<span className="text-[13px] text-fg-3 tabular-nums">{t.chars(title.trim().length)}</span>}>
+      <Field label={t.title} htmlFor={`${id}-t`} aside={<span className="text-[0.8125rem] text-fg-3 tabular-nums">{t.chars(title.trim().length)}</span>}>
         <Input id={`${id}-t`} value={title} onChange={(e) => setTitle(e.target.value)} size="lg" autoComplete="off" />
       </Field>
-      <Field label={t.desc} htmlFor={`${id}-d`} aside={<span className="text-[13px] text-fg-3 tabular-nums">{t.chars(desc.trim().length)}</span>}>
+      <Field label={t.desc} htmlFor={`${id}-d`} aside={<span className="text-[0.8125rem] text-fg-3 tabular-nums">{t.chars(desc.trim().length)}</span>}>
         <Textarea id={`${id}-d`} value={desc} onChange={(e) => setDesc(e.target.value)} rows={3} />
       </Field>
 

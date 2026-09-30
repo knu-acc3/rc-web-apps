@@ -96,7 +96,7 @@ export default function ColorMixer({ locale, a: a0 = "#808080", b: b0 = "#0000FF
               {SPACES.filter((s) => s !== space).map((s) => (
                 <div key={s} className="grid grid-cols-[6.5rem_minmax(0,1fr)] items-center gap-3">
                   <span className="text-sm text-fg-3">{SPACE_LABEL[s]}</span>
-                  <div className={cn("flex h-7 overflow-hidden rounded-[8px] border border-line")} aria-hidden>
+                  <div className={cn("flex h-7 overflow-hidden rounded-[0.5rem] border border-line")} aria-hidden>
                     {mixSteps(a!, b!, steps, s).map((c, i) => (
                       <span key={i} className="flex-1" style={{ background: toHex(c) }} />
                     ))}

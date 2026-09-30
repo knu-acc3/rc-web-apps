@@ -66,11 +66,11 @@ function FileRow({
   return (
     <li className="px-3 py-2.5 sm:px-4">
       <div className="flex items-center gap-3">
-        <span className="flex size-9 shrink-0 items-center justify-center rounded-[8px] bg-err-soft text-err" aria-hidden>
+        <span className="flex size-9 shrink-0 items-center justify-center rounded-[0.5rem] bg-err-soft text-err" aria-hidden>
           {file.status === "loading" ? <Loader2 className="size-4 animate-spin" /> : <FileText className="size-4" />}
         </span>
         <div className="min-w-0 flex-1">
-          <p className="truncate text-[15px] font-medium text-fg" title={file.name}>
+          <p className="truncate text-[0.9375rem] font-medium text-fg" title={file.name}>
             {reorder && <span className="tabular mr-1.5 text-fg-3">{index + 1}.</span>}
             {file.name}
           </p>

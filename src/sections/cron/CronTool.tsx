@@ -215,13 +215,13 @@ export default function CronTool({ locale, expr: expr0 = "*/5 * * * *", dialect:
               {t.none}
             </Notice>
           ) : (
-            <ol className="mt-3 grid gap-x-6 gap-y-1 font-mono text-[14px] sm:grid-cols-2">
+            <ol className="mt-3 grid gap-x-6 gap-y-1 font-mono text-[0.875rem] sm:grid-cols-2">
               {runs.map((r, i) => (
                 <li key={r.ms} className="flex gap-3">
                   <span className="w-6 shrink-0 text-right text-fg-3">{i + 1}</span>
                   <span className="text-fg">
                     {dateFmt.format(r.ms)}
-                    {(r.gap || r.overlap) && <span className="ml-2 font-sans text-[12px] text-warn">{r.gap ? t.gap : t.overlap}</span>}
+                    {(r.gap || r.overlap) && <span className="ml-2 font-sans text-[0.75rem] text-warn">{r.gap ? t.gap : t.overlap}</span>}
                   </span>
                 </li>
               ))}

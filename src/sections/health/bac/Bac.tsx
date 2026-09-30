@@ -131,7 +131,7 @@ export default function Bac({ locale }: ToolProps) {
             </li>
           ))}
         </ul>
-        <p className="mt-1 text-[12px] text-fg-3">
+        <p className="mt-1 text-[0.75rem] text-fg-3">
           {t.ml} · {t.abv} · {t.count}
         </p>
         <div className="mt-2 flex items-center gap-2">

@@ -56,7 +56,7 @@ export function FilePicker({
   return (
     <Panel className="flex flex-col gap-3 p-4">
       <div className="flex flex-wrap items-center gap-3">
-        <span className="flex size-10 shrink-0 items-center justify-center rounded-[10px] bg-accent-soft text-accent">
+        <span className="flex size-10 shrink-0 items-center justify-center rounded-[0.625rem] bg-accent-soft text-accent">
           <Icon className="size-5" aria-hidden />
         </span>
         <div className="min-w-0 flex-1">

@@ -77,7 +77,7 @@ export function ImageStage({
     <div className={cn("flex flex-col", className)}>
       <div
         ref={boxRef}
-        className={cn("overflow-auto rounded-[10px] border border-line p-3", checker)}
+        className={cn("overflow-auto rounded-[0.625rem] border border-line p-3", checker)}
         style={{ maxHeight: zoom > 1 ? `${maxHeightVh}vh` : undefined }}
       >
         <div className="relative mx-auto" style={{ width: cssW || undefined, height: cssH || undefined }}>

@@ -49,7 +49,7 @@ export default function Weekday({ locale }: { locale: Locale }) {
       {years.length > 0 && (
         <section>
           <h2 className="mb-2 text-sm font-semibold text-fg">{t.other}</h2>
-          <ul className="grid gap-x-6 gap-y-1 text-[15px] text-fg-2 sm:grid-cols-2">
+          <ul className="grid gap-x-6 gap-y-1 text-[0.9375rem] text-fg-2 sm:grid-cols-2">
             {years.map((y) => (
               <li key={y.y}>
                 <span className="tabular text-fg">{fmtDate(locale, y)}</span> — {names[weekdayOf(y) - 1]}

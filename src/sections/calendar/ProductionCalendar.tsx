@@ -58,7 +58,7 @@ export default function ProductionCalendar({ locale, country, year, others }: Pr
         <Stat label={t.off} value={formatNumber(locale, norm.offDays)} />
         <Stat label={t.hours} value={formatNumber(locale, norm.hours40)} />
       </div>
-      <div className="grid gap-x-6 gap-y-5 rounded-[12px] border border-line bg-surface p-4 sm:grid-cols-2 sm:p-5 lg:grid-cols-3 xl:grid-cols-4 print:grid-cols-3 print:border-0 print:p-0">
+      <div className="grid gap-x-6 gap-y-5 rounded-[0.75rem] border border-line bg-surface p-4 sm:grid-cols-2 sm:p-5 lg:grid-cols-3 xl:grid-cols-4 print:grid-cols-3 print:border-0 print:p-0">
         {MONTHS.map((m) => (
           <MonthGrid key={m} locale={locale} year={year} month={m} mark={mark} today={today} />
         ))}

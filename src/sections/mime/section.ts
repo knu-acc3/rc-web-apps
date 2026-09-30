@@ -142,7 +142,7 @@ function detectPage(l: Locale): PageModel {
     path: [ID, DETECT],
     sectionId: ID,
     kind: "tool",
-    title: ru ? "Определить тип файла по содержимому онлайн" : "File Type Checker — Detect Format by Magic Bytes",
+    title: ru ? "Определить тип файла по содержимому | MIME-тип онлайн" : "File Type Checker — Detect Format by Magic Bytes",
     h1: ru ? "Определить тип файла по содержимому" : "Detect file type by content",
     description: ru
       ? "Узнайте настоящий формат файла по сигнатуре: PNG, JPEG, PDF, DOCX, ZIP, MP4, HEIC и ещё 100+ форматов. Проверка в браузере, файл никуда не загружается."
@@ -313,7 +313,7 @@ function extPage(e: MimeEntry, l: Locale): PageModel {
   const shortName = name.replace(/\s*\([^)]*\)$/, "");
   const title = ru
     ? fit([`MIME-тип .${e.ext} — ${type}`, `MIME-тип .${e.ext} (${lower1(shortName)}) — Content-Type`, `MIME-тип .${e.ext}: Content-Type и настройка`])
-    : fit([`.${e.ext} MIME Type — ${type}`, `.${e.ext} MIME Type (${shortName}) — Content-Type`, `.${e.ext} MIME Type and Content-Type`]);
+    : fit([`.${e.ext} MIME Type — ${type}`, `.${e.ext} MIME Type (${shortName}) — Content-Type`, `.${e.ext} MIME Type | Content-Type`]);
   const base = ru ? `MIME-тип .${e.ext} — ${type}. ${leadText(e.d[0])}` : `The .${e.ext} MIME type is ${type}. ${leadText(e.d[1])}`;
   const sig = e.magic.length > 0;
   const description = describe(

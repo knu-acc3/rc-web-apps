@@ -59,7 +59,7 @@ export default function UserAgentInfo({ locale }: ToolProps) {
           {u ? u.ua || "—" : <span className="font-sans text-fg-3">{c.detecting}</span>}
         </p>
         <noscript>
-          <p className="mt-4 rounded-[10px] bg-warn-soft px-4 py-3 text-sm text-warn">{c.noscript}</p>
+          <p className="mt-4 rounded-[0.625rem] bg-warn-soft px-4 py-3 text-sm text-warn">{c.noscript}</p>
         </noscript>
       </Panel>
       <Facts
@@ -78,7 +78,7 @@ export default function UserAgentInfo({ locale }: ToolProps) {
       {u?.hintsRaw ? (
         <details className="group">
           <summary className="cursor-pointer text-sm font-semibold text-fg-2 hover:text-fg">{t.hints}</summary>
-          <pre className="mt-2 overflow-x-auto rounded-[10px] bg-surface-2 px-4 py-3 font-mono text-[13px] leading-relaxed text-fg">
+          <pre className="mt-2 overflow-x-auto rounded-[0.625rem] bg-surface-2 px-4 py-3 font-mono text-[0.8125rem] leading-relaxed text-fg">
             {JSON.stringify(u.hintsRaw, null, 2)}
           </pre>
         </details>

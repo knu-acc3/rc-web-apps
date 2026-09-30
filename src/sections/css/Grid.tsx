@@ -114,7 +114,7 @@ export default function GridGenerator({ locale, recipe }: { locale: Locale; reci
   return (
     <div className="flex flex-col gap-4">
       <Stage locale={locale} minHeight={280} switcher={false} className="[&>div]:items-stretch [&>div]:p-3!">
-        <div style={container} className="rounded-[10px] border-2 border-dashed border-zinc-300 bg-white p-2">
+        <div style={container} className="rounded-[0.625rem] border-2 border-dashed border-zinc-300 bg-white p-2">
           {s.items.map((it, i) => (
             <button
               key={it.id}
@@ -122,7 +122,7 @@ export default function GridGenerator({ locale, recipe }: { locale: Locale; reci
               onClick={() => setSel(it.id)}
               aria-pressed={it.id === sel}
               aria-label={t.item(i + 1)}
-              className={cn("min-h-12 min-w-0 rounded-[8px] px-3 py-2 text-left text-sm font-medium break-words text-white", it.id === sel && "ring-3 ring-zinc-900 ring-offset-2")}
+              className={cn("min-h-12 min-w-0 rounded-[0.5rem] px-3 py-2 text-left text-sm font-medium break-words text-white", it.id === sel && "ring-3 ring-zinc-900 ring-offset-2")}
               style={{ background: COLORS[i % COLORS.length], ...itemStyle(it) }}
             >
               {it.label}
@@ -134,7 +134,7 @@ export default function GridGenerator({ locale, recipe }: { locale: Locale; reci
       <div className="grid gap-4 lg:grid-cols-2">
         <Panel className="flex flex-col gap-3 p-4">
           <h2 className="text-sm font-semibold text-fg">{t.container}</h2>
-          <Field label={<code className="text-[13px]">{t.columns}</code>} htmlFor={`${id}-c`}>
+          <Field label={<code className="text-[0.8125rem]">{t.columns}</code>} htmlFor={`${id}-c`}>
             <Input id={`${id}-c`} value={s.columns} onChange={(e) => set({ columns: e.target.value })} list={`${id}-cl`} className="font-mono" size="sm" autoComplete="off" />
             <datalist id={`${id}-cl`}>
               {COLUMN_PRESETS.map((p) => (
@@ -142,7 +142,7 @@ export default function GridGenerator({ locale, recipe }: { locale: Locale; reci
               ))}
             </datalist>
           </Field>
-          <Field label={<code className="text-[13px]">{t.rows}</code>} htmlFor={`${id}-r`}>
+          <Field label={<code className="text-[0.8125rem]">{t.rows}</code>} htmlFor={`${id}-r`}>
             <Input id={`${id}-r`} value={s.rows} onChange={(e) => set({ rows: e.target.value })} className="font-mono" size="sm" placeholder="auto 1fr auto" autoComplete="off" />
           </Field>
           <Field label={t.areas} htmlFor={`${id}-ar`} error={areasError ?? undefined}>
@@ -161,14 +161,14 @@ export default function GridGenerator({ locale, recipe }: { locale: Locale; reci
           </Field>
           <NumberSlider label={t.gap} value={s.gap} min={0} max={64} onChange={(v) => set({ gap: Math.max(0, v) })} unit="px" />
           <div className="grid grid-cols-2 gap-3">
-            <Field label={<code className="text-[13px]">{t.justify}</code>} htmlFor={`${id}-ji`}>
+            <Field label={<code className="text-[0.8125rem]">{t.justify}</code>} htmlFor={`${id}-ji`}>
               <Select id={`${id}-ji`} value={s.justifyItems} onChange={(e) => set({ justifyItems: e.target.value as GridState["justifyItems"] })} size="sm">
                 {["stretch", "start", "end", "center"].map((x) => (
                   <option key={x}>{x}</option>
                 ))}
               </Select>
             </Field>
-            <Field label={<code className="text-[13px]">{t.align}</code>} htmlFor={`${id}-ai`}>
+            <Field label={<code className="text-[0.8125rem]">{t.align}</code>} htmlFor={`${id}-ai`}>
               <Select id={`${id}-ai`} value={s.alignItems} onChange={(e) => set({ alignItems: e.target.value as GridState["alignItems"] })} size="sm">
                 {["stretch", "start", "end", "center"].map((x) => (
                   <option key={x}>{x}</option>
@@ -217,7 +217,7 @@ export default function GridGenerator({ locale, recipe }: { locale: Locale; reci
                 <Input id={`${id}-l`} value={item.label} onChange={(e) => setItem({ label: e.target.value })} size="sm" />
               </Field>
               {names.length > 0 && (
-                <Field label={<code className="text-[13px]">{t.area}</code>} htmlFor={`${id}-ga`}>
+                <Field label={<code className="text-[0.8125rem]">{t.area}</code>} htmlFor={`${id}-ga`}>
                   <Select id={`${id}-ga`} value={item.area} onChange={(e) => setItem({ area: e.target.value })} size="sm">
                     <option value="">{t.none}</option>
                     {names.map((n) => (
@@ -229,10 +229,10 @@ export default function GridGenerator({ locale, recipe }: { locale: Locale; reci
                 </Field>
               )}
               <div className="grid grid-cols-2 gap-3">
-                <Field label={<code className="text-[13px]">{t.column}</code>} htmlFor={`${id}-gc`}>
+                <Field label={<code className="text-[0.8125rem]">{t.column}</code>} htmlFor={`${id}-gc`}>
                   <Input id={`${id}-gc`} value={item.column} onChange={(e) => setItem({ column: e.target.value })} placeholder="span 2" className="font-mono" size="sm" disabled={!!item.area && names.includes(item.area)} />
                 </Field>
-                <Field label={<code className="text-[13px]">{t.row}</code>} htmlFor={`${id}-gr`}>
+                <Field label={<code className="text-[0.8125rem]">{t.row}</code>} htmlFor={`${id}-gr`}>
                   <Input id={`${id}-gr`} value={item.row} onChange={(e) => setItem({ row: e.target.value })} placeholder="1 / 3" className="font-mono" size="sm" disabled={!!item.area && names.includes(item.area)} />
                 </Field>
               </div>

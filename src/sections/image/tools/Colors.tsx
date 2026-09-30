@@ -124,7 +124,7 @@ export default function Colors({ locale }: { locale: Locale }) {
   if (!p) {
     return (
       <div className="flex flex-col gap-3">
-        <Dropzone onFiles={(f) => f[0] && file.load(f[0])} accept={IMAGE_ACCEPT} title={s.dropOne} hint={s.dropHint} className="min-h-64" />
+        <Dropzone onFiles={(f) => f[0] && file.load(f[0])} accept={IMAGE_ACCEPT} title={s.dropOne} hint={s.dropHint} />
         {file.error ? <Notice tone="err">{errorText(locale, file.error)}</Notice> : null}
       </div>
     );
@@ -154,8 +154,8 @@ export default function Colors({ locale }: { locale: Locale }) {
   return (
     <div className="flex flex-col gap-4">
       <Panel className="overflow-hidden">
-        <div className="grid gap-4 p-3 sm:p-4 md:grid-cols-[minmax(0,1fr)_260px]">
-          <div className={cn("relative flex min-h-56 items-center justify-center overflow-hidden rounded-[10px] border border-line", checker)}>
+        <div className="grid gap-4 p-3 sm:p-4 md:grid-cols-[minmax(0,1fr)_16.25rem]">
+          <div className={cn("relative flex min-h-56 items-center justify-center overflow-hidden rounded-[0.625rem] border border-line", checker)}>
             {!px && <Loader2 className="size-6 animate-spin text-accent" aria-hidden />}
             <div className={cn("relative", !px && "hidden")}>
               <canvas
@@ -204,7 +204,7 @@ export default function Colors({ locale }: { locale: Locale }) {
             <p className="text-sm font-medium text-fg-2">{t.picked}</p>
             {picked ? (
               <>
-                <div className="h-24 rounded-[10px] border border-line" style={{ background: picked.hex }} />
+                <div className="h-24 rounded-[0.625rem] border border-line" style={{ background: picked.hex }} />
                 <p className="tabular text-3xl font-semibold tracking-tight text-fg">{picked.hex}</p>
                 <ul className="flex flex-col gap-1 text-sm">
                   {[picked.hex, picked.rgb, picked.hsl].map((v) => (
@@ -218,7 +218,7 @@ export default function Colors({ locale }: { locale: Locale }) {
             ) : (
               <p className="text-sm text-fg-3">—</p>
             )}
-            <p className="text-[13px] text-fg-3">{t.pickHint}</p>
+            <p className="text-[0.8125rem] text-fg-3">{t.pickHint}</p>
           </div>
         </div>
       </Panel>
@@ -248,7 +248,7 @@ export default function Colors({ locale }: { locale: Locale }) {
                     }}
                     aria-label={t.copyHex(hex)}
                     className={cn(
-                      "flex h-20 w-24 flex-col justify-end rounded-[10px] border border-line p-2 text-left text-xs font-medium",
+                      "flex h-20 w-24 flex-col justify-end rounded-[0.625rem] border border-line p-2 text-left text-xs font-medium",
                       dark ? "text-white" : "text-black",
                     )}
                     style={{ background: hex }}

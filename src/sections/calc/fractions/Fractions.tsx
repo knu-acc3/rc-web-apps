@@ -174,7 +174,7 @@ export default function Fractions({ locale, mode = "calc" }: ToolProps<{ mode?: 
             ]}
           />
         </div>
-        <p className="text-[13px] text-fg-3">{t.hint}</p>
+        <p className="text-[0.8125rem] text-fg-3">{t.hint}</p>
       </>
     ) : m === "simplify" ? (
       <NumField id={`${id}-s`} label={t.frac} hint={t.hint} value={q.v.s} onChange={(s) => q.set({ s })} inputMode="text" error={bad(q.v.s, S)} size="lg" />

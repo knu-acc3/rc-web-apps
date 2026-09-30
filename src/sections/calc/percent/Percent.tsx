@@ -250,7 +250,7 @@ export default function Percent({ locale, mode: mode0 = "x-percent-of-y" }: Tool
                 </ToolActions>
               }
             >
-              {formula && <code className="tabular mt-3 inline-block rounded-[6px] bg-surface px-2 py-1 text-sm text-fg-2">{formula}</code>}
+              {formula && <code className="tabular mt-3 inline-block rounded-[0.375rem] bg-surface px-2 py-1 text-sm text-fg-2">{formula}</code>}
             </ResultMain>
           }
         />

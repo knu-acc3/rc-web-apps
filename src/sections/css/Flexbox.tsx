@@ -59,7 +59,7 @@ const COLORS = ["#6366f1", "#ec4899", "#f59e0b", "#10b981", "#0ea5e9", "#8b5cf6"
 
 function Choice<V extends string>({ id, label, value, options, onChange }: { id: string; label: string; value: V; options: readonly V[]; onChange: (v: V) => void }) {
   return (
-    <Field label={<code className="text-[13px]">{label}</code>} htmlFor={id}>
+    <Field label={<code className="text-[0.8125rem]">{label}</code>} htmlFor={id}>
       <Select id={id} value={value} onChange={(e) => onChange(e.target.value as V)} size="sm">
         {options.map((o) => (
           <option key={o} value={o}>
@@ -97,7 +97,7 @@ export default function FlexboxGenerator({ locale, recipe }: { locale: Locale; r
   return (
     <div className="flex flex-col gap-4">
       <Stage locale={locale} minHeight={260} switcher={false} className="[&>div]:items-stretch [&>div]:p-3!">
-        <div style={container} className="rounded-[10px] border-2 border-dashed border-zinc-300 bg-white p-2">
+        <div style={container} className="rounded-[0.625rem] border-2 border-dashed border-zinc-300 bg-white p-2">
           {s.items.map((it, i) => (
             <button
               key={it.id}
@@ -105,7 +105,7 @@ export default function FlexboxGenerator({ locale, recipe }: { locale: Locale; r
               onClick={() => setSel(it.id)}
               aria-pressed={it.id === sel}
               aria-label={t.item(i + 1)}
-              className={cn("min-h-12 min-w-12 rounded-[8px] px-3 py-2 text-left text-sm font-medium text-white", it.id === sel && "ring-3 ring-zinc-900 ring-offset-2")}
+              className={cn("min-h-12 min-w-12 rounded-[0.5rem] px-3 py-2 text-left text-sm font-medium text-white", it.id === sel && "ring-3 ring-zinc-900 ring-offset-2")}
               style={{
                 background: COLORS[i % COLORS.length],
                 flexGrow: it.grow,
@@ -176,18 +176,18 @@ export default function FlexboxGenerator({ locale, recipe }: { locale: Locale; r
                 <Input id={`${id}-l`} value={item.label} onChange={(e) => setItem({ label: e.target.value })} size="sm" />
               </Field>
               <div className="grid grid-cols-3 gap-3">
-                <Field label={<code className="text-[13px]">{t.grow}</code>} htmlFor={`${id}-g`}>
+                <Field label={<code className="text-[0.8125rem]">{t.grow}</code>} htmlFor={`${id}-g`}>
                   <Input id={`${id}-g`} type="number" min={0} value={item.grow} onChange={(e) => setItem({ grow: Math.max(0, Number(e.target.value) || 0) })} size="sm" />
                 </Field>
-                <Field label={<code className="text-[13px]">{t.shrink}</code>} htmlFor={`${id}-s`}>
+                <Field label={<code className="text-[0.8125rem]">{t.shrink}</code>} htmlFor={`${id}-s`}>
                   <Input id={`${id}-s`} type="number" min={0} value={item.shrink} onChange={(e) => setItem({ shrink: Math.max(0, Number(e.target.value) || 0) })} size="sm" />
                 </Field>
-                <Field label={<code className="text-[13px]">{t.order}</code>} htmlFor={`${id}-o`}>
+                <Field label={<code className="text-[0.8125rem]">{t.order}</code>} htmlFor={`${id}-o`}>
                   <Input id={`${id}-o`} type="number" value={item.order} onChange={(e) => setItem({ order: Number(e.target.value) || 0 })} size="sm" />
                 </Field>
               </div>
               <div className="grid grid-cols-2 gap-3">
-                <Field label={<code className="text-[13px]">{t.basis}</code>} htmlFor={`${id}-b`}>
+                <Field label={<code className="text-[0.8125rem]">{t.basis}</code>} htmlFor={`${id}-b`}>
                   <Input id={`${id}-b`} value={item.basis} onChange={(e) => setItem({ basis: e.target.value.trim() || "auto" })} size="sm" className="font-mono" />
                 </Field>
                 <Choice id={`${id}-as`} label={t.alignSelf} value={item.alignSelf} options={["auto", "flex-start", "flex-end", "center", "stretch", "baseline"] as const} onChange={(v) => setItem({ alignSelf: v })} />

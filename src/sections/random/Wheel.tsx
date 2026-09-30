@@ -257,7 +257,7 @@ export default function Wheel({ locale, preset, entries: presetEntries, colors }
   return (
     <div className="grid gap-4 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)]">
       <Panel className="flex flex-col items-center gap-4 p-4 sm:p-5">
-        <div className="relative mt-3 aspect-square w-full max-w-[440px]">
+        <div className="relative mt-3 aspect-square w-full max-w-[27.5rem]">
           <WheelPointer />
           {/* The wheel surface is a mouse shortcut; the button below is the accessible control. */}
           {/* Clip the rotating square so its corners never create page overflow. */}
@@ -270,8 +270,8 @@ export default function Wheel({ locale, preset, entries: presetEntries, colors }
         <Button variant="primary" size="lg" onClick={spin} disabled={spinning || entries.length < 2} className="w-full sm:w-auto sm:min-w-60">
           {spinning ? t.spinning : t.spin}
         </Button>
-        <div className="flex min-h-[84px] w-full flex-col items-center justify-center gap-1 rounded-[10px] bg-surface-2 px-4 py-3 text-center">
-          <div className="text-[13px] font-medium text-fg-2">{t.result}</div>
+        <div className="flex min-h-[5.25rem] w-full flex-col items-center justify-center gap-1 rounded-[0.625rem] bg-surface-2 px-4 py-3 text-center">
+          <div className="text-[0.8125rem] font-medium text-fg-2">{t.result}</div>
           <div aria-live="polite" className="min-h-8 text-2xl font-semibold break-words text-fg">
             {result && !spinning ? result.label : ""}
           </div>
@@ -294,7 +294,7 @@ export default function Wheel({ locale, preset, entries: presetEntries, colors }
           <Field
             label={t.entries}
             htmlFor={`${id}-list`}
-            aside={<span className="tabular text-[13px] text-fg-3">{count(locale, entries.length, t.entryForms)}</span>}
+            aside={<span className="tabular text-[0.8125rem] text-fg-3">{count(locale, entries.length, t.entryForms)}</span>}
             hint={`${t.limit}. ${t.saved}`}
           >
             <Textarea
@@ -303,7 +303,7 @@ export default function Wheel({ locale, preset, entries: presetEntries, colors }
               readOnly={spinning}
               rows={8}
               onChange={(e) => onText(e.target.value)}
-              className="font-sans! text-[15px]!"
+              className="font-sans! text-[0.9375rem]!"
             />
           </Field>
           <Switch label={t.autoRemove} checked={autoRemove} onChange={(e) => setAutoRemove(e.target.checked)} />

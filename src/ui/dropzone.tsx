@@ -92,20 +92,20 @@ export function Dropzone({
         emit(e.dataTransfer.files);
       }}
       className={cn(
-        "flex w-full cursor-pointer flex-col items-center justify-center gap-2 rounded-[12px] border-2 border-dashed text-center transition-colors duration-150",
-        compact ? "min-h-24 px-4 py-4" : "min-h-44 px-6 py-8",
-        over ? "border-accent bg-accent-soft" : "border-line-strong bg-surface hover:border-accent hover:bg-surface-2",
+        "flex w-full cursor-pointer flex-col items-center justify-center gap-2.5 rounded-[0.875rem] border-2 border-dashed text-center transition-colors duration-150",
+        compact ? "min-h-24 px-4 py-4" : "min-h-40 px-5 py-7",
+        over ? "border-accent bg-accent-soft" : "border-line-strong bg-surface hover:border-accent",
         disabled && "pointer-events-none opacity-60",
         className,
       )}
     >
-      <span className="flex size-11 items-center justify-center rounded-full bg-accent-soft text-accent">
-        <Upload className="size-5" aria-hidden />
+      <span className={cn("flex items-center justify-center rounded-full bg-accent text-accent-fg", compact ? "size-9" : "size-12")}>
+        <Upload className={compact ? "size-4" : "size-5"} aria-hidden />
       </span>
-      <span id={`${id}-title`} className="text-[15px] font-medium text-fg">
+      <span id={`${id}-title`} className={cn("font-semibold text-fg", compact ? "text-[0.9375rem]" : "text-base")}>
         {title}
       </span>
-      {hint && <span className="text-sm text-fg-3">{hint}</span>}
+      {hint && <span className="max-w-md text-sm text-fg-3">{hint}</span>}
       {children}
       {/* Hidden (not sr-only): the zone itself is the control; .click() still opens the picker. */}
       <input

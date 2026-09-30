@@ -34,7 +34,7 @@ export default function UtcNow({ locale }: NowProps) {
     <div className="flex flex-col gap-4">
       <Panel className="flex flex-col items-center gap-3 px-4 py-8 text-center sm:py-12">
         <p className="text-sm font-semibold tracking-wide text-fg-3">UTC</p>
-        <BigTime parts={u} className="text-[60px] sm:text-[104px]" />
+        <BigTime parts={u} className="text-[3.75rem] sm:text-[6.5rem]" />
         <p className="min-h-7 text-lg text-fg-2 sm:text-xl">{u ? longDate(locale, u) : " "}</p>
       </Panel>
       <Panel>
@@ -43,7 +43,7 @@ export default function UtcNow({ locale }: NowProps) {
             <li key={k} className="flex min-h-12 items-center justify-between gap-3 px-4 py-2">
               <span className="text-sm text-fg-3">{k}</span>
               <span className="flex min-w-0 items-center gap-2">
-                <span className="tabular truncate font-mono text-[15px] text-fg">{v || "—"}</span>
+                <span className="tabular truncate font-mono text-[0.9375rem] text-fg">{v || "—"}</span>
                 {copy !== undefined && <CopyButton value={copy} label={t.copy} copiedLabel={t.copied} showLabel={false} size="icon-sm" variant="ghost" />}
               </span>
             </li>

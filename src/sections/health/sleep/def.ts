@@ -98,6 +98,7 @@ function bedVariant(time: string): VariantDef {
 
 export const sleepTool: ToolDef = {
   slug: "sleep-calculator",
+  seoAlt: { ru: ["калькулятор сна по циклам", "калькулятор сна", "сон по циклам"], en: ["sleep cycle calculator", "sleep calculator", "sleep cycles"] },
   component: "health/sleep",
   icon: "BedDouble",
   popular: true,

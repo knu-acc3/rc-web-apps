@@ -60,7 +60,7 @@ function Ball({ n, bonus }: { n: number; bonus?: boolean }) {
   return (
     <span
       className={cn(
-        "tabular inline-flex size-10 items-center justify-center rounded-full text-[15px] font-bold sm:size-11",
+        "tabular inline-flex size-10 items-center justify-center rounded-full text-[0.9375rem] font-bold sm:size-11",
         bonus ? "bg-accent text-accent-fg" : "border-2 border-line-strong bg-surface text-fg",
       )}
     >
@@ -107,7 +107,7 @@ export default function Lottery({ locale, fields: fields0 = [{ pick: 6, of: 45 }
     <div className="flex flex-col gap-4">
       <Panel className="flex flex-col gap-4 p-4 sm:p-5">
         {fixed ? (
-          <p className="text-[15px] text-fg-2">
+          <p className="text-[0.9375rem] text-fg-2">
             {t.format}:{" "}
             <strong className="text-fg">
               {fields.map((f) => `${f.pick} ${locale === "ru" ? "из" : "of"} ${f.of}`).join(" + ")}

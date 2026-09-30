@@ -54,7 +54,7 @@ export function PlaceSearch({ locale, label, onPick, exclude = [], className }: 
         autoComplete="off"
         spellCheck={false}
         placeholder={t.placeholder}
-        className="control h-10 pl-9 text-[15px]"
+        className="control h-10 pl-9 text-[0.9375rem]"
         value={q}
         onFocus={() => {
           ensure();
@@ -88,7 +88,7 @@ export function PlaceSearch({ locale, label, onPick, exclude = [], className }: 
           id={`${id}-list`}
           role="listbox"
           aria-label={label}
-          className="absolute inset-x-0 top-full z-30 mt-1 max-h-80 overflow-auto rounded-[10px] border border-line bg-surface py-1 shadow-[var(--shadow-overlay)]"
+          className="absolute inset-x-0 top-full z-30 mt-1 max-h-80 overflow-auto rounded-[0.625rem] border border-line bg-surface py-1 shadow-[var(--shadow-overlay)]"
         >
           {!list && <li className="px-3 py-2 text-sm text-fg-3">{t.loading}</li>}
           {list && results.length === 0 && <li className="px-3 py-2 text-sm text-fg-3">{t.empty}</li>}
@@ -103,10 +103,10 @@ export function PlaceSearch({ locale, label, onPick, exclude = [], className }: 
                 pick(p);
               }}
               onMouseEnter={() => setActive(i)}
-              className={cn("flex cursor-pointer items-baseline justify-between gap-3 px-3 py-2 text-[15px]", i === active && "bg-surface-2")}
+              className={cn("flex cursor-pointer items-baseline justify-between gap-3 px-3 py-2 text-[0.9375rem]", i === active && "bg-surface-2")}
             >
               <span className="truncate font-medium text-fg">{p.name}</span>
-              <span className="shrink-0 truncate text-[13px] text-fg-3">{p.sub}</span>
+              <span className="shrink-0 truncate text-[0.8125rem] text-fg-3">{p.sub}</span>
             </li>
           ))}
         </ul>

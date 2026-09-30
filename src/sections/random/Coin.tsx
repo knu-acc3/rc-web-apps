@@ -95,7 +95,7 @@ function CoinFace({ label, back }: { label: string; back?: boolean }) {
         color: "#2b2410",
       }}
     >
-      <span className="px-2 text-[clamp(14px,4.2vw,22px)] leading-tight">{label}</span>
+      <span className="px-2 text-[clamp(0.875rem,4.2vw,1.375rem)] leading-tight">{label}</span>
     </div>
   );
 }
@@ -201,8 +201,8 @@ export default function Coin({ locale, coins: coins0 = 1 }: CoinProps) {
           </Button>
         </div>
 
-        <div className="flex min-h-[76px] w-full flex-col items-center justify-center rounded-[10px] bg-surface-2 px-4 py-3 text-center">
-          <div className="text-[13px] font-medium text-fg-2">{t.result}</div>
+        <div className="flex min-h-[4.75rem] w-full flex-col items-center justify-center rounded-[0.625rem] bg-surface-2 px-4 py-3 text-center">
+          <div className="text-[0.8125rem] font-medium text-fg-2">{t.result}</div>
           <div aria-live="polite" className="min-h-8 text-2xl font-semibold text-fg">
             {last ? describe(last) : ""}
           </div>
@@ -232,7 +232,7 @@ export default function Coin({ locale, coins: coins0 = 1 }: CoinProps) {
               [t.current, stats.currentSide === null ? "—" : `${formatNumber(locale, stats.current)} · ${sideName(stats.currentSide)}`],
             ].map(([k, v], i) => (
               <div key={k} className={i === 0 ? "col-span-2 bg-surface px-4 py-2.5" : "bg-surface px-4 py-2.5"}>
-                <dt className="text-[13px] text-fg-3">{k}</dt>
+                <dt className="text-[0.8125rem] text-fg-3">{k}</dt>
                 <dd className="tabular font-semibold text-fg">{v}</dd>
               </div>
             ))}

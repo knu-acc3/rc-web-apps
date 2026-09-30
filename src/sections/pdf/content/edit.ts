@@ -128,6 +128,7 @@ const compressVariants = (): VariantDef[] => [
 
 export const compressTool: ToolDef = {
   slug: "compress-pdf",
+  seoAlt: { ru: ["уменьшить размер PDF-файла", "уменьшить PDF"], en: ["reduce PDF file size", "shrink a PDF"] },
   component: "pdf/compress",
   icon: "Minimize2",
   popular: true,
@@ -239,6 +240,7 @@ const wmVariant = (slug: "confidential" | "draft" | "sample" | "copy"): VariantD
 
 export const watermarkTool: ToolDef = {
   slug: "watermark-pdf",
+  seoAlt: { ru: ["добавить водяной знак в PDF", "штамп на PDF", "штамп"], en: ["add a watermark to a PDF", "stamp a PDF", "stamp"] },
   component: "pdf/watermark",
   icon: "Stamp",
   name: { ru: "Водяной знак на PDF", en: "Watermark PDF" },
@@ -481,6 +483,7 @@ const numberVariants = (): VariantDef[] => [
 
 export const pageNumbersTool: ToolDef = {
   slug: "add-page-numbers-to-pdf",
+  seoAlt: { ru: ["нумерация страниц PDF", "пронумеровать онлайн", "номера страниц"], en: ["PDF page numbering", "number pages online", "page numbers", "numbering"] },
   component: "pdf/page-numbers",
   icon: "ListOrdered",
   name: { ru: "Пронумеровать страницы PDF", en: "Add page numbers to PDF" },
@@ -689,6 +692,7 @@ const nupVariant = (n: 2 | 4 | 6 | 9): VariantDef => {
 
 export const nupTool: ToolDef = {
   slug: "n-up-pdf",
+  seoAlt: { ru: ["печать нескольких страниц на листе", "печать N на листе", "N на листе"], en: ["print several pages per sheet", "N-up printing", "N-up"] },
   component: "pdf/nup",
   icon: "LayoutDashboard",
   name: { ru: "Несколько страниц PDF на листе", en: "N-up PDF (pages per sheet)" },

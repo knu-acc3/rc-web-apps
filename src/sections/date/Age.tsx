@@ -130,7 +130,7 @@ export default function Age({ locale, birthYear }: AgeProps) {
         <div className="mt-6 border-t border-line pt-6">
           <BigResult value={main} sub={sub} />
         </div>
-        {valid && valid.m === 2 && valid.d === 29 && <p className="mt-3 text-center text-[13px] text-fg-3">{t.feb29}</p>}
+        {valid && valid.m === 2 && valid.d === 29 && <p className="mt-3 text-center text-[0.8125rem] text-fg-3">{t.feb29}</p>}
       </Panel>
 
       {rows.length > 0 && (

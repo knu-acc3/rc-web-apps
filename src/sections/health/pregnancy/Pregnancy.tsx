@@ -181,7 +181,7 @@ export default function Pregnancy({ locale, week }: ToolProps<{ week?: number }>
         <section>
           <SubHeading>{t.weekTitle(info.week)}</SubHeading>
           <p className="text-sm font-medium text-fg">{t.size(cm(info.length), info.weight ? g(info.weight) : null)}</p>
-          <ul className="mt-2 max-w-[75ch] list-disc space-y-1 pl-5 text-[15px] text-fg-2">
+          <ul className="mt-2 max-w-[75ch] list-disc space-y-1 pl-5 text-[0.9375rem] text-fg-2">
             {info[locale].map((x) => (
               <li key={x}>{x}</li>
             ))}

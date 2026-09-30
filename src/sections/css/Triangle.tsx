@@ -94,7 +94,7 @@ export default function TriangleGenerator({ locale }: { locale: Locale }) {
                     aria-label={t.dirs[d]}
                     title={t.dirs[d]}
                     onClick={() => setDir(d)}
-                    className={cn("flex size-10 items-center justify-center rounded-[8px] border", dir === d ? "border-accent bg-accent-soft text-accent" : "border-line text-fg-2 hover:bg-surface-2")}
+                    className={cn("flex size-10 items-center justify-center rounded-[0.5rem] border", dir === d ? "border-accent bg-accent-soft text-accent" : "border-line text-fg-2 hover:bg-surface-2")}
                   >
                     {(() => {
                       const Icon = ICON[d];

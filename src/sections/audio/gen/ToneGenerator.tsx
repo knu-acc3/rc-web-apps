@@ -172,7 +172,7 @@ function ToneGeneratorInner({ locale, freq: freq0 = 440 }: { locale: Locale; fre
       <Panel className="flex flex-col gap-5 p-5">
         {mode === "steady" ? (
           <div className="flex flex-col items-center gap-3">
-            <div className="flex items-center gap-2">
+            <div className="flex w-full max-w-sm items-center gap-2">
               <Button variant="outline" size="icon" onClick={() => setF(freq / Math.pow(2, 1 / 12))} aria-label={t.down} title={t.down}>
                 <Minus aria-hidden />
               </Button>
@@ -191,9 +191,9 @@ function ToneGeneratorInner({ locale, freq: freq0 = 440 }: { locale: Locale; fre
                   if (v !== null && v >= MIN && v <= MAX) setFreq(v);
                 }}
                 onBlur={() => setText(null)}
-                className="tabular h-16! w-48 text-center text-4xl! font-semibold"
+                className="tabular h-16! min-w-0 flex-1 text-center text-[clamp(1.5rem,9vw,2.25rem)]! font-semibold"
               />
-              <span className="text-2xl text-fg-2">{locale === "ru" ? "Гц" : "Hz"}</span>
+              <span className="text-xl text-fg-2 sm:text-2xl">{locale === "ru" ? "Гц" : "Hz"}</span>
               <Button variant="outline" size="icon" onClick={() => setF(freq * Math.pow(2, 1 / 12))} aria-label={t.up} title={t.up}>
                 <Plus aria-hidden />
               </Button>

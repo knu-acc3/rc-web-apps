@@ -156,7 +156,7 @@ export default function VideoTrim({ locale }: { locale: Locale }) {
             ]}
             size="sm"
           />
-          <p className="text-[13px] text-fg-3">{precise ? t.preciseHint : t.fastHint}</p>
+          <p className="text-[0.8125rem] text-fg-3">{precise ? t.preciseHint : t.fastHint}</p>
         </div>
       }
       action={{ label: t.trim, onClick: run, disabled: !(length > 0), icon: <Scissors aria-hidden /> }}

@@ -226,7 +226,7 @@ export default function Unzip({ locale }: { locale: Locale }) {
       {!problem && <JobProgress job={open} locale={locale} onCancel={open.cancel} />}
       <JobProgress job={all} locale={locale} onCancel={all.cancel} />
       {all.status === "done" && canDir && <Notice tone="ok">{t.done}</Notice>}
-      {!canDir && entries.length > 0 && <p className="-mt-2 text-[13px] text-fg-3">{t.allNote}</p>}
+      {!canDir && entries.length > 0 && <p className="-mt-2 text-[0.8125rem] text-fg-3">{t.allNote}</p>}
 
       {entries.length > 0 && (
         <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
@@ -271,9 +271,9 @@ export default function Unzip({ locale }: { locale: Locale }) {
                 </div>
                 {IMAGE.test(selected.path) ? (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img ref={img} alt={selected.path} className="max-h-80 w-auto max-w-full self-center rounded-[8px]" />
+                  <img ref={img} alt={selected.path} className="max-h-80 w-auto max-w-full self-center rounded-[0.5rem]" />
                 ) : selected.text !== null ? (
-                  <pre className="max-h-80 overflow-auto rounded-[8px] bg-surface-2 p-3 font-mono text-[13px] whitespace-pre-wrap break-words text-fg">{selected.text}</pre>
+                  <pre className="max-h-80 overflow-auto rounded-[0.5rem] bg-surface-2 p-3 font-mono text-[0.8125rem] whitespace-pre-wrap break-words text-fg">{selected.text}</pre>
                 ) : (
                   <p className="text-sm text-fg-3">{t.noPreview}</p>
                 )}

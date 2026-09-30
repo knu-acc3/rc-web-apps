@@ -30,13 +30,13 @@ export const KeyboardVisual = memo(function KeyboardVisual({
             key={k.code}
             data-code={k.code}
             className={cn(
-              "absolute flex select-none rounded-[6px] border leading-none transition-colors duration-75",
+              "absolute flex select-none rounded-[0.375rem] border leading-none transition-colors duration-75",
               isDown
                 ? "border-accent bg-accent text-accent-fg"
                 : tested
                   ? "border-ok/50 bg-ok-soft text-ok"
                   : "border-line-strong/70 bg-surface text-fg-2",
-              k.named ? "text-[11px]" : "text-sm font-medium",
+              k.named ? "text-[0.6875rem]" : "text-sm font-medium",
             )}
             style={{ left: k.x * U, top: k.y * U, width: k.w * U - GAP, height: k.h * U - GAP }}
           >

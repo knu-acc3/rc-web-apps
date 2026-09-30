@@ -64,6 +64,7 @@ function presetVariant(p: WheelPreset): VariantDef {
 
 export const wheelTool: ToolDef = {
   slug: "spin-the-wheel",
+  seoAlt: { ru: ["крутить колесо со своими вариантами", "колесо фортуны"], en: ["spin a wheel with your own options", "wheel spinner"] },
   component: "random/wheel",
   icon: "Disc3",
   popular: true,

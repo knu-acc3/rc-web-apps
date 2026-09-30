@@ -53,12 +53,12 @@ export default function MonthCalendar({ locale, year, month, prev, next }: Month
         {link(next, t.next, <ChevronRight aria-hidden />)}
       </div>
       <CalendarControls locale={locale} choice={choice} onChoice={setChoice} weeks={weeks} onWeeks={setWeeks} />
-      <div className="rounded-[12px] border border-line bg-surface p-3 sm:p-5 print:border-0 print:p-0">
+      <div className="rounded-[0.75rem] border border-line bg-surface p-3 sm:p-5 print:border-0 print:p-0">
         <MonthGrid locale={locale} year={year} month={month} mark={holidayMarker(choice, locale)} today={today} weekNumbers={weeks} size="lg" showTitle={false} />
       </div>
       <Legend locale={locale} choice={choice} />
       {choice !== "none" && (
-        <ul className="text-[15px] text-fg-2">
+        <ul className="text-[0.9375rem] text-fg-2">
           {holidays.length === 0 && <li className="text-fg-3">{t.none}</li>}
           {holidays.map((h) => (
             <li key={`${h.key}${h.ymd.d}`}>

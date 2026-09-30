@@ -100,14 +100,14 @@ export default function MimeDetect({ locale, known }: { locale: Locale; known: s
           const all = d ? [d.ext, ...(d.alt ?? [])] : [];
           const matches = !!d && !!r.claimedExt && (all.includes(r.claimedExt) || (r.claimedExt === "jpeg" && d.ext === "jpg") || (r.claimedExt === "tiff" && d.ext === "tif"));
           return (
-            <li key={r.key} className="rounded-[12px] border border-line bg-surface p-4">
+            <li key={r.key} className="rounded-[0.75rem] border border-line bg-surface p-4">
               <div className="flex flex-wrap items-baseline justify-between gap-2">
                 <span className="min-w-0 font-medium break-all text-fg">{r.name}</span>
                 <span className="text-sm text-fg-3">{formatBytes(locale, r.size)}</span>
               </div>
               {d ? (
                 <div className="mt-2">
-                  <div className="text-[13px] text-fg-3">{t.detected}</div>
+                  <div className="text-[0.8125rem] text-fg-3">{t.detected}</div>
                   <div className="mt-0.5 flex flex-wrap items-baseline gap-x-3 gap-y-1">
                     <span className="text-xl font-semibold text-fg">{d.name[locale === "ru" ? 0 : 1]}</span>
                     <span className="font-mono text-sm break-all text-fg-2">{d.mime}</span>
@@ -115,7 +115,7 @@ export default function MimeDetect({ locale, known }: { locale: Locale; known: s
                   <div className="mt-2 flex flex-wrap items-center gap-2">
                     <Badge tone="accent">.{d.ext}</Badge>
                     {r.claimedExt ? <Badge tone={matches ? "ok" : "warn"}>{matches ? t.match : `${t.mismatch}: .${r.claimedExt}`}</Badge> : <Badge>{t.noExt}</Badge>}
-                    {d.confidence === "medium" && <span className="text-[13px] text-fg-3">{t.medium}</span>}
+                    {d.confidence === "medium" && <span className="text-[0.8125rem] text-fg-3">{t.medium}</span>}
                     {knownSet.has(d.ext) && (
                       <Link href={href(locale, ["mime", d.ext])} className="text-sm text-accent hover:underline">
                         {t.more}
@@ -131,11 +131,11 @@ export default function MimeDetect({ locale, known }: { locale: Locale; known: s
               )}
               <dl className="mt-3 grid gap-x-6 gap-y-1 text-sm sm:grid-cols-2">
                 <div>
-                  <dt className="text-[13px] text-fg-3">{t.browser}</dt>
+                  <dt className="text-[0.8125rem] text-fg-3">{t.browser}</dt>
                   <dd className="font-mono break-all text-fg-2">{r.browserType || t.none}</dd>
                 </div>
                 <div>
-                  <dt className="text-[13px] text-fg-3">{t.first}</dt>
+                  <dt className="text-[0.8125rem] text-fg-3">{t.first}</dt>
                   <dd className="font-mono break-all text-fg-2">{r.hex}</dd>
                 </div>
               </dl>

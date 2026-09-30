@@ -42,8 +42,8 @@ function Node({ node, depth, locale, isIndex, autoOpen }: { node: JsonNode; dept
   const hidden = size - (node.c?.length ?? 0);
   return (
     <li className="py-px">
-      <button type="button" aria-expanded={open} onClick={() => setOpen((o) => !o)} disabled={!size} className="inline-flex max-w-full items-start gap-1 rounded-[4px] text-left hover:bg-surface-2 disabled:hover:bg-transparent">
-        <ChevronRight aria-hidden className={cn("mt-[3px] size-4 shrink-0 text-fg-3 transition-transform", open && size ? "rotate-90" : "", !size && "invisible")} />
+      <button type="button" aria-expanded={open} onClick={() => setOpen((o) => !o)} disabled={!size} className="inline-flex max-w-full items-start gap-1 rounded-[0.25rem] text-left hover:bg-surface-2 disabled:hover:bg-transparent">
+        <ChevronRight aria-hidden className={cn("mt-[0.1875rem] size-4 shrink-0 text-fg-3 transition-transform", open && size ? "rotate-90" : "", !size && "invisible")} />
         <span className="break-all">
           {key}
           <span className="text-fg-3">

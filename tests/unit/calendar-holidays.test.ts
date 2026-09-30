@@ -11,6 +11,7 @@ describe("Russia production calendar (official totals)", () => {
     [2024, 248, 1979],
     [2025, 247, 1972],
     [2026, 247, 1972],
+    [2027, 247, 1972],
   ])("%i: %i days, %i hours", (y, days, hours) => {
     const n = yearNorm("ru", y);
     expect(n.workDays).toBe(days);
@@ -53,7 +54,10 @@ describe("Russia production calendar (official totals)", () => {
 describe("Kazakhstan holidays by law", () => {
   it("fixed holidays", () => {
     const keys = holidaysByLaw("kz", 2026).map((h) => `${ymdStr(h.ymd)} ${h.key}`);
-    expect(keys).toContain("2026-08-30 constitution");
+    // Law No. 306-VIII of 11.06.2026: Constitution Day moved from August 30 to March 15 from 1 July 2026.
+    expect(keys.some((k) => k.endsWith("constitution"))).toBe(false);
+    expect(holidaysByLaw("kz", 2025).map((h) => `${ymdStr(h.ymd)} ${h.key}`)).toContain("2025-08-30 constitution");
+    expect(holidaysByLaw("kz", 2027).map((h) => `${ymdStr(h.ymd)} ${h.key}`)).toContain("2027-03-15 constitution");
     expect(keys).toContain("2026-10-25 republic");
     expect(keys).toContain("2026-12-16 independence");
     expect(keys).toContain("2026-07-06 capital");
@@ -68,11 +72,17 @@ describe("Kazakhstan holidays by law", () => {
     expect(py.type(d("2026-03-24"))).toBe("off");
     expect(py.type(d("2026-03-25"))).toBe("off");
     expect(py.type(d("2026-03-26"))).toBe("work");
-    // Constitution Day Sun Aug 30 → Mon Aug 31
-    expect(py.type(d("2026-08-31"))).toBe("off");
+    // Republic Day Sun Oct 25 → Mon Oct 26; August 31 is an ordinary working day (no Constitution Day in 2026)
+    expect(py.type(d("2026-10-26"))).toBe("off");
+    expect(py.type(d("2026-08-31"))).toBe("work");
     // Orthodox Christmas 2023 (Sat Jan 7) was not moved
     expect(productionYear("kz", 2023).type(d("2023-01-09"))).toBe("work");
-    expect(py.decree).toBe("unknown");
+    expect(py.decree).toBe("known");
+    expect(productionYear("kz", 2027).decree).toBe("unknown");
+  });
+
+  it("2026 totals: 247 working days (5-day week)", () => {
+    expect(yearNorm("kz", 2026).workDays).toBe(247);
   });
 });
 

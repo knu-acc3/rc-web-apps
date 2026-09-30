@@ -4,6 +4,7 @@
  * symbols and digit grouping.
  */
 import { normalizeNewlines } from "./textOps";
+import { replaceNotAfter } from "@/lib/lookbehind";
 
 export const NBSP = " ";
 /** Narrow no-break space — used for thousands grouping. */
@@ -77,7 +78,7 @@ function fixDashes(s: string, lang: TypoLang): string {
   // word - word, word -- word, word – word  → em dash
   t = t.replace(/([^\s\n])[ \t]+(?:--?|–|—)[ \t]+/g, lang === "ru" ? `$1${NBSP}— ` : "$1 — ");
   // number ranges 10-20 → 10–20 (not dates or phone numbers with more parts)
-  t = t.replace(/(?<![\d\-–.:/])(\d+)-(\d+)(?![\d\-–.:/])/g, "$1–$2");
+  t = replaceNotAfter(t, /(\d+)-(\d+)(?![\d\-–.:/])/g, /[\d\-–.:/]/, (m) => `${m[1]}–${m[2]}`);
   return t;
 }
 
@@ -88,8 +89,8 @@ function fixNbsp(s: string, lang: TypoLang): string {
     t = t.replace(RU_SHORT_RE, `$1$2${NBSP}`).replace(RU_SHORT_RE, `$1$2${NBSP}`);
     t = t.replace(RU_PARTICLES_RE, `$1${NBSP}$2`);
     // initials: А. С. Пушкин
-    t = t.replace(/(?<![\p{L}])(\p{Lu}\.)[ \t]*(\p{Lu}\.)[ \t]*(\p{Lu}\p{Ll}+)/gu, `$1${NBSP}$2${NBSP}$3`);
-    t = t.replace(/(?<![\p{L}])(\p{Lu}\p{Ll}+)[ \t]+(\p{Lu}\.)[ \t]*(\p{Lu}\.)/gu, `$1${NBSP}$2${NBSP}$3`);
+    t = replaceNotAfter(t, /(\p{Lu}\.)[ \t]*(\p{Lu}\.)[ \t]*(\p{Lu}\p{Ll}+)/gu, /\p{L}/u, (m) => `${m[1]}${NBSP}${m[2]}${NBSP}${m[3]}`);
+    t = replaceNotAfter(t, /(\p{Lu}\p{Ll}+)[ \t]+(\p{Lu}\.)[ \t]*(\p{Lu}\.)/gu, /\p{L}/u, (m) => `${m[1]}${NBSP}${m[2]}${NBSP}${m[3]}`);
     // abbreviations: т. е., т. д., т. п., и т. д.
     t = t.replace(/(^|[\s(])(т|и)\.[ \t]*(е|д|п|к)\./gu, `$1$2.${NBSP}$3.`);
     t = t.replace(/(^|[\s(])и[ \t]+т\./gu, `$1и${NBSP}т.`);
@@ -104,11 +105,12 @@ function fixNbsp(s: string, lang: TypoLang): string {
 }
 
 function groupDigits(s: string): string {
-  return s.replace(/(?<![\d.,:/\-+#№\p{L}_])(\d{5,})(?![\d\p{L}/:_])/gu, (m, digits: string, offset: number, all: string) => {
+  return replaceNotAfter(s, /(\d{5,})(?![\d\p{L}/:_])/gu, /[\d.,:/\-+#№\p{L}_]/u, (m) => {
+    const digits = m[1];
     // don't touch the fractional part (3,14159) or leading-zero codes
-    if (digits.startsWith("0")) return m;
-    const before = all.slice(Math.max(0, offset - 2), offset);
-    if (/\d[.,]$/.test(before)) return m;
+    if (digits.startsWith("0")) return m[0];
+    const before = s.slice(Math.max(0, m.index - 2), m.index);
+    if (/\d[.,]$/.test(before)) return m[0];
     return digits.replace(/\B(?=(\d{3})+(?!\d))/g, NNBSP);
   });
 }
@@ -121,11 +123,11 @@ function fixSymbols(s: string, lang: TypoLang): string {
     .replace(/\(tm\)/gi, "™")
     .replace(/\+-/g, "±")
     .replace(/(\s)->(\s)/g, "$1→$2")
-    .replace(/(\s)<-(\s)/g, "$1←$2")
-    // 1920x1080 → 1920×1080 (but not hex like 0x1F)
-    .replace(/(?<![\p{L}\p{N}])(\d+)[ \t]*[xх][ \t]*(\d+)(?![\p{L}])/gu, (m, a: string, b: string) => (a === "0" ? m : `${a}×${b}`));
+    .replace(/(\s)<-(\s)/g, "$1←$2");
+  // 1920x1080 → 1920×1080 (but not hex like 0x1F)
+  t = replaceNotAfter(t, /(\d+)[ \t]*[xх][ \t]*(\d+)(?![\p{L}])/gu, /[\p{L}\p{N}]/u, (m) => (m[1] === "0" ? m[0] : `${m[1]}×${m[2]}`));
   // m2, м3, км2 → m², м³, км²
-  t = t.replace(/(?<![\p{L}])((?:к|с|д|м)?м|(?:k|c|d|m)?m|ft|in)([23])(?![\p{L}\p{N}])/gu, (_m, u: string, p: string) => u + (p === "2" ? "²" : "³"));
+  t = replaceNotAfter(t, /((?:к|с|д|м)?м|(?:k|c|d|m)?m|ft|in)([23])(?![\p{L}\p{N}])/gu, /\p{L}/u, (m) => m[1] + (m[2] === "2" ? "²" : "³"));
   if (lang === "ru") t = t.replace(/(\d)[ \t]*(?:гр\.|град\.)/g, "$1°");
   return t;
 }

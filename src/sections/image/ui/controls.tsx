@@ -38,7 +38,7 @@ export function ColorField({
           aria-label={label}
           value={value}
           onChange={(e) => onChange(e.target.value.toUpperCase())}
-          className="h-10 w-12 shrink-0 cursor-pointer rounded-[8px] border border-line bg-surface p-1"
+          className="h-10 w-12 shrink-0 cursor-pointer rounded-[0.5rem] border border-line bg-surface p-1"
         />
         <Input
           id={`${id}-hex`}

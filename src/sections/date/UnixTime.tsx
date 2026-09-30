@@ -109,9 +109,9 @@ export default function UnixTime({ locale, value = "" }: UnixTimeProps) {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex flex-wrap items-center justify-between gap-2 rounded-[12px] bg-surface-2 px-4 py-2.5">
+      <div className="flex flex-wrap items-center justify-between gap-2 rounded-[0.75rem] bg-surface-2 px-4 py-2.5">
         <span className="text-sm text-fg-3">
-          {t.now}: <span className="tabular font-mono text-[15px] font-semibold text-fg">{now !== null ? Math.floor(now / 1000) : "—"}</span>
+          {t.now}: <span className="tabular font-mono text-[0.9375rem] font-semibold text-fg">{now !== null ? Math.floor(now / 1000) : "—"}</span>
         </span>
         <CopyButton value={() => String(Math.floor(nowMs() / 1000))} label={t.copy} copiedLabel={t.copied} variant="ghost" />
       </div>
@@ -156,7 +156,7 @@ export default function UnixTime({ locale, value = "" }: UnixTimeProps) {
             <p className="text-fg-3">{t.ph}</p>
           )}
         </div>
-        {parsed?.guessed && digits > 11 && <p className="mt-3 text-center text-[13px] text-fg-3">{t.guessed(t.units[parsed.unit], digits)}</p>}
+        {parsed?.guessed && digits > 11 && <p className="mt-3 text-center text-[0.8125rem] text-fg-3">{t.guessed(t.units[parsed.unit], digits)}</p>}
         {parsed?.suspicious && (
           <Notice tone="warn" className="mt-3">
             {t.suspicious}
@@ -165,12 +165,12 @@ export default function UnixTime({ locale, value = "" }: UnixTimeProps) {
       </Panel>
 
       {rows.length > 0 && (
-        <ul className="divide-y divide-line overflow-hidden rounded-[12px] border border-line bg-surface">
+        <ul className="divide-y divide-line overflow-hidden rounded-[0.75rem] border border-line bg-surface">
           {rows.map(([k, v]) => (
             <li key={k} className="flex min-h-11 items-center justify-between gap-3 px-4 py-1.5">
               <span className="shrink-0 text-sm text-fg-3">{k}</span>
               <span className="flex min-w-0 items-center gap-1">
-                <span className="truncate font-mono text-[14px] text-fg">{v}</span>
+                <span className="truncate font-mono text-[0.875rem] text-fg">{v}</span>
                 <CopyButton value={v} label={t.copy} copiedLabel={t.copied} showLabel={false} size="icon-sm" variant="ghost" />
               </span>
             </li>
@@ -185,7 +185,7 @@ export default function UnixTime({ locale, value = "" }: UnixTimeProps) {
             <Input id={`${id}-dt`} type="datetime-local" step={1} value={dt} onChange={(e) => setDt(e.target.value)} />
           </Field>
           {Number.isFinite(dtMs) && (
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 font-mono text-[15px] text-fg">
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 font-mono text-[0.9375rem] text-fg">
               <span>
                 {Math.floor(dtMs / 1000)} <span className="text-fg-3">{locale === "ru" ? "с" : "s"}</span>
               </span>

@@ -144,12 +144,12 @@ export default function Notepad({ locale }: { locale: Locale }) {
                   }}
                   aria-current={n.id === active?.id ? "true" : undefined}
                   className={cn(
-                    "flex w-full flex-col items-start rounded-[8px] px-3 py-2 text-left transition-colors duration-150",
+                    "flex w-full flex-col items-start rounded-[0.5rem] px-3 py-2 text-left transition-colors duration-150",
                     n.id === active?.id ? "bg-accent-soft text-accent" : "text-fg hover:bg-surface-2",
                   )}
                 >
                   <span className="w-full truncate text-sm font-medium">{noteTitle(n.text, t.untitled)}</span>
-                  <span className="text-[12px] text-fg-3">{formatDate(locale, new Date(n.updated), { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}</span>
+                  <span className="text-[0.75rem] text-fg-3">{formatDate(locale, new Date(n.updated), { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}</span>
                 </button>
               </li>
             ))}
@@ -174,7 +174,7 @@ export default function Notepad({ locale }: { locale: Locale }) {
           </Button>
         </div>
 
-        <div className="flex min-w-0 flex-col overflow-hidden rounded-[12px] border border-line bg-surface">
+        <div className="flex min-w-0 flex-col overflow-hidden rounded-[0.75rem] border border-line bg-surface">
           <div className="flex min-h-11 items-center justify-between gap-2 border-b border-line px-3 py-1.5">
             <label htmlFor={`${id}-note`} className="min-w-0 truncate text-sm font-semibold text-fg">
               {active ? title : t.editor}
@@ -197,7 +197,7 @@ export default function Notepad({ locale }: { locale: Locale }) {
               onChange={(e) => onChange(e.target.value)}
               placeholder={t.placeholder}
               rows={20}
-              className="min-h-96 w-full resize-y bg-transparent px-4 py-3 text-[16px] leading-relaxed text-fg placeholder:text-fg-3 focus:outline-none"
+              className="min-h-96 w-full resize-y bg-transparent px-4 py-3 text-[1rem] leading-relaxed text-fg placeholder:text-fg-3 focus:outline-none"
             />
           ) : renderer ? (
             <div className={cn(MD_PROSE, "min-h-96 px-4 py-3")} dangerouslySetInnerHTML={{ __html: html }} />

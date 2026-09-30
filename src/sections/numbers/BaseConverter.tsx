@@ -221,7 +221,7 @@ export default function BaseConverter({ locale, from: from0 = 10, to: to0 = 2, v
 
         <div className="mt-5 min-h-16" aria-live="polite">
           {error ? (
-            <p className="text-[15px] text-err">{error}</p>
+            <p className="text-[0.9375rem] text-err">{error}</p>
           ) : out ? (
             <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
               <div className="min-w-0">

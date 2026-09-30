@@ -138,7 +138,7 @@ export function EntryTable({
                   disabled={disabled}
                   onChange={(ev) => onColor(e.id, ev.target.value)}
                   aria-label={`${t.color} ${t.of} «${e.label}»`}
-                  className="h-8 w-10 cursor-pointer rounded-[6px] border border-line bg-surface p-0.5"
+                  className="h-8 w-10 cursor-pointer rounded-[0.375rem] border border-line bg-surface p-0.5"
                 />
               </td>
               <td className="max-w-40 truncate sm:max-w-none">{e.label}</td>

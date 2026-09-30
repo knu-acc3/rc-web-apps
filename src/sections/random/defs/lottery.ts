@@ -207,6 +207,7 @@ function lotteryVariant(p: LotteryPreset): VariantDef {
 
 export const lotteryTool: ToolDef = {
   slug: "lottery-number-generator",
+  seoAlt: { ru: "числа для лотереи", en: "lottery numbers" },
   component: "random/lottery",
   icon: "Ticket",
   name: { ru: "Генератор чисел лотереи", en: "Lottery number generator" },

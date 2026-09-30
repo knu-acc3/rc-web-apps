@@ -135,7 +135,7 @@ export default function StringEscape({ locale, target: target0 = "js" }: { local
         </label>
       </div>
       <CodeEditor id={`${id}-in`} locale={locale} label={t.input} value={text} onChange={setText} rows={5} wrap />
-      <div className="mt-4 rounded-[10px] bg-surface-2 p-4">
+      <div className="mt-4 rounded-[0.625rem] bg-surface-2 p-4">
         <div className="flex items-center justify-between gap-2">
           <span className="text-sm font-medium text-fg-2">{LABEL[target]}</span>
           <CopyButton value={out} label={KIT_T[locale].copy} copiedLabel={KIT_T[locale].copied} variant="outline" />
@@ -149,7 +149,7 @@ export default function StringEscape({ locale, target: target0 = "js" }: { local
           {t.sql}
         </Notice>
       )}
-      {target === "regex" && dir === "escape" && <p className="mt-3 text-[13px] text-fg-3">{t.regex}</p>}
+      {target === "regex" && dir === "escape" && <p className="mt-3 text-[0.8125rem] text-fg-3">{t.regex}</p>}
     </Panel>
   );
 }

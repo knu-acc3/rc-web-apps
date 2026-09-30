@@ -64,7 +64,7 @@ export default function SpecificityCalculator({ locale }: { locale: Locale }) {
         <label htmlFor={`${id}-in`} className="text-sm font-medium text-fg-2">
           {t.input}
         </label>
-        <Textarea id={`${id}-in`} value={text} onChange={(e) => setText(e.target.value)} rows={5} className="text-[15px]" />
+        <Textarea id={`${id}-in`} value={text} onChange={(e) => setText(e.target.value)} rows={5} className="text-[0.9375rem]" />
       </div>
       <p className="text-sm text-fg-3">
         (a, b, c) = ({t.a}, {t.b}, {t.c})
@@ -79,7 +79,7 @@ export default function SpecificityCalculator({ locale }: { locale: Locale }) {
               <li key={i}>
                 <Panel className={cn("flex flex-col gap-2 p-4 sm:flex-row sm:items-start sm:justify-between", win && "border-accent")}>
                   <div className="min-w-0">
-                    <code className="block font-mono text-[15px] break-all text-fg">{r.selector}</code>
+                    <code className="block font-mono text-[0.9375rem] break-all text-fg">{r.selector}</code>
                     {r.error ? (
                       <p className="mt-1 text-sm text-err">
                         {t.error} «{r.error}»
@@ -87,7 +87,7 @@ export default function SpecificityCalculator({ locale }: { locale: Locale }) {
                     ) : (
                       <ul className="mt-2 flex flex-wrap gap-1.5">
                         {r.parts.map((p, k) => (
-                          <li key={k} className="rounded-[6px] bg-surface-2 px-2 py-0.5 text-xs text-fg-2" title={t.kinds[p.kind]}>
+                          <li key={k} className="rounded-[0.375rem] bg-surface-2 px-2 py-0.5 text-xs text-fg-2" title={t.kinds[p.kind]}>
                             <code className="font-mono text-fg">{p.text}</code> <span className="text-fg-3">{specText(p.spec)}</span>
                           </li>
                         ))}

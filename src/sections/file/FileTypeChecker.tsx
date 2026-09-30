@@ -164,12 +164,12 @@ function Card({ file, locale, onRemove }: { file: File; locale: Locale; onRemove
           </div>
         ))}
       </dl>
-      <p className="text-[13px] text-fg-3">{t.created}</p>
+      <p className="text-[0.8125rem] text-fg-3">{t.created}</p>
       {info && (
         <details className="text-sm">
           <summary className="cursor-pointer text-fg-3 hover:text-fg">{t.hex}</summary>
           <div className="mt-2 flex items-start gap-2">
-            <pre className="min-w-0 flex-1 overflow-x-auto rounded-[8px] bg-surface-2 p-3 font-mono text-[12px] leading-relaxed text-fg">{info.hex}</pre>
+            <pre className="min-w-0 flex-1 overflow-x-auto rounded-[0.5rem] bg-surface-2 p-3 font-mono text-[0.75rem] leading-relaxed text-fg">{info.hex}</pre>
             <CopyButton value={info.hex} showLabel={false} size="icon-sm" variant="ghost" label={locale === "ru" ? "Копировать" : "Copy"} copiedLabel={locale === "ru" ? "Скопировано" : "Copied"} />
           </div>
         </details>
@@ -214,7 +214,7 @@ function Hashes({ file, locale }: { file: File; locale: Locale }) {
           <div key={k} className="contents">
             <dt className="text-fg-3">{k}</dt>
             <dd className="flex min-w-0 items-center gap-1">
-              <code className="min-w-0 break-all font-mono text-[13px] text-fg">{v}</code>
+              <code className="min-w-0 break-all font-mono text-[0.8125rem] text-fg">{v}</code>
               <CopyButton value={v} showLabel={false} size="icon-sm" variant="ghost" label={locale === "ru" ? "Копировать" : "Copy"} copiedLabel={locale === "ru" ? "Скопировано" : "Copied"} />
             </dd>
           </div>

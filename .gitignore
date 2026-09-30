@@ -27,3 +27,4 @@ npm-debug.log*
 /scripts/data/node_modules/
 /AGENTS.md
 /CLAUDE.md
+/public/legacy.css

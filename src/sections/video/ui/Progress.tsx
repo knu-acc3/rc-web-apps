@@ -36,7 +36,7 @@ export function JobProgress<R>({ job, locale, onCancel, onRetry }: { job: JobSta
     const preparing = job.stage === "prepare" && job.progress === 0;
     const text = preparing ? t.preparing : downloading ? t.downloadingEngine : job.engine === "ffmpeg" ? t.ffmpegWork : t.processing;
     return (
-      <div className="flex flex-col gap-2 rounded-[10px] bg-surface-2 px-4 py-3">
+      <div className="flex flex-col gap-2 rounded-[0.625rem] bg-surface-2 px-4 py-3">
         <div className="flex items-center justify-between gap-3">
           <span className="min-w-0 text-sm font-medium text-fg-2">
             {text}

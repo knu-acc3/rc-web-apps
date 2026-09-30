@@ -13,6 +13,7 @@ const COUNT = OBJECTS.length;
 
 const objectsTool: ToolDef = {
   slug: "",
+  seoAlt: { ru: ["реальный размер на экране", "натуральная величина", "1:1 на экране"], en: ["real size on screen", "actual size", "1:1 on screen"] },
   component: "actual-size/object",
   icon: "Ruler",
   name: { ru: "Реальный размер предметов", en: "Actual size objects" },
@@ -413,7 +414,7 @@ const protractorTool: ToolDef = {
       "Use it to check angles on printouts and small objects held against the screen. For tenth-of-a-degree precision pick the 0.1° step and move the arms with the arrow keys.",
     ],
   },
-  related: ["convert/angle"],
+  related: ["angle-converter"],
 };
 
 const base = defineToolSection({

@@ -75,7 +75,7 @@ export default function FeaturesInfo({ locale }: ToolProps) {
               </h2>
               <ul className="mt-1 divide-y divide-line border-y border-line">
                 {items.map((f) => (
-                  <li key={f.id} className="flex items-center justify-between gap-3 py-2 text-[15px]">
+                  <li key={f.id} className="flex items-center justify-between gap-3 py-2 text-[0.9375rem]">
                     <span className="min-w-0 text-fg">{tr(f.name, locale)}</span>
                     {d ? (
                       d[f.id] ? (

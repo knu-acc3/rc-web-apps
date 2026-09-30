@@ -2,6 +2,7 @@
 
 import type { Locale } from "@/i18n/config";
 import type { Block, QA, VariantDef } from "@/registry/types";
+import { appStorePayload, eventPayload, geoPayload, mailtoPayload, smsPayload, telPayload, whatsappPayload } from "./payloads";
 
 export interface VT {
   name: string;
@@ -13,6 +14,65 @@ export interface VT {
   about?: { title: string; paragraphs: string[] };
   table?: { title: string; head: string[]; rows: string[][] };
   faq: QA[];
+}
+
+type Row = [string, string];
+
+/** What exactly goes into the code for each QR type: a real payload built by the same functions the generator uses. */
+const PAYLOAD: Record<string, { ru: Row[]; en: Row[]; example: { ru: string; en: string } }> = {
+  email: {
+    example: { ru: mailtoPayload({ to: "info@example.com", subject: "Отзыв", body: "Здравствуйте!" }), en: mailtoPayload({ to: "info@example.com", subject: "Feedback", body: "Hello!" }) },
+    ru: [["Формат", "ссылка mailto: с полями subject и body"], ["Открывается в", "почтовом приложении по умолчанию: Почта, Gmail, Outlook"], ["Кириллица", "кодируется как %D0%9E… — это нормально"]],
+    en: [["Format", "a mailto: link with subject and body"], ["Opens in", "the default mail app: Mail, Gmail, Outlook"], ["Special characters", "percent-encoded, e.g. a space becomes %20"]],
+  },
+  sms: {
+    example: { ru: smsPayload({ phone: "+7 700 123-45-67", message: "Запись на 15:00" }), en: smsPayload({ phone: "+1 555 010 0199", message: "Book me for 3 pm" }) },
+    ru: [["Формат", "SMSTO:номер:текст (или sms:номер?body=…)"], ["Открывается в", "«Сообщениях» на iPhone и Android"], ["Отправка", "только после нажатия «Отправить»"]],
+    en: [["Format", "SMSTO:number:text (or sms:number?body=…)"], ["Opens in", "Messages on iPhone and Android"], ["Sending", "only after the person taps Send"]],
+  },
+  phone: {
+    example: { ru: telPayload("+7 (700) 123-45-67"), en: telPayload("+1 (555) 010-0199") },
+    ru: [["Формат", "tel:+номер без пробелов и скобок"], ["Действие", "телефон предлагает позвонить"], ["Номер", "в международном виде с +, чтобы работал из любой страны"]],
+    en: [["Format", "tel:+number without spaces or brackets"], ["Action", "the phone offers to call"], ["Number", "in international form with +, so it works from any country"]],
+  },
+  whatsapp: {
+    example: { ru: whatsappPayload({ phone: "+7 700 123 45 67", message: "Здравствуйте!" }), en: whatsappPayload({ phone: "+1 555 010 0199", message: "Hi!" }) },
+    ru: [["Формат", "ссылка wa.me/номер?text=…"], ["Номер", "только цифры с кодом страны, без + и нулей"], ["Без WhatsApp", "ссылка откроется в браузере с кнопкой установки"]],
+    en: [["Format", "a wa.me/number?text=… link"], ["Number", "digits only with the country code, no + or leading zeros"], ["Without WhatsApp", "the link opens in a browser with an install button"]],
+  },
+  telegram: {
+    example: { ru: "https://t.me/durov", en: "https://t.me/durov" },
+    ru: [["Формат", "ссылка t.me/имя"], ["Подходит для", "профиля, канала, группы или бота"], ["Имя", "5–32 символа: латиница, цифры и _"]],
+    en: [["Format", "a t.me/username link"], ["Works for", "a profile, channel, group or bot"], ["Username", "5–32 characters: Latin letters, digits and _"]],
+  },
+  location: {
+    example: { ru: geoPayload(51.128207, 71.430411, "Астана"), en: geoPayload(51.507351, -0.127758, "London") },
+    ru: [["Формат", "geo:широта,долгота или ссылка Google Maps / Яндекс Карт"], ["Точность", "6 знаков после запятой — около 10 см"], ["Открывается в", "картах по умолчанию или в выбранном сервисе"]],
+    en: [["Format", "geo:latitude,longitude or a Google Maps link"], ["Precision", "6 decimal places — about 10 cm"], ["Opens in", "the default maps app or the chosen service"]],
+  },
+  event: {
+    example: {
+      ru: eventPayload({ title: "Встреча выпускников", start: "2026-10-15T19:00", end: "2026-10-15T22:00", location: "Кафе «Уют»" }),
+      en: eventPayload({ title: "Reunion", start: "2026-10-15T19:00", end: "2026-10-15T22:00", location: "Main Hall" }),
+    },
+    ru: [["Формат", "iCalendar VEVENT (RFC 5545)"], ["Время", "местное: у гостя встреча будет на те же часы"], ["Открывается в", "Календаре iPhone, Google Календаре и Outlook"]],
+    en: [["Format", "iCalendar VEVENT (RFC 5545)"], ["Time", "floating local time: guests see the same clock time"], ["Opens in", "iPhone Calendar, Google Calendar and Outlook"]],
+  },
+  "app-store": {
+    example: { ru: appStorePayload({ store: "apple", id: "id284882215" }), en: appStorePayload({ store: "google", id: "com.whatsapp" }) },
+    ru: [["App Store", "apps.apple.com/app/id…"], ["Google Play", "play.google.com/store/apps/details?id=…"], ["Где взять ID", "в адресе страницы приложения в магазине"]],
+    en: [["App Store", "apps.apple.com/app/id…"], ["Google Play", "play.google.com/store/apps/details?id=…"], ["Where to find the ID", "in the address of the app's store page"]],
+  },
+};
+
+function payloadBlock(slug: string, l: Locale): Block | null {
+  const p = PAYLOAD[slug];
+  if (!p) return null;
+  return {
+    type: "facts",
+    title: l === "ru" ? "Что записано в коде" : "What the code contains",
+    rows: [...p[l], [l === "ru" ? "Пример" : "Example", p.example[l]]],
+  };
 }
 
 export function variant(slug: string, props: Record<string, unknown>, ru: VT, en: VT): VariantDef {
@@ -31,6 +91,8 @@ export function variant(slug: string, props: Record<string, unknown>, ru: VT, en
       const out: Block[] = [];
       if (v.about) out.push({ type: "text", title: v.about.title, paragraphs: v.about.paragraphs });
       if (v.table) out.push({ type: "table", title: v.table.title, head: v.table.head, rows: v.table.rows });
+      const payload = payloadBlock(slug, l);
+      if (payload) out.push(payload);
       return out;
     },
     faq: { ru: ru.faq, en: en.faq },

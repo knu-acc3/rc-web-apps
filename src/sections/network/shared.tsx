@@ -22,11 +22,11 @@ const L = {
 /** The one prominent result of a tool: big value, one or two quiet lines under it. */
 export function ResultCard({ value, sub, badge, className }: { value: ReactNode; sub?: ReactNode; badge?: ReactNode; className?: string }) {
   return (
-    <div className={cn("rounded-[12px] bg-surface-2 px-4 py-4 sm:px-5", className)}>
+    <div className={cn("rounded-[0.75rem] bg-surface-2 px-4 py-4 sm:px-5", className)}>
       <div aria-live="polite" className="font-mono text-2xl font-semibold tracking-tight break-all text-fg sm:text-3xl">
         {value}
       </div>
-      {sub && <div className="mt-1.5 text-[15px] text-fg-2">{sub}</div>}
+      {sub && <div className="mt-1.5 text-[0.9375rem] text-fg-2">{sub}</div>}
       {badge && <div className="mt-2.5 flex flex-wrap items-center gap-2">{badge}</div>}
     </div>
   );
@@ -37,7 +37,7 @@ export function DetailList({ rows, locale, title, className }: { rows: ValueRow[
   const t = L[locale];
   const text = rows.map((r) => `${r.label}: ${r.value}`).join("\n");
   return (
-    <section className={cn("rounded-[12px] border border-line bg-surface", className)}>
+    <section className={cn("rounded-[0.75rem] border border-line bg-surface", className)}>
       <div className="flex min-h-11 items-center justify-between gap-2 border-b border-line px-4 py-1.5">
         <h2 className="text-sm font-semibold text-fg-2">{title ?? t.details}</h2>
         <CopyButton value={text} label={t.copyAll} copiedLabel={t.copied} variant="ghost" />
@@ -45,8 +45,8 @@ export function DetailList({ rows, locale, title, className }: { rows: ValueRow[
       <dl className="grid gap-x-8 px-4 py-2.5 sm:grid-cols-2">
         {rows.map((r) => (
           <div key={r.label} className="flex min-w-0 flex-col py-1.5">
-            <dt className="text-[13px] text-fg-3">{r.label}</dt>
-            <dd className={cn("break-all text-fg select-all", r.plain ? "text-[15px]" : "font-mono text-sm")}>{r.value}</dd>
+            <dt className="text-[0.8125rem] text-fg-3">{r.label}</dt>
+            <dd className={cn("break-all text-fg select-all", r.plain ? "text-[0.9375rem]" : "font-mono text-sm")}>{r.value}</dd>
           </div>
         ))}
       </dl>

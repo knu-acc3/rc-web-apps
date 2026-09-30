@@ -123,7 +123,7 @@ export default function UnitPrice({ locale }: ToolProps) {
   return (
     <Stack>
       <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)] lg:gap-6">
-        <section className="flex min-w-0 flex-col gap-3 rounded-[12px] border border-line bg-surface p-4 sm:p-5">
+        <section className="flex min-w-0 flex-col gap-3 rounded-[0.75rem] border border-line bg-surface p-4 sm:p-5">
           <h2 className="text-sm font-semibold text-fg-2">{t.items}</h2>
           <ul className="flex flex-col gap-3">
             {computed.map((c, i) => (
@@ -155,7 +155,7 @@ export default function UnitPrice({ locale }: ToolProps) {
                     </Select>
                   </label>
                   {c.up && (
-                    <p className="tabular col-span-2 text-[13px] text-fg-3 min-[520px]:col-span-4">
+                    <p className="tabular col-span-2 text-[0.8125rem] text-fg-3 min-[520px]:col-span-4">
                       <span className={best && c.index === best.index ? "font-semibold text-ok" : "text-fg-2"}>
                         {money(c.up.perBase)} {perText(c.up.base)}
                       </span>
@@ -187,7 +187,7 @@ export default function UnitPrice({ locale }: ToolProps) {
             sub={best ? (worst && worst.index !== best.index ? t.sub(label(best), fmtPct(locale, (1 - best.up!.perBase / worst.up!.perBase) * 100, 1)) : t.subOne(label(best))) : t.enter}
             actions={<ToolActions locale={locale} onReset={q.reset} shareUrl={q.shareUrl} />}
           >
-            {bases.length > 1 && <p className="mt-3 text-[13px] text-fg-2">{t.mixed}</p>}
+            {bases.length > 1 && <p className="mt-3 text-[0.8125rem] text-fg-2">{t.mixed}</p>}
           </ResultMain>
         </div>
       </div>

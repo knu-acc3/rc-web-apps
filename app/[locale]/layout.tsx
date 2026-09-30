@@ -7,6 +7,7 @@ import { ui } from "@/i18n/ui";
 import { Footer } from "@/site/footer";
 import { Header } from "@/site/header";
 import { THEME_SCRIPT } from "@/site/theme";
+import { LEGACY_SCRIPT } from "@/site/legacy";
 import { Analytics } from "@/site/analytics";
 
 
@@ -57,13 +58,14 @@ export default async function LocaleLayout({ children, params }: { children: Rea
     <html lang={locale} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
+        <script dangerouslySetInnerHTML={{ __html: LEGACY_SCRIPT }} />
         <link rel="preload" href="/fonts/onest-latin.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
         {locale === "ru" && <link rel="preload" href="/fonts/onest-cyrillic.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />}
       </head>
       <body className="flex min-h-dvh flex-col">
         <a
           href="#main"
-          className="sr-only focus:not-sr-only focus:fixed focus:left-3 focus:top-3 focus:z-50 focus:rounded-[8px] focus:bg-accent focus:px-4 focus:py-2 focus:text-accent-fg"
+          className="sr-only focus:not-sr-only focus:fixed focus:left-3 focus:top-3 focus:z-50 focus:rounded-[0.5rem] focus:bg-accent focus:px-4 focus:py-2 focus:text-accent-fg"
         >
           {t.skipToContent}
         </a>

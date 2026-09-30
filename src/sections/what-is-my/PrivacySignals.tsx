@@ -69,7 +69,7 @@ function Big({ locale, title, sub, state }: { locale: Locale; title: string; sub
   const t = T[locale];
   const tone = state === "on" ? "text-ok" : state === "off" ? "text-fg" : "text-fg-3";
   return (
-    <div className="rounded-[10px] bg-surface-2 px-4 py-3">
+    <div className="rounded-[0.625rem] bg-surface-2 px-4 py-3">
       <p className="text-sm font-medium text-fg-2">{title}</p>
       <p className={`mt-1 text-2xl font-bold sm:text-3xl ${tone}`}>{state ? t.state[state] : <Pending locale={locale} />}</p>
       <p className="mt-1 text-sm text-fg-3">{sub}</p>
@@ -90,7 +90,7 @@ export default function PrivacySignals({ locale }: ToolProps) {
           <Big locale={locale} title={t.dnt} sub={t.dntSub} state={d?.dnt ?? null} />
         </div>
         <noscript>
-          <p className="mt-3 rounded-[10px] bg-warn-soft px-4 py-3 text-sm text-warn">{c.noscript}</p>
+          <p className="mt-3 rounded-[0.625rem] bg-warn-soft px-4 py-3 text-sm text-warn">{c.noscript}</p>
         </noscript>
       </Panel>
       <Facts

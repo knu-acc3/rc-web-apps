@@ -78,7 +78,7 @@ export default function NamedColor({ locale, hex, name }: { locale: Locale; hex:
           <div className="grid gap-3 sm:grid-cols-2">
             {HARMONIES.map((k) => (
               <div key={k}>
-                <div className="mb-1 text-[13px] text-fg-3">{t.h[k]}</div>
+                <div className="mb-1 text-[0.8125rem] text-fg-3">{t.h[k]}</div>
                 <SwatchStrip items={harmony(c, k).map((x) => ({ color: x }))} {...labels} />
               </div>
             ))}

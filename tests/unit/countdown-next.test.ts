@@ -51,7 +51,8 @@ describe("event rules", () => {
     expect(ev("maslenitsa").dates!(2026)).toEqual([{ y: 2026, m: 2, d: 16 }]);
   });
   it("Kazakh holidays", () => {
-    expect(ev("kazakhstan-constitution-day").md).toEqual([8, 30]);
+    // Law No. 306-VIII of 11.06.2026: August 30 → March 15.
+    expect(ev("kazakhstan-constitution-day").md).toEqual([3, 15]);
     expect(ev("nauryz").md).toEqual([3, 21]);
     expect(ev("kurban-ait").dates!(2026)).toEqual([{ y: 2026, m: 5, d: 27 }]);
   });
