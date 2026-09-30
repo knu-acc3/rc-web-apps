@@ -56,7 +56,7 @@ export default function MultiHash({ locale, sample = "" }: { locale: Locale; sam
         </label>
         <span className="text-fg-3">{"error" in data ? <span className="text-err">{data.error}</span> : t.copyHint}</span>
       </div>
-      <dl className={`mt-4 divide-y divide-line overflow-hidden rounded-[10px] border border-line ${live.pending ? "opacity-70" : ""}`}>
+      <dl className={`mt-4 divide-y divide-line overflow-hidden rounded-[10px] border border-line ${live.pending ? "[&_dd_button]:text-fg-3" : ""}`}>
         {ORDER.map((a) => {
           const def = ALGOS.find((x) => x.id === a)!;
           const value = digests?.[a] ? formatDigest(digests[a], fmt) : "";
