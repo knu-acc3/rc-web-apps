@@ -46,5 +46,6 @@ export interface JobResult {
 
 export type WorkerMessage =
   | { type: "progress"; value: number }
+  | { type: "codec"; id: number; request: import("./main-codec").CodecRequest }
   | { type: "done"; result: JobResult }
   | { type: "error"; code: PdfErrorCode | "generic"; message: string };

@@ -2,8 +2,8 @@
  * Browser/worker implementations of image decoding and encoding
  * (createImageBitmap + OffscreenCanvas). Used only inside pdf.worker.ts.
  */
-import { readJpegInfo } from "./image-info";
-import { stripJpegOrientation, type ImageCodec } from "./optimize";
+import { readJpegInfo, stripJpegOrientation } from "./image-info";
+import type { ImageCodec } from "./optimize";
 import type { PreparedImage } from "./pdf-ops";
 
 async function blobBytes(blob: Blob): Promise<Uint8Array> {
@@ -85,4 +85,40 @@ export async function convertImage(bytes: Uint8Array, kind: string): Promise<Pre
   } finally {
     bitmap.close();
   }
+}
+
+/* ───────────── fallback: ask the page to do the canvas work ───────────── */
+
+export type CallMain = (req: import("./main-codec").CodecRequest, transfer: Transferable[]) => Promise<unknown>;
+
+interface RemoteBitmap {
+  width: number;
+  height: number;
+  jpeg?: Uint8Array;
+  rgba?: Uint8ClampedArray;
+}
+
+/** Codec for workers without OffscreenCanvas (Safari < 16.4): each image is re-encoded by the page. */
+export function remoteCodec(call: CallMain): ImageCodec<RemoteBitmap> {
+  return {
+    async decodeJpeg(bytes) {
+      return { width: 0, height: 0, jpeg: bytes };
+    },
+    async fromPixels(rgba, width, height) {
+      return { width, height, rgba };
+    },
+    async encodeJpeg(src, targetW, targetH, quality) {
+      const data = (src.jpeg ? src.jpeg.slice() : src.rgba!.slice()).buffer as ArrayBuffer;
+      const out = (await call({ op: "recode", kind: src.jpeg ? "jpeg" : "rgba", data, width: src.width, height: src.height, targetW, targetH, quality }, [data])) as ArrayBuffer;
+      return new Uint8Array(out);
+    },
+  };
+}
+
+export function remoteConvert(call: CallMain) {
+  return async (bytes: Uint8Array, kind: string): Promise<PreparedImage> => {
+    const data = bytes.slice().buffer as ArrayBuffer;
+    const r = (await call({ op: "convert", kind, data }, [data])) as import("./main-codec").ConvertResult;
+    return { kind: r.kind, bytes: new Uint8Array(r.bytes), pxWidth: r.pxWidth, pxHeight: r.pxHeight, dpiX: null, dpiY: null, orientation: r.orientation };
+  };
 }

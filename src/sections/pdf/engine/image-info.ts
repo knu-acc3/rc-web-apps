@@ -154,3 +154,35 @@ export function readPngInfo(b: Uint8Array): ImageInfo | null {
 export function readImageInfo(b: Uint8Array): ImageInfo | null {
   return readJpegInfo(b) ?? readPngInfo(b);
 }
+
+/** Copy of a JPEG with its EXIF orientation reset to 1 (PDF viewers ignore EXIF). */
+export function stripJpegOrientation(b: Uint8Array): Uint8Array {
+  let o = 2;
+  while (o + 4 <= b.length && b[o] === 0xff) {
+    const marker = b[o + 1];
+    if (marker === 0xda || marker === 0xd9) break;
+    const len = (b[o + 2] << 8) | b[o + 3];
+    if (marker === 0xe1 && b[o + 4] === 0x45 && b[o + 5] === 0x78 && b[o + 6] === 0x69 && b[o + 7] === 0x66) {
+      const t = o + 10;
+      const le = b[t] === 0x49;
+      const u16 = (p: number) => (le ? b[p] | (b[p + 1] << 8) : (b[p] << 8) | b[p + 1]);
+      const u32 = (p: number) => (le ? b[p] | (b[p + 1] << 8) | (b[p + 2] << 16) | (b[p + 3] << 24) : (b[p] << 24) | (b[p + 1] << 16) | (b[p + 2] << 8) | b[p + 3]) >>> 0;
+      const ifd = t + u32(t + 4);
+      const count = ifd + 2 <= b.length ? u16(ifd) : 0;
+      for (let i = 0; i < count; i++) {
+        const e = ifd + 2 + i * 12;
+        if (e + 12 > b.length) break;
+        if (u16(e) === 0x0112) {
+          if (u16(e + 8) === 1) return b;
+          const copy = b.slice();
+          copy[e + 8] = le ? 1 : 0;
+          copy[e + 9] = le ? 0 : 1;
+          return copy;
+        }
+      }
+      return b;
+    }
+    o += 2 + len;
+  }
+  return b;
+}

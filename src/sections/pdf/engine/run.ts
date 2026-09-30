@@ -60,10 +60,14 @@ export async function prepareImage(input: ImageInput, env: RunEnv): Promise<Prep
   } else if (kind === "png") {
     const info = readPngInfo(bytes);
     if (info) return { kind: "png", bytes, pxWidth: info.width, pxHeight: info.height, dpiX: info.dpiX, dpiY: info.dpiY, orientation: 1 };
-  } else if (kind && env.convertImage) {
-    return env.convertImage(bytes, kind);
+  } else if (kind && kind !== "tiff" && env.convertImage) {
+    try {
+      return await env.convertImage(bytes, kind);
+    } catch {
+      throw new PdfError("bad-image", input.name);
+    }
   }
-  throw new PdfError("invalid-pdf", `unsupported-image:${input.name}`);
+  throw new PdfError("bad-image", input.name);
 }
 
 export async function runJob(job: Job, env: RunEnv = {}, progress: (p: number) => void = () => {}): Promise<JobResult> {
@@ -196,6 +200,7 @@ export async function runJob(job: Job, env: RunEnv = {}, progress: (p: number) =
     }
 
     case "unlock": {
+      if (!(await isEncrypted(u8(job.source.bytes)))) throw new PdfError("not-encrypted");
       const doc = await open(job.source);
       const bytes = await saveLoaded(doc);
       if (await isEncrypted(bytes)) throw new Error("verify: still encrypted");

@@ -67,7 +67,6 @@ export async function openDocument(bytes: ArrayBuffer, password?: string): Promi
     standardFontDataUrl: `${ASSETS}standard_fonts/`,
     wasmUrl: `${ASSETS}wasm/`,
     iccUrl: `${ASSETS}iccs/`,
-    isEvalSupported: false,
     enableXfa: false,
   });
   try {

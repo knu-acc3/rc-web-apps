@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronLeft, ChevronRight, Copy, RotateCcw, RotateCw, Trash2, Undo2 } from "lucide-react";
+import { Check, Trash2 } from "lucide-react";
 import { useEffect, useId, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
 import type { Locale } from "@/i18n/config";
 import { cn } from "@/lib/cn";
@@ -17,37 +17,34 @@ export interface GridPage {
   index: number;
   /** Extra clockwise rotation, degrees. */
   rotate: number;
-  /** Marked for deletion (shown faded). */
-  deleted?: boolean;
 }
 
 interface Props {
   locale: Locale;
   pages: readonly GridPage[];
-  thumbsOf: (fileId: string) => Thumbnailer | null;
+  thumbsOf?: (fileId: string) => Thumbnailer | null;
+  /** Custom thumbnail (e.g. an image preview) instead of a rendered PDF page. */
+  renderThumb?: (p: GridPage) => ReactNode;
   label: (p: GridPage, position: number) => string;
-  /** Accessible name of a page, e.g. "Страница 3 файла report.pdf". */
+  /** Accessible name of a page. */
   describe?: (p: GridPage, position: number) => string;
   selected?: ReadonlySet<string>;
+  /** "delete" shows selected pages as marked for removal. */
+  mark?: "select" | "delete";
   onToggle?: (key: string, extendRange: boolean) => void;
   onMove?: (from: number, to: number) => void;
   onRotate?: (key: string, delta: number) => void;
-  /** Toggle deletion (or remove the page). */
   onDelete?: (key: string) => void;
-  onDuplicate?: (key: string) => void;
-  /** Show both rotate buttons (rotate tool) instead of clockwise only. */
-  bothRotations?: boolean;
+  /** One quiet row of actions above the grid. */
   toolbar?: ReactNode;
 }
 
-const iconBtn =
-  "inline-flex size-7 items-center justify-center rounded-[6px] text-fg-2 transition-colors hover:bg-surface-2 hover:text-fg disabled:opacity-40 [&_svg]:size-4";
-
 /**
- * Thumbnail grid with selection, drag & drop and keyboard reordering.
- * Thumbnails render lazily as they scroll into view.
+ * Page thumbnails: click to select (Shift+click for a range), drag to reorder.
+ * Keyboard: arrows move focus, Space selects, Alt+arrows move the page,
+ * R rotates, Delete removes. Thumbnails render lazily while scrolling.
  */
-export function PageGrid({ locale, pages, thumbsOf, label, describe, selected, onToggle, onMove, onRotate, onDelete, onDuplicate, bothRotations, toolbar }: Props) {
+export function PageGrid({ locale, pages, thumbsOf, renderThumb, label, describe, selected, mark = "select", onToggle, onMove, onRotate, onDelete, toolbar }: Props) {
   const t = S[locale];
   const helpId = useId();
   const refs = useRef(new Map<string, HTMLButtonElement>());
@@ -76,52 +73,43 @@ export function PageGrid({ locale, pages, thumbsOf, label, describe, selected, o
     return n === -1 ? els.length : n;
   };
 
+  const move = (p: GridPage, from: number, to: number) => {
+    if (!onMove || to < 0 || to >= pages.length || to === from) return;
+    focusKey.current = p.key;
+    onMove(from, to);
+  };
+
   const onKey = (e: KeyboardEvent<HTMLButtonElement>, p: GridPage, i: number) => {
     const mod = e.altKey || e.ctrlKey || e.metaKey;
-    if ((e.key === "ArrowLeft" || e.key === "ArrowRight") && mod && onMove) {
+    const horiz = e.key === "ArrowLeft" ? -1 : e.key === "ArrowRight" ? 1 : 0;
+    const vert = e.key === "ArrowUp" ? -1 : e.key === "ArrowDown" ? 1 : 0;
+    if (horiz || vert) {
       e.preventDefault();
-      const to = i + (e.key === "ArrowLeft" ? -1 : 1);
-      if (to >= 0 && to < pages.length) {
-        focusKey.current = p.key;
-        onMove(i, to);
-      }
-    } else if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
-      e.preventDefault();
-      focusAt(i + (e.key === "ArrowLeft" ? -1 : 1));
-    } else if (e.key === "ArrowUp" || e.key === "ArrowDown") {
-      e.preventDefault();
-      const c = columns();
-      if (mod && onMove) {
-        const to = Math.max(0, Math.min(pages.length - 1, i + (e.key === "ArrowUp" ? -c : c)));
-        if (to !== i) {
-          focusKey.current = p.key;
-          onMove(i, to);
-        }
-      } else focusAt(i + (e.key === "ArrowUp" ? -c : c));
+      const step = horiz || vert * columns();
+      if (mod) move(p, i, Math.max(0, Math.min(pages.length - 1, i + step)));
+      else focusAt(i + step);
     } else if (e.key === "Home" || e.key === "End") {
       e.preventDefault();
       focusAt(e.key === "Home" ? 0 : pages.length - 1);
-    } else if ((e.key === "r" || e.key === "R" || e.key === "к" || e.key === "К") && onRotate && !mod) {
+    } else if (onRotate && !mod && (e.key === "r" || e.key === "R" || e.key === "к" || e.key === "К")) {
       e.preventDefault();
       onRotate(p.key, e.shiftKey ? -90 : 90);
-    } else if ((e.key === "Delete" || e.key === "Backspace") && onDelete) {
+    } else if (onDelete && (e.key === "Delete" || e.key === "Backspace")) {
       e.preventDefault();
-      if (!p.deleted) focusAt(i + 1 < pages.length ? i + 1 : i - 1);
+      focusAt(i + 1 < pages.length ? i + 1 : i - 1);
       onDelete(p.key);
     }
   };
 
+  const interactive = !!(onMove || onRotate || onDelete || onToggle);
+
   return (
-    <div>
+    <div className="flex flex-col gap-3">
       {toolbar}
-      {(onMove || onRotate || onDelete) && (
-        <p id={helpId} className="mb-3 text-sm text-fg-3">
-          {t.gridHelp}
-        </p>
-      )}
-      <ul className="grid grid-cols-3 gap-2.5 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6">
+      <ul className="grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6" aria-describedby={interactive ? helpId : undefined}>
         {pages.map((p, i) => {
           const isSel = selected?.has(p.key) ?? false;
+          const del = isSel && mark === "delete";
           const name = describe?.(p, i) ?? `${t.page} ${label(p, i)}`;
           return (
             <li
@@ -149,12 +137,7 @@ export function PageGrid({ locale, pages, thumbsOf, label, describe, selected, o
                 dragFrom.current = null;
                 setOver(null);
               }}
-              className={cn(
-                "flex min-w-0 flex-col rounded-[10px] border bg-surface p-1.5 transition-colors",
-                isSel ? "border-accent ring-2 ring-accent/30" : "border-line",
-                over === i && "border-accent bg-accent-soft",
-                onMove && "cursor-grab active:cursor-grabbing",
-              )}
+              className={cn("min-w-0", onMove && "cursor-grab active:cursor-grabbing")}
             >
               <button
                 type="button"
@@ -164,76 +147,38 @@ export function PageGrid({ locale, pages, thumbsOf, label, describe, selected, o
                 }}
                 aria-label={name}
                 aria-pressed={onToggle ? isSel : undefined}
-                aria-describedby={onMove || onRotate || onDelete ? helpId : undefined}
-                aria-keyshortcuts={onMove ? "Alt+ArrowLeft Alt+ArrowRight" : undefined}
                 onClick={(e) => onToggle?.(p.key, e.shiftKey)}
                 onKeyDown={(e) => onKey(e, p, i)}
-                className={cn("relative block w-full rounded-[8px]", !onToggle && "cursor-default")}
+                className={cn(
+                  "group relative block w-full rounded-[10px] border-2 p-1 transition-colors",
+                  over === i ? "border-accent bg-accent-soft" : del ? "border-err/60" : isSel ? "border-accent" : "border-transparent hover:border-line-strong",
+                  !onToggle && "cursor-default",
+                )}
               >
-                <Thumb thumbs={thumbsOf(p.file)} index={p.index} rotate={p.rotate} dim={p.deleted} />
-                {p.deleted && (
+                {renderThumb ? renderThumb(p) : <Thumb thumbs={thumbsOf?.(p.file) ?? null} index={p.index} rotate={p.rotate} dim={del} />}
+                {del && (
                   <span className="absolute inset-0 flex items-center justify-center" aria-hidden>
-                    <Trash2 className="size-7 text-err" />
+                    <span className="flex size-9 items-center justify-center rounded-full bg-err text-white">
+                      <Trash2 className="size-4" />
+                    </span>
                   </span>
                 )}
-                {onToggle && (
-                  <span
-                    aria-hidden
-                    className={cn(
-                      "absolute top-1.5 left-1.5 flex size-5 items-center justify-center rounded-full border-2 text-[11px] font-bold",
-                      isSel ? "border-accent bg-accent text-accent-fg" : "border-line-strong bg-surface/90",
-                    )}
-                  >
-                    {isSel ? "✓" : ""}
+                {isSel && !del && (
+                  <span className="absolute top-2 right-2 flex size-5 items-center justify-center rounded-full bg-accent text-accent-fg" aria-hidden>
+                    <Check className="size-3.5" strokeWidth={3} />
                   </span>
                 )}
+                <span className={cn("tabular mt-1 block truncate text-center text-xs text-fg-3", isSel && "font-semibold text-fg", del && "line-through")}>{label(p, i)}</span>
               </button>
-              <div className="mt-1 flex min-h-7 flex-wrap items-center justify-between gap-x-1">
-                <span className={cn("tabular truncate px-1 text-xs font-medium text-fg-2", p.deleted && "line-through")}>{label(p, i)}</span>
-                <span className="flex flex-wrap items-center justify-end">
-                  {onMove && (
-                    <button type="button" tabIndex={-1} className={iconBtn} aria-label={`${t.moveLeft}: ${name}`} title={t.moveLeft} disabled={i === 0} onClick={() => onMove(i, i - 1)}>
-                      <ChevronLeft />
-                    </button>
-                  )}
-                  {onRotate && bothRotations && (
-                    <button type="button" tabIndex={-1} className={iconBtn} aria-label={`${t.rotateLeft}: ${name}`} title={t.rotateLeft} onClick={() => onRotate(p.key, -90)}>
-                      <RotateCcw />
-                    </button>
-                  )}
-                  {onRotate && (
-                    <button type="button" tabIndex={-1} className={iconBtn} aria-label={`${t.rotateRight}: ${name}`} title={t.rotateRight} onClick={() => onRotate(p.key, 90)}>
-                      <RotateCw />
-                    </button>
-                  )}
-                  {onDuplicate && (
-                    <button type="button" tabIndex={-1} className={iconBtn} aria-label={`${t.duplicatePage}: ${name}`} title={t.duplicatePage} onClick={() => onDuplicate(p.key)}>
-                      <Copy />
-                    </button>
-                  )}
-                  {onDelete && (
-                    <button
-                      type="button"
-                      tabIndex={-1}
-                      className={cn(iconBtn, !p.deleted && "hover:text-err")}
-                      aria-label={`${p.deleted ? t.restorePage : t.deletePage}: ${name}`}
-                      title={p.deleted ? t.restorePage : t.deletePage}
-                      onClick={() => onDelete(p.key)}
-                    >
-                      {p.deleted ? <Undo2 /> : <Trash2 />}
-                    </button>
-                  )}
-                  {onMove && (
-                    <button type="button" tabIndex={-1} className={iconBtn} aria-label={`${t.moveRight}: ${name}`} title={t.moveRight} disabled={i === pages.length - 1} onClick={() => onMove(i, i + 1)}>
-                      <ChevronRight />
-                    </button>
-                  )}
-                </span>
-              </div>
             </li>
           );
         })}
       </ul>
+      {interactive && (
+        <p id={helpId} className="text-xs text-fg-3">
+          {onMove ? (onRotate ? t.gridHelp : t.gridHelpMove) : mark === "delete" ? t.gridHelpDelete : t.gridHelpSelect}
+        </p>
+      )}
     </div>
   );
 }
@@ -243,5 +188,22 @@ export function moveItem<T>(list: readonly T[], from: number, to: number): T[] {
   const next = list.slice();
   const [item] = next.splice(from, 1);
   next.splice(to, 0, item);
+  return next;
+}
+
+/** Selection with Shift+click ranges over an ordered list of keys. */
+export function toggleSelection(prev: ReadonlySet<string>, keys: readonly string[], key: string, extend: boolean, anchor: { current: string | null }): Set<string> {
+  const next = new Set(prev);
+  if (extend && anchor.current && keys.includes(anchor.current)) {
+    const a = keys.indexOf(anchor.current);
+    const b = keys.indexOf(key);
+    const [lo, hi] = a < b ? [a, b] : [b, a];
+    for (let i = lo; i <= hi; i++) next.add(keys[i]);
+  } else if (next.has(key)) {
+    next.delete(key);
+  } else {
+    next.add(key);
+  }
+  anchor.current = key;
   return next;
 }

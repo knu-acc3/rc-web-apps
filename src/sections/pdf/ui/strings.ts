@@ -42,7 +42,10 @@ export const S = {
     duplicatePage: "Дублировать страницу",
     moveLeft: "Переместить назад",
     moveRight: "Переместить вперёд",
-    gridHelp: "Перетаскивайте страницы мышью. С клавиатуры: Alt+← / Alt+→ — переместить, R — повернуть, Delete — удалить, пробел — выбрать.",
+    gridHelp: "Нажмите на страницу, чтобы выбрать её (Shift — диапазон), и перетаскивайте мышью. С клавиатуры: стрелки, пробел — выбрать, Alt+стрелка — переместить, R — повернуть, Delete — удалить.",
+    gridHelpSelect: "Нажмите на страницы, чтобы выбрать их (Shift — диапазон). С клавиатуры: стрелки и пробел.",
+    gridHelpMove: "Перетаскивайте мышью, чтобы изменить порядок. С клавиатуры: стрелки, пробел — выбрать, Alt+стрелка — переместить, Delete — убрать.",
+    gridHelpDelete: "Нажмите на страницы, которые нужно удалить (Shift — диапазон). С клавиатуры: стрелки, пробел или Delete.",
     select: "Выбрать",
     selectAll: "Выбрать все",
     selectNone: "Снять выбор",
@@ -55,6 +58,7 @@ export const S = {
       "font-required": "Не удалось загрузить шрифт для этого текста",
       "no-pages": "Не выбрано ни одной страницы",
       "no-form": "В файле нет полей формы",
+      "not-encrypted": "Этот файл не защищён паролем — снимать нечего",
       generic: "Не удалось обработать файл",
       memory: "Не хватает памяти браузера: уменьшите DPI или выберите меньше страниц",
     },
@@ -103,7 +107,10 @@ export const S = {
     duplicatePage: "Duplicate page",
     moveLeft: "Move back",
     moveRight: "Move forward",
-    gridHelp: "Drag pages with the mouse. Keyboard: Alt+← / Alt+→ to move, R to rotate, Delete to remove, Space to select.",
+    gridHelp: "Click a page to select it (Shift for a range) and drag to reorder. Keyboard: arrows, Space to select, Alt+arrow to move, R to rotate, Delete to remove.",
+    gridHelpSelect: "Click pages to select them (Shift for a range). Keyboard: arrows and Space.",
+    gridHelpMove: "Drag to change the order. Keyboard: arrows, Space to select, Alt+arrow to move, Delete to remove.",
+    gridHelpDelete: "Click the pages to delete (Shift for a range). Keyboard: arrows, Space or Delete.",
     select: "Select",
     selectAll: "Select all",
     selectNone: "Clear selection",
@@ -116,6 +123,7 @@ export const S = {
       "font-required": "Couldn't load a font for this text",
       "no-pages": "No pages selected",
       "no-form": "The file has no form fields",
+      "not-encrypted": "This file is not password-protected — there is nothing to remove",
       generic: "Couldn't process the file",
       memory: "The browser ran out of memory: lower the DPI or choose fewer pages",
     },
@@ -144,9 +152,17 @@ export function rangeErrorText(locale: Locale, e: RangeError, max: number): stri
   }
 }
 
+/** An error whose message is already written for the user (shown as is). */
+export class UserFacingError extends Error {}
+
 export function errorText(locale: Locale, e: unknown): string {
+  if (e instanceof UserFacingError) return e.message;
   const t = S[locale].errors;
   const code = (e as { code?: string })?.code;
+  if (code === "bad-image") {
+    const name = e instanceof Error ? e.message : "";
+    return locale === "ru" ? `Не удалось прочитать картинку «${name}» — файл повреждён или формат не поддерживается` : `Couldn't read the image “${name}” — it is damaged or the format is not supported`;
+  }
   if (code && code in t) return t[code as keyof typeof t];
   const msg = e instanceof Error ? e.message : "";
   if (/memory|allocation|Array buffer/i.test(msg)) return t.memory;

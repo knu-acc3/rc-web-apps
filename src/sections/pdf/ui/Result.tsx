@@ -74,10 +74,13 @@ export function ResultCard({
   notice,
   onReset,
   children,
+  emphasizeSize,
 }: {
   locale: Locale;
   items: readonly OutputItem[];
   originalSize?: number;
+  /** Show the size reduction in large type (compression). */
+  emphasizeSize?: boolean;
   zipName?: string;
   notice?: ReactNode;
   onReset?: () => void;
@@ -95,6 +98,11 @@ export function ResultCard({
         <div className="flex min-w-0 items-start gap-3">
           <CheckCircle2 className="mt-0.5 size-5 shrink-0 text-ok" aria-hidden />
           <div className="min-w-0" aria-live="polite">
+            {emphasizeSize && delta !== null && delta < 0 && (
+              <p className="tabular text-3xl font-bold tracking-tight text-ok sm:text-4xl">
+                −{formatNumber(locale, Math.abs(delta) * 100, { maximumFractionDigits: delta > -0.1 ? 1 : 0 })}%
+              </p>
+            )}
             <p className="truncate font-semibold text-fg" title={single?.name}>
               {single ? single.name : `${t.result}: ${formatNumber(locale, items.length)} ${locale === "ru" ? pluralFiles(items.length) : items.length === 1 ? "file" : "files"}`}
             </p>

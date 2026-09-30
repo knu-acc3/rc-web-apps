@@ -15,7 +15,7 @@ import {
   visualToPage,
   type Matrix,
 } from "@/sections/pdf/engine/geometry";
-import { readJpegInfo, readPngInfo, sniffImage } from "@/sections/pdf/engine/image-info";
+import { readJpegInfo, readPngInfo, sniffImage, stripJpegOrientation } from "@/sections/pdf/engine/image-info";
 
 const A4 = PAPER.a4;
 const close = (a: number, b: number, eps = 0.01) => Math.abs(a - b) < eps;
@@ -244,6 +244,16 @@ describe("image headers", () => {
     expect(info?.dpiX).toBeCloseTo(96, 0);
     expect(info?.alpha).toBe(true);
     expect(readPngInfo(pngBytes(10, 10))?.dpiX).toBeNull();
+  });
+
+  it("resets EXIF orientation without touching the original bytes", () => {
+    const src = jpegBytes({ w: 640, h: 480, exif: { orientation: 6 } });
+    const out = stripJpegOrientation(src);
+    expect(readJpegInfo(out)?.orientation).toBe(1);
+    expect(readJpegInfo(src)?.orientation).toBe(6);
+    expect(out.length).toBe(src.length);
+    const plain = jpegBytes({ w: 10, h: 10 });
+    expect(stripJpegOrientation(plain)).toBe(plain);
   });
 
   it("sniffs formats", () => {

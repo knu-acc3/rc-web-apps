@@ -11,7 +11,7 @@ import { PdfError, openPdf, pageGeometry, pageLabel, pageNumberPlan, readForm, r
 import { runJob } from "@/sections/pdf/engine/run";
 import { chunkPages } from "@/sections/pdf/engine/ranges";
 
-const FONT = readFileSync(join(process.cwd(), "public/vendor/pdf/fonts/NotoSans-Regular.ttf"));
+const FONT = readFileSync(join(process.cwd(), "src/sections/pdf/assets/NotoSans-Regular.ttf"));
 const STD_FONTS = join(process.cwd(), "node_modules/pdfjs-dist/standard_fonts/").replace(/\\/g, "/");
 
 /** A PDF whose pages say "Doc <tag> page <n>" and have distinct sizes. */
@@ -33,7 +33,7 @@ async function makePdf(tag: string, n: number, opts: { rotate?: number[]; title?
 const buf = (u: Uint8Array) => u.slice().buffer;
 
 async function pdfText(bytes: Uint8Array, password?: string): Promise<string[]> {
-  const doc = await getDocument({ data: bytes.slice(), password, standardFontDataUrl: STD_FONTS, isEvalSupported: false }).promise;
+  const doc = await getDocument({ data: bytes.slice(), password, standardFontDataUrl: STD_FONTS }).promise;
   const out: string[] = [];
   for (let i = 1; i <= doc.numPages; i++) {
     const page = await doc.getPage(i);

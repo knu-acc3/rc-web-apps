@@ -44,7 +44,16 @@ export function runPdfJob(job: Job, opts: { onProgress?: (p: number) => void; si
     worker.onmessage = (e: MessageEvent<WorkerMessage>) => {
       const m = e.data;
       if (m.type === "progress") opts.onProgress?.(m.value);
-      else if (m.type === "done") {
+      else if (m.type === "codec") {
+        // Worker without OffscreenCanvas: encode/decode this one image on the page.
+        import("./main-codec")
+          .then((c) => c.handleCodecRequest(m.request))
+          .then((result) => {
+            const transfer = result instanceof ArrayBuffer ? [result] : [result.bytes];
+            worker.postMessage({ type: "codec-result", id: m.id, result }, transfer);
+          })
+          .catch((err: unknown) => worker.postMessage({ type: "codec-result", id: m.id, error: err instanceof Error ? err.message : String(err) }));
+      } else if (m.type === "done") {
         finish();
         resolve(m.result);
       } else {

@@ -78,7 +78,7 @@ describe("real pdf.js items", () => {
     page.drawText("Hello world", { x: 20, y: 350, size: 14, font });
     page.drawText("Second line", { x: 20, y: 332, size: 14, font });
     page.drawText("Far paragraph", { x: 20, y: 250, size: 14, font });
-    const pdf = await getDocument({ data: await doc.save(), isEvalSupported: false }).promise;
+    const pdf = await getDocument({ data: await doc.save() }).promise;
     const tc = await (await pdf.getPage(1)).getTextContent();
     expect(pageParagraphs(tc.items as TextItemLike[])).toEqual([["Hello world", "Second line"], ["Far paragraph"]]);
     await pdf.loadingTask.destroy();

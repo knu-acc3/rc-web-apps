@@ -52,7 +52,7 @@ import {
 
 /* ───────────── errors ───────────── */
 
-export type PdfErrorCode = "password-required" | "password-incorrect" | "encryption-unsupported" | "invalid-pdf" | "font-required" | "no-pages" | "no-form";
+export type PdfErrorCode = "password-required" | "password-incorrect" | "encryption-unsupported" | "invalid-pdf" | "font-required" | "no-pages" | "no-form" | "not-encrypted" | "bad-image";
 
 export class PdfError extends Error {
   constructor(
@@ -345,20 +345,8 @@ export function stampImage(page: PDFPage, image: import("@cantoo/pdf-lib").PDFIm
 
 /* ───────────── page numbers ───────────── */
 
-export type NumberFormat = "n" | "n-of-total" | "page-n-of-total" | "dash-n";
-
-export function pageLabel(format: NumberFormat, n: number, total: number, locale: "ru" | "en"): string {
-  switch (format) {
-    case "n-of-total":
-      return `${n} / ${total}`;
-    case "page-n-of-total":
-      return locale === "ru" ? `Страница ${n} из ${total}` : `Page ${n} of ${total}`;
-    case "dash-n":
-      return `– ${n} –`;
-    default:
-      return String(n);
-  }
-}
+import { pageNumberPlan, type NumberFormat } from "./labels";
+export { pageLabel, pageNumberPlan, type NumberFormat } from "./labels";
 
 export interface PageNumberOptions {
   position: Anchor;
@@ -372,14 +360,6 @@ export interface PageNumberOptions {
   /** Distance from the page edge, points. */
   margin: number;
   color: RGB;
-}
-
-/** Labels for every page (null = not numbered). The total is the last printed number. */
-export function pageNumberPlan(pageCount: number, o: Pick<PageNumberOptions, "format" | "locale" | "start" | "skipFirst">): (string | null)[] {
-  const first = o.skipFirst ? 1 : 0;
-  const numbered = Math.max(0, pageCount - first);
-  const total = o.start + numbered - 1;
-  return Array.from({ length: pageCount }, (_, i) => (i < first ? null : pageLabel(o.format, o.start + i - first, total, o.locale)));
 }
 
 /**
