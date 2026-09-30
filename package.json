@@ -7,7 +7,7 @@
   },
   "scripts": {
     "dev": "next dev -p 3000",
-    "prebuild": "node scripts/vendor.mjs",
+    "prebuild": "node scripts/gen-tool-components.mjs && node scripts/vendor.mjs",
     "build": "next build",
     "start": "next start -p 3000",
     "lint": "eslint",
