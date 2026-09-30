@@ -241,18 +241,27 @@ export function defineToolSection(input: ToolSectionInput): SectionDef {
   }
 
   function relatedLinks(tool: ToolDef, locale: Locale): LinkItem[] {
-    const out: LinkItem[] = [];
-    for (const key of tool.related ?? []) {
-      const link = relatedResolver(key, locale);
-      if (link) out.push(link);
-      else unresolved.add(`${tool.slug || input.id} → ${key}`);
+    // Resolving a related page builds that page; its own related list is not needed (and two
+    // tools that reference each other would otherwise recurse forever).
+    if (relatedDepth > 0) return [];
+    relatedDepth++;
+    try {
+      const out: LinkItem[] = [];
+      for (const key of tool.related ?? []) {
+        const link = relatedResolver(key, locale);
+        if (link) out.push(link);
+        else unresolved.add(`${tool.slug || input.id} → ${key}`);
+      }
+      return out;
+    } finally {
+      relatedDepth--;
     }
-    return out;
   }
 
   return section;
 }
 
+let relatedDepth = 0;
 const unresolved = new Set<string>();
 /** Related keys that did not resolve to a page (checked by the registry test). */
 export function unresolvedRelated(): string[] {
