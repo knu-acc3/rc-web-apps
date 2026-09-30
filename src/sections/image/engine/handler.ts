@@ -15,12 +15,20 @@ import type {
   GifFramesResult,
   InfoResult,
   JobRequest,
+  Op,
   OutFormat,
   PixelsResult,
   PreviewResult,
   ProcessResult,
   Src,
+  TileResult,
 } from "./types";
+
+function cloneCanvas(env: Env, c: AnyCanvas): AnyCanvas {
+  const out = makeCanvas(env, c.width, c.height);
+  ctx2d(out).drawImage(c, 0, 0);
+  return out;
+}
 
 export interface HandlerCtx {
   progress(v: number): void;
@@ -163,7 +171,7 @@ async function processJob(req: Extract<JobRequest, { type: "process" }>, hc: Han
   checkAbort(hc.signal);
   hc.progress(0.25);
   const info: RunInfo = { limited: false };
-  let canvas = await runOps(env, decoded, req.ops, info);
+  const canvas = await runOps(env, decoded, req.ops, info);
   if (canvas !== decoded) releaseCanvas(decoded);
   checkAbort(hc.signal);
   hc.progress(0.5);
@@ -372,6 +380,26 @@ export async function handle(req: JobRequest, hc: HandlerCtx): Promise<Handled> 
         hc.progress((f.index + 1) / frames.length);
       }
       return { result: out, transfer };
+    }
+
+    case "tiles": {
+      const env = makeEnv();
+      const full = await decodeSrc(req.src, env);
+      const tiles: TileResult[] = [];
+      for (let i = 0; i < req.rects.length; i++) {
+        checkAbort(hc.signal);
+        const ops: Op[] = [{ t: "crop", rect: req.rects[i] }];
+        if (req.size) ops.push({ t: "size", w: req.size.w, h: req.size.h });
+        const c = await runOps(env, full, ops);
+        const enc = await encodeCanvas(c === full ? cloneCanvas(env, full) : c, req.out, env);
+        const bytes = finishBytes(enc.bytes, req.out, null);
+        const buf = bytes.slice().buffer as ArrayBuffer;
+        tiles.push({ bytes: buf, width: c.width, height: c.height });
+        if (c !== full) releaseCanvas(c);
+        hc.progress((i + 1) / req.rects.length);
+      }
+      releaseCanvas(full);
+      return { result: tiles, transfer: tiles.map((t) => t.bytes) };
     }
 
     case "encode-rgba": {

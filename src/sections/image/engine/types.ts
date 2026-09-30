@@ -137,7 +137,15 @@ export type JobRequest =
   | { type: "palette"; src: Src; count: number }
   | { type: "gif-encode"; frames: ImageBitmap[]; width: number; height: number; fit: "contain" | "cover"; background: string; delay: number; delays?: number[]; loop: number }
   | { type: "gif-frames"; bytes: ArrayBuffer; indices?: number[] }
-  | { type: "encode-rgba"; rgba: ArrayBuffer; width: number; height: number; out: OutputSpec };
+  | { type: "encode-rgba"; rgba: ArrayBuffer; width: number; height: number; out: OutputSpec }
+  /** Decode once, then crop (and optionally resize) many rectangles. */
+  | { type: "tiles"; src: Src; rects: Rect[]; out: OutputSpec; size?: { w: number; h: number } };
+
+export interface TileResult {
+  bytes: ArrayBuffer;
+  width: number;
+  height: number;
+}
 
 export interface PreviewResult {
   bitmap: ImageBitmap;

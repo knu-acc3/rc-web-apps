@@ -332,8 +332,8 @@ export const CONVERT_PAIRS: ConvertPair[] = [
     to: "jpg",
     name: { ru: "HEIC → JPG", en: "HEIC → JPG" },
     title: {
-      ru: "HEIC в JPG — конвертер фото с iPhone онлайн",
-      en: "HEIC to JPG Converter — iPhone Photos to JPG",
+      ru: "Конвертировать HEIC в JPG онлайн — фото с iPhone",
+      en: "Convert HEIC to JPG Online — iPhone Photos",
     },
     h1: { ru: "Конвертировать HEIC в JPG", en: "Convert HEIC to JPG" },
     description: {
@@ -411,8 +411,8 @@ export const CONVERT_PAIRS: ConvertPair[] = [
     to: "png",
     name: { ru: "HEIC → PNG", en: "HEIC → PNG" },
     title: {
-      ru: "HEIC в PNG — фото с айфона без повторного сжатия",
-      en: "HEIC to PNG — Lossless Copies of iPhone Photos",
+      ru: "Конвертировать HEIC в PNG онлайн — снимки без сжатия",
+      en: "Convert HEIC to PNG Online — No Extra Compression",
     },
     h1: { ru: "Конвертировать HEIC в PNG", en: "Convert HEIC to PNG" },
     description: {
@@ -489,8 +489,8 @@ export const CONVERT_PAIRS: ConvertPair[] = [
     to: "webp",
     name: { ru: "HEIC → WebP", en: "HEIC → WebP" },
     title: {
-      ru: "HEIC в WebP — лёгкие фото с iPhone для сайта",
-      en: "HEIC to WebP — Lightweight iPhone Photos for the Web",
+      ru: "Конвертировать HEIC в WebP онлайн — фото для сайта",
+      en: "Convert HEIC to WebP Online — iPhone Photos for the Web",
     },
     h1: { ru: "Конвертировать HEIC в WebP", en: "Convert HEIC to WebP" },
     description: {
@@ -568,8 +568,8 @@ export const CONVERT_PAIRS: ConvertPair[] = [
     to: "jpg",
     name: { ru: "WebP → JPG", en: "WebP → JPG" },
     title: {
-      ru: "WebP в JPG — картинки с сайтов для любых программ",
-      en: "WebP to JPG — Make Web Images Open in Any Program",
+      ru: "Конвертировать WebP в JPG онлайн — для любых программ",
+      en: "Convert WebP to JPG Online — Open in Any Program",
     },
     h1: { ru: "Конвертировать WebP в JPG", en: "Convert WebP to JPG" },
     description: {
@@ -647,8 +647,8 @@ export const CONVERT_PAIRS: ConvertPair[] = [
     to: "png",
     name: { ru: "WebP → PNG", en: "WebP → PNG" },
     title: {
-      ru: "WebP в PNG — конвертер с сохранением прозрачности",
-      en: "WebP to PNG Converter — Transparency Preserved",
+      ru: "Конвертировать WebP в PNG онлайн — с прозрачностью",
+      en: "Convert WebP to PNG Online — Keep Transparency",
     },
     h1: { ru: "Конвертировать WebP в PNG", en: "Convert WebP to PNG" },
     description: {
@@ -725,8 +725,8 @@ export const CONVERT_PAIRS: ConvertPair[] = [
     to: "jpg",
     name: { ru: "AVIF → JPG", en: "AVIF → JPG" },
     title: {
-      ru: "AVIF в JPG — картинка, которая откроется везде",
-      en: "AVIF to JPG — Make AVIF Images Open Anywhere",
+      ru: "Конвертировать AVIF в JPG онлайн — откроется везде",
+      en: "Convert AVIF to JPG Online — Opens Everywhere",
     },
     h1: { ru: "Конвертировать AVIF в JPG", en: "Convert AVIF to JPG" },
     description: {
@@ -803,8 +803,8 @@ export const CONVERT_PAIRS: ConvertPair[] = [
     to: "png",
     name: { ru: "AVIF → PNG", en: "AVIF → PNG" },
     title: {
-      ru: "AVIF в PNG — без новых потерь и с прозрачностью",
-      en: "AVIF to PNG — Lossless PNG with Transparency",
+      ru: "Конвертировать AVIF в PNG онлайн — без новых потерь",
+      en: "Convert AVIF to PNG Online — Lossless, with Alpha",
     },
     h1: { ru: "Конвертировать AVIF в PNG", en: "Convert AVIF to PNG" },
     description: {
@@ -882,8 +882,8 @@ export const CONVERT_PAIRS: ConvertPair[] = [
     to: "jpg",
     name: { ru: "PNG → JPG", en: "PNG → JPG" },
     title: {
-      ru: "PNG в JPG — уменьшить вес картинки в разы",
-      en: "PNG to JPG — Shrink Images, Pick a Background Color",
+      ru: "Конвертировать PNG в JPG онлайн — вес меньше в разы",
+      en: "Convert PNG to JPG Online — Much Smaller Files",
     },
     h1: { ru: "Конвертировать PNG в JPG", en: "Convert PNG to JPG" },
     description: {
@@ -961,8 +961,8 @@ export const CONVERT_PAIRS: ConvertPair[] = [
     to: "png",
     name: { ru: "JPG → PNG", en: "JPG → PNG" },
     title: {
-      ru: "JPG в PNG — конвертер без дальнейшей потери качества",
-      en: "JPG to PNG Converter — Stop Further Quality Loss",
+      ru: "Конвертировать JPG в PNG онлайн — без пересжатия",
+      en: "Convert JPG to PNG Online — No Further Quality Loss",
     },
     h1: { ru: "Конвертировать JPG в PNG", en: "Convert JPG to PNG" },
     description: {
@@ -1041,8 +1041,8 @@ export const CONVERT_PAIRS: ConvertPair[] = [
     to: "webp",
     name: { ru: "JPG → WebP", en: "JPG → WebP" },
     title: {
-      ru: "JPG в WebP — фото на 25–34 % легче для сайта",
-      en: "JPG to WebP — 25–34% Smaller Photos for Your Site",
+      ru: "Конвертировать JPG в WebP онлайн — на 25–34 % легче",
+      en: "Convert JPG to WebP Online — 25–34% Smaller Files",
     },
     h1: { ru: "Конвертировать JPG в WebP", en: "Convert JPG to WebP" },
     description: {
@@ -1120,8 +1120,8 @@ export const CONVERT_PAIRS: ConvertPair[] = [
     to: "webp",
     name: { ru: "PNG → WebP", en: "PNG → WebP" },
     title: {
-      ru: "PNG в WebP — меньше вес, прозрачность на месте",
-      en: "PNG to WebP — Smaller Files, Transparency Kept",
+      ru: "Конвертировать PNG в WebP онлайн — прозрачность на месте",
+      en: "Convert PNG to WebP Online — Transparency Kept",
     },
     h1: { ru: "Конвертировать PNG в WebP", en: "Convert PNG to WebP" },
     description: {
@@ -1197,8 +1197,8 @@ export const CONVERT_PAIRS: ConvertPair[] = [
     to: "avif",
     name: { ru: "JPG → AVIF", en: "JPG → AVIF" },
     title: {
-      ru: "JPG в AVIF — сжатие нового поколения для фото",
-      en: "JPG to AVIF — Next-Generation Compression for Photos",
+      ru: "Конвертировать JPG в AVIF онлайн — кодек AV1 для сайта",
+      en: "Convert JPG to AVIF Online — Next-Gen AV1 Compression",
     },
     h1: { ru: "Конвертировать JPG в AVIF", en: "Convert JPG to AVIF" },
     description: {
@@ -1274,8 +1274,8 @@ export const CONVERT_PAIRS: ConvertPair[] = [
     to: "avif",
     name: { ru: "PNG → AVIF", en: "PNG → AVIF" },
     title: {
-      ru: "PNG в AVIF — компактные картинки с прозрачностью",
-      en: "PNG to AVIF — Compact Images with Transparency",
+      ru: "Конвертировать PNG в AVIF онлайн — прозрачность и малый вес",
+      en: "Convert PNG to AVIF Online — Small Files with Alpha",
     },
     h1: { ru: "Конвертировать PNG в AVIF", en: "Convert PNG to AVIF" },
     description: {
@@ -1352,8 +1352,8 @@ export const CONVERT_PAIRS: ConvertPair[] = [
     to: "png",
     name: { ru: "SVG → PNG", en: "SVG → PNG" },
     title: {
-      ru: "SVG в PNG — растровая картинка нужного размера",
-      en: "SVG to PNG — Render Vector Graphics at Any Size",
+      ru: "Конвертировать SVG в PNG онлайн — любой размер",
+      en: "Convert SVG to PNG Online — Render at Any Size",
     },
     h1: { ru: "Конвертировать SVG в PNG", en: "Convert SVG to PNG" },
     description: {
@@ -1431,8 +1431,8 @@ export const CONVERT_PAIRS: ConvertPair[] = [
     to: "jpg",
     name: { ru: "SVG → JPG", en: "SVG → JPG" },
     title: {
-      ru: "SVG в JPG — вектор в картинку на сплошном фоне",
-      en: "SVG to JPG — Vector Art on a Solid Background",
+      ru: "Конвертировать SVG в JPG онлайн — на сплошном фоне",
+      en: "Convert SVG to JPG Online — Solid Background",
     },
     h1: { ru: "Конвертировать SVG в JPG", en: "Convert SVG to JPG" },
     description: {
@@ -1508,8 +1508,8 @@ export const CONVERT_PAIRS: ConvertPair[] = [
     to: "webp",
     name: { ru: "SVG → WebP", en: "SVG → WebP" },
     title: {
-      ru: "SVG в WebP — растровая копия логотипа для сайта",
-      en: "SVG to WebP — Rasterize Vector Art for the Web",
+      ru: "Конвертировать SVG в WebP онлайн — растр для сайта",
+      en: "Convert SVG to WebP Online — Raster Copy for the Web",
     },
     h1: { ru: "Конвертировать SVG в WebP", en: "Convert SVG to WebP" },
     description: {
@@ -1585,8 +1585,8 @@ export const CONVERT_PAIRS: ConvertPair[] = [
     to: "ico",
     name: { ru: "SVG → ICO", en: "SVG → ICO" },
     title: {
-      ru: "SVG в ICO — иконка для сайта и Windows из вектора",
-      en: "SVG to ICO — Favicon and Windows Icon from Vector",
+      ru: "Конвертировать SVG в ICO онлайн — иконка из вектора",
+      en: "Convert SVG to ICO Online — Icon from Vector",
     },
     h1: { ru: "Конвертировать SVG в ICO", en: "Convert SVG to ICO" },
     description: {
@@ -1664,8 +1664,8 @@ export const CONVERT_PAIRS: ConvertPair[] = [
     to: "ico",
     name: { ru: "PNG → ICO", en: "PNG → ICO" },
     title: {
-      ru: "PNG в ICO — favicon и иконка Windows до 256×256",
-      en: "PNG to ICO — Favicon and Windows Icons up to 256×256",
+      ru: "Конвертировать PNG в ICO онлайн — favicon до 256×256",
+      en: "Convert PNG to ICO Online — Favicon up to 256×256",
     },
     h1: { ru: "Конвертировать PNG в ICO", en: "Convert PNG to ICO" },
     description: {
@@ -1743,8 +1743,8 @@ export const CONVERT_PAIRS: ConvertPair[] = [
     to: "ico",
     name: { ru: "JPG → ICO", en: "JPG → ICO" },
     title: {
-      ru: "JPG в ICO — иконка из фото или логотипа",
-      en: "JPG to ICO — Make an Icon from a Photo or Logo",
+      ru: "Конвертировать JPG в ICO онлайн — иконка из фото",
+      en: "Convert JPG to ICO Online — Icon from a Photo",
     },
     h1: { ru: "Конвертировать JPG в ICO", en: "Convert JPG to ICO" },
     description: {
@@ -1820,8 +1820,8 @@ export const CONVERT_PAIRS: ConvertPair[] = [
     to: "png",
     name: { ru: "ICO → PNG", en: "ICO → PNG" },
     title: {
-      ru: "ICO в PNG — достать картинку из иконки",
-      en: "ICO to PNG — Extract the Image from an Icon File",
+      ru: "Конвертировать ICO в PNG онлайн — картинка из иконки",
+      en: "Convert ICO to PNG Online — Extract the Icon Image",
     },
     h1: { ru: "Конвертировать ICO в PNG", en: "Convert ICO to PNG" },
     description: {
@@ -1898,8 +1898,8 @@ export const CONVERT_PAIRS: ConvertPair[] = [
     to: "png",
     name: { ru: "GIF → PNG", en: "GIF → PNG" },
     title: {
-      ru: "GIF в PNG — кадр без потерь и с прозрачностью",
-      en: "GIF to PNG — Lossless Frame with Transparency",
+      ru: "Конвертировать GIF в PNG онлайн — кадр без потерь",
+      en: "Convert GIF to PNG Online — Lossless Frame",
     },
     h1: { ru: "Конвертировать GIF в PNG", en: "Convert GIF to PNG" },
     description: {
@@ -1975,8 +1975,8 @@ export const CONVERT_PAIRS: ConvertPair[] = [
     to: "jpg",
     name: { ru: "GIF → JPG", en: "GIF → JPG" },
     title: {
-      ru: "GIF в JPG — первый кадр анимации как картинка",
-      en: "GIF to JPG — Save a GIF Frame as a JPG Image",
+      ru: "Конвертировать GIF в JPG онлайн — первый кадр",
+      en: "Convert GIF to JPG Online — Save the First Frame",
     },
     h1: { ru: "Конвертировать GIF в JPG", en: "Convert GIF to JPG" },
     description: {
@@ -2054,8 +2054,8 @@ export const CONVERT_PAIRS: ConvertPair[] = [
     to: "jpg",
     name: { ru: "BMP → JPG", en: "BMP → JPG" },
     title: {
-      ru: "BMP в JPG — из тяжёлого BMP в компактное фото",
-      en: "BMP to JPG — Turn Bulky Bitmaps into Compact JPGs",
+      ru: "Конвертировать BMP в JPG онлайн — сжать тяжёлый BMP",
+      en: "Convert BMP to JPG Online — Shrink Bulky Bitmaps",
     },
     h1: { ru: "Конвертировать BMP в JPG", en: "Convert BMP to JPG" },
     description: {
@@ -2131,8 +2131,8 @@ export const CONVERT_PAIRS: ConvertPair[] = [
     to: "png",
     name: { ru: "BMP → PNG", en: "BMP → PNG" },
     title: {
-      ru: "BMP в PNG — меньше вес без потери качества",
-      en: "BMP to PNG — Smaller Files with Zero Quality Loss",
+      ru: "Конвертировать BMP в PNG онлайн — без потери качества",
+      en: "Convert BMP to PNG Online — Zero Quality Loss",
     },
     h1: { ru: "Конвертировать BMP в PNG", en: "Convert BMP to PNG" },
     description: {
@@ -2210,8 +2210,8 @@ export const CONVERT_PAIRS: ConvertPair[] = [
     to: "jpg",
     name: { ru: "TIFF → JPG", en: "TIFF → JPG" },
     title: {
-      ru: "TIFF в JPG — скан или макет для почты и сайта",
-      en: "TIFF to JPG — Scans and Print Files for Email and Web",
+      ru: "Конвертировать TIFF в JPG онлайн — сканы для почты",
+      en: "Convert TIFF to JPG Online — Scans for Email and Web",
     },
     h1: { ru: "Конвертировать TIFF в JPG", en: "Convert TIFF to JPG" },
     description: {
@@ -2289,8 +2289,8 @@ export const CONVERT_PAIRS: ConvertPair[] = [
     to: "png",
     name: { ru: "TIFF → PNG", en: "TIFF → PNG" },
     title: {
-      ru: "TIFF в PNG — конвертер сканов без потерь",
-      en: "TIFF to PNG — Lossless Conversion for Scans",
+      ru: "Конвертировать TIFF в PNG онлайн — сканы без потерь",
+      en: "Convert TIFF to PNG Online — Lossless Scans",
     },
     h1: { ru: "Конвертировать TIFF в PNG", en: "Convert TIFF to PNG" },
     description: {
@@ -2368,8 +2368,8 @@ export const CONVERT_PAIRS: ConvertPair[] = [
     to: "jpg",
     name: { ru: "JFIF → JPG", en: "JFIF → JPG" },
     title: {
-      ru: "JFIF в JPG — сменить расширение без потерь",
-      en: "JFIF to JPG — Rename to .jpg Without Re-Encoding",
+      ru: "Конвертировать JFIF в JPG онлайн — без перекодирования",
+      en: "Convert JFIF to JPG Online — No Re-Encoding",
     },
     h1: { ru: "Конвертировать JFIF в JPG", en: "Convert JFIF to JPG" },
     description: {
@@ -2447,8 +2447,8 @@ export const CONVERT_PAIRS: ConvertPair[] = [
     to: "png",
     name: { ru: "JFIF → PNG", en: "JFIF → PNG" },
     title: {
-      ru: "JFIF в PNG — для форм, где .jfif не принимают",
-      en: "JFIF to PNG — Convert .jfif Images to PNG",
+      ru: "Конвертировать JFIF в PNG онлайн — для редакторов и форм",
+      en: "Convert JFIF to PNG Online — For Editors and Forms",
     },
     h1: { ru: "Конвертировать JFIF в PNG", en: "Convert JFIF to PNG" },
     description: {
@@ -2526,8 +2526,8 @@ export const CONVERT_PAIRS: ConvertPair[] = [
     to: "gif",
     name: { ru: "JPG → GIF", en: "JPG → GIF" },
     title: {
-      ru: "JPG в GIF — статичный GIF из фото, 256 цветов",
-      en: "JPG to GIF — Static GIF with a 256-Color Palette",
+      ru: "Конвертировать JPG в GIF онлайн — палитра 256 цветов",
+      en: "Convert JPG to GIF Online — 256-Color Palette",
     },
     h1: { ru: "Конвертировать JPG в GIF", en: "Convert JPG to GIF" },
     description: {
@@ -2603,8 +2603,8 @@ export const CONVERT_PAIRS: ConvertPair[] = [
     to: "gif",
     name: { ru: "PNG → GIF", en: "PNG → GIF" },
     title: {
-      ru: "PNG в GIF — графика для старых сайтов и форумов",
-      en: "PNG to GIF — Graphics with 1-Bit Transparency",
+      ru: "Конвертировать PNG в GIF онлайн — для старых сайтов",
+      en: "Convert PNG to GIF Online — For Legacy Sites",
     },
     h1: { ru: "Конвертировать PNG в GIF", en: "Convert PNG to GIF" },
     description: {

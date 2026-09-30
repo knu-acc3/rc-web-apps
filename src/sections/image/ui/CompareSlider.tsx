@@ -50,11 +50,7 @@ export function CompareSlider({
   return (
     <div className={cn("flex flex-col gap-2", className)}>
       <div className="flex items-center justify-between gap-2">
-        <div className="flex gap-2 text-[13px] text-fg-3">
-          <span>
-            ◧ {beforeLabel ?? t.before} / {afterLabel ?? t.after}
-          </span>
-        </div>
+        <span className="text-[13px] text-fg-3">{t.dragHint}</span>
         <Segmented
           size="sm"
           label={t.zoom}

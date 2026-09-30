@@ -155,7 +155,10 @@ export function stripJpegMetadata(b: Uint8Array): { bytes: Uint8Array; report: S
     if (!drop) parts.push(b.subarray(s.start, s.end));
   }
   if (eoiEnd < b.length) removed.add("trailer");
-  const bytes = concat(parts);
+  let bytes = concat(parts);
+  // Keep the photo upright: re-add a minimal EXIF block with only the orientation.
+  const orientation = readExifOrientation(b);
+  if (orientation !== 1) bytes = setExifOrientation(bytes, orientation);
   return { bytes, report: { removed: [...removed], bytesBefore: b.length, bytesAfter: bytes.length } };
 }
 
@@ -435,4 +438,20 @@ export function composeOrientation(current: number, flip: boolean, rot: number):
 export function transformJpegLossless(b: Uint8Array, flip: boolean, rot: number): Uint8Array {
   const next = composeOrientation(readExifOrientation(b), flip, rot);
   return setExifOrientation(b, next);
+}
+
+/** Stored pixel size from the SOF segment (before EXIF orientation). */
+export function jpegSize(b: Uint8Array): { width: number; height: number } | null {
+  const { segments } = parseJpeg(b, true);
+  const sof = segments.find((s) => s.marker >= 0xc0 && s.marker <= 0xcf && s.marker !== 0xc4 && s.marker !== 0xc8 && s.marker !== 0xcc);
+  if (!sof || sof.dataEnd - sof.dataStart < 5) return null;
+  const d = sof.dataStart;
+  return { height: (b[d + 1] << 8) | b[d + 2], width: (b[d + 3] << 8) | b[d + 4] };
+}
+
+/** Displayed size (orientations 5–8 swap width and height). */
+export function jpegDisplaySize(b: Uint8Array): { width: number; height: number } | null {
+  const s = jpegSize(b);
+  if (!s) return null;
+  return readExifOrientation(b) >= 5 ? { width: s.height, height: s.width } : s;
 }

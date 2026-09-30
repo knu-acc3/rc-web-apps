@@ -331,8 +331,20 @@ describe("JPEG metadata (lossless)", () => {
     expect(eoiEnd).toBe(f.length);
   });
 
+  it("keeps the photo upright: orientation survives stripping as a minimal EXIF block", () => {
+    const f = jpegFixture(exif); // orientation 6 + Make
+    const { bytes: out } = stripJpegMetadata(f);
+    expect(readExifOrientation(out)).toBe(6);
+    expect(indexOfSeq(out, bytes(0x43, 0x42, 0x41))).toBe(-1); // Make is gone
+    expect(extractExifSegment(out)!.length).toBeLessThan(40);
+  });
+
   it("strips APP1 (EXIF/XMP), APP13, comments and trailers; keeps JFIF, ICC and image data", () => {
     const trailer = bytes(0xff, 0xd8, 0xff, 0xe1, 0, 4, 1, 2); // e.g. an MPF secondary image
+    const exif = tiffIfd([
+      [0x010f, 2, 4, 0x00414243],
+      [0x0112, 3, 1, 1],
+    ]);
     const f = jpegFixture(exif, [], trailer);
     const { bytes: out, report } = stripJpegMetadata(f);
     expect(report.removed.sort()).toEqual(["COM", "EXIF", "IPTC", "XMP", "trailer"].sort());

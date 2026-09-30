@@ -64,6 +64,7 @@ export function useBatch({ runner, settingsKey, concurrency = 2, delay = 350 }: 
   const running = useRef(new Map<string, AbortController>());
   const gen = useRef(new Map<string, number>());
   const mounted = useRef(true);
+  const pumpRef = useRef<() => void>(() => {});
 
   useEffect(() => {
     runnerRef.current = runner;
@@ -119,10 +120,14 @@ export function useBatch({ runner, settingsKey, concurrency = 2, delay = 350 }: 
         })
         .finally(() => {
           if (running.current.get(it.key) === ac) running.current.delete(it.key);
-          queueMicrotask(pump);
+          queueMicrotask(() => pumpRef.current());
         });
     }
   }, [concurrency, getEngine, patch]);
+
+  useEffect(() => {
+    pumpRef.current = pump;
+  }, [pump]);
 
   const addFiles = useCallback(
     (files: File[]) => {

@@ -394,7 +394,7 @@ export const RESIZE_PRESETS: ResizePreset[] = [
     fit: "cover",
     name: { ru: "Обложка Facebook", en: "Facebook cover" },
     title: {
-      ru: "Обложка Facebook — размер 851×315 онлайн",
+      ru: "Размер обложки Facebook — 851×315 онлайн",
       en: "Facebook Cover Photo Size 851×315 — Resize Image",
     },
     h1: {
@@ -491,7 +491,7 @@ export const RESIZE_PRESETS: ResizePreset[] = [
     fit: "cover",
     name: { ru: "Пост Facebook", en: "Facebook post" },
     title: {
-      ru: "Картинка для поста Facebook — 1200×630 онлайн",
+      ru: "Размер картинки для Facebook — 1200×630 онлайн",
       en: "Facebook Post & Link Image Size 1200×630 — Resize",
     },
     h1: {
@@ -589,7 +589,7 @@ export const RESIZE_PRESETS: ResizePreset[] = [
     fit: "cover",
     name: { ru: "Превью YouTube", en: "YouTube thumbnail" },
     title: {
-      ru: "Превью для YouTube — размер 1280×720 онлайн",
+      ru: "Размер превью для YouTube — 1280×720 онлайн",
       en: "YouTube Thumbnail Size 1280×720 — Resize Image",
     },
     h1: {
@@ -689,7 +689,7 @@ export const RESIZE_PRESETS: ResizePreset[] = [
     fit: "cover",
     name: { ru: "Шапка YouTube", en: "YouTube banner" },
     title: {
-      ru: "Шапка YouTube-канала — размер 2048×1152 онлайн",
+      ru: "Размер шапки YouTube — 2048×1152 онлайн",
       en: "YouTube Banner Size 2048×1152 — Channel Art Resizer",
     },
     h1: {
@@ -787,7 +787,7 @@ export const RESIZE_PRESETS: ResizePreset[] = [
     fit: "cover",
     name: { ru: "Шапка X", en: "X header" },
     title: {
-      ru: "Шапка профиля X (Twitter) — размер 1500×500",
+      ru: "Размер шапки X (Twitter) — 1500×500 онлайн",
       en: "X (Twitter) Header Size 1500×500 — Resize Image",
     },
     h1: {
@@ -874,7 +874,7 @@ export const RESIZE_PRESETS: ResizePreset[] = [
     fit: "cover",
     name: { ru: "Пост X", en: "X post" },
     title: {
-      ru: "Картинка для поста X (Twitter) — 1600×900",
+      ru: "Размер картинки для X (Twitter) — 1600×900 онлайн",
       en: "X (Twitter) Post Image Size 1600×900 — Resize",
     },
     h1: {
@@ -961,7 +961,7 @@ export const RESIZE_PRESETS: ResizePreset[] = [
     fit: "cover",
     name: { ru: "Фон LinkedIn", en: "LinkedIn banner" },
     title: {
-      ru: "Фон профиля LinkedIn — размер 1584×396 онлайн",
+      ru: "Размер фона LinkedIn — 1584×396 онлайн",
       en: "LinkedIn Banner Size 1584×396 — Resize Background",
     },
     h1: {
@@ -1050,7 +1050,7 @@ export const RESIZE_PRESETS: ResizePreset[] = [
     fit: "cover",
     name: { ru: "Пост LinkedIn", en: "LinkedIn post" },
     title: {
-      ru: "Изображение для поста LinkedIn — 1200×627",
+      ru: "Размер картинки для LinkedIn — 1200×627 онлайн",
       en: "LinkedIn Post Image Size 1200×627 — Resize Photo",
     },
     h1: {
@@ -1137,7 +1137,7 @@ export const RESIZE_PRESETS: ResizePreset[] = [
     fit: "cover",
     name: { ru: "Аватар WhatsApp", en: "WhatsApp DP" },
     title: {
-      ru: "Аватарка для WhatsApp — размер фото 500×500",
+      ru: "Размер аватарки WhatsApp — фото 500×500 онлайн",
       en: "WhatsApp DP Size 500×500 — Resize Profile Photo",
     },
     h1: {
@@ -1231,7 +1231,7 @@ export const RESIZE_PRESETS: ResizePreset[] = [
     fit: "cover",
     name: { ru: "Аватар Telegram", en: "Telegram avatar" },
     title: {
-      ru: "Аватарка для Telegram — размер 640×640 онлайн",
+      ru: "Размер аватарки Telegram — 640×640 онлайн",
       en: "Telegram Avatar Size 640×640 — Resize Profile Photo",
     },
     h1: {
@@ -1325,7 +1325,7 @@ export const RESIZE_PRESETS: ResizePreset[] = [
     fit: "cover",
     name: { ru: "Обложка ВК", en: "VK cover" },
     title: {
-      ru: "Обложка сообщества ВК — размер 1920×768 онлайн",
+      ru: "Размер обложки ВК — 1920×768 онлайн",
       en: "VK Community Cover Size 1920×768 — Resize Image",
     },
     h1: {
@@ -1708,7 +1708,7 @@ export const RESIZE_PRESETS: ResizePreset[] = [
     fit: "cover",
     name: { ru: "Паспорт США 2×2", en: "US passport 2×2" },
     title: {
-      ru: "Фото 2×2 дюйма на паспорт и визу США — 600×600",
+      ru: "Фото на визу и паспорт США 2×2 — 600×600 px",
       en: "US Passport Photo 2×2 in — Resize to 600×600 px",
     },
     h1: {
@@ -1810,7 +1810,7 @@ export const RESIZE_PRESETS: ResizePreset[] = [
     fit: "cover",
     name: { ru: "Печать 10×15", en: "4×6 print" },
     title: {
-      ru: "Фото для печати 10×15 — 1200×1800 px, 300 dpi",
+      ru: "Фото 10×15 для печати — 1200×1800 px, 300 dpi",
       en: "4×6 Print Size (10×15 cm) — 1200×1800 px at 300 dpi",
     },
     h1: {
@@ -1908,7 +1908,7 @@ export const RESIZE_PRESETS: ResizePreset[] = [
     fit: "cover",
     name: { ru: "Печать 13×18", en: "5×7 print" },
     title: {
-      ru: "Фото для печати 13×18 — 1500×2100 px, 300 dpi",
+      ru: "Фото 13×18 для печати — 1500×2100 px, 300 dpi",
       en: "5×7 Print Size (13×18 cm) — 1500×2100 px at 300 dpi",
     },
     h1: {
@@ -2096,8 +2096,8 @@ export const RESIZE_PRESETS: ResizePreset[] = [
     fit: "cover",
     name: { ru: "Full HD", en: "Full HD" },
     title: {
-      ru: "Изменить размер фото до Full HD 1920×1080",
-      en: "Resize Image to Full HD 1920×1080 (1080p)",
+      ru: "Изменить размер фото 1920×1080 онлайн — Full HD",
+      en: "Resize Image to 1920×1080 — Full HD 1080p",
     },
     h1: {
       ru: "Изменить размер изображения до Full HD (1920×1080)",
@@ -2182,8 +2182,8 @@ export const RESIZE_PRESETS: ResizePreset[] = [
     fit: "cover",
     name: { ru: "2K QHD", en: "2K QHD" },
     title: {
-      ru: "Размер 2K (2560×1440) — изменить фото онлайн",
-      en: "Resize Image to 2K / QHD 2560×1440",
+      ru: "Изменить размер фото 2560×1440 онлайн — 2K QHD",
+      en: "Resize Image to 2560×1440 — 2K QHD",
     },
     h1: {
       ru: "Изменить размер изображения до 2K (2560×1440)",
@@ -2268,8 +2268,8 @@ export const RESIZE_PRESETS: ResizePreset[] = [
     fit: "cover",
     name: { ru: "4K UHD", en: "4K UHD" },
     title: {
-      ru: "Изменить размер фото до 4K — 3840×2160 онлайн",
-      en: "Resize Image to 4K UHD 3840×2160",
+      ru: "Изменить размер фото 3840×2160 онлайн — 4K UHD",
+      en: "Resize Image to 3840×2160 — 4K UHD",
     },
     h1: {
       ru: "Изменить размер изображения до 4K (3840×2160)",
@@ -2358,7 +2358,7 @@ export const RESIZE_PRESETS: ResizePreset[] = [
     fit: "contain",
     name: { ru: "Wildberries", en: "Wildberries" },
     title: {
-      ru: "Фото для Wildberries 3:4 — размер 900×1200",
+      ru: "Размер фото для Wildberries — 900×1200, 3:4",
       en: "Wildberries Photo Size 900×1200 (3:4) — Resize",
     },
     h1: {

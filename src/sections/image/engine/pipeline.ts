@@ -215,33 +215,9 @@ async function runOp(env: Env, c: AnyCanvas, op: Op, info: RunInfo): Promise<Any
       return c;
     }
 
-    case "censor": {
-      const ctx = ctx2d(c);
-      for (const a of op.areas) {
-        const r = scaleRect(a, s);
-        const x = Math.max(0, Math.floor(r.x));
-        const y = Math.max(0, Math.floor(r.y));
-        const w = Math.min(c.width - x, Math.ceil(r.w));
-        const h = Math.min(c.height - y, Math.ceil(r.h));
-        if (w < 1 || h < 1) continue;
-        if (op.mode === "box") {
-          ctx.fillStyle = op.color ?? "#000000";
-          ctx.fillRect(x, y, w, h);
-          continue;
-        }
-        const k = Math.max(0, Math.min(100, op.strength)) / 100;
-        const short = Math.min(w, h);
-        const img = ctx.getImageData(x, y, w, h);
-        if (op.mode === "pixelate") pixelate(img, Math.max(3, short * (0.04 + 0.26 * k)));
-        else {
-          gaussianBlur(img, Math.max(2, short * (0.03 + 0.17 * k)));
-          // second pass removes residual structure
-          gaussianBlur(img, Math.max(1, short * 0.02));
-        }
-        ctx.putImageData(img, x, y);
-      }
+    case "censor":
+      censorOn(ctx2d(c), c.width, c.height, op, s);
       return c;
-    }
 
     case "round":
     case "circle": {
@@ -307,6 +283,33 @@ async function runOp(env: Env, c: AnyCanvas, op: Op, info: RunInfo): Promise<Any
     case "text":
       for (const b of op.blocks) drawTextBlock(ctx2d(c), c.width, c.height, b);
       return c;
+  }
+}
+
+/** Blur / pixelate / black-box rectangles (source px × scale) in place. */
+export function censorOn(ctx: Ctx2D, cw: number, ch: number, op: Extract<Op, { t: "censor" }>, s: number) {
+  for (const a of op.areas) {
+    const r = scaleRect(a, s);
+    const x = Math.max(0, Math.floor(r.x));
+    const y = Math.max(0, Math.floor(r.y));
+    const w = Math.min(cw - x, Math.ceil(r.w + (r.x - x)));
+    const h = Math.min(ch - y, Math.ceil(r.h + (r.y - y)));
+    if (w < 1 || h < 1) continue;
+    if (op.mode === "box") {
+      ctx.fillStyle = op.color ?? "#000000";
+      ctx.fillRect(x, y, w, h);
+      continue;
+    }
+    const k = Math.max(0, Math.min(100, op.strength)) / 100;
+    const short = Math.min(w, h);
+    const img = ctx.getImageData(x, y, w, h);
+    if (op.mode === "pixelate") pixelate(img, Math.max(3, short * (0.04 + 0.26 * k)));
+    else {
+      gaussianBlur(img, Math.max(2, short * (0.03 + 0.17 * k)));
+      // second pass removes residual structure
+      gaussianBlur(img, Math.max(1, short * 0.02));
+    }
+    ctx.putImageData(img, x, y);
   }
 }
 
