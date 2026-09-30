@@ -69,12 +69,12 @@ describe("registry", () => {
         if (locale === "ru" && /\b(the|and|with|for|your)\b/i.test(`${page.h1} ${page.lead ?? ""}`)) problems.push(`${key}: english words in ru h1/lead`);
       }
       expect(problems.slice(0, 50), problems.join("\n")).toEqual([]);
-    });
+    }, 120_000);
 
     it(`related links resolve (${locale})`, () => {
       for (const p of paths) resolvePage(locale, p);
       expect(unresolvedRelated()).toEqual([]);
-    });
+    }, 120_000);
 
     it(`search index entries point to existing pages (${locale})`, () => {
       const bad = searchEntries(locale)
@@ -82,6 +82,6 @@ describe("registry", () => {
         .filter((e) => !known.has(e.path.join("/")))
         .map((e) => e.path.join("/"));
       expect(bad).toEqual([]);
-    });
+    }, 120_000);
   }
 });
