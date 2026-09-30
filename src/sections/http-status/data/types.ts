@@ -37,7 +37,7 @@ export interface HttpCode {
   name: string;
   status: CodeStatus;
   /** Specification or origin, e.g. "RFC 9110, 15.5.5" or "nginx". */
-  spec: string;
+  spec: string | { ru: string; en: string };
   /** Heuristically cacheable by default (RFC 9110 §15.1). */
   cacheable?: boolean;
   headers?: string[];
