@@ -11,7 +11,7 @@ import { IconTile } from "@/ui/icon";
 import { LinkCards } from "@/site/links";
 import { SearchButton } from "@/site/search";
 import { RecentList } from "@/site/recent-list";
-import { alternates, JsonLd } from "@/site/seo";
+import { alternates, JsonLd, ogImage } from "@/site/seo";
 
 const HOME = {
   ru: {
@@ -35,7 +35,8 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
     title: { absolute: HOME[locale].title },
     description: HOME[locale].description,
     alternates: alternates([], locale),
-    openGraph: { type: "website", title: HOME[locale].title, description: HOME[locale].description, siteName: BRAND.name, url: SITE_URL + href(locale) },
+    openGraph: { type: "website", title: HOME[locale].title, description: HOME[locale].description, siteName: BRAND.name, url: SITE_URL + href(locale), images: [ogImage(locale, "home")] },
+    twitter: { card: "summary_large_image", title: HOME[locale].title, description: HOME[locale].description, images: [ogImage(locale, "home").url] },
   };
 }
 
