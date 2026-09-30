@@ -995,11 +995,59 @@ if (cldrRoot) {
   if (diff.length) console.log(`CLDR name differences (curated names kept):\n  ${diff.join("\n  ")}`);
 }
 
-if (warn.length) console.log(`Warnings:\n  ${warn.join("\n  ")}`);
 if (problems.length) {
   console.error(`PROBLEMS:\n  ${problems.join("\n  ")}`);
   process.exit(1);
 }
+
+/* ───────────── country zone lists + zone names (CLDR) ───────────── */
+
+/** ICU canonicalises to legacy ids; publish the current IANA names. */
+const MODERN = {
+  "Europe/Kiev": "Europe/Kyiv", "Asia/Calcutta": "Asia/Kolkata", "Asia/Saigon": "Asia/Ho_Chi_Minh", "Asia/Katmandu": "Asia/Kathmandu",
+  "Asia/Rangoon": "Asia/Yangon", "America/Godthab": "America/Nuuk", "America/Indianapolis": "America/Indiana/Indianapolis",
+  "America/Louisville": "America/Kentucky/Louisville", "America/Buenos_Aires": "America/Argentina/Buenos_Aires",
+  "America/Cordoba": "America/Argentina/Cordoba", "America/Mendoza": "America/Argentina/Mendoza", "America/Catamarca": "America/Argentina/Catamarca",
+  "America/Jujuy": "America/Argentina/Jujuy", "Atlantic/Faeroe": "Atlantic/Faroe", "Pacific/Ponape": "Pacific/Pohnpei", "Pacific/Truk": "Pacific/Chuuk",
+  "Pacific/Enderbury": "Pacific/Kanton", "America/Coral_Harbour": "America/Atikokan", "Asia/Ulan_Bator": "Asia/Ulaanbaatar", "Africa/Asmera": "Africa/Asmara",
+};
+const LEGACY = Object.fromEntries(Object.entries(MODERN).map(([a, b]) => [b, a]));
+/** Zones deliberately not listed: official national time differs (China uses Beijing time) or the territory is disputed. */
+const EXCLUDE = { CN: ["Asia/Urumqi"], UA: ["Europe/Simferopol"] };
+
+for (const c of countries) {
+  let zones = [];
+  try {
+    const loc = new Intl.Locale(`und-${c.cc}`);
+    zones = (loc.getTimeZones ? loc.getTimeZones() : loc.timeZones) ?? [];
+  } catch {
+    zones = [];
+  }
+  zones = zones.map((z) => MODERN[z] ?? z).filter((z) => !(EXCLUDE[c.cc] ?? []).includes(z));
+  for (const city of cities.filter((x) => x.cc === c.cc)) if (!zones.includes(city.tz)) zones.push(city.tz);
+  c.zones = zones;
+}
+
+const zoneNames = {};
+if (cldrRoot) {
+  const dates = (loc) => JSON.parse(readFileSync(join(cldrRoot, `cldr-dates-full/main/${loc}/timeZoneNames.json`), "utf8")).main[loc].dates.timeZoneNames.zone;
+  const ruZ = dates("ru");
+  const enZ = dates("en");
+  const pick = (tree, id) => id.split("/").reduce((n, k) => (n ? n[k] : undefined), tree)?.exemplarCity;
+  const allZones = new Set(countries.flatMap((c) => c.zones));
+  for (const z of allZones) {
+    const legacy = LEGACY[z] ?? z;
+    const fallback = z.split("/").pop().replace(/_/g, " ");
+    const ru = pick(ruZ, z) ?? pick(ruZ, legacy);
+    const en = pick(enZ, z) ?? pick(enZ, legacy) ?? fallback;
+    if (!ru) warn.push(`no Russian exemplar city for ${z}`);
+    zoneNames[z] = [ru ?? fallback, en];
+  }
+} else {
+  console.log("CLDR not installed: zone-names.json not regenerated");
+}
+
+if (warn.length) console.log(`Warnings:\n  ${warn.join("\n  ")}`);
 
 /* ───────────── write ───────────── */
 
@@ -1009,6 +1057,13 @@ mkdirSync(OUT, { recursive: true });
 const dump = (arr) => `[\n${arr.map((x) => `  ${JSON.stringify(x)}`).join(",\n")}\n]\n`;
 writeFileSync(join(OUT, "cities.json"), dump(cities));
 writeFileSync(join(OUT, "countries.json"), dump(countries));
+if (Object.keys(zoneNames).length) {
+  const body = Object.entries(zoneNames)
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([k, v]) => `  ${JSON.stringify(k)}: ${JSON.stringify(v)}`)
+    .join(",\n");
+  writeFileSync(join(OUT, "zone-names.json"), `{\n${body}\n}\n`);
+}
 
 const byCc = (cc) => cities.filter((c) => c.cc === cc).length;
 console.log(`cities: ${cities.length}, countries: ${countries.length}`);
