@@ -35,14 +35,7 @@ export const COMPRESS_VARIANTS: CompressVariant[] = [
         "сжатие jpg без потери качества",
         "mozjpeg онлайн",
       ],
-      en: [
-        "compress jpg",
-        "compress jpeg online",
-        "reduce jpg file size",
-        "jpg compressor",
-        "shrink photo file size",
-        "mozjpeg online",
-      ],
+      en: ["compress jpg", "compress jpeg online", "reduce jpg file size", "jpg compressor", "shrink photo file size", "mozjpeg online"],
     },
     paragraphs: {
       ru: [
@@ -123,24 +116,8 @@ export const COMPRESS_VARIANTS: CompressVariant[] = [
       en: "Your PNG gets smaller either with not a single pixel changed or — much more — by reducing the number of colors.",
     },
     keywords: {
-      ru: [
-        "сжать png",
-        "сжать png онлайн",
-        "уменьшить размер png",
-        "сжать png без потери качества",
-        "оптимизация png",
-        "аналог tinypng",
-        "сжать картинку png",
-      ],
-      en: [
-        "compress png",
-        "compress png online",
-        "reduce png file size",
-        "lossless png compression",
-        "png optimizer",
-        "tinypng alternative",
-        "oxipng online",
-      ],
+      ru: ["сжать png", "сжать png онлайн", "уменьшить размер png", "сжать png без потери качества", "оптимизация png", "аналог tinypng", "сжать картинку png"],
+      en: ["compress png", "compress png online", "reduce png file size", "lossless png compression", "png optimizer", "tinypng alternative", "oxipng online"],
     },
     paragraphs: {
       ru: [
@@ -221,22 +198,8 @@ export const COMPRESS_VARIANTS: CompressVariant[] = [
       en: "WebP files are re-encoded at the quality you need, and JPG or PNG can go straight to WebP, a format every modern browser opens.",
     },
     keywords: {
-      ru: [
-        "сжать webp",
-        "сжать webp онлайн",
-        "уменьшить размер webp",
-        "сжать картинку в webp",
-        "оптимизировать webp",
-        "webp компрессор",
-      ],
-      en: [
-        "compress webp",
-        "compress webp online",
-        "reduce webp file size",
-        "webp compressor",
-        "compress images to webp",
-        "optimize webp images",
-      ],
+      ru: ["сжать webp", "сжать webp онлайн", "уменьшить размер webp", "сжать картинку в webp", "оптимизировать webp", "webp компрессор"],
+      en: ["compress webp", "compress webp online", "reduce webp file size", "webp compressor", "compress images to webp", "optimize webp images"],
     },
     paragraphs: {
       ru: [
@@ -315,22 +278,8 @@ export const COMPRESS_VARIANTS: CompressVariant[] = [
       en: "JPG, PNG, WebP and other images are saved as AVIF, the most efficient format available here.",
     },
     keywords: {
-      ru: [
-        "сжать в avif",
-        "конвертировать в avif онлайн",
-        "avif сжатие",
-        "сжать фото avif",
-        "avif компрессор",
-        "перевести картинки в avif",
-      ],
-      en: [
-        "compress to avif",
-        "avif compressor online",
-        "convert images to avif",
-        "avif image compression",
-        "reduce avif file size",
-        "make avif images",
-      ],
+      ru: ["сжать в avif", "конвертировать в avif онлайн", "avif сжатие", "сжать фото avif", "avif компрессор", "перевести картинки в avif"],
+      en: ["compress to avif", "avif compressor online", "convert images to avif", "avif image compression", "reduce avif file size", "make avif images"],
     },
     paragraphs: {
       ru: [
@@ -421,14 +370,7 @@ export const COMPRESS_VARIANTS: CompressVariant[] = [
         "фото на документы 20 кб",
         "как уменьшить вес фото до 20 кб",
       ],
-      en: [
-        "compress image to 20kb",
-        "resize photo to 20kb",
-        "reduce jpg to 20kb",
-        "photo under 20kb",
-        "20kb photo for form",
-        "compress picture to 20 kb",
-      ],
+      en: ["compress image to 20kb", "resize photo to 20kb", "reduce jpg to 20kb", "photo under 20kb", "20kb photo for form", "compress picture to 20 kb"],
     },
     paragraphs: {
       ru: [
@@ -499,22 +441,8 @@ export const COMPRESS_VARIANTS: CompressVariant[] = [
       en: "The photo is re-encoded at the highest quality that still keeps the file at or under 30 KB.",
     },
     keywords: {
-      ru: [
-        "сжать фото до 30 кб",
-        "уменьшить фото до 30 кб",
-        "фото до 30 кб онлайн",
-        "сжать картинку до 30 кб",
-        "сжать jpg до 30 кб",
-        "фото для анкеты 30 кб",
-      ],
-      en: [
-        "compress image to 30kb",
-        "reduce photo to 30kb",
-        "photo under 30kb",
-        "compress jpg to 30kb",
-        "resize image to 30 kb",
-        "30kb image converter",
-      ],
+      ru: ["сжать фото до 30 кб", "уменьшить фото до 30 кб", "фото до 30 кб онлайн", "сжать картинку до 30 кб", "сжать jpg до 30 кб", "фото для анкеты 30 кб"],
+      en: ["compress image to 30kb", "reduce photo to 30kb", "photo under 30kb", "compress jpg to 30kb", "resize image to 30 kb", "30kb image converter"],
     },
     paragraphs: {
       ru: [
@@ -583,22 +511,8 @@ export const COMPRESS_VARIANTS: CompressVariant[] = [
       en: "Your picture fits into 50 KB at the highest quality the limit allows.",
     },
     keywords: {
-      ru: [
-        "сжать фото до 50 кб",
-        "уменьшить фото до 50 кб",
-        "фото 50 кб онлайн",
-        "сжать jpg до 50 кб",
-        "аватарка до 50 кб",
-        "уменьшить вес картинки до 50 кб",
-      ],
-      en: [
-        "compress image to 50kb",
-        "reduce image size to 50kb",
-        "photo under 50kb",
-        "compress jpg to 50kb",
-        "50kb avatar",
-        "resize photo to 50 kb",
-      ],
+      ru: ["сжать фото до 50 кб", "уменьшить фото до 50 кб", "фото 50 кб онлайн", "сжать jpg до 50 кб", "аватарка до 50 кб", "уменьшить вес картинки до 50 кб"],
+      en: ["compress image to 50kb", "reduce image size to 50kb", "photo under 50kb", "compress jpg to 50kb", "50kb avatar", "resize photo to 50 kb"],
     },
     paragraphs: {
       ru: [
@@ -755,22 +669,8 @@ export const COMPRESS_VARIANTS: CompressVariant[] = [
       en: "The photo is compressed to 150 KB and stays large and sharp enough for a computer screen.",
     },
     keywords: {
-      ru: [
-        "сжать фото до 150 кб",
-        "уменьшить фото до 150 кб",
-        "фото до 150 кб",
-        "сжать jpg до 150 кб",
-        "фото для резюме вес",
-        "сжать картинку до 150 кб",
-      ],
-      en: [
-        "compress image to 150kb",
-        "reduce photo to 150kb",
-        "photo under 150kb",
-        "compress jpg to 150kb",
-        "resume photo file size",
-        "150kb image",
-      ],
+      ru: ["сжать фото до 150 кб", "уменьшить фото до 150 кб", "фото до 150 кб", "сжать jpg до 150 кб", "фото для резюме вес", "сжать картинку до 150 кб"],
+      en: ["compress image to 150kb", "reduce photo to 150kb", "photo under 150kb", "compress jpg to 150kb", "resume photo file size", "150kb image"],
     },
     paragraphs: {
       ru: [
@@ -927,22 +827,8 @@ export const COMPRESS_VARIANTS: CompressVariant[] = [
       en: "Your photo is squeezed to 300 KB while staying large enough to illustrate an article or an email.",
     },
     keywords: {
-      ru: [
-        "сжать фото до 300 кб",
-        "уменьшить фото до 300 кб",
-        "фото до 300 кб",
-        "сжать jpg до 300 кб",
-        "сжать фото для сайта",
-        "уменьшить картинку до 300 кб",
-      ],
-      en: [
-        "compress image to 300kb",
-        "reduce photo to 300kb",
-        "photo under 300kb",
-        "compress jpg to 300kb",
-        "compress image for website",
-        "300kb photo",
-      ],
+      ru: ["сжать фото до 300 кб", "уменьшить фото до 300 кб", "фото до 300 кб", "сжать jpg до 300 кб", "сжать фото для сайта", "уменьшить картинку до 300 кб"],
+      en: ["compress image to 300kb", "reduce photo to 300kb", "photo under 300kb", "compress jpg to 300kb", "compress image for website", "300kb photo"],
     },
     paragraphs: {
       ru: [
@@ -1107,14 +993,7 @@ export const COMPRESS_VARIANTS: CompressVariant[] = [
         "уменьшить размер фото до 1 мегабайта",
         "сжать фото с телефона",
       ],
-      en: [
-        "compress image to 1mb",
-        "reduce photo to 1mb",
-        "photo under 1mb",
-        "compress jpg to 1mb",
-        "shrink phone photo size",
-        "1mb image compressor",
-      ],
+      en: ["compress image to 1mb", "reduce photo to 1mb", "photo under 1mb", "compress jpg to 1mb", "shrink phone photo size", "1mb image compressor"],
     },
     paragraphs: {
       ru: [
@@ -1193,14 +1072,7 @@ export const COMPRESS_VARIANTS: CompressVariant[] = [
         "уменьшить размер фото до 2 мегабайт",
         "сжать фото для загрузки на сайт",
       ],
-      en: [
-        "compress image to 2mb",
-        "reduce photo to 2mb",
-        "photo under 2mb",
-        "compress jpg to 2mb",
-        "2mb image compressor",
-        "shrink image under 2 mb",
-      ],
+      en: ["compress image to 2mb", "reduce photo to 2mb", "photo under 2mb", "compress jpg to 2mb", "2mb image compressor", "shrink image under 2 mb"],
     },
     paragraphs: {
       ru: [

@@ -122,7 +122,14 @@ export function FrameStrip({
           </li>
         ))}
         <li className="shrink-0">
-          <Dropzone onFiles={onAdd} accept={IMAGE_ACCEPT} multiple compact title={t.add} className="size-20! min-h-0! gap-1! p-1! text-xs [&>span:first-child]:size-7" />
+          <Dropzone
+            onFiles={onAdd}
+            accept={IMAGE_ACCEPT}
+            multiple
+            compact
+            title={t.add}
+            className="size-20! min-h-0! gap-1! p-1! text-xs [&>span:first-child]:size-7"
+          />
         </li>
       </ul>
     </div>

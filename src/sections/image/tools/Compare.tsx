@@ -146,7 +146,13 @@ export default function Compare({ locale }: { locale: Locale }) {
 
   const pick = (label: string, drop: string, side: Side | null, set: (s: Side | null) => void) =>
     side ? (
-      <Dropzone onFiles={load(set)} accept={IMAGE_ACCEPT} compact title={`${label}: ${side.prepared.file.name}`} hint={`${side.w}×${side.h} · ${formatBytes(locale, side.prepared.file.size)} · ${t.replace}`} />
+      <Dropzone
+        onFiles={load(set)}
+        accept={IMAGE_ACCEPT}
+        compact
+        title={`${label}: ${side.prepared.file.name}`}
+        hint={`${side.w}×${side.h} · ${formatBytes(locale, side.prepared.file.size)} · ${t.replace}`}
+      />
     ) : (
       <Dropzone onFiles={load(set)} accept={IMAGE_ACCEPT} title={drop} hint={label} className="min-h-40" />
     );
@@ -163,7 +169,17 @@ export default function Compare({ locale }: { locale: Locale }) {
         <>
           <div className="flex flex-wrap items-end gap-x-4 gap-y-3 rounded-[12px] border border-line bg-surface px-4 py-3">
             <Field label={t.mode}>
-              <Segmented label={t.mode} value={mode} onChange={setMode} options={[{ value: "slider", label: t.slider }, { value: "side", label: t.side }, { value: "diff", label: t.diff }]} />
+              <Segmented
+                wrap
+                label={t.mode}
+                value={mode}
+                onChange={setMode}
+                options={[
+                  { value: "slider", label: t.slider },
+                  { value: "side", label: t.side },
+                  { value: "diff", label: t.diff },
+                ]}
+              />
             </Field>
             {mode === "diff" && (
               <div className="w-56">

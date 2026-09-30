@@ -4,7 +4,7 @@
 import { Download } from "lucide-react";
 import { useEffect, useId, useMemo, useState } from "react";
 import type { Locale } from "@/i18n/config";
-import { formatBytes, formatNumber } from "@/i18n/format";
+import { formatBytes, formatNumber, plural } from "@/i18n/format";
 import { downloadText } from "@/lib/clipboard";
 import { Button } from "@/ui/button";
 import { CopyButton } from "@/ui/copy-button";
@@ -29,7 +29,7 @@ const T = {
     svgUrl: "Для SVG: URL-кодирование вместо Base64 (обычно короче)",
     detected: "Формат по содержимому",
     mismatch: (ext: string, real: string) => `Расширение .${ext}, но на самом деле это ${real} — в Data URI указан настоящий тип`,
-    length: (n: string) => `${n} символов`,
+    length: (n: number) => `${formatNumber("ru", n)} ${plural("ru", n, ["символ", "символа", "символов"])}`,
     truncated: "Показано начало строки — целиком её дают кнопки «Копировать» и «Скачать»",
     copy: "Копировать",
     copied: "Скопировано",
@@ -47,7 +47,7 @@ const T = {
     svgUrl: "For SVG: URL-encoding instead of Base64 (usually shorter)",
     detected: "Detected format",
     mismatch: (ext: string, real: string) => `The extension is .${ext}, but it is really ${real} — the Data URI uses the real type`,
-    length: (n: string) => `${n} characters`,
+    length: (n: number) => `${formatNumber("en", n)} ${plural("en", n, ["character", "characters"])}`,
     truncated: "Only the beginning is shown — Copy and Download give the full string",
     copy: "Copy",
     copied: "Copied",
@@ -121,13 +121,29 @@ export default function ToBase64({ locale }: { locale: Locale }) {
 
   const ext = file?.name.match(/\.([^.]+)$/)?.[1]?.toLowerCase();
   const realExt = data?.format ? FORMAT_META[data.format].ext : null;
-  const mismatch = ext && realExt && ext !== realExt && !(realExt === "jpg" && ["jpeg", "jfif", "jpe", "pjpeg", "pjp"].includes(ext)) && !(realExt === "tiff" && ext === "tif") && !(realExt === "heic" && ext === "heif");
+  const mismatch =
+    ext &&
+    realExt &&
+    ext !== realExt &&
+    !(realExt === "jpg" && ["jpeg", "jfif", "jpe", "pjpeg", "pjp"].includes(ext)) &&
+    !(realExt === "tiff" && ext === "tif") &&
+    !(realExt === "heic" && ext === "heif");
   const shown = value.length > PREVIEW_LIMIT ? `${value.slice(0, PREVIEW_LIMIT)}…` : value;
 
   if (!file || !data) {
     return (
       <div className="flex flex-col gap-3">
-        <Dropzone onFiles={(f) => { setError(null); setData(null); setFile(f[0] ?? null); }} accept={IMAGE_ACCEPT} title={s.dropOne} hint={s.dropHint} className="min-h-64" />
+        <Dropzone
+          onFiles={(f) => {
+            setError(null);
+            setData(null);
+            setFile(f[0] ?? null);
+          }}
+          accept={IMAGE_ACCEPT}
+          title={s.dropOne}
+          hint={s.dropHint}
+          className="min-h-64"
+        />
         {error ? <Notice tone="err">{errorText(locale, error)}</Notice> : null}
       </div>
     );
@@ -137,6 +153,7 @@ export default function ToBase64({ locale }: { locale: Locale }) {
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-end gap-x-4 gap-y-3 rounded-[12px] border border-line bg-surface px-4 py-3">
         <Segmented
+          wrap
           label={t.as}
           value={kind}
           onChange={setKind}
@@ -154,15 +171,21 @@ export default function ToBase64({ locale }: { locale: Locale }) {
         <div className="flex flex-col gap-4 p-4 sm:flex-row">
           {url && (
             <div className={`flex size-32 shrink-0 items-center justify-center overflow-hidden rounded-[8px] border border-line ${checker}`}>
-              <img src={url} alt={alt} className="max-h-full max-w-full object-contain" onLoad={(e) => setDims({ w: e.currentTarget.naturalWidth, h: e.currentTarget.naturalHeight })} />
+              <img
+                src={url}
+                alt={alt}
+                className="max-h-full max-w-full object-contain"
+                onLoad={(e) => setDims({ w: e.currentTarget.naturalWidth, h: e.currentTarget.naturalHeight })}
+              />
             </div>
           )}
           <div className="min-w-0 flex-1" aria-live="polite">
             <p className="tabular text-2xl font-semibold tracking-tight text-fg">
-              {formatBytes(locale, value.length)} <span className="text-base font-normal text-fg-3">{t.length(formatNumber(locale, value.length))}</span>
+              {formatBytes(locale, value.length)} <span className="text-base font-normal text-fg-3">{t.length(value.length)}</span>
             </p>
             <p className="tabular text-sm text-fg-2">
-              {file.name} · {formatBytes(locale, data.bytes)} → +{formatNumber(locale, ((base64Length(data.bytes) - data.bytes) / Math.max(1, data.bytes)) * 100, { maximumFractionDigits: 0 })} %
+              {file.name} · {formatBytes(locale, data.bytes)} → +
+              {formatNumber(locale, ((base64Length(data.bytes) - data.bytes) / Math.max(1, data.bytes)) * 100, { maximumFractionDigits: 0 })} %
               {dims ? ` · ${dims.w}×${dims.h}` : ""}
             </p>
             <p className="text-sm text-fg-2">
@@ -185,11 +208,27 @@ export default function ToBase64({ locale }: { locale: Locale }) {
               <CopyButton value={() => value} label={t.copy} copiedLabel={t.copied} variant="primary" />
             </div>
           </div>
-          <textarea id={`${id}-out`} readOnly value={shown} rows={6} spellCheck={false} className="block min-h-32 w-full resize-y border-t border-line bg-transparent px-3 py-2.5 font-mono text-xs leading-relaxed text-fg-2 focus:outline-none" />
+          <textarea
+            id={`${id}-out`}
+            readOnly
+            value={shown}
+            rows={6}
+            spellCheck={false}
+            className="block min-h-32 w-full resize-y border-t border-line bg-transparent px-3 py-2.5 font-mono text-xs leading-relaxed text-fg-2 focus:outline-none"
+          />
           {value.length > PREVIEW_LIMIT && <p className="border-t border-line px-3 py-2 text-[13px] text-fg-3">{t.truncated}</p>}
         </div>
       </Panel>
-      <Dropzone onFiles={(f) => { setError(null); setData(null); setFile(f[0] ?? null); }} accept={IMAGE_ACCEPT} compact title={s.dropOne} />
+      <Dropzone
+        onFiles={(f) => {
+          setError(null);
+          setData(null);
+          setFile(f[0] ?? null);
+        }}
+        accept={IMAGE_ACCEPT}
+        compact
+        title={s.dropOne}
+      />
     </div>
   );
 }

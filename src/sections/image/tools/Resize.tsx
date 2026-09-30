@@ -99,14 +99,27 @@ export default function Resize({ locale, preset }: ResizeProps) {
   const runner: Runner = async (p, ctx) => {
     const fmt = resolveOut(out, p.format);
     const ops: Op[] = [{ t: "resize", spec, fill }];
-    const r = await processFile(ctx.engine, p, ops, { format: fmt, quality: quality ?? DEFAULT_QUALITY[fmt], background: padColor, dpi: dpi ?? undefined, keepExif }, { signal: ctx.signal, onProgress: ctx.onProgress });
-    return { blob: toBlob(r), name: `${baseName(p.file.name)}-${r.width}x${r.height}.${r.ext}`, width: r.width, height: r.height, meta: { limited: r.limited } };
+    const r = await processFile(
+      ctx.engine,
+      p,
+      ops,
+      { format: fmt, quality: quality ?? DEFAULT_QUALITY[fmt], background: padColor, dpi: dpi ?? undefined, keepExif },
+      { signal: ctx.signal, onProgress: ctx.onProgress },
+    );
+    return {
+      blob: toBlob(r),
+      name: `${baseName(p.file.name)}-${r.width}x${r.height}.${r.ext}`,
+      width: r.width,
+      height: r.height,
+      meta: { limited: r.limited },
+    };
   };
   const batch = useBatch({ runner, settingsKey: key });
 
   const options = (
     <>
       <Segmented
+        wrap
         label={t.mode}
         value={mode}
         onChange={setMode}
@@ -118,11 +131,41 @@ export default function Resize({ locale, preset }: ResizeProps) {
       />
       {mode === "px" && (
         <div className="flex items-end gap-2">
-          <NumberField label={s.width} value={w} onChange={(v) => { setW(v); if (locked && v) setH(null); }} suffix="px" className="w-28" placeholder={t.auto} max={30000} />
-          <Button variant="ghost" size="icon" aria-pressed={locked} aria-label={locked ? t.lock : t.unlock} title={locked ? t.lock : t.unlock} onClick={() => setLocked((x) => !x)} className="mb-0">
+          <NumberField
+            label={s.width}
+            value={w}
+            onChange={(v) => {
+              setW(v);
+              if (locked && v) setH(null);
+            }}
+            suffix="px"
+            className="w-28"
+            placeholder={t.auto}
+            max={30000}
+          />
+          <Button
+            variant="ghost"
+            size="icon"
+            aria-pressed={locked}
+            aria-label={locked ? t.lock : t.unlock}
+            title={locked ? t.lock : t.unlock}
+            onClick={() => setLocked((x) => !x)}
+            className="mb-0"
+          >
             {locked ? <Link2 aria-hidden /> : <Link2Off aria-hidden />}
           </Button>
-          <NumberField label={s.height} value={h} onChange={(v) => { setH(v); if (locked && v) setW(null); }} suffix="px" className="w-28" placeholder={t.auto} max={30000} />
+          <NumberField
+            label={s.height}
+            value={h}
+            onChange={(v) => {
+              setH(v);
+              if (locked && v) setW(null);
+            }}
+            suffix="px"
+            className="w-28"
+            placeholder={t.auto}
+            max={30000}
+          />
         </div>
       )}
       {both && (
@@ -158,13 +201,29 @@ export default function Resize({ locale, preset }: ResizeProps) {
           ))}
         </Select>
       </Field>
-      {(out === "same" || LOSSY.has(out)) && <RangeField label={s.quality} value={quality ?? (out === "same" ? 88 : DEFAULT_QUALITY[out])} onChange={setQuality} min={1} max={100} locale={locale} />}
+      {(out === "same" || LOSSY.has(out)) && (
+        <RangeField label={s.quality} value={quality ?? (out === "same" ? 88 : DEFAULT_QUALITY[out])} onChange={setQuality} min={1} max={100} locale={locale} />
+      )}
       {both && fit === "pad" && (
         <Field label={t.padFill}>
-          <Segmented label={t.padFill} value={padFill} onChange={setPadFill} options={[{ value: "blur", label: t.blur }, { value: "color", label: t.color }]} />
+          <Segmented
+            wrap
+            label={t.padFill}
+            value={padFill}
+            onChange={setPadFill}
+            options={[
+              { value: "blur", label: t.blur },
+              { value: "color", label: t.color },
+            ]}
+          />
         </Field>
       )}
-      <ColorField label={both && fit === "pad" && padFill === "color" ? t.padFill : `${s.background} (JPG)`} value={padColor} onChange={setPadColor} locale={locale} />
+      <ColorField
+        label={both && fit === "pad" && padFill === "color" ? t.padFill : `${s.background} (JPG)`}
+        value={padColor}
+        onChange={setPadColor}
+        locale={locale}
+      />
       <NumberField label={t.dpi} value={dpi} onChange={setDpi} min={1} max={2400} placeholder={t.none} />
     </>
   );

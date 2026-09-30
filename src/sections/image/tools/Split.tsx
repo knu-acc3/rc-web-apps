@@ -5,6 +5,7 @@ import type { Locale } from "@/i18n/config";
 import { plural } from "@/i18n/format";
 import { Field, Select, Switch } from "@/ui/field";
 import { Segmented } from "@/ui/segmented";
+import { gridRects } from "../engine/collage";
 import { centeredAspectRect, type Rect } from "../engine/geometry";
 import { baseName, materialize } from "../engine/source";
 import type { OutFormat, TileResult } from "../engine/types";
@@ -51,21 +52,17 @@ const SLIDE_SIZES = [
   { value: "1080x1080", w: 1080, h: 1080 },
 ] as const;
 
-/** Grid cells in source px (edges rounded so tiles cover the image exactly). */
-export function gridRects(w: number, h: number, rows: number, cols: number): Rect[] {
-  const out: Rect[] = [];
-  for (let r = 0; r < rows; r++)
-    for (let c = 0; c < cols; c++) {
-      const x0 = Math.round((c * w) / cols);
-      const x1 = Math.round(((c + 1) * w) / cols);
-      const y0 = Math.round((r * h) / rows);
-      const y1 = Math.round(((r + 1) * h) / rows);
-      out.push({ x: x0, y: y0, w: x1 - x0, h: y1 - y0 });
-    }
-  return out;
-}
-
-export default function Split({ locale, initialMode = "grid", rows: r0 = 3, cols: c0 = 3 }: { locale: Locale; initialMode?: "grid" | "carousel"; rows?: number; cols?: number }) {
+export default function Split({
+  locale,
+  initialMode = "grid",
+  rows: r0 = 3,
+  cols: c0 = 3,
+}: {
+  locale: Locale;
+  initialMode?: "grid" | "carousel";
+  rows?: number;
+  cols?: number;
+}) {
   const t = T[locale];
   const id = useId();
   const getEngine = useEngine();
@@ -103,7 +100,13 @@ export default function Split({ locale, initialMode = "grid", rows: r0 = 3, cols
       const fmt: OutFormat = sameFormat(p.format);
       const m = await materialize(p);
       const tiles = await getEngine().run<TileResult[]>(
-        { type: "tiles", src: m.src, rects, out: { format: fmt, quality: LOSSY.has(fmt) ? 92 : DEFAULT_QUALITY[fmt], background: "#FFFFFF" }, size: mode === "carousel" ? { w: ss.w, h: ss.h } : undefined },
+        {
+          type: "tiles",
+          src: m.src,
+          rects,
+          out: { format: fmt, quality: LOSSY.has(fmt) ? 92 : DEFAULT_QUALITY[fmt], background: "#FFFFFF" },
+          size: mode === "carousel" ? { w: ss.w, h: ss.h } : undefined,
+        },
         { signal, onProgress, transfer: m.transfer },
       );
       const { default: JSZip } = await import("jszip");
@@ -122,11 +125,21 @@ export default function Split({ locale, initialMode = "grid", rows: r0 = 3, cols
 
   const options = (
     <>
-      <Segmented label={t.mode} value={mode} onChange={setMode} options={[{ value: "grid", label: t.grid }, { value: "carousel", label: t.carousel }]} />
+      <Segmented
+        wrap
+        label={t.mode}
+        value={mode}
+        onChange={setMode}
+        options={[
+          { value: "grid", label: t.grid },
+          { value: "carousel", label: t.carousel },
+        ]}
+      />
       {mode === "grid" ? (
         <>
           <Field label={t.presets}>
             <Segmented
+              wrap
               label={t.presets}
               value={`${rows}x${cols}`}
               onChange={(v) => {
@@ -162,7 +175,13 @@ export default function Split({ locale, initialMode = "grid", rows: r0 = 3, cols
             </Select>
           </Field>
           <Field label={t.slide}>
-            <Segmented label={t.slide} value={slideSize} onChange={setSlideSize} options={SLIDE_SIZES.map((x) => ({ value: x.value, label: `${x.w}×${x.h}` }))} />
+            <Segmented
+              wrap
+              label={t.slide}
+              value={slideSize}
+              onChange={setSlideSize}
+              options={SLIDE_SIZES.map((x) => ({ value: x.value, label: `${x.w}×${x.h}` }))}
+            />
           </Field>
         </>
       )}
@@ -184,9 +203,18 @@ export default function Split({ locale, initialMode = "grid", rows: r0 = 3, cols
         <ImageStage bitmap={bitmap} srcWidth={W} locale={locale}>
           {(f) => (
             <div className="absolute inset-0 overflow-hidden" aria-hidden>
-              {strip && <div className="absolute shadow-[0_0_0_9999px_rgb(0_0_0/0.5)]" style={{ left: strip.x * f, top: strip.y * f, width: strip.w * f, height: strip.h * f }} />}
+              {strip && (
+                <div
+                  className="absolute shadow-[0_0_0_9999px_rgb(0_0_0/0.5)]"
+                  style={{ left: strip.x * f, top: strip.y * f, width: strip.w * f, height: strip.h * f }}
+                />
+              )}
               {rects.map((r, i) => (
-                <div key={i} className="absolute flex items-center justify-center border border-white/80 shadow-[inset_0_0_0_1px_rgb(0_0_0/0.35)]" style={{ left: r.x * f, top: r.y * f, width: r.w * f, height: r.h * f }}>
+                <div
+                  key={i}
+                  className="absolute flex items-center justify-center border border-white/80 shadow-[inset_0_0_0_1px_rgb(0_0_0/0.35)]"
+                  style={{ left: r.x * f, top: r.y * f, width: r.w * f, height: r.h * f }}
+                >
                   <span className="rounded bg-black/60 px-1.5 text-xs font-semibold text-white">{order(i)}</span>
                 </div>
               ))}

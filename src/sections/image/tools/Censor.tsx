@@ -97,7 +97,13 @@ export default function Censor({ locale }: { locale: Locale }) {
     if (!p) return;
     exp.run(async (signal, onProgress) => {
       const fmt = sameFormat(p.format);
-      const res = await processFile(getEngine(), p, [op], { format: fmt, quality: LOSSY.has(fmt) ? 90 : DEFAULT_QUALITY[fmt], background: "#FFFFFF" }, { signal, onProgress });
+      const res = await processFile(
+        getEngine(),
+        p,
+        [op],
+        { format: fmt, quality: LOSSY.has(fmt) ? 90 : DEFAULT_QUALITY[fmt], background: "#FFFFFF" },
+        { signal, onProgress },
+      );
       return { blob: toBlob(res), name: `${baseName(p.file.name)}-censored.${res.ext}` };
     });
   };
@@ -105,7 +111,17 @@ export default function Censor({ locale }: { locale: Locale }) {
   const options = (
     <>
       <Field label={t.mode}>
-        <Segmented label={t.mode} value={mode} onChange={setMode} options={[{ value: "pixelate", label: t.pixelate }, { value: "blur", label: t.blur }, { value: "box", label: t.box }]} />
+        <Segmented
+          wrap
+          label={t.mode}
+          value={mode}
+          onChange={setMode}
+          options={[
+            { value: "pixelate", label: t.pixelate },
+            { value: "blur", label: t.blur },
+            { value: "box", label: t.box },
+          ]}
+        />
       </Field>
       {mode === "box" ? (
         <ColorField label={t.color} value={color} onChange={setColor} locale={locale} className="w-48" />
@@ -115,11 +131,28 @@ export default function Censor({ locale }: { locale: Locale }) {
         </div>
       )}
       <div className="flex gap-1.5">
-        <Button variant="outline" onClick={() => { setAreas((a) => [...a, centeredAspectRect(W, H, null, 0.25)]); setSel(areas.length); }} disabled={!W}>
+        <Button
+          variant="outline"
+          onClick={() => {
+            setAreas((a) => [...a, centeredAspectRect(W, H, null, 0.25)]);
+            setSel(areas.length);
+          }}
+          disabled={!W}
+        >
           <Plus aria-hidden />
           {t.add}
         </Button>
-        <Button variant="ghost" size="icon" aria-label={t.del} title={t.del} disabled={!areas.length} onClick={() => { setAreas((a) => a.filter((_, i) => i !== sel)); setSel(0); }}>
+        <Button
+          variant="ghost"
+          size="icon"
+          aria-label={t.del}
+          title={t.del}
+          disabled={!areas.length}
+          onClick={() => {
+            setAreas((a) => a.filter((_, i) => i !== sel));
+            setSel(0);
+          }}
+        >
           <Trash2 aria-hidden />
         </Button>
       </div>

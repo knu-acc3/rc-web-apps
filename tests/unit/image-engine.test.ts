@@ -17,7 +17,17 @@ import {
   stripJpegMetadata,
   transformJpegLossless,
 } from "@/sections/image/engine/jpeg";
-import { crc32, makePngChunk, pngChunks, readIcoDirectory, readPngDpi, setPngDpi, stripPngMetadata, stripWebpMetadata, writeIco } from "@/sections/image/engine/container";
+import {
+  crc32,
+  makePngChunk,
+  pngChunks,
+  readIcoDirectory,
+  readPngDpi,
+  setPngDpi,
+  stripPngMetadata,
+  stripWebpMetadata,
+  writeIco,
+} from "@/sections/image/engine/container";
 import { decodeGifFrames, gifInfo, lzwDecode } from "@/sections/image/engine/gif-decode";
 import { medianCut, normalizeHex, rgbToHex, rgbToHsl } from "@/sections/image/engine/palette";
 import { applyFilter, gaussianBlur } from "@/sections/image/engine/filters";
@@ -307,7 +317,22 @@ const SCAN = bytes(0x12, 0xff, 0x00, 0x34, 0xff, 0xd0, 0x56, 0x78);
 const EOI = bytes(0xff, 0xd9);
 
 function jpegFixture(exif: Uint8Array | null, extra: Uint8Array[] = [], trailer = new Uint8Array(0)) {
-  return cat(bytes(0xff, 0xd8), JFIF, ...(exif ? [seg(0xe1, cat(bytes("Exif", 0, 0), exif))] : []), ICC, XMP, IPTC, COMMENT, ...extra, DQT, SOF, SOS_HDR, SCAN, EOI, trailer);
+  return cat(
+    bytes(0xff, 0xd8),
+    JFIF,
+    ...(exif ? [seg(0xe1, cat(bytes("Exif", 0, 0), exif))] : []),
+    ICC,
+    XMP,
+    IPTC,
+    COMMENT,
+    ...extra,
+    DQT,
+    SOF,
+    SOS_HDR,
+    SCAN,
+    EOI,
+    trailer,
+  );
 }
 
 const indexOfSeq = (hay: Uint8Array, needle: Uint8Array) => {
@@ -456,7 +481,14 @@ describe("EXIF orientation algebra", () => {
 /* ───────────── PNG / WebP / ICO ───────────── */
 
 const PNG_SIG = bytes(0x89, "PNG", 0x0d, 0x0a, 0x1a, 0x0a);
-const pngFixture = (...chunks: Uint8Array[]) => cat(PNG_SIG, makePngChunk("IHDR", bytes(0, 0, 0, 2, 0, 0, 0, 2, 8, 6, 0, 0, 0)), ...chunks, makePngChunk("IDAT", bytes(1, 2, 3)), makePngChunk("IEND", new Uint8Array(0)));
+const pngFixture = (...chunks: Uint8Array[]) =>
+  cat(
+    PNG_SIG,
+    makePngChunk("IHDR", bytes(0, 0, 0, 2, 0, 0, 0, 2, 8, 6, 0, 0, 0)),
+    ...chunks,
+    makePngChunk("IDAT", bytes(1, 2, 3)),
+    makePngChunk("IEND", new Uint8Array(0)),
+  );
 
 describe("PNG chunks", () => {
   it("CRC32 matches known values", () => {
@@ -472,7 +504,12 @@ describe("PNG chunks", () => {
     expect(readPngDpi(again)).toEqual({ x: 72, y: 72 });
   });
   it("strips text/EXIF/time chunks but keeps colour chunks", () => {
-    const f = pngFixture(makePngChunk("iCCP", bytes("x", 0, 0, 1)), makePngChunk("tEXt", bytes("Author", 0, "me")), makePngChunk("eXIf", bytes("MM", 0, 42)), makePngChunk("tIME", new Uint8Array(7)));
+    const f = pngFixture(
+      makePngChunk("iCCP", bytes("x", 0, 0, 1)),
+      makePngChunk("tEXt", bytes("Author", 0, "me")),
+      makePngChunk("eXIf", bytes("MM", 0, 42)),
+      makePngChunk("tIME", new Uint8Array(7)),
+    );
     const { bytes: out, removed } = stripPngMetadata(f);
     expect(removed.sort()).toEqual(["eXIf", "tEXt", "tIME"]);
     expect(pngChunks(out).map((c) => c.type)).toEqual(["IHDR", "iCCP", "IDAT", "IEND"]);

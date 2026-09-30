@@ -105,7 +105,13 @@ export default function Watermark({ locale }: { locale: Locale }) {
 
   const runner: Runner = async (p, ctx) => {
     const fmt = resolveOut("same", p.format);
-    const r = await processFile(ctx.engine, p, active ? ops : [], { format: fmt, quality: LOSSY.has(fmt) ? Math.max(88, DEFAULT_QUALITY[fmt]) : 100, background: "#FFFFFF" }, { signal: ctx.signal, onProgress: ctx.onProgress, assets });
+    const r = await processFile(
+      ctx.engine,
+      p,
+      active ? ops : [],
+      { format: fmt, quality: LOSSY.has(fmt) ? Math.max(88, DEFAULT_QUALITY[fmt]) : 100, background: "#FFFFFF" },
+      { signal: ctx.signal, onProgress: ctx.onProgress, assets },
+    );
     return { blob: toBlob(r), name: `${baseName(p.file.name)}-watermark.${r.ext}`, width: r.width, height: r.height };
   };
   const batch = useBatch({ runner, settingsKey: key, delay: 600 });
@@ -127,7 +133,16 @@ export default function Watermark({ locale }: { locale: Locale }) {
   const options = (
     <>
       <Field label={t.kind}>
-        <Segmented label={t.kind} value={kind} onChange={setKind} options={[{ value: "text", label: t.text }, { value: "image", label: t.logo }]} />
+        <Segmented
+          wrap
+          label={t.kind}
+          value={kind}
+          onChange={setKind}
+          options={[
+            { value: "text", label: t.text },
+            { value: "image", label: t.logo },
+          ]}
+        />
       </Field>
       {kind === "text" ? (
         <Field label={t.textValue} htmlFor={`${id}-txt`} className="min-w-48 flex-1">
@@ -139,8 +154,22 @@ export default function Watermark({ locale }: { locale: Locale }) {
             <ImagePlus aria-hidden />
             {logo ? t.change : t.choose}
           </Button>
-          {logoError ? <p className="text-sm text-err" role="alert">{errorText(locale, logoError)}</p> : null}
-          <input ref={fileRef} type="file" accept="image/*,.svg" className="sr-only" tabIndex={-1} onChange={(e) => { pickLogo(e.target.files?.[0]); e.target.value = ""; }} />
+          {logoError ? (
+            <p className="text-sm text-err" role="alert">
+              {errorText(locale, logoError)}
+            </p>
+          ) : null}
+          <input
+            ref={fileRef}
+            type="file"
+            accept="image/*,.svg"
+            className="sr-only"
+            tabIndex={-1}
+            onChange={(e) => {
+              pickLogo(e.target.files?.[0]);
+              e.target.value = "";
+            }}
+          />
         </div>
       )}
       <PositionPicker label={t.position} value={position} onChange={setPosition} locale={locale} />

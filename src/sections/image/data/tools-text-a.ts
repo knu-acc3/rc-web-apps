@@ -243,15 +243,7 @@ export const TOOL_TEXTS_A: Record<string, ToolText> = {
         "обрезать изображение по размеру",
         "вырезать часть фото",
       ],
-      en: [
-        "crop image",
-        "crop image online",
-        "crop photo",
-        "crop picture to size",
-        "image cropper",
-        "cut out part of an image",
-        "crop image to exact pixels",
-      ],
+      en: ["crop image", "crop image online", "crop photo", "crop picture to size", "image cropper", "cut out part of an image", "crop image to exact pixels"],
     },
     howTo: {
       ru: [
@@ -344,14 +336,7 @@ export const TOOL_TEXTS_A: Record<string, ToolText> = {
         "вырезать круг из фото",
         "фото в круге на прозрачном фоне",
       ],
-      en: [
-        "crop image in circle",
-        "circle crop online",
-        "round profile picture maker",
-        "make image round",
-        "circle png from photo",
-        "circular crop tool",
-      ],
+      en: ["crop image in circle", "circle crop online", "round profile picture maker", "make image round", "circle png from photo", "circular crop tool"],
     },
     howTo: {
       ru: [
@@ -543,14 +528,7 @@ export const TOOL_TEXTS_A: Record<string, ToolText> = {
         "перевернуть фото зеркально",
         "отразить фото по вертикали",
       ],
-      en: [
-        "flip image",
-        "mirror image online",
-        "flip photo horizontally",
-        "flip image vertically",
-        "mirror a picture",
-        "unmirror selfie",
-      ],
+      en: ["flip image", "mirror image online", "flip photo horizontally", "flip image vertically", "mirror a picture", "unmirror selfie"],
     },
     howTo: {
       ru: [
@@ -736,14 +714,7 @@ export const TOOL_TEXTS_A: Record<string, ToolText> = {
         "винтажный фильтр для фото",
         "обработать фото онлайн",
       ],
-      en: [
-        "photo filters online",
-        "apply filter to photo",
-        "photo effects online",
-        "black and white photo filter",
-        "vintage photo filter",
-        "image filters",
-      ],
+      en: ["photo filters online", "apply filter to photo", "photo effects online", "black and white photo filter", "vintage photo filter", "image filters"],
     },
     howTo: {
       ru: [
@@ -938,14 +909,7 @@ export const TOOL_TEXTS_A: Record<string, ToolText> = {
         "сделать вотермарк",
         "полупрозрачная надпись на фото",
       ],
-      en: [
-        "add watermark to photo",
-        "watermark images online",
-        "batch watermark photos",
-        "add logo to photo",
-        "text watermark",
-        "watermark maker",
-      ],
+      en: ["add watermark to photo", "watermark images online", "batch watermark photos", "add logo to photo", "text watermark", "watermark maker"],
     },
     howTo: {
       ru: [
@@ -1039,14 +1003,7 @@ export const TOOL_TEXTS_A: Record<string, ToolText> = {
         "цитата на картинке",
         "сделать мем с надписью",
       ],
-      en: [
-        "add text to photo",
-        "add text to image online",
-        "meme generator",
-        "caption photo",
-        "put words on a picture",
-        "quote image maker",
-      ],
+      en: ["add text to photo", "add text to image online", "meme generator", "caption photo", "put words on a picture", "quote image maker"],
     },
     howTo: {
       ru: [
@@ -1139,14 +1096,7 @@ export const TOOL_TEXTS_A: Record<string, ToolText> = {
         "png в base64",
         "jpg в base64",
       ],
-      en: [
-        "image to base64",
-        "convert image to base64",
-        "base64 image encoder",
-        "png to base64",
-        "image to data uri",
-        "base64 css background",
-      ],
+      en: ["image to base64", "convert image to base64", "base64 image encoder", "png to base64", "image to data uri", "base64 css background"],
     },
     howTo: {
       ru: [
@@ -1229,14 +1179,7 @@ export const TOOL_TEXTS_A: Record<string, ToolText> = {
         "data uri в картинку",
         "преобразовать base64 в фото",
       ],
-      en: [
-        "base64 to image",
-        "decode base64 image",
-        "base64 to png",
-        "base64 to jpg",
-        "data uri to image",
-        "base64 image viewer",
-      ],
+      en: ["base64 to image", "decode base64 image", "base64 to png", "base64 to jpg", "data uri to image", "base64 image viewer"],
     },
     howTo: {
       ru: [

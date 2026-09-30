@@ -1,6 +1,22 @@
 "use client";
 
-import { Copy, Download, Eraser, FlipHorizontal2, FlipVertical2, Grid3x3, Loader2, PaintBucket, Pencil, Pipette, Plus, Redo2, Trash2, Undo2 } from "lucide-react";
+import {
+  Copy,
+  Download,
+  Eraser,
+  FlipHorizontal2,
+  FlipVertical2,
+  Grid3x3,
+  Loader2,
+  PaintBucket,
+  Pencil,
+  Pipette,
+  Plus,
+  Redo2,
+  Trash2,
+  Undo2,
+  Settings2,
+} from "lucide-react";
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { cn } from "@/lib/cn";
@@ -221,10 +237,11 @@ export default function PixelArt({ locale }: { locale: Locale }) {
     const ctx = c.getContext("2d")!;
     const cell = VIEW / size;
     const chk = Math.max(4, cell / 2);
-    for (let y = 0; y < VIEW; y += chk) for (let x = 0; x < VIEW; x += chk) {
-      ctx.fillStyle = ((x + y) / chk) % 2 === 0 ? "#ffffff" : "#e5e7eb";
-      ctx.fillRect(x, y, chk, chk);
-    }
+    for (let y = 0; y < VIEW; y += chk)
+      for (let x = 0; x < VIEW; x += chk) {
+        ctx.fillStyle = ((x + y) / chk) % 2 === 0 ? "#ffffff" : "#e5e7eb";
+        ctx.fillRect(x, y, chk, chk);
+      }
     for (let i = 0; i < frame.length; i++) {
       const v = frame[i];
       if (!v) continue;
@@ -295,7 +312,14 @@ export default function PixelArt({ locale }: { locale: Locale }) {
           const c = renderFrame(f, sc, pad, withBg);
           const px = c.getContext("2d")!.getImageData(0, 0, c.width, c.height).data;
           const { index, palette, transparentIndex } = await indexFrame(px);
-          gif.writeFrame(index, c.width, c.height, { palette, delay: Math.max(20, delay ?? 200), repeat: 0, transparent: transparentIndex >= 0, transparentIndex: Math.max(0, transparentIndex), dispose: transparentIndex >= 0 ? 2 : -1 });
+          gif.writeFrame(index, c.width, c.height, {
+            palette,
+            delay: Math.max(20, delay ?? 200),
+            repeat: 0,
+            transparent: transparentIndex >= 0,
+            transparentIndex: Math.max(0, transparentIndex),
+            dispose: transparentIndex >= 0 ? 2 : -1,
+          });
         }
         gif.finish();
         downloadBlob(new Blob([gif.bytes() as BlobPart], { type: "image/gif" }), `pixel-art-${size}x${size}.gif`);
@@ -312,7 +336,15 @@ export default function PixelArt({ locale }: { locale: Locale }) {
   }
 
   const toolBtn = (v: Tool, Icon: typeof Pencil, label: string) => (
-    <Button key={v} variant={tool === v ? "primary" : "outline"} size="icon" aria-label={label} title={label} aria-pressed={tool === v} onClick={() => setTool(v)}>
+    <Button
+      key={v}
+      variant={tool === v ? "primary" : "outline"}
+      size="icon"
+      aria-label={label}
+      title={label}
+      aria-pressed={tool === v}
+      onClick={() => setTool(v)}
+    >
       <Icon aria-hidden />
     </Button>
   );
@@ -326,12 +358,29 @@ export default function PixelArt({ locale }: { locale: Locale }) {
           {toolBtn("fill", PaintBucket, t.fill)}
           {toolBtn("picker", Pipette, t.picker)}
         </div>
-        <ColorField label={t.color} value={color} onChange={(c) => { setColor(c); remember(c); }} locale={locale} className="w-44" />
+        <ColorField
+          label={t.color}
+          value={color}
+          onChange={(c) => {
+            setColor(c);
+            remember(c);
+          }}
+          locale={locale}
+          className="w-44"
+        />
         <div className="flex flex-col gap-1.5">
           <span className="text-sm font-medium text-fg-2">{t.recent}</span>
           <div className="flex flex-wrap gap-1">
             {recent.map((c) => (
-              <button key={c} type="button" aria-label={t.useColor(c)} title={c} onClick={() => setColor(c)} className={cn("size-6 rounded-[5px] border", c === color ? "border-accent ring-2 ring-accent/40" : "border-line")} style={{ background: c }} />
+              <button
+                key={c}
+                type="button"
+                aria-label={t.useColor(c)}
+                title={c}
+                onClick={() => setColor(c)}
+                className={cn("size-6 rounded-[5px] border", c === color ? "border-accent ring-2 ring-accent/40" : "border-line")}
+                style={{ background: c }}
+              />
             ))}
           </div>
         </div>
@@ -380,7 +429,8 @@ export default function PixelArt({ locale }: { locale: Locale }) {
               if (k === "g") return setTool("fill");
               if (k === "i") return setTool("picker");
               const c = cursor ?? { x: 0, y: 0 };
-              const d = e.key === "ArrowLeft" ? [-1, 0] : e.key === "ArrowRight" ? [1, 0] : e.key === "ArrowUp" ? [0, -1] : e.key === "ArrowDown" ? [0, 1] : null;
+              const d =
+                e.key === "ArrowLeft" ? [-1, 0] : e.key === "ArrowRight" ? [1, 0] : e.key === "ArrowUp" ? [0, -1] : e.key === "ArrowDown" ? [0, 1] : null;
               if (d) {
                 e.preventDefault();
                 const next = { x: Math.max(0, Math.min(size - 1, c.x + d[0])), y: Math.max(0, Math.min(size - 1, c.y + d[1])) };
@@ -410,16 +460,46 @@ export default function PixelArt({ locale }: { locale: Locale }) {
               <Button variant="outline" size="icon" aria-label={t.redo} title={t.redo} onClick={doRedo} disabled={!redo.length}>
                 <Redo2 aria-hidden />
               </Button>
-              <Button variant={mirrorX ? "primary" : "outline"} size="icon" aria-label={t.mirrorX} title={t.mirrorX} aria-pressed={mirrorX} onClick={() => setMirrorX((x) => !x)}>
+              <Button
+                variant={mirrorX ? "primary" : "outline"}
+                size="icon"
+                aria-label={t.mirrorX}
+                title={t.mirrorX}
+                aria-pressed={mirrorX}
+                onClick={() => setMirrorX((x) => !x)}
+              >
                 <FlipHorizontal2 aria-hidden />
               </Button>
-              <Button variant={mirrorY ? "primary" : "outline"} size="icon" aria-label={t.mirrorY} title={t.mirrorY} aria-pressed={mirrorY} onClick={() => setMirrorY((x) => !x)}>
+              <Button
+                variant={mirrorY ? "primary" : "outline"}
+                size="icon"
+                aria-label={t.mirrorY}
+                title={t.mirrorY}
+                aria-pressed={mirrorY}
+                onClick={() => setMirrorY((x) => !x)}
+              >
                 <FlipVertical2 aria-hidden />
               </Button>
-              <Button variant={grid ? "primary" : "outline"} size="icon" aria-label={t.grid} title={t.grid} aria-pressed={grid} onClick={() => setGrid((x) => !x)}>
+              <Button
+                variant={grid ? "primary" : "outline"}
+                size="icon"
+                aria-label={t.grid}
+                title={t.grid}
+                aria-pressed={grid}
+                onClick={() => setGrid((x) => !x)}
+              >
                 <Grid3x3 aria-hidden />
               </Button>
-              <Button variant="outline" size="icon" aria-label={t.clear} title={t.clear} onClick={() => { pushHistory(); setFrames((fs) => fs.map((f, i) => (i === cur ? new Uint32Array(size * size) : f))); }}>
+              <Button
+                variant="outline"
+                size="icon"
+                aria-label={t.clear}
+                title={t.clear}
+                onClick={() => {
+                  pushHistory();
+                  setFrames((fs) => fs.map((f, i) => (i === cur ? new Uint32Array(size * size) : f)));
+                }}
+              >
                 <Trash2 aria-hidden />
               </Button>
             </div>
@@ -427,19 +507,61 @@ export default function PixelArt({ locale }: { locale: Locale }) {
               <span className="text-sm font-medium text-fg-2">{t.frames}</span>
               <div role="radiogroup" aria-label={t.frames} className="flex flex-wrap gap-1">
                 {frames.map((_, i) => (
-                  <button key={i} type="button" role="radio" aria-checked={i === cur} aria-label={t.frame(i + 1)} onClick={() => setCur(i)} className={cn("h-8 min-w-8 rounded-[6px] border px-2 text-sm font-medium", i === cur ? "border-accent bg-accent-soft text-accent" : "border-line text-fg-2")}>
+                  <button
+                    key={i}
+                    type="button"
+                    role="radio"
+                    aria-checked={i === cur}
+                    aria-label={t.frame(i + 1)}
+                    onClick={() => setCur(i)}
+                    className={cn(
+                      "h-8 min-w-8 rounded-[6px] border px-2 text-sm font-medium",
+                      i === cur ? "border-accent bg-accent-soft text-accent" : "border-line text-fg-2",
+                    )}
+                  >
                     {i + 1}
                   </button>
                 ))}
               </div>
               <div className="flex gap-1.5">
-                <Button variant="ghost" size="icon-sm" aria-label={t.addFrame} title={t.addFrame} onClick={() => { pushHistory(); setFrames((fs) => [...fs, new Uint32Array(size * size)]); setCur(frames.length); }}>
+                <Button
+                  variant="ghost"
+                  size="icon-sm"
+                  aria-label={t.addFrame}
+                  title={t.addFrame}
+                  onClick={() => {
+                    pushHistory();
+                    setFrames((fs) => [...fs, new Uint32Array(size * size)]);
+                    setCur(frames.length);
+                  }}
+                >
                   <Plus aria-hidden />
                 </Button>
-                <Button variant="ghost" size="icon-sm" aria-label={t.dupFrame} title={t.dupFrame} onClick={() => { pushHistory(); setFrames((fs) => [...fs.slice(0, cur + 1), fs[cur].slice(), ...fs.slice(cur + 1)]); setCur(cur + 1); }}>
+                <Button
+                  variant="ghost"
+                  size="icon-sm"
+                  aria-label={t.dupFrame}
+                  title={t.dupFrame}
+                  onClick={() => {
+                    pushHistory();
+                    setFrames((fs) => [...fs.slice(0, cur + 1), fs[cur].slice(), ...fs.slice(cur + 1)]);
+                    setCur(cur + 1);
+                  }}
+                >
                   <Copy aria-hidden />
                 </Button>
-                <Button variant="ghost" size="icon-sm" aria-label={t.delFrame} title={t.delFrame} disabled={frames.length < 2} onClick={() => { pushHistory(); setFrames((fs) => fs.filter((_, i) => i !== cur)); setCur(Math.max(0, cur - 1)); }}>
+                <Button
+                  variant="ghost"
+                  size="icon-sm"
+                  aria-label={t.delFrame}
+                  title={t.delFrame}
+                  disabled={frames.length < 2}
+                  onClick={() => {
+                    pushHistory();
+                    setFrames((fs) => fs.filter((_, i) => i !== cur));
+                    setCur(Math.max(0, cur - 1));
+                  }}
+                >
                   <Trash2 aria-hidden />
                 </Button>
               </div>
@@ -449,7 +571,13 @@ export default function PixelArt({ locale }: { locale: Locale }) {
         <div className="flex flex-col gap-3 border-t border-line px-4 py-3 sm:flex-row sm:items-end sm:justify-between">
           <div className="flex flex-wrap items-end gap-3">
             <Field label={t.format}>
-              <Segmented label={t.format} value={format} onChange={setFormat} options={(["png", "jpg", "webp", "gif"] as const).map((f) => ({ value: f, label: f.toUpperCase() }))} />
+              <Segmented
+                wrap
+                label={t.format}
+                value={format}
+                onChange={setFormat}
+                options={(["png", "jpg", "webp", "gif"] as const).map((f) => ({ value: f, label: f.toUpperCase() }))}
+              />
             </Field>
             <NumberField label={t.scale} value={scale} onChange={setScale} min={1} max={32} className="w-32" />
           </div>
@@ -459,14 +587,26 @@ export default function PixelArt({ locale }: { locale: Locale }) {
           </Button>
         </div>
         <details className="border-t border-line">
-          <summary className="cursor-pointer px-4 py-2.5 text-sm text-fg-2 hover:text-fg">{locale === "ru" ? "Дополнительно" : "More options"}</summary>
+          <summary className="flex cursor-pointer items-center gap-2 px-4 py-2.5 text-sm text-fg-2 hover:text-fg">
+            <Settings2 className="size-4" aria-hidden />
+            {locale === "ru" ? "Дополнительно" : "More options"}
+          </summary>
           <div className="grid gap-4 px-4 pb-4 pt-1 sm:grid-cols-2">
             <NumberField label={t.padding} value={padding} onChange={setPadding} min={0} max={256} suffix="px" />
             <Field label={t.bg}>
-              <Segmented label={t.bg} value={bgKind} onChange={setBgKind} options={[{ value: "transparent", label: t.transparent }, { value: "color", label: t.solid }]} />
+              <Segmented
+                wrap
+                label={t.bg}
+                value={bgKind}
+                onChange={setBgKind}
+                options={[
+                  { value: "transparent", label: t.transparent },
+                  { value: "color", label: t.solid },
+                ]}
+              />
             </Field>
             {(bgKind === "color" || format === "jpg") && <ColorField label={t.bgColor} value={bg} onChange={setBg} locale={locale} />}
-            {format === "gif" && <NumberField label={t.delay} value={delay} onChange={setDelay} min={20} max={10000} suffix="ms" />}
+            {format === "gif" && <NumberField label={t.delay} value={delay} onChange={setDelay} min={20} max={10000} suffix={locale === "ru" ? "мс" : "ms"} />}
             {format === "gif" && <p className="text-sm text-fg-3 sm:col-span-2">{t.gifNote}</p>}
           </div>
         </details>

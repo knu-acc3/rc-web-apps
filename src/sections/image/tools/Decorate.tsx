@@ -25,6 +25,7 @@ const T = {
     cornerColor: "Цвет углов",
     width: "Толщина рамки",
     unit: "Единицы",
+    roundPctHint: "100 % — половина короткой стороны: квадрат станет кругом, прямоугольник — «таблеткой»",
     pct: "% короткой стороны",
     px: "px",
     color: "Цвет рамки",
@@ -45,6 +46,7 @@ const T = {
     cornerColor: "Corner colour",
     width: "Border width",
     unit: "Units",
+    roundPctHint: "100% is half the shorter side: a square becomes a circle, a rectangle a pill",
     pct: "% of short side",
     px: "px",
     color: "Border colour",
@@ -71,6 +73,7 @@ export default function Decorate({ locale, mode }: { locale: Locale; mode: Mode 
   const s = S(locale);
   const id = useId();
   const [radius, setRadius] = useState(12);
+  const [rUnit, setRUnit] = useState<"%" | "px">("%");
   const [cornerKind, setCornerKind] = useState<"transparent" | "color">("transparent");
   const [cornerColor, setCornerColor] = useState("#FFFFFF");
   const [bw, setBw] = useState(4);
@@ -85,7 +88,7 @@ export default function Decorate({ locale, mode }: { locale: Locale; mode: Mode 
   let ops: Op[];
   if (mode === "round") {
     const fill: Fill = cornerKind === "transparent" ? { kind: "transparent" } : { kind: "color", color: cornerColor };
-    ops = [{ t: "round", radius, unit: "%", fill }];
+    ops = [{ t: "round", radius, unit: rUnit, fill }];
   } else if (mode === "border") {
     ops = [{ t: "border", width: bw, unit, color: bColor, inside }];
   } else {
@@ -103,7 +106,13 @@ export default function Decorate({ locale, mode }: { locale: Locale; mode: Mode 
 
   const runner: Runner = async (p, ctx) => {
     const fmt = pickFormat(p.format);
-    const r = await processFile(ctx.engine, p, ops, { format: fmt, quality: LOSSY.has(fmt) ? Math.max(88, DEFAULT_QUALITY[fmt]) : 100, background: mode === "round" ? cornerColor : "#FFFFFF" }, { signal: ctx.signal, onProgress: ctx.onProgress });
+    const r = await processFile(
+      ctx.engine,
+      p,
+      ops,
+      { format: fmt, quality: LOSSY.has(fmt) ? Math.max(88, DEFAULT_QUALITY[fmt]) : 100, background: mode === "round" ? cornerColor : "#FFFFFF" },
+      { signal: ctx.signal, onProgress: ctx.onProgress },
+    );
     const suffix = mode === "round" ? "rounded" : mode === "border" ? "border" : "square";
     return { blob: toBlob(r), name: `${baseName(p.file.name)}-${suffix}.${r.ext}`, width: r.width, height: r.height };
   };
@@ -113,26 +122,53 @@ export default function Decorate({ locale, mode }: { locale: Locale; mode: Mode 
     mode === "round" ? (
       <>
         <div className="min-w-52 flex-1">
-          <RangeField label={t.radius} value={radius} onChange={setRadius} min={0} max={100} unit="%" locale={locale} />
+          <RangeField label={t.radius} value={radius} onChange={setRadius} min={0} max={rUnit === "%" ? 100 : 1000} unit={rUnit} locale={locale} />
         </div>
         <Field label={t.corners}>
-          <Segmented label={t.corners} value={cornerKind} onChange={setCornerKind} options={[{ value: "transparent", label: t.transparent }, { value: "color", label: t.filled }]} />
+          <Segmented
+            wrap
+            label={t.corners}
+            value={cornerKind}
+            onChange={setCornerKind}
+            options={[
+              { value: "transparent", label: t.transparent },
+              { value: "color", label: t.filled },
+            ]}
+          />
         </Field>
       </>
     ) : mode === "border" ? (
       <>
         <div className="min-w-52 flex-1">
-          <RangeField label={t.width} value={bw} onChange={setBw} min={0} max={unit === "%" ? 25 : 300} step={unit === "%" ? 0.5 : 1} unit={unit === "%" ? "%" : "px"} locale={locale} />
+          <RangeField
+            label={t.width}
+            value={bw}
+            onChange={setBw}
+            min={0}
+            max={unit === "%" ? 25 : 300}
+            step={unit === "%" ? 0.5 : 1}
+            unit={unit === "%" ? "%" : "px"}
+            locale={locale}
+          />
         </div>
         <ColorField label={t.color} value={bColor} onChange={setBColor} locale={locale} className="w-48" />
       </>
     ) : (
       <>
         <Field label={t.ratio}>
-          <Segmented label={t.ratio} value={ratio} onChange={setRatio} options={RATIOS.map((x) => ({ value: x.value, label: x.value }))} />
+          <Segmented wrap label={t.ratio} value={ratio} onChange={setRatio} options={RATIOS.map((x) => ({ value: x.value, label: x.value }))} />
         </Field>
         <Field label={t.fill}>
-          <Segmented label={t.fill} value={fillKind} onChange={setFillKind} options={[{ value: "blur", label: t.blur }, { value: "color", label: t.solid }]} />
+          <Segmented
+            wrap
+            label={t.fill}
+            value={fillKind}
+            onChange={setFillKind}
+            options={[
+              { value: "blur", label: t.blur },
+              { value: "color", label: t.solid },
+            ]}
+          />
         </Field>
         {fillKind === "color" && <ColorField label={t.fillColor} value={fillColor} onChange={setFillColor} locale={locale} className="w-48" />}
       </>
@@ -140,11 +176,40 @@ export default function Decorate({ locale, mode }: { locale: Locale; mode: Mode 
 
   const more = (
     <>
+      {mode === "round" && (
+        <Field label={t.unit} hint={rUnit === "%" ? t.roundPctHint : undefined}>
+          <Segmented
+            wrap
+            label={t.unit}
+            value={rUnit}
+            onChange={(u) => {
+              setRUnit(u);
+              setRadius(u === "%" ? 12 : 60);
+            }}
+            options={[
+              { value: "%", label: "%" },
+              { value: "px", label: t.px },
+            ]}
+          />
+        </Field>
+      )}
       {mode === "round" && cornerKind === "color" && <ColorField label={t.cornerColor} value={cornerColor} onChange={setCornerColor} locale={locale} />}
       {mode === "border" && (
         <>
           <Field label={t.unit}>
-            <Segmented label={t.unit} value={unit} onChange={(u) => { setUnit(u); setBw(u === "%" ? 4 : 40); }} options={[{ value: "%", label: t.pct }, { value: "px", label: t.px }]} />
+            <Segmented
+              wrap
+              label={t.unit}
+              value={unit}
+              onChange={(u) => {
+                setUnit(u);
+                setBw(u === "%" ? 4 : 40);
+              }}
+              options={[
+                { value: "%", label: t.pct },
+                { value: "px", label: t.px },
+              ]}
+            />
           </Field>
           <Switch label={t.inside} checked={inside} onChange={(e) => setInside(e.target.checked)} />
         </>

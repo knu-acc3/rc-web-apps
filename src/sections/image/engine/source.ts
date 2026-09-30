@@ -44,7 +44,10 @@ function parseLength(v: string | null): number | null {
 /** Intrinsic size of an SVG document (width/height attributes or viewBox). */
 export function svgIntrinsicSize(doc: Document): { w: number; h: number; hasViewBox: boolean } {
   const root = doc.documentElement;
-  const vb = (root.getAttribute("viewBox") ?? "").trim().split(/[\s,]+/).map(Number);
+  const vb = (root.getAttribute("viewBox") ?? "")
+    .trim()
+    .split(/[\s,]+/)
+    .map(Number);
   const hasViewBox = vb.length === 4 && vb.every(Number.isFinite) && vb[2] > 0 && vb[3] > 0;
   let w = parseLength(root.getAttribute("width"));
   let h = parseLength(root.getAttribute("height"));

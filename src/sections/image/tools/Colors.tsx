@@ -8,7 +8,6 @@ import { cn } from "@/lib/cn";
 import { copyText } from "@/lib/clipboard";
 import { CopyButton } from "@/ui/copy-button";
 import { Dropzone } from "@/ui/dropzone";
-import { Field } from "@/ui/field";
 import { Notice, Panel } from "@/ui/panel";
 import { Segmented } from "@/ui/segmented";
 import { IMAGE_ACCEPT } from "../engine/detect";
@@ -16,8 +15,8 @@ import { luminance, rgbToHex, rgbToHsl, type PaletteColor } from "../engine/pale
 import { materialize } from "../engine/source";
 import { pixelsOf } from "../engine/run";
 import type { PixelsResult } from "../engine/types";
-import { checker } from "../ui/controls";
-import { useEngine } from "../ui/hooks";
+import { checker, RangeField } from "../ui/controls";
+import { useDebounced, useEngine } from "../ui/hooks";
 import { useSingleFile } from "../ui/SingleImage";
 import { errorText, S } from "../ui/strings";
 
@@ -54,8 +53,6 @@ const T = {
   },
 } as const;
 
-const COUNTS = ["5", "8", "12", "16"] as const;
-
 export default function Colors({ locale }: { locale: Locale }) {
   const t = T[locale];
   const s = S(locale);
@@ -64,7 +61,8 @@ export default function Colors({ locale }: { locale: Locale }) {
   const file = useSingleFile();
   const [pxState, setPx] = useState<{ id: string; px: PixelsResult } | null>(null);
   const [palState, setPalette] = useState<{ key: string; colors: PaletteColor[] } | null>(null);
-  const [count, setCount] = useState<(typeof COUNTS)[number]>("8");
+  const [count, setCount] = useState(8);
+  const debCount = useDebounced(count, 250);
   const [fmt, setFmt] = useState<"hex" | "css" | "json">("hex");
   const [cursorState, setCursor] = useState<{ id: string; x: number; y: number } | null>(null);
   const [error, setError] = useState<unknown>(null);
@@ -72,7 +70,7 @@ export default function Colors({ locale }: { locale: Locale }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const p = file.prepared;
   const px = pxState && p && pxState.id === p.id ? pxState.px : null;
-  const palKey = p ? `${p.id}:${count}` : "";
+  const palKey = p ? `${p.id}:${debCount}` : "";
   const palette = palState && palState.key === palKey ? palState.colors : null;
   const cursor = cursorState && p && cursorState.id === p.id ? cursorState : null;
 
@@ -95,14 +93,14 @@ export default function Colors({ locale }: { locale: Locale }) {
     (async () => {
       try {
         const m = await materialize(p);
-        const res = await getEngine().run<PaletteColor[]>({ type: "palette", src: m.src, count: Number(count) }, { signal: ac.signal, transfer: m.transfer });
+        const res = await getEngine().run<PaletteColor[]>({ type: "palette", src: m.src, count: debCount }, { signal: ac.signal, transfer: m.transfer });
         if (!ac.signal.aborted) setPalette({ key: palKey, colors: res });
       } catch (e) {
         if (!ac.signal.aborted) setError(e);
       }
     })();
     return () => ac.abort();
-  }, [p, count, palKey, getEngine]);
+  }, [p, debCount, palKey, getEngine]);
 
   useEffect(() => {
     const c = canvasRef.current;
@@ -116,7 +114,11 @@ export default function Colors({ locale }: { locale: Locale }) {
     const c = canvasRef.current;
     if (!c || !px) return;
     const r = c.getBoundingClientRect();
-    setCursor({ id: p!.id, x: Math.min(px.width - 1, Math.max(0, Math.floor(((clientX - r.left) / r.width) * px.width))), y: Math.min(px.height - 1, Math.max(0, Math.floor(((clientY - r.top) / r.height) * px.height))) });
+    setCursor({
+      id: p!.id,
+      x: Math.min(px.width - 1, Math.max(0, Math.floor(((clientX - r.left) / r.width) * px.width))),
+      y: Math.min(px.height - 1, Math.max(0, Math.floor(((clientY - r.top) / r.height) * px.height))),
+    });
   };
 
   if (!p) {
@@ -143,7 +145,11 @@ export default function Colors({ locale }: { locale: Locale }) {
       ? hexes.join("\n")
       : fmt === "css"
         ? `:root {\n${hexes.map((h, i) => `  --color-${i + 1}: ${h};`).join("\n")}\n}`
-        : JSON.stringify((palette ?? []).map((c, i) => ({ hex: hexes[i], rgb: [c.r, c.g, c.b], share: Math.round(c.share * 1000) / 1000 })), null, 2);
+        : JSON.stringify(
+            (palette ?? []).map((c, i) => ({ hex: hexes[i], rgb: [c.r, c.g, c.b], share: Math.round(c.share * 1000) / 1000 })),
+            null,
+            2,
+          );
 
   return (
     <div className="flex flex-col gap-4">
@@ -152,26 +158,39 @@ export default function Colors({ locale }: { locale: Locale }) {
           <div className={cn("relative flex min-h-56 items-center justify-center overflow-hidden rounded-[10px] border border-line", checker)}>
             {!px && <Loader2 className="size-6 animate-spin text-accent" aria-hidden />}
             <div className={cn("relative", !px && "hidden")}>
-            <canvas
-              ref={canvasRef}
-              tabIndex={0}
-              role="img"
-              aria-label={`${t.image}. ${t.pickHint}`}
-              className="block max-h-[60vh] max-w-full cursor-crosshair touch-none"
-              onPointerDown={(e) => {
-                e.currentTarget.setPointerCapture(e.pointerId);
-                pickAt(e.clientX, e.clientY);
-              }}
-              onPointerMove={(e) => e.buttons && pickAt(e.clientX, e.clientY)}
-              onKeyDown={(e) => {
-                if (!px || !cursor) return;
-                const st = e.shiftKey ? 10 : 1;
-                const d = e.key === "ArrowLeft" ? [-st, 0] : e.key === "ArrowRight" ? [st, 0] : e.key === "ArrowUp" ? [0, -st] : e.key === "ArrowDown" ? [0, st] : null;
-                if (!d) return;
-                e.preventDefault();
-                setCursor({ id: cursor.id, x: Math.min(px.width - 1, Math.max(0, cursor.x + d[0])), y: Math.min(px.height - 1, Math.max(0, cursor.y + d[1])) });
-              }}
-            />
+              <canvas
+                ref={canvasRef}
+                tabIndex={0}
+                role="img"
+                aria-label={`${t.image}. ${t.pickHint}`}
+                className="block max-h-[60vh] max-w-full cursor-crosshair touch-none"
+                onPointerDown={(e) => {
+                  e.currentTarget.setPointerCapture(e.pointerId);
+                  pickAt(e.clientX, e.clientY);
+                }}
+                onPointerMove={(e) => e.buttons && pickAt(e.clientX, e.clientY)}
+                onKeyDown={(e) => {
+                  if (!px || !cursor) return;
+                  const st = e.shiftKey ? 10 : 1;
+                  const d =
+                    e.key === "ArrowLeft"
+                      ? [-st, 0]
+                      : e.key === "ArrowRight"
+                        ? [st, 0]
+                        : e.key === "ArrowUp"
+                          ? [0, -st]
+                          : e.key === "ArrowDown"
+                            ? [0, st]
+                            : null;
+                  if (!d) return;
+                  e.preventDefault();
+                  setCursor({
+                    id: cursor.id,
+                    x: Math.min(px.width - 1, Math.max(0, cursor.x + d[0])),
+                    y: Math.min(px.height - 1, Math.max(0, cursor.y + d[1])),
+                  });
+                }}
+              />
               {px && cursor && (
                 <span
                   aria-hidden
@@ -207,9 +226,9 @@ export default function Colors({ locale }: { locale: Locale }) {
       <Panel className="overflow-hidden">
         <div className="flex flex-wrap items-end justify-between gap-3 border-b border-line px-4 py-3">
           <h2 className="text-sm font-semibold text-fg">{t.palette}</h2>
-          <Field label={t.count}>
-            <Segmented label={t.count} value={count} onChange={setCount} options={COUNTS.map((c) => ({ value: c, label: c }))} size="sm" />
-          </Field>
+          <div className="w-56">
+            <RangeField label={t.count} value={count} onChange={setCount} min={3} max={16} locale={locale} />
+          </div>
         </div>
         {!palette ? (
           <div className="flex min-h-24 items-center justify-center">
@@ -228,7 +247,10 @@ export default function Colors({ locale }: { locale: Locale }) {
                       if (await copyText(hex)) setCopiedHex(hex);
                     }}
                     aria-label={t.copyHex(hex)}
-                    className={cn("flex h-20 w-24 flex-col justify-end rounded-[10px] border border-line p-2 text-left text-xs font-medium", dark ? "text-white" : "text-black")}
+                    className={cn(
+                      "flex h-20 w-24 flex-col justify-end rounded-[10px] border border-line p-2 text-left text-xs font-medium",
+                      dark ? "text-white" : "text-black",
+                    )}
                     style={{ background: hex }}
                   >
                     <span className="font-mono">{copiedHex === hex ? t.copied : hex}</span>
@@ -241,13 +263,31 @@ export default function Colors({ locale }: { locale: Locale }) {
         )}
         <div className="border-t border-line">
           <div className="flex items-center justify-between gap-2 px-3 py-1.5">
-            <Segmented label={t.export} value={fmt} onChange={setFmt} size="sm" options={[{ value: "hex", label: t.hex }, { value: "css", label: t.css }, { value: "json", label: t.json }]} />
+            <Segmented
+              wrap
+              label={t.export}
+              value={fmt}
+              onChange={setFmt}
+              size="sm"
+              options={[
+                { value: "hex", label: t.hex },
+                { value: "css", label: t.css },
+                { value: "json", label: t.json },
+              ]}
+            />
             <CopyButton value={exportText} label={t.copy} copiedLabel={t.copied} variant="ghost" />
           </div>
           <label htmlFor={`${id}-exp`} className="sr-only">
             {t.export}
           </label>
-          <textarea id={`${id}-exp`} readOnly value={exportText} rows={Math.min(10, exportText.split("\n").length)} spellCheck={false} className="block w-full resize-y border-t border-line bg-transparent px-3 py-2.5 font-mono text-xs leading-relaxed text-fg-2 focus:outline-none" />
+          <textarea
+            id={`${id}-exp`}
+            readOnly
+            value={exportText}
+            rows={Math.min(10, exportText.split("\n").length)}
+            spellCheck={false}
+            className="block w-full resize-y border-t border-line bg-transparent px-3 py-2.5 font-mono text-xs leading-relaxed text-fg-2 focus:outline-none"
+          />
         </div>
       </Panel>
       {error ? <Notice tone="err">{errorText(locale, error)}</Notice> : null}

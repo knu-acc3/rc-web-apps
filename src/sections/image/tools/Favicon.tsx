@@ -1,6 +1,6 @@
 "use client";
 
-import { Download, Loader2 } from "lucide-react";
+import { Download, Loader2, Settings2 } from "lucide-react";
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { formatBytes } from "@/i18n/format";
@@ -92,7 +92,8 @@ const PREVIEW = [16, 32, 48, 180];
 
 /** Grapheme clusters (emoji with modifiers/ZWJ count as one). */
 function graphemes(s: string): string[] {
-  const Seg = (Intl as unknown as { Segmenter?: new (l?: string, o?: { granularity: string }) => { segment(s: string): Iterable<{ segment: string }> } }).Segmenter;
+  const Seg = (Intl as unknown as { Segmenter?: new (l?: string, o?: { granularity: string }) => { segment(s: string): Iterable<{ segment: string }> } })
+    .Segmenter;
   if (Seg) return Array.from(new Seg(undefined, { granularity: "grapheme" }).segment(s), (x) => x.segment);
   return Array.from(s);
 }
@@ -175,7 +176,17 @@ export default function Favicon({ locale }: { locale: Locale }) {
   const s = S(locale);
   const id = useId();
   const getEngine = useEngine();
-  const [d, setD] = useState<Design>({ mode: "text", text: "A", emoji: "🚀", font: "arial", shape: "rounded", bg: "#2952FF", transparent: false, fg: "#FFFFFF", padding: 12 });
+  const [d, setD] = useState<Design>({
+    mode: "text",
+    text: "A",
+    emoji: "🚀",
+    font: "arial",
+    shape: "rounded",
+    bg: "#2952FF",
+    transparent: false,
+    fg: "#FFFFFF",
+    padding: 12,
+  });
   const [img, setImg] = useBitmap();
   const [imgName, setImgName] = useState("");
   const [appName, setAppName] = useState(locale === "ru" ? "Мой сайт" : "My site");
@@ -268,7 +279,17 @@ export default function Favicon({ locale }: { locale: Locale }) {
       <div className="rounded-[12px] border border-line bg-surface">
         <div className="flex flex-wrap items-end gap-x-4 gap-y-3 px-4 py-3">
           <Field label={t.source}>
-            <Segmented label={t.source} value={d.mode} onChange={(m) => set({ mode: m })} options={[{ value: "text", label: t.text }, { value: "emoji", label: t.emoji }, { value: "image", label: t.image }]} />
+            <Segmented
+              wrap
+              label={t.source}
+              value={d.mode}
+              onChange={(m) => set({ mode: m })}
+              options={[
+                { value: "text", label: t.text },
+                { value: "emoji", label: t.emoji },
+                { value: "image", label: t.image },
+              ]}
+            />
           </Field>
           {d.mode === "text" && (
             <Field label={t.textLabel} htmlFor={`${id}-txt`} className="w-40">
@@ -294,15 +315,37 @@ export default function Favicon({ locale }: { locale: Locale }) {
             <Dropzone onFiles={pick} accept={IMAGE_ACCEPT} compact title={imgName || t.pickImage} className="min-h-14! max-w-sm flex-1 py-2!" />
           )}
           <Field label={t.shape}>
-            <Segmented label={t.shape} value={d.shape} onChange={(v) => set({ shape: v })} options={[{ value: "square", label: t.square }, { value: "rounded", label: t.rounded }, { value: "circle", label: t.circle }]} />
+            <Segmented
+              wrap
+              label={t.shape}
+              value={d.shape}
+              onChange={(v) => set({ shape: v })}
+              options={[
+                { value: "square", label: t.square },
+                { value: "rounded", label: t.rounded },
+                { value: "circle", label: t.circle },
+              ]}
+            />
           </Field>
           <ColorField label={t.bg} value={d.bg} onChange={(c) => set({ bg: c, transparent: false })} locale={locale} className="w-44" />
         </div>
         <details className="border-t border-line">
-          <summary className="cursor-pointer px-4 py-2.5 text-sm text-fg-2 hover:text-fg">{locale === "ru" ? "Дополнительно" : "More options"}</summary>
+          <summary className="flex cursor-pointer items-center gap-2 px-4 py-2.5 text-sm text-fg-2 hover:text-fg">
+            <Settings2 className="size-4" aria-hidden />
+            {locale === "ru" ? "Дополнительно" : "More options"}
+          </summary>
           <div className="grid gap-4 px-4 pb-4 pt-1 sm:grid-cols-2">
             <Field label={t.fill}>
-              <Segmented label={t.fill} value={d.transparent ? "t" : "c"} onChange={(v) => set({ transparent: v === "t" })} options={[{ value: "c", label: t.bg }, { value: "t", label: t.transparentBg }]} />
+              <Segmented
+                wrap
+                label={t.fill}
+                value={d.transparent ? "t" : "c"}
+                onChange={(v) => set({ transparent: v === "t" })}
+                options={[
+                  { value: "c", label: t.bg },
+                  { value: "t", label: t.transparentBg },
+                ]}
+              />
             </Field>
             {d.mode === "text" && (
               <>
@@ -342,7 +385,11 @@ export default function Favicon({ locale }: { locale: Locale }) {
                 aria-label={t.preview(n)}
                 width={n}
                 height={n}
-                style={{ width: n === 16 ? 32 : n === 180 ? 120 : n, height: n === 16 ? 32 : n === 180 ? 120 : n, imageRendering: n <= 32 ? "pixelated" : "auto" }}
+                style={{
+                  width: n === 16 ? 32 : n === 180 ? 120 : n,
+                  height: n === 16 ? 32 : n === 180 ? 120 : n,
+                  imageRendering: n <= 32 ? "pixelated" : "auto",
+                }}
               />
               <figcaption className="text-xs text-fg-2">
                 {n}×{n}
@@ -353,7 +400,9 @@ export default function Favicon({ locale }: { locale: Locale }) {
         <div className="flex flex-col gap-3 border-t border-line px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
           <div aria-live="polite">
             <p className="text-lg font-semibold text-fg">favicon.ico + 6 PNG + site.webmanifest</p>
-            <p className="text-sm text-fg-3">{zipSize ? formatBytes(locale, zipSize) : `ICO: ${ICO_SIZES.join(", ")} px · PNG: ${PNG_SIZES.map(([n]) => n).join(", ")} px`}</p>
+            <p className="text-sm text-fg-3">
+              {zipSize ? formatBytes(locale, zipSize) : `ICO: ${ICO_SIZES.join(", ")} px · PNG: ${PNG_SIZES.map(([n]) => n).join(", ")} px`}
+            </p>
           </div>
           <Button variant="primary" size="lg" onClick={download} disabled={busy || (d.mode === "image" && !img)}>
             {busy ? <Loader2 className="animate-spin" aria-hidden /> : <Download aria-hidden />}
@@ -369,7 +418,14 @@ export default function Favicon({ locale }: { locale: Locale }) {
           </label>
           <CopyButton value={html} variant="ghost" label={locale === "ru" ? "Копировать" : "Copy"} copiedLabel={locale === "ru" ? "Скопировано" : "Copied"} />
         </div>
-        <textarea id={`${id}-html`} readOnly value={html} rows={6} spellCheck={false} className="block w-full resize-y bg-transparent px-3 py-2.5 font-mono text-xs leading-relaxed text-fg-2 focus:outline-none" />
+        <textarea
+          id={`${id}-html`}
+          readOnly
+          value={html}
+          rows={6}
+          spellCheck={false}
+          className="block w-full resize-y bg-transparent px-3 py-2.5 font-mono text-xs leading-relaxed text-fg-2 focus:outline-none"
+        />
       </div>
       {error ? <Notice tone="err">{errorText(locale, error)}</Notice> : null}
       <p className="sr-only">{s.processingIn}</p>

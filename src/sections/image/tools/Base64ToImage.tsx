@@ -82,7 +82,13 @@ export default function Base64ToImage({ locale }: { locale: Locale }) {
     return () => clearTimeout(h);
   }, [text, t, locale]);
 
-  const url = useMemo(() => (result?.format && displayable(result.format) ? URL.createObjectURL(new Blob([result.bytes as BlobPart], { type: FORMAT_META[result.format].mime })) : null), [result]);
+  const url = useMemo(
+    () =>
+      result?.format && displayable(result.format)
+        ? URL.createObjectURL(new Blob([result.bytes as BlobPart], { type: FORMAT_META[result.format].mime }))
+        : null,
+    [result],
+  );
   useEffect(
     () => () => {
       if (url) URL.revokeObjectURL(url);
@@ -140,7 +146,12 @@ export default function Base64ToImage({ locale }: { locale: Locale }) {
         <Panel className="overflow-hidden">
           <div className={`flex min-h-40 items-center justify-center p-3 ${checker}`}>
             {url ? (
-              <img src={url} alt={t.decoded} className="block max-h-[60vh] max-w-full object-contain" onLoad={(e) => setDims({ url, w: e.currentTarget.naturalWidth, h: e.currentTarget.naturalHeight })} />
+              <img
+                src={url}
+                alt={t.decoded}
+                className="block max-h-[60vh] max-w-full object-contain"
+                onLoad={(e) => setDims({ url, w: e.currentTarget.naturalWidth, h: e.currentTarget.naturalHeight })}
+              />
             ) : (
               <p className="px-4 text-center text-sm text-fg-2">{t.noPreview}</p>
             )}

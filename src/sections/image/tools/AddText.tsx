@@ -1,6 +1,6 @@
 "use client";
 
-import { AlignCenter, AlignLeft, AlignRight, Download, Loader2, Plus, Trash2 } from "lucide-react";
+import { AlignCenter, AlignLeft, AlignRight, Download, Loader2, Plus, Trash2, Settings2 } from "lucide-react";
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { Button } from "@/ui/button";
@@ -132,6 +132,7 @@ function BlockEditor({ b, set, locale, compact }: { b: B; set: (p: Partial<B>) =
       <RangeField label={t.strokeWidth} value={b.strokeWidth} onChange={(v) => set({ strokeWidth: v })} min={0} max={30} unit="%" locale={locale} />
       <Field label={t.align}>
         <Segmented
+          wrap
           label={t.align}
           value={b.align}
           onChange={(v) => set({ align: v })}
@@ -195,7 +196,13 @@ export default function AddText({ locale }: { locale: Locale }) {
     if (!p) return;
     exp.run(async (signal, onProgress) => {
       const fmt = sameFormat(p.format);
-      const res = await processFile(getEngine(), p, [{ t: "text", blocks }], { format: fmt, quality: LOSSY.has(fmt) ? 92 : DEFAULT_QUALITY[fmt], background: "#FFFFFF" }, { signal, onProgress });
+      const res = await processFile(
+        getEngine(),
+        p,
+        [{ t: "text", blocks }],
+        { format: fmt, quality: LOSSY.has(fmt) ? 92 : DEFAULT_QUALITY[fmt], background: "#FFFFFF" },
+        { signal, onProgress },
+      );
       return { blob: toBlob(res), name: `${baseName(p.file.name)}-text.${res.ext}` };
     });
   };
@@ -203,13 +210,37 @@ export default function AddText({ locale }: { locale: Locale }) {
   const blockTabs = (
     <div className="flex items-end gap-1.5">
       <Field label={t.block}>
-        <Segmented label={t.block} value={String(sel)} onChange={(v) => setSel(Number(v))} options={blocks.map((_, i) => ({ value: String(i), label: names(i) }))} />
+        <Segmented
+          wrap
+          label={t.block}
+          value={String(sel)}
+          onChange={(v) => setSel(Number(v))}
+          options={blocks.map((_, i) => ({ value: String(i), label: names(i) }))}
+        />
       </Field>
-      <Button variant="ghost" size="icon" aria-label={t.add} title={t.add} onClick={() => { setBlocks((bs) => [...bs, { ...meme(0.5, "middle"), size: 7 }]); setSel(blocks.length); }}>
+      <Button
+        variant="ghost"
+        size="icon"
+        aria-label={t.add}
+        title={t.add}
+        onClick={() => {
+          setBlocks((bs) => [...bs, { ...meme(0.5, "middle"), size: 7 }]);
+          setSel(blocks.length);
+        }}
+      >
         <Plus aria-hidden />
       </Button>
       {blocks.length > 1 && (
-        <Button variant="ghost" size="icon" aria-label={t.del} title={t.del} onClick={() => { setBlocks((bs) => bs.filter((_, i) => i !== sel)); setSel(0); }}>
+        <Button
+          variant="ghost"
+          size="icon"
+          aria-label={t.del}
+          title={t.del}
+          onClick={() => {
+            setBlocks((bs) => bs.filter((_, i) => i !== sel));
+            setSel(0);
+          }}
+        >
           <Trash2 aria-hidden />
         </Button>
       )}
@@ -235,14 +266,34 @@ export default function AddText({ locale }: { locale: Locale }) {
 
   const modeSwitch = (
     <Segmented
+      wrap
       label={t.mode}
       value={mode}
       onChange={(m) => {
         setMode(m);
         if (m === "quote") {
           setBlocks([
-            { ...meme(0.45, "middle"), text: t.quoteText, fontId: "georgia", font: fontCss("georgia"), size: 5.5, strokeWidth: 0, uppercase: false, maxWidth: 80 },
-            { ...meme(0.82, "middle"), text: t.author, fontId: "georgia", font: fontCss("georgia"), size: 3, strokeWidth: 0, uppercase: false, maxWidth: 80, color: "#E8E8F0" },
+            {
+              ...meme(0.45, "middle"),
+              text: t.quoteText,
+              fontId: "georgia",
+              font: fontCss("georgia"),
+              size: 5.5,
+              strokeWidth: 0,
+              uppercase: false,
+              maxWidth: 80,
+            },
+            {
+              ...meme(0.82, "middle"),
+              text: t.author,
+              fontId: "georgia",
+              font: fontCss("georgia"),
+              size: 3,
+              strokeWidth: 0,
+              uppercase: false,
+              maxWidth: 80,
+              color: "#E8E8F0",
+            },
           ]);
         } else setBlocks([meme(0.03, "top"), meme(0.97, "bottom")]);
         setSel(0);
@@ -254,7 +305,18 @@ export default function AddText({ locale }: { locale: Locale }) {
     />
   );
 
-  if (mode === "quote") return <QuoteCard locale={locale} modeSwitch={modeSwitch} blockTabs={blockTabs} textField={textField} fontField={fontField} blocks={blocks} editor={<BlockEditor b={cur} set={set} locale={locale} />} />;
+  if (mode === "quote")
+    return (
+      <QuoteCard
+        locale={locale}
+        modeSwitch={modeSwitch}
+        blockTabs={blockTabs}
+        textField={textField}
+        fontField={fontField}
+        blocks={blocks}
+        editor={<BlockEditor b={cur} set={set} locale={locale} />}
+      />
+    );
 
   return (
     <div className="flex flex-col gap-3">
@@ -370,13 +432,25 @@ function QuoteCard({
           {fontField}
         </div>
         <details className="border-t border-line">
-          <summary className="cursor-pointer px-4 py-2.5 text-sm text-fg-2 hover:text-fg">{locale === "ru" ? "Дополнительно" : "More options"}</summary>
+          <summary className="flex cursor-pointer items-center gap-2 px-4 py-2.5 text-sm text-fg-2 hover:text-fg">
+            <Settings2 className="size-4" aria-hidden />
+            {locale === "ru" ? "Дополнительно" : "More options"}
+          </summary>
           <div className="grid gap-4 px-4 pb-4 pt-1 sm:grid-cols-2">
             <Field label={t.format}>
-              <Segmented label={t.format} value={card} onChange={setCard} options={CARDS.map((c) => ({ value: c.value, label: `${c.w}×${c.h}` }))} />
+              <Segmented wrap label={t.format} value={card} onChange={setCard} options={CARDS.map((c) => ({ value: c.value, label: `${c.w}×${c.h}` }))} />
             </Field>
             <Field label={t.bg}>
-              <Segmented label={t.bg} value={bgKind} onChange={setBgKind} options={[{ value: "gradient", label: t.gradient }, { value: "solid", label: t.solid }]} />
+              <Segmented
+                wrap
+                label={t.bg}
+                value={bgKind}
+                onChange={setBgKind}
+                options={[
+                  { value: "gradient", label: t.gradient },
+                  { value: "solid", label: t.solid },
+                ]}
+              />
             </Field>
             <ColorField label={t.bg1} value={bg1} onChange={setBg1} locale={locale} />
             {bgKind === "gradient" && <ColorField label={t.bg2} value={bg2} onChange={setBg2} locale={locale} />}
@@ -386,7 +460,12 @@ function QuoteCard({
       </div>
       <Panel className="overflow-hidden">
         <div className={`flex justify-center p-3 sm:p-4 ${checker}`}>
-          <canvas ref={canvasRef} role="img" aria-label={blocks.map((b) => b.text).join(" ")} className="block h-auto max-h-[65vh] w-auto max-w-full rounded-[6px]" />
+          <canvas
+            ref={canvasRef}
+            role="img"
+            aria-label={blocks.map((b) => b.text).join(" ")}
+            className="block h-auto max-h-[65vh] w-auto max-w-full rounded-[6px]"
+          />
         </div>
         <div className="flex flex-col gap-3 border-t border-line px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
           <p className="tabular text-2xl font-semibold tracking-tight text-fg" aria-live="polite">
@@ -397,7 +476,11 @@ function QuoteCard({
             {t.download}
           </Button>
         </div>
-        {error ? <p className="border-t border-line px-4 py-2.5 text-[13px] text-err" role="alert">{errorText(locale, error)}</p> : null}
+        {error ? (
+          <p className="border-t border-line px-4 py-2.5 text-[13px] text-err" role="alert">
+            {errorText(locale, error)}
+          </p>
+        ) : null}
       </Panel>
       <p className="sr-only">{s.processingIn}</p>
     </div>

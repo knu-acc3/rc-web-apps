@@ -135,7 +135,17 @@ export type JobRequest =
   /** RGBA of a downscaled copy (palette, eyedropper). */
   | { type: "pixels"; src: Src; maxSide: number }
   | { type: "palette"; src: Src; count: number }
-  | { type: "gif-encode"; frames: ImageBitmap[]; width: number; height: number; fit: "contain" | "cover"; background: string; delay: number; delays?: number[]; loop: number }
+  | {
+      type: "gif-encode";
+      frames: ImageBitmap[];
+      width: number;
+      height: number;
+      fit: "contain" | "cover";
+      background: string;
+      delay: number;
+      delays?: number[];
+      loop: number;
+    }
   | { type: "gif-frames"; bytes: ArrayBuffer; indices?: number[] }
   | { type: "encode-rgba"; rgba: ArrayBuffer; width: number; height: number; out: OutputSpec }
   /** Decode once, then crop (and optionally resize) many rectangles. */

@@ -122,11 +122,22 @@ export default function GifFrames({ locale }: { locale: Locale }) {
             <p className="tabular text-2xl font-semibold tracking-tight text-fg">{info ? `${info.frames} ${plural(locale, info.frames, t.frames)}` : "—"}</p>
             {info && (
               <p className="tabular text-sm text-fg-3">
-                {info.width}×{info.height} px · {t.duration} {formatNumber(locale, info.duration / 1000, { maximumFractionDigits: 2 })} s · {t.loop}: {loopText}
+                {info.width}×{info.height} px · {t.duration} {formatNumber(locale, info.duration / 1000, { maximumFractionDigits: 2 })}{" "}
+                {locale === "ru" ? "с" : "s"} · {t.loop}: {loopText}
               </p>
             )}
           </div>
-          <Button variant="primary" size="lg" disabled={!frames.length} onClick={() => downloadZip(frames.map((f, i) => ({ name: fname(i), blob: f.blob })), `${name}-frames.zip`)}>
+          <Button
+            variant="primary"
+            size="lg"
+            disabled={!frames.length}
+            onClick={() =>
+              downloadZip(
+                frames.map((f, i) => ({ name: fname(i), blob: f.blob })),
+                `${name}-frames.zip`,
+              )
+            }
+          >
             {busy ? <Loader2 className="animate-spin" aria-hidden /> : <Download aria-hidden />}
             {busy ? `${t.extracting} ${Math.round(progress * 100)} %` : t.all}
           </Button>
@@ -141,11 +152,18 @@ export default function GifFrames({ locale }: { locale: Locale }) {
           <ul className="grid grid-cols-[repeat(auto-fill,minmax(112px,1fr))] gap-2">
             {frames.map((f, i) => (
               <li key={f.index}>
-                <button type="button" onClick={() => downloadBlob(f.blob, fname(i))} aria-label={t.frame(i + 1, f.delay)} className={`group flex w-full flex-col overflow-hidden rounded-[8px] border border-line text-left hover:border-accent ${checker}`}>
+                <button
+                  type="button"
+                  onClick={() => downloadBlob(f.blob, fname(i))}
+                  aria-label={t.frame(i + 1, f.delay)}
+                  className={`group flex w-full flex-col overflow-hidden rounded-[8px] border border-line text-left hover:border-accent ${checker}`}
+                >
                   <img src={f.url} alt="" loading="lazy" className="aspect-square w-full object-contain" />
                   <span className="tabular flex justify-between bg-surface px-2 py-1 text-[12px] text-fg-2">
                     <span>#{i + 1}</span>
-                    <span>{f.delay} ms</span>
+                    <span>
+                      {f.delay} {locale === "ru" ? "мс" : "ms"}
+                    </span>
                   </span>
                 </button>
               </li>

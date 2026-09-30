@@ -353,14 +353,7 @@ export const CONVERT_PAIRS: ConvertPair[] = [
         "перевести фото с айфона в jpg",
         "конвертировать heic в jpg пакетно",
       ],
-      en: [
-        "heic to jpg",
-        "heic to jpg converter",
-        "convert heic to jpeg",
-        "open heic on windows",
-        "iphone photo to jpg",
-        "batch heic to jpg",
-      ],
+      en: ["heic to jpg", "heic to jpg converter", "convert heic to jpeg", "open heic on windows", "iphone photo to jpg", "batch heic to jpg"],
     },
     paragraphs: {
       ru: [
@@ -424,21 +417,8 @@ export const CONVERT_PAIRS: ConvertPair[] = [
       en: "The main image from a HEIC file is saved as a lossless PNG — handy when the photo will be edited further.",
     },
     keywords: {
-      ru: [
-        "heic в png",
-        "конвертер heic в png",
-        "heic в png онлайн",
-        "перевести heic в png",
-        "фото с айфона в png",
-        "heic в png без потери качества",
-      ],
-      en: [
-        "heic to png",
-        "heic to png converter",
-        "convert heic to png",
-        "heic to png lossless",
-        "iphone photo to png",
-      ],
+      ru: ["heic в png", "конвертер heic в png", "heic в png онлайн", "перевести heic в png", "фото с айфона в png", "heic в png без потери качества"],
+      en: ["heic to png", "heic to png converter", "convert heic to png", "heic to png lossless", "iphone photo to png"],
     },
     paragraphs: {
       ru: [
@@ -502,20 +482,8 @@ export const CONVERT_PAIRS: ConvertPair[] = [
       en: "iPhone photos are re-encoded to WebP, a format every modern browser displays — unlike HEIC.",
     },
     keywords: {
-      ru: [
-        "heic в webp",
-        "конвертер heic в webp",
-        "heic в webp онлайн",
-        "фото с айфона для сайта",
-        "перевести heic в webp",
-      ],
-      en: [
-        "heic to webp",
-        "heic to webp converter",
-        "convert heic to webp",
-        "iphone photos for website",
-        "heic to webp online",
-      ],
+      ru: ["heic в webp", "конвертер heic в webp", "heic в webp онлайн", "фото с айфона для сайта", "перевести heic в webp"],
+      en: ["heic to webp", "heic to webp converter", "convert heic to webp", "iphone photos for website", "heic to webp online"],
     },
     paragraphs: {
       ru: [
@@ -581,22 +549,8 @@ export const CONVERT_PAIRS: ConvertPair[] = [
       en: "WebP files your browser saves from websites become JPGs that any program or form will accept.",
     },
     keywords: {
-      ru: [
-        "webp в jpg",
-        "конвертер webp в jpg",
-        "webp в jpeg онлайн",
-        "как сохранить webp в jpg",
-        "перевести webp в jpg",
-        "чем открыть webp",
-      ],
-      en: [
-        "webp to jpg",
-        "webp to jpg converter",
-        "convert webp to jpeg",
-        "save webp as jpg",
-        "open webp file",
-        "batch webp to jpg",
-      ],
+      ru: ["webp в jpg", "конвертер webp в jpg", "webp в jpeg онлайн", "как сохранить webp в jpg", "перевести webp в jpg", "чем открыть webp"],
+      en: ["webp to jpg", "webp to jpg converter", "convert webp to jpeg", "save webp as jpg", "open webp file", "batch webp to jpg"],
     },
     paragraphs: {
       ru: [
@@ -660,20 +614,8 @@ export const CONVERT_PAIRS: ConvertPair[] = [
       en: "WebP becomes PNG with its transparency intact — for editors, presentations and programs that can't read WebP.",
     },
     keywords: {
-      ru: [
-        "webp в png",
-        "конвертер webp в png",
-        "webp в png с прозрачным фоном",
-        "перевести webp в png",
-        "webp в png онлайн",
-      ],
-      en: [
-        "webp to png",
-        "webp to png converter",
-        "webp to png transparent",
-        "convert webp to png",
-        "webp to png online",
-      ],
+      ru: ["webp в png", "конвертер webp в png", "webp в png с прозрачным фоном", "перевести webp в png", "webp в png онлайн"],
+      en: ["webp to png", "webp to png converter", "webp to png transparent", "convert webp to png", "webp to png online"],
     },
     paragraphs: {
       ru: [
@@ -738,21 +680,8 @@ export const CONVERT_PAIRS: ConvertPair[] = [
       en: "AVIF images are re-encoded to JPG, a format every editor, phone and upload form can open.",
     },
     keywords: {
-      ru: [
-        "avif в jpg",
-        "конвертер avif в jpg",
-        "avif в jpeg онлайн",
-        "чем открыть avif",
-        "перевести avif в jpg",
-        "avif в jpg без потери качества",
-      ],
-      en: [
-        "avif to jpg",
-        "avif to jpg converter",
-        "convert avif to jpeg",
-        "open avif file",
-        "avif to jpg online",
-      ],
+      ru: ["avif в jpg", "конвертер avif в jpg", "avif в jpeg онлайн", "чем открыть avif", "перевести avif в jpg", "avif в jpg без потери качества"],
+      en: ["avif to jpg", "avif to jpg converter", "convert avif to jpeg", "open avif file", "avif to jpg online"],
     },
     paragraphs: {
       ru: [
@@ -816,20 +745,8 @@ export const CONVERT_PAIRS: ConvertPair[] = [
       en: "An AVIF image is saved to PNG pixel for pixel, transparent background included.",
     },
     keywords: {
-      ru: [
-        "avif в png",
-        "конвертер avif в png",
-        "avif в png онлайн",
-        "перевести avif в png",
-        "avif в png с прозрачностью",
-      ],
-      en: [
-        "avif to png",
-        "avif to png converter",
-        "convert avif to png",
-        "avif to png transparent",
-        "avif to png online",
-      ],
+      ru: ["avif в png", "конвертер avif в png", "avif в png онлайн", "перевести avif в png", "avif в png с прозрачностью"],
+      en: ["avif to png", "avif to png converter", "convert avif to png", "avif to png transparent", "avif to png online"],
     },
     paragraphs: {
       ru: [
@@ -895,22 +812,8 @@ export const CONVERT_PAIRS: ConvertPair[] = [
       en: "A PNG becomes a compact JPG, and transparent areas are filled with the background color you choose.",
     },
     keywords: {
-      ru: [
-        "png в jpg",
-        "конвертер png в jpg",
-        "png в jpeg онлайн",
-        "перевести png в jpg",
-        "png в jpg с белым фоном",
-        "конвертировать png в jpg пакетно",
-      ],
-      en: [
-        "png to jpg",
-        "png to jpg converter",
-        "convert png to jpeg",
-        "png to jpg white background",
-        "batch png to jpg",
-        "reduce png file size",
-      ],
+      ru: ["png в jpg", "конвертер png в jpg", "png в jpeg онлайн", "перевести png в jpg", "png в jpg с белым фоном", "конвертировать png в jpg пакетно"],
+      en: ["png to jpg", "png to jpg converter", "convert png to jpeg", "png to jpg white background", "batch png to jpg", "reduce png file size"],
     },
     paragraphs: {
       ru: [
@@ -974,21 +877,8 @@ export const CONVERT_PAIRS: ConvertPair[] = [
       en: "A JPG is saved as a lossless PNG, so further editing stops adding compression artifacts.",
     },
     keywords: {
-      ru: [
-        "jpg в png",
-        "конвертер jpg в png",
-        "jpeg в png онлайн",
-        "перевести jpg в png",
-        "сохранить фото в png",
-        "jpg в png без потери качества",
-      ],
-      en: [
-        "jpg to png",
-        "jpg to png converter",
-        "convert jpeg to png",
-        "jpg to png online",
-        "save jpg as png",
-      ],
+      ru: ["jpg в png", "конвертер jpg в png", "jpeg в png онлайн", "перевести jpg в png", "сохранить фото в png", "jpg в png без потери качества"],
+      en: ["jpg to png", "jpg to png converter", "convert jpeg to png", "jpg to png online", "save jpg as png"],
     },
     paragraphs: {
       ru: [
@@ -1054,22 +944,8 @@ export const CONVERT_PAIRS: ConvertPair[] = [
       en: "JPG photos are re-encoded to WebP, so pages that use them load faster thanks to smaller files.",
     },
     keywords: {
-      ru: [
-        "jpg в webp",
-        "конвертер jpg в webp",
-        "jpeg в webp онлайн",
-        "перевести jpg в webp",
-        "webp для сайта",
-        "конвертировать фото в webp пакетно",
-      ],
-      en: [
-        "jpg to webp",
-        "jpg to webp converter",
-        "convert jpeg to webp",
-        "webp for website",
-        "batch jpg to webp",
-        "serve images in next-gen formats",
-      ],
+      ru: ["jpg в webp", "конвертер jpg в webp", "jpeg в webp онлайн", "перевести jpg в webp", "webp для сайта", "конвертировать фото в webp пакетно"],
+      en: ["jpg to webp", "jpg to webp converter", "convert jpeg to webp", "webp for website", "batch jpg to webp", "serve images in next-gen formats"],
     },
     paragraphs: {
       ru: [
@@ -1133,20 +1009,8 @@ export const CONVERT_PAIRS: ConvertPair[] = [
       en: "Transparent PNGs are re-encoded to WebP — the background stays transparent while the file gets lighter.",
     },
     keywords: {
-      ru: [
-        "png в webp",
-        "конвертер png в webp",
-        "png в webp с прозрачностью",
-        "перевести png в webp",
-        "png в webp онлайн",
-      ],
-      en: [
-        "png to webp",
-        "png to webp converter",
-        "png to webp transparent",
-        "convert png to webp",
-        "batch png to webp",
-      ],
+      ru: ["png в webp", "конвертер png в webp", "png в webp с прозрачностью", "перевести png в webp", "png в webp онлайн"],
+      en: ["png to webp", "png to webp converter", "png to webp transparent", "convert png to webp", "batch png to webp"],
     },
     paragraphs: {
       ru: [
@@ -1210,20 +1074,8 @@ export const CONVERT_PAIRS: ConvertPair[] = [
       en: "JPG photos are re-encoded to AVIF, the most compact format modern browsers understand.",
     },
     keywords: {
-      ru: [
-        "jpg в avif",
-        "конвертер jpg в avif",
-        "jpeg в avif онлайн",
-        "перевести фото в avif",
-        "avif для сайта",
-      ],
-      en: [
-        "jpg to avif",
-        "jpg to avif converter",
-        "convert jpeg to avif",
-        "avif for website",
-        "jpg to avif online",
-      ],
+      ru: ["jpg в avif", "конвертер jpg в avif", "jpeg в avif онлайн", "перевести фото в avif", "avif для сайта"],
+      en: ["jpg to avif", "jpg to avif converter", "convert jpeg to avif", "avif for website", "jpg to avif online"],
     },
     paragraphs: {
       ru: [
@@ -1287,20 +1139,8 @@ export const CONVERT_PAIRS: ConvertPair[] = [
       en: "A transparent PNG is re-encoded to AVIF — the background stays transparent and the file gets several times smaller.",
     },
     keywords: {
-      ru: [
-        "png в avif",
-        "конвертер png в avif",
-        "png в avif с прозрачностью",
-        "перевести png в avif",
-        "png в avif онлайн",
-      ],
-      en: [
-        "png to avif",
-        "png to avif converter",
-        "png to avif transparent",
-        "convert png to avif",
-        "png to avif online",
-      ],
+      ru: ["png в avif", "конвертер png в avif", "png в avif с прозрачностью", "перевести png в avif", "png в avif онлайн"],
+      en: ["png to avif", "png to avif converter", "png to avif transparent", "convert png to avif", "png to avif online"],
     },
     paragraphs: {
       ru: [
@@ -1365,22 +1205,8 @@ export const CONVERT_PAIRS: ConvertPair[] = [
       en: "A vector SVG is rendered to a PNG at the pixel size you set, with a transparent background.",
     },
     keywords: {
-      ru: [
-        "svg в png",
-        "конвертер svg в png",
-        "svg в png онлайн",
-        "перевести svg в png",
-        "svg в png с прозрачным фоном",
-        "svg в png высокого разрешения",
-      ],
-      en: [
-        "svg to png",
-        "svg to png converter",
-        "convert svg to png",
-        "svg to png transparent",
-        "svg to png high resolution",
-        "svg to png online",
-      ],
+      ru: ["svg в png", "конвертер svg в png", "svg в png онлайн", "перевести svg в png", "svg в png с прозрачным фоном", "svg в png высокого разрешения"],
+      en: ["svg to png", "svg to png converter", "convert svg to png", "svg to png transparent", "svg to png high resolution", "svg to png online"],
     },
     paragraphs: {
       ru: [
@@ -1444,20 +1270,8 @@ export const CONVERT_PAIRS: ConvertPair[] = [
       en: "An SVG is rendered at the size you choose and saved as a JPG on a solid background.",
     },
     keywords: {
-      ru: [
-        "svg в jpg",
-        "конвертер svg в jpg",
-        "svg в jpeg онлайн",
-        "перевести svg в jpg",
-        "svg в jpg с белым фоном",
-      ],
-      en: [
-        "svg to jpg",
-        "svg to jpg converter",
-        "convert svg to jpeg",
-        "svg to jpg white background",
-        "svg to jpg online",
-      ],
+      ru: ["svg в jpg", "конвертер svg в jpg", "svg в jpeg онлайн", "перевести svg в jpg", "svg в jpg с белым фоном"],
+      en: ["svg to jpg", "svg to jpg converter", "convert svg to jpeg", "svg to jpg white background", "svg to jpg online"],
     },
     paragraphs: {
       ru: [
@@ -1521,20 +1335,8 @@ export const CONVERT_PAIRS: ConvertPair[] = [
       en: "An SVG becomes a WebP at the size you set — lighter than PNG, with transparency kept.",
     },
     keywords: {
-      ru: [
-        "svg в webp",
-        "конвертер svg в webp",
-        "svg в webp онлайн",
-        "перевести svg в webp",
-        "svg в растр",
-      ],
-      en: [
-        "svg to webp",
-        "svg to webp converter",
-        "convert svg to webp",
-        "rasterize svg",
-        "svg to webp online",
-      ],
+      ru: ["svg в webp", "конвертер svg в webp", "svg в webp онлайн", "перевести svg в webp", "svg в растр"],
+      en: ["svg to webp", "svg to webp converter", "convert svg to webp", "rasterize svg", "svg to webp online"],
     },
     paragraphs: {
       ru: [
@@ -1598,20 +1400,8 @@ export const CONVERT_PAIRS: ConvertPair[] = [
       en: "A vector logo becomes an .ico file with a set of sizes, ready for a favicon or an app icon.",
     },
     keywords: {
-      ru: [
-        "svg в ico",
-        "конвертер svg в ico",
-        "svg в favicon",
-        "создать favicon из svg",
-        "svg в ico онлайн",
-      ],
-      en: [
-        "svg to ico",
-        "svg to ico converter",
-        "svg to favicon",
-        "convert svg to ico",
-        "svg to ico online",
-      ],
+      ru: ["svg в ico", "конвертер svg в ico", "svg в favicon", "создать favicon из svg", "svg в ico онлайн"],
+      en: ["svg to ico", "svg to ico converter", "svg to favicon", "convert svg to ico", "svg to ico online"],
     },
     paragraphs: {
       ru: [
@@ -1677,22 +1467,8 @@ export const CONVERT_PAIRS: ConvertPair[] = [
       en: "A PNG image becomes an .ico file with several icon sizes inside, transparency preserved.",
     },
     keywords: {
-      ru: [
-        "png в ico",
-        "конвертер png в ico",
-        "png в ico онлайн",
-        "сделать иконку ico из png",
-        "png в favicon.ico",
-        "иконка для папки windows",
-      ],
-      en: [
-        "png to ico",
-        "png to ico converter",
-        "convert png to ico",
-        "png to favicon.ico",
-        "make ico from png",
-        "windows folder icon",
-      ],
+      ru: ["png в ico", "конвертер png в ico", "png в ico онлайн", "сделать иконку ico из png", "png в favicon.ico", "иконка для папки windows"],
+      en: ["png to ico", "png to ico converter", "convert png to ico", "png to favicon.ico", "make ico from png", "windows folder icon"],
     },
     paragraphs: {
       ru: [
@@ -1756,20 +1532,8 @@ export const CONVERT_PAIRS: ConvertPair[] = [
       en: "A JPG photo or logo becomes an .ico file with a set of sizes for Windows and websites.",
     },
     keywords: {
-      ru: [
-        "jpg в ico",
-        "конвертер jpg в ico",
-        "jpeg в ico онлайн",
-        "иконка из фото",
-        "сделать ico из картинки",
-      ],
-      en: [
-        "jpg to ico",
-        "jpg to ico converter",
-        "convert jpeg to ico",
-        "make icon from photo",
-        "image to ico",
-      ],
+      ru: ["jpg в ico", "конвертер jpg в ico", "jpeg в ico онлайн", "иконка из фото", "сделать ico из картинки"],
+      en: ["jpg to ico", "jpg to ico converter", "convert jpeg to ico", "make icon from photo", "image to ico"],
     },
     paragraphs: {
       ru: [
@@ -1833,20 +1597,8 @@ export const CONVERT_PAIRS: ConvertPair[] = [
       en: "An .ico file, whether a site favicon or a program icon, becomes a regular PNG with transparency.",
     },
     keywords: {
-      ru: [
-        "ico в png",
-        "конвертер ico в png",
-        "ico в png онлайн",
-        "favicon в png",
-        "перевести иконку в png",
-      ],
-      en: [
-        "ico to png",
-        "ico to png converter",
-        "convert ico to png",
-        "favicon to png",
-        "icon to png",
-      ],
+      ru: ["ico в png", "конвертер ico в png", "ico в png онлайн", "favicon в png", "перевести иконку в png"],
+      en: ["ico to png", "ico to png converter", "convert ico to png", "favicon to png", "icon to png"],
     },
     paragraphs: {
       ru: [
@@ -1868,7 +1620,7 @@ export const CONVERT_PAIRS: ConvertPair[] = [
         },
         {
           q: "Где взять favicon сайта для конвертации?",
-          a: "Откройте в браузере адрес вида example.com/favicon.ico и сохраните файл. Если его там нет, путь к иконке указан в коде страницы в теге <link rel=\"icon\">.",
+          a: 'Откройте в браузере адрес вида example.com/favicon.ico и сохраните файл. Если его там нет, путь к иконке указан в коде страницы в теге <link rel="icon">.',
         },
         {
           q: "Сохранится ли прозрачность?",
@@ -1911,20 +1663,8 @@ export const CONVERT_PAIRS: ConvertPair[] = [
       en: "A static GIF, or the first frame of an animated one, is saved to PNG pixel for pixel.",
     },
     keywords: {
-      ru: [
-        "gif в png",
-        "конвертер gif в png",
-        "gif в png онлайн",
-        "перевести gif в png",
-        "сохранить кадр из gif",
-      ],
-      en: [
-        "gif to png",
-        "gif to png converter",
-        "convert gif to png",
-        "gif frame to png",
-        "gif to png transparent",
-      ],
+      ru: ["gif в png", "конвертер gif в png", "gif в png онлайн", "перевести gif в png", "сохранить кадр из gif"],
+      en: ["gif to png", "gif to png converter", "convert gif to png", "gif frame to png", "gif to png transparent"],
     },
     paragraphs: {
       ru: [
@@ -1988,20 +1728,8 @@ export const CONVERT_PAIRS: ConvertPair[] = [
       en: "The first frame of a GIF is taken and saved as a JPG on a solid background.",
     },
     keywords: {
-      ru: [
-        "gif в jpg",
-        "конвертер gif в jpg",
-        "gif в jpeg онлайн",
-        "перевести gif в jpg",
-        "кадр из gif в jpg",
-      ],
-      en: [
-        "gif to jpg",
-        "gif to jpg converter",
-        "convert gif to jpeg",
-        "gif frame to jpg",
-        "gif to jpg online",
-      ],
+      ru: ["gif в jpg", "конвертер gif в jpg", "gif в jpeg онлайн", "перевести gif в jpg", "кадр из gif в jpg"],
+      en: ["gif to jpg", "gif to jpg converter", "convert gif to jpeg", "gif frame to jpg", "gif to jpg online"],
     },
     paragraphs: {
       ru: [
@@ -2067,20 +1795,8 @@ export const CONVERT_PAIRS: ConvertPair[] = [
       en: "Uncompressed BMP files are re-encoded to JPG and become many times smaller.",
     },
     keywords: {
-      ru: [
-        "bmp в jpg",
-        "конвертер bmp в jpg",
-        "bmp в jpeg онлайн",
-        "перевести bmp в jpg",
-        "уменьшить размер bmp",
-      ],
-      en: [
-        "bmp to jpg",
-        "bmp to jpg converter",
-        "convert bmp to jpeg",
-        "bmp to jpg online",
-        "reduce bmp file size",
-      ],
+      ru: ["bmp в jpg", "конвертер bmp в jpg", "bmp в jpeg онлайн", "перевести bmp в jpg", "уменьшить размер bmp"],
+      en: ["bmp to jpg", "bmp to jpg converter", "convert bmp to jpeg", "bmp to jpg online", "reduce bmp file size"],
     },
     paragraphs: {
       ru: [
@@ -2144,20 +1860,8 @@ export const CONVERT_PAIRS: ConvertPair[] = [
       en: "A BMP is re-saved as PNG with zero loss, so the file gets smaller and opens everywhere.",
     },
     keywords: {
-      ru: [
-        "bmp в png",
-        "конвертер bmp в png",
-        "bmp в png онлайн",
-        "перевести bmp в png",
-        "bmp в png без потери качества",
-      ],
-      en: [
-        "bmp to png",
-        "bmp to png converter",
-        "convert bmp to png",
-        "bmp to png lossless",
-        "bmp to png online",
-      ],
+      ru: ["bmp в png", "конвертер bmp в png", "bmp в png онлайн", "перевести bmp в png", "bmp в png без потери качества"],
+      en: ["bmp to png", "bmp to png converter", "convert bmp to png", "bmp to png lossless", "bmp to png online"],
     },
     paragraphs: {
       ru: [
@@ -2223,22 +1927,8 @@ export const CONVERT_PAIRS: ConvertPair[] = [
       en: "Heavy TIFFs from a scanner or print shop become compact JPGs that any browser can open.",
     },
     keywords: {
-      ru: [
-        "tiff в jpg",
-        "конвертер tiff в jpg",
-        "tif в jpg онлайн",
-        "перевести tiff в jpeg",
-        "скан tiff в jpg",
-        "чем открыть tiff",
-      ],
-      en: [
-        "tiff to jpg",
-        "tiff to jpg converter",
-        "tif to jpg",
-        "convert tiff to jpeg",
-        "scan tiff to jpg",
-        "open tiff file",
-      ],
+      ru: ["tiff в jpg", "конвертер tiff в jpg", "tif в jpg онлайн", "перевести tiff в jpeg", "скан tiff в jpg", "чем открыть tiff"],
+      en: ["tiff to jpg", "tiff to jpg converter", "tif to jpg", "convert tiff to jpeg", "scan tiff to jpg", "open tiff file"],
     },
     paragraphs: {
       ru: [
@@ -2302,20 +1992,8 @@ export const CONVERT_PAIRS: ConvertPair[] = [
       en: "A TIFF is re-saved as a lossless PNG that opens in any browser and on any website.",
     },
     keywords: {
-      ru: [
-        "tiff в png",
-        "конвертер tiff в png",
-        "tif в png онлайн",
-        "перевести tiff в png",
-        "tiff в png без потерь",
-      ],
-      en: [
-        "tiff to png",
-        "tiff to png converter",
-        "tif to png",
-        "convert tiff to png",
-        "tiff to png lossless",
-      ],
+      ru: ["tiff в png", "конвертер tiff в png", "tif в png онлайн", "перевести tiff в png", "tiff в png без потерь"],
+      en: ["tiff to png", "tiff to png converter", "tif to png", "convert tiff to png", "tiff to png lossless"],
     },
     paragraphs: {
       ru: [
@@ -2381,22 +2059,8 @@ export const CONVERT_PAIRS: ConvertPair[] = [
       en: "A .jfif file is saved as .jpg byte for byte — quality, size and metadata stay the same.",
     },
     keywords: {
-      ru: [
-        "jfif в jpg",
-        "конвертер jfif в jpg",
-        "jfif в jpeg",
-        "что такое jfif",
-        "как открыть jfif",
-        "почему картинки сохраняются в jfif",
-      ],
-      en: [
-        "jfif to jpg",
-        "jfif to jpg converter",
-        "jfif to jpeg",
-        "what is jfif",
-        "open jfif file",
-        "why do images save as jfif",
-      ],
+      ru: ["jfif в jpg", "конвертер jfif в jpg", "jfif в jpeg", "что такое jfif", "как открыть jfif", "почему картинки сохраняются в jfif"],
+      en: ["jfif to jpg", "jfif to jpg converter", "jfif to jpeg", "what is jfif", "open jfif file", "why do images save as jfif"],
     },
     paragraphs: {
       ru: [
@@ -2460,20 +2124,8 @@ export const CONVERT_PAIRS: ConvertPair[] = [
       en: "A .jfif image is re-saved as PNG, a lossless format every editor and website accepts.",
     },
     keywords: {
-      ru: [
-        "jfif в png",
-        "конвертер jfif в png",
-        "jfif в png онлайн",
-        "перевести jfif в png",
-        "открыть jfif",
-      ],
-      en: [
-        "jfif to png",
-        "jfif to png converter",
-        "convert jfif to png",
-        "jfif to png online",
-        "jfif file to png",
-      ],
+      ru: ["jfif в png", "конвертер jfif в png", "jfif в png онлайн", "перевести jfif в png", "открыть jfif"],
+      en: ["jfif to png", "jfif to png converter", "convert jfif to png", "jfif to png online", "jfif file to png"],
     },
     paragraphs: {
       ru: [
@@ -2539,20 +2191,8 @@ export const CONVERT_PAIRS: ConvertPair[] = [
       en: "A JPG photo is re-encoded into a static GIF with a palette of up to 256 colors.",
     },
     keywords: {
-      ru: [
-        "jpg в gif",
-        "конвертер jpg в gif",
-        "jpeg в gif онлайн",
-        "перевести фото в gif",
-        "картинку jpg в gif",
-      ],
-      en: [
-        "jpg to gif",
-        "jpg to gif converter",
-        "convert jpeg to gif",
-        "photo to gif",
-        "jpg to gif online",
-      ],
+      ru: ["jpg в gif", "конвертер jpg в gif", "jpeg в gif онлайн", "перевести фото в gif", "картинку jpg в gif"],
+      en: ["jpg to gif", "jpg to gif converter", "convert jpeg to gif", "photo to gif", "jpg to gif online"],
     },
     paragraphs: {
       ru: [
@@ -2616,20 +2256,8 @@ export const CONVERT_PAIRS: ConvertPair[] = [
       en: "A PNG is saved as a GIF: colors are reduced to a 256-color palette and transparency becomes 1-bit.",
     },
     keywords: {
-      ru: [
-        "png в gif",
-        "конвертер png в gif",
-        "png в gif онлайн",
-        "перевести png в gif",
-        "png в gif с прозрачностью",
-      ],
-      en: [
-        "png to gif",
-        "png to gif converter",
-        "convert png to gif",
-        "png to gif transparent",
-        "png to gif online",
-      ],
+      ru: ["png в gif", "конвертер png в gif", "png в gif онлайн", "перевести png в gif", "png в gif с прозрачностью"],
+      en: ["png to gif", "png to gif converter", "convert png to gif", "png to gif transparent", "png to gif online"],
     },
     paragraphs: {
       ru: [

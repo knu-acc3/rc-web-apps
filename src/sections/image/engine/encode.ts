@@ -70,14 +70,13 @@ async function jsquashWebp(img: RawImage, quality: number): Promise<Uint8Array> 
 }
 
 async function jsquashAvif(img: RawImage, quality: number): Promise<Uint8Array> {
-  const { default: encode } = await import("@jsquash/avif/encode");
-  return new Uint8Array(await encode(img as ImageData, { quality, speed: img.width * img.height > 8e6 ? 8 : 6 }));
+  const { encodeAvif } = await import("./codecs");
+  return encodeAvif(img, quality, img.width * img.height > 8e6 ? 8 : 6);
 }
 
 export async function oxipng(png: Uint8Array, level = 2): Promise<Uint8Array> {
-  const { default: optimise } = await import("@jsquash/oxipng/optimise");
-  const buf = png.buffer.byteLength === png.byteLength ? png.buffer : png.slice().buffer;
-  return new Uint8Array(await optimise(buf as ArrayBuffer, { level, interlace: false, optimiseAlpha: true }));
+  const { optimisePng } = await import("./codecs");
+  return optimisePng(png, level);
 }
 
 /** Reduce a canvas to at most `colors` colours (in place), like pngquant. */

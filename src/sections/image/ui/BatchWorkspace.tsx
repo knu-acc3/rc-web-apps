@@ -1,7 +1,7 @@
 "use client";
 
 /* eslint-disable @next/next/no-img-element -- blob: URLs of local files */
-import { AlertTriangle, Download, Loader2, Settings2, X } from "lucide-react";
+import { AlertTriangle, Download, Loader2, X } from "lucide-react";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import type { Locale } from "@/i18n/config";
 import { formatBytes, formatNumber } from "@/i18n/format";
@@ -14,6 +14,7 @@ import { IMAGE_ACCEPT } from "../engine/detect";
 import { previewFile } from "../engine/run";
 import { displayable, type Prepared } from "../engine/source";
 import { CompareSlider } from "./CompareSlider";
+import { OptionsBar } from "./OptionsBar";
 import { checker, ProgressBar } from "./controls";
 import { useEngine } from "./hooks";
 import { errorText, filesCount, S } from "./strings";
@@ -65,7 +66,8 @@ export function useOriginalUrl(p: Prepared | undefined, maxSide = 2048): string 
 
 function delta(locale: Locale, before: number, after: number) {
   const pct = before ? ((after - before) / before) * 100 : 0;
-  const sign = pct <= 0 ? "−" : "+";
+  if (Math.abs(pct) < 0.05) return "0 %";
+  const sign = pct < 0 ? "−" : "+";
   return `${sign}${formatNumber(locale, Math.abs(pct), { maximumFractionDigits: Math.abs(pct) < 10 ? 1 : 0 })} %`;
 }
 
@@ -81,7 +83,10 @@ function StatusLine({ it, locale }: { it: BatchItem; locale: Locale }) {
     <span className="tabular">
       {formatBytes(locale, it.file.size)} → <span className="font-medium text-fg">{formatBytes(locale, r.blob.size)}</span>{" "}
       <span className={r.blob.size <= it.file.size ? "text-ok" : "text-warn"}>{delta(locale, it.file.size, r.blob.size)}</span>
-      <span className="text-fg-3"> · {r.width}×{r.height}</span>
+      <span className="text-fg-3">
+        {" "}
+        · {r.width}×{r.height}
+      </span>
     </span>
   );
 }
@@ -125,6 +130,7 @@ export function BatchWorkspace({
   dropHint,
   stage,
   stat,
+  sizeFocus = false,
 }: {
   locale: Locale;
   batch: Batch;
@@ -144,11 +150,16 @@ export function BatchWorkspace({
   stage?: (it: BatchItem) => ReactNode;
   /** Replace the big result figure (default: file size and change). */
   stat?: (it: BatchItem, r: BatchResult) => ReactNode;
+  /** The tool is about file size: explain when a result grows. */
+  sizeFocus?: boolean;
 }) {
   const t = S(locale);
   const { items } = batch;
   const [selKey, setSelKey] = useState<string | null>(null);
   const sel = items.find((i) => i.key === selKey) ?? items[0];
+  const selectedKey = sel?.key ?? null;
+  const { prioritize } = batch;
+  useEffect(() => prioritize(selectedKey), [prioritize, selectedKey]);
   const origUrl = useOriginalUrl(compare && !stage ? sel?.prepared : undefined);
   const done = items.filter((i) => i.result);
   const totalIn = done.reduce((n, i) => n + i.file.size, 0);
@@ -165,7 +176,11 @@ export function BatchWorkspace({
   if (!items.length) {
     return (
       <div className="flex flex-col gap-4">
-        {options && <OptionsBar more={more} locale={locale}>{options}</OptionsBar>}
+        {options && (
+          <OptionsBar more={more} locale={locale}>
+            {options}
+          </OptionsBar>
+        )}
         <Dropzone onFiles={add} accept={accept} multiple={!single} title={single ? t.dropOne : t.dropMany} hint={dropHint ?? t.dropHint} className="min-h-64" />
       </div>
     );
@@ -175,7 +190,11 @@ export function BatchWorkspace({
   const extraNode = sel && extra ? extra(sel) : null;
   return (
     <div className="flex flex-col gap-4">
-      {options && <OptionsBar more={more} locale={locale}>{options}</OptionsBar>}
+      {options && (
+        <OptionsBar more={more} locale={locale}>
+          {options}
+        </OptionsBar>
+      )}
 
       {sel && (
         <Panel className="overflow-hidden">
@@ -195,7 +214,9 @@ export function BatchWorkspace({
                 ) : (
                   <>
                     <Loader2 className="size-6 animate-spin text-accent" aria-hidden />
-                    <span>{sel.status === "working" ? `${t.working} ${Math.round(sel.progress * 100)} %` : sel.status === "reading" ? t.reading : t.queued}</span>
+                    <span>
+                      {sel.status === "working" ? `${t.working} ${Math.round(sel.progress * 100)} %` : sel.status === "reading" ? t.reading : t.queued}
+                    </span>
                   </>
                 )}
               </div>
@@ -221,21 +242,26 @@ export function BatchWorkspace({
                 <p className="truncate text-sm text-fg-2">{sel.file.name}</p>
               )}
             </div>
-            <div className="flex shrink-0 items-center gap-2">
+            <div className="flex flex-wrap items-center justify-end gap-2 sm:shrink-0">
               {batch.busy && (
                 <Button variant="ghost" size="sm" onClick={batch.cancelAll}>
                   {t.cancel}
                 </Button>
               )}
-              <Button variant="primary" size="lg" disabled={!r} onClick={() => r && downloadBlob(r.blob, r.name)}>
+              <Button variant="primary" size="lg" className="flex-1 sm:flex-none" disabled={!r} onClick={() => r && downloadBlob(r.blob, r.name)}>
                 <Download aria-hidden />
                 {t.download}
               </Button>
             </div>
           </div>
-          {(sel.prepared?.animated || r?.keptOriginal || r?.limited || r?.missedTarget || (!stat && r && r.blob.size > sel.file.size * 1.02) || extraNode) && (
+          {(sel.prepared?.animated ||
+            r?.keptOriginal ||
+            r?.limited ||
+            r?.missedTarget ||
+            (sizeFocus && r && !r.keptOriginal && r.blob.size > sel.file.size * 1.02) ||
+            extraNode) && (
             <div className="flex flex-col gap-1 border-t border-line px-4 py-2.5">
-              <Notes it={sel} locale={locale} grewNote={!stat} />
+              <Notes it={sel} locale={locale} grewNote={sizeFocus} />
               {extraNode}
             </div>
           )}
@@ -279,9 +305,21 @@ export function BatchWorkspace({
           <ul className="divide-y divide-line">
             {items.map((it) => (
               <li key={it.key} className={cn("flex items-center gap-3 px-3 py-2", it === sel && "bg-surface-2")}>
-                <button type="button" onClick={() => setSelKey(it.key)} className="flex min-w-0 flex-1 items-center gap-3 text-left" aria-pressed={it === sel} aria-label={it.file.name}>
+                <button
+                  type="button"
+                  onClick={() => setSelKey(it.key)}
+                  className="flex min-w-0 flex-1 items-center gap-3 text-left"
+                  aria-pressed={it === sel}
+                  aria-label={it.file.name}
+                >
                   <span className={cn("flex size-11 shrink-0 items-center justify-center overflow-hidden rounded-[6px] border border-line", checker)}>
-                    {it.result ? <img src={it.result.url} alt="" className="size-full object-cover" /> : it.status === "error" ? <AlertTriangle className="size-4 text-err" aria-hidden /> : <Loader2 className="size-4 animate-spin text-fg-3" aria-hidden />}
+                    {it.result ? (
+                      <img src={it.result.url} alt="" className="size-full object-cover" />
+                    ) : it.status === "error" ? (
+                      <AlertTriangle className="size-4 text-err" aria-hidden />
+                    ) : (
+                      <Loader2 className="size-4 animate-spin text-fg-3" aria-hidden />
+                    )}
                   </span>
                   <span className="min-w-0 flex-1">
                     <span className="block truncate text-sm font-medium text-fg">{it.file.name}</span>
@@ -292,7 +330,13 @@ export function BatchWorkspace({
                   </span>
                 </button>
                 {it.result && (
-                  <Button variant="ghost" size="icon-sm" aria-label={`${t.download}: ${it.result.name}`} title={t.download} onClick={() => downloadBlob(it.result!.blob, it.result!.name)}>
+                  <Button
+                    variant="ghost"
+                    size="icon-sm"
+                    aria-label={`${t.download}: ${it.result.name}`}
+                    title={t.download}
+                    onClick={() => downloadBlob(it.result!.blob, it.result!.name)}
+                  >
                     <Download aria-hidden />
                   </Button>
                 )}
@@ -311,26 +355,6 @@ export function BatchWorkspace({
           {t.clear}
         </Button>
       </div>
-    </div>
-  );
-}
-
-/** A single quiet row of main options + an optional "more settings" disclosure. */
-export function OptionsBar({ children, more, locale }: { children: ReactNode; more?: ReactNode; locale: Locale }) {
-  const t = S(locale);
-  return (
-    <div className="rounded-[12px] border border-line bg-surface">
-      <div className="flex flex-wrap items-end gap-x-4 gap-y-3 px-4 py-3">{children}</div>
-      {more && (
-        <details className="group border-t border-line">
-          <summary className="flex cursor-pointer items-center gap-2 px-4 py-2.5 text-sm text-fg-2 hover:text-fg">
-            <Settings2 className="size-4" aria-hidden />
-            {locale === "ru" ? "Дополнительно" : "More options"}
-            <span className="sr-only">{t.settings}</span>
-          </summary>
-          <div className="grid gap-4 px-4 pb-4 pt-1 sm:grid-cols-2">{more}</div>
-        </details>
-      )}
     </div>
   );
 }

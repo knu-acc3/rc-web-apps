@@ -27,14 +27,7 @@ export const TOOL_TEXTS_B: Record<string, ToolText> = {
         "коллаж из 4 фото",
         "фотоколлаж онлайн",
       ],
-      en: [
-        "photo collage maker",
-        "make a collage online",
-        "combine photos into one",
-        "photo grid maker",
-        "put two photos side by side",
-        "4 photo collage",
-      ],
+      en: ["photo collage maker", "make a collage online", "combine photos into one", "photo grid maker", "put two photos side by side", "4 photo collage"],
     },
     howTo: {
       ru: [
@@ -327,14 +320,7 @@ export const TOOL_TEXTS_B: Record<string, ToolText> = {
         "добавить белые края к фото",
         "черная рамка на фото",
       ],
-      en: [
-        "add border to image",
-        "add border to photo online",
-        "white border for photo",
-        "image frame online",
-        "add outline to picture",
-        "photo border maker",
-      ],
+      en: ["add border to image", "add border to photo online", "white border for photo", "image frame online", "add outline to picture", "photo border maker"],
     },
     howTo: {
       ru: [
@@ -520,15 +506,7 @@ export const TOOL_TEXTS_B: Record<string, ToolText> = {
         "размер apple touch icon",
         "фавикон из текста",
       ],
-      en: [
-        "favicon generator",
-        "favicon maker",
-        "create favicon ico",
-        "png to favicon",
-        "favicon from text",
-        "emoji favicon",
-        "apple touch icon generator",
-      ],
+      en: ["favicon generator", "favicon maker", "create favicon ico", "png to favicon", "favicon from text", "emoji favicon", "apple touch icon generator"],
     },
     howTo: {
       ru: [
@@ -564,7 +542,7 @@ export const TOOL_TEXTS_B: Record<string, ToolText> = {
         },
         {
           q: "Как подключить favicon в HTML?",
-          a: "Скопируйте файлы в корень сайта и добавьте в <head> теги: <link rel=\"icon\" href=\"/favicon.ico\"> для ICO, такой же тег с type=\"image/png\" и sizes=\"32x32\" для PNG-иконки, <link rel=\"apple-touch-icon\" href=\"/apple-touch-icon.png\"> для устройств Apple и <link rel=\"manifest\" href=\"/site.webmanifest\"> для манифеста. Готовый блок тегов генератор выдаёт вместе с файлами — его достаточно скопировать.",
+          a: 'Скопируйте файлы в корень сайта и добавьте в <head> теги: <link rel="icon" href="/favicon.ico"> для ICO, такой же тег с type="image/png" и sizes="32x32" для PNG-иконки, <link rel="apple-touch-icon" href="/apple-touch-icon.png"> для устройств Apple и <link rel="manifest" href="/site.webmanifest"> для манифеста. Готовый блок тегов генератор выдаёт вместе с файлами — его достаточно скопировать.',
         },
         {
           q: "Почему favicon не обновился после замены?",
@@ -582,7 +560,7 @@ export const TOOL_TEXTS_B: Record<string, ToolText> = {
         },
         {
           q: "How do I add a favicon to my HTML?",
-          a: "Copy the files to the site root and add these tags to <head>: <link rel=\"icon\" href=\"/favicon.ico\"> for the ICO file, a similar tag with type=\"image/png\" and sizes=\"32x32\" for a PNG icon, <link rel=\"apple-touch-icon\" href=\"/apple-touch-icon.png\"> for Apple devices and <link rel=\"manifest\" href=\"/site.webmanifest\"> for the manifest. The generator gives you the ready-made block of tags along with the files, so you only need to copy it.",
+          a: 'Copy the files to the site root and add these tags to <head>: <link rel="icon" href="/favicon.ico"> for the ICO file, a similar tag with type="image/png" and sizes="32x32" for a PNG icon, <link rel="apple-touch-icon" href="/apple-touch-icon.png"> for Apple devices and <link rel="manifest" href="/site.webmanifest"> for the manifest. The generator gives you the ready-made block of tags along with the files, so you only need to copy it.',
         },
         {
           q: "Why hasn’t my favicon updated after I replaced it?",
@@ -723,14 +701,7 @@ export const TOOL_TEXTS_B: Record<string, ToolText> = {
         "склеить картинки в gif",
         "гифка из нескольких фото",
       ],
-      en: [
-        "gif maker",
-        "make gif from images",
-        "create animated gif",
-        "photos to gif",
-        "gif creator online",
-        "images to animated gif",
-      ],
+      en: ["gif maker", "make gif from images", "create animated gif", "photos to gif", "gif creator online", "images to animated gif"],
     },
     howTo: {
       ru: [
@@ -823,14 +794,7 @@ export const TOOL_TEXTS_B: Record<string, ToolText> = {
         "сохранить кадр из гифки",
         "вытащить кадр из gif",
       ],
-      en: [
-        "split gif into frames",
-        "gif frame extractor",
-        "extract frames from gif",
-        "gif to png frames",
-        "gif splitter",
-        "save a frame from a gif",
-      ],
+      en: ["split gif into frames", "gif frame extractor", "extract frames from gif", "gif to png frames", "gif splitter", "save a frame from a gif"],
     },
     howTo: {
       ru: [
@@ -921,14 +885,7 @@ export const TOOL_TEXTS_B: Record<string, ToolText> = {
         "dpi картинки онлайн",
         "разрешение фото для печати",
       ],
-      en: [
-        "change image dpi",
-        "change dpi online",
-        "convert image to 300 dpi",
-        "check image dpi",
-        "set dpi of jpg",
-        "image dpi for printing",
-      ],
+      en: ["change image dpi", "change dpi online", "convert image to 300 dpi", "check image dpi", "set dpi of jpg", "image dpi for printing"],
     },
     howTo: {
       ru: [
@@ -1020,24 +977,8 @@ export const TOOL_TEXTS_B: Record<string, ToolText> = {
       en: "Open an SVG to view the picture and its code, shrink the file with a safe clean-up, or save it as a PNG at the width you need.",
     },
     keywords: {
-      ru: [
-        "просмотр svg онлайн",
-        "оптимизация svg",
-        "сжать svg",
-        "svg в png",
-        "открыть svg файл",
-        "уменьшить размер svg",
-        "svg в jpg",
-      ],
-      en: [
-        "svg viewer",
-        "svg optimizer",
-        "minify svg",
-        "svg to png",
-        "compress svg",
-        "open svg file online",
-        "svg to jpg",
-      ],
+      ru: ["просмотр svg онлайн", "оптимизация svg", "сжать svg", "svg в png", "открыть svg файл", "уменьшить размер svg", "svg в jpg"],
+      en: ["svg viewer", "svg optimizer", "minify svg", "svg to png", "compress svg", "open svg file online", "svg to jpg"],
     },
     howTo: {
       ru: [
@@ -1138,14 +1079,7 @@ export const TOOL_TEXTS_B: Record<string, ToolText> = {
         "редактор спрайтов онлайн",
         "пиксельная графика онлайн",
       ],
-      en: [
-        "pixel art maker",
-        "pixel art editor online",
-        "draw pixel art",
-        "sprite editor online",
-        "pixel art gif maker",
-        "8-bit art maker",
-      ],
+      en: ["pixel art maker", "pixel art editor online", "draw pixel art", "sprite editor online", "pixel art gif maker", "8-bit art maker"],
     },
     howTo: {
       ru: [

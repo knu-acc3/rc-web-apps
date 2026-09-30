@@ -79,7 +79,8 @@ export default function Crop({ locale, ratio: presetRatio, shape = "rect" }: Cro
   const { bitmap, info } = usePreviewBitmap(file.prepared ?? undefined, 1600);
   const circle = shape === "circle";
   const presetKey = presetRatio ? `${presetRatio[0]}:${presetRatio[1]}` : null;
-  const ratios: [string, number | null][] = presetKey && !RATIOS.some(([k]) => k === presetKey) ? [...RATIOS, [presetKey, presetRatio![0] / presetRatio![1]]] : RATIOS;
+  const ratios: [string, number | null][] =
+    presetKey && !RATIOS.some(([k]) => k === presetKey) ? [...RATIOS, [presetKey, presetRatio![0] / presetRatio![1]]] : RATIOS;
   const [ratioKey, setRatioKey] = useState<string>(circle ? "1:1" : (presetKey ?? "free"));
   const aspect = circle ? 1 : (ratios.find(([k]) => k === ratioKey)?.[1] ?? null);
   const [rect, setRect] = useState<Rect | null>(null);
@@ -122,7 +123,13 @@ export default function Crop({ locale, ratio: presetRatio, shape = "rect" }: Cro
       const ops: Op[] = [{ t: "crop", rect: r }];
       if (circle) ops.push({ t: "circle", fill: fmt === "jpg" ? { kind: "color", color: bg } : { kind: "transparent" } });
       if (outSize) ops.push({ t: "size", w: outSize, h: Math.round((outSize * r.h) / r.w) });
-      const res = await processFile(getEngine(), p, ops, { format: fmt, quality: LOSSY.has(fmt) ? 92 : DEFAULT_QUALITY[fmt], background: bg }, { signal, onProgress });
+      const res = await processFile(
+        getEngine(),
+        p,
+        ops,
+        { format: fmt, quality: LOSSY.has(fmt) ? 92 : DEFAULT_QUALITY[fmt], background: bg },
+        { signal, onProgress },
+      );
       return { blob: toBlob(res), name: `${baseName(p.file.name)}-${circle ? "circle" : "cropped"}.${res.ext}` };
     });
   };
@@ -131,7 +138,13 @@ export default function Crop({ locale, ratio: presetRatio, shape = "rect" }: Cro
     <>
       {!circle && (
         <Field label={t.ratio}>
-          <Segmented label={t.ratio} value={ratioKey} onChange={chooseRatio} wrap options={ratios.map(([k]) => ({ value: k, label: k === "free" ? t.free : k }))} />
+          <Segmented
+            wrap
+            label={t.ratio}
+            value={ratioKey}
+            onChange={chooseRatio}
+            options={ratios.map(([k]) => ({ value: k, label: k === "free" ? t.free : k }))}
+          />
         </Field>
       )}
       <Field label={t.output} htmlFor={`${id}-out`} className="w-40">
@@ -173,7 +186,20 @@ export default function Crop({ locale, ratio: presetRatio, shape = "rect" }: Cro
       stage={
         <ImageStage bitmap={bitmap} srcWidth={W} locale={locale}>
           {(factor) =>
-            rect && <RectEditor rect={rect} onChange={setRect} imgW={W} imgH={H} factor={factor} aspect={aspect} shape={circle ? "ellipse" : "rect"} thirds={!circle} locale={locale} label={t.frame} />
+            rect && (
+              <RectEditor
+                rect={rect}
+                onChange={setRect}
+                imgW={W}
+                imgH={H}
+                factor={factor}
+                aspect={aspect}
+                shape={circle ? "ellipse" : "rect"}
+                thirds={!circle}
+                locale={locale}
+                label={t.frame}
+              />
+            )
           }
         </ImageStage>
       }

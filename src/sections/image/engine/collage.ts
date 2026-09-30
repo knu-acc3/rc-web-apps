@@ -12,11 +12,30 @@ const BASE: Record<number, number[][]> = {
   2: [[2]],
   3: [[3], [1, 2], [2, 1]],
   4: [[2, 2], [4], [1, 3], [3, 1]],
-  5: [[2, 3], [3, 2], [1, 2, 2]],
-  6: [[3, 3], [2, 2, 2], [1, 2, 3]],
-  7: [[3, 4], [4, 3], [2, 3, 2]],
-  8: [[4, 4], [3, 2, 3], [2, 2, 2, 2]],
-  9: [[3, 3, 3], [2, 3, 4]],
+  5: [
+    [2, 3],
+    [3, 2],
+    [1, 2, 2],
+  ],
+  6: [
+    [3, 3],
+    [2, 2, 2],
+    [1, 2, 3],
+  ],
+  7: [
+    [3, 4],
+    [4, 3],
+    [2, 3, 2],
+  ],
+  8: [
+    [4, 4],
+    [3, 2, 3],
+    [2, 2, 2, 2],
+  ],
+  9: [
+    [3, 3, 3],
+    [2, 3, 4],
+  ],
 };
 
 /** All distinct layouts for `n` images (2–9). */
@@ -26,7 +45,11 @@ export function layoutsFor(n: number): Layout[] {
   const seen = new Set<string>();
   for (const lines of base) {
     for (const cols of [false, true]) {
-      const sig = JSON.stringify(cellsOf({ id: "", lines, cols }).map((c) => [c.x, c.y, c.w, c.h].map((v) => Math.round(v * 1000))).sort());
+      const sig = JSON.stringify(
+        cellsOf({ id: "", lines, cols })
+          .map((c) => [c.x, c.y, c.w, c.h].map((v) => Math.round(v * 1000)))
+          .sort(),
+      );
       if (seen.has(sig)) continue;
       seen.add(sig);
       out.push({ id: `${cols ? "c" : "r"}${lines.join("-")}`, lines, cols });
@@ -71,5 +94,19 @@ export function placeCells(layout: Layout, W: number, H: number, gap: number, pa
       out.push(layout.cols ? { x: pad + b0, y: pad + a0, w: b1 - b0, h: a1 - a0 } : { x: pad + a0, y: pad + b0, w: a1 - a0, h: b1 - b0 });
     }
   });
+  return out;
+}
+
+/** Grid cells in source px (edges rounded so tiles cover the image exactly). */
+export function gridRects(w: number, h: number, rows: number, cols: number): Rect[] {
+  const out: Rect[] = [];
+  for (let r = 0; r < rows; r++)
+    for (let c = 0; c < cols; c++) {
+      const x0 = Math.round((c * w) / cols);
+      const x1 = Math.round(((c + 1) * w) / cols);
+      const y0 = Math.round((r * h) / rows);
+      const y1 = Math.round(((r + 1) * h) / rows);
+      out.push({ x: x0, y: y0, w: x1 - x0, h: y1 - y0 });
+    }
   return out;
 }

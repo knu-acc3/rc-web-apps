@@ -30,7 +30,7 @@ export function parseBase64Input(input: string): ParsedInput {
   let s = input.trim();
   if (!s) throw new Base64Error("EMPTY");
   // CSS url("…") / HTML src="…" wrappers
-  const wrapped = /^(?:url\(\s*)?["']?(data:[^"')\s]+)["']?\s*\)?;?$/i.exec(s);
+  const wrapped = /^(?:url\(\s*)?["']?(data:[^"')]+?)["']?\s*\)?;?$/i.exec(s);
   if (wrapped) s = wrapped[1];
   let declared: string | undefined;
   if (/^data:/i.test(s)) {

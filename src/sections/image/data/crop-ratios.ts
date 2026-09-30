@@ -22,22 +22,8 @@ export const CROP_RATIOS: CropRatio[] = [
       en: "The crop frame is locked to 1:1 — you choose which square of the photo to keep.",
     },
     keywords: {
-      ru: [
-        "обрезать фото квадратом",
-        "обрезать фото 1:1",
-        "квадратное фото онлайн",
-        "обрезать фото для аватарки",
-        "кадрировать фото в квадрат",
-        "фото 1 к 1",
-      ],
-      en: [
-        "crop image to square",
-        "crop photo 1:1",
-        "square crop online",
-        "crop profile picture",
-        "1:1 aspect ratio crop",
-        "make image square by cropping",
-      ],
+      ru: ["обрезать фото квадратом", "обрезать фото 1:1", "квадратное фото онлайн", "обрезать фото для аватарки", "кадрировать фото в квадрат", "фото 1 к 1"],
+      en: ["crop image to square", "crop photo 1:1", "square crop online", "crop profile picture", "1:1 aspect ratio crop", "make image square by cropping"],
     },
     paragraphs: {
       ru: [
@@ -123,20 +109,8 @@ export const CROP_RATIOS: CropRatio[] = [
       en: "The crop frame is locked to 4:3 — a landscape frame like most smartphone photos.",
     },
     keywords: {
-      ru: [
-        "обрезать фото 4:3",
-        "формат 4 3 онлайн",
-        "кадрировать фото 4 на 3",
-        "соотношение сторон 4:3",
-        "обрезать 16:9 в 4:3",
-      ],
-      en: [
-        "crop image 4:3",
-        "4:3 aspect ratio crop",
-        "crop photo to 4 by 3",
-        "convert 16:9 to 4:3 crop",
-        "4:3 crop online",
-      ],
+      ru: ["обрезать фото 4:3", "формат 4 3 онлайн", "кадрировать фото 4 на 3", "соотношение сторон 4:3", "обрезать 16:9 в 4:3"],
+      en: ["crop image 4:3", "4:3 aspect ratio crop", "crop photo to 4 by 3", "convert 16:9 to 4:3 crop", "4:3 crop online"],
     },
     paragraphs: {
       ru: [
@@ -214,20 +188,8 @@ export const CROP_RATIOS: CropRatio[] = [
       en: "The crop frame is locked to 3:4 — a portrait frame like a phone photo taken upright.",
     },
     keywords: {
-      ru: [
-        "обрезать фото 3:4",
-        "вертикальное фото 3 на 4",
-        "формат 3:4 онлайн",
-        "обрезать фото для вайлдберриз",
-        "кадрировать фото 3 к 4",
-      ],
-      en: [
-        "crop image 3:4",
-        "3:4 portrait crop",
-        "crop photo to 3 by 4",
-        "3:4 aspect ratio online",
-        "portrait crop for product photos",
-      ],
+      ru: ["обрезать фото 3:4", "вертикальное фото 3 на 4", "формат 3:4 онлайн", "обрезать фото для вайлдберриз", "кадрировать фото 3 к 4"],
+      en: ["crop image 3:4", "3:4 portrait crop", "crop photo to 3 by 4", "3:4 aspect ratio online", "portrait crop for product photos"],
     },
     paragraphs: {
       ru: [
@@ -305,20 +267,8 @@ export const CROP_RATIOS: CropRatio[] = [
       en: "The crop frame is locked to 3:2 — the shape of a 35 mm film frame and most DSLRs.",
     },
     keywords: {
-      ru: [
-        "обрезать фото 3:2",
-        "формат 3 2 онлайн",
-        "обрезать фото под печать 10х15",
-        "соотношение сторон 3:2",
-        "кадрировать фото 3 на 2",
-      ],
-      en: [
-        "crop image 3:2",
-        "3:2 aspect ratio crop",
-        "crop photo for 4x6 print",
-        "crop to 3 by 2",
-        "dslr aspect ratio crop",
-      ],
+      ru: ["обрезать фото 3:2", "формат 3 2 онлайн", "обрезать фото под печать 10х15", "соотношение сторон 3:2", "кадрировать фото 3 на 2"],
+      en: ["crop image 3:2", "3:2 aspect ratio crop", "crop photo for 4x6 print", "crop to 3 by 2", "dslr aspect ratio crop"],
     },
     paragraphs: {
       ru: [
@@ -395,20 +345,8 @@ export const CROP_RATIOS: CropRatio[] = [
       en: "The crop frame is locked to 2:3 — a portrait frame like a DSLR shot taken upright.",
     },
     keywords: {
-      ru: [
-        "обрезать фото 2:3",
-        "формат 2 3 вертикальный",
-        "обрезать фото для pinterest",
-        "фото для постера 2:3",
-        "кадрировать фото 2 на 3",
-      ],
-      en: [
-        "crop image 2:3",
-        "2:3 portrait crop",
-        "crop photo for pinterest",
-        "2:3 poster crop",
-        "crop to 2 by 3",
-      ],
+      ru: ["обрезать фото 2:3", "формат 2 3 вертикальный", "обрезать фото для pinterest", "фото для постера 2:3", "кадрировать фото 2 на 3"],
+      en: ["crop image 2:3", "2:3 portrait crop", "crop photo for pinterest", "2:3 poster crop", "crop to 2 by 3"],
     },
     paragraphs: {
       ru: [
@@ -671,20 +609,8 @@ export const CROP_RATIOS: CropRatio[] = [
       en: "The crop frame is locked to 4:5 — the portrait format that takes up the most space in the Instagram feed.",
     },
     keywords: {
-      ru: [
-        "обрезать фото 4:5",
-        "формат 4 5 для инстаграм",
-        "обрезать фото для инстаграма вертикально",
-        "кадрировать фото 4 на 5",
-        "фото 8х10 обрезать",
-      ],
-      en: [
-        "crop image 4:5",
-        "4:5 instagram crop",
-        "crop photo for instagram portrait",
-        "8x10 crop",
-        "crop to 4 by 5",
-      ],
+      ru: ["обрезать фото 4:5", "формат 4 5 для инстаграм", "обрезать фото для инстаграма вертикально", "кадрировать фото 4 на 5", "фото 8х10 обрезать"],
+      en: ["crop image 4:5", "4:5 instagram crop", "crop photo for instagram portrait", "8x10 crop", "crop to 4 by 5"],
     },
     paragraphs: {
       ru: [
@@ -761,20 +687,8 @@ export const CROP_RATIOS: CropRatio[] = [
       en: "The crop frame is locked to 5:4 — a nearly square landscape frame.",
     },
     keywords: {
-      ru: [
-        "обрезать фото 5:4",
-        "формат 5 4 онлайн",
-        "кадрировать фото 5 на 4",
-        "соотношение сторон 5:4",
-        "фото 10х8 обрезать",
-      ],
-      en: [
-        "crop image 5:4",
-        "5:4 aspect ratio crop",
-        "10x8 print crop",
-        "crop to 5 by 4",
-        "1280x1024 aspect ratio",
-      ],
+      ru: ["обрезать фото 5:4", "формат 5 4 онлайн", "кадрировать фото 5 на 4", "соотношение сторон 5:4", "фото 10х8 обрезать"],
+      en: ["crop image 5:4", "5:4 aspect ratio crop", "10x8 print crop", "crop to 5 by 4", "1280x1024 aspect ratio"],
     },
     paragraphs: {
       ru: [
@@ -850,20 +764,8 @@ export const CROP_RATIOS: CropRatio[] = [
       en: "The crop frame is locked to 21:9 (≈2.33:1) — an ultrawide, cinematic frame.",
     },
     keywords: {
-      ru: [
-        "обрезать фото 21:9",
-        "обои 21:9",
-        "формат 21 9 онлайн",
-        "обои для широкоформатного монитора",
-        "кинематографичный кадр обрезать",
-      ],
-      en: [
-        "crop image 21:9",
-        "ultrawide wallpaper crop",
-        "21:9 aspect ratio",
-        "cinematic crop online",
-        "3440x1440 wallpaper",
-      ],
+      ru: ["обрезать фото 21:9", "обои 21:9", "формат 21 9 онлайн", "обои для широкоформатного монитора", "кинематографичный кадр обрезать"],
+      en: ["crop image 21:9", "ultrawide wallpaper crop", "21:9 aspect ratio", "cinematic crop online", "3440x1440 wallpaper"],
     },
     paragraphs: {
       ru: [
@@ -941,20 +843,8 @@ export const CROP_RATIOS: CropRatio[] = [
       en: "The crop frame is locked to 3:1 — a narrow horizontal strip for banners and headers.",
     },
     keywords: {
-      ru: [
-        "обрезать фото 3:1",
-        "обрезать фото для шапки твиттер",
-        "баннер 3 к 1",
-        "формат 3:1 онлайн",
-        "вырезать полосу из фото",
-      ],
-      en: [
-        "crop image 3:1",
-        "crop photo for twitter header",
-        "3:1 banner crop",
-        "crop to 3 by 1",
-        "wide banner crop online",
-      ],
+      ru: ["обрезать фото 3:1", "обрезать фото для шапки твиттер", "баннер 3 к 1", "формат 3:1 онлайн", "вырезать полосу из фото"],
+      en: ["crop image 3:1", "crop photo for twitter header", "3:1 banner crop", "crop to 3 by 1", "wide banner crop online"],
     },
     paragraphs: {
       ru: [
@@ -1031,20 +921,8 @@ export const CROP_RATIOS: CropRatio[] = [
       en: "The crop frame is locked to 2:1 — a landscape frame twice as wide as it is tall.",
     },
     keywords: {
-      ru: [
-        "обрезать фото 2:1",
-        "формат 2 к 1",
-        "панорама 2:1",
-        "картинка для карточки twitter размер",
-        "соотношение 18:9",
-      ],
-      en: [
-        "crop image 2:1",
-        "2:1 aspect ratio crop",
-        "2:1 panorama",
-        "twitter card image crop",
-        "18:9 aspect ratio",
-      ],
+      ru: ["обрезать фото 2:1", "формат 2 к 1", "панорама 2:1", "картинка для карточки twitter размер", "соотношение 18:9"],
+      en: ["crop image 2:1", "2:1 aspect ratio crop", "2:1 panorama", "twitter card image crop", "18:9 aspect ratio"],
     },
     paragraphs: {
       ru: [

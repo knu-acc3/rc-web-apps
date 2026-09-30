@@ -10,19 +10,7 @@ import { extractExifSegment } from "./jpeg";
 import { medianCut } from "./palette";
 import { ctx2d, makeCanvas, paintBlank, releaseCanvas, resampleCanvas, runOps, type Env, type RunInfo } from "./pipeline";
 import { fitToSize } from "./target-size";
-import type {
-  AnyCanvas,
-  GifFramesResult,
-  InfoResult,
-  JobRequest,
-  Op,
-  OutFormat,
-  PixelsResult,
-  PreviewResult,
-  ProcessResult,
-  Src,
-  TileResult,
-} from "./types";
+import type { AnyCanvas, GifFramesResult, InfoResult, JobRequest, Op, OutFormat, PixelsResult, PreviewResult, ProcessResult, Src, TileResult } from "./types";
 
 function cloneCanvas(env: Env, c: AnyCanvas): AnyCanvas {
   const out = makeCanvas(env, c.width, c.height);
@@ -234,6 +222,10 @@ async function processJob(req: Extract<JobRequest, { type: "process" }>, hc: Han
   }
   releaseCanvas(canvas);
 
+  if (out.format === "ico") {
+    const sizes = out.icoSizes?.length ? out.icoSizes : [16, 32, 48];
+    width = height = Math.min(256, Math.max(...sizes));
+  }
   const result: ProcessResult = {
     bytes: bytes.buffer.byteLength === bytes.byteLength ? (bytes.buffer as ArrayBuffer) : (bytes.slice().buffer as ArrayBuffer),
     mime: OUT_MIME[out.format],
@@ -248,7 +240,14 @@ async function processJob(req: Extract<JobRequest, { type: "process" }>, hc: Han
   };
 
   // Never return a bigger file than the original when nothing else changed.
-  if (out.keepSmaller && src.kind === "blob" && FORMAT_META[src.format]?.mime === result.mime && width === srcW && height === srcH && src.blob.size <= bytes.length) {
+  if (
+    out.keepSmaller &&
+    src.kind === "blob" &&
+    FORMAT_META[src.format]?.mime === result.mime &&
+    width === srcW &&
+    height === srcH &&
+    src.blob.size <= bytes.length
+  ) {
     const orig = await src.blob.arrayBuffer();
     return { result: { ...result, bytes: orig, keptOriginal: true, encoder: undefined }, transfer: [orig] };
   }
@@ -300,7 +299,8 @@ export async function handle(req: JobRequest, hc: HandlerCtx): Promise<Handled> 
 
     case "pixels":
     case "palette": {
-      const env = makeEnv();
+      // plain canvas downscale (no sharpening halos that would add fake colours)
+      const env: Env = { ...makeEnv(), resample: undefined };
       const full = await decodeSrc(req.src, env);
       const maxSide = req.type === "pixels" ? req.maxSide : 480;
       const k = Math.min(1, maxSide / Math.max(full.width, full.height));
@@ -310,7 +310,7 @@ export async function handle(req: JobRequest, hc: HandlerCtx): Promise<Handled> 
       const srcHeight = full.height;
       if (small !== full) releaseCanvas(small);
       releaseCanvas(full);
-      if (req.type === "palette") return { result: medianCut(img.data, req.count), transfer: [] };
+      if (req.type === "palette") return { result: medianCut(img.data, req.count).filter((c, i) => i === 0 || c.share >= 0.005), transfer: [] };
       const result: PixelsResult = { rgba: img.data.buffer as ArrayBuffer, width: img.width, height: img.height, srcWidth, srcHeight };
       return { result, transfer: [result.rgba] };
     }
@@ -409,7 +409,10 @@ export async function handle(req: JobRequest, hc: HandlerCtx): Promise<Handled> 
       const enc = await encodeCanvas(c, req.out, env);
       const bytes = finishBytes(enc.bytes, req.out, null);
       const buf = bytes.slice().buffer as ArrayBuffer;
-      return { result: { bytes: buf, mime: OUT_MIME[req.out.format], ext: EXT[req.out.format], width: c.width, height: c.height, encoder: enc.encoder }, transfer: [buf] };
+      return {
+        result: { bytes: buf, mime: OUT_MIME[req.out.format], ext: EXT[req.out.format], width: c.width, height: c.height, encoder: enc.encoder },
+        transfer: [buf],
+      };
     }
   }
 }

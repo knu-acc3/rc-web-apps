@@ -9,12 +9,46 @@ import type { Pos9 } from "../engine/types";
 const ORDER: Pos9[] = ["tl", "tc", "tr", "ml", "mc", "mr", "bl", "bc", "br"];
 
 const NAMES: Record<Locale, Record<Pos9 | "tile", string>> = {
-  ru: { tl: "Сверху слева", tc: "Сверху по центру", tr: "Сверху справа", ml: "Слева по центру", mc: "По центру", mr: "Справа по центру", bl: "Снизу слева", bc: "Снизу по центру", br: "Снизу справа", tile: "Замостить всё изображение" },
-  en: { tl: "Top left", tc: "Top centre", tr: "Top right", ml: "Middle left", mc: "Centre", mr: "Middle right", bl: "Bottom left", bc: "Bottom centre", br: "Bottom right", tile: "Tile over the whole image" },
+  ru: {
+    tl: "Сверху слева",
+    tc: "Сверху по центру",
+    tr: "Сверху справа",
+    ml: "Слева по центру",
+    mc: "По центру",
+    mr: "Справа по центру",
+    bl: "Снизу слева",
+    bc: "Снизу по центру",
+    br: "Снизу справа",
+    tile: "Замостить всё изображение",
+  },
+  en: {
+    tl: "Top left",
+    tc: "Top centre",
+    tr: "Top right",
+    ml: "Middle left",
+    mc: "Centre",
+    mr: "Middle right",
+    bl: "Bottom left",
+    bc: "Bottom centre",
+    br: "Bottom right",
+    tile: "Tile over the whole image",
+  },
 };
 
 /** 3×3 position grid + tile option; a radio group with arrow-key navigation. */
-export function PositionPicker({ value, onChange, locale, label, tile = true }: { value: Pos9 | "tile"; onChange: (v: Pos9 | "tile") => void; locale: Locale; label: string; tile?: boolean }) {
+export function PositionPicker({
+  value,
+  onChange,
+  locale,
+  label,
+  tile = true,
+}: {
+  value: Pos9 | "tile";
+  onChange: (v: Pos9 | "tile") => void;
+  locale: Locale;
+  label: string;
+  tile?: boolean;
+}) {
   const n = NAMES[locale];
   const refs = useRef<(HTMLButtonElement | null)[]>([]);
   const all: (Pos9 | "tile")[] = tile ? [...ORDER, "tile"] : ORDER;
@@ -50,7 +84,11 @@ export function PositionPicker({ value, onChange, locale, label, tile = true }: 
           on ? "border-accent bg-accent text-accent-fg" : "border-line bg-surface text-fg-3 hover:border-line-strong",
         )}
       >
-        {p === "tile" ? <Grid3x3 className="size-4" aria-hidden /> : <span className={cn("size-1.5 rounded-full", on ? "bg-accent-fg" : "bg-fg-3")} aria-hidden />}
+        {p === "tile" ? (
+          <Grid3x3 className="size-4" aria-hidden />
+        ) : (
+          <span className={cn("size-1.5 rounded-full", on ? "bg-accent-fg" : "bg-fg-3")} aria-hidden />
+        )}
       </button>
     );
   };

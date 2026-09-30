@@ -52,6 +52,7 @@ export function CompareSlider({
       <div className="flex items-center justify-between gap-2">
         <span className="text-[13px] text-fg-3">{t.dragHint}</span>
         <Segmented
+          wrap
           size="sm"
           label={t.zoom}
           value={zoom}
@@ -96,7 +97,10 @@ export function CompareSlider({
               className="absolute inset-0 size-full object-contain"
               style={{ clipPath: `inset(0 ${100 - pos}% 0 0)` }}
             />
-            <div className="pointer-events-none absolute inset-y-0 w-0.5 -translate-x-1/2 bg-white shadow-[0_0_0_1px_rgb(0_0_0/0.35)]" style={{ left: `${pos}%` }} />
+            <div
+              className="pointer-events-none absolute inset-y-0 w-0.5 -translate-x-1/2 bg-white shadow-[0_0_0_1px_rgb(0_0_0/0.35)]"
+              style={{ left: `${pos}%` }}
+            />
             <div
               role="slider"
               tabIndex={0}

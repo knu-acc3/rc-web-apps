@@ -21,8 +21,9 @@ import { useImageList } from "../ui/useImageList";
 const T = {
   ru: {
     frames: ["кадр", "кадра", "кадров"],
-    delay: "Задержка кадра",
+    delay: "Задержка кадров",
     ms: "мс",
+    ownDelay: (n: number) => `Задержка кадра ${n} (пусто — общая)`,
     loop: "Повтор",
     forever: "Бесконечно",
     once: "Один раз",
@@ -47,8 +48,9 @@ const T = {
   },
   en: {
     frames: ["frame", "frames"],
-    delay: "Frame delay",
+    delay: "Frame delay (all)",
     ms: "ms",
+    ownDelay: (n: number) => `Frame ${n} delay (empty = common)`,
     loop: "Loop",
     forever: "Forever",
     once: "Once",
@@ -101,18 +103,23 @@ export default function GifMaker({ locale }: { locale: Locale }) {
   const first = items[0];
   const height = first ? Math.max(1, Math.round((width * first.srcHeight) / first.srcWidth)) : width;
   const d = Math.max(20, delay ?? 500);
+  // per-frame overrides (empty = the common delay)
+  const [own, setOwn] = useState<Record<string, number>>({});
+  const delays = items.map((i) => Math.max(20, own[i.key] ?? d));
 
   // any change invalidates the finished GIF
-  const settingsKey = JSON.stringify({ keys: items.map((i) => i.key), d, loop, width, fit, bgKind, bg });
+  const settingsKey = JSON.stringify({ keys: items.map((i) => i.key), delays, loop, width, fit, bgKind, bg });
   const [madeFor, setMadeFor] = useState("");
   const stale = result && madeFor !== settingsKey;
 
-  // live preview (plays the frames with the chosen delay)
+  // live preview (plays the frames with their delays)
+  const cur = items.length ? frame % items.length : 0;
+  const curDelay = delays[cur] ?? d;
   useEffect(() => {
     if (items.length === 0) return;
-    const timer = setInterval(() => setFrame((f) => (f + 1) % items.length), d);
-    return () => clearInterval(timer);
-  }, [items.length, d]);
+    const timer = setTimeout(() => setFrame((f) => (f + 1) % items.length), curDelay);
+    return () => clearTimeout(timer);
+  }, [items.length, frame, curDelay]);
   useEffect(() => {
     const c = canvasRef.current;
     const it = items[frame % Math.max(1, items.length)];
@@ -143,7 +150,17 @@ export default function GifMaker({ locale }: { locale: Locale }) {
       // clones (not transfers) so the previews stay usable
       const frames = await Promise.all(items.map((i) => createImageBitmap(i.bitmap!)));
       const buf = await getEngine().run<ArrayBuffer>(
-        { type: "gif-encode", frames, width, height, fit, background: bgKind === "transparent" ? "transparent" : bg, delay: d, loop: loop === "-1" ? -1 : loop === "0" ? 0 : Number(loop) - 1 },
+        {
+          type: "gif-encode",
+          frames,
+          width,
+          height,
+          fit,
+          background: bgKind === "transparent" ? "transparent" : bg,
+          delay: d,
+          delays,
+          loop: loop === "-1" ? -1 : loop === "0" ? 0 : Number(loop) - 1,
+        },
         { signal: c.signal, onProgress: setProgress, transfer: frames },
       );
       const blob = new Blob([buf], { type: "image/gif" });
@@ -166,7 +183,7 @@ export default function GifMaker({ locale }: { locale: Locale }) {
     );
   }
 
-  const total = d * items.length;
+  const total = delays.reduce((a, b) => a + b, 0);
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-end gap-x-4 gap-y-3 rounded-[12px] border border-line bg-surface px-4 py-3">
@@ -190,10 +207,28 @@ export default function GifMaker({ locale }: { locale: Locale }) {
           </Select>
         </Field>
         <Field label={t.fit}>
-          <Segmented label={t.fit} value={fit} onChange={setFit} options={[{ value: "contain", label: t.contain }, { value: "cover", label: t.cover }]} />
+          <Segmented
+            wrap
+            label={t.fit}
+            value={fit}
+            onChange={setFit}
+            options={[
+              { value: "contain", label: t.contain },
+              { value: "cover", label: t.cover },
+            ]}
+          />
         </Field>
         <Field label={t.bg}>
-          <Segmented label={t.bg} value={bgKind} onChange={setBgKind} options={[{ value: "color", label: t.color }, { value: "transparent", label: t.transparent }]} />
+          <Segmented
+            wrap
+            label={t.bg}
+            value={bgKind}
+            onChange={setBgKind}
+            options={[
+              { value: "color", label: t.color },
+              { value: "transparent", label: t.transparent },
+            ]}
+          />
         </Field>
         {bgKind === "color" && <ColorField label={t.bgColor} value={bg} onChange={setBg} locale={locale} className="w-44" />}
       </div>
@@ -212,7 +247,8 @@ export default function GifMaker({ locale }: { locale: Locale }) {
               {result && !stale ? formatBytes(locale, result.blob.size) : `${items.length} ${plural(locale, items.length, t.frames)}`}
             </p>
             <p className="tabular text-sm text-fg-3">
-              {width}×{height} px · {t.duration} {formatNumber(locale, total / 1000, { maximumFractionDigits: 2 })} s · {formatNumber(locale, 1000 / d, { maximumFractionDigits: 1 })} {t.fps}
+              {width}×{height} px · {t.duration} {formatNumber(locale, total / 1000, { maximumFractionDigits: 2 })} {locale === "ru" ? "с" : "s"} ·{" "}
+              {formatNumber(locale, 1000 / d, { maximumFractionDigits: 1 })} {t.fps}
             </p>
           </div>
           {result && !stale ? (
@@ -237,9 +273,28 @@ export default function GifMaker({ locale }: { locale: Locale }) {
         onAdd={list.add}
         locale={locale}
         label={t.frameList}
-        selected={frame % items.length}
+        selected={cur}
         onSelect={setFrame}
       />
+      {items[cur] && (
+        <NumberField
+          label={t.ownDelay(cur + 1)}
+          value={own[items[cur].key] ?? null}
+          onChange={(v) =>
+            setOwn((o) => {
+              const next = { ...o };
+              if (v === null) delete next[items[cur].key];
+              else next[items[cur].key] = v;
+              return next;
+            })
+          }
+          min={20}
+          max={10000}
+          suffix={t.ms}
+          placeholder={String(d)}
+          className="w-64"
+        />
+      )}
       {error ? <Notice tone="err">{errorText(locale, error)}</Notice> : null}
       {list.errors.length > 0 && <Notice tone="warn">{errorText(locale, list.errors[list.errors.length - 1])}</Notice>}
     </div>

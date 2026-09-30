@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import type { Locale } from "@/i18n/config";
-import { formatNumber } from "@/i18n/format";
+import { formatNumber, plural } from "@/i18n/format";
 import { Field } from "@/ui/field";
 import { Segmented } from "@/ui/segmented";
 import { readPngDpi, readPngHeader, setPngDpi } from "../engine/container";
@@ -20,7 +20,7 @@ const T = {
     none: "не задано",
     print: "При печати",
     cm: "см",
-    inch: "дюйма",
+    inch: ["дюйм", "дюйма", "дюймов", "дюйма"],
     note: "Пиксели не изменились — поменялась только запись о плотности печати",
     lossless: "Без перекодирования",
     pngAccept: "Только JPG и PNG · файлы не покидают устройство",
@@ -32,7 +32,7 @@ const T = {
     none: "not set",
     print: "Prints at",
     cm: "cm",
-    inch: "in",
+    inch: ["in", "in"],
     note: "Pixels didn't change — only the print density record did",
     lossless: "No re-encoding",
     pngAccept: "JPG and PNG only · files never leave your device",
@@ -69,7 +69,13 @@ export default function Dpi({ locale }: { locale: Locale }) {
     setInfo((x) => ({ ...x, [p.id]: before }));
     const out = p.format === "jpg" ? setJpegDpi(b, value) : setPngDpi(b, value);
     const ext = p.file.name.match(/\.([^.]+)$/)?.[1] ?? p.format;
-    return { blob: new Blob([out as BlobPart], { type: p.format === "jpg" ? "image/jpeg" : "image/png" }), name: `${baseName(p.file.name)}-${value}dpi.${ext}`, width: before.w, height: before.h, meta: { lossless: true } };
+    return {
+      blob: new Blob([out as BlobPart], { type: p.format === "jpg" ? "image/jpeg" : "image/png" }),
+      name: `${baseName(p.file.name)}-${value}dpi.${ext}`,
+      width: before.w,
+      height: before.h,
+      meta: { lossless: true },
+    };
   };
   const batch = useBatch({ runner, settingsKey: String(value), delay: 250 });
 
@@ -77,7 +83,13 @@ export default function Dpi({ locale }: { locale: Locale }) {
     <>
       <NumberField label={t.dpi} value={dpi} onChange={setDpi} min={1} max={2400} suffix="dpi" className="w-40" />
       <Field label={t.presets}>
-        <Segmented label={t.presets} value={PRESETS.includes(value as (typeof PRESETS)[number]) ? String(value) : ""} onChange={(v) => setDpi(Number(v))} options={PRESETS.map((d) => ({ value: String(d), label: String(d) }))} />
+        <Segmented
+          wrap
+          label={t.presets}
+          value={PRESETS.includes(value as (typeof PRESETS)[number]) ? String(value) : ""}
+          onChange={(v) => setDpi(Number(v))}
+          options={PRESETS.map((d) => ({ value: String(d), label: String(d) }))}
+        />
       </Field>
     </>
   );
@@ -98,7 +110,8 @@ export default function Dpi({ locale }: { locale: Locale }) {
         <p className="tabular text-2xl font-semibold tracking-tight text-fg">
           {value} dpi · {cm(r.width)} × {cm(r.height)} {t.cm}{" "}
           <span className="text-base font-normal text-fg-3">
-            ({inch(r.width)} × {inch(r.height)} {t.inch}; {t.was} {info[it.prepared?.id ?? ""]?.dpi ?? t.none})
+            ({inch(r.width)} × {inch(r.height)} {plural(locale, Math.round((r.height / value) * 100) / 100, t.inch)}; {t.was}{" "}
+            {info[it.prepared?.id ?? ""]?.dpi ?? t.none})
           </span>
         </p>
       )}

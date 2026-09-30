@@ -28,14 +28,7 @@ export const FILTER_TEXTS: FilterText[] = [
       en: "Each pixel’s luminance Y = 0.2126 R + 0.7152 G + 0.0722 B (Rec. 709 weights) is written to all three channels; strength 0–100% blends the result with the original.",
     },
     keywords: {
-      ru: [
-        "сделать фото черно-белым",
-        "черно-белое фото онлайн",
-        "оттенки серого онлайн",
-        "обесцветить фото",
-        "перевести картинку в серый",
-        "grayscale фото",
-      ],
+      ru: ["сделать фото черно-белым", "черно-белое фото онлайн", "оттенки серого онлайн", "обесцветить фото", "перевести картинку в серый", "grayscale фото"],
       en: [
         "make photo black and white",
         "grayscale image online",
@@ -111,22 +104,8 @@ export const FILTER_TEXTS: FilterText[] = [
       en: "The standard sepia matrix: R' = 0.393R + 0.769G + 0.189B; G' = 0.349R + 0.686G + 0.168B; B' = 0.272R + 0.534G + 0.131B. Strength 0–100% moves smoothly from the original colors to full sepia.",
     },
     keywords: {
-      ru: [
-        "эффект сепии онлайн",
-        "сепия фото",
-        "фильтр сепия",
-        "состарить фото онлайн",
-        "фото в коричневых тонах",
-        "сделать фото как старое",
-      ],
-      en: [
-        "sepia filter online",
-        "sepia effect photo",
-        "sepia tone converter",
-        "make photo look old",
-        "brown tone photo",
-        "old photo effect",
-      ],
+      ru: ["эффект сепии онлайн", "сепия фото", "фильтр сепия", "состарить фото онлайн", "фото в коричневых тонах", "сделать фото как старое"],
+      en: ["sepia filter online", "sepia effect photo", "sepia tone converter", "make photo look old", "brown tone photo", "old photo effect"],
     },
     paragraphs: {
       ru: [
@@ -202,14 +181,7 @@ export const FILTER_TEXTS: FilterText[] = [
         "обратить цвета изображения",
         "инвертировать картинку онлайн",
       ],
-      en: [
-        "invert image colors",
-        "photo negative online",
-        "invert colors of picture",
-        "negative image effect",
-        "color inversion tool",
-        "invert png online",
-      ],
+      en: ["invert image colors", "photo negative online", "invert colors of picture", "negative image effect", "color inversion tool", "invert png online"],
     },
     paragraphs: {
       ru: [
@@ -275,22 +247,8 @@ export const FILTER_TEXTS: FilterText[] = [
       en: "Gaussian blur approximated by three box-blur passes; the radius (sigma) of 1–100 px is measured in full-resolution pixels, so the preview matches the exported file.",
     },
     keywords: {
-      ru: [
-        "размыть фото онлайн",
-        "размытие изображения",
-        "размытие по гауссу онлайн",
-        "размыть картинку",
-        "размытый фон для текста",
-        "blur фото онлайн",
-      ],
-      en: [
-        "blur image online",
-        "gaussian blur online",
-        "blur photo",
-        "blur picture",
-        "blurred background image",
-        "soften image",
-      ],
+      ru: ["размыть фото онлайн", "размытие изображения", "размытие по гауссу онлайн", "размыть картинку", "размытый фон для текста", "blur фото онлайн"],
+      en: ["blur image online", "gaussian blur online", "blur photo", "blur picture", "blurred background image", "soften image"],
     },
     paragraphs: {
       ru: [
@@ -356,14 +314,7 @@ export const FILTER_TEXTS: FilterText[] = [
         "нерезкая маска онлайн",
         "улучшить четкость фото",
       ],
-      en: [
-        "sharpen image online",
-        "sharpen photo",
-        "make picture clearer",
-        "unsharp mask online",
-        "increase image sharpness",
-        "fix slightly blurry photo",
-      ],
+      en: ["sharpen image online", "sharpen photo", "make picture clearer", "unsharp mask online", "increase image sharpness", "fix slightly blurry photo"],
     },
     paragraphs: {
       ru: [
@@ -429,22 +380,8 @@ export const FILTER_TEXTS: FilterText[] = [
       en: "Each channel is multiplied by a factor of 0–300% (100% = unchanged), like the CSS brightness() function; values above 255 are clipped.",
     },
     keywords: {
-      ru: [
-        "осветлить фото онлайн",
-        "изменить яркость фото",
-        "затемнить фото",
-        "сделать фото светлее",
-        "осветлить темное фото",
-        "яркость картинки онлайн",
-      ],
-      en: [
-        "brighten image online",
-        "adjust photo brightness",
-        "darken image",
-        "make photo lighter",
-        "lighten dark photo",
-        "image brightness editor",
-      ],
+      ru: ["осветлить фото онлайн", "изменить яркость фото", "затемнить фото", "сделать фото светлее", "осветлить темное фото", "яркость картинки онлайн"],
+      en: ["brighten image online", "adjust photo brightness", "darken image", "make photo lighter", "lighten dark photo", "image brightness editor"],
     },
     paragraphs: {
       ru: [
@@ -656,14 +593,7 @@ export const FILTER_TEXTS: FilterText[] = [
         "изменить тон фото",
         "hue rotate онлайн",
       ],
-      en: [
-        "hue rotate image",
-        "change hue of image online",
-        "shift colors in photo",
-        "recolor image online",
-        "change image color",
-        "hue shift tool",
-      ],
+      en: ["hue rotate image", "change hue of image online", "shift colors in photo", "recolor image online", "change image color", "hue shift tool"],
     },
     paragraphs: {
       ru: [
@@ -729,14 +659,7 @@ export const FILTER_TEXTS: FilterText[] = [
         "эффект выцветшего фото",
         "винтажное фото онлайн",
       ],
-      en: [
-        "vintage photo filter",
-        "retro photo effect online",
-        "old film look",
-        "faded photo effect",
-        "make photo look vintage",
-        "vintage filter online",
-      ],
+      en: ["vintage photo filter", "retro photo effect online", "old film look", "faded photo effect", "make photo look vintage", "vintage filter online"],
     },
     paragraphs: {
       ru: [
@@ -802,14 +725,7 @@ export const FILTER_TEXTS: FilterText[] = [
         "запикселить фото",
         "пикселизировать изображение",
       ],
-      en: [
-        "pixelate image online",
-        "pixelate photo",
-        "mosaic effect",
-        "pixel effect picture",
-        "make image pixelated",
-        "8-bit photo effect",
-      ],
+      en: ["pixelate image online", "pixelate photo", "mosaic effect", "pixel effect picture", "make image pixelated", "8-bit photo effect"],
     },
     paragraphs: {
       ru: [
@@ -875,14 +791,7 @@ export const FILTER_TEXTS: FilterText[] = [
         "поп-арт эффект фото",
         "фото в стиле плаката",
       ],
-      en: [
-        "posterize image online",
-        "poster effect photo",
-        "reduce colors in image",
-        "posterize filter",
-        "pop art photo effect",
-        "color levels effect",
-      ],
+      en: ["posterize image online", "poster effect photo", "reduce colors in image", "posterize filter", "pop art photo effect", "color levels effect"],
     },
     paragraphs: {
       ru: [
@@ -951,14 +860,7 @@ export const FILTER_TEXTS: FilterText[] = [
         "дизеринг онлайн",
         "бинаризация изображения",
       ],
-      en: [
-        "pure black and white image",
-        "1-bit image converter",
-        "image threshold online",
-        "dithering online",
-        "black and white signature",
-        "binarize image",
-      ],
+      en: ["pure black and white image", "1-bit image converter", "image threshold online", "dithering online", "black and white signature", "binarize image"],
     },
     paragraphs: {
       ru: [
@@ -1026,22 +928,8 @@ export const FILTER_TEXTS: FilterText[] = [
       en: "Pixel luminance (Rec. 709 weights) sets a position on a gradient from the shadow color to the highlight color: black gets the first color, white the second, midtones a linear mix.",
     },
     keywords: {
-      ru: [
-        "дуотон онлайн",
-        "эффект дуотон для фото",
-        "фото в двух цветах",
-        "двухцветный фильтр для фото",
-        "градиентная карта онлайн",
-        "duotone эффект",
-      ],
-      en: [
-        "duotone effect online",
-        "duotone photo",
-        "two color photo filter",
-        "gradient map online",
-        "duotone generator",
-        "two tone image",
-      ],
+      ru: ["дуотон онлайн", "эффект дуотон для фото", "фото в двух цветах", "двухцветный фильтр для фото", "градиентная карта онлайн", "duotone эффект"],
+      en: ["duotone effect online", "duotone photo", "two color photo filter", "gradient map online", "duotone generator", "two tone image"],
     },
     paragraphs: {
       ru: [
@@ -1099,22 +987,8 @@ export const FILTER_TEXTS: FilterText[] = [
       en: "Darkening depends on the distance from the center: pixels inside the chosen middle area stay untouched, beyond it brightness falls off smoothly (smoothstep curve) toward the corners by the strength amount.",
     },
     keywords: {
-      ru: [
-        "виньетка онлайн",
-        "затемнить края фото",
-        "эффект виньетки",
-        "затемнение по краям фото",
-        "виньетирование фото",
-        "темные углы на фото",
-      ],
-      en: [
-        "vignette effect online",
-        "add vignette to photo",
-        "darken edges of photo",
-        "vignette filter",
-        "dark corners photo",
-        "photo vignette maker",
-      ],
+      ru: ["виньетка онлайн", "затемнить края фото", "эффект виньетки", "затемнение по краям фото", "виньетирование фото", "темные углы на фото"],
+      en: ["vignette effect online", "add vignette to photo", "darken edges of photo", "vignette filter", "dark corners photo", "photo vignette maker"],
     },
     paragraphs: {
       ru: [
@@ -1172,22 +1046,8 @@ export const FILTER_TEXTS: FilterText[] = [
       en: "Convolution with the 3×3 kernel [−2 −1 0; −1 1 1; 0 1 2]: its coefficients sum to 1, so flat areas keep their color while diagonal edges get lighter or darker. Strength 0–100% blends the result with the original.",
     },
     keywords: {
-      ru: [
-        "эффект тиснения онлайн",
-        "рельеф из фото",
-        "тиснение изображения",
-        "объемный эффект для фото",
-        "барельеф из фото",
-        "emboss эффект",
-      ],
-      en: [
-        "emboss effect online",
-        "emboss image",
-        "relief effect photo",
-        "embossed picture",
-        "3d relief from photo",
-        "emboss filter",
-      ],
+      ru: ["эффект тиснения онлайн", "рельеф из фото", "тиснение изображения", "объемный эффект для фото", "барельеф из фото", "emboss эффект"],
+      en: ["emboss effect online", "emboss image", "relief effect photo", "embossed picture", "3d relief from photo", "emboss filter"],
     },
     paragraphs: {
       ru: [
@@ -1318,22 +1178,8 @@ export const FILTER_TEXTS: FilterText[] = [
       en: "The same pseudo-random value is added to all three channels of each pixel (monochrome, roughly normally distributed noise); a generator with a fixed seed gives the same result on every export.",
     },
     keywords: {
-      ru: [
-        "добавить шум на фото",
-        "эффект зерна онлайн",
-        "пленочное зерно на фото",
-        "зернистость фото онлайн",
-        "шум на картинку",
-        "film grain эффект",
-      ],
-      en: [
-        "add noise to image",
-        "film grain effect online",
-        "grain filter photo",
-        "add grain to photo",
-        "noise effect picture",
-        "analog film look",
-      ],
+      ru: ["добавить шум на фото", "эффект зерна онлайн", "пленочное зерно на фото", "зернистость фото онлайн", "шум на картинку", "film grain эффект"],
+      en: ["add noise to image", "film grain effect online", "grain filter photo", "add grain to photo", "noise effect picture", "analog film look"],
     },
     paragraphs: {
       ru: [
@@ -1407,14 +1253,7 @@ export const FILTER_TEXTS: FilterText[] = [
         "теплые тона на фото",
         "золотистый оттенок фото",
       ],
-      en: [
-        "warm photo filter",
-        "make photo warmer",
-        "warm tone photo online",
-        "fix blue photo",
-        "warm white balance",
-        "golden hour filter",
-      ],
+      en: ["warm photo filter", "make photo warmer", "warm tone photo online", "fix blue photo", "warm white balance", "golden hour filter"],
     },
     paragraphs: {
       ru: [
@@ -1480,14 +1319,7 @@ export const FILTER_TEXTS: FilterText[] = [
         "холодные тона онлайн",
         "исправить желтое фото",
       ],
-      en: [
-        "cool photo filter",
-        "make photo cooler",
-        "remove yellow tint from photo",
-        "blue tone photo",
-        "cold color filter",
-        "fix yellow photo",
-      ],
+      en: ["cool photo filter", "make photo cooler", "remove yellow tint from photo", "blue tone photo", "cold color filter", "fix yellow photo"],
     },
     paragraphs: {
       ru: [

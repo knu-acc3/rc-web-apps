@@ -410,13 +410,7 @@ export const RESIZE_PRESETS: ResizePreset[] = [
       en: "Your image becomes 851×315 px — the size Facebook recommends for uploading a Page cover.",
     },
     keywords: {
-      ru: [
-        "размер обложки facebook",
-        "обложка фейсбук размер",
-        "851 на 315",
-        "обложка для страницы facebook",
-        "размер обложки фейсбук для телефона",
-      ],
+      ru: ["размер обложки facebook", "обложка фейсбук размер", "851 на 315", "обложка для страницы facebook", "размер обложки фейсбук для телефона"],
       en: [
         "facebook cover photo size",
         "facebook cover size",
@@ -515,14 +509,7 @@ export const RESIZE_PRESETS: ResizePreset[] = [
         "open graph размер изображения",
         "размер картинки для репоста",
       ],
-      en: [
-        "facebook post image size",
-        "1200x630",
-        "og image size",
-        "open graph image size",
-        "link preview image size",
-        "facebook shared link image size",
-      ],
+      en: ["facebook post image size", "1200x630", "og image size", "open graph image size", "link preview image size", "facebook shared link image size"],
     },
     paragraphs: {
       ru: [
@@ -803,21 +790,8 @@ export const RESIZE_PRESETS: ResizePreset[] = [
       en: "Your image becomes 1500×500 px — the recommended size for an X profile header.",
     },
     keywords: {
-      ru: [
-        "размер шапки твиттер",
-        "шапка для x размер",
-        "1500 на 500",
-        "обложка профиля twitter размер",
-        "header twitter размер",
-      ],
-      en: [
-        "twitter header size",
-        "x header size",
-        "1500x500",
-        "twitter banner size",
-        "resize image for twitter header",
-        "x profile banner dimensions",
-      ],
+      ru: ["размер шапки твиттер", "шапка для x размер", "1500 на 500", "обложка профиля twitter размер", "header twitter размер"],
+      en: ["twitter header size", "x header size", "1500x500", "twitter banner size", "resize image for twitter header", "x profile banner dimensions"],
     },
     paragraphs: {
       ru: [
@@ -890,21 +864,8 @@ export const RESIZE_PRESETS: ResizePreset[] = [
       en: "Your image becomes 1600×900 px — a 16:9 landscape that X shows in the feed without cropping.",
     },
     keywords: {
-      ru: [
-        "размер картинки для твиттера",
-        "размер фото для поста в x",
-        "1600 на 900",
-        "картинка 16:9 для twitter",
-        "изображение для твита размер",
-      ],
-      en: [
-        "twitter image size",
-        "x post image size",
-        "1600x900",
-        "twitter photo dimensions",
-        "resize image for twitter post",
-        "16:9 image for x",
-      ],
+      ru: ["размер картинки для твиттера", "размер фото для поста в x", "1600 на 900", "картинка 16:9 для twitter", "изображение для твита размер"],
+      en: ["twitter image size", "x post image size", "1600x900", "twitter photo dimensions", "resize image for twitter post", "16:9 image for x"],
     },
     paragraphs: {
       ru: [
@@ -977,13 +938,7 @@ export const RESIZE_PRESETS: ResizePreset[] = [
       en: "Your image becomes 1584×396 px — the recommended size for a LinkedIn personal profile background.",
     },
     keywords: {
-      ru: [
-        "размер фона linkedin",
-        "баннер linkedin размер",
-        "1584 на 396",
-        "обложка профиля линкедин",
-        "фоновое изображение linkedin",
-      ],
+      ru: ["размер фона linkedin", "баннер linkedin размер", "1584 на 396", "обложка профиля линкедин", "фоновое изображение linkedin"],
       en: [
         "linkedin banner size",
         "linkedin background photo size",
@@ -1247,20 +1202,8 @@ export const RESIZE_PRESETS: ResizePreset[] = [
       en: "Your photo becomes 640×640 px — the largest size Telegram keeps for avatars.",
     },
     keywords: {
-      ru: [
-        "размер аватарки телеграм",
-        "аватарка для телеграм канала размер",
-        "640 на 640",
-        "фото профиля telegram размер",
-        "аватар для группы телеграм",
-      ],
-      en: [
-        "telegram avatar size",
-        "telegram profile picture size",
-        "640x640",
-        "telegram channel avatar size",
-        "resize photo for telegram",
-      ],
+      ru: ["размер аватарки телеграм", "аватарка для телеграм канала размер", "640 на 640", "фото профиля telegram размер", "аватар для группы телеграм"],
+      en: ["telegram avatar size", "telegram profile picture size", "640x640", "telegram channel avatar size", "resize photo for telegram"],
     },
     paragraphs: {
       ru: [
@@ -1349,13 +1292,7 @@ export const RESIZE_PRESETS: ResizePreset[] = [
         "размер обложки вк для мобильной версии",
         "шапка группы вк размер",
       ],
-      en: [
-        "vk cover size",
-        "vkontakte community cover size",
-        "1920x768",
-        "vk group cover dimensions",
-        "resize image for vk cover",
-      ],
+      en: ["vk cover size", "vkontakte community cover size", "1920x768", "vk group cover dimensions", "resize image for vk cover"],
     },
     paragraphs: {
       ru: [
@@ -1436,21 +1373,8 @@ export const RESIZE_PRESETS: ResizePreset[] = [
       en: "Your photo becomes a 1000×1500 px vertical — the 2:3 ratio Pinterest recommends for pins.",
     },
     keywords: {
-      ru: [
-        "размер пина pinterest",
-        "размер фото для пинтерест",
-        "1000 на 1500",
-        "формат 2:3 для pinterest",
-        "размер картинки для пинтереста",
-      ],
-      en: [
-        "pinterest pin size",
-        "pinterest image size",
-        "1000x1500",
-        "2:3 pin dimensions",
-        "resize image for pinterest",
-        "pinterest pin aspect ratio",
-      ],
+      ru: ["размер пина pinterest", "размер фото для пинтерест", "1000 на 1500", "формат 2:3 для pinterest", "размер картинки для пинтереста"],
+      en: ["pinterest pin size", "pinterest image size", "1000x1500", "2:3 pin dimensions", "resize image for pinterest", "pinterest pin aspect ratio"],
     },
     paragraphs: {
       ru: [
@@ -1627,21 +1551,8 @@ export const RESIZE_PRESETS: ResizePreset[] = [
       en: "Your photo becomes 354×472 px at 300 dpi — exactly 30×40 mm when printed.",
     },
     keywords: {
-      ru: [
-        "фото 3х4 онлайн",
-        "фото 3 на 4 размер в пикселях",
-        "сделать фото 3х4",
-        "фото на пропуск 3х4",
-        "фото 3х4 на студенческий",
-        "фото на документы 3х4",
-      ],
-      en: [
-        "3x4 photo",
-        "3x4 cm photo size in pixels",
-        "30x40 mm photo",
-        "resize photo to 3x4",
-        "id photo 3x4",
-      ],
+      ru: ["фото 3х4 онлайн", "фото 3 на 4 размер в пикселях", "сделать фото 3х4", "фото на пропуск 3х4", "фото 3х4 на студенческий", "фото на документы 3х4"],
+      en: ["3x4 photo", "3x4 cm photo size in pixels", "30x40 mm photo", "resize photo to 3x4", "id photo 3x4"],
     },
     paragraphs: {
       ru: [
@@ -1724,22 +1635,8 @@ export const RESIZE_PRESETS: ResizePreset[] = [
       en: "Your photo becomes a 600×600 px square at 300 dpi — exactly 2×2 inches when printed.",
     },
     keywords: {
-      ru: [
-        "фото на визу сша размер",
-        "фото 2х2 дюйма",
-        "фото 5х5 на визу сша",
-        "фото для ds-160 размер",
-        "фото на грин карту размер",
-        "фото 600х600 онлайн",
-      ],
-      en: [
-        "us passport photo size",
-        "2x2 photo",
-        "600x600 photo",
-        "us visa photo size",
-        "ds-160 photo requirements size",
-        "green card lottery photo size",
-      ],
+      ru: ["фото на визу сша размер", "фото 2х2 дюйма", "фото 5х5 на визу сша", "фото для ds-160 размер", "фото на грин карту размер", "фото 600х600 онлайн"],
+      en: ["us passport photo size", "2x2 photo", "600x600 photo", "us visa photo size", "ds-160 photo requirements size", "green card lottery photo size"],
     },
     paragraphs: {
       ru: [
@@ -1826,20 +1723,8 @@ export const RESIZE_PRESETS: ResizePreset[] = [
       en: "Your photo becomes 1200×1800 px at 300 dpi — enough for a sharp 4×6 inch print.",
     },
     keywords: {
-      ru: [
-        "фото 10х15 размер в пикселях",
-        "подготовить фото к печати 10х15",
-        "1200 на 1800",
-        "разрешение для печати фото 10х15",
-        "фото 10 на 15 онлайн",
-      ],
-      en: [
-        "4x6 photo size in pixels",
-        "1200x1800",
-        "resize photo for 4x6 print",
-        "10x15 photo size",
-        "4x6 print resolution",
-      ],
+      ru: ["фото 10х15 размер в пикселях", "подготовить фото к печати 10х15", "1200 на 1800", "разрешение для печати фото 10х15", "фото 10 на 15 онлайн"],
+      en: ["4x6 photo size in pixels", "1200x1800", "resize photo for 4x6 print", "10x15 photo size", "4x6 print resolution"],
     },
     paragraphs: {
       ru: [
@@ -1924,20 +1809,8 @@ export const RESIZE_PRESETS: ResizePreset[] = [
       en: "Your photo becomes 1500×2100 px at 300 dpi — for a sharp 5×7 inch print.",
     },
     keywords: {
-      ru: [
-        "фото 13х18 размер в пикселях",
-        "1500 на 2100",
-        "печать фото 13х18",
-        "подготовить фото к печати 13 на 18",
-        "фото для рамки 13х18",
-      ],
-      en: [
-        "5x7 photo size in pixels",
-        "1500x2100",
-        "resize photo for 5x7 print",
-        "13x18 photo size",
-        "5x7 print resolution",
-      ],
+      ru: ["фото 13х18 размер в пикселях", "1500 на 2100", "печать фото 13х18", "подготовить фото к печати 13 на 18", "фото для рамки 13х18"],
+      en: ["5x7 photo size in pixels", "1500x2100", "resize photo for 5x7 print", "13x18 photo size", "5x7 print resolution"],
     },
     paragraphs: {
       ru: [
@@ -2012,20 +1885,8 @@ export const RESIZE_PRESETS: ResizePreset[] = [
       en: "Your image becomes 2480×3508 px at 300 dpi — exactly one A4 sheet when printed.",
     },
     keywords: {
-      ru: [
-        "размер а4 в пикселях",
-        "а4 300 dpi",
-        "2480 на 3508",
-        "фото на весь лист а4",
-        "изменить размер картинки под а4",
-      ],
-      en: [
-        "a4 size in pixels",
-        "a4 300 dpi",
-        "2480x3508",
-        "resize image to a4",
-        "a4 print resolution",
-      ],
+      ru: ["размер а4 в пикселях", "а4 300 dpi", "2480 на 3508", "фото на весь лист а4", "изменить размер картинки под а4"],
+      en: ["a4 size in pixels", "a4 300 dpi", "2480x3508", "resize image to a4", "a4 print resolution"],
     },
     paragraphs: {
       ru: [
@@ -2112,20 +1973,8 @@ export const RESIZE_PRESETS: ResizePreset[] = [
       en: "Your image becomes 1920×1080 px — Full HD (1080p) resolution with a 16:9 shape.",
     },
     keywords: {
-      ru: [
-        "изменить размер фото 1920х1080",
-        "1920 на 1080 онлайн",
-        "обои 1920х1080 из фото",
-        "сделать картинку full hd",
-        "размер 1080p",
-      ],
-      en: [
-        "resize image to 1920x1080",
-        "1920x1080 image resizer",
-        "full hd image size",
-        "1080p wallpaper resize",
-        "make image 1920x1080",
-      ],
+      ru: ["изменить размер фото 1920х1080", "1920 на 1080 онлайн", "обои 1920х1080 из фото", "сделать картинку full hd", "размер 1080p"],
+      en: ["resize image to 1920x1080", "1920x1080 image resizer", "full hd image size", "1080p wallpaper resize", "make image 1920x1080"],
     },
     paragraphs: {
       ru: [
@@ -2198,20 +2047,8 @@ export const RESIZE_PRESETS: ResizePreset[] = [
       en: "Your image becomes 2560×1440 px — QHD (1440p) resolution, which monitor makers usually call 2K.",
     },
     keywords: {
-      ru: [
-        "2k разрешение",
-        "2560 на 1440",
-        "обои 2560х1440",
-        "изменить размер фото до 2k",
-        "размер qhd",
-      ],
-      en: [
-        "2k resolution",
-        "2560x1440",
-        "qhd image size",
-        "1440p wallpaper resize",
-        "resize image to 2k",
-      ],
+      ru: ["2k разрешение", "2560 на 1440", "обои 2560х1440", "изменить размер фото до 2k", "размер qhd"],
+      en: ["2k resolution", "2560x1440", "qhd image size", "1440p wallpaper resize", "resize image to 2k"],
     },
     paragraphs: {
       ru: [
@@ -2284,20 +2121,8 @@ export const RESIZE_PRESETS: ResizePreset[] = [
       en: "Your image becomes 3840×2160 px — 4K UHD resolution for TVs and monitors.",
     },
     keywords: {
-      ru: [
-        "4k разрешение в пикселях",
-        "3840 на 2160",
-        "обои 4k из фото",
-        "изменить размер фото до 4k",
-        "размер картинки 4k",
-      ],
-      en: [
-        "4k resolution",
-        "3840x2160",
-        "resize image to 4k",
-        "4k wallpaper size",
-        "uhd image size",
-      ],
+      ru: ["4k разрешение в пикселях", "3840 на 2160", "обои 4k из фото", "изменить размер фото до 4k", "размер картинки 4k"],
+      en: ["4k resolution", "3840x2160", "resize image to 4k", "4k wallpaper size", "uhd image size"],
     },
     paragraphs: {
       ru: [
@@ -2382,13 +2207,7 @@ export const RESIZE_PRESETS: ResizePreset[] = [
         "фото товара для маркетплейса размер",
         "как сделать фото 3 на 4 для вб",
       ],
-      en: [
-        "wildberries photo size",
-        "wildberries image requirements",
-        "900x1200",
-        "3:4 product photo",
-        "resize product photos for marketplace",
-      ],
+      en: ["wildberries photo size", "wildberries image requirements", "900x1200", "3:4 product photo", "resize product photos for marketplace"],
     },
     paragraphs: {
       ru: [

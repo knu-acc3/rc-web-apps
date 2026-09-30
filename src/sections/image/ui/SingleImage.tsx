@@ -11,6 +11,7 @@ import { Notice, Panel } from "@/ui/panel";
 import { isAbort } from "../engine/client";
 import { IMAGE_ACCEPT } from "../engine/detect";
 import { prepareFile, type Prepared } from "../engine/source";
+import { OptionsBar } from "./OptionsBar";
 import { ProgressBar } from "./controls";
 import { errorText, S } from "./strings";
 
@@ -128,15 +129,9 @@ export function SingleImageShell({
   return (
     <div className="flex flex-col gap-4">
       {options && (
-        <div className="rounded-[12px] border border-line bg-surface">
-          <div className="flex flex-wrap items-end gap-x-4 gap-y-3 px-4 py-3">{options}</div>
-          {more && (
-            <details className="border-t border-line">
-              <summary className="cursor-pointer px-4 py-2.5 text-sm text-fg-2 hover:text-fg">{locale === "ru" ? "Дополнительно" : "More options"}</summary>
-              <div className="grid gap-4 px-4 pb-4 pt-1 sm:grid-cols-2">{more}</div>
-            </details>
-          )}
-        </div>
+        <OptionsBar more={more} locale={locale}>
+          {options}
+        </OptionsBar>
       )}
       <Panel className="overflow-hidden">
         <div className="p-3 sm:p-4">{stage}</div>
@@ -148,7 +143,7 @@ export function SingleImageShell({
               {exp.last ? ` · ${exp.last.name} — ${formatBytes(locale, exp.last.size)}` : ""}
             </p>
           </div>
-          <div className="flex shrink-0 items-center gap-2">
+          <div className="flex flex-wrap items-center justify-end gap-2 sm:shrink-0">
             <Button variant="ghost" size="sm" onClick={file.reset}>
               <X aria-hidden />
               {t.remove}
@@ -159,7 +154,7 @@ export function SingleImageShell({
                 {t.cancel} · {Math.round(exp.progress * 100)} %
               </Button>
             ) : (
-              <Button variant="primary" size="lg" onClick={onExport}>
+              <Button variant="primary" size="lg" className="flex-1 sm:flex-none" onClick={onExport}>
                 <Download aria-hidden />
                 {exportLabel ?? t.download}
               </Button>
@@ -170,7 +165,11 @@ export function SingleImageShell({
         {(exp.error || extra || file.prepared.animated) && (
           <div className="flex flex-col gap-1 border-t border-line px-4 py-2.5 text-[13px]">
             {file.prepared.animated && <p className="text-warn">{t.animatedWarn}</p>}
-            {exp.error ? <p className="text-err" role="alert">{errorText(locale, exp.error)}</p> : null}
+            {exp.error ? (
+              <p className="text-err" role="alert">
+                {errorText(locale, exp.error)}
+              </p>
+            ) : null}
             {extra}
           </div>
         )}

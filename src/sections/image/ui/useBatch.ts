@@ -75,14 +75,14 @@ export function useBatch({ runner, settingsKey, concurrency = 2, delay = 350 }: 
     if (mounted.current) setItems(itemsRef.current);
   }, []);
 
-  const patch = useCallback(
-    (key: string, p: Partial<BatchItem>) => commit((list) => list.map((it) => (it.key === key ? { ...it, ...p } : it))),
-    [commit],
-  );
+  const patch = useCallback((key: string, p: Partial<BatchItem>) => commit((list) => list.map((it) => (it.key === key ? { ...it, ...p } : it))), [commit]);
 
+  const priority = useRef<string | null>(null);
   const pump = useCallback(() => {
     if (!mounted.current) return;
-    for (const it of itemsRef.current) {
+    // the file on screen first, then the rest in list order
+    const list = [...itemsRef.current].sort((a, b) => Number(b.key === priority.current) - Number(a.key === priority.current));
+    for (const it of list) {
       if (running.current.size >= concurrency) return;
       if (it.status !== "queued" || !it.prepared || running.current.has(it.key)) continue;
       const ac = new AbortController();
@@ -99,13 +99,14 @@ export function useBatch({ runner, settingsKey, concurrency = 2, delay = 350 }: 
         return;
       }
       const prepared = it.prepared;
-      runnerRef.current(prepared, {
-        engine,
-        signal: ac.signal,
-        onProgress: (v) => {
-          if (gen.current.get(it.key) === myGen) patch(it.key, { progress: v });
-        },
-      })
+      runnerRef
+        .current(prepared, {
+          engine,
+          signal: ac.signal,
+          onProgress: (v) => {
+            if (gen.current.get(it.key) === myGen) patch(it.key, { progress: v });
+          },
+        })
         .then((out) => {
           if (gen.current.get(it.key) !== myGen || !mounted.current) return;
           const prev = itemsRef.current.find((x) => x.key === it.key)?.result;
@@ -176,7 +177,13 @@ export function useBatch({ runner, settingsKey, concurrency = 2, delay = 350 }: 
   /** Cancel everything that hasn't finished (keeps finished results). */
   const cancelAll = useCallback(() => {
     for (const it of itemsRef.current) if (it.status === "working" || it.status === "queued") abort(it.key);
-    commit((list) => list.map((it) => (it.status === "working" || it.status === "queued" ? { ...it, status: it.result ? "done" : "error", error: it.result ? undefined : new Error("CANCELLED") } : it)));
+    commit((list) =>
+      list.map((it) =>
+        it.status === "working" || it.status === "queued"
+          ? { ...it, status: it.result ? "done" : "error", error: it.result ? undefined : new Error("CANCELLED") }
+          : it,
+      ),
+    );
   }, [commit]);
 
   const retry = useCallback(
@@ -217,7 +224,11 @@ export function useBatch({ runner, settingsKey, concurrency = 2, delay = 350 }: 
   }, []);
 
   const busy = items.some((i) => i.status === "working" || i.status === "queued" || i.status === "reading");
-  return { items, addFiles, remove, clear, cancelAll, retry, busy };
+  const prioritize = useCallback((key: string | null) => {
+    priority.current = key;
+  }, []);
+
+  return { items, addFiles, remove, clear, cancelAll, retry, busy, prioritize };
 }
 
 /** Make file names unique inside a ZIP: "a.jpg", "a (2).jpg"… */

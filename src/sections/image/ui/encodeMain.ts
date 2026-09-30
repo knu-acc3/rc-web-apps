@@ -23,6 +23,9 @@ export async function encodeMainCanvas(engine: Engine, canvas: HTMLCanvasElement
   }
   const img = canvas.getContext("2d")!.getImageData(0, 0, canvas.width, canvas.height);
   const buf = img.data.buffer as ArrayBuffer;
-  const r = await engine.run<ProcessResult>({ type: "encode-rgba", rgba: buf, width: canvas.width, height: canvas.height, out: { format, quality, background } }, { transfer: [buf] });
+  const r = await engine.run<ProcessResult>(
+    { type: "encode-rgba", rgba: buf, width: canvas.width, height: canvas.height, out: { format, quality, background } },
+    { transfer: [buf] },
+  );
   return new Blob([r.bytes], { type: r.mime });
 }

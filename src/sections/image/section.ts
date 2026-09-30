@@ -108,7 +108,8 @@ function orientation(w: number, h: number, locale: Locale): string {
 }
 
 const mp = (locale: Locale, w: number, h: number) => `${num(locale, (w * h) / 1e6)} ${locale === "ru" ? "Мп" : "MP"}`;
-const yesNo = (locale: Locale, v: boolean | "limited") => (v === "limited" ? (locale === "ru" ? "ограниченно" : "limited") : v ? (locale === "ru" ? "да" : "yes") : locale === "ru" ? "нет" : "no");
+const yesNo = (locale: Locale, v: boolean | "limited") =>
+  v === "limited" ? (locale === "ru" ? "ограниченно" : "limited") : v ? (locale === "ru" ? "да" : "yes") : locale === "ru" ? "нет" : "no";
 
 /* ───────────── format pairs ───────────── */
 
@@ -166,7 +167,10 @@ const resizeVariants = (): VariantDef[] =>
       ];
       if (p.mm) rows.push([ru ? "Физический размер" : "Physical size", `${num(locale, p.mm[0], 1)} × ${num(locale, p.mm[1], 1)} ${ru ? "мм" : "mm"}`]);
       if (p.dpi) rows.push([ru ? "Разрешение печати" : "Print resolution", `${p.dpi} dpi ${ru ? "(записывается в JPG/PNG)" : "(written into JPG/PNG)"}`]);
-      rows.push([ru ? "Заполнение по умолчанию" : "Default fit", p.fit === "cover" ? (ru ? "заполнить и обрезать по центру" : "fill and crop centre") : ru ? "вписать с полями" : "fit with padding"]);
+      rows.push([
+        ru ? "Заполнение по умолчанию" : "Default fit",
+        p.fit === "cover" ? (ru ? "заполнить и обрезать по центру" : "fill and crop centre") : ru ? "вписать с полями" : "fit with padding",
+      ]);
       const blocks: Block[] = [
         { type: "facts", title: ru ? "Параметры размера" : "Size details", rows },
         { type: "facts", title: ru ? "Требования и советы" : "Requirements and tips", rows: pick(p.facts, locale) },
@@ -257,10 +261,22 @@ const converterBlocks = (locale: Locale): Block[] => {
     {
       type: "table",
       title: ru ? "Поддерживаемые форматы" : "Supported formats",
-      head: [ru ? "Формат" : "Format", ru ? "Открыть" : "Read", ru ? "Сохранить в" : "Save as", ru ? "Прозрачность" : "Transparency", ru ? "Анимация" : "Animation"],
+      head: [
+        ru ? "Формат" : "Format",
+        ru ? "Открыть" : "Read",
+        ru ? "Сохранить в" : "Save as",
+        ru ? "Прозрачность" : "Transparency",
+        ru ? "Анимация" : "Animation",
+      ],
       rows: READABLE.map((id) => {
         const f = FORMATS[id];
-        return [`${f.label} (.${f.exts[0]})`, ru ? "да" : "yes", WRITABLE.has(id) ? (ru ? "да" : "yes") : "—", yesNo(locale, f.alpha), yesNo(locale, f.animation)];
+        return [
+          `${f.label} (.${f.exts[0]})`,
+          ru ? "да" : "yes",
+          WRITABLE.has(id) ? (ru ? "да" : "yes") : "—",
+          yesNo(locale, f.alpha),
+          yesNo(locale, f.animation),
+        ];
       }),
     },
   ];
@@ -273,7 +289,11 @@ const resizeBlocks = (locale: Locale): Block[] => {
       type: "table",
       title: ru ? "Популярные размеры изображений" : "Popular image sizes",
       head: [ru ? "Для чего" : "For", ru ? "Пиксели" : "Pixels", ru ? "Пропорции" : "Ratio"],
-      rows: RESIZE_PRESETS.map((p) => [pick(p.name, locale), `${p.w} × ${p.h}${p.mm ? ` (${p.mm[0]}×${p.mm[1]} ${ru ? "мм" : "mm"})` : ""}`, ratioLabel(p.w, p.h, locale)]),
+      rows: RESIZE_PRESETS.map((p) => [
+        pick(p.name, locale),
+        `${p.w} × ${p.h}${p.mm ? ` (${p.mm[0]}×${p.mm[1]} ${ru ? "мм" : "mm"})` : ""}`,
+        ratioLabel(p.w, p.h, locale),
+      ]),
     },
   ];
 };
@@ -324,8 +344,14 @@ export const imageSection = defineToolSection({
     tool("add-text", "image/add-text", "Type", { related: ["add-watermark", "photo-collage", "add-border-to-image"] }),
     tool("collage", "image/collage", "LayoutGrid", { related: ["split-image", "make-image-square", "gif-maker"] }),
     tool("split", "image/split", "Scissors", { related: ["photo-collage", "crop-image", "make-image-square"] }),
-    tool("square", "image/decorate", "Square", { props: { mode: "square" }, related: ["resize-image/instagram-post", "crop-image/1-1", "add-border-to-image"] }),
-    tool("round-corners", "image/decorate", "SquareRoundCorner", { props: { mode: "round" }, related: ["add-border-to-image", "crop-image-circle", "make-image-square"] }),
+    tool("square", "image/decorate", "Square", {
+      props: { mode: "square" },
+      related: ["resize-image/instagram-post", "crop-image/1-1", "add-border-to-image"],
+    }),
+    tool("round-corners", "image/decorate", "SquareRoundCorner", {
+      props: { mode: "round" },
+      related: ["add-border-to-image", "crop-image-circle", "make-image-square"],
+    }),
     tool("border", "image/decorate", "Frame", { props: { mode: "border" }, related: ["round-image-corners", "make-image-square", "add-watermark"] }),
     tool("exif", "image/exif", "FileSearch", { related: ["change-dpi", "compress-image", "rotate-image"] }),
     tool("dpi", "image/dpi", "Printer", { related: ["resize-image/print-10x15", "resize-image/passport-35x45", "exif-viewer"] }),

@@ -32,7 +32,8 @@ const T = {
     jpg: "JPG",
     lossless: "Без потерь (EXIF)",
     pixels: "Повернуть пиксели",
-    losslessHint: "Пиксели не перекодируются, меняется только ориентация. Некоторые старые программы и сайты игнорируют флаг — для них выберите «Повернуть пиксели».",
+    losslessHint:
+      "Пиксели не перекодируются, меняется только ориентация. Некоторые старые программы и сайты игнорируют флаг — для них выберите «Повернуть пиксели».",
     losslessNote: (o: number) => `Без потерь: изменён только флаг ориентации EXIF (теперь ${o}), данные изображения не перекодированы`,
     flipMode: "Отражение",
     h: "По горизонтали",
@@ -95,11 +96,23 @@ export default function Orient({ locale, mode = "rotate" }: OrientProps) {
       const bytes = new Uint8Array(await p.file.arrayBuffer());
       const out = transformJpegLossless(bytes, flipH, k);
       const size = jpegDisplaySize(out) ?? { width: 0, height: 0 };
-      return { blob: new Blob([out as BlobPart], { type: "image/jpeg" }), name: `${name}-${mode === "flip" ? "flipped" : "rotated"}.jpg`, width: size.width, height: size.height, meta: { lossless: true, quality: readExifOrientation(out) } };
+      return {
+        blob: new Blob([out as BlobPart], { type: "image/jpeg" }),
+        name: `${name}-${mode === "flip" ? "flipped" : "rotated"}.jpg`,
+        width: size.width,
+        height: size.height,
+        meta: { lossless: true, quality: readExifOrientation(out) },
+      };
     }
     let fmt = sameFormat(p.format);
     if (mode === "rotate" && angle !== 0 && corners === "expand" && fillKind === "transparent" && fmt === "jpg") fmt = "png";
-    const r = await processFile(ctx.engine, p, ops, { format: fmt, quality: 92, background: fillColor, best: false }, { signal: ctx.signal, onProgress: ctx.onProgress });
+    const r = await processFile(
+      ctx.engine,
+      p,
+      ops,
+      { format: fmt, quality: 92, background: fillColor, best: false },
+      { signal: ctx.signal, onProgress: ctx.onProgress },
+    );
     return { blob: toBlob(r), name: `${name}-${mode === "flip" ? "flipped" : "rotated"}.${r.ext}`, width: r.width, height: r.height };
   };
   const batch = useBatch({ runner, settingsKey: key, delay: 500 });
@@ -128,19 +141,38 @@ export default function Orient({ locale, mode = "rotate" }: OrientProps) {
             max={45}
             step={0.1}
             locale={locale}
-            format={(v) => `${v > 0 ? "+" : v < 0 ? "−" : ""}${formatNumber(locale, Math.abs(v), { maximumFractionDigits: 1 })}° · ${formatNumber(locale, ((k * 90 + angle) % 360 + 360) % 360, { maximumFractionDigits: 1 })}°`}
+            format={(v) =>
+              `${v > 0 ? "+" : v < 0 ? "−" : ""}${formatNumber(locale, Math.abs(v), { maximumFractionDigits: 1 })}° · ${formatNumber(locale, (((k * 90 + angle) % 360) + 360) % 360, { maximumFractionDigits: 1 })}°`
+            }
           />
         </div>
       </>
     ) : (
       <Field label={t.flipMode}>
         <Segmented
+          wrap
           label={t.flipMode}
           value={flip}
           onChange={setFlip}
           options={[
-            { value: "h", label: <span className="inline-flex items-center gap-1.5"><FlipHorizontal2 className="size-4" aria-hidden />{t.h}</span> },
-            { value: "v", label: <span className="inline-flex items-center gap-1.5"><FlipVertical2 className="size-4" aria-hidden />{t.v}</span> },
+            {
+              value: "h",
+              label: (
+                <span className="inline-flex items-center gap-1.5">
+                  <FlipHorizontal2 className="size-4" aria-hidden />
+                  {t.h}
+                </span>
+              ),
+            },
+            {
+              value: "v",
+              label: (
+                <span className="inline-flex items-center gap-1.5">
+                  <FlipVertical2 className="size-4" aria-hidden />
+                  {t.v}
+                </span>
+              ),
+            },
             { value: "both", label: t.both },
           ]}
         />
@@ -150,16 +182,43 @@ export default function Orient({ locale, mode = "rotate" }: OrientProps) {
   const more = (
     <>
       <Field label={t.jpg} hint={t.losslessHint}>
-        <Segmented label={t.jpg} value={lossless ? "lossless" : "pixels"} onChange={(v) => setLossless(v === "lossless")} options={[{ value: "lossless", label: t.lossless }, { value: "pixels", label: t.pixels }]} />
+        <Segmented
+          wrap
+          label={t.jpg}
+          value={lossless ? "lossless" : "pixels"}
+          onChange={(v) => setLossless(v === "lossless")}
+          options={[
+            { value: "lossless", label: t.lossless },
+            { value: "pixels", label: t.pixels },
+          ]}
+        />
       </Field>
       {mode === "rotate" && (
         <>
           <Field label={t.corners}>
-            <Segmented label={t.corners} value={corners} onChange={setCorners} options={[{ value: "crop", label: t.crop }, { value: "expand", label: t.expand }]} />
+            <Segmented
+              wrap
+              label={t.corners}
+              value={corners}
+              onChange={setCorners}
+              options={[
+                { value: "crop", label: t.crop },
+                { value: "expand", label: t.expand },
+              ]}
+            />
           </Field>
           {corners === "expand" && (
             <Field label={t.fill}>
-              <Segmented label={t.fill} value={fillKind} onChange={setFillKind} options={[{ value: "color", label: t.color }, { value: "transparent", label: t.transparent }]} />
+              <Segmented
+                wrap
+                label={t.fill}
+                value={fillKind}
+                onChange={setFillKind}
+                options={[
+                  { value: "color", label: t.color },
+                  { value: "transparent", label: t.transparent },
+                ]}
+              />
             </Field>
           )}
           {corners === "expand" && fillKind === "color" && <ColorField label={t.fill} value={fillColor} onChange={setFillColor} locale={locale} />}

@@ -16,7 +16,6 @@ import { LiveStage } from "../ui/LiveStage";
 import { S } from "../ui/strings";
 import { useBatch, type Runner } from "../ui/useBatch";
 
-
 const PARAM_LABEL: Record<string, { ru: string; en: string }> = {
   "%": { ru: "Сила", en: "Strength" },
   px: { ru: "Радиус", en: "Radius" },
@@ -26,8 +25,24 @@ const PARAM_LABEL: Record<string, { ru: string; en: string }> = {
 };
 
 const T = {
-  ru: { filter: "Фильтр", threshold: "Порог", dither: "Дизеринг (Флойд — Стейнберг)", shadows: "Тени", highlights: "Света", size: "Размер центра", block: "Размер блока" },
-  en: { filter: "Filter", threshold: "Threshold", dither: "Dithering (Floyd–Steinberg)", shadows: "Shadows", highlights: "Highlights", size: "Centre size", block: "Block size" },
+  ru: {
+    filter: "Фильтр",
+    threshold: "Порог",
+    dither: "Дизеринг (Флойд — Стейнберг)",
+    shadows: "Тени",
+    highlights: "Света",
+    size: "Размер центра",
+    block: "Размер блока",
+  },
+  en: {
+    filter: "Filter",
+    threshold: "Threshold",
+    dither: "Dithering (Floyd–Steinberg)",
+    shadows: "Shadows",
+    highlights: "Highlights",
+    size: "Centre size",
+    block: "Block size",
+  },
 } as const;
 
 export interface FiltersProps {
@@ -53,7 +68,13 @@ export default function Filters({ locale, filter: initial = "grayscale" }: Filte
 
   const runner: Runner = async (p, ctx) => {
     const fmt = resolveOut(out, p.format);
-    const r = await processFile(ctx.engine, p, ops, { format: fmt, quality: LOSSY.has(fmt) ? Math.max(88, DEFAULT_QUALITY[fmt]) : 100, background: "#FFFFFF" }, { signal: ctx.signal, onProgress: ctx.onProgress });
+    const r = await processFile(
+      ctx.engine,
+      p,
+      ops,
+      { format: fmt, quality: LOSSY.has(fmt) ? Math.max(88, DEFAULT_QUALITY[fmt]) : 100, background: "#FFFFFF" },
+      { signal: ctx.signal, onProgress: ctx.onProgress },
+    );
     return { blob: toBlob(r), name: `${baseName(p.file.name)}-${filter}.${r.ext}`, width: r.width, height: r.height };
   };
   const batch = useBatch({ runner, settingsKey: key, delay: 600 });
@@ -93,8 +114,20 @@ export default function Filters({ locale, filter: initial = "grayscale" }: Filte
           <ColorField label={t.highlights} value={params.color2 ?? "#FFC45A"} onChange={(c) => setParams((x) => ({ ...x, color2: c }))} locale={locale} />
         </>
       )}
-      {filter === "black-and-white" && <Switch label={t.dither} checked={!!params.dither} onChange={(e) => setParams((x) => ({ ...x, dither: e.target.checked }))} />}
-      {filter === "vignette" && <RangeField label={t.size} value={params.size ?? 40} onChange={(v) => setParams((x) => ({ ...x, size: v }))} min={0} max={90} unit="%" locale={locale} />}
+      {filter === "black-and-white" && (
+        <Switch label={t.dither} checked={!!params.dither} onChange={(e) => setParams((x) => ({ ...x, dither: e.target.checked }))} />
+      )}
+      {filter === "vignette" && (
+        <RangeField
+          label={t.size}
+          value={params.size ?? 40}
+          onChange={(v) => setParams((x) => ({ ...x, size: v }))}
+          min={0}
+          max={90}
+          unit="%"
+          locale={locale}
+        />
+      )}
       <Field label={s.outputFormat} htmlFor={`${id}-out`}>
         <Select id={`${id}-out`} value={out} onChange={(e) => setOut(e.target.value as OutChoice)}>
           {(["same", "jpg", "png", "webp"] as const).map((f) => (

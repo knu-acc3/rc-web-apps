@@ -74,19 +74,37 @@ export function ImageStage({
   const zi = ZOOMS.indexOf(zoom);
 
   return (
-    <div className={cn("relative", className)}>
-      <div ref={boxRef} className={cn("overflow-auto rounded-[10px] border border-line p-3", checker)} style={{ maxHeight: zoom > 1 ? `${maxHeightVh}vh` : undefined }}>
+    <div className={cn("flex flex-col", className)}>
+      <div
+        ref={boxRef}
+        className={cn("overflow-auto rounded-[10px] border border-line p-3", checker)}
+        style={{ maxHeight: zoom > 1 ? `${maxHeightVh}vh` : undefined }}
+      >
         <div className="relative mx-auto" style={{ width: cssW || undefined, height: cssH || undefined }}>
           <canvas ref={canvasRef} role="img" aria-label={label ?? t.preview} className="block size-full" />
           {bitmap && factor > 0 && <div className="absolute inset-0">{children?.(factor)}</div>}
         </div>
       </div>
       {bitmap && (
-        <div className="absolute right-2 top-2 flex gap-1">
-          <Button variant="secondary" size="icon-sm" className="opacity-90" aria-label={t.zoomOut} title={t.zoomOut} disabled={zi <= 0} onClick={() => setZoom(ZOOMS[Math.max(0, zi - 1)])}>
+        <div className="mt-2 flex justify-end gap-1">
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            aria-label={t.zoomOut}
+            title={t.zoomOut}
+            disabled={zi <= 0}
+            onClick={() => setZoom(ZOOMS[Math.max(0, zi - 1)])}
+          >
             <ZoomOut aria-hidden />
           </Button>
-          <Button variant="secondary" size="icon-sm" className="opacity-90" aria-label={t.zoomIn} title={t.zoomIn} disabled={zi >= ZOOMS.length - 1} onClick={() => setZoom(ZOOMS[Math.min(ZOOMS.length - 1, zi + 1)])}>
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            aria-label={t.zoomIn}
+            title={t.zoomIn}
+            disabled={zi >= ZOOMS.length - 1}
+            onClick={() => setZoom(ZOOMS[Math.min(ZOOMS.length - 1, zi + 1)])}
+          >
             <ZoomIn aria-hidden />
           </Button>
         </div>

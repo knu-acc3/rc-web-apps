@@ -47,7 +47,18 @@ const T = {
     software: "Программа",
     copyright: "Автор / права",
     reading: "Чтение метаданных…",
-    group: { ifd0: "Основные (IFD0)", exif: "EXIF", gps: "GPS", interop: "Interop", ifd1: "Миниатюра (IFD1)", iptc: "IPTC", xmp: "XMP", icc: "ICC-профиль", jfif: "JFIF", ihdr: "PNG (IHDR)" } as Record<string, string>,
+    group: {
+      ifd0: "Основные (IFD0)",
+      exif: "EXIF",
+      gps: "GPS",
+      interop: "Interop",
+      ifd1: "Миниатюра (IFD1)",
+      iptc: "IPTC",
+      xmp: "XMP",
+      icc: "ICC-профиль",
+      jfif: "JFIF",
+      ihdr: "PNG (IHDR)",
+    } as Record<string, string>,
   },
   en: {
     file: "File",
@@ -75,7 +86,18 @@ const T = {
     software: "Software",
     copyright: "Artist / copyright",
     reading: "Reading metadata…",
-    group: { ifd0: "Main (IFD0)", exif: "EXIF", gps: "GPS", interop: "Interop", ifd1: "Thumbnail (IFD1)", iptc: "IPTC", xmp: "XMP", icc: "ICC profile", jfif: "JFIF", ihdr: "PNG (IHDR)" } as Record<string, string>,
+    group: {
+      ifd0: "Main (IFD0)",
+      exif: "EXIF",
+      gps: "GPS",
+      interop: "Interop",
+      ifd1: "Thumbnail (IFD1)",
+      iptc: "IPTC",
+      xmp: "XMP",
+      icc: "ICC profile",
+      jfif: "JFIF",
+      ihdr: "PNG (IHDR)",
+    } as Record<string, string>,
   },
 } as const;
 
@@ -110,7 +132,24 @@ function show(locale: Locale, v: unknown): string {
 
 async function readMeta(p: Prepared): Promise<Pick<Item, "tags" | "gps">> {
   const exifr = (await import("exifr")).default;
-  const opts = { tiff: true, exif: true, gps: true, interop: true, ifd1: true, iptc: true, xmp: true, icc: true, jfif: true, ihdr: true, makerNote: false, userComment: true, mergeOutput: false, translateValues: true, reviveValues: true, sanitize: true };
+  const opts = {
+    tiff: true,
+    exif: true,
+    gps: true,
+    interop: true,
+    ifd1: true,
+    iptc: true,
+    xmp: true,
+    icc: true,
+    jfif: true,
+    ihdr: true,
+    makerNote: false,
+    userComment: true,
+    mergeOutput: false,
+    translateValues: true,
+    reviveValues: true,
+    sanitize: true,
+  };
   let tags: Tags | null = null;
   try {
     tags = ((await exifr.parse(p.file, opts)) as Tags | undefined) ?? null;
@@ -119,7 +158,8 @@ async function readMeta(p: Prepared): Promise<Pick<Item, "tags" | "gps">> {
   }
   let gps: Item["gps"] = null;
   const g = tags?.gps as { latitude?: number; longitude?: number; GPSAltitude?: number } | undefined;
-  if (g && typeof g.latitude === "number" && typeof g.longitude === "number" && Number.isFinite(g.latitude)) gps = { latitude: g.latitude, longitude: g.longitude, altitude: g.GPSAltitude };
+  if (g && typeof g.latitude === "number" && typeof g.longitude === "number" && Number.isFinite(g.latitude))
+    gps = { latitude: g.latitude, longitude: g.longitude, altitude: g.GPSAltitude };
   else if (g) {
     try {
       const c = await exifr.gps(p.file);
@@ -154,7 +194,6 @@ export default function Exif({ locale }: { locale: Locale }) {
   const [error, setError] = useState<unknown>(null);
   const cur = items[sel];
 
-
   async function add(files: File[]) {
     setLoading(true);
     setError(null);
@@ -178,7 +217,10 @@ export default function Exif({ locale }: { locale: Locale }) {
     return toBlob(r);
   };
   const outName = (p: Prepared, blob: Blob) => {
-    const ext = p.format === "jpg" || p.format === "png" || p.format === "webp" ? (p.file.name.match(/\.([^.]+)$/)?.[1] ?? p.format) : blob.type.split("/")[1]?.replace("jpeg", "jpg") ?? "png";
+    const ext =
+      p.format === "jpg" || p.format === "png" || p.format === "webp"
+        ? (p.file.name.match(/\.([^.]+)$/)?.[1] ?? p.format)
+        : (blob.type.split("/")[1]?.replace("jpeg", "jpg") ?? "png");
     return `${baseName(p.file.name)}-clean.${ext}`;
   };
 
@@ -245,7 +287,13 @@ export default function Exif({ locale }: { locale: Locale }) {
       [t.focal, typeof pick("FocalLength") === "number" ? `${pick("FocalLength")} mm` : undefined],
       [t.size, pick("ExifImageWidth", "ImageWidth") ? `${pick("ExifImageWidth", "ImageWidth")} × ${pick("ExifImageHeight", "ImageHeight")}` : undefined],
       [t.software, pick("Software", "CreatorTool")],
-      [t.copyright, [pick("Artist", "Creator", "creator"), pick("Copyright", "Rights")].filter(Boolean).map((x) => show(locale, x)).join(" · ")],
+      [
+        t.copyright,
+        [pick("Artist", "Creator", "creator"), pick("Copyright", "Rights")]
+          .filter(Boolean)
+          .map((x) => show(locale, x))
+          .join(" · "),
+      ],
     ] as [string, unknown][]
   )
     .filter(([, v]) => v !== undefined && v !== null && v !== "")
@@ -256,7 +304,14 @@ export default function Exif({ locale }: { locale: Locale }) {
       {items.length > 1 && (
         <div className="flex flex-wrap items-end gap-3 rounded-[12px] border border-line bg-surface px-4 py-3">
           <Field label={t.file} htmlFor={`${id}-f`} className="min-w-56 flex-1">
-            <Select id={`${id}-f`} value={String(sel)} onChange={(e) => { setSel(Number(e.target.value)); setDone(null); }}>
+            <Select
+              id={`${id}-f`}
+              value={String(sel)}
+              onChange={(e) => {
+                setSel(Number(e.target.value));
+                setDone(null);
+              }}
+            >
               {items.map((it, i) => (
                 <option key={it.prepared.id} value={i}>
                   {it.prepared.file.name}
@@ -300,7 +355,13 @@ export default function Exif({ locale }: { locale: Locale }) {
                 <dt className="text-fg-3">{t.decimal}</dt>
                 <dd className="flex items-center gap-1 font-mono text-fg">
                   {cur.gps.latitude.toFixed(6)}, {cur.gps.longitude.toFixed(6)}
-                  <CopyButton value={`${cur.gps.latitude.toFixed(6)}, ${cur.gps.longitude.toFixed(6)}`} size="icon-sm" variant="ghost" label={locale === "ru" ? "Копировать" : "Copy"} copiedLabel={locale === "ru" ? "Скопировано" : "Copied"} />
+                  <CopyButton
+                    value={`${cur.gps.latitude.toFixed(6)}, ${cur.gps.longitude.toFixed(6)}`}
+                    size="icon-sm"
+                    variant="ghost"
+                    label={locale === "ru" ? "Копировать" : "Copy"}
+                    copiedLabel={locale === "ru" ? "Скопировано" : "Copied"}
+                  />
                 </dd>
               </div>
               <div>

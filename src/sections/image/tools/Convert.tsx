@@ -63,7 +63,13 @@ export default function Convert({ locale, from, to: to0 = "jpg" }: ConvertProps)
       const size = jpegDisplaySize(bytes) ?? { width: 0, height: 0 };
       return { blob: new Blob([bytes], { type: "image/jpeg" }), name: `${name}.jpg`, width: size.width, height: size.height, meta: { lossless: true } };
     }
-    const r = await processFile(ctx.engine, p, [], { format: to, quality: q, background: bg, icoSizes, best: to === "png" }, { signal: ctx.signal, onProgress: ctx.onProgress, svgWidth: svgWidth ?? undefined });
+    const r = await processFile(
+      ctx.engine,
+      p,
+      [],
+      { format: to, quality: q, background: bg, icoSizes, best: to === "png" },
+      { signal: ctx.signal, onProgress: ctx.onProgress, svgWidth: svgWidth ?? undefined },
+    );
     return { blob: toBlob(r), name: `${name}.${r.ext}`, width: r.width, height: r.height, meta: { encoder: r.encoder } };
   };
   const batch = useBatch({ runner, settingsKey: key });
@@ -72,7 +78,7 @@ export default function Convert({ locale, from, to: to0 = "jpg" }: ConvertProps)
   const options = (
     <>
       <Field label={t.to}>
-        <Segmented label={t.to} value={to} onChange={setTo} options={TARGETS.map((f) => ({ value: f, label: OUT_LABEL[f] }))} />
+        <Segmented wrap label={t.to} value={to} onChange={setTo} options={TARGETS.map((f) => ({ value: f, label: OUT_LABEL[f] }))} />
       </Field>
       {LOSSY.has(to) && (
         <div className="min-w-44 flex-1">
@@ -91,7 +97,10 @@ export default function Convert({ locale, from, to: to0 = "jpg" }: ConvertProps)
                   type="button"
                   aria-pressed={on}
                   onClick={() => setIcoSizes((xs) => (on ? (xs.length > 1 ? xs.filter((x) => x !== n) : xs) : [...xs, n].sort((a, b) => a - b)))}
-                  className={cn("h-8 rounded-[7px] border px-2.5 text-[13px] font-medium", on ? "border-accent bg-accent-soft text-accent" : "border-line text-fg-2 hover:text-fg")}
+                  className={cn(
+                    "h-8 rounded-[7px] border px-2.5 text-[13px] font-medium",
+                    on ? "border-accent bg-accent-soft text-accent" : "border-line text-fg-2 hover:text-fg",
+                  )}
                 >
                   {n}
                 </button>
@@ -114,6 +123,7 @@ export default function Convert({ locale, from, to: to0 = "jpg" }: ConvertProps)
   const fromLabel = from ? FORMAT_META[from === "jfif" ? "jpg" : (from as keyof typeof FORMAT_META)]?.label : undefined;
   return (
     <BatchWorkspace
+      sizeFocus
       locale={locale}
       batch={batch}
       options={options}

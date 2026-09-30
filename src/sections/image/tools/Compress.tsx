@@ -123,6 +123,7 @@ export default function Compress({ locale, format, targetKb }: CompressProps) {
   const options = (
     <>
       <Segmented
+        wrap
         label={t.mode}
         value={mode}
         onChange={setMode}
@@ -168,5 +169,5 @@ export default function Compress({ locale, format, targetKb }: CompressProps) {
     </>
   );
 
-  return <BatchWorkspace locale={locale} batch={batch} options={options} more={more} zipName="compressed-images.zip" />;
+  return <BatchWorkspace sizeFocus locale={locale} batch={batch} options={options} more={more} zipName="compressed-images.zip" />;
 }

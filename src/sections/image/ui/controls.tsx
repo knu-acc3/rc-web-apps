@@ -9,7 +9,19 @@ import { normalizeHex } from "../engine/palette";
 import { S } from "./strings";
 
 /** Colour picker + validated HEX text input. `value` is always "#RRGGBB". */
-export function ColorField({ label, value, onChange, locale, className }: { label: string; value: string; onChange: (hex: string) => void; locale: Locale; className?: string }) {
+export function ColorField({
+  label,
+  value,
+  onChange,
+  locale,
+  className,
+}: {
+  label: string;
+  value: string;
+  onChange: (hex: string) => void;
+  locale: Locale;
+  className?: string;
+}) {
   const id = useId();
   const [text, setText] = useState(value);
   const [prev, setPrev] = useState(value);
@@ -143,7 +155,10 @@ export function NumberField({
 export function ProgressBar({ value, className }: { value: number; className?: string }) {
   return (
     <div className={cn("h-1.5 w-full overflow-hidden rounded-full bg-surface-2", className)} aria-hidden>
-      <div className="h-full rounded-full bg-accent transition-[width] duration-200" style={{ width: `${Math.round(Math.max(0.03, Math.min(1, value)) * 100)}%` }} />
+      <div
+        className="h-full rounded-full bg-accent transition-[width] duration-200"
+        style={{ width: `${Math.round(Math.max(0.03, Math.min(1, value)) * 100)}%` }}
+      />
     </div>
   );
 }

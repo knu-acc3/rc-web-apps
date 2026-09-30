@@ -42,7 +42,8 @@ const T = {
     width: "Ширина",
     format: "Формат",
     exportBtn: "Скачать",
-    report: (r: SvgReport) => `Удалено: комментариев — ${r.comments}, блоков metadata — ${r.metadata}, данных редакторов — ${r.editorNodes + r.editorAttrs}, пустых текстовых узлов — ${r.whitespace}${r.rounded ? `; округлено атрибутов — ${r.rounded}` : ""}`,
+    report: (r: SvgReport) =>
+      `Удалено: комментариев — ${r.comments}, блоков metadata — ${r.metadata}, данных редакторов — ${r.editorNodes + r.editorAttrs}, пустых текстовых узлов — ${r.whitespace}${r.rounded ? `; округлено атрибутов — ${r.rounded}` : ""}`,
     size: "Размер",
     viewBox: "viewBox",
     none: "нет",
@@ -69,7 +70,8 @@ const T = {
     width: "Width",
     format: "Format",
     exportBtn: "Download",
-    report: (r: SvgReport) => `Removed: ${r.comments} comments, ${r.metadata} metadata blocks, ${r.editorNodes + r.editorAttrs} editor items, ${r.whitespace} empty text nodes${r.rounded ? `; ${r.rounded} attributes rounded` : ""}`,
+    report: (r: SvgReport) =>
+      `Removed: ${r.comments} comments, ${r.metadata} metadata blocks, ${r.editorNodes + r.editorAttrs} editor items, ${r.whitespace} empty text nodes${r.rounded ? `; ${r.rounded} attributes rounded` : ""}`,
     size: "Size",
     viewBox: "viewBox",
     none: "none",
@@ -152,7 +154,14 @@ export default function Svg({ locale }: { locale: Locale }) {
       <div className="flex flex-col gap-3">
         <Dropzone onFiles={loadFile} accept="image/svg+xml,.svg" title={t.drop} className="min-h-48" />
         <Field label={t.or} htmlFor={`${id}-paste`}>
-          <textarea id={`${id}-paste`} rows={4} spellCheck={false} placeholder='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">…</svg>' className="control min-h-28 resize-y py-2.5 font-mono text-sm" onChange={(e) => setSrc(e.target.value)} />
+          <textarea
+            id={`${id}-paste`}
+            rows={4}
+            spellCheck={false}
+            placeholder='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">…</svg>'
+            className="control min-h-28 resize-y py-2.5 font-mono text-sm"
+            onChange={(e) => setSrc(e.target.value)}
+          />
         </Field>
       </div>
     );
@@ -162,7 +171,16 @@ export default function Svg({ locale }: { locale: Locale }) {
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-end gap-x-4 gap-y-3 rounded-[12px] border border-line bg-surface px-4 py-3">
         <Field label={t.view}>
-          <Segmented label={t.view} value={show} onChange={setShow} options={[{ value: "optimized", label: t.optimized }, { value: "original", label: t.original }]} />
+          <Segmented
+            wrap
+            label={t.view}
+            value={show}
+            onChange={setShow}
+            options={[
+              { value: "optimized", label: t.optimized },
+              { value: "original", label: t.original },
+            ]}
+          />
         </Field>
         <Field label={t.precision} htmlFor={`${id}-prec`} className="w-52">
           <Select id={`${id}-prec`} value={precision} onChange={(e) => setPrecision(e.target.value)}>
@@ -175,7 +193,17 @@ export default function Svg({ locale }: { locale: Locale }) {
           </Select>
         </Field>
         <Field label={t.bg}>
-          <Segmented label={t.bg} value={bg} onChange={setBg} options={[{ value: "transparent", label: t.transparent }, { value: "light", label: t.light }, { value: "dark", label: t.dark }]} />
+          <Segmented
+            wrap
+            label={t.bg}
+            value={bg}
+            onChange={setBg}
+            options={[
+              { value: "transparent", label: t.transparent },
+              { value: "light", label: t.light },
+              { value: "dark", label: t.dark },
+            ]}
+          />
         </Field>
       </div>
 
@@ -195,7 +223,8 @@ export default function Svg({ locale }: { locale: Locale }) {
                 </span>
               </p>
               <p className="tabular text-sm text-fg-3">
-                {formatBytes(locale, before)} → {formatBytes(locale, after)} · {t.size} {formatNumber(locale, ok.size.w, { maximumFractionDigits: 2 })}×{formatNumber(locale, ok.size.h, { maximumFractionDigits: 2 })} · {t.viewBox}: {ok.viewBox ?? t.none}
+                {formatBytes(locale, before)} → {formatBytes(locale, after)} · {t.size} {formatNumber(locale, ok.size.w, { maximumFractionDigits: 2 })}×
+                {formatNumber(locale, ok.size.h, { maximumFractionDigits: 2 })} · {t.viewBox}: {ok.viewBox ?? t.none}
               </p>
             </div>
             <Button variant="primary" size="lg" onClick={() => downloadText(ok.output, `${name}.min.svg`, "image/svg+xml")}>
@@ -218,7 +247,13 @@ export default function Svg({ locale }: { locale: Locale }) {
             </span>
             <NumberField label={t.width} value={width} onChange={setWidth} min={8} max={16384} suffix="px" placeholder={String(outW)} className="w-36" />
             <Field label={t.format}>
-              <Segmented label={t.format} value={fmt} onChange={setFmt} options={(["png", "jpg", "webp"] as const).map((f) => ({ value: f, label: f.toUpperCase() }))} />
+              <Segmented
+                wrap
+                label={t.format}
+                value={fmt}
+                onChange={setFmt}
+                options={(["png", "jpg", "webp"] as const).map((f) => ({ value: f, label: f.toUpperCase() }))}
+              />
             </Field>
             <Button variant="secondary" onClick={exportImage} disabled={busy}>
               {busy ? <Loader2 className="animate-spin" aria-hidden /> : <Download aria-hidden />}
@@ -232,9 +267,21 @@ export default function Svg({ locale }: { locale: Locale }) {
                 <FileCode className="size-4" aria-hidden />
                 {t.code}
               </label>
-              <CopyButton value={ok.output} variant="ghost" label={locale === "ru" ? "Копировать" : "Copy"} copiedLabel={locale === "ru" ? "Скопировано" : "Copied"} />
+              <CopyButton
+                value={ok.output}
+                variant="ghost"
+                label={locale === "ru" ? "Копировать" : "Copy"}
+                copiedLabel={locale === "ru" ? "Скопировано" : "Copied"}
+              />
             </div>
-            <textarea id={`${id}-code`} readOnly value={ok.output.length > 200_000 ? `${ok.output.slice(0, 200_000)}…` : ok.output} rows={8} spellCheck={false} className="block w-full resize-y bg-transparent px-3 py-2.5 font-mono text-xs leading-relaxed text-fg-2 focus:outline-none" />
+            <textarea
+              id={`${id}-code`}
+              readOnly
+              value={ok.output.length > 200_000 ? `${ok.output.slice(0, 200_000)}…` : ok.output}
+              rows={8}
+              spellCheck={false}
+              className="block w-full resize-y bg-transparent px-3 py-2.5 font-mono text-xs leading-relaxed text-fg-2 focus:outline-none"
+            />
           </div>
         </>
       )}

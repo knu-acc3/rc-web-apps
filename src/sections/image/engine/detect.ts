@@ -3,21 +3,7 @@
  * extension or the declared MIME type.
  */
 
-export type SniffedFormat =
-  | "jpg"
-  | "png"
-  | "gif"
-  | "webp"
-  | "avif"
-  | "heic"
-  | "bmp"
-  | "ico"
-  | "cur"
-  | "tiff"
-  | "svg"
-  | "jxl"
-  | "psd"
-  | "pdf";
+export type SniffedFormat = "jpg" | "png" | "gif" | "webp" | "avif" | "heic" | "bmp" | "ico" | "cur" | "tiff" | "svg" | "jxl" | "psd" | "pdf";
 
 export interface FormatMeta {
   mime: string;
@@ -169,5 +155,4 @@ export function isAnimated(b: Uint8Array, format: SniffedFormat | null): boolean
 export const DECODABLE = new Set<SniffedFormat>(["jpg", "png", "gif", "webp", "avif", "heic", "bmp", "ico", "cur", "tiff", "svg"]);
 
 /** `accept` attribute for image inputs (HEIC/TIFF often have no MIME on Windows). */
-export const IMAGE_ACCEPT =
-  "image/*,.heic,.heif,.avif,.tif,.tiff,.jfif,.pjpeg,.pjp,.ico,.cur,.bmp,.svg,.webp";
+export const IMAGE_ACCEPT = "image/*,.heic,.heif,.avif,.tif,.tiff,.jfif,.pjpeg,.pjp,.ico,.cur,.bmp,.svg,.webp";

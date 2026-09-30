@@ -132,49 +132,44 @@ export function RectEditor({
           <div className={cn("absolute shadow-[0_0_0_9999px_rgb(0_0_0/0.5)]", round)} style={style} />
         </div>
       )}
-    <div className="absolute" style={style}>
-      <div
-        role="button"
-        tabIndex={0}
-        aria-label={`${label ?? n.body}: ${Math.round(rect.w)}×${Math.round(rect.h)}. ${n.help}`}
-        aria-pressed={active}
-        onPointerDown={(e) => begin("move", e)}
-        onPointerMove={move}
-        onPointerUp={end}
-        onPointerCancel={end}
-        onKeyDown={(e) => onKey("move", e)}
-        onFocus={onActivate}
-        className={cn(
-          "absolute inset-0 cursor-move touch-none border-2 outline-offset-4",
-          border,
-          round,
-          "shadow-[0_0_0_1px_rgb(0_0_0/0.4)]",
-        )}
-      >
-        {thirds && active && (
-          <div aria-hidden className={cn("pointer-events-none absolute inset-0 overflow-hidden", round)}>
-            <div className="absolute inset-y-0 left-1/3 w-px bg-white/50" />
-            <div className="absolute inset-y-0 left-2/3 w-px bg-white/50" />
-            <div className="absolute inset-x-0 top-1/3 h-px bg-white/50" />
-            <div className="absolute inset-x-0 top-2/3 h-px bg-white/50" />
-          </div>
-        )}
+      <div className="absolute" style={style}>
+        <div
+          role="button"
+          tabIndex={0}
+          aria-label={`${label ?? n.body}: ${Math.round(rect.w)}×${Math.round(rect.h)}. ${n.help}`}
+          aria-pressed={active}
+          onPointerDown={(e) => begin("move", e)}
+          onPointerMove={move}
+          onPointerUp={end}
+          onPointerCancel={end}
+          onKeyDown={(e) => onKey("move", e)}
+          onFocus={onActivate}
+          className={cn("absolute inset-0 cursor-move touch-none border-2 outline-offset-4", border, round, "shadow-[0_0_0_1px_rgb(0_0_0/0.4)]")}
+        >
+          {thirds && active && (
+            <div aria-hidden className={cn("pointer-events-none absolute inset-0 overflow-hidden", round)}>
+              <div className="absolute inset-y-0 left-1/3 w-px bg-white/50" />
+              <div className="absolute inset-y-0 left-2/3 w-px bg-white/50" />
+              <div className="absolute inset-x-0 top-1/3 h-px bg-white/50" />
+              <div className="absolute inset-x-0 top-2/3 h-px bg-white/50" />
+            </div>
+          )}
+        </div>
+        {active &&
+          HANDLES.filter((h) => !aspect || h.length === 2).map((h) => (
+            <button
+              key={h}
+              type="button"
+              aria-label={`${n[h]}. ${n.help}`}
+              onPointerDown={(e) => begin(h, e)}
+              onPointerMove={move}
+              onPointerUp={end}
+              onPointerCancel={end}
+              onKeyDown={(e) => onKey(h, e)}
+              className={cn("absolute z-10 size-4 touch-none rounded-[3px] border border-black/40 bg-white", POS[h])}
+            />
+          ))}
       </div>
-      {active &&
-        HANDLES.filter((h) => !aspect || h.length === 2).map((h) => (
-          <button
-            key={h}
-            type="button"
-            aria-label={`${n[h]}. ${n.help}`}
-            onPointerDown={(e) => begin(h, e)}
-            onPointerMove={move}
-            onPointerUp={end}
-            onPointerCancel={end}
-            onKeyDown={(e) => onKey(h, e)}
-            className={cn("absolute z-10 size-4 touch-none rounded-[3px] border border-black/40 bg-white", POS[h])}
-          />
-        ))}
-    </div>
     </>
   );
 }

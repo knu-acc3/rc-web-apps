@@ -1,6 +1,6 @@
 "use client";
 
-import { Download, Loader2 } from "lucide-react";
+import { Download, Loader2, Settings2 } from "lucide-react";
 import { useEffect, useId, useMemo, useRef, useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { formatBytes } from "@/i18n/format";
@@ -64,7 +64,14 @@ const RATIOS = [
 ] as const;
 const WIDTHS = [1080, 1600, 2048];
 
-function drawCollage(ctx: CanvasRenderingContext2D, W: number, H: number, layout: Layout, items: ListImage[], o: { gap: number; pad: number; radius: number; bg: string }) {
+function drawCollage(
+  ctx: CanvasRenderingContext2D,
+  W: number,
+  H: number,
+  layout: Layout,
+  items: ListImage[],
+  o: { gap: number; pad: number; radius: number; bg: string },
+) {
   const unit = Math.min(W, H) / 100;
   ctx.fillStyle = o.bg;
   ctx.fillRect(0, 0, W, H);
@@ -182,7 +189,10 @@ export default function Collage({ locale }: { locale: Locale }) {
                   aria-label={t.layoutN(i + 1)}
                   title={t.layoutN(i + 1)}
                   onClick={() => setLayoutId(l.id)}
-                  className={cn("flex size-10 items-center justify-center rounded-[8px] border", l === layout ? "border-accent bg-accent-soft text-accent" : "border-line text-fg-3 hover:text-fg")}
+                  className={cn(
+                    "flex size-10 items-center justify-center rounded-[8px] border",
+                    l === layout ? "border-accent bg-accent-soft text-accent" : "border-line text-fg-3 hover:text-fg",
+                  )}
                 >
                   <LayoutIcon layout={l} />
                 </button>
@@ -190,14 +200,17 @@ export default function Collage({ locale }: { locale: Locale }) {
             </div>
           </div>
           <Field label={t.ratio}>
-            <Segmented label={t.ratio} value={ratio} onChange={setRatio} options={RATIOS.map((x) => ({ value: x.value, label: x.value }))} />
+            <Segmented wrap label={t.ratio} value={ratio} onChange={setRatio} options={RATIOS.map((x) => ({ value: x.value, label: x.value }))} />
           </Field>
           <div className="w-40">
             <RangeField label={t.gap} value={gap} onChange={setGap} min={0} max={8} step={0.5} unit="%" locale={locale} />
           </div>
         </div>
         <details className="border-t border-line">
-          <summary className="cursor-pointer px-4 py-2.5 text-sm text-fg-2 hover:text-fg">{locale === "ru" ? "Дополнительно" : "More options"}</summary>
+          <summary className="flex cursor-pointer items-center gap-2 px-4 py-2.5 text-sm text-fg-2 hover:text-fg">
+            <Settings2 className="size-4" aria-hidden />
+            {locale === "ru" ? "Дополнительно" : "More options"}
+          </summary>
           <div className="grid gap-4 px-4 pb-4 pt-1 sm:grid-cols-2">
             <RangeField label={t.pad} value={pad} onChange={setPad} min={0} max={10} step={0.5} unit="%" locale={locale} />
             <RangeField label={t.radius} value={radius} onChange={setRadius} min={0} max={100} unit="%" locale={locale} />

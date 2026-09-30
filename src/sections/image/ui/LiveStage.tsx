@@ -128,7 +128,12 @@ export function LiveStage({
         ) : !bitmap ? (
           <Loader2 className="size-6 animate-spin text-accent" aria-hidden />
         ) : null}
-        <canvas ref={canvasRef} role="img" aria-label={showOrig ? t.original : t.preview} className={cn("block max-h-[62vh] max-w-full object-contain", !bitmap && "hidden")} />
+        <canvas
+          ref={canvasRef}
+          role="img"
+          aria-label={showOrig ? t.original : t.preview}
+          className={cn("block max-h-[62vh] max-w-full object-contain", !bitmap && "hidden")}
+        />
       </div>
       {bitmap && (
         <Button
