@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { isCancelled, WorkerClient } from "./worker-client";
 
 /**
@@ -67,6 +67,46 @@ export function useLiveTask<R>(key: unknown, task: (() => Promise<R>) | null, de
     pending: hasTask && !current,
     stale: state?.ok ? state.value : undefined,
   };
+}
+
+const noopSubscribe = () => () => {};
+
+/** false during SSR and hydration, true afterwards (no setState in effects). */
+export function useHydrated(): boolean {
+  return useSyncExternalStore(
+    noopSubscribe,
+    () => true,
+    () => false,
+  );
+}
+
+/* One shared 1-second clock for all components that need "now". */
+const clock: { now: number; subs: Set<() => void>; timer: ReturnType<typeof setInterval> | null } = { now: 0, subs: new Set(), timer: null };
+function subscribeClock(cb: () => void) {
+  clock.subs.add(cb);
+  if (!clock.timer) {
+    clock.now = Date.now();
+    clock.timer = setInterval(() => {
+      clock.now = Date.now();
+      clock.subs.forEach((f) => f());
+    }, 1000);
+  }
+  return () => {
+    clock.subs.delete(cb);
+    if (clock.subs.size === 0 && clock.timer) {
+      clearInterval(clock.timer);
+      clock.timer = null;
+    }
+  };
+}
+function clockSnapshot() {
+  if (!clock.now) clock.now = Date.now();
+  return clock.now;
+}
+
+/** Current time in ms, updated every second; null on the server and during hydration. */
+export function useNow(): number | null {
+  return useSyncExternalStore<number | null>(subscribeClock, clockSnapshot, () => null);
 }
 
 /** Debounce a fast-changing value (e.g. textarea text) for cheap-but-not-free main-thread work. */
