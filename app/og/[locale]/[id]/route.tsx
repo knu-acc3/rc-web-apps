@@ -19,7 +19,7 @@ function loadFonts() {
     const dir = join(process.cwd(), "src", "assets", "og");
     fonts = Promise.all(
       (["latin", "cyrillic"] as const).flatMap((subset) =>
-        ([400, 700] as const).map(async (weight) => ({ name: "Onest", weight, data: await readFile(join(dir, `onest-${subset}-${weight}.woff`)) })),
+        ([400, 700] as const).map(async (weight) => ({ name: subset === "latin" ? "Onest" : "OnestCyr", weight, data: await readFile(join(dir, `onest-${subset}-${weight}.woff`)) })),
       ),
     );
   }
@@ -35,7 +35,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ locale:
 
   return new ImageResponse(
     (
-      <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", justifyContent: "space-between", background: "#F6F6F3", padding: "72px 80px", fontFamily: "Onest" }}>
+      <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", justifyContent: "space-between", background: "#F6F6F3", padding: "72px 80px", fontFamily: "Onest, OnestCyr" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
           <div style={{ width: 72, height: 72, borderRadius: 18, background: BRAND.color, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 30, fontWeight: 700 }}>
             {BRAND_MARK}
