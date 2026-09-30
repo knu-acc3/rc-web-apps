@@ -54,7 +54,7 @@ export default function FormatterTool({ locale, lang, dialect, sample: preset }:
     <div className="flex flex-col gap-4">
       <div className="grid gap-4 lg:grid-cols-2">
         <CodeEditor id={editorId} locale={locale} label={`${t.input}: ${meta.label}`} value={text} onChange={setText} rows={18} sample={sample} fileAccept={`.${meta.ext},.txt`} invalid={!!fail} />
-        <CodeOutput value={fail ? "" : (res?.output ?? "")} title={`${t.result}: ${meta.label}`} filename={`formatted.${meta.ext}`} mime={meta.mime} labels={outputLabels(locale)} minRows={18} className={live.pending ? "opacity-70" : undefined} />
+        <CodeOutput value={fail ? "" : (res?.output ?? "")} title={`${t.result}: ${meta.label}`} filename={`formatted.${meta.ext}`} mime={meta.mime} labels={outputLabels(locale)} minRows={18} className={live.pending ? "[&>textarea]:text-fg-3" : undefined} />
       </div>
 
       {fail && <ErrorBox locale={locale} fail={fail} text={text} editorId={editorId} />}

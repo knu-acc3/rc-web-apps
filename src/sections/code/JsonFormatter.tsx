@@ -60,7 +60,7 @@ export default function JsonFormatter({ locale, indent: initialIndent = "2" }: J
       <div className="grid gap-4 lg:grid-cols-2">
         <CodeEditor id={editorId} locale={locale} label={`${t.input}: JSON`} value={text} onChange={setText} rows={18} sample={SAMPLES.json} fileAccept=".json,.txt,application/json" invalid={!!fail} />
         {view === "text" ? (
-          <CodeOutput value={output} title={t.result} filename="formatted.json" mime="application/json" labels={outputLabels(locale)} minRows={18} className={live.pending ? "opacity-70" : undefined} />
+          <CodeOutput value={output} title={t.result} filename="formatted.json" mime="application/json" labels={outputLabels(locale)} minRows={18} className={live.pending ? "[&>textarea]:text-fg-3" : undefined} />
         ) : (
           <div className="flex min-w-0 flex-col overflow-hidden rounded-[12px] border border-line bg-surface">
             <div className="flex min-h-11 items-center justify-between gap-2 border-b border-line px-3 py-1.5">

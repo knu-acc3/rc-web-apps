@@ -327,7 +327,7 @@ function MediaConverterInner({ locale, kind, to, targets }: MediaConverterProps)
                 {done.length > 1 && (
                   <Button size="sm" variant="ghost" onClick={zipAll}>
                     <FileArchive aria-hidden />
-                    <span className="hidden sm:inline">{t.zip}</span>
+                    <span className="max-sm:sr-only">{t.zip}</span>
                   </Button>
                 )}
                 {done.length > 0 && !busy && (
@@ -393,7 +393,7 @@ function QueueRow({
         {item.status === "done" && item.result ? (
           <Button size="sm" variant="ghost" className="text-accent" onClick={() => downloadBlob(item.result!.blob, item.name)}>
             <Download aria-hidden />
-            <span className="hidden sm:inline">{u.download}</span>
+            <span className="max-sm:sr-only">{u.download}</span>
           </Button>
         ) : running ? (
           <Button size="sm" variant="ghost" onClick={onCancel}>

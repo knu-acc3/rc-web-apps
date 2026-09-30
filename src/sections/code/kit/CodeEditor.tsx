@@ -79,8 +79,7 @@ export function CodeEditor({
             <>
               <button type="button" className={buttonClass("ghost", "sm")} onClick={() => fileRef.current?.click()}>
                 <FolderOpen aria-hidden />
-                <span className="hidden sm:inline">{t.openFile}</span>
-                <span className="sr-only sm:hidden">{t.openFile}</span>
+                <span className="max-sm:sr-only">{t.openFile}</span>
               </button>
               <input
                 ref={fileRef}
@@ -105,15 +104,13 @@ export function CodeEditor({
           {editable && sample !== undefined && (
             <button type="button" className={buttonClass("ghost", "sm")} onClick={() => onChange?.(sample)}>
               <FileText aria-hidden />
-              <span className="hidden sm:inline">{t.sample}</span>
-              <span className="sr-only sm:hidden">{t.sample}</span>
+              <span className="max-sm:sr-only">{t.sample}</span>
             </button>
           )}
           {editable && (
             <button type="button" className={buttonClass("ghost", "sm")} onClick={() => onChange?.("")} disabled={!value}>
               <Eraser aria-hidden />
-              <span className="hidden sm:inline">{t.clear}</span>
-              <span className="sr-only sm:hidden">{t.clear}</span>
+              <span className="max-sm:sr-only">{t.clear}</span>
             </button>
           )}
         </div>

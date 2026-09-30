@@ -260,7 +260,7 @@ export default function MarkdownEditor({ locale }: { locale: Locale }) {
         <FileOpenButton locale={locale} accept=".md,.markdown,.txt,text/markdown,text/plain" onText={(v) => setText(v)} />
         <button type="button" className={buttonClass("ghost", "sm")} onClick={() => writeKey(KEY, null)} disabled={stored === null}>
           <RotateCcw aria-hidden />
-          <span className="hidden sm:inline">{t.reset}</span>
+          <span className="max-sm:sr-only">{t.reset}</span>
         </button>
         <button type="button" className={buttonClass("ghost", "sm")} onClick={() => downloadText(text, `${title.slice(0, 60) || "document"}.md`, "text/markdown;charset=utf-8")}>
           <Download aria-hidden />

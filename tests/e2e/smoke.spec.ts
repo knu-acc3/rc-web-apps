@@ -1,8 +1,19 @@
 import { expect, test } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 
-/** One representative page per section (+ home). Kept in sync with the registry by the unit tests. */
-const PAGES = ["/ru", "/en", "/ru/convert", "/ru/convert/length", "/ru/convert/kilometers-to-miles", "/en/convert/celsius-to-fahrenheit", "/ru/about/privacy"];
+/** One representative page per section (tools, variants, catalogues) + home and static pages. */
+const SAMPLE = [
+  "pdf", "merge-pdf", "compress-image", "resize-image/instagram-post", "video-converter", "audio-converter", "metronome/120-bpm",
+  "create-zip", "word-counter", "font-generator", "notes", "emoji", "emoji/red-heart", "symbols", "symbols/hearts", "kaomoji",
+  "time/almaty", "world-clock", "timer/5-minutes", "stopwatch", "countdown/new-year", "calendar", "age-calculator",
+  "percentage-calculator", "finance", "mortgage-calculator", "bmi-calculator", "roman-numerals", "number-to-words",
+  "convert", "convert/length", "convert/kilometers-to-miles", "paper-sizes/a4", "actual-size", "random", "spin-the-wheel",
+  "color", "color-picker", "css", "box-shadow-generator", "json-formatter", "json-to-csv", "regex", "cron", "base64-encode",
+  "hash-generator", "uuid-generator", "jwt-decoder", "http-status", "http-status/404", "mime", "port", "password-generator",
+  "qr-code-generator", "iban-validator", "subnet-calculator", "meta-tag-generator", "microphone-test", "keyboard-test",
+  "what-is-my-browser", "about/privacy",
+];
+const PAGES = ["/ru", "/en", ...SAMPLE.map((p) => `/ru/${p}`), "/en/convert/celsius-to-fahrenheit", "/en/merge-pdf", "/en/emoji"];
 
 for (const path of PAGES) {
   test(`renders ${path}`, async ({ page }) => {
@@ -33,9 +44,33 @@ test("search palette finds a page", async ({ page, isMobile }) => {
   await expect(page.getByRole("option").first()).toBeVisible();
 });
 
-test("home has no critical accessibility violations", async ({ page }) => {
-  await page.goto("/ru");
-  const results = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa"]).analyze();
-  const serious = results.violations.filter((v) => v.impact === "critical" || v.impact === "serious");
-  expect(serious.map((v) => `${v.id}: ${v.nodes.length}`)).toEqual([]);
+const AXE_PAGES = ["/ru", "/ru/merge-pdf", "/ru/word-counter", "/ru/emoji", "/ru/timer/5-minutes", "/ru/percentage-calculator", "/ru/color-picker", "/ru/json-formatter", "/ru/password-generator", "/ru/microphone-test", "/ru/convert/kilometers-to-miles", "/ru/spin-the-wheel"];
+for (const path of AXE_PAGES) {
+  test(`no serious accessibility violations on ${path}`, async ({ page }) => {
+    await page.goto(path);
+    const results = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa"]).analyze();
+    const serious = results.violations.filter((v) => v.impact === "critical" || v.impact === "serious");
+    expect(serious.map((v) => `${v.id}: ${v.nodes.map((n) => n.target.join(" ")).slice(0, 3).join(" | ")}`)).toEqual([]);
+  });
+}
+
+test("legacy URLs redirect permanently", async ({ request }) => {
+  for (const [from, to] of [
+    ["/ru/tools/merge-pdf", "/ru/merge-pdf"],
+    ["/en/tools/percentage-calc", "/en/percentage-calculator"],
+    ["/ru/time-now/kz-almaty", "/ru/time/almaty"],
+    ["/ru/timer/countdown-5m", "/ru/timer/5-minutes"],
+    ["/tools/word-counter", "/ru/word-counter"],
+    ["/ru/privacy", "/ru/about/privacy"],
+  ]) {
+    const res = await request.get(from, { maxRedirects: 0 });
+    expect(res.status(), from).toBe(301);
+    expect(new URL(res.headers()["location"], "http://x").pathname, from).toBe(to);
+  }
+});
+
+test("unknown pages return 404", async ({ request }) => {
+  for (const path of ["/ru/no-such-tool", "/ru/merge-pdf/nope", "/xx/merge-pdf", "/ru/emoji/no-such-emoji"]) {
+    expect((await request.get(path)).status(), path).toBe(404);
+  }
 });

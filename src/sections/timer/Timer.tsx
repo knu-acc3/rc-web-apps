@@ -241,7 +241,7 @@ export default function Timer({ locale, seconds = 300 }: TimerProps) {
           )}
           <Button variant="secondary" size="lg" onClick={addMinute} aria-label={t.add} title={t.add}>
             <Plus aria-hidden />
-            <span className="hidden sm:inline">1</span>
+            <span className="max-sm:sr-only">1</span>
           </Button>
           <Button variant="ghost" size="lg" onClick={reset} disabled={status === "idle"} aria-label={t.reset} title={t.reset}>
             <RotateCcw aria-hidden />

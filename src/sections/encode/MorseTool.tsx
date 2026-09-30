@@ -120,7 +120,7 @@ export default function MorseTool({ locale, dir: dir0 = "encode", sample }: { lo
           <div className="flex items-center gap-1">
             <Button variant="ghost" size="sm" onClick={swap} disabled={!res.text} title={t.swap}>
               <ArrowUpDown aria-hidden />
-              <span className="hidden sm:inline">{t.swap}</span>
+              <span className="max-sm:sr-only">{t.swap}</span>
             </Button>
             <Button variant="ghost" size="sm" onClick={wav} disabled={!code.trim()}>
               <Download aria-hidden />

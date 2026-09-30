@@ -311,13 +311,13 @@ export default function Codec({ locale, codec, dir: dir0, samples, outputs, opti
             {codec !== "rot" && codec !== "atbash" && (
               <Button variant="ghost" size="sm" onClick={swap} disabled={!out} title={t.swap}>
                 <ArrowUpDown aria-hidden />
-                <span className="hidden sm:inline">{t.swap}</span>
+                <span className="max-sm:sr-only">{t.swap}</span>
               </Button>
             )}
             {out.length > 2000 && (
               <Button variant="ghost" size="sm" onClick={() => downloadText(out, `${codec}-${dir}.txt`)}>
                 <Download aria-hidden />
-                <span className="hidden sm:inline">{t.download}</span>
+                <span className="max-sm:sr-only">{t.download}</span>
               </Button>
             )}
             <CopyButton value={out} label={KIT_T[locale].copy} copiedLabel={KIT_T[locale].copied} variant="outline" />

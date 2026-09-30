@@ -233,7 +233,7 @@ export default function TypingTest({ locale, seconds = 60 }: { locale: Locale; s
             <span>
               <span className="font-semibold text-fg">{showLive ? nf(live.cpm) : "—"}</span> {t.cpm}
             </span>
-            <span className="hidden sm:inline">
+            <span className="max-sm:sr-only">
               <span className="font-semibold text-fg">{showLive ? nf(live.wpm) : "—"}</span> {t.wpm}
             </span>
             <span>

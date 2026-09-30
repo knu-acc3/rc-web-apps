@@ -233,7 +233,7 @@ function PagesBody({ locale, mode, angle0, file, job, onClear }: { locale: Local
         </Button>
         <Button size="sm" variant="ghost" disabled={!selected.size} onClick={() => setPages(pages.flatMap((p) => (selected.has(p.key) ? [p, { ...p, key: `${p.index}:d${++dup.current}` }] : [p])))}>
           <Copy aria-hidden />
-          <span className="hidden sm:inline">{t.duplicate}</span>
+          <span className="max-sm:sr-only">{t.duplicate}</span>
         </Button>
         <Button
           size="sm"
@@ -245,11 +245,11 @@ function PagesBody({ locale, mode, angle0, file, job, onClear }: { locale: Local
           }}
         >
           <Trash2 aria-hidden />
-          <span className="hidden sm:inline">{s.deletePage}</span>
+          <span className="max-sm:sr-only">{s.deletePage}</span>
         </Button>
         <Button size="sm" variant="ghost" onClick={() => setPages(pages.slice().reverse())}>
           <ArrowDownUp aria-hidden />
-          <span className="hidden sm:inline">{t.reverse}</span>
+          <span className="max-sm:sr-only">{t.reverse}</span>
         </Button>
         <Button size="sm" variant="ghost" onClick={() => setSelected(selected.size ? new Set() : new Set(pages.map((p) => p.key)))}>
           {selected.size ? s.selectNone : t.selectAll}

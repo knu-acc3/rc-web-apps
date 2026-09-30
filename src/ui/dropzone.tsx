@@ -107,11 +107,11 @@ export function Dropzone({
       </span>
       {hint && <span className="text-sm text-fg-3">{hint}</span>}
       {children}
+      {/* Hidden (not sr-only): the zone itself is the control; .click() still opens the picker. */}
       <input
         ref={inputRef}
         type="file"
-        className="sr-only"
-        tabIndex={-1}
+        hidden
         accept={accept}
         multiple={multiple}
         onChange={(e) => {

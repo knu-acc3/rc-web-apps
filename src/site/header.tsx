@@ -23,7 +23,7 @@ export function Header({ locale }: { locale: Locale }) {
           aria-label={t.allTools}
         >
           <LayoutGrid aria-hidden />
-          <span className="hidden sm:inline">{t.allTools}</span>
+          <span className="max-sm:sr-only">{t.allTools}</span>
         </button>
         <div className="ml-auto flex items-center gap-1">
           <SearchButton

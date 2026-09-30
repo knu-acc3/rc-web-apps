@@ -203,7 +203,7 @@ export default function ToBase64({ locale }: { locale: Locale }) {
             <div className="flex gap-1">
               <Button variant="ghost" size="sm" onClick={() => downloadText(value, `${alt || "image"}-base64.txt`)}>
                 <Download aria-hidden />
-                <span className="hidden sm:inline">{t.download}</span>
+                <span className="max-sm:sr-only">{t.download}</span>
               </Button>
               <CopyButton value={() => value} label={t.copy} copiedLabel={t.copied} variant="primary" />
             </div>

@@ -143,7 +143,7 @@ export default function ColorPicker({ locale, initial = "#3B82F6" }: PickerProps
           <FormatList color={color} locale={locale} formats={["rgb", "hsl", "oklch", "hwb", "hsv", "cmyk", "lab", "lch", "oklab", "p3"]} />
           <p className="px-3 pt-1 pb-1.5 text-xs text-fg-3">
             {t.nearest}:{" "}
-            <Link href={href(locale, ["color", near.name])} className="text-accent hover:underline">
+            <Link href={href(locale, ["color", near.name])} className="text-accent underline underline-offset-2">
               {near.name}
             </Link>
             {near.distance < 1e-6 ? ` (${t.exact})` : ` (${near.hex})`}

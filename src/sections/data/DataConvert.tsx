@@ -184,7 +184,7 @@ export default function DataConvert({ locale, from, to, options = {}, reverse }:
     <div className="flex flex-col gap-4">
       <div className="grid gap-4 lg:grid-cols-2">
         <CodeEditor id={`${id}-in`} locale={locale} label={`${t.input}: ${inM.label}`} value={text} onChange={setText} rows={16} sample={SAMPLES[from]?.[locale]} fileAccept={`.${inM.ext},.txt,${inM.mime.split(";")[0]}`} invalid={!!err} />
-        <CodeOutput value={res?.output ?? ""} title={outM.label} filename={`data.${outM.ext}`} mime={outM.mime} labels={outputLabels(locale)} minRows={16} className={live.pending ? "opacity-70" : undefined} />
+        <CodeOutput value={res?.output ?? ""} title={outM.label} filename={`data.${outM.ext}`} mime={outM.mime} labels={outputLabels(locale)} minRows={16} className={live.pending ? "[&>textarea]:text-fg-3" : undefined} />
       </div>
 
       {err && (

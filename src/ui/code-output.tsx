@@ -41,7 +41,7 @@ export function CodeOutput({
               disabled={!value}
             >
               <Download aria-hidden />
-              <span className="hidden sm:inline">{labels.download}</span>
+              <span className="max-sm:sr-only">{labels.download}</span>
             </button>
           )}
           <CopyButton value={value} label={labels.copy} copiedLabel={labels.copied} variant="ghost" />

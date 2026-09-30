@@ -63,7 +63,7 @@ export function FileOpenButton({ locale, onText, accept = ".txt,.md,.csv,.html,.
     <>
       <button type="button" className={buttonClass("ghost", "sm")} onClick={() => ref.current?.click()}>
         <FileUp aria-hidden />
-        <span className="hidden sm:inline">{TX[locale].open}</span>
+        <span className="max-sm:sr-only">{TX[locale].open}</span>
       </button>
       <input
         ref={ref}
@@ -124,7 +124,7 @@ export function InputPanel({
           {allowFile && <FileOpenButton locale={locale} onText={(text) => onChange(text)} />}
           <button type="button" className={buttonClass("ghost", "sm")} onClick={() => onChange("")} disabled={!value} title={t.clear}>
             <Eraser aria-hidden />
-            <span className="hidden sm:inline">{t.clear}</span>
+            <span className="max-sm:sr-only">{t.clear}</span>
           </button>
         </div>
       </div>

@@ -125,7 +125,7 @@ function Encoder({ locale }: { locale: Locale }) {
           <div className="flex gap-1">
             <Button variant="ghost" size="sm" onClick={() => downloadText(output, `${file.name}.base64.txt`)} disabled={!output}>
               <Download aria-hidden />
-              <span className="hidden sm:inline">{t.download}</span>
+              <span className="max-sm:sr-only">{t.download}</span>
             </Button>
             <CopyButton value={() => output} label={t.copy} copiedLabel={t.copied} variant="primary" />
           </div>

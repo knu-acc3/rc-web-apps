@@ -168,7 +168,7 @@ export default function TextCompare({ locale }: { locale: Locale }) {
             mode === "lines" && res?.patch ? (
               <button type="button" className={buttonClass("ghost", "sm")} onClick={() => downloadText(res.patch, "changes.diff", "text/x-diff;charset=utf-8")}>
                 <Download aria-hidden />
-                <span className="hidden sm:inline">{t.patch}</span>
+                <span className="max-sm:sr-only">{t.patch}</span>
               </button>
             ) : null
           }

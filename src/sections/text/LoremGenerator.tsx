@@ -121,7 +121,7 @@ export default function LoremGenerator({ locale, lang: lang0 = "latin", unit: un
             <>
               <button type="button" className={buttonClass("ghost", "sm")} onClick={() => downloadText(text, html ? "lorem.html" : "lorem.txt")}>
                 <Download aria-hidden />
-                <span className="hidden sm:inline">{TX[locale].download}</span>
+                <span className="max-sm:sr-only">{TX[locale].download}</span>
               </button>
               <CopyButton value={text} label={TX[locale].copy} copiedLabel={TX[locale].copied} variant="primary" />
             </>
