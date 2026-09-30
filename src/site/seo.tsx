@@ -22,9 +22,15 @@ export function clampDescription(text: string, max = 160): string {
   return cut.slice(0, cut.lastIndexOf(" ")).replace(/[,;:.\-–—]+$/, "") + "…";
 }
 
+/** Static OG image generated per section (app/og/[locale]/[id]). */
+export function ogImage(locale: Locale, id: string) {
+  return { url: `${SITE_URL}/og/${locale}/${id}`, width: 1200, height: 630, type: "image/png" };
+}
+
 export function pageMetadata(page: PageModel, locale: Locale): Metadata {
   const url = absoluteUrl(locale, page.path);
   const description = clampDescription(page.description);
+  const image = ogImage(locale, page.sectionId);
   return {
     title: page.title,
     description,
@@ -38,8 +44,9 @@ export function pageMetadata(page: PageModel, locale: Locale): Metadata {
       siteName: BRAND.name,
       locale: OG_LOCALE[locale],
       alternateLocale: LOCALES.filter((l) => l !== locale).map((l) => OG_LOCALE[l]),
+      images: [image],
     },
-    twitter: { card: "summary_large_image", title: page.title, description },
+    twitter: { card: "summary_large_image", title: page.title, description, images: [image.url] },
   };
 }
 

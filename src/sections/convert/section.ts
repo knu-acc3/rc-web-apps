@@ -43,7 +43,7 @@ const sym = (u: UnitDef, locale: Locale) => u.sym[locale];
 const num = (n: number, locale: Locale) => formatSmart(locale, clean(n));
 const qty = (n: number, u: UnitDef, locale: Locale) => `${num(n, locale)} ${nameN(u, clean(n), locale)}`;
 /** RU symbol that is really a word (миля, фут, дюйм…) must be declined in prose. */
-const isWord = (u: UnitDef) => u.ru.f[0].toLowerCase().startsWith(u.sym.ru.toLowerCase());
+const isWord = (u: UnitDef) => u.ru.f[0].toLowerCase() === u.sym.ru.toLowerCase();
 /** "5 км" / "5 миль" / "5 mi" — short quantity for tables and facts. */
 const short = (n: number, u: UnitDef, locale: Locale) => (locale === "ru" && isWord(u) ? qty(n, u, locale) : `${num(n, locale)} ${sym(u, locale)}`);
 /** Unit as a noun in formulas: "км", "мили", "mi". */
