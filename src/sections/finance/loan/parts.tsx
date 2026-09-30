@@ -1,16 +1,14 @@
 "use client";
 
 import { Download } from "lucide-react";
-import type { ReactNode } from "react";
 import type { Locale } from "@/i18n/config";
 import { plural } from "@/i18n/format";
 import { downloadText } from "@/lib/clipboard";
 import { Button } from "@/ui/button";
-import { Panel } from "@/ui/panel";
-import { BarChart, Donut } from "../../calc/kit/charts";
+import { BarChart } from "../../calc/kit/charts";
 import { toCsv } from "../../calc/kit/csv";
-import { CURRENCY_SYMBOL, fmtCompact, fmtMoney, type Currency } from "../../calc/kit/fmt";
-import { DataTable } from "../../calc/kit/ui";
+import { CURRENCIES, CURRENCY_SYMBOL, fmtCompact, fmtMoney, type Currency } from "../../calc/kit/fmt";
+import { DataTable, InlineSelect, SubHeading } from "../../calc/kit/ui";
 import { yearlyTotals, type LoanResult, type LoanRow } from "../engines/loan";
 
 const T = {
@@ -23,13 +21,11 @@ const T = {
     extra: "Досрочно",
     balance: "Остаток",
     total: "Итого",
-    csv: "Скачать CSV",
+    csv: "CSV",
+    csvLong: "Скачать график в CSV",
     byYear: "Погашение по годам",
     byMonth: "Погашение по месяцам",
-    year: "Год",
-    structure: "Структура выплат",
-    loan: "Сумма кредита",
-    overpay: "Переплата",
+    currency: "Валюта",
     years: ["год", "года", "лет"],
     months: ["месяц", "месяца", "месяцев"],
   },
@@ -42,13 +38,11 @@ const T = {
     extra: "Extra",
     balance: "Balance",
     total: "Total",
-    csv: "Download CSV",
+    csv: "CSV",
+    csvLong: "Download the schedule as CSV",
     byYear: "Repayment by year",
     byMonth: "Repayment by month",
-    year: "Year",
-    structure: "What you pay",
-    loan: "Loan amount",
-    overpay: "Interest",
+    currency: "Currency",
     years: ["year", "years"],
     months: ["month", "months"],
   },
@@ -65,38 +59,23 @@ export function termText(locale: Locale, months: number): string {
   return parts.join(" ");
 }
 
+/** Currency label picker (label only — no exchange rates). */
+export function CurrencySelect({ id, locale, value, onChange }: { id: string; locale: Locale; value: Currency; onChange: (c: Currency) => void }) {
+  return <InlineSelect id={id} label={T[locale].currency} value={value} onChange={onChange} options={CURRENCIES.map((c) => ({ value: c, label: CURRENCY_SYMBOL[c] }))} />;
+}
+
 export interface ExtraColumn {
   label: string;
   values: number[];
 }
 
-/** Donut: principal vs interest (vs extra lines such as insurance). */
-export function LoanDonut({ locale, principal, interest, extra, cur }: { locale: Locale; principal: number; interest: number; extra?: { label: string; value: number }[]; cur: Currency }) {
-  const t = T[locale];
-  return (
-    <Panel className="p-4 sm:p-5">
-      <h2 className="mb-3 text-sm font-semibold text-fg">{t.structure}</h2>
-      <Donut
-        ariaLabel={t.structure}
-        format={(v) => fmtMoney(locale, v, cur, 0)}
-        parts={[
-          { label: t.loan, value: principal, tone: "accent" },
-          { label: t.overpay, value: interest, tone: "warn" },
-          ...(extra ?? []).map((e) => ({ label: e.label, value: e.value, tone: "muted" as const })),
-        ]}
-      />
-    </Panel>
-  );
-}
-
-/** Chart + full schedule table + CSV export. */
+/** Quiet chart + full schedule table + CSV export, shown below the calculator. */
 export function ScheduleView({
   locale,
   result,
   cur,
   extraCols = [],
   filename,
-  children,
 }: {
   locale: Locale;
   result: LoanResult;
@@ -104,7 +83,6 @@ export function ScheduleView({
   /** Additional per-month columns (e.g. insurance), same length as result.rows. */
   extraCols?: ExtraColumn[];
   filename: string;
-  children?: ReactNode;
 }) {
   const t = T[locale];
   const rows = result.rows;
@@ -146,8 +124,8 @@ export function ScheduleView({
 
   return (
     <>
-      <Panel className="p-4 sm:p-5">
-        <h2 className="mb-3 text-sm font-semibold text-fg">{byYear ? t.byYear : t.byMonth}</h2>
+      <section>
+        <SubHeading>{byYear ? t.byYear : t.byMonth}</SubHeading>
         <BarChart
           ariaLabel={byYear ? t.byYear : t.byMonth}
           labels={chartLabels}
@@ -157,17 +135,19 @@ export function ScheduleView({
           ]}
           yFormat={(v) => fmtCompact(locale, v)}
         />
-      </Panel>
-      {children}
-      <section className="flex flex-col gap-3">
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <h2 className="text-lg font-semibold text-fg">{t.schedule}</h2>
-          <Button variant="outline" size="sm" onClick={exportCsv}>
-            <Download aria-hidden />
-            {t.csv}
-          </Button>
-        </div>
-        <DataTable caption={t.schedule} head={head} rows={rows.map(cell)} foot={foot} maxHeight={480} />
+      </section>
+      <section>
+        <SubHeading
+          aside={
+            <Button variant="ghost" size="sm" onClick={exportCsv} title={t.csvLong} aria-label={t.csvLong}>
+              <Download aria-hidden />
+              {t.csv}
+            </Button>
+          }
+        >
+          {t.schedule}
+        </SubHeading>
+        <DataTable caption={t.schedule} head={head} rows={rows.map(cell)} foot={foot} maxHeight={440} />
       </section>
     </>
   );

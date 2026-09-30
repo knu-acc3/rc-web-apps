@@ -24,7 +24,7 @@ function table(locale: Locale): Block {
 }
 
 export const mortgageTool: ToolDef = {
-  slug: "mortgage",
+  slug: "mortgage-calculator",
   component: "finance/mortgage",
   icon: "House",
   popular: true,
@@ -84,6 +84,6 @@ export const mortgageTool: ToolDef = {
       { q: "How is insurance calculated?", a: "The annual insurance rate is applied to the balance at the start of each month, so insurance gets cheaper over time. Your insurer sets the exact method." },
     ],
   },
-  related: ["finance/loan", "finance/deposit", "finance/savings-goal", "finance/inflation", "calc/percent"],
+  related: ["loan-calculator", "deposit-calculator", "savings-goal-calculator", "inflation-calculator", "percentage-calculator"],
   blocks: (locale) => [table(locale)],
 };

@@ -342,7 +342,7 @@ function variants(): VariantDef[] {
 }
 
 export const percentTool: ToolDef = {
-  slug: "percent",
+  slug: "percentage-calculator",
   component: "calc/percent",
   icon: "Percent",
   popular: true,
@@ -402,6 +402,6 @@ export const percentTool: ToolDef = {
       { q: "What is the difference between percent and percentage points?", a: "Percentage points are the plain difference of two percentages: 12% to 16% is +4 pp, or +33.33% in relative terms." },
     ],
   },
-  related: ["finance/discount", "finance/vat", "finance/markup-margin", "calc/proportion", "calc/fractions"],
+  related: ["discount-calculator", "vat-calculator", "markup-margin-calculator", "proportion-calculator", "fraction-calculator"],
   variants: { title: { ru: "Виды расчёта процентов", en: "Percentage calculations" }, list: variants },
 };

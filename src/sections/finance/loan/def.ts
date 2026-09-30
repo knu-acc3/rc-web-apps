@@ -26,7 +26,7 @@ function rateTable(locale: Locale): Block {
 }
 
 export const loanTool: ToolDef = {
-  slug: "loan",
+  slug: "loan-calculator",
   component: "finance/loan",
   icon: "Landmark",
   popular: true,
@@ -118,6 +118,6 @@ export const loanTool: ToolDef = {
       },
     ],
   },
-  related: ["finance/mortgage", "finance/deposit", "finance/inflation", "calc/percent", "finance/salary-kz"],
+  related: ["mortgage-calculator", "deposit-calculator", "inflation-calculator", "percentage-calculator", "kazakhstan-salary-calculator"],
   blocks: (locale) => [rateTable(locale)],
 };

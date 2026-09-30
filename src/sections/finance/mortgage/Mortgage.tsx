@@ -3,13 +3,13 @@
 import { useId } from "react";
 import { Segmented } from "@/ui/segmented";
 import type { ToolProps } from "../../types";
-import { CURRENCIES, CURRENCY_NAME, CURRENCY_SYMBOL, fmtMoney, fmtPct, isCurrency, type Currency } from "../../calc/kit/fmt";
+import { CURRENCIES, CURRENCY_SYMBOL, fmtMoney, fmtPct, isCurrency, type Currency } from "../../calc/kit/fmt";
 import { roundTo } from "../../calc/kit/math";
 import { field, toInput } from "../../calc/kit/num";
-import { CalcGrid, Disclaimer, Explain, FieldRow, NumField, ResultMain, ResultRows, SelectField, Stack, ToolActions } from "../../calc/kit/ui";
+import { Advanced, CalcGrid, Disclaimer, Explain, FieldRow, InlineToggle, NumField, OptionsRow, ResultMain, Stack, ToolActions } from "../../calc/kit/ui";
 import { useQueryState } from "../../calc/kit/url-state";
 import { loanSchedule, type LoanType } from "../engines/loan";
-import { LoanDonut, ScheduleView, termText } from "../loan/parts";
+import { CurrencySelect, ScheduleView, termText } from "../loan/parts";
 
 const T = {
   ru: {
@@ -25,10 +25,10 @@ const T = {
     annuity: "Аннуитетный",
     diff: "Дифференцированный",
     currency: "Валюта (только подпись)",
-    extras: "Страховка и налог (необязательно)",
+    extras: "Страховка и налог на имущество",
     ins: "Страхование, % от остатка в год",
     tax: "Налог на имущество в год",
-    presets: "Примеры параметров",
+    presets: "Примеры параметров программ",
     presetsNote: "Ставки и условия программ меняются — уточняйте в банке. Примеры можно менять.",
     monthly: "Ежемесячный платёж",
     firstLast: "Первый → последний платёж",
@@ -65,10 +65,10 @@ const T = {
     annuity: "Annuity (fixed)",
     diff: "Differentiated",
     currency: "Currency (label only)",
-    extras: "Insurance and property tax (optional)",
+    extras: "Insurance and property tax",
     ins: "Insurance, % of balance per year",
     tax: "Property tax per year",
-    presets: "Example parameters",
+    presets: "Example programme parameters",
     presetsNote: "Programme rates and terms change — check with the bank. The examples are editable.",
     monthly: "Monthly payment",
     firstLast: "First → last payment",
@@ -165,6 +165,7 @@ export default function Mortgage({
         suffix={dm === "pct" ? "%" : sym}
         error={D.message ?? downErr}
         hint={downHint}
+        size="lg"
         aside={
           <Segmented
             size="sm"
@@ -213,9 +214,8 @@ export default function Mortgage({
           }
         />
       </FieldRow>
-      <div className="flex flex-col gap-1.5">
-        <span className="text-sm font-medium text-fg-2">{t.type}</span>
-        <Segmented
+      <OptionsRow>
+        <InlineToggle
           label={t.type}
           value={q.v.k as LoanType}
           onChange={(k) => q.set({ k })}
@@ -224,19 +224,16 @@ export default function Mortgage({
             { value: "diff", label: t.diff },
           ]}
         />
-      </div>
-      <details className="rounded-[10px] border border-line px-3 py-2" open={insRate > 0 || taxYear > 0 || undefined}>
-        <summary className="cursor-pointer py-1 text-sm font-semibold text-fg">{t.extras}</summary>
-        <div className="mt-2 flex flex-col gap-3 pb-1">
-          <FieldRow>
-            <NumField id={`${id}-i`} label={t.ins} value={q.v.i} onChange={(i) => q.set({ i })} suffix="%" error={I.message} placeholder="0" />
-            <NumField id={`${id}-tx`} label={t.tax} value={q.v.tx} onChange={(tx) => q.set({ tx })} suffix={sym} error={TX.message} placeholder="0" />
-          </FieldRow>
-        </div>
-      </details>
-      <div className="flex flex-col gap-2">
-        <span className="text-sm font-medium text-fg-2">{t.presets}</span>
-        <div className="flex flex-wrap gap-2">
+        <CurrencySelect id={`${id}-c`} locale={locale} value={cur} onChange={(c) => q.set({ c })} />
+      </OptionsRow>
+      <Advanced title={t.extras} open={insRate > 0 || taxYear > 0}>
+        <FieldRow>
+          <NumField id={`${id}-i`} label={t.ins} value={q.v.i} onChange={(i) => q.set({ i })} suffix="%" error={I.message} placeholder="0" />
+          <NumField id={`${id}-tx`} label={t.tax} value={q.v.tx} onChange={(tx) => q.set({ tx })} suffix={sym} error={TX.message} placeholder="0" />
+        </FieldRow>
+      </Advanced>
+      <Advanced title={t.presets}>
+        <ul className="flex flex-col gap-1">
           {(
             [
               [t.p7, t.p7h, 7, 20, 25],
@@ -244,16 +241,16 @@ export default function Mortgage({
               [t.pFamily, t.pFamilyH, 6, 20, 30],
             ] as const
           ).map(([label, hint, r, d, y]) => (
-            <button key={label} type="button" className="chip h-auto! flex-col items-start! gap-0! py-1.5 text-left" onClick={() => applyPreset(r, d, y)}>
-              <span className="text-sm font-medium">{label}</span>
-              <span className="text-[12px] text-fg-3">{hint}</span>
-            </button>
+            <li key={label}>
+              <button type="button" className="text-left text-sm text-accent hover:underline" onClick={() => applyPreset(r, d, y)}>
+                {label}
+              </button>
+              <span className="text-[13px] text-fg-3"> — {hint}</span>
+            </li>
           ))}
-        </div>
+        </ul>
         <p className="text-[13px] text-fg-3">{t.presetsNote}</p>
-      </div>
-      <SelectField id={`${id}-c`} label={t.currency} value={cur} onChange={(c) => q.set({ c })} options={CURRENCIES.map((c) => ({ value: c, label: CURRENCY_NAME[locale][c] }))} size="sm" />
-      <ToolActions locale={locale} onReset={q.reset} shareUrl={q.shareUrl} />
+      </Advanced>
     </>
   );
 
@@ -261,36 +258,29 @@ export default function Mortgage({
   const mainValue = res ? (q.v.k === "annuity" ? money(res.firstPayment) : `${money(res.firstPayment)} → ${money(res.lastPayment)}`) : "—";
   const mainSub = !res ? (downErr ?? t.enter) : extraCols.length ? t.withExtras(money(firstTotal)) : `${t.loan}: ${money(principal ?? 0, 0)}`;
 
-  const results = (
-    <>
-      <ResultMain label={q.v.k === "annuity" ? t.monthly : t.firstLast} value={mainValue} sub={mainSub} />
-      {res && principal !== null && downAmount !== null && (
-        <ResultRows
-          rows={[
-            { label: t.loan, value: money(principal) },
-            { label: t.overpay, value: money(res.totalInterest), strong: true },
-            ...(insRate > 0 ? [{ label: t.insTotal, value: money(insTotal) }] : []),
-            ...(taxYear > 0 ? [{ label: t.taxTotal, value: money(taxTotal) }] : []),
-            { label: t.totalCost, hint: t.totalCostHint, value: money(roundTo(downAmount + res.totalPaid + insTotal + taxTotal, 2)) },
-            { label: t.termIs, value: termText(locale, res.months) },
-          ]}
-        />
-      )}
-      {res && principal !== null && (
-        <LoanDonut
-          locale={locale}
-          principal={principal}
-          interest={res.totalInterest}
-          cur={cur}
-          extra={[...(insRate > 0 ? [{ label: t.insurance, value: insTotal }] : []), ...(taxYear > 0 ? [{ label: t.taxCol, value: taxTotal }] : [])]}
-        />
-      )}
-    </>
+  const result = (
+    <ResultMain
+      label={q.v.k === "annuity" ? t.monthly : t.firstLast}
+      value={mainValue}
+      sub={mainSub}
+      rows={
+        res && principal !== null && downAmount !== null
+          ? [
+              { label: t.overpay, value: money(res.totalInterest) },
+              ...(insRate > 0 ? [{ label: t.insTotal, value: money(insTotal) }] : []),
+              ...(taxYear > 0 ? [{ label: t.taxTotal, value: money(taxTotal) }] : []),
+              { label: t.totalCost, hint: t.totalCostHint, value: money(roundTo(downAmount + res.totalPaid + insTotal + taxTotal, 2)) },
+              { label: t.termIs, value: termText(locale, res.months) },
+            ]
+          : undefined
+      }
+      actions={<ToolActions locale={locale} onReset={q.reset} shareUrl={q.shareUrl} />}
+    />
   );
 
   return (
     <Stack>
-      <CalcGrid inputs={inputs} results={results} />
+      <CalcGrid inputs={inputs} result={result} />
       {res && <ScheduleView locale={locale} result={res} cur={cur} extraCols={extraCols} filename={locale === "ru" ? "ipoteka-grafik.csv" : "mortgage-schedule.csv"} />}
       {locale === "ru" ? (
         <Explain

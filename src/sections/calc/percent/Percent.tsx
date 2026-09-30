@@ -2,13 +2,12 @@
 
 import { useId } from "react";
 import { CopyButton } from "@/ui/copy-button";
-import { Panel } from "@/ui/panel";
 import { Tabs } from "@/ui/tabs";
 import type { ToolProps } from "../../types";
 import { fmtN, fmtRound } from "../kit/fmt";
 import { tidy } from "../kit/math";
 import { field, toInput } from "../kit/num";
-import { Explain, FieldRow, NumField, ResultMain, ResultRows, SelectField, ToolActions } from "../kit/ui";
+import { CalcGrid, Explain, FieldRow, InlineSelect, NumField, OptionsRow, ResultMain, ResultRows, Stack, ToolActions } from "../kit/ui";
 import { useQueryState } from "../kit/url-state";
 import { computePercent, PERCENT_DEFAULTS, PERCENT_MODES, type PercentMode } from "./engine";
 
@@ -40,7 +39,7 @@ const T = {
     answer: "Ответ",
     precision: "Округление",
     auto: "Авто",
-    digits: (n: string) => `${n} зн. после запятой`,
+    digits: (n: string) => `${n} зн.`,
     div0: "На ноль делить нельзя — измените число",
     enter: "Введите оба числа",
     copy: "Копировать",
@@ -98,7 +97,7 @@ const T = {
     answer: "Answer",
     precision: "Rounding",
     auto: "Auto",
-    digits: (n: string) => `${n} decimal places`,
+    digits: (n: string) => `${n} dp`,
     div0: "Division by zero — change the number",
     enter: "Enter both numbers",
     copy: "Copy",
@@ -218,44 +217,49 @@ export default function Percent({ locale, mode: mode0 = "x-percent-of-y" }: Tool
   }
 
   return (
-    <div className="flex flex-col gap-4">
-      <Tabs label={t.modeLabel} value={mode} onChange={switchMode} items={PERCENT_MODES.map((m) => ({ value: m, label: t.modes[m] }))} />
-      <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)]">
-        <Panel className="flex flex-col gap-4 p-4 sm:p-5">
-          <FieldRow>
-            <NumField id={`${id}-a`} label={la} value={q.v.a} onChange={(a) => q.set({ a })} suffix={pctA ? "%" : undefined} error={A.message} size="lg" />
-            <NumField id={`${id}-b`} label={lb} value={q.v.b} onChange={(b) => q.set({ b })} suffix={pctB ? "%" : undefined} error={B.message} size="lg" />
-          </FieldRow>
-          <SelectField
-            id={`${id}-d`}
-            label={t.precision}
-            value={prec}
-            onChange={(d) => q.set({ d })}
-            options={PRECISION.map((p) => ({ value: p, label: p === "auto" ? t.auto : t.digits(p) }))}
-            size="sm"
-          />
-          <ToolActions locale={locale} onReset={q.reset} shareUrl={q.shareUrl} />
-        </Panel>
-        <div className="flex min-w-0 flex-col gap-4">
-          <ResultMain label={t.answer} value={main} sub={sentence}>
-            {formula && (
-              <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
-                <code className="tabular rounded-[6px] bg-surface-2 px-2 py-1 text-sm text-fg-2">{formula}</code>
-                <CopyButton value={main.replace(/[  ]/g, " ")} label={t.copy} copiedLabel={t.copied} variant="ghost" />
-              </div>
-            )}
-          </ResultMain>
-          {extra.length > 0 && <ResultRows rows={extra} />}
-          {mode === "x-percent-of-y" && B.value !== null && (
-            <ResultRows
-              title={t.others(f(b))}
-              rows={OTHER_PERCENTS.filter((p) => p !== a).map((p) => ({ label: pct(p), value: f(tidy((b * p) / 100)) }))}
-            />
-          )}
-        </div>
+    <Stack>
+      <div className="flex flex-col gap-4">
+        <Tabs label={t.modeLabel} value={mode} onChange={switchMode} items={PERCENT_MODES.map((m) => ({ value: m, label: t.modes[m] }))} />
+        <CalcGrid
+          inputs={
+            <>
+              <FieldRow>
+                <NumField id={`${id}-a`} label={la} value={q.v.a} onChange={(a) => q.set({ a })} suffix={pctA ? "%" : undefined} error={A.message} size="lg" />
+                <NumField id={`${id}-b`} label={lb} value={q.v.b} onChange={(b) => q.set({ b })} suffix={pctB ? "%" : undefined} error={B.message} size="lg" />
+              </FieldRow>
+              <OptionsRow>
+                <InlineSelect
+                  id={`${id}-d`}
+                  label={t.precision}
+                  value={prec}
+                  onChange={(d) => q.set({ d })}
+                  options={PRECISION.map((p) => ({ value: p, label: p === "auto" ? t.auto : t.digits(p) }))}
+                />
+              </OptionsRow>
+            </>
+          }
+          result={
+            <ResultMain
+              label={t.answer}
+              value={main}
+              sub={sentence}
+              rows={extra}
+              actions={
+                <ToolActions locale={locale} onReset={q.reset} shareUrl={q.shareUrl}>
+                  {r?.ok && <CopyButton value={main.replace(/[  ]/g, " ")} label={t.copy} copiedLabel={t.copied} variant="ghost" />}
+                </ToolActions>
+              }
+            >
+              {formula && <code className="tabular mt-3 inline-block rounded-[6px] bg-surface px-2 py-1 text-sm text-fg-2">{formula}</code>}
+            </ResultMain>
+          }
+        />
       </div>
+      {mode === "x-percent-of-y" && B.value !== null && (
+        <ResultRows title={t.others(f(b))} rows={OTHER_PERCENTS.filter((p) => p !== a).map((p) => ({ label: pct(p), value: f(tidy((b * p) / 100)) }))} />
+      )}
       <Explain locale={locale} formula={t.formulas[mode]} notes={t.notes[mode]} />
-    </div>
+    </Stack>
   );
 }
 
