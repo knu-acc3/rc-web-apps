@@ -86,7 +86,7 @@ function quantityLink(q: QuantityDef, locale: Locale): LinkItem {
   return {
     path: [SECTION_ID, q.id],
     label: locale === "ru" ? `Конвертер ${q.gen.ru}` : `${q.name.en} converter`,
-    hint: q.units.slice(0, 6).map((u) => sym(u, locale)).join(", "),
+    hint: titleUnits(q, locale),
     icon: q.icon,
     hue: HUE,
   };
