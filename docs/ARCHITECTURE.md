@@ -20,13 +20,15 @@ src/i18n/                      locales, formatting (formatNumber, formatSmart, p
 src/registry/                  types, section registry, generic tool-section builder
 src/sections/<id>/             ONE FOLDER PER SECTION: section.ts, components.ts, tools (*.tsx), engines, data
 src/sections/index.ts          list of all sections
-src/sections/components.ts     merged map of tool component loaders
+src/sections/components.ts     merged map of tool component loaders (source of truth for component ids)
+src/sections/tool-components.ts  GENERATED next/dynamic map (scripts/gen-tool-components.mjs, runs in prebuild)
 src/site/                      layout, page renderer, blocks, SEO helpers, search
-src/ui/                        design-system primitives
+src/ui/                        design-system primitives (link.tsx = next/link without viewport prefetch)
 src/lib/                       small shared helpers (cn, clipboard, recent, search)
+src/config/redirects.ts        301 map from the previous site's URLs, applied by proxy.ts
 scripts/data/gen-*.mjs         build-time data generators (Unicode CLDR etc.) → JSON in src/sections/<id>/data/
-tests/unit/                    vitest tests
-legacy/                        the previous version of the site — READ-ONLY reference for reusable logic; will be deleted
+scripts/vendor-*.mjs           copy wasm/worker/font assets into public/vendor/ (prebuild)
+tests/unit/, tests/e2e/        vitest (registry invariants, engines) and Playwright smoke + axe
 ```
 
 ## How a page is produced
@@ -34,6 +36,8 @@ legacy/                        the previous version of the site — READ-ONLY re
 title (the complete `<title>`; no brand suffix is appended), h1, description (meta, ≤160 chars), lead (one line with the answer), breadcrumbs, `tool` (component id + serializable props),
 `topBlocks` (variant/sibling chips right under the tool), `blocks` (facts, tables, text), `howTo`, `faq`, `related`.
 `src/site/page-view.tsx` renders it, `src/site/seo.tsx` builds metadata, canonical, hreflang (ru, en, x-default) and JSON-LD.
+The tool itself is rendered by `ToolClient` from the generated `next/dynamic` map: every tool is its own chunk, preloaded
+from the HTML of the pages that use it, so shared JS stays at the framework floor.
 Sitemaps (`/sitemap.xml` → `/sitemaps/<section>.xml`) and the search index (`/<locale>/search.json`) are generated from `SectionDef.paths()` / `search()`.
 
 ## Two ways to write a section
@@ -54,7 +58,8 @@ visually quiet; no walls of equal-weight controls, no rows of per-item buttons. 
 
 ## Tool components
 - File `src/sections/<id>/<Name>.tsx`, `"use client"`, **default export**, props `{ locale, ...preset }` (`ToolProps` in `src/sections/types.ts`). Props must be JSON-serializable.
-- Register in `src/sections/<id>/components.ts`: `"<id>/<name>": () => import("./Name")`. Component ids are namespaced by section id.
+- Register in `src/sections/<id>/components.ts`: `"<id>/<name>": () => import("./Name")` — only dynamic imports in that file.
+  Then run `node scripts/gen-tool-components.mjs` (the build does it too; a unit test fails if the generated map is stale).
 - Strings: a local `const T = { ru: {...}, en: {...} }` inside the tool file.
 - Reference implementation: `src/sections/convert/UnitConverter.tsx`.
 - UI primitives (`src/ui`): `Button`, `ButtonLink`, `Field`, `Input` (size sm|md|lg), `Textarea`, `Select`, `Checkbox`, `Switch`, `Slider`, `Segmented`, `Tabs`, `Panel`, `PanelHeader`, `Stat`, `Badge`, `Kbd`, `Notice`, `CopyButton`, `CodeOutput`, `Dropzone`.
@@ -64,6 +69,9 @@ visually quiet; no walls of equal-weight controls, no rows of per-item buttons. 
 - Numbers: parse user input with `parseNumber()` (accepts "1 000,5" and "1,000.5"), display with `formatNumber()`/`formatSmart()`; never `toFixed` + regex trimming.
 - Dates/time: never compute "now" during server render; read the clock in `useEffect` (render a neutral placeholder on the server).
 - Randomness: `crypto.getRandomValues` with rejection sampling (no `Math.random` for anything user-facing).
+- Links: `import Link from "@/ui/link"` (prefetches on hover/focus only). Long link lists (chips, glyph grids, menus) use plain `<a>`.
+- Mobile: must work at 360px. Grids without explicit columns shrink (`minmax(0,1fr)` by default), long tokens wrap;
+  scrollable tables/lists get `tabIndex={0}`.
 
 ## SEO requirements for every page
 - Title/h1 = what people actually type into a search engine ("Проверка микрофона онлайн", "Таймер на 5 минут"). Never generic group
