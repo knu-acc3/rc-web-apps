@@ -138,6 +138,10 @@ export default function FindReplace({ locale, find: find0, replace: replace0 = "
     ) : res && res.ok ? (
       `${t.found}: ${formatNumber(locale, res.count)} ${plural(locale, res.count, t.matches)}`
     ) : null;
+  const statusText =
+    res === "timeout" ? t.timeout : res && !res.ok ? `${t.invalid}: ${res.error}` : res && res.ok ? `${t.found}: ${formatNumber(locale, res.count)} ${plural(locale, res.count, t.matches)}` : "";
+  // Screen readers hear the count once the user pauses, not on every keystroke.
+  const announce = useDebounced(pending ? "" : statusText, 700);
 
   return (
     <div className="flex flex-col gap-4">
@@ -158,9 +162,10 @@ export default function FindReplace({ locale, find: find0, replace: replace0 = "
         <InputPanel id={`${id}-in`} locale={locale} value={text} onChange={setText} />
         <OutputPanel locale={locale} value={output} filename="replaced.txt" />
       </TwoPane>
-      <p className="tabular min-h-5 text-sm text-fg-2" aria-live="polite">
-        {pending ? t.working : status}
-      </p>
+      <p className="tabular min-h-5 text-sm text-fg-2">{pending ? t.working : status}</p>
+      <span className="sr-only" aria-live="polite">
+        {announce}
+      </span>
       <MoreOptions locale={locale}>
         <Checkbox label={t.all} checked={flags.all} onChange={set("all")} />
         <Checkbox label={t.escapes} checked={flags.escapes} onChange={set("escapes")} />

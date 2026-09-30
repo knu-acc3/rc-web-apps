@@ -392,6 +392,6 @@ export const caseConverter: ToolDef = {
       ["How do camelCase and snake_case split words?", "On spaces, punctuation and case changes: XMLHttpRequest → XML · Http · Request, hello,_world → hello · world. Every line is converted separately."],
     ],
   ),
-  related: ["word-counter", "transliteration", "keyboard-layout-converter", "text-cleaner"],
+  related: ["word-counter", "font-generator", "transliteration", "keyboard-layout-converter", "text-cleaner"],
   variants: { title: L("Все варианты регистра", "All case styles"), list: () => PAGES.map(variant) },
 };

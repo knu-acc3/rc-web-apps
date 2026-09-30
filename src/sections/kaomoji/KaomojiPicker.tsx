@@ -74,7 +74,8 @@ export default function KaomojiPicker({ locale, category }: KaomojiPickerProps) 
   const tagged = useMemo(() => (cat ? taggedFor(cat) : []), [cat]);
 
   async function pick(e: MouseEvent<HTMLButtonElement>) {
-    const k = e.currentTarget.dataset.k;
+    // The tile's text is exactly the kaomoji (see KaomojiGrid).
+    const k = e.currentTarget.textContent;
     if (!k) return;
     const ok = await copyText(k);
     if (timer.current) clearTimeout(timer.current);
@@ -183,7 +184,9 @@ export default function KaomojiPicker({ locale, category }: KaomojiPickerProps) 
       </div>
 
       <div role="status" aria-live="polite" className="pointer-events-none fixed inset-x-0 bottom-5 z-50 flex justify-center px-4">
-        {status && <span className="max-w-full truncate rounded-full bg-fg px-4 py-2 text-sm font-medium text-bg shadow-[var(--shadow-overlay)]">{status}</span>}
+        {status && (
+          <span className="max-w-md rounded-[18px] bg-fg px-4 py-2 text-center text-sm font-medium [overflow-wrap:anywhere] text-bg shadow-[var(--shadow-overlay)]">{status}</span>
+        )}
       </div>
     </div>
   );

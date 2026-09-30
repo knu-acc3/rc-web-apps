@@ -1,14 +1,24 @@
 "use client";
 
 import type { MouseEventHandler } from "react";
-import { cn } from "@/lib/cn";
+import s from "./KaomojiGrid.module.css";
 
-/** Long scenes get two columns so they stay on one or two lines. */
-const isLong = (k: string) => Array.from(k).length > 14;
+/** Characters that usually render about twice as wide as Latin letters (CJK, fullwidth, box drawing, shapes). */
+const WIDE = /[ᄀ-ᅟ─-◿⺀-꓏가-힣豈-﫿︰-﹏！-｠￠-￦]/u;
+
+/** Approximate width in Latin-letter units; combining marks take no space. */
+export function visualWidth(k: string): number {
+  let w = 0;
+  for (const ch of k) w += /\p{M}/u.test(ch) ? 0 : WIDE.test(ch) ? 2 : 1;
+  return w;
+}
+
+/** Long scenes get two columns so they stay on one line at 360 px. */
+const isLong = (k: string) => visualWidth(k) > 13;
 
 /**
- * Grid of kaomoji tiles. One shared click handler reads the kaomoji from `data-k`, so hundreds
- * of tiles don't each allocate a closure. Native buttons: Enter/Space work out of the box.
+ * Grid of kaomoji tiles. One shared click handler reads the kaomoji from the button text, so
+ * hundreds of tiles don't each allocate a closure. Native buttons: Enter/Space work out of the box.
  */
 export function KaomojiGrid({
   items,
@@ -24,25 +34,10 @@ export function KaomojiGrid({
   size?: "sm" | "md";
 }) {
   return (
-    <ul
-      className={cn(
-        "grid gap-2",
-        size === "md" ? "grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5" : "grid-cols-[repeat(auto-fill,minmax(112px,1fr))]",
-      )}
-    >
+    <ul className={size === "sm" ? `${s.grid} ${s.small}` : s.grid}>
       {items.map((k) => (
-        <li key={k} className={cn(size === "md" && isLong(k) && "col-span-2")}>
-          <button
-            type="button"
-            data-k={k}
-            onClick={onPick}
-            aria-label={`${copyLabel} ${k}`}
-            className={cn(
-              "flex h-full w-full items-center justify-center rounded-[10px] border px-2 text-center leading-snug [overflow-wrap:anywhere] transition-colors duration-150",
-              size === "md" ? "min-h-16 py-3 text-lg" : "min-h-10 py-1.5 text-[15px]",
-              k === copied ? "border-ok bg-ok-soft text-ok" : "border-line bg-surface text-fg hover:border-accent hover:text-accent",
-            )}
-          >
+        <li key={k} className={size === "md" && isLong(k) ? s.wide : undefined}>
+          <button type="button" onClick={onPick} aria-label={`${copyLabel} ${k}`} data-copied={k === copied ? "" : undefined} className={s.tile}>
             {k}
           </button>
         </li>

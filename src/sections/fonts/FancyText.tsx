@@ -113,7 +113,7 @@ function Generator({ locale, style, platform, t }: { locale: Locale; style?: Sty
             <span className="font-medium">{STYLE_NAMES[selected][locale]}</span>
             {pf?.xCounter && <XCount text={result} label={t.xCount} />}
           </div>
-          <p className="mt-1 min-h-10 text-2xl leading-relaxed font-medium whitespace-pre-wrap text-fg [overflow-wrap:anywhere] sm:text-3xl" aria-live="polite">
+          <p className="mt-1 min-h-10 text-2xl leading-relaxed font-medium whitespace-pre-wrap text-fg [overflow-wrap:anywhere] sm:text-3xl">
             {result}
           </p>
           {notice && <p className="mt-2 text-[13px] text-warn">{notice === "none" ? t.noticeNone(info.digits !== "none") : t.noticePartial}</p>}

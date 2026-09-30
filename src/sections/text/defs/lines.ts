@@ -431,10 +431,12 @@ export const addPrefixSuffix = lineTool({
   faq: {
     ru: [
       ["Как сделать из столбца список для SQL IN (…)?", "Префикс ', суффикс ', — затем объедините строки инструментом «Объединить строки» и уберите последнюю запятую."],
+      ["Можно ли обернуть строки в HTML-теги?", "Да: префикс <li>, суффикс </li> — и каждая строка станет пунктом списка. Так же добавляются кавычки, скобки или точка с запятой."],
       ["Добавляется ли текст к пустым строкам?", "Нет, пока включено «Пропускать пустые»."],
     ],
     en: [
       ["How do I turn a column into an SQL IN (…) list?", "Use prefix ' and suffix ', then merge the lines with Join lines and drop the last comma."],
+      ["Can I wrap lines in HTML tags?", "Yes: prefix <li> and suffix </li> turn every line into a list item. Quotes, brackets or semicolons work the same way."],
       ["Is text added to empty lines?", "Not while “Skip empty lines” is on."],
     ],
   },
@@ -471,10 +473,12 @@ export const joinLinesTool = lineTool({
   faq: {
     ru: [
       ["Как соединить строки через запятую?", "Выберите разделитель «запятая и пробел» — «яблоко, груша, слива»."],
+      ["Что будет с пустыми строками?", "Они пропускаются, а пробелы по краям каждой строки обрезаются — лишних разделителей не появится."],
       ["Как убрать переносы строк внутри абзацев, а абзацы оставить?", "Для этого подходит «Удалить переносы строк»: он склеивает строки внутри абзацев и сохраняет пустую строку между ними."],
     ],
     en: [
       ["How do I join lines with commas?", "Pick “comma and space” — “apple, pear, plum”."],
+      ["What happens to empty lines?", "They are skipped and every line is trimmed, so no stray separators appear."],
       ["How do I remove line breaks inside paragraphs but keep paragraphs?", "Use Remove line breaks: it joins lines inside paragraphs and keeps the blank line between them."],
     ],
   },
@@ -511,10 +515,12 @@ export const splitText = lineTool({
   faq: {
     ru: [
       ["Как поставить каждое слово с новой строки?", "Укажите в разделителе пробел — каждое слово окажется на своей строке."],
+      ["Можно ли разбить текст сразу по нескольким разделителям?", "За один раз — по одному. Если разделителей несколько, сначала замените остальные на один через «Найти и заменить»."],
       ["Как вставить результат в Excel столбцом?", "Скопируйте результат и вставьте в ячейку — каждая строка займёт отдельную ячейку столбца."],
     ],
     en: [
       ["How do I put each word on a new line?", "Use a space as the delimiter — every word ends up on its own line."],
+      ["Can I split on several delimiters at once?", "One at a time. If there are several, first replace the others with one delimiter using Find and replace."],
       ["How do I paste the result into Excel as a column?", "Copy the result and paste it into a cell — each line fills its own cell in the column."],
     ],
   },
@@ -551,10 +557,12 @@ export const removeEmptyLines = lineTool({
   faq: {
     ru: [
       ["Удалятся ли строки, в которых только пробелы?", "Да, по умолчанию. Снимите галочку «Строки из пробелов тоже пустые», чтобы их оставить."],
+      ["Меняется ли порядок строк?", "Нет, удаляются только пустые строки, остальные остаются на своих местах."],
       ["Как оставить одну пустую строку между абзацами?", "В «Очистке текста» выберите для пустых строк «не больше одной подряд»."],
     ],
     en: [
       ["Are whitespace-only lines removed?", "Yes, by default. Untick “Whitespace-only lines count as empty” to keep them."],
+      ["Does the order of lines change?", "No, only empty lines are removed; everything else stays in place."],
       ["How do I keep one blank line between paragraphs?", "In the Text cleaner set empty lines to “at most one in a row”."],
     ],
   },
@@ -591,10 +599,12 @@ export const repeatTextTool: ToolDef = {
   faq: FAQ(
     [
       ["Сколько раз можно повторить текст?", "До 10 000 раз. Для очень длинного результата удобнее скачать файл, чем копировать."],
+      ["Можно ли повторить несколько строк?", "Да, повторяется весь введённый текст целиком, включая переносы строк внутри него."],
       ["Можно ли повторить текст без пробелов?", "Да, выберите разделитель «без разделителя» — копии склеятся подряд."],
     ],
     [
       ["How many times can text be repeated?", "Up to 10,000. For a very long result, downloading a file is easier than copying."],
+      ["Can I repeat several lines?", "Yes, the whole text you enter is repeated, including the line breaks inside it."],
       ["Can I repeat text without spaces?", "Yes, choose “nothing” as the separator — the copies are glued together."],
     ],
   ),

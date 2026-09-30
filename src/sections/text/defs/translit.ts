@@ -24,6 +24,7 @@ function letterTable(locale: Locale, std: StandardId, lang: Lang, letters: strin
     head: locale === "ru" ? ["Буква", "Латиница"] : ["Letter", "Latin"],
     rows,
     mono: true,
+    split: true,
   };
 }
 
@@ -228,7 +229,7 @@ const PAGES: StdPage[] = [
     title: ["Перевод на казахскую латиницу онлайн — алфавит 2021 года", "Kazakh Cyrillic to Latin converter — 2021 alphabet"],
     h1: ["Перевод на казахскую латиницу", "Kazakh Cyrillic to Latin converter"],
     description: [
-      "Переведите казахский текст на латиницу по алфавиту, представленному в 2021 году: Ә → Ä, Ғ → Ğ, Қ → Q, Ң → Ñ, Ө → Ö, Ұ → Ū, Ү → Ü, Ш → Ş, І → I. Есть обратный перевод.",
+      "Переведите казахский текст на латиницу по алфавиту 2021 года: Ә → Ä, Ғ → Ğ, Қ → Q, Ң → Ñ, Ө → Ö, Ұ → Ū, Ү → Ü, Ш → Ş, І → I. Есть обратный перевод.",
       "Convert Kazakh text to the Latin alphabet presented in 2021: Ә → Ä, Ғ → Ğ, Қ → Q, Ң → Ñ, Ө → Ö, Ұ → Ū, Ү → Ü, Ш → Ş, І → I. Works in reverse too.",
     ],
     lead: ["Қазақстан → Qazaqstan: казахский текст на латинице 2021 года.", "Қазақстан → Qazaqstan: Kazakh text in the 2021 Latin alphabet."],
@@ -396,13 +397,14 @@ export const transliterationTool: ToolDef = {
 /* ───────────── keyboard layout ───────────── */
 
 function layoutTable(locale: Locale): Block {
-  const letters = LAYOUT_PAIRS.filter(([en]) => /[a-z`,.;'[\]/]/.test(en));
+  const keys = LAYOUT_PAIRS.filter(([en]) => /[a-z`,.;'[\]/]/.test(en));
   return {
     type: "table",
     title: locale === "ru" ? "Соответствие клавиш QWERTY и ЙЦУКЕН" : "QWERTY to ЙЦУКЕН key map",
-    head: locale === "ru" ? ["EN", "RU", "EN", "RU", "EN", "RU"] : ["EN", "RU", "EN", "RU", "EN", "RU"],
-    rows: Array.from({ length: Math.ceil(letters.length / 3) }, (_, i) => letters.slice(i * 3, i * 3 + 3).flatMap(([a, b]) => [a, b])).map((r) => [...r, "", "", "", ""].slice(0, 6)),
+    head: ["EN", "RU"],
+    rows: keys.map(([a, b]) => [a, b]),
     mono: true,
+    split: true,
   };
 }
 

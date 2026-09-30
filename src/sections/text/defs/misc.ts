@@ -482,10 +482,12 @@ export const urlExtractor = extractorTool({
   faq: {
     ru: [
       ["Найдутся ли ссылки без http://?", "Да, если включена опция «Адреса без http://»: example.kz или site.com/page тоже попадут в список."],
+      ["Можно ли достать ссылки из HTML-кода страницы?", "Да, вставьте исходный код: найдутся все абсолютные адреса — с http, https или www, в том числе в атрибутах href и src."],
       ["Попадёт ли в ссылку точка в конце предложения?", "Нет, точки, запятые и закрывающие кавычки в конце отрезаются."],
     ],
     en: [
       ["Are links without http:// found?", "Yes, while “Addresses without http://” is on: example.com or site.org/page are listed too."],
+      ["Can I pull links out of a page’s HTML?", "Yes, paste the source code: every absolute address — with http, https or www — is found, including those in href and src attributes."],
       ["Is the period at the end of a sentence included?", "No, trailing periods, commas and closing quotes are trimmed."],
     ],
   },
@@ -563,10 +565,12 @@ export const numberExtractor = extractorTool({
   faq: {
     ru: [
       ["Не разобьётся ли 1 000 000 на три числа?", "Нет. Группы по три цифры через пробел, запятую или точку считаются одним числом."],
+      ["Извлекаются ли отрицательные и дробные числа?", "Да: −3, 15,5 и 2.75 извлекаются вместе со знаком минус и дробной частью."],
       ["Как получить сумму чисел?", "Скопируйте список и вставьте в столбец таблицы — Excel и Google Таблицы посчитают сумму функцией СУММ."],
     ],
     en: [
       ["Will 1,000,000 be split into three numbers?", "No. Groups of three digits separated by commas, spaces or dots are treated as one number."],
+      ["Are negative and decimal numbers extracted?", "Yes: −3, 15.5 and 2,75 come out with their minus sign and fractional part."],
       ["How do I sum the numbers?", "Copy the list into a spreadsheet column — Excel or Google Sheets will add them with SUM."],
     ],
   },

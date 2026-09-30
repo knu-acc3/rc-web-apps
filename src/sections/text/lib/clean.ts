@@ -85,6 +85,7 @@ export function stripHtml(html: string): string {
       .replace(/<!--[\s\S]*?-->/g, "")
       .replace(/<(script|style|noscript|template|head)\b[\s\S]*?<\/\1\s*>/gi, "")
       .replace(/<br\s*\/?>/gi, "\n")
+      .replace(/<\/t[dh]\s*>/gi, "\t")
       .replace(/<\/(p|div|h[1-6]|li|tr|blockquote|pre|section|article|header|footer|ul|ol|table)\s*>/gi, "\n")
       .replace(/<li\b[^>]*>/gi, "• ")
       .replace(/<\/?[a-z][^>]*>/gi, ""),

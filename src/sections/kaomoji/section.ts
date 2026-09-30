@@ -199,6 +199,8 @@ export const kaomojiSection = defineToolSection({
       },
       popular: true,
       wide: true,
+      // Links inside this branch; emoji and symbols are linked during integration.
+      related: ["font-generator", "font-generator/invisible-character", "word-counter", "notes"],
       howTo: {
         ru: [
           "Найдите настроение: введите слово в поиск — «кот», «грусть», «спасибо» — или выберите категорию.",

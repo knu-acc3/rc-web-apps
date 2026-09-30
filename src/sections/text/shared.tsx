@@ -235,13 +235,3 @@ export function InlineSelect<T extends string>({
     </div>
   );
 }
-
-/** Summary line under a result (announced politely once the user stops typing). */
-export function ResultNote({ children, tone = "neutral" }: { children: ReactNode; tone?: "neutral" | "warn" | "err" | "ok" }) {
-  const cls = tone === "err" ? "text-err" : tone === "warn" ? "text-warn" : tone === "ok" ? "text-ok" : "text-fg-2";
-  return (
-    <p className={cn("tabular text-sm", cls)} aria-live="polite">
-      {children}
-    </p>
-  );
-}

@@ -165,10 +165,12 @@ export const removeExtraSpaces = cleanTool({
   faq: {
     ru: [
       ["Удаляются ли переносы строк?", "Нет, только пробелы. Чтобы убрать переносы, воспользуйтесь «Удалить переносы строк»."],
+      ["Что происходит с табуляцией?", "По умолчанию каждая табуляция заменяется одним пробелом. Её можно оставить или развернуть в пробелы до позиции табуляции нужной ширины."],
       ["Почему после замены в Word двойные пробелы остались?", "Скорее всего, часть из них — неразрывные пробелы. Здесь они тоже заменяются обычными и схлопываются."],
     ],
     en: [
       ["Are line breaks removed?", "No, only spaces. Use Remove line breaks for that."],
+      ["What happens to tabs?", "By default every tab becomes one space. You can keep tabs or expand them to spaces up to the next tab stop of a chosen width."],
       ["Why did double spaces survive Find & Replace in Word?", "Some of them are probably non-breaking spaces. Here they are converted to regular spaces and collapsed too."],
     ],
   },
@@ -205,10 +207,12 @@ export const removeHtmlTags = cleanTool({
   faq: {
     ru: [
       ["Выполняются ли скрипты из вставленного HTML?", "Нет. Код обрабатывается как строка и не вставляется на страницу, поэтому ничего не выполняется и не загружается."],
+      ["Что происходит со списками и таблицами?", "Пункты списков становятся строками с «•», ячейки таблицы разделяются табуляцией, а строки таблицы — переносами, чтобы текст оставался читаемым."],
       ["Сохранятся ли ссылки?", "Останется текст ссылки, а сам адрес удалится вместе с тегом <a>. Чтобы достать адреса, воспользуйтесь «Извлечь ссылки»."],
     ],
     en: [
       ["Are scripts in the pasted HTML executed?", "No. The code is processed as a string and never inserted into the page, so nothing runs or loads."],
+      ["What happens to lists and tables?", "List items become lines starting with “•”, table cells are separated by tabs and table rows by line breaks, so the text stays readable."],
       ["Are links kept?", "The link text stays; the address is removed with the <a> tag. Use URL extractor to pull out the addresses."],
     ],
   },
@@ -254,7 +258,7 @@ export const removeInvisibleCharacters = cleanTool({
       ["Which characters are removed?", "They are listed in the table below: zero-width spaces and joiners, soft hyphen, direction marks and isolates, BOM, Hangul fillers and the blank Braille pattern."],
     ],
   },
-  related: ["remove-extra-spaces", "text-cleaner", "word-counter"],
+  related: ["remove-extra-spaces", "text-cleaner", "font-generator/invisible-character", "word-counter"],
   blocks: (locale) => [
     {
       type: "table",
@@ -262,6 +266,7 @@ export const removeInvisibleCharacters = cleanTool({
       head: locale === "ru" ? ["Код", "Название"] : ["Code point", "Name"],
       rows: INVISIBLE_CHARS.map((c) => [`U+${c.cp.toString(16).toUpperCase().padStart(4, "0")}`, c.name]),
       mono: true,
+      split: true,
     },
   ],
 });
@@ -334,7 +339,7 @@ export const typographTool: ToolDef = {
   title: L("Типограф онлайн — кавычки «ёлочки», тире и неразрывные пробелы", "Online Typographer — Russian quotes, dashes, non-breaking spaces"),
   h1: L("Типограф онлайн", "Online typographer"),
   description: L(
-    "Подготовьте текст к публикации по правилам русской типографики: «ёлочки» и „лапки“, тире с неразрывным пробелом, неразрывные пробелы после предлогов, разряды в числах.",
+    "Подготовьте текст к публикации по правилам русской типографики: «ёлочки» и „лапки“, тире с неразрывным пробелом, пробелы после предлогов, разряды в числах.",
     "Prepare Russian text for publishing: «guillemets» with „inner quotes“, em dashes with non-breaking spaces, spaces after short prepositions and digit grouping.",
   ),
   lead: L("Вставьте текст — кавычки, тире и пробелы расставятся по правилам.", "Paste text — quotes, dashes and spaces are fixed by the rules."),
