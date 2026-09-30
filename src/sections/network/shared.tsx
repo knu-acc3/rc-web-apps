@@ -1,5 +1,6 @@
 "use client";
 
+import type { ReactNode } from "react";
 import type { Locale } from "@/i18n/config";
 import { cn } from "@/lib/cn";
 import { CopyButton } from "@/ui/copy-button";
@@ -9,33 +10,47 @@ import type { V6Error } from "./lib/ipv6";
 export interface ValueRow {
   label: string;
   value: string;
-  mono?: boolean;
-  hint?: string;
-  /** Hide the copy button (e.g. for plain descriptive values). */
-  noCopy?: boolean;
+  /** Plain text (not monospace). */
+  plain?: boolean;
 }
 
 const L = {
-  ru: { copy: "Копировать", copied: "Скопировано" },
-  en: { copy: "Copy", copied: "Copied" },
+  ru: { copyAll: "Копировать всё", copied: "Скопировано", details: "Подробности" },
+  en: { copyAll: "Copy all", copied: "Copied", details: "Details" },
 } as const;
 
-/** Label/value list with a copy button per value. */
-export function ValueRows({ rows, locale, className }: { rows: ValueRow[]; locale: Locale; className?: string }) {
-  const t = L[locale];
+/** The one prominent result of a tool: big value, one or two quiet lines under it. */
+export function ResultCard({ value, sub, badge, className }: { value: ReactNode; sub?: ReactNode; badge?: ReactNode; className?: string }) {
   return (
-    <ul className={cn("rows", className)}>
-      {rows.map((r) => (
-        <li key={r.label}>
-          <span className="min-w-0">
-            <span className="block text-[13px] text-fg-3">{r.label}</span>
-            <span className={cn("block font-semibold break-all text-fg", r.mono !== false && "font-mono text-[15px]")}>{r.value}</span>
-            {r.hint && <span className="block text-[13px] text-fg-3">{r.hint}</span>}
-          </span>
-          {!r.noCopy && <CopyButton value={r.value} label={`${t.copy}: ${r.label}`} copiedLabel={t.copied} size="icon-sm" variant="ghost" showLabel={false} />}
-        </li>
-      ))}
-    </ul>
+    <div className={cn("rounded-[12px] bg-surface-2 px-4 py-4 sm:px-5", className)}>
+      <div aria-live="polite" className="font-mono text-2xl font-semibold tracking-tight break-all text-fg sm:text-3xl">
+        {value}
+      </div>
+      {sub && <div className="mt-1.5 text-[15px] text-fg-2">{sub}</div>}
+      {badge && <div className="mt-2.5 flex flex-wrap items-center gap-2">{badge}</div>}
+    </div>
+  );
+}
+
+/** Quiet two-column definition list with a single "copy all" action. Values are easy to select. */
+export function DetailList({ rows, locale, title, className }: { rows: ValueRow[]; locale: Locale; title?: string; className?: string }) {
+  const t = L[locale];
+  const text = rows.map((r) => `${r.label}: ${r.value}`).join("\n");
+  return (
+    <section className={cn("rounded-[12px] border border-line bg-surface", className)}>
+      <div className="flex min-h-11 items-center justify-between gap-2 border-b border-line px-4 py-1.5">
+        <h2 className="text-sm font-semibold text-fg-2">{title ?? t.details}</h2>
+        <CopyButton value={text} label={t.copyAll} copiedLabel={t.copied} variant="ghost" />
+      </div>
+      <dl className="grid gap-x-8 px-4 py-2.5 sm:grid-cols-2">
+        {rows.map((r) => (
+          <div key={r.label} className="flex min-w-0 flex-col py-1.5">
+            <dt className="text-[13px] text-fg-3">{r.label}</dt>
+            <dd className={cn("break-all text-fg select-all", r.plain ? "text-[15px]" : "font-mono text-sm")}>{r.value}</dd>
+          </div>
+        ))}
+      </dl>
+    </section>
   );
 }
 

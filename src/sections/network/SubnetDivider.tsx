@@ -151,7 +151,7 @@ export default function SubnetDivider({ locale, network = "192.168.0.0/24", mode
 
   return (
     <div className="flex flex-col gap-4">
-      <Panel className="grid gap-4 p-4 sm:p-5">
+      <div className="grid gap-4">
         <div className="grid gap-3 sm:grid-cols-2">
           <Field label={t.network} htmlFor={`${id}-net`} hint={t.networkHint} error={!parsed.ok && net.trim() ? err4(locale, parsed.error) : undefined}>
             <Input id={`${id}-net`} value={net} onChange={(e) => setNet(e.target.value)} size="lg" className="font-mono" autoComplete="off" spellCheck={false} aria-invalid={!parsed.ok} />
@@ -173,7 +173,7 @@ export default function SubnetDivider({ locale, network = "192.168.0.0/24", mode
             <Checkbox label={t.p2p} checked={p2p} onChange={(e) => setP2p(e.target.checked)} />
           </>
         )}
-      </Panel>
+      </div>
 
       {result && "error" in result && <Notice tone="err">{result.error}</Notice>}
       {result && !("error" in result) && base && (

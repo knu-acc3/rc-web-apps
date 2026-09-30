@@ -3,12 +3,12 @@
 import { useId, useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { Field, Input } from "@/ui/field";
-import { Badge, Notice, Panel } from "@/ui/panel";
+import { Badge, Notice } from "@/ui/panel";
 import { parseAnyV4, type ConvError, type Notation } from "./lib/convert";
 import { toBinary, toDotted, toHex } from "./lib/ipv4";
 import { compress, expand, mapV4, reverse4 } from "./lib/ipv6";
 import { special4 } from "./lib/special";
-import { ValueRows } from "./shared";
+import { DetailList, ResultCard } from "./shared";
 
 const T = {
   ru: {
@@ -33,7 +33,7 @@ const T = {
     sixToFour: "Префикс 6to4",
     rdns: "Обратная зона DNS",
     type: "Тип",
-    public: "Публичный адрес",
+    public: "публичный адрес",
   },
   en: {
     input: "IPv4 address in any notation",
@@ -57,7 +57,7 @@ const T = {
     sixToFour: "6to4 prefix",
     rdns: "Reverse DNS zone",
     type: "Type",
-    public: "Public address",
+    public: "public address",
   },
 } as const;
 
@@ -69,34 +69,37 @@ export default function IpConverter({ locale, value = "192.168.1.10" }: { locale
 
   return (
     <div className="flex flex-col gap-4">
-      <Panel className="p-4 sm:p-5">
-        <Field label={t.input} htmlFor={`${id}-in`} hint={t.hint}>
-          <Input id={`${id}-in`} value={text} onChange={(e) => setText(e.target.value)} size="lg" className="font-mono" autoComplete="off" spellCheck={false} aria-invalid={!r.ok && text.trim() !== ""} />
-        </Field>
-      </Panel>
+      <Field label={t.input} htmlFor={`${id}-in`} hint={t.hint}>
+        <Input id={`${id}-in`} value={text} onChange={(e) => setText(e.target.value)} size="lg" className="font-mono" autoComplete="off" spellCheck={false} aria-invalid={!r.ok && text.trim() !== ""} />
+      </Field>
       {r.ok ? (
         <>
-          <p className="flex flex-wrap items-center gap-2 text-sm text-fg-2" aria-live="polite">
-            {t.detected}: <Badge tone="accent">{t.notation[r.from]}</Badge> → <span className="font-mono font-semibold text-fg">{toDotted(r.value)}</span>
-          </p>
-          <Panel>
-            <ValueRows
-              locale={locale}
-              rows={[
-                { label: t.dotted, value: toDotted(r.value) },
-                { label: t.integer, value: String(r.value) },
-                { label: t.hex, value: toHex(r.value) },
-                { label: t.octets, value: toDotted(r.value).split(".").map((o) => Number(o).toString(16).toUpperCase().padStart(2, "0")).join(".") },
-                { label: t.binary, value: toBinary(r.value) },
-                { label: t.mapped, value: compress(mapV4(r.value)) },
-                { label: t.mappedHex, value: compress(mapV4(r.value), false) },
-                { label: t.mappedFull, value: expand(mapV4(r.value)) },
-                { label: t.sixToFour, value: `${compress((0x2002n << 112n) | (BigInt(r.value) << 80n), false)}/48` },
-                { label: t.rdns, value: reverse4(r.value) },
-                { label: t.type, value: special4(r.value)?.[locale] ?? t.public, mono: false, noCopy: true },
-              ]}
-            />
-          </Panel>
+          <ResultCard
+            value={`${toDotted(r.value)} = ${r.value}`}
+            sub={`${toHex(r.value)} · ${compress(mapV4(r.value))}`}
+            badge={
+              <>
+                <span className="text-sm text-fg-3">{t.detected}</span>
+                <Badge tone="accent">{t.notation[r.from]}</Badge>
+                <span className="text-sm text-fg-3">· {special4(r.value)?.[locale] ?? t.public}</span>
+              </>
+            }
+          />
+          <DetailList
+            locale={locale}
+            rows={[
+              { label: t.dotted, value: toDotted(r.value) },
+              { label: t.integer, value: String(r.value) },
+              { label: t.hex, value: toHex(r.value) },
+              { label: t.octets, value: toDotted(r.value).split(".").map((o) => Number(o).toString(16).toUpperCase().padStart(2, "0")).join(".") },
+              { label: t.binary, value: toBinary(r.value) },
+              { label: t.mapped, value: compress(mapV4(r.value)) },
+              { label: t.mappedHex, value: compress(mapV4(r.value), false) },
+              { label: t.mappedFull, value: expand(mapV4(r.value)) },
+              { label: t.sixToFour, value: `${compress((0x2002n << 112n) | (BigInt(r.value) << 80n), false)}/48` },
+              { label: t.rdns, value: reverse4(r.value) },
+            ]}
+          />
         </>
       ) : (
         text.trim() !== "" && <Notice tone="err">{t.errors[r.error]}</Notice>

@@ -5,7 +5,7 @@ import type { Locale } from "@/i18n/config";
 import { plural } from "@/i18n/format";
 import { CodeOutput } from "@/ui/code-output";
 import { Field, Textarea } from "@/ui/field";
-import { Notice, Panel } from "@/ui/panel";
+import { Notice } from "@/ui/panel";
 import { cidrRange, rangeToCidrs } from "./lib/cidr";
 import { parseIPv4, toDotted } from "./lib/ipv4";
 import { compress, parseIPv6 } from "./lib/ipv6";
@@ -117,11 +117,11 @@ export default function CidrRange({ locale, mode = "cidr-to-range", sample }: { 
 
   return (
     <div className="grid gap-4 lg:grid-cols-2">
-      <Panel className="p-4">
+      <div>
         <Field label={mode === "cidr-to-range" ? t.inCidr : t.inRange} htmlFor={`${id}-in`} hint={mode === "cidr-to-range" ? t.hintCidr : t.hintRange}>
           <Textarea id={`${id}-in`} value={text} onChange={(e) => setText(e.target.value)} rows={8} autoComplete="off" />
         </Field>
-      </Panel>
+      </div>
       <div className="flex min-w-0 flex-col gap-3">
         <CodeOutput value={res.out} title={t.out} filename={mode === "cidr-to-range" ? "ranges.txt" : "cidr.txt"} labels={{ copy: t.copy, copied: t.copied, download: t.download }} minRows={8} />
         <p className="text-sm text-fg-2" aria-live="polite">

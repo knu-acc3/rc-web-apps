@@ -256,8 +256,6 @@ function specialTable(l: Locale): Block[] {
 export const networkSection = defineToolSection({
   id: "network",
   name: { ru: "IP и сети", en: "IP & networks" },
-  title: { ru: "IP-калькулятор и сетевые инструменты онлайн", en: "IP calculator & subnet tools online" },
-  h1: { ru: "IP-калькулятор и сетевые инструменты", en: "IP calculator and network tools" },
   description: {
     ru: "IP-калькулятор подсетей IPv4 и IPv6: маска, wildcard, broadcast, диапазон хостов, CIDR ↔ диапазон, деление сети (VLSM), конвертер IP и MAC-адресов.",
     en: "IPv4 and IPv6 subnet calculator: netmask, wildcard, broadcast, host range, CIDR ↔ range, network splitting (VLSM), IP and MAC address converters.",
@@ -266,32 +264,15 @@ export const networkSection = defineToolSection({
   hue: 200,
   category: "web",
   order: 4,
-  hubBlocks: (l) => [
-    {
-      type: "text",
-      title: l === "ru" ? "Всё считается в браузере" : "Everything runs in your browser",
-      paragraphs:
-        l === "ru"
-          ? [
-              "Калькуляторы работают без сервера: введённые адреса никуда не отправляются. Поддерживаются IPv4 (маски, wildcard, /31 и /32, специальные диапазоны вроде CGNAT 100.64.0.0/10) и IPv6 (сокращение по RFC 5952, обратные зоны ip6.arpa).",
-              "Для каждой маски от /0 до /32 есть отдельная страница с таблицей подсетей — удобно, когда нужно быстро вспомнить, сколько хостов в /27 или какая маска у /22.",
-            ]
-          : [
-              "The calculators work without a server: the addresses you type never leave the page. IPv4 (masks, wildcard, /31 and /32, special ranges such as CGNAT 100.64.0.0/10) and IPv6 (RFC 5952 compression, ip6.arpa reverse zones) are supported.",
-              "Every mask from /0 to /32 has its own page with a subnet table — handy when you need to recall how many hosts a /27 has or what mask a /22 is.",
-            ],
-    },
-    ...specialTable(l),
-  ],
   tools: [
     {
-      slug: "ip-calculator",
+      slug: "subnet-calculator",
       component: "network/ip-calculator",
       icon: "Calculator",
       popular: true,
       name: { ru: "IP-калькулятор", en: "IP subnet calculator" },
-      title: { ru: "IP-калькулятор подсетей IPv4 и IPv6 онлайн", en: "IP Subnet Calculator (IPv4 & IPv6) — CIDR, Mask" },
-      h1: { ru: "IP-калькулятор подсетей", en: "IP subnet calculator" },
+      title: { ru: "IP-калькулятор подсетей IPv4 и IPv6 онлайн", en: "Subnet Calculator — IPv4 & IPv6, CIDR, Mask, Wildcard" },
+      h1: { ru: "IP-калькулятор подсетей", en: "Subnet calculator (IPv4 & IPv6)" },
       description: {
         ru: "Калькулятор IP-подсетей: маска, wildcard, адрес сети и broadcast, первый и последний хост, число хостов (/31, /32), тип адреса (частный, CGNAT), IPv6.",
         en: "IP subnet calculator: netmask, wildcard, network and broadcast, first and last host, host count (/31, /32 rules), address type (private, CGNAT) and IPv6.",
@@ -300,6 +281,7 @@ export const networkSection = defineToolSection({
         ru: "Введите адрес с маской — сеть, broadcast, wildcard и диапазон хостов посчитаются сразу.",
         en: "Type an address with a mask — network, broadcast, wildcard and host range appear instantly.",
       },
+      blocks: (l) => specialTable(l),
       keywords: {
         ru: ["калькулятор подсетей", "ip калькулятор", "маска подсети", "wildcard", "broadcast", "cidr калькулятор"],
         en: ["subnet calculator", "ip calculator", "cidr calculator", "netmask", "wildcard mask", "broadcast address"],
@@ -346,16 +328,15 @@ export const networkSection = defineToolSection({
           "The address type is highlighted too: private, ISP CGNAT, loopback, link-local, multicast, documentation and benchmarking ranges. Containing networks are computed from the address itself — for 10.1.2.0/24 they are 10.1.2.0/23, 10.1.0.0/22 and so on.",
         ],
       },
-      related: ["port"],
     },
     {
-      slug: "subnet",
+      slug: "subnet-mask",
       component: "network/subnet-mask",
       icon: "Table",
       popular: true,
       name: { ru: "Маски подсети", en: "Subnet masks" },
-      title: { ru: "Таблица масок подсети /0–/32 и калькулятор", en: "Subnet Mask Table /0–/32 & Mask Calculator" },
-      h1: { ru: "Маски подсети: таблица CIDR", en: "Subnet mask cheat sheet (CIDR table)" },
+      title: { ru: "Маска подсети: таблица /0–/32 и калькулятор масок", en: "Subnet Mask Table /0–/32 & Mask Calculator" },
+      h1: { ru: "Маска подсети — таблица CIDR", en: "Subnet mask table (CIDR cheat sheet)" },
       description: {
         ru: "Таблица масок подсети IPv4 от /0 до /32: маска, wildcard, число адресов и хостов. Перевод маски 255.255.255.0 в префикс /24 и обратно онлайн.",
         en: "IPv4 subnet mask table from /0 to /32: netmask, wildcard, addresses and hosts. Convert 255.255.255.0 to /24 and back online.",
@@ -407,7 +388,7 @@ export const networkSection = defineToolSection({
       variants: { title: { ru: "Маска по префиксу", en: "Mask by prefix" }, list: prefixVariants, limit: 33 },
     },
     {
-      slug: "cidr-to-range",
+      slug: "cidr-to-ip-range",
       component: "network/cidr-range",
       icon: "ArrowRightLeft",
       name: { ru: "CIDR в диапазон IP", en: "CIDR to IP range" },
@@ -441,7 +422,7 @@ export const networkSection = defineToolSection({
       },
     },
     {
-      slug: "range-to-cidr",
+      slug: "ip-range-to-cidr",
       component: "network/cidr-range",
       icon: "ArrowLeftRight",
       name: { ru: "Диапазон IP в CIDR", en: "IP range to CIDR" },
@@ -475,11 +456,11 @@ export const networkSection = defineToolSection({
       },
     },
     {
-      slug: "ip-converter",
+      slug: "ip-address-converter",
       component: "network/ip-converter",
       icon: "Binary",
       name: { ru: "Конвертер IP-адресов", en: "IP address converter" },
-      title: { ru: "Конвертер IP: в число, hex, двоичный вид", en: "IP Address Converter — Decimal, Hex, Binary" },
+      title: { ru: "Конвертер IP-адресов: в число, hex и двоичный вид", en: "IP Address Converter — Decimal, Hex, Binary" },
       description: {
         ru: "Перевод IPv4-адреса в 32-битное число, hex и двоичный вид и обратно: 192.168.1.10 = 3232235786 = 0xC0A8010A. Плюс IPv4-mapped IPv6 и обратная зона.",
         en: "Convert an IPv4 address to a 32-bit integer, hex and binary and back: 192.168.1.10 = 3232235786 = 0xC0A8010A. Plus IPv4-mapped IPv6 and reverse DNS.",
@@ -508,11 +489,11 @@ export const networkSection = defineToolSection({
       },
     },
     {
-      slug: "ipv6",
+      slug: "ipv6-compress-expand",
       component: "network/ipv6",
       icon: "Globe",
       name: { ru: "Сокращение и развёртывание IPv6", en: "IPv6 compress & expand" },
-      title: { ru: "IPv6: сокращение и полная запись адреса онлайн", en: "IPv6 Compress & Expand Tool (RFC 5952)" },
+      title: { ru: "Сокращение IPv6-адреса и полная запись онлайн", en: "IPv6 Compress & Expand Tool (RFC 5952)" },
       h1: { ru: "Сокращение и полная запись IPv6", en: "IPv6 address compress and expand" },
       description: {
         ru: "Сокращение IPv6 по RFC 5952 и полная запись: 2001:0db8:0000:0000:0000:ff00:0042:8329 ↔ 2001:db8::ff00:42:8329. Тип адреса и обратная зона ip6.arpa.",
@@ -542,12 +523,12 @@ export const networkSection = defineToolSection({
       },
     },
     {
-      slug: "mac",
+      slug: "mac-address-formatter",
       component: "network/mac",
       icon: "Cpu",
       name: { ru: "Форматирование MAC-адреса", en: "MAC address formatter" },
-      title: { ru: "MAC-адрес: форматы, биты I/G и U/L, EUI-64", en: "MAC Address Formatter — Formats, I/G & U/L, EUI-64" },
-      h1: { ru: "Форматирование и разбор MAC-адреса", en: "MAC address formatter and analyser" },
+      title: { ru: "Конвертер MAC-адреса: форматы, биты I/G и U/L, EUI-64", en: "MAC Address Formatter — Formats, I/G & U/L, EUI-64" },
+      h1: { ru: "Конвертер MAC-адреса", en: "MAC address formatter" },
       description: {
         ru: "Перевод MAC-адреса между форматами 00:1A:2B…, 00-1A-2B…, 001a.2b3c.4d5e. Показывает юникаст/мультикаст, локально администрируемый бит и EUI-64 для IPv6.",
         en: "Convert a MAC address between 00:1A:2B…, 00-1A-2B… and 001a.2b3c.4d5e formats. Shows unicast/multicast, the locally administered bit and IPv6 EUI-64.",
