@@ -282,6 +282,7 @@ export const networkSection = defineToolSection({
         en: "Type an address with a mask — network, broadcast, wildcard and host range appear instantly.",
       },
       blocks: (l) => specialTable(l),
+      related: ["port", "port/443", "port/22"],
       keywords: {
         ru: ["калькулятор подсетей", "ip калькулятор", "маска подсети", "wildcard", "broadcast", "cidr калькулятор"],
         en: ["subnet calculator", "ip calculator", "cidr calculator", "netmask", "wildcard mask", "broadcast address"],
