@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { LayoutGrid, X } from "lucide-react";
-import { href, tr, type Locale } from "@/i18n/config";
+import { href, type Locale } from "@/i18n/config";
 import { ui } from "@/i18n/ui";
-import { sectionsByCategory } from "@/registry";
+import { navigation } from "@/registry";
 import { buttonClass } from "@/ui/button";
 import { IconTile } from "@/ui/icon";
 import { LangSwitch } from "./lang-switch";
@@ -39,10 +39,10 @@ export function Header({ locale }: { locale: Locale }) {
   );
 }
 
-/** Full catalogue of sections. Uses the native Popover API — no JavaScript. */
+/** Tool catalogue by category. Uses the native Popover API — no JavaScript. */
 function AllToolsMenu({ locale }: { locale: Locale }) {
   const t = ui(locale);
-  const groups = sectionsByCategory(locale);
+  const groups = navigation(locale, 8);
   return (
     <div
       id="all-tools"
@@ -61,14 +61,21 @@ function AllToolsMenu({ locale }: { locale: Locale }) {
             <div key={g.id}>
               <p className="mb-2 text-[13px] font-semibold tracking-wide text-fg-3 uppercase">{g.label}</p>
               <ul className="flex flex-col gap-0.5">
-                {g.sections.map((s) => (
-                  <li key={s.id}>
-                    <Link href={href(locale, [s.id])} className="flex items-center gap-2.5 rounded-[8px] px-2 py-1.5 text-[15px] hover:bg-surface-2 hover:text-accent">
-                      <IconTile name={s.icon} hue={s.hue} size="sm" />
-                      <span className="truncate">{tr(s.name, locale)}</span>
+                {g.items.map((l) => (
+                  <li key={l.path.join("/")}>
+                    <Link href={href(locale, l.path)} className="flex items-center gap-2.5 rounded-[8px] px-2 py-1.5 text-[15px] hover:bg-surface-2 hover:text-accent">
+                      <IconTile name={l.icon} hue={l.hue} size="sm" />
+                      <span className="truncate">{l.label}</span>
                     </Link>
                   </li>
                 ))}
+                {g.total > g.items.length && (
+                  <li>
+                    <Link href={`${href(locale)}#cat-${g.id}`} className="block px-2 py-1.5 text-sm text-fg-3 hover:text-accent">
+                      {t.showAll} · {g.total}
+                    </Link>
+                  </li>
+                )}
               </ul>
             </div>
           ))}
