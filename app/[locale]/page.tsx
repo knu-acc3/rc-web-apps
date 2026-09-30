@@ -5,7 +5,7 @@ import { BRAND, SITE_URL } from "@/config/brand";
 import { href, isLocale, tr, type Locale } from "@/i18n/config";
 import { count } from "@/i18n/format";
 import { ui } from "@/i18n/ui";
-import { allPaths, sectionsByCategory } from "@/registry";
+import { allPaths, sectionHub, sectionsByCategory, sectionTools } from "@/registry";
 import type { LinkItem } from "@/registry/types";
 import { IconTile } from "@/ui/icon";
 import { LinkCards } from "@/site/links";
@@ -46,7 +46,7 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
   const locale: Locale = raw;
   const t = ui(locale);
   const groups = sectionsByCategory(locale);
-  const popular: LinkItem[] = groups.flatMap((g) => g.sections.flatMap((s) => s.featured(locale).slice(0, 2))).slice(0, 12);
+  const popular: LinkItem[] = groups.flatMap((g) => g.sections.flatMap((s) => s.featured(locale).slice(0, 1).map((l) => ({ ...l, icon: l.icon ?? s.icon, hue: l.hue ?? s.hue })))).slice(0, 12);
   const toolCount = allPaths().length;
 
   return (
@@ -83,31 +83,40 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
 
       <div className="flex flex-col gap-12">
         {groups.map((g) => (
-          <section key={g.id} aria-labelledby={`cat-${g.id}`}>
-            <h2 id={`cat-${g.id}`} className="mb-4 text-xl font-semibold text-fg">
+          <section key={g.id} id={`cat-${g.id}`} aria-labelledby={`cat-${g.id}-h`} className="scroll-mt-20">
+            <h2 id={`cat-${g.id}-h`} className="mb-4 text-xl font-semibold text-fg">
               {g.label}
             </h2>
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-              {g.sections.map((s) => (
-                <div key={s.id} className="flex flex-col rounded-[12px] border border-line bg-surface p-4">
-                  <Link href={href(locale, [s.id])} className="group flex items-center gap-3">
-                    <IconTile name={s.icon} hue={s.hue} />
-                    <span className="min-w-0">
-                      <span className="block font-semibold text-fg group-hover:text-accent">{tr(s.name, locale)}</span>
-                      <span className="line-clamp-1 block text-sm text-fg-3">{tr(s.description, locale)}</span>
-                    </span>
-                  </Link>
-                  <ul className="mt-3 flex flex-wrap gap-x-3 gap-y-1.5 border-t border-line pt-3">
-                    {s.featured(locale).slice(0, 6).map((f) => (
-                      <li key={f.path.join("/")}>
-                        <Link href={href(locale, f.path)} className="text-sm text-fg-2 hover:text-accent">
-                          {f.label}
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ))}
+              {g.sections.map((s) => {
+                const hub = sectionHub(s);
+                const head = (
+                  <>
+                    <IconTile name={s.icon} hue={s.hue} size="sm" />
+                    <span className="font-semibold text-fg">{tr(s.name, locale)}</span>
+                  </>
+                );
+                return (
+                  <div key={s.id} className="flex flex-col rounded-[12px] border border-line bg-surface p-4">
+                    {hub ? (
+                      <Link href={href(locale, hub)} className="flex items-center gap-2.5 hover:[&>span]:text-accent">
+                        {head}
+                      </Link>
+                    ) : (
+                      <h3 className="flex items-center gap-2.5 text-base">{head}</h3>
+                    )}
+                    <ul className="mt-3 flex flex-col gap-1.5 border-t border-line pt-3">
+                      {sectionTools(s, locale).map((f) => (
+                        <li key={f.path.join("/")}>
+                          <Link href={href(locale, f.path)} className="text-[15px] text-fg-2 hover:text-accent">
+                            {f.label}
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                );
+              })}
             </div>
           </section>
         ))}

@@ -98,7 +98,7 @@ export interface SearchEntry {
 export interface SectionDef {
   id: string;
   name: L10n;
-  /** Short description used on hub cards and the section page. */
+  /** Short description used in navigation. */
   description: L10n;
   icon: string;
   hue: number;
@@ -107,16 +107,28 @@ export interface SectionDef {
   hidden?: boolean;
   /** Order inside the category on the home page (lower first). */
   order?: number;
-  /** Resolve a page. `rest` = path segments after the section id. */
+  /**
+   * Absolute sections own several top-level URL segments (`mounts`), receive the full path in
+   * `resolve` and return full paths from `paths`/`prebuild`. Prefixed sections (default) live
+   * under `/{id}/…` and work with paths relative to the id.
+   */
+  absolute?: boolean;
+  /** Top-level segments owned by an absolute section. */
+  mounts?(): string[];
+  /** Section landing page, or null when the section has none (navigation-only group). */
+  hubPath?: string[] | null;
+  /** Resolve a page. `rest` = segments after the id (prefixed) or all segments (absolute). */
   resolve(locale: Locale, rest: string[]): PageModel | null;
-  /** All paths (after the section id) that exist, including [] for the section root. */
+  /** All paths that exist (relative to the id for prefixed sections, full for absolute ones). */
   paths(): string[][];
   /** Paths prebuilt at build time; the rest are rendered on first request. Default: all. */
   prebuild?(): string[][];
   /** Entries for the search index. */
   search(locale: Locale): SearchEntry[];
-  /** Highlighted links for the home page / mega menu. */
+  /** Highlighted links for the header menu and footer. */
   featured(locale: Locale): LinkItem[];
+  /** Every tool of the section (no variants) for the home-page catalogue. Default: featured. */
+  tools?(locale: Locale): LinkItem[];
 }
 
 /* ───────────── Declarative tool sections ───────────── */
@@ -139,7 +151,11 @@ export interface VariantDef {
 }
 
 export interface ToolDef {
-  /** URL slug inside the section; "" = the section root page is this tool. */
+  /**
+   * Top-level URL slug of the tool, unique across the whole site: the English form of the main
+   * search query (e.g. "microphone-test", "merge-pdf", "word-counter"). "" = the tool lives at
+   * `/{section id}` itself.
+   */
   slug: string;
   /** Component key in src/tools/index.ts */
   component: string;
@@ -154,7 +170,7 @@ export interface ToolDef {
   howTo?: L10nList;
   about?: L10nList;
   faq?: Record<Locale, QA[]>;
-  /** Related tools as "section/slug" or "section" keys. */
+  /** Related pages as paths without locale: "merge-pdf", "timer/5-minutes", "convert/km-to-miles". */
   related?: string[];
   popular?: boolean;
   wide?: boolean;
