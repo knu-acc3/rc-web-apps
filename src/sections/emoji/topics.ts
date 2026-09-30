@@ -32,17 +32,6 @@ export interface TopicAlias {
 
 export const TOPICS: TopicDef[] = [
   {
-    slug: "hearts",
-    name: { ru: "Сердечки", en: "Heart emojis" },
-    h1: { ru: "Эмодзи сердечки", en: "Heart emojis" },
-    intro: {
-      ru: "Все сердечки Unicode: цветные сердца, разбитое, пульсирующее, со стрелой и с лентой, а также смайлики и жесты с сердечками.",
-      en: "Every heart in Unicode: colored hearts, broken, beating, with an arrow or a ribbon, plus smileys and gestures with hearts.",
-    },
-    sub: ["heart"],
-    add: "😍🥰😻💑💏🫶💌💒♥️🏩",
-  },
-  {
     slug: "love",
     name: { ru: "Любовь", en: "Love" },
     h1: { ru: "Эмодзи любовь", en: "Love emojis" },
@@ -76,8 +65,8 @@ export const TOPICS: TopicDef[] = [
   },
   {
     slug: "flowers",
-    name: { ru: "Цветы и букеты", en: "Flowers & bouquets" },
-    h1: { ru: "Эмодзи цветы", en: "Flower emojis" },
+    name: { ru: "Цветы и растения", en: "Flowers & plants" },
+    h1: { ru: "Эмодзи цветы и растения", en: "Flower & plant emojis" },
     intro: {
       ru: "Цветы, букеты и растения: роза, тюльпан, подсолнух, сакура, лотос, а также смайлики и предметы с цветами.",
       en: "Flowers, bouquets and plants: rose, tulip, sunflower, cherry blossom, lotus and other flowery emojis.",
@@ -473,17 +462,6 @@ export const TOPICS: TopicDef[] = [
     add: "😢😭😞😔😟😕🙁☹️😣😖😫😩🥺🥹😿😥😓😪💔😿🫤😒😮‍💨",
   },
   {
-    slug: "faces-angry",
-    name: { ru: "Злые смайлики", en: "Angry faces" },
-    h1: { ru: "Злые смайлики", en: "Angry face emojis" },
-    intro: {
-      ru: "Злость и раздражение: сердитые и красные от гнева смайлики, ругательства, пар из носа, чертёнок и злой кот.",
-      en: "Anger and irritation: angry and pouting faces, cursing, steam from the nose, a devil and a pouting cat.",
-    },
-    sub: ["face-negative"],
-    add: "😾💢🗯️👊🖕😒🙄",
-  },
-  {
     slug: "surprised",
     name: { ru: "Удивление", en: "Surprise" },
     h1: { ru: "Удивлённые смайлики", en: "Surprised emojis" },
@@ -537,7 +515,7 @@ export const TOPICS: TopicDef[] = [
   },
   {
     slug: "colors",
-    name: { ru: "Цветные фигуры", en: "Colors" },
+    name: { ru: "Цвета", en: "Colors" },
     h1: { ru: "Эмодзи цветные кружки и квадраты", en: "Colored circle & square emojis" },
     intro: {
       ru: "Кружки, квадраты и сердечки всех цветов радуги — для цветовых меток, опросов и оформления постов.",
@@ -611,6 +589,8 @@ export const TOPICS: TopicDef[] = [
 ];
 
 export const ALIASES: TopicAlias[] = [
+  { slug: "hearts", name: { ru: "Сердечки", en: "Hearts" }, to: ["subgroup", "heart"] },
+  { slug: "faces-angry", name: { ru: "Злые смайлики", en: "Angry faces" }, to: ["subgroup", "face-negative"] },
   { slug: "smileys", name: { ru: "Смайлики", en: "Smileys" }, to: ["group", "smileys-emotion"] },
   { slug: "food", name: { ru: "Еда", en: "Food" }, to: ["group", "food-drink"] },
   { slug: "fruits", name: { ru: "Фрукты", en: "Fruits" }, to: ["subgroup", "food-fruit"] },

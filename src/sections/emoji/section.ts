@@ -71,8 +71,26 @@ function version(e: Emoji) {
   return { ver: fmtVer(e.version), uni, year, retro: e.version < 1 };
 }
 
+/**
+ * Join sentences while the text fits a meta description. The first part is always kept; an array
+ * part means "the first alternative that still fits".
+ */
+function fit(parts: (string | string[])[], max = 160): string {
+  let out = String(parts[0]);
+  for (const p of parts.slice(1)) {
+    // UTF-16 length, the same measure the SEO layer uses to clamp descriptions.
+    const alt = (Array.isArray(p) ? p : [p]).find((x) => `${out} ${x}`.length <= max);
+    if (alt) out = `${out} ${alt}`;
+  }
+  return out;
+}
+
 const groupName = (g: string, locale: Locale) => tr(GROUPS[g].name, locale);
 const subName = (s: string, locale: Locale) => tr(SUBGROUPS[s] ?? { ru: s, en: s }, locale);
+/** Subgroups with fewer emoji ("Amphibians": 🐸) get no page of their own; the group page covers them. */
+const MIN_SUB = 5;
+const hasSubPage = (s: string) => (bySub.get(s)?.length ?? 0) >= MIN_SUB;
+const SUB_PAGES = SUBGROUP_KEYS.filter(hasSubPage);
 
 /* ───────────── links ───────────── */
 
@@ -103,6 +121,8 @@ function allTopicChips(locale: Locale, exclude?: string): LinkItem[] {
   }
   return out;
 }
+/* Cross-section links go only to the sibling "symbols" section (both live in this branch);
+   links to other sections are added during integration. */
 const sectionLinks = (locale: Locale): LinkItem[] => [
   {
     path: ["symbols"],
@@ -111,14 +131,14 @@ const sectionLinks = (locale: Locale): LinkItem[] => [
     icon: "Asterisk",
     hue: 265,
   },
-  {
-    path: ["kaomoji"],
-    label: locale === "ru" ? "Каомодзи" : "Kaomoji",
-    hint: locale === "ru" ? "Японские текстовые смайлики вроде (＾▽＾)" : "Japanese text faces like (＾▽＾)",
-    icon: "Smile",
-    hue: 330,
-  },
 ];
+
+const hubLink = (locale: Locale): LinkItem => ({
+  path: [ID],
+  label: locale === "ru" ? "Эмодзи: копировать и вставить" : "Emoji copy and paste",
+  hint: locale === "ru" ? "Поиск по названию, категории и подборки" : "Search by name, categories and collections",
+  glyph: "😀",
+});
 
 const board = (list: Emoji[], locale: Locale): BoardItem[] => list.map((e) => [e.glyph, e.slug, nameOf(e, locale)]);
 
@@ -340,19 +360,28 @@ function emojiPage(e: Emoji, locale: Locale): PageModel {
     sectionId: ID,
     kind: "entity",
     title: shortTitle,
-    h1: ru ? `Эмодзи ${e.glyph} «${title}»` : `${e.glyph} ${title} emoji`,
+    h1: ru ? `Эмодзи «${title}» ${e.glyph}` : `${title} emoji ${e.glyph}`,
     description: ru
-      ? `Эмодзи ${e.glyph} «${e.ru}»: значение, код ${code}${shortcode ? `, шорткод :${shortcode}:` : ""}. В стандарте с ${year} года (Emoji ${ver}). Скопируйте ${e.glyph} в один клик.`
-      : `${e.glyph} ${title} emoji: meaning, Unicode ${code}${shortcode ? `, shortcode :${shortcode}:` : ""}, part of Emoji ${ver} (${year}). Copy and paste ${e.glyph} in one click, get HTML and CSS codes.`,
+      ? fit([
+          `Эмодзи ${e.glyph} «${e.ru}»: значение${code.length <= 24 ? `, код ${code}` : ""}${shortcode && shortcode.length <= 20 ? `, шорткод :${shortcode}:` : ""}.`,
+          `В стандарте с ${year} года (Emoji ${ver}).`,
+          `Скопируйте ${e.glyph} в один клик.`,
+          "Коды HTML и CSS.",
+        ])
+      : fit([
+          `${e.glyph} ${title} emoji: meaning${code.length <= 24 ? `, Unicode ${code}` : ""}${shortcode && shortcode.length <= 20 ? `, shortcode :${shortcode}:` : ""}, part of Emoji ${ver} (${year}).`,
+          `Copy and paste ${e.glyph} in one click.`,
+          "Get HTML and CSS codes.",
+        ]),
     lead: ru
       ? `${e.glyph} — эмодзи «${e.ru}» из раздела «${subName(s, "ru")}». Нажмите «Копировать», чтобы вставить его в сообщение.`
       : `${e.glyph} is the “${lower(e, locale)}” emoji from “${subName(s, "en")}”. Press Copy to paste it into a message.`,
-    breadcrumbs: crumbs(locale, { name: groupName(g, locale), path: groupPath(g) }, { name: subName(s, locale), path: subPath(s) }),
+    breadcrumbs: crumbs(locale, { name: groupName(g, locale), path: groupPath(g) }, ...(hasSubPage(s) ? [{ name: subName(s, locale), path: subPath(s) }] : [])),
     tool: { id: "emoji/card", props: { glyph: e.glyph, name: title, variants: variants.length ? variants : undefined } },
     topBlocks: [{ type: "links", title: ru ? `Похожие эмодзи: ${subName(s, "ru").toLowerCase()}` : `More emoji: ${subName(s, "en").toLowerCase()}`, style: "chips", items: related.map((x) => emojiLink(x, locale)) }],
     blocks,
     faq,
-    related: [subLink(s, locale), groupLink(g, locale), ...topics.slice(0, 2).map((t) => topicLink(t, locale)), ...sectionLinks(locale)].slice(0, 6),
+    related: [...(hasSubPage(s) ? [subLink(s, locale)] : []), groupLink(g, locale), ...topics.slice(0, 2).map((t) => topicLink(t, locale)), ...sectionLinks(locale)].slice(0, 6),
     schemaType: "DefinedTerm",
     jsonLd: [
       {
@@ -398,7 +427,7 @@ function groupPage(g: string, locale: Locale): PageModel {
   const list = byGroup.get(g)!;
   const subs = subgroupsOf(g);
   const name = groupName(g, locale);
-  const sections: BoardSection[] = subs.map((s) => [subName(s, locale), bySub.get(s)!.length, `/${locale}/${subPath(s).join("/")}`]);
+  const sections: BoardSection[] = subs.map((s) => [subName(s, locale), bySub.get(s)!.length, hasSubPage(s) ? `/${locale}/${subPath(s).join("/")}` : undefined]);
   const items = subs.flatMap((s) => board(bySub.get(s)!, locale));
   const subList = subs.map((s) => subName(s, locale).toLowerCase());
   const overlap = TOPICS.map((t) => ({ t, k: topicEmoji(t).filter((e) => e.group === g).length }))
@@ -410,18 +439,21 @@ function groupPage(g: string, locale: Locale): PageModel {
     path: groupPath(g),
     sectionId: ID,
     kind: "variant",
-    title: ru ? `${name}: эмодзи ${sample(list, 3)} — копировать` : `${name} Emoji ${sample(list, 3)} — Copy & Paste`,
-    h1: ru ? `Эмодзи: ${name.toLowerCase()}` : `${name} emoji`,
+    title: ru ? `Эмодзи ${name.toLowerCase()} ${sample(list, 3)} — копировать` : `${name} Emoji ${sample(list, 3)} — Copy & Paste`,
+    h1: ru ? `Эмодзи ${name.toLowerCase()}` : `${name} emoji`,
     description: ru
-      ? `Все эмодзи категории «${name}»: ${cnt("ru", list.length)} в ${n("ru", subs.length)} ${plural("ru", subs.length, ["подкатегории", "подкатегориях", "подкатегориях"])} — ${subList.slice(0, 3).join(", ")} и другие. Нажмите, чтобы скопировать.`
-      : `All ${name} emoji: ${list.length} emoji in ${subs.length} subgroups — ${subList.slice(0, 3).join(", ")} and more. Click any emoji to copy it, open it for meaning and codes.`,
+      ? fit([
+          `Все эмодзи категории «${name}»: ${cnt("ru", list.length)} в ${n("ru", subs.length)} ${plural("ru", subs.length, ["подкатегории", "подкатегориях", "подкатегориях"])} — ${subList.slice(0, 3).join(", ")} и другие.`,
+          "Нажмите, чтобы скопировать.",
+        ])
+      : fit([`All ${name} emoji: ${list.length} emoji in ${subs.length} subgroups — ${subList.slice(0, 3).join(", ")} and more.`, "Click any emoji to copy it.", "Open it for meaning and codes."]),
     lead: ru
       ? `${cnt("ru", list.length)} в ${n("ru", subs.length)} ${plural("ru", subs.length, ["подкатегории", "подкатегориях", "подкатегориях"])}: нажмите на эмодзи, чтобы скопировать его.`
       : `${cnt("en", list.length)} in ${subs.length} subgroups: click an emoji to copy it.`,
     breadcrumbs: crumbs(locale),
     tool: { id: "emoji/grid", props: { base: `/${locale}/${ID}/`, items, sections } },
     topBlocks: [
-      { type: "links", title: ru ? "Подкатегории" : "Subgroups", style: "chips", items: subs.map((s) => subLink(s, locale)) },
+      { type: "links", title: ru ? "Подкатегории" : "Subgroups", style: "chips", items: subs.filter(hasSubPage).map((s) => subLink(s, locale)) },
       { type: "links", title: ru ? "Другие категории эмодзи" : "Other emoji categories", style: "chips", items: GROUP_KEYS.filter((x) => x !== g).map((x) => groupLink(x, locale)) },
     ],
     blocks: [
@@ -458,19 +490,23 @@ function subPage(s: string, locale: Locale): PageModel {
   const list = bySub.get(s)!;
   const g = subgroupGroup.get(s)!;
   const name = subName(s, locale);
-  const siblings = subgroupsOf(g).filter((x) => x !== s);
-  const others = SUBGROUP_KEYS.filter((x) => subgroupGroup.get(x) !== g && (bySub.get(x)?.length ?? 0) > 0);
+  const siblings = subgroupsOf(g).filter((x) => x !== s && hasSubPage(x));
+  const others = SUB_PAGES.filter((x) => subgroupGroup.get(x) !== g);
   const chips = [...siblings, ...others].slice(0, 40).map((x) => subLink(x, locale));
   const names = list.slice(0, 8).map((e) => lower(e, locale));
+  const Name = ru ? name : titleCase(name);
   return {
     path: subPath(s),
     sectionId: ID,
     kind: "variant",
-    title: ru ? `${name} — эмодзи ${sample(list, 4)}, копировать` : `${name} Emoji ${sample(list, 4)} — Copy & Paste`,
-    h1: ru ? `Эмодзи: ${name.toLowerCase()}` : `${name} emoji`,
+    title: ru ? `Эмодзи ${name.toLowerCase()} ${sample(list, 4)} — копировать` : `${Name} Emoji ${sample(list, 4)} — Copy & Paste`,
+    h1: ru ? `Эмодзи ${name.toLowerCase()}` : `${Name} emoji`,
     description: ru
-      ? `${name}: ${cnt("ru", list.length)} из категории «${groupName(g, "ru")}» — ${names.slice(0, 4).join(", ")} и другие. Названия, коды Unicode и копирование в один клик.`
-      : `${name}: ${list.length} emoji from “${groupName(g, "en")}” — ${names.slice(0, 4).join(", ")} and more. Names, Unicode codes and one-click copy.`,
+      ? fit([
+          `${name}: ${cnt("ru", list.length)} из категории «${groupName(g, "ru")}» — ${names.slice(0, 3).join(", ")} и другие.`,
+          ["Названия, коды Unicode и копирование в один клик.", "Копирование в один клик."],
+        ])
+      : fit([`${Name}: ${list.length} emoji from “${groupName(g, "en")}” — ${names.slice(0, 3).join(", ")} and more.`, ["Names, meanings, Unicode codes and one-click copy for every emoji.", "Names, Unicode codes and one-click copy.", "One-click copy."]]),
     lead: ru
       ? `${cnt("ru", list.length)} в разделе «${name}»: нажмите на эмодзи, чтобы скопировать его.`
       : `${cnt("en", list.length)} in “${name}”: click an emoji to copy it.`,
@@ -519,8 +555,8 @@ function topicPage(t: TopicDef, locale: Locale): PageModel {
     title: ru ? `${h1} — скопировать ${sample(list, 4)}` : `${h1.charAt(0).toUpperCase() + h1.slice(1)} — Copy & Paste ${sample(list, 4)}`,
     h1,
     description: ru
-      ? `${h1}: ${cnt("ru", list.length)} — ${sample(list, 8)} и другие. ${t.intro.ru}`
-      : `${h1.charAt(0).toUpperCase() + h1.slice(1)}: ${list.length} emoji — ${sample(list, 8)} and more. ${t.intro.en}`,
+      ? fit([`${h1}: ${cnt("ru", list.length)} — ${sample(list, 4)} и другие.`, [t.intro.ru, "Нажмите на эмодзи, чтобы скопировать его, или откройте страницу со значением и кодами.", "Копирование в один клик, названия и коды."]])
+      : fit([`${h1.charAt(0).toUpperCase() + h1.slice(1)}: ${list.length} emoji — ${sample(list, 4)} and more.`, [t.intro.en, "Click an emoji to copy it, or open its page for the meaning and codes.", "One-click copy, names and codes."]]),
     lead: ru ? `${t.intro.ru} Нажмите на эмодзи, чтобы скопировать.` : `${t.intro.en} Click an emoji to copy it.`,
     breadcrumbs: crumbs(locale),
     tool: { id: "emoji/grid", props: { base: `/${locale}/${ID}/`, items: board(list, locale) } },
@@ -548,6 +584,7 @@ function topicPage(t: TopicDef, locale: Locale): PageModel {
       copyFaq(locale),
     ],
     related: [...new Set(list.map((e) => e.sub))]
+      .filter(hasSubPage)
       .slice(0, 4)
       .map((s) => subLink(s, locale))
       .concat(sectionLinks(locale))
@@ -566,8 +603,8 @@ function hubPage(locale: Locale): PageModel {
     path: [ID],
     sectionId: ID,
     kind: "hub",
-    title: ru ? "Эмодзи — все смайлики с названиями и кодами, копировать" : "Emoji List — Copy & Paste Every Emoji with Meanings",
-    h1: ru ? "Эмодзи: скопировать и вставить" : "Emoji: copy and paste",
+    title: ru ? "Эмодзи — скопировать и вставить, все смайлики с названиями" : "Emoji Copy and Paste — Every Emoji with Meanings",
+    h1: ru ? "Эмодзи: скопировать и вставить" : "Emoji copy and paste",
     description: ru
       ? `Все ${n("ru", EMOJI.length)} эмодзи Unicode 16 с русскими названиями, значениями и кодами: поиск, ${GROUP_KEYS.length} категорий, подборки и копирование в один клик.`
       : `All ${n("en", EMOJI.length)} Unicode 16 emoji with names, meanings and codes: search, ${GROUP_KEYS.length} categories, curated collections and one-click copy.`,
@@ -638,7 +675,7 @@ export const emojiSection: SectionDef = {
       [],
       ...EMOJI.map((e) => [e.slug]),
       ...GROUP_KEYS.map((g) => ["group", g]),
-      ...SUBGROUP_KEYS.map((s) => ["subgroup", s]),
+      ...SUB_PAGES.map((s) => ["subgroup", s]),
       ...TOPICS.map((t) => ["topic", t.slug]),
     ];
   },
@@ -646,7 +683,7 @@ export const emojiSection: SectionDef = {
     return [
       [],
       ...GROUP_KEYS.map((g) => ["group", g]),
-      ...SUBGROUP_KEYS.map((s) => ["subgroup", s]),
+      ...SUB_PAGES.map((s) => ["subgroup", s]),
       ...TOPICS.map((t) => ["topic", t.slug]),
       ...popular(PREBUILD_EMOJI).map((e) => [e.slug]),
     ];
@@ -660,7 +697,7 @@ export const emojiSection: SectionDef = {
     if (rest.length !== 2) return null;
     const [kind, key] = rest;
     if (kind === "group") return GROUPS[key] && byGroup.has(key) ? groupPage(key, locale) : null;
-    if (kind === "subgroup") return bySub.has(key) ? subPage(key, locale) : null;
+    if (kind === "subgroup") return hasSubPage(key) ? subPage(key, locale) : null;
     if (kind === "topic") {
       const t = topicBySlug.get(key);
       return t ? topicPage(t, locale) : null;
@@ -673,16 +710,20 @@ export const emojiSection: SectionDef = {
       { path: [ID], title: locale === "ru" ? "Эмодзи — копировать" : "Emoji — copy and paste", hint: ui(locale).allTools, keywords: "эмодзи смайлики смайлы emoji emojis копировать", weight: 3 },
     ];
     for (const g of GROUP_KEYS) out.push({ path: groupPath(g), title: groupLink(g, locale).label, hint, keywords: `${tr(GROUPS[g].name, "en")} ${tr(GROUPS[g].name, "ru")} эмодзи emoji`, glyph: GROUPS[g].glyph, weight: 2 });
-    for (const s of SUBGROUP_KEYS)
+    for (const s of SUB_PAGES)
       out.push({ path: subPath(s), title: `${subName(s, locale)} — ${locale === "ru" ? "эмодзи" : "emoji"}`, hint, keywords: `${tr(SUBGROUPS[s], "en")} ${tr(SUBGROUPS[s], "ru")}`, glyph: bySub.get(s)?.[0]?.glyph, weight: 1 });
     for (const t of TOPICS) out.push({ path: topicPath(t.slug), title: tr(t.h1, locale), hint, keywords: `${t.name.ru} ${t.name.en} ${t.h1.en}`, glyph: topicEmoji(t)[0]?.glyph, weight: 2 });
     for (const e of popular(PREBUILD_EMOJI))
       out.push({ path: emojiPath(e), title: nameOf(e, locale), hint, keywords: locale === "ru" ? e.en : e.ru, glyph: e.glyph, weight: 1 });
     return out;
   },
+  tools(locale) {
+    return [hubLink(locale)];
+  },
   featured(locale) {
     return [
-      topicLink(topicBySlug.get("hearts")!, locale),
+      hubLink(locale),
+      subLink("heart", locale),
       groupLink("smileys-emotion", locale),
       topicLink(topicBySlug.get("hands")!, locale),
       topicLink(topicBySlug.get("animals")!, locale),
