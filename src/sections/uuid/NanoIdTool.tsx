@@ -8,80 +8,55 @@ import { outputLabels } from "@/sections/code/kit/labels";
 import { Button } from "@/ui/button";
 import { CodeOutput } from "@/ui/code-output";
 import { CopyButton } from "@/ui/copy-button";
-import { Field, Input, Select, Slider } from "@/ui/field";
+import { Field, Input, Select } from "@/ui/field";
 import { Panel } from "@/ui/panel";
 import { entropyBits, log10IdsForCollision, NANOID_ALPHABETS, nanoid } from "./engine";
 
 type Preset = keyof typeof NANOID_ALPHABETS | "custom";
+type Unit = "sec" | "min" | "hour" | "day" | "year";
 
 const T = {
   ru: {
     alphabet: "Алфавит",
-    presets: {
-      default: "Стандартный NanoID (A–Z, a–z, 0–9, _ -)",
-      alphanumeric: "Буквы и цифры",
-      numbers: "Только цифры",
-      lowercase: "Строчные буквы и цифры",
-      hex: "Шестнадцатеричный (0–9, a–f)",
-      nolookalikes: "Без похожих символов (нет 0/O, 1/l/I)",
-      custom: "Свой алфавит",
-    },
+    presets: { default: "A–Z a–z 0–9 _ -", alphanumeric: "A–Z a–z 0–9", numbers: "0–9", lowercase: "a–z 0–9", hex: "0–9 a–f", nolookalikes: "без похожих символов", custom: "свой" },
     customLabel: "Символы алфавита",
     length: "Длина",
     count: "Количество",
-    rate: "Скорость генерации, ID в час",
-    generate: "Сгенерировать",
-    id: "Ваш NanoID",
-    waiting: "Генерируется в браузере…",
+    rate: "ID в час",
+    generate: "Новый",
     badAlphabet: "Нужно от 2 до 256 разных символов",
-    entropy: "Энтропия",
     bits: ["бит", "бита", "бит"],
-    symbols: ["символ", "символа", "символов"],
-    risk1: "Вероятность хотя бы одной коллизии достигнет 1 % примерно после",
+    risk: (n: string, ids: string) => `Риск коллизии 1 % — после ${n} ${ids}`,
+    time: (rate: string, d: string) => `при ${rate} ID в час это ≈ ${d}`,
     ids: ["идентификатора", "идентификаторов", "идентификаторов"],
-    at: "При",
-    perHour: "ID в час это случится через",
-    units: { sec: ["секунду", "секунды", "секунд"], min: ["минуту", "минуты", "минут"], hour: ["час", "часа", "часов"], day: ["день", "дня", "дней"], year: ["год", "года", "лет"] },
+    units: { sec: ["секунда", "секунды", "секунд"], min: ["минута", "минуты", "минут"], hour: ["час", "часа", "часов"], day: ["день", "дня", "дней"], year: ["год", "года", "лет"] },
     copy: "Копировать",
     copied: "Скопировано",
   },
   en: {
     alphabet: "Alphabet",
-    presets: {
-      default: "Default NanoID (A–Z, a–z, 0–9, _ -)",
-      alphanumeric: "Letters and digits",
-      numbers: "Digits only",
-      lowercase: "Lowercase letters and digits",
-      hex: "Hexadecimal (0–9, a–f)",
-      nolookalikes: "No look-alikes (no 0/O, 1/l/I)",
-      custom: "Custom alphabet",
-    },
+    presets: { default: "A–Z a–z 0–9 _ -", alphanumeric: "A–Z a–z 0–9", numbers: "0–9", lowercase: "a–z 0–9", hex: "0–9 a–f", nolookalikes: "no look-alikes", custom: "custom" },
     customLabel: "Alphabet characters",
     length: "Length",
-    count: "How many",
-    rate: "Generation rate, IDs per hour",
-    generate: "Generate",
-    id: "Your NanoID",
-    waiting: "Generating in your browser…",
+    count: "Count",
+    rate: "IDs per hour",
+    generate: "New",
     badAlphabet: "Use 2 to 256 distinct characters",
-    entropy: "Entropy",
     bits: ["bit", "bits"],
-    symbols: ["symbol", "symbols"],
-    risk1: "The probability of at least one collision reaches 1% after about",
+    risk: (n: string, ids: string) => `1% collision risk after ${n} ${ids}`,
+    time: (rate: string, d: string) => `at ${rate} IDs per hour that is ≈ ${d}`,
     ids: ["ID", "IDs"],
-    at: "At",
-    perHour: "IDs per hour that takes",
     units: { sec: ["second", "seconds"], min: ["minute", "minutes"], hour: ["hour", "hours"], day: ["day", "days"], year: ["year", "years"] },
     copy: "Copy",
     copied: "Copied",
   },
 } as const;
 
+const SUP = "⁰¹²³⁴⁵⁶⁷⁸⁹";
 function bigNumber(locale: Locale, log10: number): string {
   if (log10 < 15) return formatNumber(locale, Math.round(10 ** log10));
   const e = Math.floor(log10);
-  const m = 10 ** (log10 - e);
-  return `${formatNumber(locale, m, { maximumFractionDigits: 1 })}×10${String(e).replace(/\d/g, (d) => "⁰¹²³⁴⁵⁶⁷⁸⁹"[Number(d)])}`;
+  return `${formatNumber(locale, 10 ** (log10 - e), { maximumFractionDigits: 1 })}×10${String(e).replace(/\d/g, (d) => SUP[Number(d)])}`;
 }
 
 export default function NanoIdTool({ locale, preset: preset0 = "default", size: size0 = 21 }: { locale: Locale; preset?: Preset; size?: number }) {
@@ -89,14 +64,15 @@ export default function NanoIdTool({ locale, preset: preset0 = "default", size: 
   const id = useId();
   const [preset, setPreset] = useState<Preset>(preset0);
   const [custom, setCustom] = useState("0123456789ABCDEF");
-  const [size, setSize] = useState(size0);
-  const [countText, setCountText] = useState("10");
+  const [sizeText, setSizeText] = useState(String(size0));
+  const [countText, setCountText] = useState("1");
   const [rateText, setRateText] = useState("1000");
   const [ids, setIds] = useState<string[] | null>(null);
 
   const alphabet = preset === "custom" ? custom : NANOID_ALPHABETS[preset];
   const chars = [...alphabet];
   const valid = chars.length >= 2 && chars.length <= 256 && new Set(chars).size === chars.length;
+  const size = Math.min(256, Math.max(2, Math.floor(Number(sizeText) || size0)));
   const count = Math.min(10000, Math.max(1, Math.floor(Number(countText) || 1)));
   const rate = Math.max(1, Number(rateText.replace(/\s/g, "")) || 1);
 
@@ -108,7 +84,7 @@ export default function NanoIdTool({ locale, preset: preset0 = "default", size: 
 
   const first = useRef({ a: alphabet, s: size0 });
   useEffect(() => {
-    const timer = setTimeout(() => setIds(Array.from({ length: 10 }, () => nanoid(first.current.a, first.current.s))), 0);
+    const timer = setTimeout(() => setIds([nanoid(first.current.a, first.current.s)]), 0);
     return () => clearTimeout(timer);
   }, []);
 
@@ -116,54 +92,45 @@ export default function NanoIdTool({ locale, preset: preset0 = "default", size: 
     if (!valid) return null;
     const lg = log10IdsForCollision(chars.length, size, 0.01);
     const hours = 10 ** (lg - Math.log10(rate));
-    let unit: keyof (typeof T)["ru"]["units"] = "hour";
+    let unit: Unit = "hour";
     let value = hours;
-    if (hours < 1 / 60) {
-      unit = "sec";
-      value = hours * 3600;
-    } else if (hours < 1) {
-      unit = "min";
-      value = hours * 60;
-    } else if (hours >= 24 * 365) {
-      unit = "year";
-      value = hours / (24 * 365.25);
-    } else if (hours >= 48) {
-      unit = "day";
-      value = hours / 24;
-    }
+    if (hours < 1 / 60) [unit, value] = ["sec", hours * 3600];
+    else if (hours < 1) [unit, value] = ["min", hours * 60];
+    else if (hours >= 24 * 365) [unit, value] = ["year", hours / (24 * 365.25)];
+    else if (hours >= 48) [unit, value] = ["day", hours / 24];
     return { lg, bits: entropyBits(chars.length, size), unit, value };
   }, [valid, chars.length, size, rate]);
 
-  const durationText = stats
-    ? stats.value >= 1e15
-      ? `${bigNumber(locale, Math.log10(stats.value))} ${plural(locale, 5, t.units[stats.unit])}`
-      : `${formatSmart(locale, stats.value >= 10 ? Math.round(stats.value) : Number(stats.value.toPrecision(2)))} ${plural(locale, stats.value >= 10 ? Math.round(stats.value) : stats.value, t.units[stats.unit])}`
-    : "";
+  let duration = "";
+  if (stats) {
+    const v = stats.value >= 10 ? Math.round(stats.value) : Number(stats.value.toPrecision(2));
+    duration = stats.value >= 1e15 ? `${bigNumber(locale, Math.log10(stats.value))} ${plural(locale, 5, t.units[stats.unit])}` : `${formatSmart(locale, v)} ${plural(locale, v, t.units[stats.unit])}`;
+  }
+
+  const commit = () => gen();
 
   return (
     <div className="flex flex-col gap-4">
-      <Panel className="p-4 sm:p-5">
-        <div className="flex flex-col gap-3 rounded-[10px] bg-surface-2 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
-          <div className="min-w-0">
-            <div className="text-[13px] font-medium text-fg-2">{t.id}</div>
-            <output className="block min-h-8 font-mono text-lg font-semibold break-all text-fg sm:text-xl" aria-live="polite">
-              {ids ? ids[0] : <span className="text-base font-normal text-fg-3">{t.waiting}</span>}
-            </output>
-          </div>
-          <div className="flex shrink-0 gap-2">
-            <CopyButton value={ids?.[0] ?? ""} label={t.copy} copiedLabel={t.copied} />
-            <Button variant="primary" size="sm" onClick={() => gen()} disabled={!valid}>
-              <RefreshCw aria-hidden />
-              {t.generate}
-            </Button>
-          </div>
+      <Panel className="p-4 sm:p-6">
+        <div className="text-sm font-medium text-fg-2">NanoID</div>
+        <output className="mt-1 block min-h-9 font-mono text-xl font-semibold tracking-tight break-all text-fg sm:text-[26px]" aria-live="polite">
+          {ids?.[0] ?? "…"}
+        </output>
+        <div className="mt-4 flex flex-wrap items-center gap-2">
+          <Button variant="primary" onClick={() => gen()} disabled={!valid}>
+            <RefreshCw aria-hidden />
+            {t.generate}
+          </Button>
+          <CopyButton value={ids?.[0] ?? ""} label={t.copy} copiedLabel={t.copied} size="md" variant="outline" />
         </div>
 
-        <div className="mt-4 grid gap-3 sm:grid-cols-2">
-          <Field label={t.alphabet} htmlFor={`${id}-a`}>
+        <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-3 border-t border-line pt-4 text-sm text-fg-2">
+          <label className="flex items-center gap-2">
+            {t.alphabet}
             <Select
-              id={`${id}-a`}
               value={preset}
+              size="sm"
+              className="w-48"
               onChange={(e) => {
                 const p = e.target.value as Preset;
                 setPreset(p);
@@ -176,52 +143,35 @@ export default function NanoIdTool({ locale, preset: preset0 = "default", size: 
                 </option>
               ))}
             </Select>
-          </Field>
-          {preset === "custom" ? (
-            <Field label={t.customLabel} htmlFor={`${id}-c`} error={!valid ? t.badAlphabet : undefined}>
-              <Input id={`${id}-c`} value={custom} onChange={(e) => setCustom(e.target.value)} onBlur={() => gen()} className="font-mono" spellCheck={false} aria-invalid={!valid} />
-            </Field>
-          ) : (
-            <Field label={t.customLabel} htmlFor={`${id}-c`}>
-              <Input id={`${id}-c`} value={alphabet} readOnly className="font-mono" />
-            </Field>
-          )}
-          <Field label={`${t.length}: ${size}`} htmlFor={`${id}-l`}>
-            <Slider
-              id={`${id}-l`}
-              min={2}
-              max={64}
-              value={size}
-              onChange={(e) => setSize(Number(e.target.value))}
-              onPointerUp={() => gen()}
-              onKeyUp={() => gen()}
-            />
-          </Field>
-          <Field label={t.count} htmlFor={`${id}-n`}>
-            <Input id={`${id}-n`} inputMode="numeric" value={countText} onChange={(e) => setCountText(e.target.value)} onBlur={() => gen()} />
-          </Field>
+          </label>
+          <label className="flex items-center gap-2" htmlFor={`${id}-l`}>
+            {t.length}
+            <Input id={`${id}-l`} size="sm" inputMode="numeric" className="w-16" value={sizeText} onChange={(e) => setSizeText(e.target.value)} onBlur={commit} onKeyDown={(e) => e.key === "Enter" && commit()} />
+          </label>
+          <label className="flex items-center gap-2" htmlFor={`${id}-n`}>
+            {t.count}
+            <Input id={`${id}-n`} size="sm" inputMode="numeric" className="w-20" value={countText} onChange={(e) => setCountText(e.target.value)} onBlur={commit} onKeyDown={(e) => e.key === "Enter" && commit()} />
+          </label>
         </div>
+        {preset === "custom" && (
+          <Field className="mt-3" label={t.customLabel} htmlFor={`${id}-c`} error={!valid ? t.badAlphabet : undefined}>
+            <Input id={`${id}-c`} value={custom} onChange={(e) => setCustom(e.target.value)} onBlur={commit} className="font-mono" spellCheck={false} aria-invalid={!valid} />
+          </Field>
+        )}
       </Panel>
 
       {stats && (
-        <Panel className="p-4 sm:p-5">
-          <div className="grid gap-3 sm:grid-cols-[1fr_16rem] sm:items-end">
-            <div className="text-[15px] text-fg-2">
-              <p>
-                {t.entropy}: <strong className="text-fg">{formatNumber(locale, stats.bits, { maximumFractionDigits: 1 })} {plural(locale, Math.round(stats.bits), t.bits)}</strong> ({chars.length} {plural(locale, chars.length, t.symbols)} × {size}).
-              </p>
-              <p className="mt-1">
-                {t.risk1} <strong className="text-fg">{bigNumber(locale, stats.lg)}</strong> {plural(locale, stats.lg < 15 ? Math.round(10 ** stats.lg) : 5, t.ids)}.
-              </p>
-              <p className="mt-1">
-                {t.at} {formatNumber(locale, rate)} {t.perHour} <strong className="text-fg">≈ {durationText}</strong>.
-              </p>
-            </div>
-            <Field label={t.rate} htmlFor={`${id}-r`}>
-              <Input id={`${id}-r`} inputMode="numeric" value={rateText} onChange={(e) => setRateText(e.target.value)} />
-            </Field>
-          </div>
-        </Panel>
+        <div className="flex flex-wrap items-center gap-x-2 gap-y-2 px-1 text-sm text-fg-2">
+          <span>
+            {formatNumber(locale, stats.bits, { maximumFractionDigits: 1 })} {plural(locale, Math.round(stats.bits), t.bits)} ·{" "}
+            {t.risk(bigNumber(locale, stats.lg), plural(locale, stats.lg < 15 ? Math.round(10 ** stats.lg) : 5, t.ids))},
+          </span>
+          <span>{t.time(formatNumber(locale, rate), duration)}</span>
+          <label className="flex items-center gap-2 text-fg-3" htmlFor={`${id}-r`}>
+            ({t.rate}
+            <Input id={`${id}-r`} size="sm" inputMode="numeric" className="w-24" value={rateText} onChange={(e) => setRateText(e.target.value)} />)
+          </label>
+        </div>
       )}
 
       {ids && ids.length > 1 && <CodeOutput value={ids.join("\n")} title="NanoID" filename={`nanoid-${ids.length}.txt`} labels={outputLabels(locale)} />}

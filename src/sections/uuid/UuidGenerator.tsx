@@ -9,59 +9,52 @@ import { outputLabels } from "@/sections/code/kit/labels";
 import { Button } from "@/ui/button";
 import { CodeOutput } from "@/ui/code-output";
 import { CopyButton } from "@/ui/copy-button";
-import { Checkbox, Field, Input, Select, Switch } from "@/ui/field";
+import { Input, Select, Switch } from "@/ui/field";
 import { Panel } from "@/ui/panel";
-import { formatUuid, ObjectIdGenerator, TimeUuidGenerator, UlidGenerator, uuidV4 } from "./engine";
+import { formatUuid, ObjectIdGenerator, TimeUuidGenerator, UlidGenerator, uuidV4, type UuidFormat } from "./engine";
 
 export type GenKind = "v4" | "v7" | "v1" | "v6" | "ulid" | "objectid";
+export type FormatId = "std" | "upper" | "braces" | "braces-upper" | "nodash" | "urn";
+
+const FORMATS: Record<FormatId, UuidFormat> = {
+  std: {},
+  upper: { upper: true },
+  braces: { braces: true },
+  "braces-upper": { braces: true, upper: true },
+  nodash: { dashes: false },
+  urn: { urn: true },
+};
 
 const T = {
   ru: {
-    generate: "Сгенерировать",
+    generate: "Новый",
     count: "Количество",
-    kind: "Тип идентификатора",
-    upper: "ЗАГЛАВНЫЕ буквы",
-    braces: "В фигурных скобках {…}",
-    dashes: "Без дефисов",
-    urn: "С префиксом urn:uuid:",
-    monotonic: "Монотонно в пределах миллисекунды",
-    result: "Результат",
-    first: "Ваш идентификатор",
+    kind: "Тип",
+    format: "Формат",
+    formats: { std: "xxxxxxxx-xxxx-…", upper: "ЗАГЛАВНЫЕ", braces: "{в скобках}", "braces-upper": "{ЗАГЛАВНЫЕ В СКОБКАХ}", nodash: "без дефисов", urn: "urn:uuid:…" },
+    monotonic: "Монотонно",
     list: ["идентификатор", "идентификатора", "идентификаторов"],
-    max: "не больше 10 000",
     copy: "Копировать",
     copied: "Скопировано",
-    waiting: "Генерируется в браузере…",
+    waiting: "…",
     json: "JSON",
   },
   en: {
-    generate: "Generate",
-    count: "How many",
-    kind: "ID type",
-    upper: "UPPERCASE",
-    braces: "Wrapped in braces {…}",
-    dashes: "No dashes",
-    urn: "urn:uuid: prefix",
-    monotonic: "Monotonic within a millisecond",
-    result: "Result",
-    first: "Your ID",
+    generate: "New",
+    count: "Count",
+    kind: "Type",
+    format: "Format",
+    formats: { std: "xxxxxxxx-xxxx-…", upper: "UPPERCASE", braces: "{braces}", "braces-upper": "{UPPERCASE BRACES}", nodash: "no dashes", urn: "urn:uuid:…" },
+    monotonic: "Monotonic",
     list: ["ID", "IDs"],
-    max: "up to 10,000",
     copy: "Copy",
     copied: "Copied",
-    waiting: "Generating in your browser…",
+    waiting: "…",
     json: "JSON",
   },
 } as const;
 
-const KIND_LABEL: Record<GenKind, string> = {
-  v4: "UUID v4",
-  v7: "UUID v7",
-  v1: "UUID v1",
-  v6: "UUID v6",
-  ulid: "ULID",
-  objectid: "ObjectId",
-};
+const KIND_LABEL: Record<GenKind, string> = { v4: "UUID v4", v7: "UUID v7", v1: "UUID v1", v6: "UUID v6", ulid: "ULID", objectid: "ObjectId" };
 
 export interface UuidGeneratorProps {
   locale: Locale;
@@ -69,8 +62,9 @@ export interface UuidGeneratorProps {
   count?: number;
   /** Show a type selector with these kinds (bulk page). */
   kinds?: GenKind[];
-  upper?: boolean;
-  braces?: boolean;
+  format?: FormatId;
+  /** Label above the main value */
+  label?: string;
 }
 
 function generate(kind: GenKind, count: number, monotonic: boolean): string[] {
@@ -90,22 +84,19 @@ function generate(kind: GenKind, count: number, monotonic: boolean): string[] {
   return out;
 }
 
-export default function UuidGenerator({ locale, kind: kind0 = "v4", count: count0 = 1, kinds, upper: upper0 = false, braces: braces0 = false }: UuidGeneratorProps) {
+export default function UuidGenerator({ locale, kind: kind0 = "v4", count: count0 = 1, kinds, format: format0 = "std", label }: UuidGeneratorProps) {
   const t = T[locale];
   const id = useId();
   const [kind, setKind] = useState<GenKind>(kind0);
   const [countText, setCountText] = useState(String(count0));
-  const [upper, setUpper] = useState(upper0);
-  const [braces, setBraces] = useState(braces0);
-  const [noDashes, setNoDashes] = useState(false);
-  const [urn, setUrn] = useState(false);
+  const [format, setFormat] = useState<FormatId>(format0);
   const [monotonic, setMonotonic] = useState(true);
   const [ids, setIds] = useState<string[] | null>(null);
 
   const count = Math.min(10000, Math.max(1, Math.floor(Number(countText.replace(/\s/g, "")) || 1)));
   const isUuid = kind !== "ulid" && kind !== "objectid";
 
-  // First generation happens in the browser after mount (never on the server).
+  // Generated in the browser after mount — never on the server.
   const first = useRef({ kind: kind0, count: count0 });
   useEffect(() => {
     const timer = setTimeout(() => setIds(generate(first.current.kind, first.current.count, true)), 0);
@@ -113,40 +104,36 @@ export default function UuidGenerator({ locale, kind: kind0 = "v4", count: count
   }, []);
 
   const regen = (k = kind, n = count, m = monotonic) => setIds(generate(k, n, m));
+  const commitCount = () => {
+    setCountText(String(count));
+    regen(kind, count);
+  };
 
-  const shown = useMemo(() => {
-    if (!ids) return null;
-    if (!isUuid) return ids;
-    return ids.map((u) => formatUuid(u, { upper, braces, dashes: !noDashes, urn }));
-  }, [ids, isUuid, upper, braces, noDashes, urn]);
-
-  const text = shown ? shown.join("\n") : "";
+  const shown = useMemo(() => (!ids ? null : isUuid ? ids.map((u) => formatUuid(u, FORMATS[format])) : ids), [ids, isUuid, format]);
 
   return (
     <div className="flex flex-col gap-4">
-      <Panel className="p-4 sm:p-5">
-        <div className="flex flex-col gap-3 rounded-[10px] bg-surface-2 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
-          <div className="min-w-0">
-            <div className="text-[13px] font-medium text-fg-2">{t.first}</div>
-            <output className="block min-h-8 font-mono text-lg font-semibold break-all text-fg sm:text-xl" aria-live="polite">
-              {shown ? shown[0] : <span className="text-base font-normal text-fg-3">{t.waiting}</span>}
-            </output>
-          </div>
-          <div className="flex shrink-0 gap-2">
-            <CopyButton value={shown?.[0] ?? ""} label={t.copy} copiedLabel={t.copied} />
-            <Button variant="primary" size="sm" onClick={() => regen()}>
-              <RefreshCw aria-hidden />
-              {t.generate}
-            </Button>
-          </div>
+      <Panel className="p-4 sm:p-6">
+        <div className="text-sm font-medium text-fg-2">{label ?? KIND_LABEL[kind]}</div>
+        <output className="mt-1 block min-h-9 font-mono text-xl font-semibold tracking-tight break-all text-fg sm:text-[26px]" aria-live="polite">
+          {shown ? shown[0] : t.waiting}
+        </output>
+        <div className="mt-4 flex flex-wrap items-center gap-2">
+          <Button variant="primary" onClick={() => regen()}>
+            <RefreshCw aria-hidden />
+            {t.generate}
+          </Button>
+          <CopyButton value={shown?.[0] ?? ""} label={t.copy} copiedLabel={t.copied} size="md" variant="outline" />
         </div>
 
-        <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-3 border-t border-line pt-4 text-sm text-fg-2">
           {kinds && kinds.length > 1 && (
-            <Field label={t.kind} htmlFor={`${id}-k`}>
+            <label className="flex items-center gap-2">
+              {t.kind}
               <Select
-                id={`${id}-k`}
                 value={kind}
+                size="sm"
+                className="w-36"
                 onChange={(e) => {
                   const k = e.target.value as GenKind;
                   setKind(k);
@@ -159,36 +146,32 @@ export default function UuidGenerator({ locale, kind: kind0 = "v4", count: count
                   </option>
                 ))}
               </Select>
-            </Field>
+            </label>
           )}
-          <Field label={t.count} htmlFor={`${id}-n`} hint={t.max}>
+          <label className="flex items-center gap-2" htmlFor={`${id}-n`}>
+            {t.count}
             <Input
               id={`${id}-n`}
+              size="sm"
               inputMode="numeric"
+              className="w-24"
               value={countText}
               onChange={(e) => setCountText(e.target.value)}
-              onBlur={() => {
-                setCountText(String(count));
-                regen(kind, count);
-              }}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  setCountText(String(count));
-                  regen(kind, count);
-                }
-              }}
+              onBlur={commitCount}
+              onKeyDown={(e) => e.key === "Enter" && commitCount()}
             />
-          </Field>
-        </div>
-
-        <div className="mt-4 flex flex-wrap gap-x-6 gap-y-2">
+          </label>
           {isUuid ? (
-            <>
-              <Checkbox label={t.upper} checked={upper} onChange={(e) => setUpper(e.target.checked)} />
-              <Checkbox label={t.braces} checked={braces} disabled={urn} onChange={(e) => setBraces(e.target.checked)} />
-              <Checkbox label={t.dashes} checked={noDashes} onChange={(e) => setNoDashes(e.target.checked)} />
-              <Checkbox label={t.urn} checked={urn} onChange={(e) => setUrn(e.target.checked)} />
-            </>
+            <label className="flex items-center gap-2">
+              {t.format}
+              <Select value={format} size="sm" className="w-52" onChange={(e) => setFormat(e.target.value as FormatId)}>
+                {(Object.keys(FORMATS) as FormatId[]).map((f) => (
+                  <option key={f} value={f}>
+                    {t.formats[f]}
+                  </option>
+                ))}
+              </Select>
+            </label>
           ) : kind === "ulid" ? (
             <Switch
               label={t.monotonic}
@@ -204,11 +187,11 @@ export default function UuidGenerator({ locale, kind: kind0 = "v4", count: count
 
       {shown && shown.length > 1 && (
         <CodeOutput
-          value={text}
+          value={shown.join("\n")}
           title={`${formatNumber(locale, shown.length)} ${plural(locale, shown.length, t.list)}`}
           filename={`${kind}-${shown.length}.txt`}
           labels={outputLabels(locale)}
-          minRows={Math.min(14, shown.length)}
+          minRows={Math.min(12, shown.length)}
           extraActions={
             <Button variant="ghost" size="sm" onClick={() => downloadText(JSON.stringify(shown, null, 2), `${kind}-${shown.length}.json`, "application/json")}>
               {t.json}

@@ -1,7 +1,7 @@
 import type { Locale } from "@/i18n/config";
 import type { Block, ToolDef } from "@/registry/types";
 import { defineToolSection } from "@/registry/tool-section";
-import { withRelated } from "@/sections/code/kit/related";
+import { registerTools, withRelated } from "@/sections/code/kit/related";
 import { NAMESPACES, uuidNameBased } from "./engine";
 
 type Row = [string, string, string];
@@ -14,15 +14,25 @@ const layout = (locale: Locale, rows: { ru: Row[]; en: Row[] }, title: { ru: str
 
 const VARIANT_ROW = { ru: ["variant", "2", "10 — вариант RFC 9562"] as Row, en: ["variant", "2", "10 — RFC 9562 variant"] as Row };
 
-const RELATED = ["random", "password", "hash", "date"];
+/** Extra related pages per tool (cycle-safe, see kit/related). */
+const RELATED: Record<string, string[]> = {
+  "uuid-generator": ["uuid-v7", "guid-generator", "uuid-validator", "bulk-uuid-generator"],
+  "uuid-v7": ["ulid-generator", "uuid-validator", "uuid-generator"],
+  "uuid-v1": ["uuid-v7", "uuid-validator"],
+  "uuid-v3": ["uuid-v5"],
+  "uuid-v5": ["uuid-v3"],
+  "ulid-generator": ["uuid-v7", "uuid-validator"],
+  "objectid-generator": ["uuid-validator"],
+  "uuid-validator": ["uuid-v7", "ulid-generator"],
+};
 
 const tools: ToolDef[] = [
   {
-    slug: "",
+    slug: "uuid-generator",
     component: "uuid/generator",
     icon: "KeyRound",
     popular: true,
-    props: { kind: "v4", count: 10 },
+    props: { kind: "v4" },
     name: { ru: "Генератор UUID v4", en: "UUID v4 generator" },
     h1: { ru: "Генератор UUID", en: "UUID generator" },
     title: { ru: "Генератор UUID онлайн — случайный UUID v4", en: "UUID generator online — random UUID v4" },
@@ -85,11 +95,11 @@ const tools: ToolDef[] = [
     ],
   },
   {
-    slug: "v7",
+    slug: "uuid-v7",
     component: "uuid/generator",
     icon: "Clock",
     popular: true,
-    props: { kind: "v7", count: 10 },
+    props: { kind: "v7" },
     name: { ru: "UUID v7", en: "UUID v7" },
     h1: { ru: "Генератор UUID v7", en: "UUID v7 generator" },
     title: { ru: "UUID v7 генератор онлайн — UUID с меткой времени", en: "UUID v7 generator online — time-ordered UUIDs" },
@@ -150,10 +160,10 @@ const tools: ToolDef[] = [
     ],
   },
   {
-    slug: "v1",
+    slug: "uuid-v1",
     component: "uuid/generator",
     icon: "History",
-    props: { kind: "v1", count: 10 },
+    props: { kind: "v1" },
     name: { ru: "UUID v1", en: "UUID v1" },
     h1: { ru: "Генератор UUID v1", en: "UUID v1 generator" },
     title: { ru: "UUID v1 генератор онлайн — UUID на основе времени", en: "UUID v1 generator online — time-based UUIDs" },
@@ -206,7 +216,7 @@ const tools: ToolDef[] = [
   nameTool(3),
   nameTool(5),
   {
-    slug: "nil",
+    slug: "nil-uuid",
     component: "uuid/nil",
     icon: "CircleSlash",
     name: { ru: "Nil и Max UUID", en: "Nil & Max UUID" },
@@ -240,7 +250,7 @@ const tools: ToolDef[] = [
     },
   },
   {
-    slug: "bulk",
+    slug: "bulk-uuid-generator",
     component: "uuid/generator",
     icon: "ListOrdered",
     props: { kind: "v4", count: 100, kinds: ["v4", "v7", "v1", "v6", "ulid", "objectid"] },
@@ -275,10 +285,10 @@ const tools: ToolDef[] = [
     },
   },
   {
-    slug: "guid",
+    slug: "guid-generator",
     component: "uuid/generator",
     icon: "Braces",
-    props: { kind: "v4", count: 10, upper: true, braces: true },
+    props: { kind: "v4", format: "braces-upper", label: "GUID" },
     name: { ru: "Генератор GUID", en: "GUID generator" },
     h1: { ru: "Генератор GUID", en: "GUID generator" },
     title: { ru: "Генератор GUID онлайн — GUID для C# и .NET", en: "GUID generator online — GUIDs for C# and .NET" },
@@ -310,11 +320,11 @@ const tools: ToolDef[] = [
     },
   },
   {
-    slug: "ulid",
+    slug: "ulid-generator",
     component: "uuid/generator",
     icon: "ArrowDownNarrowWide",
     popular: true,
-    props: { kind: "ulid", count: 10 },
+    props: { kind: "ulid" },
     name: { ru: "Генератор ULID", en: "ULID generator" },
     title: { ru: "Генератор ULID онлайн — сортируемые уникальные ID", en: "ULID generator online — sortable unique IDs" },
     description: {
@@ -355,7 +365,7 @@ const tools: ToolDef[] = [
     ],
   },
   {
-    slug: "nanoid",
+    slug: "nanoid-generator",
     component: "uuid/nanoid",
     icon: "Hash",
     popular: true,
@@ -389,10 +399,10 @@ const tools: ToolDef[] = [
     },
   },
   {
-    slug: "objectid",
+    slug: "objectid-generator",
     component: "uuid/generator",
     icon: "Database",
-    props: { kind: "objectid", count: 10 },
+    props: { kind: "objectid" },
     name: { ru: "MongoDB ObjectId", en: "MongoDB ObjectId" },
     h1: { ru: "Генератор MongoDB ObjectId", en: "MongoDB ObjectId generator" },
     title: { ru: "Генератор MongoDB ObjectId онлайн", en: "MongoDB ObjectId generator online" },
@@ -434,7 +444,7 @@ const tools: ToolDef[] = [
     ],
   },
   {
-    slug: "validator",
+    slug: "uuid-validator",
     component: "uuid/decoder",
     icon: "ScanSearch",
     popular: true,
@@ -476,7 +486,7 @@ function nameTool(version: 3 | 5): ToolDef {
   const hash = version === 3 ? "MD5" : "SHA-1";
   const example = uuidNameBased(version, NAMESPACES.dns, "example.com");
   return {
-    slug: `v${version}`,
+    slug: `uuid-v${version}`,
     component: "uuid/name",
     icon: "Fingerprint",
     props: { version, name: "example.com", namespace: "dns" },
@@ -539,7 +549,6 @@ function nameTool(version: 3 | 5): ToolDef {
 export const uuidSection = withRelated(defineToolSection({
   id: "uuid",
   name: { ru: "UUID и ID", en: "UUID & IDs" },
-  title: { ru: "Генератор UUID онлайн — UUID v4, v7, ULID, NanoID", en: "UUID generator online — UUID v4, v7, ULID, NanoID" },
   description: {
     ru: "Генерация и расшифровка уникальных идентификаторов: UUID v4, v7, v1, v3, v5, GUID, ULID, NanoID и MongoDB ObjectId — в браузере, до 10 000 штук за раз.",
     en: "Generate and decode unique identifiers: UUID v4, v7, v1, v3, v5, GUID, ULID, NanoID and MongoDB ObjectId — in your browser, up to 10,000 at a time.",
@@ -549,4 +558,6 @@ export const uuidSection = withRelated(defineToolSection({
   category: "dev",
   order: 7,
   tools,
-}), () => RELATED);
+}), (segs) => RELATED[segs[0]] ?? []);
+
+registerTools("uuid", 170, tools);
