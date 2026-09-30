@@ -3,7 +3,7 @@ import { formatNumber, plural } from "@/i18n/format";
 import { ui } from "@/i18n/ui";
 import type { Block, Crumb, LinkItem, PageModel, QA, SearchEntry, SectionDef } from "@/registry/types";
 import type { BoardItem } from "../emoji/shared/GlyphBoard";
-import { cssEscape, hex, htmlDec, htmlHex, jsEscape, pyEscape, uPlus, urlEncode, utf16, utf8 } from "../emoji/shared/codes";
+import { cssEscape, hex, htmlDec, htmlHex, jsEscape, pyEscape, urlEncode, utf16, utf8 } from "../emoji/shared/codes";
 import { COLLECTION_META, CURATED, GC_NAMES, HUB_GROUPS, LOOKALIKES, POPULAR_SYMBOLS } from "./content";
 import { COLLECTIONS, collectionById, collectionsOf, pageByKey, pageOf, PAGES, sym, SYMS, type Collection, type Sym, type SymPage } from "./data";
 
@@ -87,7 +87,8 @@ const pagePath = (p: SymPage) => [ID, p.col, p.slug];
 const pageLink = (p: SymPage, locale: Locale): LinkItem => ({ path: pagePath(p), label: pageName(p, locale), glyph: p.sym.ext.d ? undefined : p.pair ? p.pair.ch : p.sym.ch });
 const colMeta = (id: string) => COLLECTION_META[id];
 function colLink(c: Collection, locale: Locale): LinkItem {
-  return { path: [ID, c.id], label: tr(colMeta(c.id).name, locale), hint: `${cnt(locale, c.chars.length)}: ${sampleOf(c, 6)}`, glyph: firstVisible(c) };
+  const sample = sampleOf(c, 6);
+  return { path: [ID, c.id], label: tr(colMeta(c.id).name, locale), hint: sample ? `${cnt(locale, c.chars.length)}: ${sample}` : cnt(locale, c.chars.length), glyph: firstVisible(c) };
 }
 const firstVisible = (c: Collection) => c.chars.find((s) => !s.ext.d)?.ch;
 const sampleOf = (c: Collection, k: number) =>
@@ -155,16 +156,18 @@ function typingRows(s: Sym, locale: Locale): string[][] {
   return rows;
 }
 
-function codeRows(s: Sym): string[][] {
+/** Developer codes; letter pages list the uppercase and lowercase forms. */
+function codeRows(s: Sym, pair?: Sym): string[][] {
+  const both = (f: (x: Sym) => string) => (pair ? `${f(pair)}  /  ${f(s)}` : f(s));
   return [
-    ["Unicode", u(s)],
-    ["HTML", [entity(s), htmlHex(s.ch), htmlDec(s.ch)].filter(Boolean).join("  ")],
-    ["CSS", cssEscape(s.ch)],
-    ["JavaScript", jsEscape(s.ch)],
-    ["Python", pyEscape(s.ch)],
-    ["UTF-8", utf8(s.ch)],
-    ["UTF-16", utf16(s.ch)],
-    ["URL", urlEncode(s.ch)],
+    ["Unicode", both(u)],
+    ["HTML", both((x) => [entity(x), htmlHex(x.ch), htmlDec(x.ch)].filter(Boolean).join("  "))],
+    ["CSS", both((x) => cssEscape(x.ch))],
+    ["JavaScript", both((x) => jsEscape(x.ch))],
+    ["Python", both((x) => pyEscape(x.ch))],
+    ["UTF-8", both((x) => utf8(x.ch))],
+    ["UTF-16", both((x) => utf16(x.ch))],
+    ["URL", both((x) => urlEncode(x.ch))],
   ];
 }
 
@@ -228,6 +231,13 @@ function symbolPage(p: SymPage, locale: Locale): PageModel {
   const invisible = !!s.ext.d;
   const h1 = cur?.h1 ? tr(cur.h1, locale) : invisible ? `${name} (${glyph})` : `${name} ${glyph}`;
   const codeText = p.pair ? `${u(p.pair)} / ${u(s)}` : u(s);
+  /** "знак тенге" from the curated h1 "Знак тенге ₸", else the page name. */
+  const phrase = (() => {
+    const h = cur?.h1 && !p.pair ? tr(cur.h1, locale) : "";
+    const base = h.endsWith(` ${glyph}`) ? h.slice(0, -glyph.length - 1) : name;
+    return ru ? base.charAt(0).toLowerCase() + base.slice(1) : base;
+  })();
+  const htmlOf = (x: Sym) => [entity(x), htmlDec(x.ch), htmlHex(x.ch)].filter(Boolean).join("  ");
 
   const facts: [string, string][] = [
     [ru ? "Символ" : "Character", glyph],
@@ -236,8 +246,8 @@ function symbolPage(p: SymPage, locale: Locale): PageModel {
     [ru ? "Код" : "Code point", codeText],
     [ru ? "Десятичный код" : "Decimal", p.pair ? `${p.pair.cp} / ${s.cp}` : String(s.cp)],
     [ru ? "Блок Unicode" : "Unicode block", `${blockName(s, locale)} (${blockRange(s)})`],
-    [ru ? "Категория" : "Category", tr(GC_NAMES[s.gc], locale)],
-    ["HTML", [ent, htmlDec(s.ch), htmlHex(s.ch)].filter(Boolean).join("  ")],
+    [ru ? "Категория" : "Category", p.pair ? (ru ? "буква: заглавная и строчная" : "letter: uppercase and lowercase") : tr(GC_NAMES[s.gc], locale)],
+    ["HTML", p.pair ? `${htmlOf(p.pair)}  /  ${htmlOf(s)}` : htmlOf(s)],
   ];
   if (alt) facts.push([ru ? "Alt-код" : "Alt code", alt]);
   if (s.ext.m) facts.push(["macOS", s.ext.m]);
@@ -249,7 +259,7 @@ function symbolPage(p: SymPage, locale: Locale): PageModel {
   ];
   const look = lookalikeBlock(s, locale);
   if (look) blocks.push(look);
-  blocks.push({ type: "table", title: ru ? "Коды для программистов" : "Codes for developers", head: ru ? ["Формат", "Код"] : ["Format", "Code"], rows: codeRows(s), mono: true });
+  blocks.push({ type: "table", title: ru ? "Коды для программистов" : "Codes for developers", head: ru ? ["Формат", "Код"] : ["Format", "Code"], rows: codeRows(s, p.pair), mono: true });
   const cols = (collectionsOf.get(s.ch) ?? []).map((c) => colLink(c, locale));
   if (s.ext.em) cols.unshift({ path: ["emoji", s.ext.em], label: ru ? `Эмодзи ${s.ch}\u{FE0F}` : `${s.ch}\u{FE0F} emoji`, glyph: `${s.ch}\u{FE0F}` });
   blocks.push({ type: "links", title: ru ? "Где ещё найти этот символ" : "Also in", style: "chips", items: cols });
@@ -282,7 +292,7 @@ function symbolPage(p: SymPage, locale: Locale): PageModel {
   );
   const g = LOOKALIKES.find((x) => Array.from(x.chars).includes(s.ch));
   if (g) {
-    const other = Array.from(g.chars).find((ch) => ch !== s.ch)!;
+    const other = Array.from(g.chars).find((ch) => ch !== s.ch && ch !== p.pair?.ch)!;
     const otherShown = SYMS.get(other)?.ext.d ?? other;
     faq.push(
       ru
@@ -295,21 +305,30 @@ function symbolPage(p: SymPage, locale: Locale): PageModel {
     path: pagePath(p),
     sectionId: ID,
     kind: "entity",
-    title: ru ? `${invisible ? "" : `${glyph} `}${name}${invisible ? ` (${glyph})` : ""} — скопировать символ, код` : `${invisible ? "" : `${glyph} `}${name}${invisible ? ` (${glyph})` : ""} Symbol — Copy, Unicode${alt ? " & Alt Code" : ""}`,
+    title: (() => {
+      // Phrase first: "° Знак градуса", "Знак тенге ₸", "Буква Ә ә (казахская)", "Неразрывный пробел (NBSP)".
+      const head = cur?.h1 || p.pair || invisible ? h1 : `${glyph} ${name}`;
+      const long = head.length > 38;
+      if (ru) return `${head} — ${long ? "копировать" : "скопировать символ, код"}`;
+      if (long) return `${head} — Copy`;
+      return p.pair || invisible || cur?.h1 ? `${head} — Copy & Unicode` : `${head} Symbol — Copy, Unicode${alt ? " & Alt Code" : ""}`;
+    })(),
     h1,
     description: ru
       ? fit([
-          `${invisible ? name : `${glyph} — ${ruOf(p.pair ?? s)}`}: код ${codeText}${ent ? `, HTML ${ent}` : ""}${alt ? `, ${alt}` : ""}.`,
+          `${invisible ? name : `${glyph} — ${phrase}`}: код ${codeText}${ent ? `, HTML ${ent}` : ""}${alt ? `, ${alt}` : ""}.`,
           ["Скопируйте символ в один клик и узнайте, как набрать его на Windows, Mac и Linux.", "Скопируйте символ в один клик.", "Копирование в один клик."],
+          "Есть коды HTML, CSS и JavaScript.",
         ])
       : fit([
-          `${invisible ? name : `${glyph} ${name}`}: code ${codeText}${ent ? `, HTML ${ent}` : ""}${alt ? `, ${alt}` : ""}.`,
+          `${invisible ? name : `${glyph} ${phrase}`}: code ${codeText}${ent ? `, HTML ${ent}` : ""}${alt ? `, ${alt}` : ""}.`,
           ["Copy it in one click and see how to type it on Windows, Mac and Linux.", "Copy it in one click.", "One-click copy."],
+          "HTML, CSS and JavaScript codes included.",
         ]),
     lead: ru
       ? // Entities that are English words (&and;) stay out of the Russian lead.
-        `${invisible ? name : `${glyph} — ${ruOf(p.pair ?? s)}`}, код ${codeText}${ent && !/^&(the|and|with|for|your);$/.test(ent) ? `, в HTML — ${ent}` : ""}. Нажмите «Копировать», чтобы вставить символ.`
-      : `${invisible ? name : `${glyph} is the ${name}`}, code ${codeText}${ent ? `, HTML ${ent}` : ""}. Press Copy to paste it anywhere.`,
+        `${invisible ? name : `${glyph} — ${phrase}`}, код ${codeText}${ent && !/^&(the|and|with|for|your);$/.test(ent) ? `, в HTML — ${ent}` : ""}. Нажмите «Копировать», чтобы вставить символ.`
+      : `${invisible ? name : `${glyph} is the ${phrase}`}, code ${codeText}${ent ? `, HTML ${ent}` : ""}. Press Copy to paste it anywhere.`,
     breadcrumbs: crumbs(locale, { name: tr(meta.name, locale), path: [ID, p.col] }),
     tool: {
       id: "symbols/card",
@@ -356,8 +375,8 @@ function collectionPage(c: Collection, locale: Locale): PageModel {
     title: ru ? `${h1}${hasGlyphs ? "" : ` ${sample}`} — скопировать` : `${h1}${hasGlyphs ? "" : ` ${sample}`} — Copy & Paste`,
     h1,
     description: ru
-      ? fit([`${h1}: ${cnt("ru", c.chars.length)}${hasGlyphs ? "" : ` — ${sample} и другие`}.`, [tr(meta.intro, "ru"), "Нажмите на символ, чтобы скопировать его, или откройте страницу с кодами и способами ввода.", "Копирование в один клик."]])
-      : fit([`${h1}: ${cnt("en", c.chars.length)}${hasGlyphs ? "" : ` — ${sample} and more`}.`, [tr(meta.intro, "en"), "Click a symbol to copy it, or open its page for codes and typing methods.", "One-click copy."]]),
+      ? fit([`${h1}. ${cap(cnt("ru", c.chars.length))}${hasGlyphs ? "" : `: ${sample} и другие`}.`, [tr(meta.intro, "ru"), "Нажмите на символ, чтобы скопировать его, или откройте страницу с кодами и способами ввода.", "Копирование в один клик, коды Unicode и HTML."]])
+      : fit([`${h1}. ${cap(cnt("en", c.chars.length))}${hasGlyphs ? "" : `: ${sample} and more`}.`, [tr(meta.intro, "en"), "Click a symbol to copy it, or open its page for codes and typing methods.", "One-click copy, Unicode and HTML codes."]]),
     lead: ru ? `${tr(meta.intro, "ru")} Нажмите на символ, чтобы скопировать.` : `${tr(meta.intro, "en")} Click a symbol to copy it.`,
     breadcrumbs: crumbs(locale),
     tool: { id: "symbols/grid", props: { base: boardBase(locale), items: c.chars.map((s) => boardItem(s, locale)), kind: "symbol" } },

@@ -92,25 +92,21 @@ export default function EmojiSearch({ locale, popular, groups }: EmojiSearchProp
   const [q, setQ] = useState("");
   const [group, setGroup] = useState("");
   const [index, setIndex] = useState<IndexRow[] | null>(null);
-  const [state, setState] = useState<"idle" | "loading" | "error">("idle");
+  const [failed, setFailed] = useState(false);
   const active = q.trim() !== "" || group !== "";
 
+  // The index is fetched once, the first time the user searches or picks a category.
   useEffect(() => {
-    if (!active || index || state === "loading") return;
+    if (!active || index) return;
     let alive = true;
-    setState("loading");
     loadIndex(locale).then(
-      (rows) => {
-        if (!alive) return;
-        setIndex(rows);
-        setState("idle");
-      },
-      () => alive && setState("error"),
+      (rows) => alive && setIndex(rows),
+      () => alive && setFailed(true),
     );
     return () => {
       alive = false;
     };
-  }, [active, index, locale, state]);
+  }, [active, index, locale]);
 
   const results = useMemo<BoardItem[] | null>(() => {
     if (!active || !index) return null;
@@ -166,7 +162,7 @@ export default function EmojiSearch({ locale, popular, groups }: EmojiSearchProp
         <h2 className="mb-2 text-base font-semibold text-fg" aria-live="polite">
           {!active
             ? t.popular
-            : state === "error"
+            : failed
               ? t.failed
               : !results
                 ? t.loading

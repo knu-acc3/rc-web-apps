@@ -239,8 +239,8 @@ export const COLLECTION_META: Record<string, CollectionMeta> = {
     name: { ru: "Невидимые символы", en: "Spaces" },
     h1: { ru: "Невидимые символы и пробелы", en: "Invisible characters and spaces" },
     intro: {
-      ru: "Неразрывный пробел, узкие и широкие пробелы, пробел нулевой ширины, соединитель ZWJ, мягкий перенос и символы-заполнители ㅤ (U+3164) и ⠀ (U+2800), которые используют как «пустой символ» в никах.",
-      en: "No-break space, narrow and wide spaces, zero width space, the ZWJ joiner, soft hyphen and filler characters ㅤ (U+3164) and ⠀ (U+2800) that are used as a “blank character” in nicknames.",
+      ru: "Неразрывный пробел, узкие и широкие пробелы, пробел нулевой ширины, соединитель ZWJ, мягкий перенос и символы-заполнители U+3164 и U+2800, которые используют как «пустой символ» в никах.",
+      en: "No-break space, narrow and wide spaces, zero width space, the ZWJ joiner, soft hyphen and the filler characters U+3164 and U+2800 used as a “blank character” in nicknames.",
     },
   },
   lines: {

@@ -34,7 +34,7 @@ const T = {
     copy: "Копировать",
     open: "Открывать страницу",
     tray: "Набранные символы",
-    trayHint: "Нажимайте на символы — они копируются и добавляются в эту строку",
+    trayHint: "Нажимайте на символы — они соберутся здесь",
     copyAll: "Копировать всё",
     copied: "Скопировано",
     clear: "Очистить",
@@ -46,7 +46,7 @@ const T = {
     copy: "Copy",
     open: "Open page",
     tray: "Collected characters",
-    trayHint: "Click characters — each one is copied and added to this line",
+    trayHint: "Click characters — they are collected here",
     copyAll: "Copy all",
     copied: "Copied",
     clear: "Clear",
@@ -147,7 +147,7 @@ function PickerPanel({
           placeholder={t.trayHint}
           autoComplete="off"
           size="lg"
-          className="min-w-0 flex-1 font-normal! text-2xl!"
+          className="min-w-0 flex-1 font-normal! text-xl! placeholder:text-[15px]"
         />
         <div className="flex shrink-0 gap-2">
           <CopyButton value={tray} label={t.copyAll} copiedLabel={t.copied} variant="primary" size="md" />
