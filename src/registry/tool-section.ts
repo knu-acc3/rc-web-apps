@@ -40,6 +40,8 @@ export function defineToolSection(input: ToolSectionInput): SectionDef {
     return v;
   };
   const toolPath = (t: ToolDef) => (t.slug ? [input.id, t.slug] : [input.id]);
+  // A section without tools is not published at all: no pages, no nav entry, no search entries.
+  const empty = input.tools.length === 0;
 
   const section: SectionDef = {
     id: input.id,
@@ -49,9 +51,10 @@ export function defineToolSection(input: ToolSectionInput): SectionDef {
     hue: input.hue,
     category: input.category,
     order: input.order,
-    hidden: input.hidden,
+    hidden: input.hidden || empty,
 
     paths() {
+      if (empty) return [];
       const out: string[][] = [];
       if (!bySlug.has("")) out.push([]);
       for (const t of input.tools) {
@@ -62,6 +65,7 @@ export function defineToolSection(input: ToolSectionInput): SectionDef {
     },
 
     search(locale) {
+      if (empty) return [];
       const entries: SearchEntry[] = [];
       const secName = tr(input.name, locale);
       for (const t of input.tools) {
@@ -94,6 +98,7 @@ export function defineToolSection(input: ToolSectionInput): SectionDef {
     },
 
     resolve(locale, rest) {
+      if (empty) return null;
       const t = ui(locale);
       const secCrumb = { name: tr(input.name, locale), path: [input.id] };
       const home = { name: t.home, path: [] as string[] };

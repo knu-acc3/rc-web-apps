@@ -14,6 +14,11 @@ export function allSections(): SectionDef[] {
   return SECTIONS;
 }
 
+/** Sections that publish at least one page. */
+export function liveSections(): SectionDef[] {
+  return SECTIONS.filter((s) => s.paths().length > 0);
+}
+
 export function resolvePage(locale: Locale, segments: string[]): PageModel | null {
   const [sectionId, ...rest] = segments;
   const section = byId.get(sectionId);

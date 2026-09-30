@@ -3,13 +3,13 @@ import { join } from "node:path";
 import { ImageResponse } from "next/og";
 import { BRAND, BRAND_MARK } from "@/config/brand";
 import { isLocale, LOCALES, tr } from "@/i18n/config";
-import { allSections, getSection } from "@/registry";
+import { getSection, liveSections } from "@/registry";
 
 export const dynamic = "force-static";
 export const dynamicParams = false;
 
 export function generateStaticParams() {
-  const ids = ["home", ...allSections().map((s) => s.id)];
+  const ids = ["home", ...liveSections().map((s) => s.id)];
   return LOCALES.flatMap((locale) => ids.map((id) => ({ locale, id })));
 }
 

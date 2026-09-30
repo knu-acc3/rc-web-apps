@@ -1,11 +1,11 @@
-import { allSections, getSection } from "@/registry";
+import { getSection, liveSections } from "@/registry";
 import { urlsetXml, XML_HEADERS } from "@/site/sitemap";
 
 export const dynamic = "force-static";
 export const dynamicParams = false;
 
 export function generateStaticParams() {
-  return [{ name: "core.xml" }, ...allSections().map((s) => ({ name: `${s.id}.xml` }))];
+  return [{ name: "core.xml" }, ...liveSections().map((s) => ({ name: `${s.id}.xml` }))];
 }
 
 export async function GET(_req: Request, { params }: { params: Promise<{ name: string }> }) {
