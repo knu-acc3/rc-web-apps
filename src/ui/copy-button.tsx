@@ -52,7 +52,10 @@ export function CopyButton({
       className={cn(buttonClass(variant, size), copied && "text-ok", className)}
     >
       {copied ? <Check aria-hidden /> : <Copy aria-hidden />}
-      {!iconOnly && <span aria-live="polite">{copied ? copiedLabel : label}</span>}
+      {!iconOnly && <span>{copied ? copiedLabel : label}</span>}
+      <span role="status" className="sr-only">
+        {copied ? copiedLabel : ""}
+      </span>
     </button>
   );
 }
