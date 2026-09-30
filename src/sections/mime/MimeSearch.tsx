@@ -103,7 +103,7 @@ export default function MimeSearch({ locale, items, cats, only }: { locale: Loca
       </div>
       <p className="text-sm text-fg-3" aria-live="polite">{`${rows.length} ${plural(locale, rows.length, t.found)}`}</p>
       {rows.length > 0 ? (
-        <div className="tbl">
+        <div tabIndex={0} className="tbl">
           <table>
             <thead>
               <tr>

@@ -388,7 +388,7 @@ export function DataTable({
 }) {
   const al = (j: number) => (align ? (align[j] === "right" ? "text-right" : undefined) : alignRight && j > 0 ? "text-right" : undefined);
   return (
-    <div className={cn("tbl", className)} style={maxHeight ? { maxHeight, overflowY: "auto" } : undefined}>
+    <div tabIndex={0} className={cn("tbl", className)} style={maxHeight ? { maxHeight, overflowY: "auto" } : undefined}>
       <table>
         {caption && <caption className="sr-only">{caption}</caption>}
         <thead className={maxHeight ? "sticky top-0 z-[1]" : undefined}>

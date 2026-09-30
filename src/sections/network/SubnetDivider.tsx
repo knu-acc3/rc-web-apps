@@ -195,7 +195,7 @@ export default function SubnetDivider({ locale, network = "192.168.0.0/24", mode
                 </>
               }
             />
-            <div className="tbl rounded-none! border-0!">
+            <div tabIndex={0} className="tbl rounded-none! border-0!">
               <table>
                 <thead>
                   <tr>

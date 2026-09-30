@@ -114,7 +114,7 @@ export function EntryTable({
   const t = TW[locale];
   const total = entries.reduce((s, e) => s + e.weight, 0);
   return (
-    <div className="tbl">
+    <div tabIndex={0} className="tbl">
       <table>
         <thead>
           <tr>

@@ -231,7 +231,7 @@ export default function CronTool({ locale, expr: expr0 = "*/5 * * * *", dialect:
       </Panel>
 
       {"e" in parsed && (
-        <div className="tbl">
+        <div tabIndex={0} className="tbl">
           <table>
             <thead>
               <tr>

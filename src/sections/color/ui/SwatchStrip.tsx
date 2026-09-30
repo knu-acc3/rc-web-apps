@@ -56,7 +56,7 @@ export function SwatchStrip({
                 }
               }}
             >
-              {it.caption && <span className="text-[11px] leading-none opacity-80">{it.caption}</span>}
+              {it.caption && <span className="text-[11px] leading-none">{it.caption}</span>}
               <span className="font-mono text-[11px] leading-tight font-medium break-all sm:text-xs">
                 {copied === i ? (
                   <span className="inline-flex items-center gap-0.5">

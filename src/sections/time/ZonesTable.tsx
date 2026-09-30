@@ -28,7 +28,7 @@ export default function ZonesTable({ locale, rows }: ZonesTableProps) {
         <BigTime parts={me} className="text-[44px] sm:text-[64px]" />
         <p className="min-h-6 text-[15px] text-fg-2">{me ? longDate(locale, me) : " "}</p>
       </Panel>
-      <div className="tbl">
+      <div tabIndex={0} className="tbl">
         <table>
           <thead>
             <tr>

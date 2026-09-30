@@ -125,8 +125,8 @@ export default function MetaTagGenerator({ locale }: { locale: Locale }) {
             </div>
           </div>
         </div>
-        <div className={cn("mt-2 text-xl leading-snug break-words text-accent [font-family:Arial,sans-serif]", !title.trim() && "opacity-60")}>{tt.text}</div>
-        <p className={cn("mt-1 text-sm leading-[22px] text-fg-2 [font-family:Arial,sans-serif]", !desc.trim() && "opacity-60")}>{dd.text}</p>
+        <div className={cn("mt-2 text-xl leading-snug break-words [font-family:Arial,sans-serif]", title.trim() ? "text-accent" : "text-fg-3")}>{tt.text}</div>
+        <p className={cn("mt-1 text-sm leading-[22px] [font-family:Arial,sans-serif]", desc.trim() ? "text-fg-2" : "text-fg-3")}>{dd.text}</p>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">

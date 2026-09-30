@@ -108,7 +108,7 @@ export default function KeywordDensity({ locale }: { locale: Locale }) {
       ) : rows.length === 0 ? (
         <p className="text-[15px] text-fg-3">{t.none}</p>
       ) : (
-        <div className="tbl">
+        <div tabIndex={0} className="tbl">
           <table>
             <thead>
               <tr>

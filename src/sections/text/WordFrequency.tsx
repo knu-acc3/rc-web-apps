@@ -111,7 +111,7 @@ export default function WordFrequency({ locale }: { locale: Locale }) {
         {rows.length === 0 ? (
           <p className="px-4 py-3 text-sm text-fg-3">{t.empty}</p>
         ) : (
-          <div className="max-h-[28rem] overflow-auto">
+          <div tabIndex={0} className="max-h-[28rem] overflow-auto">
             <table className="w-full text-left text-sm">
               <thead className="sticky top-0 bg-surface-2 text-fg-2">
                 <tr>

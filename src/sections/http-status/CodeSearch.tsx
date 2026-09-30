@@ -96,7 +96,7 @@ export default function CodeSearch({ locale, items, only }: { locale: Locale; it
         {`${rows.length} ${plural(locale, rows.length, t.found)}`}
       </p>
       {rows.length ? (
-        <div className="tbl">
+        <div tabIndex={0} className="tbl">
           <table>
             <thead>
               <tr>

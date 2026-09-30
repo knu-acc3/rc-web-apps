@@ -109,7 +109,7 @@ export default function AnimationGenerator({ locale, preset: preset0 = "fade-in"
               ) : preset.demo === "skeleton" ? (
                 <span className="block h-16 w-64 rounded-[10px]" />
               ) : (
-                <span className="flex size-32 items-center justify-center rounded-[18px] bg-indigo-500 text-lg font-semibold text-white">{t.demo}</span>
+                <span className="flex size-32 items-center justify-center rounded-[18px] bg-indigo-600 text-lg font-semibold text-white">{t.demo}</span>
               )}
             </div>
           </Stage>

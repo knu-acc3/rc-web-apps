@@ -92,7 +92,7 @@ export default function PortSearch({ locale, items, cats, only }: { locale: Loca
         {missing ? t.notListed(exact!) : `${rows.length} ${plural(locale, rows.length, t.found)}`}
       </p>
       {rows.length > 0 ? (
-        <div className="tbl">
+        <div tabIndex={0} className="tbl">
           <table>
             <thead>
               <tr>

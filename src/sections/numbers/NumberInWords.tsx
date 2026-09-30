@@ -152,7 +152,7 @@ export default function NumberInWords({ locale, value = "2024" }: NumberInWordsP
       {ok && !d.frac && (
         <details className="group rounded-[12px] border border-line bg-surface" open={locale === "ru"}>
           <summary className="px-4 py-3 text-sm font-semibold text-fg">{t.cases}</summary>
-          <div className="tbl rounded-none! border-0! border-t! border-line!">
+          <div tabIndex={0} className="tbl rounded-none! border-0! border-t! border-line!">
             <table>
               <tbody>
                 {CASES.map((k) => (

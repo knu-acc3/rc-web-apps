@@ -287,7 +287,7 @@ function MatchTable({ locale, matches }: { locale: Locale; matches: Match[] }) {
   const groupCount = Math.max(0, ...matches.slice(0, 200).map((m) => m.groups.length));
   const names = matches[0]?.named ? Object.keys(matches[0].named) : [];
   return (
-    <div className="tbl">
+    <div tabIndex={0} className="tbl">
       <table>
         <thead>
           <tr>

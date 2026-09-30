@@ -405,7 +405,7 @@ export default function Exif({ locale }: { locale: Locale }) {
             values && typeof values === "object" && Object.keys(values).length ? (
               <div key={group} className="border-t border-line">
                 <h3 className="bg-surface-2 px-4 py-2 text-[13px] font-semibold text-fg-2">{t.group[group] ?? group}</h3>
-                <div className="tbl rounded-none! border-0!">
+                <div tabIndex={0} className="tbl rounded-none! border-0!">
                   <table>
                     <tbody>
                       {Object.entries(values).map(([k, v]) => (

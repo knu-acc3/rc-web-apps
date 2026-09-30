@@ -182,7 +182,7 @@ export default function MultiplicationTable({ locale, n = 7 }: ToolProps<{ n?: n
         )}
 
         {view === "grid" && (
-          <div className="tbl" onMouseLeave={() => setHover(null)}>
+          <div tabIndex={0} className="tbl" onMouseLeave={() => setHover(null)}>
             <table className="text-center">
               <caption className="sr-only">{t.gridTitle(gridN)}</caption>
               <thead>

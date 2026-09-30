@@ -27,7 +27,10 @@ export function loadMarkdownRenderer(imagePlaceholder: string): Promise<Markdown
         const el = node as Element;
         if (el.tagName === "INPUT") {
           if (el.getAttribute("type") !== "checkbox") el.remove();
-          else el.setAttribute("disabled", "");
+          else {
+            el.setAttribute("disabled", "");
+            el.setAttribute("aria-hidden", "true");
+          }
         } else if (el.tagName === "A" && el.getAttribute("href")) {
           el.setAttribute("target", "_blank");
           el.setAttribute("rel", "noopener noreferrer nofollow");

@@ -235,7 +235,7 @@ export default function JwtDecoder({ locale, sample }: { locale: Locale; sample:
       )}
 
       {claimRows.length > 0 && (
-        <div className="tbl">
+        <div tabIndex={0} className="tbl">
           <table>
             <thead>
               <tr>

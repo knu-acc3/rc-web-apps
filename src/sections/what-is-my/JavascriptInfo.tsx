@@ -102,7 +102,7 @@ export default function JavascriptInfo({ locale }: ToolProps) {
       />
       <section>
         <h2 className="mb-2.5 text-base font-semibold text-fg">{t.table}</h2>
-        <div className="tbl">
+        <div tabIndex={0} className="tbl">
           <table>
             <thead>
               <tr>

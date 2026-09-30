@@ -127,8 +127,7 @@ export default function Base64ToImage({ locale }: { locale: Locale }) {
           ref={fileRef}
           type="file"
           accept=".txt,text/plain"
-          className="sr-only"
-          tabIndex={-1}
+          hidden
           onChange={async (e) => {
             const f = e.target.files?.[0];
             e.target.value = "";

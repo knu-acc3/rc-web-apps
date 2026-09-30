@@ -479,7 +479,7 @@ export default function WebcamTest({ locale }: { locale: Locale }) {
         <section className="flex flex-col gap-2">
           <h2 className="text-sm font-semibold text-fg">{t.probeTitle}</h2>
           <p className="text-sm text-fg-3">{t.probeHint}</p>
-          <div className="tbl">
+          <div tabIndex={0} className="tbl">
             <table>
               <thead>
                 <tr>

@@ -283,7 +283,7 @@ export default function MatrixCalc({ locale, op = "det" }: ToolProps<{ op?: Matr
             {TWO.has(o) && pasteArea("b", "B")}
           </Advanced>
         </section>
-        <ResultMain label={t.ops[o]} value={<div className={cn("overflow-x-auto", typeof value === "string" && "whitespace-normal")}>{value}</div>} sub={sub} rows={rows} size="md" actions={<ToolActions locale={locale} onReset={q.reset} shareUrl={q.shareUrl} />} />
+        <ResultMain label={t.ops[o]} value={<div tabIndex={0} className={cn("overflow-x-auto", typeof value === "string" && "whitespace-normal")}>{value}</div>} sub={sub} rows={rows} size="md" actions={<ToolActions locale={locale} onReset={q.reset} shareUrl={q.shareUrl} />} />
       </div>
       {steps.length > 0 && <Explain locale={locale} title={t.steps} formula={steps.slice(0, 60)} />}
       <MatrixTheory locale={locale} op={o} />

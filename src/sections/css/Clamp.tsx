@@ -90,7 +90,7 @@ export default function ClampGenerator({ locale }: { locale: Locale }) {
               {t.sample} <span className="text-sm font-normal text-fg-3">· {t.size(round(clampAt(input, width), 2))}</span>
             </p>
           </Panel>
-          <div className="tbl">
+          <div tabIndex={0} className="tbl">
             <table>
               <caption className="sr-only">{t.table}</caption>
               <thead>

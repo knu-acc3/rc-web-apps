@@ -56,7 +56,7 @@ export function BlockView({ block, locale }: { block: Block; locale: Locale }) {
           {block.title && <SectionTitle>{block.title}</SectionTitle>}
           <div className={cn(parts.length > 1 && "grid sm:grid-cols-2 sm:gap-3")}>
             {parts.map((rows, k) => (
-              <div key={k} className={cn("tbl", parts.length > 1 && (k === 0 ? "max-sm:rounded-b-none max-sm:border-b-0" : "max-sm:rounded-t-none"))}>
+              <div key={k} tabIndex={0} className={cn("tbl", parts.length > 1 && (k === 0 ? "max-sm:rounded-b-none max-sm:border-b-0" : "max-sm:rounded-t-none"))}>
                 <table className={block.mono ? "font-mono" : undefined}>
                   {block.caption && k === 0 && <caption className="sr-only">{block.caption}</caption>}
                   <thead className={cn(k > 0 && "max-sm:hidden")}>

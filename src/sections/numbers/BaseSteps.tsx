@@ -100,7 +100,7 @@ export function BaseSteps({ locale, value, from, to, upper }: { locale: Locale; 
         {steps.length > 0 && (
           <div className={terms.length ? "mt-4" : undefined}>
             <p>{t.fromDec(to)}</p>
-            <div className="tbl mt-2">
+            <div tabIndex={0} className="tbl mt-2">
               <table>
                 <thead>
                   <tr>
