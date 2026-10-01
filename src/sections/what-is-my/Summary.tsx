@@ -10,7 +10,7 @@ import type { ToolProps } from "../types";
 import { physicalSize, resolutionName } from "./lib/screen";
 import { tzOffsetMinutes, utcLabel } from "./lib/tz";
 import { detectUa, nav, screenStore, useDetected, viewportStore } from "./lib/probe";
-import { COMMON, dims, Pending } from "./ui";
+import { COMMON, dims, Pending } from "./ui/kit";
 
 const T = {
   ru: {

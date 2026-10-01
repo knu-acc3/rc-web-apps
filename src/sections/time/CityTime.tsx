@@ -4,12 +4,12 @@ import { Moon, Sun, Sunrise, Sunset } from "lucide-react";
 import { useMemo } from "react";
 import { fmtDate } from "@/sections/calendar/lib/dates";
 import { Panel } from "@/ui/panel";
-import { BigTime } from "./BigTime";
+import { BigTime } from "./ui/BigTime";
 import { sunDay, sunElevation } from "./lib/sun";
 import { dayShift, diffShort, durationWords, hms, hmWords, longDate, placeParts } from "./lib/text";
 import { fmtOffset, nextTransition, pad2, tzOffset, zoned } from "./lib/tz";
 import { useLocalZone, useMinute, useNow } from "./lib/use-now";
-import type { CityTimeProps, Place } from "./types";
+import type { CityTimeProps, Place } from "./lib/types";
 
 const T = {
   ru: {

@@ -5,7 +5,7 @@ import { formatNumber } from "@/i18n/format";
 import type { ToolProps } from "../types";
 import { breakpoint } from "./lib/screen";
 import { viewportStore } from "./lib/probe";
-import { COMMON, dims, Facts, Hero, Stack } from "./ui";
+import { COMMON, dims, Facts, Hero, Stack } from "./ui/kit";
 
 const T = {
   ru: {

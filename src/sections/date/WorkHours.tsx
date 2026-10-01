@@ -7,7 +7,7 @@ import { Field, Input } from "@/ui/field";
 import { Panel } from "@/ui/panel";
 import { WEEKDAYS } from "@/sections/calendar/lib/dates";
 import { formatDuration, parseClock, shiftMinutes } from "./lib/engine";
-import { BigResult } from "./ui";
+import { BigResult } from "./ui/kit";
 
 interface Row {
   start: string;

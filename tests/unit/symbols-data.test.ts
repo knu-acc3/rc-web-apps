@@ -2,9 +2,9 @@ import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { LOCALES } from "@/i18n/config";
 import raw from "@/sections/symbols/data/symbols.json";
-import { COLLECTION_META, CURATED, HUB_GROUPS, LOOKALIKES, POPULAR_SYMBOLS } from "@/sections/symbols/content";
-import { COLLECTIONS, PAGES, pageOf, sym, SYMS } from "@/sections/symbols/data";
-import { parseIndex, search, type RawIndex, type RawRu } from "@/sections/symbols/lookup";
+import { COLLECTION_META, CURATED, HUB_GROUPS, LOOKALIKES, POPULAR_SYMBOLS } from "@/sections/symbols/content/content";
+import { COLLECTIONS, PAGES, pageOf, sym, SYMS } from "@/sections/symbols/lib/data";
+import { parseIndex, search, type RawIndex, type RawRu } from "@/sections/symbols/lib/lookup";
 import { symbolsSection } from "@/sections/symbols/section";
 
 describe("gen-symbols output", () => {

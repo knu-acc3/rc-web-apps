@@ -1,6 +1,6 @@
 import type { Locale } from "@/i18n/config";
 import type { Block, QA, ToolDef, VariantDef } from "@/registry/types";
-import { nf, tt } from "../shared";
+import { nf, tt } from "../lib/shared";
 import { JEANS_LENGTH, MEN, SHIRTS, WOMEN, span, type MenRow, type WomenRow } from "./data";
 
 const rng = (v: number) => {

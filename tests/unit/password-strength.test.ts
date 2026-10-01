@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { checkStrength } from "@/sections/password/strength-core";
-import { humanDuration } from "@/sections/password/time";
+import { checkStrength } from "@/sections/password/lib/strength-core";
+import { humanDuration } from "@/sections/password/lib/time";
 
 describe("password strength (zxcvbn-ts)", () => {
   it("rates repeated dictionary words as weak", () => {

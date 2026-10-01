@@ -4,7 +4,7 @@ import { formatNumber } from "@/i18n/format";
 import type { ToolProps } from "../types";
 import { parseRenderer } from "./lib/ua";
 import { nav, useDetected, type GpuAdapterInfoLike } from "./lib/probe";
-import { COMMON, Facts, Hero, Hint, Stack, YesNo } from "./ui";
+import { COMMON, Facts, Hero, Hint, Stack, YesNo } from "./ui/kit";
 
 const T = {
   ru: {

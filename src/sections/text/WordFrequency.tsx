@@ -9,7 +9,7 @@ import { buttonClass } from "@/ui/button";
 import { Checkbox } from "@/ui/field";
 import { Panel, PanelHeader } from "@/ui/panel";
 import { wordFrequency } from "./lib/textOps";
-import { countLabel, InlineSelect, InputPanel, MoreOptions, OptionsBar, TX } from "./shared";
+import { countLabel, InlineSelect, InputPanel, MoreOptions, OptionsBar, TX } from "./ui/shared";
 
 const T = {
   ru: {

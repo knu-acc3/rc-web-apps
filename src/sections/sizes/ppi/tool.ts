@@ -1,6 +1,6 @@
 import type { Locale } from "@/i18n/config";
 import type { ToolDef } from "@/registry/types";
-import { nf, nfix, tt } from "../shared";
+import { nf, nfix, tt } from "../lib/shared";
 import { dotPitchMm, ppi } from "../screen/engine";
 
 const EXAMPLES: { label: Record<Locale, string>; w: number; h: number; d: number }[] = [

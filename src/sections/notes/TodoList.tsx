@@ -10,9 +10,9 @@ import { Input, Select } from "@/ui/field";
 import { Notice } from "@/ui/panel";
 import { Segmented } from "@/ui/segmented";
 import { lastWriteFailed } from "../text/lib/storage";
-import { countLabel, FileOpenButton, MoreOptions } from "../text/shared";
-import { templateItems, TEMPLATES, type TemplateId } from "./templates";
-import { createList, deleteList, moveItem, newId, readItems, readLists, useTodo, writeItems, writeLists, type TodoItem } from "./todoStore";
+import { countLabel, FileOpenButton, MoreOptions } from "../text/ui/shared";
+import { templateItems, TEMPLATES, type TemplateId } from "./content/templates";
+import { createList, deleteList, moveItem, newId, readItems, readLists, useTodo, writeItems, writeLists, type TodoItem } from "./lib/todoStore";
 
 const T = {
   ru: {

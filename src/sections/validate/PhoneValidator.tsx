@@ -5,7 +5,7 @@ import { useEffect, useId, useMemo, useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { Field, Select } from "@/ui/field";
 import { analyzePhone, type PhoneLib } from "./lib/phone";
-import { BigInput, Details, Problems, Verdict, type Row } from "./ui";
+import { BigInput, Details, Problems, Verdict, type Row } from "./ui/kit";
 
 const T = {
   ru: {

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { gs1Check, gs1Steps, gs1Valid, isbn10Check, msiMod10, upcEToA } from "@/sections/qr/checkdigits";
-import { prepareBarcode, SAMPLE, SYMBOLOGIES } from "@/sections/qr/barcode";
+import { gs1Check, gs1Steps, gs1Valid, isbn10Check, msiMod10, upcEToA } from "@/sections/qr/lib/checkdigits";
+import { prepareBarcode, SAMPLE, SYMBOLOGIES } from "@/sections/qr/lib/barcode";
 
 describe("barcode input preparation", () => {
   it("accepts every sample", () => {

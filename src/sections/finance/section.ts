@@ -1,6 +1,6 @@
 import { defineToolSection } from "@/registry/tool-section";
-import * as growth from "./group-growth";
-import * as money from "./group-money";
+import * as growth from "./content/group-growth";
+import * as money from "./content/group-money";
 
 const tools = [...growth.tools, ...money.tools];
 

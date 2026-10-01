@@ -6,7 +6,7 @@ import type { Locale } from "@/i18n/config";
 import { formatSmart, parseNumber, plural } from "@/i18n/format";
 import { cn } from "@/lib/cn";
 import { CopyButton } from "@/ui/copy-button";
-import { clean, convert, type ConvUnit } from "./engine";
+import { clean, convert, type ConvUnit } from "./lib/engine";
 
 export interface ClientUnit extends ConvUnit {
   slug: string;

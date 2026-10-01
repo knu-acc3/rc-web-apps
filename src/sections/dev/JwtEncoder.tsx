@@ -9,7 +9,7 @@ import { Button } from "@/ui/button";
 import { CopyButton } from "@/ui/copy-button";
 import { Field, Input, Select, Textarea } from "@/ui/field";
 import { Notice, Panel } from "@/ui/panel";
-import { ASYM_ALGS, generateKeyPair, hasSubtle, HMAC_ALGS, parseKey, signJwt, type Alg } from "./jwt";
+import { ASYM_ALGS, generateKeyPair, hasSubtle, HMAC_ALGS, parseKey, signJwt, type Alg } from "./lib/jwt";
 
 const T = {
   ru: {

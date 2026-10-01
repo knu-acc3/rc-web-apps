@@ -8,8 +8,8 @@ import { field, toInput } from "../../calc/kit/num";
 import { CalcGrid, DataTable, Disclaimer, Explain, FieldRow, NumField, OptionsRow, ResultMain, Stack, SubHeading, ToolActions } from "../../calc/kit/ui";
 import { useQueryState } from "../../calc/kit/url-state";
 import { bmi, bmiBodyFat, CM_PER_IN, FAT_BOUNDS, fatCategory, kgToLb, navyBodyFat, type Sex } from "../engines/body";
-import { FAT_LABEL } from "../labels";
-import { BodyFields, bodyDefaults, parseBody, SEXES, SexToggle, switchUnits, UNIT_SYSTEMS, UnitToggle } from "../parts";
+import { FAT_LABEL } from "../lib/labels";
+import { BodyFields, bodyDefaults, parseBody, SEXES, SexToggle, switchUnits, UNIT_SYSTEMS, UnitToggle } from "../ui/parts";
 
 const T = {
   ru: {

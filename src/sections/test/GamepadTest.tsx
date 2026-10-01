@@ -6,7 +6,7 @@ import type { Locale } from "@/i18n/config";
 import { Notice } from "@/ui/panel";
 import { useClientValue } from "./lib/client";
 import { stickMagnitude } from "./lib/input-stats";
-import { GamepadCard, type DriftResult, type PadSnap } from "./GamepadCard";
+import { GamepadCard, type DriftResult, type PadSnap } from "./ui/GamepadCard";
 
 const DRIFT_MS = 3000;
 

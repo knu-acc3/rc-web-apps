@@ -2,10 +2,10 @@ import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { LOCALES } from "@/i18n/config";
 import raw from "@/sections/emoji/data/emoji.json";
-import { EMOJI, bySlug, bySub, findGlyph, graphemes, topicEmoji, GROUP_KEYS, SUBGROUP_KEYS, popular } from "@/sections/emoji/data";
-import { GROUPS, SUBGROUPS, VERSIONS } from "@/sections/emoji/labels";
-import { ALIASES, TOPICS } from "@/sections/emoji/topics";
-import { POPULAR } from "@/sections/emoji/popular";
+import { EMOJI, bySlug, bySub, findGlyph, graphemes, topicEmoji, GROUP_KEYS, SUBGROUP_KEYS, popular } from "@/sections/emoji/lib/data";
+import { GROUPS, SUBGROUPS, VERSIONS } from "@/sections/emoji/lib/labels";
+import { ALIASES, TOPICS } from "@/sections/emoji/lib/topics";
+import { POPULAR } from "@/sections/emoji/lib/popular";
 import { emojiSection } from "@/sections/emoji/section";
 import { cssEscape, htmlDec, htmlHex, jsEscape, pyEscape, uPlus, utf16, utf8 } from "@/sections/emoji/shared/codes";
 

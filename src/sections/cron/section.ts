@@ -3,9 +3,9 @@ import { formatNumber, plural } from "@/i18n/format";
 import type { Block, QA, VariantDef } from "@/registry/types";
 import { defineToolSection } from "@/registry/tool-section";
 import { registerLink, registerTools, withRelated } from "@/sections/code/kit/related";
-import { describe } from "./describe";
-import { matchingDays, parseCron, runsPerDay, type CronExpr } from "./engine";
-import { toSystemd } from "./systemd";
+import { describe } from "./lib/describe";
+import { matchingDays, parseCron, runsPerDay, type CronExpr } from "./lib/engine";
+import { toSystemd } from "./lib/systemd";
 
 const HUE = 205;
 type L = { ru: string; en: string };

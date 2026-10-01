@@ -6,7 +6,7 @@ import { formatNumber, parseNumber } from "@/i18n/format";
 import { Button } from "@/ui/button";
 import { Field, Input } from "@/ui/field";
 import { Panel } from "@/ui/panel";
-import { QuietFacts, plainSpaces } from "../ui";
+import { QuietFacts, plainSpaces } from "../ui/kit";
 import { dotPitchMm, megapixels, physicalPixels, physicalSize, ppi, resolutionName } from "./engine";
 import { ratioLabel } from "./text";
 

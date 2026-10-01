@@ -2,7 +2,7 @@ import { tr, type Locale } from "@/i18n/config";
 import { ui } from "@/i18n/ui";
 import { defineToolSection } from "@/registry/tool-section";
 import type { Block, LinkItem, PageModel, SearchEntry, SectionDef, ToolDef } from "@/registry/types";
-import { DESIGN_TOOLS } from "./design-tools";
+import { DESIGN_TOOLS } from "./content/design-tools";
 import { formatColor, hex } from "./lib/color";
 import { NAMED_ALIASES, NAMED_COLORS } from "./lib/named";
 import { CONVERTER_TOOLS } from "./pages/converters";

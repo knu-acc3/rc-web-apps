@@ -7,7 +7,7 @@ import { Field, Textarea } from "@/ui/field";
 import { Segmented } from "@/ui/segmented";
 import { compress, expand, parseV6Input, reverse6 } from "./lib/ipv6";
 import { special6 } from "./lib/special";
-import { err6 } from "./shared";
+import { err6 } from "./ui/shared";
 
 type Out = "compress" | "expand" | "reverse" | "type";
 

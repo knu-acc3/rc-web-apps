@@ -6,7 +6,7 @@ import { formatNumber, plural } from "@/i18n/format";
 import { cn } from "@/lib/cn";
 import { Checkbox, Field, Input } from "@/ui/field";
 import { replaceText, type ReplaceRequest, type ReplaceResult } from "./lib/replace";
-import { InlineSelect, InputPanel, MoreOptions, OptionsBar, OutputPanel, TwoPane, useDebounced } from "./shared";
+import { InlineSelect, InputPanel, MoreOptions, OptionsBar, OutputPanel, TwoPane, useDebounced } from "./ui/shared";
 
 const T = {
   ru: {
@@ -102,7 +102,7 @@ export default function FindReplace({ locale, find: find0, replace: replace0 = "
     if (!debouncedReq.regex) return;
     const myId = ++seq.current;
     const r = debouncedReq;
-    if (!workerRef.current) workerRef.current = new Worker(new URL("./replace.worker.ts", import.meta.url), { type: "module" });
+    if (!workerRef.current) workerRef.current = new Worker(new URL("./lib/replace.worker.ts", import.meta.url), { type: "module" });
     const w = workerRef.current;
     // A runaway expression can't be interrupted inside the worker, so the worker is terminated.
     const timer = setTimeout(() => {

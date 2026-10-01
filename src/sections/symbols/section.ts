@@ -4,8 +4,8 @@ import { ui } from "@/i18n/ui";
 import type { Block, Crumb, LinkItem, PageModel, QA, SearchEntry, SectionDef } from "@/registry/types";
 import type { BoardItem } from "../emoji/shared/GlyphBoard";
 import { cssEscape, hex, htmlDec, htmlHex, jsEscape, pyEscape, urlEncode, utf16, utf8 } from "../emoji/shared/codes";
-import { COLLECTION_META, CURATED, GC_NAMES, HUB_GROUPS, LOOKALIKES, POPULAR_SYMBOLS } from "./content";
-import { COLLECTIONS, collectionById, collectionsOf, pageByKey, pageOf, PAGES, sym, SYMS, type Collection, type Sym, type SymPage } from "./data";
+import { COLLECTION_META, CURATED, GC_NAMES, HUB_GROUPS, LOOKALIKES, POPULAR_SYMBOLS } from "./content/content";
+import { COLLECTIONS, collectionById, collectionsOf, pageByKey, pageOf, PAGES, sym, SYMS, type Collection, type Sym, type SymPage } from "./lib/data";
 
 /*
  * URL scheme (absolute section: it owns two top-level segments):

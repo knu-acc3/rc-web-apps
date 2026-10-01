@@ -7,7 +7,7 @@ import { outputLabels } from "@/sections/code/kit/labels";
 import { CodeOutput } from "@/ui/code-output";
 import { Notice } from "@/ui/panel";
 import { Segmented } from "@/ui/segmented";
-import { parseCurl, toAxios, toFetch, toPython } from "./curl";
+import { parseCurl, toAxios, toFetch, toPython } from "./lib/curl";
 
 type Target = "fetch" | "axios" | "python";
 

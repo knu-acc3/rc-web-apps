@@ -18,7 +18,7 @@ import {
   toBase64,
   type PasswordOptions,
   type RandomSource,
-} from "@/sections/password/engine";
+} from "@/sections/password/lib/engine";
 
 /** Deterministic xorshift source for tests. */
 function seeded(seed = 123456789): RandomSource {

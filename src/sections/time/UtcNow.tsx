@@ -2,11 +2,11 @@
 
 import { CopyButton } from "@/ui/copy-button";
 import { Panel } from "@/ui/panel";
-import { BigTime } from "./BigTime";
+import { BigTime } from "./ui/BigTime";
 import { diffShort, hms, longDate } from "./lib/text";
 import { fmtOffset, pad2, zoned } from "./lib/tz";
 import { useLocalZone, useNow } from "./lib/use-now";
-import type { NowProps } from "./types";
+import type { NowProps } from "./lib/types";
 
 const T = {
   ru: { iso: "ISO 8601", unix: "Unix-время", you: "Вы", msk: "Москва", ast: "Астана", copy: "Копировать", copied: "Скопировано", same: "совпадает с UTC" },

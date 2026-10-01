@@ -5,7 +5,7 @@ import type { Locale } from "@/i18n/config";
 import { Checkbox, Switch } from "@/ui/field";
 import { Panel, PanelHeader } from "@/ui/panel";
 import { toHtmlEntities, typograph, type TypoLang } from "./lib/typograph";
-import { InputPanel, MoreOptions, OutputPanel, TwoPane } from "./shared";
+import { InputPanel, MoreOptions, OutputPanel, TwoPane } from "./ui/shared";
 
 const T = {
   ru: {

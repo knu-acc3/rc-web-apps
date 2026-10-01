@@ -1,5 +1,5 @@
 import type { Locale } from "@/i18n/config";
-import { nf, nfix } from "../shared";
+import { nf, nfix } from "../lib/shared";
 import { kidsLabel, type ShoeGroup, type ShoeSystem } from "./engine";
 
 export const sz = (l: Locale, v: number) => nf(l, v, 1);

@@ -2,8 +2,8 @@ import { tr, type Locale } from "@/i18n/config";
 import { formatSmart, plural } from "@/i18n/format";
 import { ui } from "@/i18n/ui";
 import type { Block, LinkItem, PageModel, QA, SearchEntry, SectionDef } from "@/registry/types";
-import { clean, convert, relation } from "./engine";
-import { QUANTITIES, type QuantityDef, type UnitDef } from "./units";
+import { clean, convert, relation } from "./lib/engine";
+import { QUANTITIES, type QuantityDef, type UnitDef } from "./data/units";
 import type { ClientUnit } from "./UnitConverter";
 
 const SECTION_ID = "convert";

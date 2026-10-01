@@ -7,9 +7,9 @@ import { CodeEditor } from "@/sections/code/kit/CodeEditor";
 import { useLiveTask, useWorkerClient } from "@/sections/code/kit/hooks";
 import { Select } from "@/ui/field";
 import { Panel } from "@/ui/panel";
-import { ALGOS, type AlgoId } from "./algorithms";
-import { formatDigest, type OutFormat } from "./engine";
-import { decodeInput, INPUT_ENC_LABEL, type InputEncoding } from "./input";
+import { ALGOS, type AlgoId } from "./lib/algorithms";
+import { formatDigest, type OutFormat } from "./lib/engine";
+import { decodeInput, INPUT_ENC_LABEL, type InputEncoding } from "./lib/input";
 
 const T = {
   ru: { input: "Текст", placeholder: "Введите текст — хэши всех алгоритмов появятся ниже", inputEnc: "Ввод", out: "Формат", copyHint: "Нажмите на хэш, чтобы скопировать", copied: "скопировано", fmt: { hex: "hex", HEX: "HEX", base64: "Base64", base64url: "Base64url" } },
@@ -25,7 +25,7 @@ export default function MultiHash({ locale, sample = "" }: { locale: Locale; sam
   const [enc, setEnc] = useState<InputEncoding>("utf8");
   const [fmt, setFmt] = useState<OutFormat>("hex");
   const [copied, setCopied] = useState<string | null>(null);
-  const client = useWorkerClient(() => new Worker(new URL("./hash.worker.ts", import.meta.url), { type: "module" }));
+  const client = useWorkerClient(() => new Worker(new URL("./lib/hash.worker.ts", import.meta.url), { type: "module" }));
   const data = decodeInput(text, enc);
   const live = useLiveTask<Record<string, string>>(`${enc}|${text}`, "error" in data ? null : () => client.run("multi", { data: data.bytes, algos: ORDER }), 150);
   const digests = live.value ?? live.stale;

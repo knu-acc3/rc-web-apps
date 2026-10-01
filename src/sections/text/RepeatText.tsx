@@ -5,7 +5,7 @@ import type { Locale } from "@/i18n/config";
 import { Input } from "@/ui/field";
 import { repeatText } from "./lib/lineTools";
 import { graphemeCount } from "./lib/textOps";
-import { countLabel, InlineSelect, InputPanel, OptionsBar, OutputPanel, TwoPane, TX } from "./shared";
+import { countLabel, InlineSelect, InputPanel, OptionsBar, OutputPanel, TwoPane, TX } from "./ui/shared";
 
 const T = {
   ru: {

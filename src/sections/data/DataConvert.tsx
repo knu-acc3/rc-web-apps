@@ -12,8 +12,8 @@ import { buttonClass } from "@/ui/button";
 import { CodeOutput } from "@/ui/code-output";
 import { Input, Select, Switch } from "@/ui/field";
 import { Notice } from "@/ui/panel";
-import type { ConvertOptions, Fmt, Warn } from "./convert";
-import { FORMAT_META, SAMPLES } from "./samples";
+import type { ConvertOptions, Fmt, Warn } from "./lib/convert";
+import { FORMAT_META, SAMPLES } from "./content/samples";
 
 const T = {
   ru: {
@@ -150,7 +150,7 @@ export default function DataConvert({ locale, from, to, options = {}, reverse }:
   const id = useId();
   const [text, setText] = useState(SAMPLES[from]?.[locale] ?? "");
   const [opts, setOpts] = useState<ConvertOptions>({ header: true, indent: 2, ...options });
-  const client = useWorkerClient(() => new Worker(new URL("./data.worker.ts", import.meta.url), { type: "module" }));
+  const client = useWorkerClient(() => new Worker(new URL("./lib/data.worker.ts", import.meta.url), { type: "module" }));
   const set = <K extends keyof ConvertOptions>(k: K, v: ConvertOptions[K]) => setOpts((p) => ({ ...p, [k]: v }));
   const live = useLiveTask<{ output: string; warnings: Warn[] }>(`${JSON.stringify(opts)}\u0000${text}`, text.trim() ? () => client.run("convert", { from, to, text, opts }, { timeoutMs: 60000 }) : null, 250);
   const res = live.value ?? (text.trim() ? live.stale : undefined);

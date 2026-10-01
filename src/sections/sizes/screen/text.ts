@@ -1,5 +1,5 @@
 import type { Locale } from "@/i18n/config";
-import { nf } from "../shared";
+import { nf } from "../lib/shared";
 import { nearestCommonRatio, ratioText, reduceRatio, resolutionName } from "./engine";
 
 /** "16:9", "683:384 ≈ 16:9", "199:139 (≈ 1,43:1)" */

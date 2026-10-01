@@ -1,6 +1,6 @@
 import type { Locale } from "@/i18n/config";
 import type { Block, ToolDef } from "@/registry/types";
-import { parseScientific, SI_PREFIXES, superscript, toEngineering, toScientific } from "../scientific";
+import { parseScientific, SI_PREFIXES, superscript, toEngineering, toScientific } from "../lib/scientific";
 
 const EXAMPLES: { v: string; ru: string; en: string }[] = [
   { v: "299792458", ru: "Скорость света, м/с", en: "Speed of light, m/s" },

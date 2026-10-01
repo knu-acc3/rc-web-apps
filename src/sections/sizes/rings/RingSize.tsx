@@ -5,7 +5,7 @@ import type { Locale } from "@/i18n/config";
 import { formatNumber, parseNumber } from "@/i18n/format";
 import { Field, Input, Select } from "@/ui/field";
 import { Panel } from "@/ui/panel";
-import { ResultTiles, plainSpaces, type Tile } from "../ui";
+import { ResultTiles, plainSpaces, type Tile } from "../ui/kit";
 import { DIAMETER_RANGE, RING_SYSTEMS, diameterFrom, diameterToJp, diameterToUs, ringSizes, ukIndexFromCirc, ukOptions, type RingSystem } from "./engine";
 
 const T = {

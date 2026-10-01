@@ -2,8 +2,8 @@ import type { Locale } from "@/i18n/config";
 import type { Block, QA, VariantDef } from "@/registry/types";
 import { defineToolSection } from "@/registry/tool-section";
 import { registerLink, registerTools, withRelated } from "@/sections/code/kit/related";
-import { exportRegex, jsLiteralBody } from "./exporters";
-import { LIBRARY, testerFlags, testerText, type LibPattern } from "./library";
+import { exportRegex, jsLiteralBody } from "./lib/exporters";
+import { LIBRARY, testerFlags, testerText, type LibPattern } from "./lib/library";
 
 const HUE = 245;
 

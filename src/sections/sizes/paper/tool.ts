@@ -1,6 +1,6 @@
 import type { Locale } from "@/i18n/config";
 import type { Block, QA, ToolDef, VariantDef } from "@/registry/types";
-import { inchWord, nf, nfix, tt, type Txt } from "../shared";
+import { inchWord, nf, nfix, tt, type Txt } from "../lib/shared";
 import { COMMON_DPI, PAPER, PAPER_BY_SLUG, areaM2, inchesOf, isoIndex, mmToPt, paperPx, type PaperFormat } from "./data";
 
 /* ───────────── typical uses ───────────── */

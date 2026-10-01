@@ -6,7 +6,7 @@ import { formatBytes } from "@/i18n/format";
 import { Button } from "@/ui/button";
 import type { ToolProps } from "../types";
 import { storageWorks, useDetected } from "./lib/probe";
-import { COMMON, Facts, Hero, Hint, Stack, YesNo } from "./ui";
+import { COMMON, Facts, Hero, Hint, Stack, YesNo } from "./ui/kit";
 
 const T = {
   ru: {

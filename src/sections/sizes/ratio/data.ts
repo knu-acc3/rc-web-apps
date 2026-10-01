@@ -1,4 +1,4 @@
-import type { Txt } from "../shared";
+import type { Txt } from "../lib/shared";
 
 export interface RatioDef {
   slug: string;

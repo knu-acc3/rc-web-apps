@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { DIALECT_PAGES } from "@/sections/code/dialects";
-import { SQL_DIALECTS } from "@/sections/code/langs";
-import { formatCode } from "@/sections/code/run";
+import { DIALECT_PAGES } from "@/sections/code/content/dialects";
+import { SQL_DIALECTS } from "@/sections/code/lib/langs";
+import { formatCode } from "@/sections/code/lib/run";
 
 describe("SQL dialect pages", () => {
   it("every page maps to a known dialect", () => {

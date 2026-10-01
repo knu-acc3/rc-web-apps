@@ -6,7 +6,7 @@ import { formatNumber, parseNumber } from "@/i18n/format";
 import { Field, Input, Select } from "@/ui/field";
 import { Panel } from "@/ui/panel";
 import { Segmented } from "@/ui/segmented";
-import { ResultTiles, plainSpaces, type Tile } from "../ui";
+import { ResultTiles, plainSpaces, type Tile } from "../ui/kit";
 import { FOOT_RANGE, SHOE_SYSTEMS, footFrom, sizeIn, sizeOptions, type ShoeGroup, type ShoeSystem } from "./engine";
 import { GROUP_LABEL, SYSTEM_LABEL, shoeLabel } from "./format";
 

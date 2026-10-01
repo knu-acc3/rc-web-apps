@@ -6,7 +6,7 @@ import { fmtRound } from "../../calc/kit/fmt";
 import { CalcGrid, Disclaimer, Explain, OptionsRow, ResultMain, Stack, ToolActions } from "../../calc/kit/ui";
 import { useQueryState } from "../../calc/kit/url-state";
 import { healthyRange, IDEAL_FORMULAS, idealWeight, kgToLb, type IdealFormula, type Sex } from "../engines/body";
-import { BodyFields, bodyDefaults, parseBody, SEXES, SexToggle, switchUnits, UNIT_SYSTEMS, UnitToggle } from "../parts";
+import { BodyFields, bodyDefaults, parseBody, SEXES, SexToggle, switchUnits, UNIT_SYSTEMS, UnitToggle } from "../ui/parts";
 
 const T = {
   ru: {

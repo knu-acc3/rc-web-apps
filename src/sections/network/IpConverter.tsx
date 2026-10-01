@@ -8,7 +8,7 @@ import { parseAnyV4, type ConvError, type Notation } from "./lib/convert";
 import { toBinary, toDotted, toHex } from "./lib/ipv4";
 import { compress, expand, mapV4, reverse4 } from "./lib/ipv6";
 import { special4 } from "./lib/special";
-import { DetailList, ResultCard } from "./shared";
+import { DetailList, ResultCard } from "./ui/shared";
 
 const T = {
   ru: {

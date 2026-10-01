@@ -5,8 +5,8 @@ import type { Locale } from "@/i18n/config";
 import { CopyButton } from "@/ui/copy-button";
 import { Field, Input } from "@/ui/field";
 import { Notice, Panel } from "@/ui/panel";
-import { applySymbolic, fromSymbolic, notes, parseOctal, SETGID, SETUID, STICKY, toChmodSymbolic, toOctal, toSymbolic, umask, type Who } from "./chmod";
-import { NOTE_TEXT } from "./chmod-text";
+import { applySymbolic, fromSymbolic, notes, parseOctal, SETGID, SETUID, STICKY, toChmodSymbolic, toOctal, toSymbolic, umask, type Who } from "./lib/chmod";
+import { NOTE_TEXT } from "./content/chmod-text";
 
 const T = {
   ru: {

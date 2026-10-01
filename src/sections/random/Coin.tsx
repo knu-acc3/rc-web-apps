@@ -9,7 +9,7 @@ import { Field, Select } from "@/ui/field";
 import { Panel, PanelHeader } from "@/ui/panel";
 import { randomInt } from "./lib/rng";
 import { prefersReducedMotion } from "./lib/storage";
-import { HistoryPanel, pushHistory } from "./shared";
+import { HistoryPanel, pushHistory } from "./ui/shared";
 
 export interface CoinProps {
   locale: Locale;

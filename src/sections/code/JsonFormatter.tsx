@@ -12,11 +12,11 @@ import { CopyButton } from "@/ui/copy-button";
 import { Select, Switch } from "@/ui/field";
 import { Notice } from "@/ui/panel";
 import { Segmented } from "@/ui/segmented";
-import { ErrorBox, failOf, useCodeWorker } from "./ErrorBox";
-import { JsonTree } from "./JsonTree";
-import type { JsonFormatResult } from "./run";
-import { SAMPLES } from "./langs";
-import { CODE_T } from "./text";
+import { ErrorBox, failOf, useCodeWorker } from "./ui/ErrorBox";
+import { JsonTree } from "./ui/JsonTree";
+import type { JsonFormatResult } from "./lib/run";
+import { SAMPLES } from "./lib/langs";
+import { CODE_T } from "./content/text";
 
 export interface JsonFormatterProps {
   locale: Locale;

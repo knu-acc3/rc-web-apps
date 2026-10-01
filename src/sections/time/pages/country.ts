@@ -16,8 +16,8 @@ import {
   zoneInfo,
   type City,
   type Country,
-} from "../model";
-import type { CountryTimeProps, Place } from "../types";
+} from "../lib/model";
+import type { CountryTimeProps, Place } from "../lib/types";
 import { cityLink, home, HUE, SECTION_ID, timeCrumb } from "./common";
 
 interface ZoneGroup {

@@ -10,7 +10,7 @@ import { Panel } from "@/ui/panel";
 import { parseYmd, ymdStr } from "@/sections/calendar/lib/dates";
 import { useHolidayChoice } from "@/sections/calendar/lib/marks";
 import { difference } from "./lib/engine";
-import { BigResult, CountryChoice, qty, useToday, ymdText } from "./ui";
+import { BigResult, CountryChoice, qty, useToday, ymdText } from "./ui/kit";
 
 const T = {
   ru: {

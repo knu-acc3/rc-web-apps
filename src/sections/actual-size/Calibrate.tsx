@@ -17,9 +17,9 @@ import {
   pxPerMmFromDiagonal,
   saveCalibration,
   screenDiagonalInches,
-} from "./calibration";
-import { CardMatcher } from "./CardMatcher";
-import { useCalibration } from "./use-calibration";
+} from "./lib/calibration";
+import { CardMatcher } from "./ui/CardMatcher";
+import { useCalibration } from "./lib/use-calibration";
 
 const T = {
   ru: {

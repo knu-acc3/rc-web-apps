@@ -6,7 +6,7 @@ import { CopyButton } from "@/ui/copy-button";
 import { Panel } from "@/ui/panel";
 import { isReducedUa } from "./lib/ua";
 import { detectUa, useDetected } from "./lib/probe";
-import { COMMON, Facts, Hint, Stack, YesNo } from "./ui";
+import { COMMON, Facts, Hint, Stack, YesNo } from "./ui/kit";
 
 const T = {
   ru: {

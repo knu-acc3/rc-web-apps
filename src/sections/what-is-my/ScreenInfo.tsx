@@ -5,7 +5,7 @@ import { formatNumber } from "@/i18n/format";
 import type { ToolProps } from "../types";
 import { aspectRatio, physicalSize, resolutionName } from "./lib/screen";
 import { screenStore } from "./lib/probe";
-import { COMMON, dims, Facts, Hero, Hint, Stack, YesNo } from "./ui";
+import { COMMON, dims, Facts, Hero, Hint, Stack, YesNo } from "./ui/kit";
 
 const T = {
   ru: {

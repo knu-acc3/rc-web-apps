@@ -10,8 +10,8 @@ import { CopyButton } from "@/ui/copy-button";
 import { Dropzone } from "@/ui/dropzone";
 import { Notice } from "@/ui/panel";
 import { Segmented } from "@/ui/segmented";
-import { parsePayload, type PayloadKind } from "./payloads";
-import { formatName, nativeDetector, zxingDetector, type Detect, type Detected } from "./scan";
+import { parsePayload, type PayloadKind } from "./lib/payloads";
+import { formatName, nativeDetector, zxingDetector, type Detect, type Detected } from "./lib/scan";
 
 type Mode = "camera" | "image";
 type CamError = "insecure" | "denied" | "notfound" | "busy" | "load" | "other";

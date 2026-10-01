@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { angleAt, armsAngle, formatInchFraction, inchFraction, polar, rulerTicks, snapAngle, snapRuler } from "@/sections/actual-size/geometry";
+import { angleAt, armsAngle, formatInchFraction, inchFraction, polar, rulerTicks, snapAngle, snapRuler } from "@/sections/actual-size/lib/geometry";
 
 describe("ruler ticks", () => {
   it("centimetre ruler: a tick every millimetre, labels every centimetre", () => {

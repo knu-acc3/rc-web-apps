@@ -14,8 +14,8 @@ import { Input } from "@/ui/field";
 import { Notice, Panel } from "@/ui/panel";
 import { Segmented } from "@/ui/segmented";
 import { Tabs } from "@/ui/tabs";
-import type { Match, MatchResult } from "./engine";
-import { exportRegex, type Lang, type Warning } from "./exporters";
+import type { Match, MatchResult } from "./lib/engine";
+import { exportRegex, type Lang, type Warning } from "./lib/exporters";
 
 const FLAGS = ["g", "i", "m", "s", "u", "v", "y", "d"] as const;
 type Flag = (typeof FLAGS)[number];
@@ -124,8 +124,8 @@ export default function RegexTester({ locale, pattern: p0 = "(?<user>[\\w.+-]+)@
   const [tab, setTab] = useState<"matches" | "replace" | "code">("matches");
   const [replacement, setReplacement] = useState(r0);
   const [lang, setLang] = useState<Lang>("js");
-  const client = useWorkerClient(() => new Worker(new URL("./regex.worker.ts", import.meta.url), { type: "module" }));
-  const replacer = useWorkerClient(() => new Worker(new URL("./regex.worker.ts", import.meta.url), { type: "module" }));
+  const client = useWorkerClient(() => new Worker(new URL("./lib/regex.worker.ts", import.meta.url), { type: "module" }));
+  const replacer = useWorkerClient(() => new Worker(new URL("./lib/regex.worker.ts", import.meta.url), { type: "module" }));
 
   const syntax = useMemo(() => {
     try {

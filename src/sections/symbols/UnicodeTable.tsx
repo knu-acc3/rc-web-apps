@@ -10,7 +10,7 @@ import { Field, Input, Select } from "@/ui/field";
 import { Panel } from "@/ui/panel";
 import { cellGrid, Cells, usePicker, type BoardItem } from "../emoji/shared/GlyphBoard";
 import { cssEscape, hex, htmlDec, htmlHex, jsEscape, utf8 } from "../emoji/shared/codes";
-import { blockOf, face, k36, nameOf, parseIndex, search, type Index, type RawIndex, type RawRu } from "./lookup";
+import { blockOf, face, k36, nameOf, parseIndex, search, type Index, type RawIndex, type RawRu } from "./lib/lookup";
 
 export interface UnicodeTableProps {
   locale: Locale;

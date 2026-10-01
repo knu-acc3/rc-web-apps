@@ -3,9 +3,9 @@ import { formatNumber } from "@/i18n/format";
 import type { Block, QA, ToolDef } from "@/registry/types";
 import { defineToolSection } from "@/registry/tool-section";
 import { registerTools, withRelated } from "@/sections/code/kit/related";
-import { ALGOS, HMACS, type AlgoDef, type KdfId } from "./algorithms";
-import { ABOUT, COMMANDS } from "./content";
-import VECTORS from "./vectors.json";
+import { ALGOS, HMACS, type AlgoDef, type KdfId } from "./lib/algorithms";
+import { ABOUT, COMMANDS } from "./content/content";
+import VECTORS from "./data/vectors.json";
 
 const HUE = 280;
 const DIGESTS = VECTORS.digests as Record<string, string[]>;

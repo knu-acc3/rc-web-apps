@@ -5,7 +5,7 @@ import type { Locale } from "@/i18n/config";
 import { Field, Input, Switch } from "@/ui/field";
 import { Badge, Notice } from "@/ui/panel";
 import { eui64, linkLocalFromMac, macBits, macFormats, parseMac, type MacError } from "./lib/mac";
-import { DetailList, ResultCard } from "./shared";
+import { DetailList, ResultCard } from "./ui/shared";
 
 const T = {
   ru: {

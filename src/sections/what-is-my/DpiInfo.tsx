@@ -17,7 +17,7 @@ import {
   sizeFromPpi,
 } from "./lib/screen";
 import { liveStore, screenStore } from "./lib/probe";
-import { COMMON, dims, Facts, Hero, Hint, Stack } from "./ui";
+import { COMMON, dims, Facts, Hero, Hint, Stack } from "./ui/kit";
 
 const T = {
   ru: {

@@ -9,7 +9,7 @@ import { Notice } from "@/ui/panel";
 import { cidrRange, rangeToCidrs } from "./lib/cidr";
 import { parseIPv4, toDotted } from "./lib/ipv4";
 import { compress, parseIPv6 } from "./lib/ipv6";
-import { bigFmt } from "./shared";
+import { bigFmt } from "./ui/shared";
 
 type Mode = "cidr-to-range" | "range-to-cidr";
 

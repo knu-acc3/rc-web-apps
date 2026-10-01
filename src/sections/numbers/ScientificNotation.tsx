@@ -6,9 +6,9 @@ import { CopyButton } from "@/ui/copy-button";
 import { Input, Select } from "@/ui/field";
 import { Panel } from "@/ui/panel";
 import { Segmented } from "@/ui/segmented";
-import { groupThousands } from "./parse";
-import { isZero, magnitude, parseScientific, SI_PREFIXES, superscript, toEngineering, toPlain, toScientific, type Notation } from "./scientific";
-import { Details } from "./ui-bits";
+import { groupThousands } from "./lib/parse";
+import { isZero, magnitude, parseScientific, SI_PREFIXES, superscript, toEngineering, toPlain, toScientific, type Notation } from "./lib/scientific";
+import { Details } from "./ui/ui-bits";
 
 export interface ScientificNotationProps {
   locale: Locale;

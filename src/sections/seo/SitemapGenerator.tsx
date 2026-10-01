@@ -9,7 +9,7 @@ import { Button } from "@/ui/button";
 import { Dropzone } from "@/ui/dropzone";
 import { Field, Input, Select, Textarea } from "@/ui/field";
 import { buildSitemaps, collectUrls, type ChangeFreq } from "./lib/sitemap";
-import { Issues, More, Output } from "./ui";
+import { Issues, More, Output } from "./ui/kit";
 
 const T = {
   ru: {

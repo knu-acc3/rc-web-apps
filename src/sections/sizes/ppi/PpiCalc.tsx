@@ -6,7 +6,7 @@ import { formatNumber, parseNumber } from "@/i18n/format";
 import { Field, Input } from "@/ui/field";
 import { Panel } from "@/ui/panel";
 import { dotPitchMm, megapixels, physicalSize, ppi, retinaDistanceIn } from "../screen/engine";
-import { QuietFacts, plainSpaces } from "../ui";
+import { QuietFacts, plainSpaces } from "../ui/kit";
 
 const T = {
   ru: {

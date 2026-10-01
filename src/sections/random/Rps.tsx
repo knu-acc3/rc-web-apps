@@ -8,7 +8,7 @@ import { Button } from "@/ui/button";
 import { Panel } from "@/ui/panel";
 import { randomInt } from "./lib/rng";
 import { rpsOutcome, type Move, type Outcome } from "./lib/rps";
-import { HistoryPanel, pushHistory } from "./shared";
+import { HistoryPanel, pushHistory } from "./ui/shared";
 
 export interface RpsProps {
   locale: Locale;

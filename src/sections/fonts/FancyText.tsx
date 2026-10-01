@@ -9,10 +9,10 @@ import { CopyButton } from "@/ui/copy-button";
 import { Field, Switch, Textarea } from "@/ui/field";
 import { Panel } from "@/ui/panel";
 import { Segmented } from "@/ui/segmented";
-import { InvisibleTool } from "./InvisibleTool";
-import { PLATFORMS, SAMPLE, STYLE_NAMES, type PlatformId } from "./names";
-import { StyleList } from "./StyleList";
-import { T, type Strings } from "./strings";
+import { InvisibleTool } from "./ui/InvisibleTool";
+import { PLATFORMS, SAMPLE, STYLE_NAMES, type PlatformId } from "./data/names";
+import { StyleList } from "./ui/StyleList";
+import { T, type Strings } from "./content/strings";
 import {
   cyrillicNotice,
   DEFAULT_SEED,
@@ -26,8 +26,8 @@ import {
   ZALGO_LEVELS,
   type StyleId,
   type ZalgoLevel,
-} from "./styles";
-import { useCopyFlash } from "./use-flash";
+} from "./lib/styles";
+import { useCopyFlash } from "./lib/use-flash";
 
 export interface FancyTextProps {
   locale: Locale;

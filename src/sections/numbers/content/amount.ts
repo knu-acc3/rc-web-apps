@@ -1,7 +1,7 @@
 import type { Locale } from "@/i18n/config";
 import type { QA, ToolDef, VariantDef } from "@/registry/types";
-import { amountEn, amountRu, CURRENCIES, moneyNumeric, parseMoney, type CurrencyDef, type Money } from "../amount";
-import { ruPlural } from "../words-ru";
+import { amountEn, amountRu, CURRENCIES, moneyNumeric, parseMoney, type CurrencyDef, type Money } from "../lib/amount";
+import { ruPlural } from "../lib/words-ru";
 import { fit } from "./text";
 
 const EXAMPLES = ["1", "2", "5", "21", "22.22", "100", "1000", "1500.50", "21000", "2000000", "1234567.89"];

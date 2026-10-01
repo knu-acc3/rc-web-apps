@@ -11,7 +11,7 @@ import { field, readNum } from "../../calc/kit/num";
 import { CalcGrid, Disclaimer, Explain, FieldRow, NumField, OptionsRow, ResultMain, Stack, ToolActions } from "../../calc/kit/ui";
 import { useQueryState } from "../../calc/kit/url-state";
 import { alcoholGrams, ELIMINATION, widmark, WIDMARK_R, type Sex } from "../engines/body";
-import { SEXES, SexToggle } from "../parts";
+import { SEXES, SexToggle } from "../ui/parts";
 
 const PRESETS = [
   { id: "beer", ml: 500, abv: 5 },

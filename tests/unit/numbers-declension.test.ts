@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { ruCardinalCase } from "@/sections/numbers/declension";
-import { ruCardinal } from "@/sections/numbers/words-ru";
+import { ruCardinalCase } from "@/sections/numbers/lib/declension";
+import { ruCardinal } from "@/sections/numbers/lib/words-ru";
 
 describe("Russian numeral declension", () => {
   it("nominative equals the cardinal engine", () => {

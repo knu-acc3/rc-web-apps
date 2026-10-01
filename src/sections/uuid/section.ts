@@ -2,7 +2,7 @@ import type { Locale } from "@/i18n/config";
 import type { Block, ToolDef } from "@/registry/types";
 import { defineToolSection } from "@/registry/tool-section";
 import { registerTools, withRelated } from "@/sections/code/kit/related";
-import { NAMESPACES, uuidNameBased } from "./engine";
+import { NAMESPACES, uuidNameBased } from "./lib/engine";
 
 type Row = [string, string, string];
 const layout = (locale: Locale, rows: { ru: Row[]; en: Row[] }, title: { ru: string; en: string }): Block => ({

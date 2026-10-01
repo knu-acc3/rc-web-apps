@@ -1,6 +1,6 @@
 import { defineToolSection } from "@/registry/tool-section";
-import * as body from "./group-body";
-import * as cycle from "./group-cycle";
+import * as body from "./content/group-body";
+import * as cycle from "./content/group-cycle";
 
 /** Navigation group only (no landing page). */
 const tools = [...body.tools, ...cycle.tools];

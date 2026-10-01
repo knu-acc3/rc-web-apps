@@ -1,8 +1,8 @@
 import type { Locale } from "@/i18n/config";
 import type { Block, QA, ToolDef, VariantDef } from "@/registry/types";
-import { ROMAN_SYMBOLS, partText, romanParts, toRoman } from "../roman";
-import { enOrdinalSuffix } from "../words-en";
-import { ruCardinal, ruOrdinal } from "../words-ru";
+import { ROMAN_SYMBOLS, partText, romanParts, toRoman } from "../lib/roman";
+import { enOrdinalSuffix } from "../lib/words-en";
+import { ruCardinal, ruOrdinal } from "../lib/words-ru";
 import { fit, num } from "./text";
 
 /* ───────────── curated numbers ───────────── */

@@ -1,11 +1,11 @@
 "use client";
 
 import { Panel } from "@/ui/panel";
-import { BigTime } from "./BigTime";
+import { BigTime } from "./ui/BigTime";
 import { dayShift, hms, longDate, placeParts } from "./lib/text";
 import { fmtOffset } from "./lib/tz";
 import { useNow } from "./lib/use-now";
-import type { CountryTimeProps } from "./types";
+import type { CountryTimeProps } from "./lib/types";
 
 export default function CountryTime({ locale, groups }: CountryTimeProps) {
   const now = useNow();

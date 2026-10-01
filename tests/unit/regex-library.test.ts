@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { captureGroups, findAll, replace } from "@/sections/regex/engine";
-import { exportRegex, jsLiteralBody } from "@/sections/regex/exporters";
-import { LIBRARY, testerFlags, testerText } from "@/sections/regex/library";
+import { captureGroups, findAll, replace } from "@/sections/regex/lib/engine";
+import { exportRegex, jsLiteralBody } from "@/sections/regex/lib/exporters";
+import { LIBRARY, testerFlags, testerText } from "@/sections/regex/lib/library";
 
 describe("regex library", () => {
   it("has ~60 unique, complete patterns", () => {

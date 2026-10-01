@@ -3,12 +3,12 @@
 import { useState } from "react";
 import { Segmented } from "@/ui/segmented";
 import { Switch } from "@/ui/field";
-import { ClockShell, isOpts, type ClockOptions } from "./ClockShell";
+import { ClockShell, isOpts, type ClockOptions } from "./ui/ClockShell";
 import { longDate } from "./lib/text";
 import { pad2, zoned } from "./lib/tz";
 import { useStoredJson } from "./lib/storage";
 import { useLocalZone, useNow } from "./lib/use-now";
-import type { NowProps } from "./types";
+import type { NowProps } from "./lib/types";
 
 const T = {
   ru: { format: "Формат времени", sec: "Секунды", date: "Дата" },

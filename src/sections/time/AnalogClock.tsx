@@ -2,12 +2,12 @@
 
 import { useEffect, useRef } from "react";
 import { Switch } from "@/ui/field";
-import { ClockShell } from "./ClockShell";
+import { ClockShell } from "./ui/ClockShell";
 import { hms, longDate } from "./lib/text";
 import { tzOffset, zoned } from "./lib/tz";
 import { useStoredJson } from "./lib/storage";
 import { useLocalZone, useNow } from "./lib/use-now";
-import type { NowProps } from "./types";
+import type { NowProps } from "./lib/types";
 
 const T = {
   ru: { sec: "Секундная стрелка", digits: "Время цифрами", label: "Аналоговые часы" },

@@ -6,11 +6,11 @@ import { href } from "@/i18n/config";
 import { isoWeek } from "@/sections/calendar/lib/dates";
 import { buttonClass } from "@/ui/button";
 import { Panel } from "@/ui/panel";
-import { BigTime } from "./BigTime";
+import { BigTime } from "./ui/BigTime";
 import { longDate, ymdOf } from "./lib/text";
 import { fmtOffset, zoned } from "./lib/tz";
 import { modernZone, useLocalZone, useNow } from "./lib/use-now";
-import type { NowProps } from "./types";
+import type { NowProps } from "./lib/types";
 
 const T = {
   ru: { week: "неделя", zone: "Часовой пояс", full: "Часы на весь экран", device: "Время вашего устройства" },

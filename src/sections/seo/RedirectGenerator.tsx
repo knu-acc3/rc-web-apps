@@ -5,7 +5,7 @@ import type { Locale } from "@/i18n/config";
 import { Field, Textarea } from "@/ui/field";
 import { Segmented } from "@/ui/segmented";
 import { htaccess, nextjs, nginx, parsePairs, redirectIssues, type Code, type Server } from "./lib/redirects";
-import { Issues, Output } from "./ui";
+import { Issues, Output } from "./ui/kit";
 
 const SAMPLE = `/old-page /new-page
 /blog/2019/post.html /blog/post

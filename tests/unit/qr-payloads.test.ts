@@ -19,10 +19,10 @@ import {
   vcardPayload,
   whatsappPayload,
   wifiPayload,
-} from "@/sections/qr/payloads";
-import { contrastCheck, detectMode, encodeQr, logoBox, modulesPath, moduleScale, qrSvg } from "@/sections/qr/qr";
-import { detectDelimiter, parseCsv, uniqueNames } from "@/sections/qr/csv";
-import { buildPayload, parseCoords } from "@/sections/qr/build";
+} from "@/sections/qr/lib/payloads";
+import { contrastCheck, detectMode, encodeQr, logoBox, modulesPath, moduleScale, qrSvg } from "@/sections/qr/lib/qr";
+import { detectDelimiter, parseCsv, uniqueNames } from "@/sections/qr/lib/csv";
+import { buildPayload, parseCoords } from "@/sections/qr/lib/build";
 
 describe("Wi-Fi", () => {
   it("escapes \\ ; , : and \"", () => {

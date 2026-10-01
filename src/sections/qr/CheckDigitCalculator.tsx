@@ -8,7 +8,7 @@ import { ButtonLink } from "@/ui/button";
 import { CopyButton } from "@/ui/copy-button";
 import { Field, Input } from "@/ui/field";
 import { Segmented } from "@/ui/segmented";
-import { gs1Steps, isbn10Steps, upcEToA, type CheckStep } from "./checkdigits";
+import { gs1Steps, isbn10Steps, upcEToA, type CheckStep } from "./lib/checkdigits";
 
 export type CheckKind = "ean13" | "ean8" | "upca" | "upce" | "gtin14" | "sscc" | "isbn10";
 

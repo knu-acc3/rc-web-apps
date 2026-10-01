@@ -8,7 +8,7 @@ import { Button } from "@/ui/button";
 import { Checkbox, Field, Select, Slider } from "@/ui/field";
 import { Notice } from "@/ui/panel";
 import { sentences } from "./lib/textOps";
-import { InputPanel, MoreOptions } from "./shared";
+import { InputPanel, MoreOptions } from "./ui/shared";
 
 const T = {
   ru: {

@@ -11,7 +11,7 @@ import { Field, Select, Switch } from "@/ui/field";
 
 import { useClientValue } from "./lib/client";
 import { hasGetUserMedia, listDevices, mediaErrorStatus, stopStream, type DeviceOption, type MediaStatus } from "./lib/media";
-import { MediaStatusNotice, PermissionHelp } from "./PermissionHelp";
+import { MediaStatusNotice, PermissionHelp } from "./ui/PermissionHelp";
 
 const PRESETS = [
   { id: "max", w: 4096, h: 2160 },

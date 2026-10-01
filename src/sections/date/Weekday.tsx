@@ -6,7 +6,7 @@ import { Field, Input } from "@/ui/field";
 import { Panel } from "@/ui/panel";
 import { cap, dayOfYear, daysInYear, fmtDate, isoWeek, isValidYmd, parseYmd, WEEKDAYS, type Ymd } from "@/sections/calendar/lib/dates";
 import { weekdayOf } from "./lib/engine";
-import { BigResult, useToday } from "./ui";
+import { BigResult, useToday } from "./ui/kit";
 
 const T = {
   ru: {

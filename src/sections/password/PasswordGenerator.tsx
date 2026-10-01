@@ -32,8 +32,8 @@ import {
   toHex,
   UPPER,
   type Strength,
-} from "./engine";
-import { humanDuration } from "./time";
+} from "./lib/engine";
+import { humanDuration } from "./lib/time";
 
 export type Mode = "password" | "pin" | "passphrase" | "wifi" | "memorable" | "hex" | "base64" | "apikey" | "string";
 

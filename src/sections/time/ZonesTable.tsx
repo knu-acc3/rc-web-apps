@@ -3,11 +3,11 @@
 import Link from "@/ui/link";
 import { cn } from "@/lib/cn";
 import { Panel } from "@/ui/panel";
-import { BigTime } from "./BigTime";
+import { BigTime } from "./ui/BigTime";
 import { dayShift, hms, longDate } from "./lib/text";
 import { fmtOffset, zoned } from "./lib/tz";
 import { modernZone, useLocalZone, useNow } from "./lib/use-now";
-import type { ZonesTableProps } from "./types";
+import type { ZonesTableProps } from "./lib/types";
 
 const T = {
   ru: { yours: "Ваш часовой пояс", offset: "Пояс", time: "Сейчас", cities: "Где", you: "вы здесь" },

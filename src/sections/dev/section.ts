@@ -3,10 +3,10 @@ import type { Block, QA, ToolDef, VariantDef } from "@/registry/types";
 import { defineToolSection } from "@/registry/tool-section";
 import { utf8Encode } from "@/sections/code/kit/bytes";
 import { registerLink, registerTools, withRelated } from "@/sections/code/kit/related";
-import { notes, parseOctal, rights, toChmodSymbolic, toOctal, toSymbolic, type Who } from "./chmod";
-import { NOTE_TEXT } from "./chmod-text";
-import { b64url, hmacSign } from "./jwt";
-import { UA_EXAMPLES } from "./ua-examples";
+import { notes, parseOctal, rights, toChmodSymbolic, toOctal, toSymbolic, type Who } from "./lib/chmod";
+import { NOTE_TEXT } from "./content/chmod-text";
+import { b64url, hmacSign } from "./lib/jwt";
+import { UA_EXAMPLES } from "./data/ua-examples";
 
 const HUE = 215;
 type L = { ru: string; en: string };

@@ -2,7 +2,7 @@ import { defineToolSection } from "@/registry/tool-section";
 import type { Locale } from "@/i18n/config";
 import type { Block } from "@/registry/types";
 import { IBAN_COUNTRIES } from "./data/iban-countries";
-import { cardVariants, countryName, ibanLayout, ibanVariants, PHONE_COUNTRIES, phoneVariants } from "./variants";
+import { cardVariants, countryName, ibanLayout, ibanVariants, PHONE_COUNTRIES, phoneVariants } from "./content/variants";
 
 const phoneCountries = (l: Locale): [string, string][] => PHONE_COUNTRIES.map((c) => [c, countryName(c, l)] as [string, string]).sort((a, b) => a[1].localeCompare(b[1], l));
 

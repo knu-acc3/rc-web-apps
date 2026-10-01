@@ -8,7 +8,7 @@ import { Badge, Notice } from "@/ui/panel";
 import { adjacent, cidr4, maskOf, parseV4Input, supernets, toBinary, toDotted, toHex, v4Info } from "./lib/ipv4";
 import { compress, expand, isV4Mapped, parseV6Input, reverse4, reverse6, v6Info } from "./lib/ipv6";
 import { MULTICAST_SCOPE, special4, special6, type SpecialRange } from "./lib/special";
-import { bigFmt, DetailList, err4, err6, ResultCard, type ValueRow } from "./shared";
+import { bigFmt, DetailList, err4, err6, ResultCard, type ValueRow } from "./ui/shared";
 
 const T = {
   ru: {

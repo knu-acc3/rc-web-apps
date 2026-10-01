@@ -1,5 +1,6 @@
 import type { Block, ToolDef } from "@/registry/types";
 import { defineToolSection } from "@/registry/tool-section";
+import { encryptFileTool, encryptTextTool } from "./content/crypt";
 
 const local = (locale: "ru" | "en"): Block => ({
   type: "text",
@@ -42,12 +43,12 @@ const tools: ToolDef[] = [
     },
     faq: {
       ru: [
-        { q: "Можно ли поставить пароль на архив?", a: "Нет, шифрование ZIP не поддерживается. Для конфиденциальных данных используйте 7-Zip с шифрованием AES-256." },
+        { q: "Можно ли поставить пароль на архив?", a: "Сам ZIP-архив создаётся без пароля, но готовый архив можно зашифровать паролем (AES-256) на странице «Зашифровать файл паролем»." },
         { q: "Сохранится ли структура папок?", a: "Да: при добавлении папки пути внутри неё сохраняются, и архив распакуется с теми же папками." },
         { q: "Насколько уменьшится размер?", a: "Текст, таблицы и документы сжимаются в 2–10 раз. JPEG, MP4, MP3 и другие уже сжатые форматы уменьшатся на единицы процентов." },
       ],
       en: [
-        { q: "Can I password-protect the archive?", a: "No, ZIP encryption isn't supported. For confidential data use 7-Zip with AES-256 encryption." },
+        { q: "Can I password-protect the archive?", a: "The ZIP itself has no password, but you can encrypt the finished archive with a password (AES-256) on the Encrypt a file page." },
         { q: "Is the folder structure kept?", a: "Yes: when you add a folder, the paths inside it are kept and the archive extracts with the same folders." },
         { q: "How much smaller will it be?", a: "Text, spreadsheets and documents shrink 2–10 times. JPEG, MP4, MP3 and other already compressed formats shrink by only a few percent." },
       ],
@@ -314,12 +315,12 @@ export const fileSection = defineToolSection({
   id: "file",
   name: { ru: "Файлы и архивы", en: "Files & archives" },
   description: {
-    ru: "ZIP-архивы, тип файла по сигнатуре, пакетное переименование, деление и склейка файлов, Base64",
-    en: "ZIP archives, file type detection, batch renaming, splitting and joining files, Base64",
+    ru: "ZIP-архивы, шифрование файлов паролем, тип файла по сигнатуре, пакетное переименование, деление и склейка файлов, Base64",
+    en: "ZIP archives, password encryption, file type detection, batch renaming, splitting and joining files, Base64",
   },
   icon: "FileArchive",
   hue: 30,
   category: "files",
   order: 5,
-  tools,
+  tools: [...tools, encryptFileTool, encryptTextTool],
 });

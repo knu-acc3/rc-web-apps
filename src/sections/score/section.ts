@@ -1,5 +1,5 @@
 import { defineToolSection } from "@/registry/tool-section";
-import { counterTool, scoreboardTool } from "./content";
+import { counterTool, scoreboardTool } from "./content/content";
 
 /** Keeping score: a two-team scoreboard (with sport presets) and a tally counter. Tools live at /scoreboard, /counter. */
 export const scoreSection = defineToolSection({

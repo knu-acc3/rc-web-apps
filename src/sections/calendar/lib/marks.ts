@@ -4,7 +4,7 @@ import { useCallback } from "react";
 import type { Locale } from "@/i18n/config";
 import { useStoredJson } from "@/sections/time/lib/storage";
 import { useLocalZone } from "@/sections/time/lib/use-now";
-import type { DayMark } from "../MonthGrid";
+import type { DayMark } from "../ui/MonthGrid";
 import type { Ymd } from "./dates";
 import { productionYear, type HolidayCountry } from "./holidays";
 

@@ -19,11 +19,11 @@ import {
   topicEmoji,
   topicsOf,
   type Emoji,
-} from "./data";
-import { CONTINENTS, GROUPS, HAIR_NAMES, SUBGROUPS, VERSIONS } from "./labels";
+} from "./lib/data";
+import { CONTINENTS, GROUPS, HAIR_NAMES, SUBGROUPS, VERSIONS } from "./lib/labels";
 import type { BoardItem, BoardSection } from "./shared/GlyphBoard";
 import { codePoints, cssEscape, htmlDec, htmlHex, jsEscape, pyEscape, uPlus, urlEncode, utf16, utf8 } from "./shared/codes";
-import { ALIASES, TOPICS, type TopicDef } from "./topics";
+import { ALIASES, TOPICS, type TopicDef } from "./lib/topics";
 
 /*
  * URL scheme (the router allows /section/slug/variant):

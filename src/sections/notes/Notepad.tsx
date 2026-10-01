@@ -12,9 +12,9 @@ import { Segmented } from "@/ui/segmented";
 import { loadMarkdownRenderer, type MarkdownRenderer } from "../text/lib/markdown";
 import { lastWriteFailed } from "../text/lib/storage";
 import { graphemeCount, wordCount } from "../text/lib/textOps";
-import { MD_PROSE } from "../text/markdownProse";
-import { countLabel, FileOpenButton, TX } from "../text/shared";
-import { createNote, deleteNote, importNotes, noteTitle, saveNote, useNotes, type Note } from "./notesStore";
+import { MD_PROSE } from "../text/lib/markdownProse";
+import { countLabel, FileOpenButton, TX } from "../text/ui/shared";
+import { createNote, deleteNote, importNotes, noteTitle, saveNote, useNotes, type Note } from "./lib/notesStore";
 
 const T = {
   ru: {

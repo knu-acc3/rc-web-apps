@@ -1,5 +1,5 @@
 /* Server-side MIME reference: curated extensions joined with mime-db. Never import from client code. */
-import { MAGIC } from "../sniff";
+import { MAGIC } from "../lib/sniff";
 import { CURATED_DOCS } from "./curated-docs";
 import { CURATED_MEDIA } from "./curated-media";
 import { CURATED_OTHER } from "./curated-other";

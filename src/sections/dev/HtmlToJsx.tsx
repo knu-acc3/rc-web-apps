@@ -8,7 +8,7 @@ import { outputLabels } from "@/sections/code/kit/labels";
 import { CodeOutput } from "@/ui/code-output";
 import { Input, Switch } from "@/ui/field";
 import { Notice } from "@/ui/panel";
-import { htmlToJsx } from "./htmljsx";
+import { htmlToJsx } from "./lib/htmljsx";
 
 const T = {
   ru: {

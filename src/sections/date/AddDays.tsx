@@ -8,7 +8,7 @@ import { Segmented } from "@/ui/segmented";
 import { diffDays, fmtDate, isoWeek, parseYmd, WEEKDAYS } from "@/sections/calendar/lib/dates";
 import { useHolidayChoice } from "@/sections/calendar/lib/marks";
 import { addPeriod, weekdayOf, type AddUnit } from "./lib/engine";
-import { BigResult, CountryChoice, qty, useToday } from "./ui";
+import { BigResult, CountryChoice, qty, useToday } from "./ui/kit";
 
 export interface AddDaysProps {
   locale: Locale;

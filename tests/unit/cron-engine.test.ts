@@ -1,8 +1,8 @@
 import { describe as suite, expect, it } from "vitest";
-import { describe, fieldRows } from "@/sections/cron/describe";
-import { CronError, matchingDays, nextRuns, parseCron, runsPerDay } from "@/sections/cron/engine";
-import { toSystemd } from "@/sections/cron/systemd";
-import { wallToInstant } from "@/sections/cron/tz";
+import { describe, fieldRows } from "@/sections/cron/lib/describe";
+import { CronError, matchingDays, nextRuns, parseCron, runsPerDay } from "@/sections/cron/lib/engine";
+import { toSystemd } from "@/sections/cron/lib/systemd";
+import { wallToInstant } from "@/sections/cron/lib/tz";
 
 const iso = (ms: number) => new Date(ms).toISOString().replace(".000Z", "Z");
 const runs = (expr: string, from: string, n: number, tz = "UTC") => nextRuns(parseCron(expr), Date.parse(from), n, tz).map((r) => iso(r.ms));

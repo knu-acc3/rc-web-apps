@@ -12,6 +12,8 @@ import { TOOL_TEXTS_B } from "./data/tools-text-b";
 import type { FormatInfo, ToolText, VariantText } from "./data/types";
 import { FILTERS } from "./engine/filters";
 import { gcd } from "./engine/geometry";
+import { idCopyTool } from "./content/id-copy";
+import { passportPhotoTool } from "./content/passport";
 
 const TEXTS: Record<string, ToolText> = { ...TOOL_TEXTS_A, ...TOOL_TEXTS_B };
 
@@ -364,5 +366,7 @@ export const imageSection = defineToolSection({
     tool("svg", "image/svg", "PenTool", { related: ["image-converter/svg-to-png", "favicon-generator", "image-to-base64"] }),
     tool("pixel-art", "image/pixel-art", "Grid3x3", { related: ["gif-maker", "favicon-generator"] }),
     tool("compare", "image/compare", "Columns2", { related: ["compress-image", "photo-filters", "image-color-picker"] }),
+    passportPhotoTool,
+    idCopyTool,
   ],
 });

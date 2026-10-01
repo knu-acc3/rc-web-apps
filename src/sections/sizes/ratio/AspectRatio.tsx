@@ -7,7 +7,7 @@ import { CopyButton } from "@/ui/copy-button";
 import { Field, Input, Select, Switch } from "@/ui/field";
 import { Panel } from "@/ui/panel";
 import { heightFor, nearestCommonRatio, ratioText, reduceRatio, roundEven, widthFor } from "../screen/engine";
-import { plainSpaces } from "../ui";
+import { plainSpaces } from "../ui/kit";
 
 const T = {
   ru: {

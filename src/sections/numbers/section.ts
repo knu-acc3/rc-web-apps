@@ -7,7 +7,7 @@ import { inWordsTool, WORD_GROUPS, wordChipNumbers } from "./content/in-words";
 import { romanChipNumbers, ROMAN_GROUPS, romanTool } from "./content/roman";
 import { scientificTool } from "./content/scientific";
 import { num } from "./content/text";
-import { toRoman } from "./roman";
+import { toRoman } from "./lib/roman";
 
 /**
  * Navigation group "Числа" (no landing page — the group name is not a search query).

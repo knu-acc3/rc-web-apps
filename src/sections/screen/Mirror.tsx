@@ -9,7 +9,7 @@ import { Slider, Switch } from "@/ui/field";
 import { Kbd } from "@/ui/panel";
 import { StageLayer, typingTarget, useStage } from "@/ui/stage";
 import { hasGetUserMedia, mediaErrorStatus, stopStream, type MediaStatus } from "../test/lib/media";
-import { MediaStatusNotice, PermissionHelp } from "../test/PermissionHelp";
+import { MediaStatusNotice, PermissionHelp } from "../test/ui/PermissionHelp";
 import { whiteAt, rgbToHex } from "./lib/color";
 
 const T = {

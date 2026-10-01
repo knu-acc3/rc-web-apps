@@ -10,7 +10,7 @@ import { extractHashtags } from "./lib/extract";
 import { smsInfo, xWeightedLength } from "./lib/limits";
 import { PLATFORM_BY_ID, type PlatformLimit } from "./lib/platforms";
 import { graphemeCount, textStats, wordFrequency } from "./lib/textOps";
-import { countLabel, InputPanel, TX } from "./shared";
+import { countLabel, InputPanel, TX } from "./ui/shared";
 
 const T = {
   ru: {

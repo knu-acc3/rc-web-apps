@@ -5,7 +5,7 @@ import type { Locale } from "@/i18n/config";
 import { plural } from "@/i18n/format";
 import { Field, Input, Select } from "@/ui/field";
 import { maskOf, parseIPv4, prefixOfMask, toBinary, toDotted, toHex, usableHosts } from "./lib/ipv4";
-import { bigFmt, DetailList, ResultCard } from "./shared";
+import { bigFmt, DetailList, ResultCard } from "./ui/shared";
 
 const T = {
   ru: {

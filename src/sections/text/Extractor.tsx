@@ -5,7 +5,7 @@ import type { Locale } from "@/i18n/config";
 import { formatNumber } from "@/i18n/format";
 import { Checkbox } from "@/ui/field";
 import { EXTRACT_KINDS, extractPhones, extractSync, uniqueList, type ExtractKind, type PhoneFormat } from "./lib/extract";
-import { InlineSelect, InputPanel, MoreOptions, OptionsBar, OutputPanel, TwoPane } from "./shared";
+import { InlineSelect, InputPanel, MoreOptions, OptionsBar, OutputPanel, TwoPane } from "./ui/shared";
 
 const T = {
   ru: {

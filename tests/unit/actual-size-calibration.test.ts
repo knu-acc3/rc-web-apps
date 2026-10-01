@@ -21,7 +21,7 @@ import {
   STORAGE_KEY,
   subscribeCalibration,
   zoomChanged,
-} from "@/sections/actual-size/calibration";
+} from "@/sections/actual-size/lib/calibration";
 
 describe("calibration math", () => {
   it("uses the ISO/IEC 7810 ID-1 card and the 96 dpi CSS reference", () => {

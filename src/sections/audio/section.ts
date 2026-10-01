@@ -1,6 +1,6 @@
 import { defineToolSection } from "@/registry/tool-section";
-import { generatorTools } from "./generators";
-import { mediaTools } from "./media-tools";
+import { generatorTools } from "./content/generators";
+import { mediaTools } from "./content/media-tools";
 
 export const audioSection = defineToolSection({
   id: "audio",

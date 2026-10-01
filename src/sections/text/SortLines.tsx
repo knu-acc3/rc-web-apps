@@ -6,7 +6,7 @@ import type { Locale } from "@/i18n/config";
 import { Button } from "@/ui/button";
 import { Checkbox } from "@/ui/field";
 import { prepareLines, shuffle, sortLines, type SortMode } from "./lib/textOps";
-import { InlineSelect, InputPanel, MoreOptions, OptionsBar, OutputPanel, TwoPane } from "./shared";
+import { InlineSelect, InputPanel, MoreOptions, OptionsBar, OutputPanel, TwoPane } from "./ui/shared";
 
 const T = {
   ru: {

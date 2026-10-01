@@ -4,7 +4,7 @@ import { useId, useMemo, useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { Segmented } from "@/ui/segmented";
 import { convertLayout, detectDirection, type LayoutDirection } from "./lib/layout";
-import { InputPanel, OutputPanel, TwoPane } from "./shared";
+import { InputPanel, OutputPanel, TwoPane } from "./ui/shared";
 
 const T = {
   ru: {

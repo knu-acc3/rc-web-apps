@@ -11,7 +11,7 @@ import { Panel, PanelHeader } from "@/ui/panel";
 import { Segmented } from "@/ui/segmented";
 import { textStats } from "./lib/textOps";
 import { generateLorem, loremToHtml, loremToText, randomSeed, type LoremLang, type LoremUnit } from "./lib/lorem";
-import { countLabel, OptionsBar, TX } from "./shared";
+import { countLabel, OptionsBar, TX } from "./ui/shared";
 
 const T = {
   ru: {

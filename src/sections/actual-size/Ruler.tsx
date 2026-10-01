@@ -6,9 +6,9 @@ import { formatNumber } from "@/i18n/format";
 import { Select, Switch } from "@/ui/field";
 import { Notice } from "@/ui/panel";
 import { Segmented } from "@/ui/segmented";
-import { CalibrationBar } from "./CalibrationBar";
-import { formatInchFraction, MM_PER_IN, rulerTicks, snapRuler, type RulerUnit } from "./geometry";
-import { useCalibration } from "./use-calibration";
+import { CalibrationBar } from "./ui/CalibrationBar";
+import { formatInchFraction, MM_PER_IN, rulerTicks, snapRuler, type RulerUnit } from "./lib/geometry";
+import { useCalibration } from "./lib/use-calibration";
 
 const T = {
   ru: {

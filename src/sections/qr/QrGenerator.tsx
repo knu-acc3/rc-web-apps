@@ -10,10 +10,10 @@ import { cn } from "@/lib/cn";
 import { Button } from "@/ui/button";
 import { Checkbox, Field, Input, Select, Textarea } from "@/ui/field";
 import { Notice } from "@/ui/panel";
-import { buildPayload, DEFAULTS, FIELDS, QR_TYPES, TYPE_NAME, type FieldSpec, type Fields, type QrType } from "./build";
-import { CAPACITY, contrastCheck, detectMode, encodeQr, fileSlug, logoBox, modulesPath, payloadUnits, qrPng, qrSvg, QUIET, type Ecc } from "./qr";
-import QrBatch from "./QrBatch";
-import { LookRow, type LookState } from "./ui";
+import { buildPayload, DEFAULTS, FIELDS, QR_TYPES, TYPE_NAME, type FieldSpec, type Fields, type QrType } from "./lib/build";
+import { CAPACITY, contrastCheck, detectMode, encodeQr, fileSlug, logoBox, modulesPath, payloadUnits, qrPng, qrSvg, QUIET, type Ecc } from "./lib/qr";
+import QrBatch from "./ui/QrBatch";
+import { LookRow, type LookState } from "./ui/kit";
 
 const T = {
   ru: {

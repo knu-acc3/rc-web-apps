@@ -1,6 +1,6 @@
 import type { Locale } from "@/i18n/config";
 import type { QA, ToolDef, VariantDef } from "@/registry/types";
-import { nf, tt } from "../shared";
+import { nf, tt } from "../lib/shared";
 import { heightFor, megapixels, physicalSize, resolutionName, roundEven, widthFor } from "../screen/engine";
 import { ratioLabel } from "../screen/text";
 import { RATIOS, type RatioDef } from "./data";

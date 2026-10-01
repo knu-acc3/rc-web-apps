@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { BAR, parseRoman, romanParts, toRoman, toRomanStandard } from "@/sections/numbers/roman";
+import { BAR, parseRoman, romanParts, toRoman, toRomanStandard } from "@/sections/numbers/lib/roman";
 
 describe("toRoman", () => {
   it.each([

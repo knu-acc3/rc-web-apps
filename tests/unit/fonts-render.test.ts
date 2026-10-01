@@ -2,9 +2,9 @@ import { createElement } from "react";
 import { renderToString } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import FancyText, { type FancyTextProps } from "@/sections/fonts/FancyText";
-import { INVISIBLE } from "@/sections/fonts/invisible";
-import { SAMPLE } from "@/sections/fonts/names";
-import { STYLE_IDS, stylize } from "@/sections/fonts/styles";
+import { INVISIBLE } from "@/sections/fonts/lib/invisible";
+import { SAMPLE } from "@/sections/fonts/data/names";
+import { STYLE_IDS, stylize } from "@/sections/fonts/lib/styles";
 
 /** Server render: every style is in the HTML and the output is deterministic (hydration-safe). */
 const html = (props: FancyTextProps) => renderToString(createElement(FancyText, props));

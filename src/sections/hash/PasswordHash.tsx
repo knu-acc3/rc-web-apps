@@ -12,8 +12,8 @@ import { CopyButton } from "@/ui/copy-button";
 import { Field, Input, Select, Textarea } from "@/ui/field";
 import { Notice, Panel } from "@/ui/panel";
 import { Segmented } from "@/ui/segmented";
-import type { KdfId } from "./algorithms";
-import type { PbkdfHash } from "./kdf";
+import type { KdfId } from "./lib/algorithms";
+import type { PbkdfHash } from "./lib/kdf";
 
 const T = {
   ru: {
@@ -74,7 +74,7 @@ const DEFAULT_HASH: Record<KdfId, string> = {
 export default function PasswordHash({ locale, kind }: { locale: Locale; kind: KdfId }) {
   const t = T[locale];
   const id = useId();
-  const client = useWorkerClient(() => new Worker(new URL("./hash.worker.ts", import.meta.url), { type: "module" }));
+  const client = useWorkerClient(() => new Worker(new URL("./lib/hash.worker.ts", import.meta.url), { type: "module" }));
   const [mode, setMode] = useState<"hash" | "verify">("hash");
   const [password, setPassword] = useState("");
   const [encoded, setEncoded] = useState("");

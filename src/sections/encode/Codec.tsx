@@ -14,9 +14,9 @@ import { CopyButton } from "@/ui/copy-button";
 import { Input, Select, Switch } from "@/ui/field";
 import { Notice, Panel } from "@/ui/panel";
 import { Segmented } from "@/ui/segmented";
-import { caesar, CYRILLIC, LATIN } from "./codecs";
-import { loadCodec, type CodecId } from "./registry";
-import type { Codec as CodecT, CodecError, CodecResult, Opts } from "./types";
+import { caesar, CYRILLIC, LATIN } from "./lib/codecs";
+import { loadCodec, type CodecId } from "./lib/registry";
+import type { Codec as CodecT, CodecError, CodecResult, Opts } from "./lib/types";
 
 type Dir = "encode" | "decode";
 type L = { ru: string; en: string };
@@ -194,7 +194,7 @@ export default function Codec({ locale, codec, dir: dir0, samples, outputs, opti
   const [text, setText] = useState(samples[locale]);
   const [opts, setOpts] = useState<Opts>(options);
   const [impl, setImpl] = useState<CodecT | null>(null);
-  const client = useWorkerClient(() => new Worker(new URL("./encode.worker.ts", import.meta.url), { type: "module" }));
+  const client = useWorkerClient(() => new Worker(new URL("./lib/encode.worker.ts", import.meta.url), { type: "module" }));
 
   useEffect(() => {
     let alive = true;

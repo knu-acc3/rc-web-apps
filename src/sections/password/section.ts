@@ -2,8 +2,8 @@ import type { Locale } from "@/i18n/config";
 import { formatNumber, plural } from "@/i18n/format";
 import { defineToolSection } from "@/registry/tool-section";
 import type { Block, QA, VariantDef } from "@/registry/types";
-import { averageCrackSeconds, memorableEntropy, passwordEntropy } from "./engine";
-import { humanDuration } from "./time";
+import { averageCrackSeconds, memorableEntropy, passwordEntropy } from "./lib/engine";
+import { humanDuration } from "./lib/time";
 
 const EN_WORDS = 1303;
 const RU_WORDS = 1359;

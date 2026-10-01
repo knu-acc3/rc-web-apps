@@ -1,8 +1,8 @@
 "use client";
 
 import type { Locale } from "@/i18n/config";
-import { CYRILLIC_MORSE, DIGIT_MORSE, KAZAKH_SUBST, LATIN_MORSE, PROSIGNS, PUNCT_MORSE } from "./morse";
-import { useMorsePlayer } from "./useMorsePlayer";
+import { CYRILLIC_MORSE, DIGIT_MORSE, KAZAKH_SUBST, LATIN_MORSE, PROSIGNS, PUNCT_MORSE } from "./lib/morse";
+import { useMorsePlayer } from "./lib/useMorsePlayer";
 
 const T = {
   ru: { latin: "Латинский алфавит", cyr: "Русский алфавит", digits: "Цифры", punct: "Знаки препинания", pro: "Служебные сигналы (просигналы)", kz: "Казахские буквы (коды ближайших русских)", hint: "Нажмите на знак, чтобы услышать его" },

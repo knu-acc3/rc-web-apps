@@ -1,4 +1,4 @@
-import type { Txt } from "../shared";
+import type { Txt } from "../lib/shared";
 
 export type ScreenKind = "monitor" | "laptop" | "tv" | "phone" | "tablet" | "legacy";
 

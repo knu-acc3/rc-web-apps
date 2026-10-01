@@ -11,7 +11,7 @@ import { Notice, Panel, PanelHeader } from "@/ui/panel";
 import { Segmented } from "@/ui/segmented";
 import { splitEqual, vlsm, type DivideError } from "./lib/divider";
 import { cidr4, maskOf, parseV4Input, toDotted, usableHosts, type Cidr4 } from "./lib/ipv4";
-import { bigFmt, err4 } from "./shared";
+import { bigFmt, err4 } from "./ui/shared";
 
 type Mode = "equal" | "vlsm";
 

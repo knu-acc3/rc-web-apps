@@ -1,10 +1,10 @@
 import type { Locale } from "@/i18n/config";
 import type { Block, QA, ToolDef, VariantDef } from "@/registry/types";
-import { amountEn, amountRu, currencyByCode } from "../amount";
-import { CASES, CASE_NAMES, ruCardinalCase } from "../declension";
-import { toRoman } from "../roman";
-import { enCardinal, enOrdinal, enOrdinalSuffix } from "../words-en";
-import { capitalize, ruCardinal, ruOrdinal, ruPlural } from "../words-ru";
+import { amountEn, amountRu, currencyByCode } from "../lib/amount";
+import { CASES, CASE_NAMES, ruCardinalCase } from "../lib/declension";
+import { toRoman } from "../lib/roman";
+import { enCardinal, enOrdinal, enOrdinalSuffix } from "../lib/words-en";
+import { capitalize, ruCardinal, ruOrdinal, ruPlural } from "../lib/words-ru";
 import { fit, num } from "./text";
 
 const WORD_NUMBERS: number[] = [

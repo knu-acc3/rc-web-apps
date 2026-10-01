@@ -5,7 +5,7 @@ import type { Locale } from "@/i18n/config";
 import { Checkbox } from "@/ui/field";
 import { Segmented } from "@/ui/segmented";
 import { detectLang, isReversible, reverseTransliterate, slugify, STANDARD_IDS, transliterate, type LangOption, type StandardId } from "./lib/translit";
-import { InlineSelect, InputPanel, OptionsBar, OutputPanel, TwoPane } from "./shared";
+import { InlineSelect, InputPanel, OptionsBar, OutputPanel, TwoPane } from "./ui/shared";
 
 const NAMES: Record<StandardId, { ru: string; en: string }> = {
   icao: { ru: "Загранпаспорт (ICAO Doc 9303)", en: "Passport (ICAO Doc 9303)" },

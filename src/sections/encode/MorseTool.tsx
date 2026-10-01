@@ -11,8 +11,8 @@ import { CopyButton } from "@/ui/copy-button";
 import { Select } from "@/ui/field";
 import { Notice, Panel } from "@/ui/panel";
 import { Segmented } from "@/ui/segmented";
-import { decodeMorse, encodeMorse, morseTimeline, renderWav } from "./morse";
-import { useMorsePlayer } from "./useMorsePlayer";
+import { decodeMorse, encodeMorse, morseTimeline, renderWav } from "./lib/morse";
+import { useMorsePlayer } from "./lib/useMorsePlayer";
 
 type Dir = "encode" | "decode";
 

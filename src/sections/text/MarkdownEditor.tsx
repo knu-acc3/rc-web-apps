@@ -11,8 +11,8 @@ import { Segmented } from "@/ui/segmented";
 import { htmlDocument, loadMarkdownRenderer, type MarkdownRenderer } from "./lib/markdown";
 import { lastWriteFailed, useStoredString, writeKey } from "./lib/storage";
 import { graphemeCount, wordCount } from "./lib/textOps";
-import { MD_PROSE } from "./markdownProse";
-import { countLabel, FileOpenButton, TX } from "./shared";
+import { MD_PROSE } from "./lib/markdownProse";
+import { countLabel, FileOpenButton, TX } from "./ui/shared";
 
 const KEY = "md-editor:draft:v1";
 

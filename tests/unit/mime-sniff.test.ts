@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { hexPreview, sniff, zipNames } from "@/sections/mime/sniff";
+import { hexPreview, sniff, zipNames } from "@/sections/mime/lib/sniff";
 
 const bytes = (...parts: (number[] | string)[]) => {
   const out: number[] = [];

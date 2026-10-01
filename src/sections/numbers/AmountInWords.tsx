@@ -6,9 +6,9 @@ import { CopyButton } from "@/ui/copy-button";
 import { Input, Select, Switch } from "@/ui/field";
 import { Panel } from "@/ui/panel";
 import { Segmented } from "@/ui/segmented";
-import { amountEn, amountRu, CURRENCIES, currencyByCode, moneyNumeric, parseMoney, type CurrencyCode, type MinorStyle, type Wrap } from "./amount";
-import { groupThousands, parseDecimalInput } from "./parse";
-import { Details } from "./ui-bits";
+import { amountEn, amountRu, CURRENCIES, currencyByCode, moneyNumeric, parseMoney, type CurrencyCode, type MinorStyle, type Wrap } from "./lib/amount";
+import { groupThousands, parseDecimalInput } from "./lib/parse";
+import { Details } from "./ui/ui-bits";
 
 export interface AmountInWordsProps {
   locale: Locale;

@@ -16,7 +16,7 @@ import {
   WEEK_YEARS,
   YEARS,
   yearPage,
-} from "./pages";
+} from "./content/pages";
 
 const NAME = { ru: "Календарь", en: "Calendar" };
 const DESC = {

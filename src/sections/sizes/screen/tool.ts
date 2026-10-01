@@ -1,6 +1,6 @@
 import type { Locale } from "@/i18n/config";
 import type { Block, QA, ToolDef, VariantDef } from "@/registry/types";
-import { nf, nfix, nint, tt } from "../shared";
+import { nf, nfix, nint, tt } from "../lib/shared";
 import { dotPitchMm, megapixels, physicalSize, ppi, resolutionName } from "./engine";
 import { SCREENS, screenSlug, type ScreenRes } from "./data";
 import { ratioLabel, shortName } from "./text";

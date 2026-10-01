@@ -8,4 +8,5 @@ export const components: ComponentMap = {
   "file/split": () => import("./SplitFile"),
   "file/join": () => import("./JoinFiles"),
   "file/base64": () => import("./FileBase64"),
+  "file/encrypt": () => import("./EncryptFile"),
 };

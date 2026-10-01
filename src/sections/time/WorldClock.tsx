@@ -5,13 +5,13 @@ import { useState } from "react";
 import { cn } from "@/lib/cn";
 import { Button } from "@/ui/button";
 import { Panel } from "@/ui/panel";
-import { PlaceSearch } from "./PlaceSearch";
+import { PlaceSearch } from "./ui/PlaceSearch";
 import { sunElevation } from "./lib/sun";
 import { dayShift, diffShort, hms, longDate, placeParts, shortDate } from "./lib/text";
 import { fmtOffset, zoned } from "./lib/tz";
 import { useStoredJson } from "./lib/storage";
 import { modernZone, useLocalZone, useNow } from "./lib/use-now";
-import type { Place, WorldClockProps } from "./types";
+import type { Place, WorldClockProps } from "./lib/types";
 
 const T = {
   ru: { you: "Ваше время", add: "Добавить город", edit: "Изменить", done: "Готово", remove: "Убрать", reset: "Вернуть список по умолчанию", day: "день", night: "ночь", same: "как у вас" },

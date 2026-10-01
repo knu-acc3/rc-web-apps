@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { convertInt, divisionSteps, formatBase, formattedText, fromTwos, groupDigits, parseBase, toTwos } from "@/sections/numbers/bases";
-import { toScientific, toEngineering, toPlain, parseScientific, roundSig } from "@/sections/numbers/scientific";
+import { convertInt, divisionSteps, formatBase, formattedText, fromTwos, groupDigits, parseBase, toTwos } from "@/sections/numbers/lib/bases";
+import { toScientific, toEngineering, toPlain, parseScientific, roundSig } from "@/sections/numbers/lib/scientific";
 
 const conv = (s: string, from: number, to: number, maxFrac = 32) => {
   const p = parseBase(s, from);

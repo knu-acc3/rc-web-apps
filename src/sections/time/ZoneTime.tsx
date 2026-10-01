@@ -2,11 +2,11 @@
 
 import { useMemo } from "react";
 import { Panel } from "@/ui/panel";
-import { BigTime } from "./BigTime";
+import { BigTime } from "./ui/BigTime";
 import { durationWords, longDate } from "./lib/text";
 import { fmtOffset, tzOffset, zoned } from "./lib/tz";
 import { useLocalZone, useMinute, useNow } from "./lib/use-now";
-import type { ZoneTimeProps } from "./types";
+import type { ZoneTimeProps } from "./lib/types";
 
 const T = {
   ru: {

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { bytesToBase64, utf8Encode } from "@/sections/code/kit/bytes";
-import { decodeToBlob, encodeBlob, sniffMime } from "@/sections/encode/b64file";
+import { decodeToBlob, encodeBlob, sniffMime } from "@/sections/encode/lib/b64file";
 import {
   ascii85Decode,
   ascii85Encode,
@@ -24,11 +24,11 @@ import {
   url,
   z85Decode,
   z85Encode,
-} from "@/sections/encode/codecs";
-import { decodeEntities, encodeEntities, ENTITY_COUNT } from "@/sections/encode/html";
-import { decodeMorse, encodeMorse, morseTimeline, renderWav } from "@/sections/encode/morse";
-import { spell } from "@/sections/encode/phonetic";
-import { domainToAscii, domainToUnicode, punyDecode, punyEncode } from "@/sections/encode/punycode";
+} from "@/sections/encode/lib/codecs";
+import { decodeEntities, encodeEntities, ENTITY_COUNT } from "@/sections/encode/lib/html";
+import { decodeMorse, encodeMorse, morseTimeline, renderWav } from "@/sections/encode/lib/morse";
+import { spell } from "@/sections/encode/lib/phonetic";
+import { domainToAscii, domainToUnicode, punyDecode, punyEncode } from "@/sections/encode/lib/punycode";
 
 const u = (s: string) => utf8Encode(s);
 const str = (b: Uint8Array) => new TextDecoder().decode(b);

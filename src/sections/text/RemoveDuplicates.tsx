@@ -4,7 +4,7 @@ import { useId, useMemo, useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { Checkbox } from "@/ui/field";
 import { removeDuplicateLines, type BlankMode, type DedupeMode } from "./lib/textOps";
-import { countLabel, InlineSelect, InputPanel, MoreOptions, OptionsBar, OutputPanel, TwoPane, TX } from "./shared";
+import { countLabel, InlineSelect, InputPanel, MoreOptions, OptionsBar, OutputPanel, TwoPane, TX } from "./ui/shared";
 
 const T = {
   ru: {

@@ -8,8 +8,8 @@ import { useHydrated, useNow } from "@/sections/code/kit/hooks";
 import { CopyButton } from "@/ui/copy-button";
 import { Field, Input, Select, Textarea } from "@/ui/field";
 import { Badge, Notice, Panel } from "@/ui/panel";
-import { ASYM_ALGS, asymVerify, hasSubtle, HMAC_ALGS, hmacVerify, parseJwt, parseKey, timeStatus, TIME_CLAIMS, type ParseError } from "./jwt";
-import { relTime } from "./reltime";
+import { ASYM_ALGS, asymVerify, hasSubtle, HMAC_ALGS, hmacVerify, parseJwt, parseKey, timeStatus, TIME_CLAIMS, type ParseError } from "./lib/jwt";
+import { relTime } from "./lib/reltime";
 
 const T = {
   ru: {

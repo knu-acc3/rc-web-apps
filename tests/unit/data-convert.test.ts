@@ -1,12 +1,12 @@
 import { describe, expect, it } from "vitest";
 import { parseJson } from "@/sections/code/kit/json";
-import { convert } from "@/sections/data/convert";
-import { detectDelimiter, guardCell, parseCsv, toHtmlTable, toMarkdownTable, writeCsv } from "@/sections/data/csv";
-import { parseEnv, writeEnv } from "@/sections/data/env";
-import { recordsToRows } from "@/sections/data/tabular";
-import { toTypeScript, toZod } from "@/sections/data/typegen";
-import { parseXml } from "@/sections/data/xml";
-import { dumpYaml, needsQuotes } from "@/sections/data/yaml";
+import { convert } from "@/sections/data/lib/convert";
+import { detectDelimiter, guardCell, parseCsv, toHtmlTable, toMarkdownTable, writeCsv } from "@/sections/data/lib/csv";
+import { parseEnv, writeEnv } from "@/sections/data/lib/env";
+import { recordsToRows } from "@/sections/data/lib/tabular";
+import { toTypeScript, toZod } from "@/sections/data/lib/typegen";
+import { parseXml } from "@/sections/data/lib/xml";
+import { dumpYaml, needsQuotes } from "@/sections/data/lib/yaml";
 
 describe("CSV", () => {
   it("RFC 4180 round-trip: quotes, delimiters, embedded newlines, BOM", () => {

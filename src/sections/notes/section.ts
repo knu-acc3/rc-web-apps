@@ -1,7 +1,7 @@
 import type { Block } from "@/registry/types";
 import { defineToolSection } from "@/registry/tool-section";
 import { FAQ, L, LL } from "../text/defs/util";
-import { PACKING, templateItems } from "./templates";
+import { PACKING, templateItems } from "./content/templates";
 
 /**
  * Notes and to-do lists stored only in the user's browser.

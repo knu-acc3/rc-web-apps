@@ -24,7 +24,7 @@ export default function EntityTable({ locale }: { locale: Locale }) {
 
   useEffect(() => {
     let alive = true;
-    import("./html").then((m) => alive && setRows(m.entityRows()));
+    import("./lib/html").then((m) => alive && setRows(m.entityRows()));
     return () => {
       alive = false;
     };

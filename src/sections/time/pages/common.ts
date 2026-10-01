@@ -3,7 +3,7 @@ import { formatNumber } from "@/i18n/format";
 import { ui } from "@/i18n/ui";
 import type { Crumb, LinkItem } from "@/registry/types";
 import { fmtOffset } from "../lib/tz";
-import { cityBySlug, cityLabel, countryName, type City } from "../model";
+import { cityBySlug, cityLabel, countryName, type City } from "../lib/model";
 
 export const SECTION_ID = "time";
 export const HUE = 195;

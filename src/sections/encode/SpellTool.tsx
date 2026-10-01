@@ -6,7 +6,7 @@ import { KIT_T } from "@/sections/code/kit/labels";
 import { CopyButton } from "@/ui/copy-button";
 import { Field, Input } from "@/ui/field";
 import { Panel } from "@/ui/panel";
-import { spell, type Spelling } from "./phonetic";
+import { spell, type Spelling } from "./lib/phonetic";
 
 const T = {
   ru: { input: "Текст для диктовки", nato: "По буквам (NATO)", russian: "По буквам" },

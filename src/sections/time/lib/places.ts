@@ -1,5 +1,5 @@
 import type { Locale } from "@/i18n/config";
-import type { Place } from "../types";
+import type { Place } from "./types";
 import { fmtOffset } from "./tz";
 
 /**

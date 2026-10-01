@@ -3,7 +3,7 @@
 import { INTL_LOCALE, type Locale } from "@/i18n/config";
 import type { ToolProps } from "../types";
 import { useDetected } from "./lib/probe";
-import { COMMON, Facts, Hero, Stack } from "./ui";
+import { COMMON, Facts, Hero, Stack } from "./ui/kit";
 
 const T = {
   ru: {

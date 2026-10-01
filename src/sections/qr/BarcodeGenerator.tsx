@@ -8,7 +8,7 @@ import { cn } from "@/lib/cn";
 import { Button } from "@/ui/button";
 import { Field, Input, Select, Switch } from "@/ui/field";
 import { Segmented } from "@/ui/segmented";
-import { JS_FORMAT, LABEL, prepareBarcode, SAMPLE, SYMBOLOGIES, type BarcodeError, type Symbology } from "./barcode";
+import { JS_FORMAT, LABEL, prepareBarcode, SAMPLE, SYMBOLOGIES, type BarcodeError, type Symbology } from "./lib/barcode";
 
 const T = {
   ru: {

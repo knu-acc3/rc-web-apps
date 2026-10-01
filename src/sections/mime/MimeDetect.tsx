@@ -7,7 +7,7 @@ import { formatBytes } from "@/i18n/format";
 import { Button } from "@/ui/button";
 import { Dropzone } from "@/ui/dropzone";
 import { Badge } from "@/ui/panel";
-import { hexPreview, sniff, type Detected } from "./sniff";
+import { hexPreview, sniff, type Detected } from "./lib/sniff";
 
 interface Result {
   key: string;

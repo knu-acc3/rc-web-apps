@@ -4,7 +4,7 @@ import { useId, useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { IBAN_BY_CODE } from "./data/iban-countries";
 import { validateIban, type IbanError } from "./lib/iban";
-import { BigInput, Details, Problems, Verdict, type Row } from "./ui";
+import { BigInput, Details, Problems, Verdict, type Row } from "./ui/kit";
 
 const T = {
   ru: {

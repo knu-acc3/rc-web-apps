@@ -6,7 +6,7 @@ import { formatDate } from "@/i18n/format";
 import type { ToolProps } from "../types";
 import { dstInfo, nextTransition, tzOffsetMinutes, utcLabel, type DstInfo, type Transition } from "./lib/tz";
 import { clockStore, useDetected } from "./lib/probe";
-import { COMMON, Facts, Hero, Hint, Stack } from "./ui";
+import { COMMON, Facts, Hero, Hint, Stack } from "./ui/kit";
 
 const T = {
   ru: {

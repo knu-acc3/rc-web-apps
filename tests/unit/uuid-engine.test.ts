@@ -14,7 +14,7 @@ import {
   uuidNameBased,
   uuidV4,
   type Rng,
-} from "@/sections/uuid/engine";
+} from "@/sections/uuid/lib/engine";
 
 /** Deterministic byte source for tests. */
 function seqRng(start = 0): Rng {

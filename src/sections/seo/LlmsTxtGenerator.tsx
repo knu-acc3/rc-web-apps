@@ -4,7 +4,7 @@ import { useId, useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { Field, Input, Textarea } from "@/ui/field";
 import { buildLlmsTxt } from "./lib/outline";
-import { Issues, More, Output } from "./ui";
+import { Issues, More, Output } from "./ui/kit";
 
 const T = {
   ru: {

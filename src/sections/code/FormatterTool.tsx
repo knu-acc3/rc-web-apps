@@ -8,9 +8,9 @@ import { outputLabels } from "@/sections/code/kit/labels";
 import { CodeOutput } from "@/ui/code-output";
 import { Select, Switch } from "@/ui/field";
 import { Notice } from "@/ui/panel";
-import { ErrorBox, failOf, useCodeWorker } from "./ErrorBox";
-import { LANG_META, SAMPLES, SQL_DIALECTS, type FormatLang, type FormatOptions, type IndentOpt } from "./langs";
-import { CODE_T } from "./text";
+import { ErrorBox, failOf, useCodeWorker } from "./ui/ErrorBox";
+import { LANG_META, SAMPLES, SQL_DIALECTS, type FormatLang, type FormatOptions, type IndentOpt } from "./lib/langs";
+import { CODE_T } from "./content/text";
 
 const WIDTH_LANGS = new Set<FormatLang>(["html", "css", "scss", "less", "javascript", "typescript", "graphql"]);
 

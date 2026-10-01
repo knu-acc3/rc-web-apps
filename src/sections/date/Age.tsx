@@ -7,7 +7,7 @@ import { Field, Input, Select } from "@/ui/field";
 import { Panel } from "@/ui/panel";
 import { daysInMonth, fmtDate, isValidYmd, MONTHS, parseYmd, WEEKDAYS, ymdStr, type Ymd } from "@/sections/calendar/lib/dates";
 import { age, weekdayOf } from "./lib/engine";
-import { BigResult, qty, useToday, ymdText } from "./ui";
+import { BigResult, qty, useToday, ymdText } from "./ui/kit";
 
 export interface AgeProps {
   locale: Locale;

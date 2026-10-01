@@ -6,11 +6,11 @@ import { CopyButton } from "@/ui/copy-button";
 import { Input, Switch } from "@/ui/field";
 import { Panel } from "@/ui/panel";
 import { Segmented } from "@/ui/segmented";
-import { CASES, CASE_NAMES, ruCardinalCase } from "./declension";
-import { parseDecimalInput } from "./parse";
-import { Details } from "./ui-bits";
-import { enCardinal, enDecimal, enOrdinal, enOrdinalSuffix } from "./words-en";
-import { capitalize, ruCardinal, ruDecimal, ruOrdinal, RU_MAX, RU_MAX_FRACTION_DIGITS, type Gender } from "./words-ru";
+import { CASES, CASE_NAMES, ruCardinalCase } from "./lib/declension";
+import { parseDecimalInput } from "./lib/parse";
+import { Details } from "./ui/ui-bits";
+import { enCardinal, enDecimal, enOrdinal, enOrdinalSuffix } from "./lib/words-en";
+import { capitalize, ruCardinal, ruDecimal, ruOrdinal, RU_MAX, RU_MAX_FRACTION_DIGITS, type Gender } from "./lib/words-ru";
 
 export interface NumberInWordsProps {
   locale: Locale;

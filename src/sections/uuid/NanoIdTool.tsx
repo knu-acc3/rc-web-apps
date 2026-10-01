@@ -10,7 +10,7 @@ import { CodeOutput } from "@/ui/code-output";
 import { CopyButton } from "@/ui/copy-button";
 import { Field, Input, Select } from "@/ui/field";
 import { Panel } from "@/ui/panel";
-import { entropyBits, log10IdsForCollision, NANOID_ALPHABETS, nanoid } from "./engine";
+import { entropyBits, log10IdsForCollision, NANOID_ALPHABETS, nanoid } from "./lib/engine";
 
 type Preset = keyof typeof NANOID_ALPHABETS | "custom";
 type Unit = "sec" | "min" | "hour" | "day" | "year";

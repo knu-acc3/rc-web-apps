@@ -7,7 +7,7 @@ import { Field, Select, Switch } from "@/ui/field";
 import { Panel } from "@/ui/panel";
 import { Segmented } from "@/ui/segmented";
 import { ALPHABETS, drawLetters, letterPool, type AlphabetId, type LetterFilter } from "./lib/letters";
-import { HistoryPanel, pushHistory } from "./shared";
+import { HistoryPanel, pushHistory } from "./ui/shared";
 
 export interface LetterGenProps {
   locale: Locale;

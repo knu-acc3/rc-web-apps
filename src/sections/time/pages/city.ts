@@ -23,8 +23,8 @@ import {
   zoneAbbr,
   zoneInfo,
   type City,
-} from "../model";
-import type { CityTimeProps } from "../types";
+} from "../lib/model";
+import type { CityTimeProps } from "../lib/types";
 import { citiesBySlugs, cityLink, fmtCoords, fmtPopulation, home, HUE, hm, offWithAbbr, SECTION_ID, timeCrumb } from "./common";
 import { pairsWith } from "./pair";
 

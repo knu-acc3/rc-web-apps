@@ -11,7 +11,7 @@ import { Badge, Notice, Panel } from "@/ui/panel";
 import { isClipping, meterFraction, noiseFloor, noiseRating, rmsPeak, toDbfs, type NoiseRating } from "./lib/audio-level";
 import { useClientValue } from "./lib/client";
 import { cssVar, extFromMime, hasGetUserMedia, listDevices, mediaErrorStatus, pickRecorderMime, stopStream, type DeviceOption, type MediaStatus } from "./lib/media";
-import { MediaStatusNotice, PermissionHelp } from "./PermissionHelp";
+import { MediaStatusNotice, PermissionHelp } from "./ui/PermissionHelp";
 
 const REC_SECONDS = 10;
 

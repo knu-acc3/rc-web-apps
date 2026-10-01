@@ -1,8 +1,8 @@
 import type { Locale } from "@/i18n/config";
 import { defineToolSection } from "@/registry/tool-section";
 import type { Block } from "@/registry/types";
-import { REDIRECT_VARIANTS, ROBOTS_VARIANTS, UTM_VARIANTS } from "./texts";
-import { SCHEMA_VARIANTS } from "./texts-schema";
+import { REDIRECT_VARIANTS, ROBOTS_VARIANTS, UTM_VARIANTS } from "./content/texts";
+import { SCHEMA_VARIANTS } from "./content/texts-schema";
 
 const t = (l: Locale, ru: string, en: string) => (l === "ru" ? ru : en);
 

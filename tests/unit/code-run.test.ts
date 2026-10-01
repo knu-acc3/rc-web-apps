@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { SAMPLES, type FormatLang } from "@/sections/code/langs";
-import { CodeError, formatCode, formatJsonText, minifyCode, validateCode } from "@/sections/code/run";
+import { SAMPLES, type FormatLang } from "@/sections/code/lib/langs";
+import { CodeError, formatCode, formatJsonText, minifyCode, validateCode } from "@/sections/code/lib/run";
 
 const failOf = async (p: Promise<unknown>) => {
   try {

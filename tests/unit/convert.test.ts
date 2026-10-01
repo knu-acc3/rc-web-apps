@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { clean, convert, relation } from "@/sections/convert/engine";
-import { QUANTITIES } from "@/sections/convert/units";
+import { clean, convert, relation } from "@/sections/convert/lib/engine";
+import { QUANTITIES } from "@/sections/convert/data/units";
 
 const unit = (slug: string) => {
   for (const q of QUANTITIES) for (const u of q.units) if (u.slug === slug) return u;

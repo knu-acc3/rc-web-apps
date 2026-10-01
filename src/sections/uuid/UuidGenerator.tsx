@@ -11,7 +11,7 @@ import { CodeOutput } from "@/ui/code-output";
 import { CopyButton } from "@/ui/copy-button";
 import { Input, Select, Switch } from "@/ui/field";
 import { Panel } from "@/ui/panel";
-import { formatUuid, ObjectIdGenerator, TimeUuidGenerator, UlidGenerator, uuidV4, type UuidFormat } from "./engine";
+import { formatUuid, ObjectIdGenerator, TimeUuidGenerator, UlidGenerator, uuidV4, type UuidFormat } from "./lib/engine";
 
 export type GenKind = "v4" | "v7" | "v1" | "v6" | "ulid" | "objectid";
 export type FormatId = "std" | "upper" | "braces" | "braces-upper" | "nodash" | "urn";

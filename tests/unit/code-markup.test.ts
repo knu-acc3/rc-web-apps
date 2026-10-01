@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { format as formatSql } from "sql-formatter";
-import { minifyJs } from "@/sections/code/jsmin";
-import { formatXml, minifyHtml, minifySql } from "@/sections/code/markup";
+import { minifyJs } from "@/sections/code/lib/jsmin";
+import { formatXml, minifyHtml, minifySql } from "@/sections/code/lib/markup";
 
 describe("JS minifier (whitespace and comments only)", () => {
   it("removes comments and spaces but keeps word separators", () => {

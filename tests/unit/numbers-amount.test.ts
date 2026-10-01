@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { amountEn, amountRu, currencyByCode, parseMoney, type Money } from "@/sections/numbers/amount";
+import { amountEn, amountRu, currencyByCode, parseMoney, type Money } from "@/sections/numbers/lib/amount";
 
 const RUB = currencyByCode.get("RUB")!;
 const KZT = currencyByCode.get("KZT")!;

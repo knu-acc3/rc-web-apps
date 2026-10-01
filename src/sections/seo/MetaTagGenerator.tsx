@@ -6,8 +6,8 @@ import { cn } from "@/lib/cn";
 import { Checkbox, Field, Input, Textarea } from "@/ui/field";
 import { Segmented } from "@/ui/segmented";
 import { attr, breadcrumbUrl, FONTS, html, LIMITS, truncateToWidth } from "./lib/serp";
-import { measurer, useClient } from "./measure";
-import { Issues, Meter, More, Output } from "./ui";
+import { measurer, useClient } from "./lib/measure";
+import { Issues, Meter, More, Output } from "./ui/kit";
 
 const T = {
   ru: {

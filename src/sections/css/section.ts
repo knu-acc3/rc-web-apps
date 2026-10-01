@@ -3,7 +3,7 @@ import { defineToolSection } from "@/registry/tool-section";
 import type { Block, SectionDef, ToolDef } from "@/registry/types";
 import { convertUnit } from "./lib/units";
 import { SHADOW_PRESETS } from "./lib/presets";
-import { animationVariants, clipVariants, flexVariants, gridVariants, localizeFlexProps, localizeGridProps, shadowVariants, textShadowVariants } from "./variants";
+import { animationVariants, clipVariants, flexVariants, gridVariants, localizeFlexProps, localizeGridProps, shadowVariants, textShadowVariants } from "./content/variants";
 
 const BOX_SHADOW: ToolDef = {
   slug: "box-shadow-generator",

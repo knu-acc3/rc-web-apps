@@ -3,7 +3,7 @@
 import { Plus, X } from "lucide-react";
 import { useId, useMemo, useState } from "react";
 import type { Locale } from "@/i18n/config";
-import { domainToUnicode } from "@/sections/encode/punycode";
+import { domainToUnicode } from "@/sections/encode/lib/punycode";
 import { Button } from "@/ui/button";
 import { CopyButton } from "@/ui/copy-button";
 import { Field, Input } from "@/ui/field";

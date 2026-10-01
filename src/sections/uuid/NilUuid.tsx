@@ -5,7 +5,7 @@ import type { Locale } from "@/i18n/config";
 import { CopyButton } from "@/ui/copy-button";
 import { Checkbox } from "@/ui/field";
 import { Panel } from "@/ui/panel";
-import { formatUuid, MAX_UUID, NIL_UUID } from "./engine";
+import { formatUuid, MAX_UUID, NIL_UUID } from "./lib/engine";
 
 const T = {
   ru: { nil: "Nil UUID (все биты — нули)", max: "Max UUID (все биты — единицы)", upper: "ЗАГЛАВНЫЕ буквы", braces: "В фигурных скобках", urn: "С префиксом urn:uuid:", copy: "Копировать", copied: "Скопировано" },

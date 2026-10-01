@@ -6,8 +6,8 @@ import type { Locale } from "@/i18n/config";
 import { cn } from "@/lib/cn";
 import { Field, Input, Select, Textarea } from "@/ui/field";
 import { isAllowed, parseRobots } from "./lib/robots";
-import { lintText } from "./robots-text";
-import { Issues } from "./ui";
+import { lintText } from "./content/robots-text";
+import { Issues } from "./ui/kit";
 
 const AGENTS = ["Googlebot", "Googlebot-Image", "Googlebot-News", "Bingbot", "YandexBot", "YandexImages", "GPTBot", "ClaudeBot", "*"];
 

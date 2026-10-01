@@ -3,7 +3,7 @@
 import { formatBytes, formatNumber } from "@/i18n/format";
 import type { ToolProps } from "../types";
 import { detectUa, nav, useDetected } from "./lib/probe";
-import { COMMON, Facts, Hero, Hint, Stack } from "./ui";
+import { COMMON, Facts, Hero, Hint, Stack } from "./ui/kit";
 
 const T = {
   ru: {

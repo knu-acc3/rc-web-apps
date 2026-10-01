@@ -5,8 +5,8 @@ import type { Locale } from "@/i18n/config";
 import { Field, Input, Select, Switch, Textarea } from "@/ui/field";
 import { buildRobots, type Preset } from "./lib/presets";
 import { parseRobots } from "./lib/robots";
-import { lintText } from "./robots-text";
-import { Issues, Output } from "./ui";
+import { lintText } from "./content/robots-text";
+import { Issues, Output } from "./ui/kit";
 
 const NAMES: Record<Preset, Record<Locale, string>> = {
   basic: { ru: "Открыть весь сайт", en: "Allow everything" },

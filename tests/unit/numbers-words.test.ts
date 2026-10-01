@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { enCardinal, enDecimal, enOrdinal, enOrdinalSuffix } from "@/sections/numbers/words-en";
-import { ruCardinal, ruDecimal, ruOrdinal, ruPlural } from "@/sections/numbers/words-ru";
-import { parseDecimalInput } from "@/sections/numbers/parse";
+import { enCardinal, enDecimal, enOrdinal, enOrdinalSuffix } from "@/sections/numbers/lib/words-en";
+import { ruCardinal, ruDecimal, ruOrdinal, ruPlural } from "@/sections/numbers/lib/words-ru";
+import { parseDecimalInput } from "@/sections/numbers/lib/parse";
 
 describe("Russian cardinal", () => {
   it.each([

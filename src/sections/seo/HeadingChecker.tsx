@@ -6,7 +6,7 @@ import { formatNumber, plural } from "@/i18n/format";
 import { cn } from "@/lib/cn";
 import { Field, Textarea } from "@/ui/field";
 import { extractHeadings, outlineIssues, type OutlineIssue } from "./lib/outline";
-import { Issues } from "./ui";
+import { Issues } from "./ui/kit";
 
 const T = {
   ru: {

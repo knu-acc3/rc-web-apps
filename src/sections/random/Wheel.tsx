@@ -11,8 +11,8 @@ import { Panel } from "@/ui/panel";
 import { pickWeighted, randomFloat, randomInt, shuffle } from "./lib/rng";
 import { prefersReducedMotion, readStored, removeStored, writeStored } from "./lib/storage";
 import { easeOutQuart, mod360, sectorsFromWeights, targetRotation, winnerAt } from "./lib/wheel";
-import { HistoryPanel, parseLines, pushHistory } from "./shared";
-import { EntryTable, WheelPointer, WheelSvg, type WheelEntry } from "./wheel-parts";
+import { HistoryPanel, parseLines, pushHistory } from "./ui/shared";
+import { EntryTable, WheelPointer, WheelSvg, type WheelEntry } from "./ui/wheel-parts";
 
 export interface WheelProps {
   locale: Locale;

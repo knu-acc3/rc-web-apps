@@ -2,7 +2,7 @@ import type { L10n, Locale } from "@/i18n/config";
 import { count, formatNumber, plural } from "@/i18n/format";
 import { defineToolSection } from "@/registry/tool-section";
 import type { Block, QA, VariantDef } from "@/registry/types";
-import { ANATOMY, CONTENT, GLOSSARY } from "./content";
+import { ANATOMY, CONTENT, GLOSSARY } from "./content/content";
 import { CATEGORIES, LENNY, SHRUG, TABLE_FLIP, DISAPPROVAL, TOTAL, taggedFor, type KaomojiCategory } from "./data";
 
 const SMILEYS_RU = ["японский смайлик", "японских смайлика", "японских смайликов"];

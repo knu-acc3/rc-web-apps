@@ -2,13 +2,13 @@
 
 import { Segmented } from "@/ui/segmented";
 import { Switch } from "@/ui/field";
-import { BigTime } from "./BigTime";
-import { ClockShell, isOpts, type ClockOptions } from "./ClockShell";
+import { BigTime } from "./ui/BigTime";
+import { ClockShell, isOpts, type ClockOptions } from "./ui/ClockShell";
 import { longDate } from "./lib/text";
 import { zoned } from "./lib/tz";
 import { useStoredJson } from "./lib/storage";
 import { useLocalZone, useNow } from "./lib/use-now";
-import type { NowProps } from "./types";
+import type { NowProps } from "./lib/types";
 
 const T = {
   ru: { format: "Формат времени", sec: "Секунды", date: "Дата" },

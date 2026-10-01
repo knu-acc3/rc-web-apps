@@ -2,7 +2,7 @@ import type { Locale } from "@/i18n/config";
 import type { SearchEntry, SectionDef } from "@/registry/types";
 import { ABBR_ZONES, OFFSET_ZONES } from "./data/zones";
 import { fmtOffset } from "./lib/tz";
-import { CITIES, COUNTRIES, cityBySlug, cityIn, cityLabel, countryBySlug, countryName, enCountry, zonePath } from "./model";
+import { CITIES, COUNTRIES, cityBySlug, cityIn, cityLabel, countryBySlug, countryName, enCountry, zonePath } from "./lib/model";
 import { cityPage } from "./pages/city";
 import { HUE } from "./pages/common";
 import { countryPage } from "./pages/country";

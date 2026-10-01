@@ -3,7 +3,7 @@
 import { useId, useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { detectKz, kzCheckDigit, parseBin, parseIin, type KzError } from "./lib/kz";
-import { BigInput, Details, Problems, Verdict, type Row } from "./ui";
+import { BigInput, Details, Problems, Verdict, type Row } from "./ui/kit";
 
 const MONTHS = {
   ru: ["января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября", "ноября", "декабря"],

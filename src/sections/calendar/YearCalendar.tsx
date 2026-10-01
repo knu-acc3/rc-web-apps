@@ -8,8 +8,8 @@ import { buttonClass } from "@/ui/button";
 import { Button } from "@/ui/button";
 import { useStoredJson } from "@/sections/time/lib/storage";
 import { useNow } from "@/sections/time/lib/use-now";
-import { CalendarControls, Legend } from "./CalendarControls";
-import { MonthGrid } from "./MonthGrid";
+import { CalendarControls, Legend } from "./ui/CalendarControls";
+import { MonthGrid } from "./ui/MonthGrid";
 import { localYmd } from "./lib/dates";
 import { holidayMarker, useHolidayChoice } from "./lib/marks";
 

@@ -6,7 +6,7 @@ import { formatNumber, plural } from "@/i18n/format";
 import type { ToolProps } from "../types";
 import type { DeviceType } from "./lib/ua";
 import { detectUa, pointerStore, screenStore, useDetected, type UaSnapshot } from "./lib/probe";
-import { COMMON, dims, Facts, Hero, Hint, Stack, YesNo } from "./ui";
+import { COMMON, dims, Facts, Hero, Hint, Stack, YesNo } from "./ui/kit";
 
 const TYPES: Record<Locale, Record<DeviceType, string>> = {
   ru: {

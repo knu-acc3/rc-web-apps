@@ -1,11 +1,11 @@
 import type { L10n, Locale } from "@/i18n/config";
 import { defineToolSection } from "@/registry/tool-section";
 import type { Block, QA, ToolDef, VariantDef } from "@/registry/types";
-import { GENERATOR_HOWTO, GENERATOR_TEXT, INVISIBLE_TEXT, PLATFORM_TEXT } from "./content-pages";
-import { STYLE_TEXT } from "./content-styles";
-import { charFacts, INVISIBLE, type UnicodeClass } from "./invisible";
-import { PLATFORM_IDS, PLATFORMS, STYLE_NAMES, TOOL_SLUG, type PlatformId } from "./names";
-import { MATH, STYLE_IDS, STYLES, stylize, ZALGO_AMOUNT, ZALGO_LEVELS, type CyrSupport, type MathStyleId, type StyleId } from "./styles";
+import { GENERATOR_HOWTO, GENERATOR_TEXT, INVISIBLE_TEXT, PLATFORM_TEXT } from "./content/content-pages";
+import { STYLE_TEXT } from "./content/content-styles";
+import { charFacts, INVISIBLE, type UnicodeClass } from "./lib/invisible";
+import { PLATFORM_IDS, PLATFORMS, STYLE_NAMES, TOOL_SLUG, type PlatformId } from "./data/names";
+import { MATH, STYLE_IDS, STYLES, stylize, ZALGO_AMOUNT, ZALGO_LEVELS, type CyrSupport, type MathStyleId, type StyleId } from "./lib/styles";
 
 const L = (ru: string, en: string): L10n => ({ ru, en });
 const both = <T>(ru: T, en: T): Record<Locale, T> => ({ ru, en });

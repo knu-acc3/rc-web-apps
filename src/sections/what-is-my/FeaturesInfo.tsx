@@ -7,7 +7,7 @@ import { Segmented } from "@/ui/segmented";
 import type { ToolProps } from "../types";
 import { detectFeatures, FEATURE_GROUPS, FEATURES } from "./lib/features";
 import { useDetected } from "./lib/probe";
-import { COMMON, Hero, Pending, Stack } from "./ui";
+import { COMMON, Hero, Pending, Stack } from "./ui/kit";
 
 type Filter = "all" | "yes" | "no";
 

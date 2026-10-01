@@ -7,7 +7,7 @@ import Calibrate from "@/sections/actual-size/Calibrate";
 import ObjectViewer from "@/sections/actual-size/ObjectViewer";
 import Protractor from "@/sections/actual-size/Protractor";
 import Ruler from "@/sections/actual-size/Ruler";
-import { OBJECTS } from "@/sections/actual-size/objects";
+import { OBJECTS } from "@/sections/actual-size/data/objects";
 
 /** Server render (SSR) of every tool: must not touch window/localStorage and must draw at the 96 ppi estimate. */
 describe("actual-size SSR", () => {

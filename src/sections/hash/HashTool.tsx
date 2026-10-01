@@ -13,9 +13,9 @@ import { Dropzone } from "@/ui/dropzone";
 import { Field, Input, Select } from "@/ui/field";
 import { Notice, Panel } from "@/ui/panel";
 import { Segmented } from "@/ui/segmented";
-import { ALGO_BY_ID, type AlgoId } from "./algorithms";
-import { digestMatches, formatDigest, type OutFormat } from "./engine";
-import { decodeInput, INPUT_ENC_LABEL, type InputEncoding } from "./input";
+import { ALGO_BY_ID, type AlgoId } from "./lib/algorithms";
+import { digestMatches, formatDigest, type OutFormat } from "./lib/engine";
+import { decodeInput, INPUT_ENC_LABEL, type InputEncoding } from "./lib/input";
 
 const T = {
   ru: {
@@ -72,7 +72,7 @@ const T = {
   },
 } as const;
 
-const newWorker = () => new Worker(new URL("./hash.worker.ts", import.meta.url), { type: "module" });
+const newWorker = () => new Worker(new URL("./lib/hash.worker.ts", import.meta.url), { type: "module" });
 
 export interface HashToolProps {
   locale: Locale;

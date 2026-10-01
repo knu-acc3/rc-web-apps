@@ -8,8 +8,8 @@ import { fmtRound } from "../../calc/kit/fmt";
 import { CalcGrid, DataTable, Disclaimer, Explain, OptionsRow, ResultMain, Stack, SubHeading, ToolActions } from "../../calc/kit/ui";
 import { useQueryState } from "../../calc/kit/url-state";
 import { bmi, BMI_CLASSES, bmiBounds, bmiClass, healthyRange, kgToLb } from "../engines/body";
-import { BMI_LABEL } from "../labels";
-import { BodyFields, bodyDefaults, parseBody, switchUnits, UNIT_SYSTEMS, UnitToggle } from "../parts";
+import { BMI_LABEL } from "../lib/labels";
+import { BodyFields, bodyDefaults, parseBody, switchUnits, UNIT_SYSTEMS, UnitToggle } from "../ui/parts";
 
 const T = {
   ru: {

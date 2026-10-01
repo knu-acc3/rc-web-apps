@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { LOCALES } from "@/i18n/config";
 import { resolvePage } from "@/registry";
-import { CAT_IDS, OBJECTS } from "@/sections/actual-size/objects";
-import { dimsText, objectVariants } from "@/sections/actual-size/pages";
-import { ROUND_SHAPES } from "@/sections/actual-size/types";
+import { CAT_IDS, OBJECTS } from "@/sections/actual-size/data/objects";
+import { dimsText, objectVariants } from "@/sections/actual-size/content/pages";
+import { ROUND_SHAPES } from "@/sections/actual-size/lib/types";
 
 const get = (slug: string) => {
   const o = OBJECTS.find((x) => x.slug === slug);

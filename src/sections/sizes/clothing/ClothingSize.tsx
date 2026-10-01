@@ -6,7 +6,7 @@ import { formatNumber, parseNumber } from "@/i18n/format";
 import { Field, Input, Select } from "@/ui/field";
 import { Panel } from "@/ui/panel";
 import { Segmented } from "@/ui/segmented";
-import { ResultTiles, plainSpaces } from "../ui";
+import { ResultTiles, plainSpaces } from "../ui/kit";
 import { MEN, SHIRTS, WOMEN, menByMeasure, shirtByNeck, span, womenByMeasure, type ClothingChart } from "./data";
 
 type Col = { key: string; label: Record<Locale, string>; get: (i: number) => string };

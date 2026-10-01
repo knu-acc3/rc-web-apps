@@ -1,6 +1,6 @@
 import type { Locale } from "@/i18n/config";
 import type { Block, QA, ToolDef, VariantDef } from "@/registry/types";
-import { inchWord, tt } from "../shared";
+import { inchWord, tt } from "../lib/shared";
 import { BANDS, EU_CUPS, braSize, cupDiff, frBand, sisterSizes, ukBand, type EuCup } from "./engine";
 
 const rng = (r: [number, number]) => `${r[0]}–${r[1]}`;

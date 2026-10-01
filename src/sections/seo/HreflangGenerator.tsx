@@ -5,7 +5,7 @@ import type { Locale } from "@/i18n/config";
 import { Field, Textarea } from "@/ui/field";
 import { Segmented } from "@/ui/segmented";
 import { hreflangHeader, hreflangHtml, hreflangIssues, hreflangSitemap, normalizeCode, type HreflangIssue, type HreflangRow } from "./lib/hreflang";
-import { Issues, Output } from "./ui";
+import { Issues, Output } from "./ui/kit";
 
 type Format = "html" | "header" | "sitemap";
 

@@ -10,7 +10,7 @@ import { Checkbox } from "@/ui/field";
 import { Panel, PanelHeader } from "@/ui/panel";
 import { Segmented } from "@/ui/segmented";
 import type { DiffMode, DiffOptions, DiffResult } from "./lib/diff";
-import { countLabel, InputPanel, MoreOptions, OptionsBar, TwoPane, useDebounced } from "./shared";
+import { countLabel, InputPanel, MoreOptions, OptionsBar, TwoPane, useDebounced } from "./ui/shared";
 
 const T = {
   ru: {
@@ -91,7 +91,7 @@ export default function TextCompare({ locale }: { locale: Locale }) {
       workerRef.current.terminate();
       workerRef.current = null;
     }
-    if (!workerRef.current) workerRef.current = new Worker(new URL("./diff.worker.ts", import.meta.url), { type: "module" });
+    if (!workerRef.current) workerRef.current = new Worker(new URL("./lib/diff.worker.ts", import.meta.url), { type: "module" });
     const w = workerRef.current;
     const myId = ++seq.current;
     const onMsg = (e: MessageEvent<Msg>) => {

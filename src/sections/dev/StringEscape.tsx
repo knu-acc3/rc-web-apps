@@ -8,7 +8,7 @@ import { CopyButton } from "@/ui/copy-button";
 import { Select } from "@/ui/field";
 import { Notice, Panel } from "@/ui/panel";
 import { Segmented } from "@/ui/segmented";
-import * as E from "./escape";
+import * as E from "./lib/escape";
 
 type Target = "js" | "js1" | "tpl" | "json" | "sql" | "mysql" | "regex" | "html" | "attr" | "xml" | "shell" | "csv";
 

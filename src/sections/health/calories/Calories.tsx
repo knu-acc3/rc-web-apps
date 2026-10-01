@@ -7,7 +7,7 @@ import { field } from "../../calc/kit/num";
 import { CalcGrid, DataTable, Disclaimer, Explain, FieldRow, NumField, OptionsRow, ResultMain, SelectField, Stack, SubHeading, ToolActions } from "../../calc/kit/ui";
 import { useQueryState } from "../../calc/kit/url-state";
 import { ACTIVITIES, ACTIVITY_FACTOR, harrisBenedict, mifflin, weeklyChange, type Activity, type Sex } from "../engines/body";
-import { BodyFields, bodyDefaults, parseBody, SEXES, SexToggle, switchUnits, UNIT_SYSTEMS, UnitToggle } from "../parts";
+import { BodyFields, bodyDefaults, parseBody, SEXES, SexToggle, switchUnits, UNIT_SYSTEMS, UnitToggle } from "../ui/parts";
 
 const GOALS = ["-500", "-250", "0", "250", "500"] as const;
 

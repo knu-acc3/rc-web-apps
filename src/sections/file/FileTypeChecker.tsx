@@ -186,7 +186,7 @@ function Hashes({ file, locale }: { file: File; locale: Locale }) {
     void job.run(
       (hooks) =>
         new Promise((resolve, reject) => {
-          const w = new Worker(new URL("./hash.worker.ts", import.meta.url), { type: "module" });
+          const w = new Worker(new URL("./lib/hash.worker.ts", import.meta.url), { type: "module" });
           const end = () => w.terminate();
           hooks.signal.addEventListener("abort", () => (end(), reject(new DOMException("Cancelled", "AbortError"))), { once: true });
           w.onmessage = (e: MessageEvent<{ progress?: number; done?: { md5: string; sha1: string; sha256: string }; error?: string }>) => {

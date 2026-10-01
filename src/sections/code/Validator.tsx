@@ -7,10 +7,10 @@ import { formatNumber, plural } from "@/i18n/format";
 import { CodeEditor } from "@/sections/code/kit/CodeEditor";
 import { useLiveTask } from "@/sections/code/kit/hooks";
 import { positionLabel } from "@/sections/code/kit/labels";
-import { ErrorBox, failOf, useCodeWorker } from "./ErrorBox";
-import { LANG_META, type ValidateLang } from "./langs";
-import type { ValidateResult } from "./run";
-import { CODE_T, type CodeT } from "./text";
+import { ErrorBox, failOf, useCodeWorker } from "./ui/ErrorBox";
+import { LANG_META, type ValidateLang } from "./lib/langs";
+import type { ValidateResult } from "./lib/run";
+import { CODE_T, type CodeT } from "./content/text";
 
 export interface ValidatorProps {
   locale: Locale;

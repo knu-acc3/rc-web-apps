@@ -1,5 +1,5 @@
 /** Main-thread wrapper for zip.worker.ts (one worker per open archive / build). */
-import type { ZipEntryInfo } from "../zip.worker";
+import type { ZipEntryInfo } from "./zip.worker";
 
 export type { ZipEntryInfo };
 
@@ -9,7 +9,7 @@ export class ZipWorker {
   private pending = new Map<number, { resolve: (v: unknown) => void; reject: (e: unknown) => void; onProgress?: (p: number) => void }>();
 
   constructor() {
-    this.w = new Worker(new URL("../zip.worker.ts", import.meta.url), { type: "module" });
+    this.w = new Worker(new URL("./zip.worker.ts", import.meta.url), { type: "module" });
     this.w.onmessage = (e: MessageEvent<{ id: number; progress?: number; done?: unknown; error?: string }>) => {
       const p = this.pending.get(e.data.id);
       if (!p) return;

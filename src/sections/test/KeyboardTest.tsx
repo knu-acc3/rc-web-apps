@@ -7,7 +7,7 @@ import { cn } from "@/lib/cn";
 import { Button } from "@/ui/button";
 import { Badge, Panel, PanelHeader } from "@/ui/panel";
 import { Segmented } from "@/ui/segmented";
-import { KeyboardVisual, type LabelMode } from "./KeyboardVisual";
+import { KeyboardVisual, type LabelMode } from "./ui/KeyboardVisual";
 import { KEY_LOCATIONS, KEYBOARD, KEYBOARD_CODES, NAV_KEYS } from "./lib/keyboard-layout";
 
 const T = {

@@ -11,7 +11,7 @@ import { ringsTool } from "./rings/tool";
 import { SCREENS, screenSlug, type ScreenRes } from "./screen/data";
 import { nearestCommonRatio } from "./screen/engine";
 import { screenTool } from "./screen/tool";
-import { tt } from "./shared";
+import { tt } from "./lib/shared";
 import { shoesTool } from "./shoes/tool";
 import { tvTool } from "./tv/tool";
 

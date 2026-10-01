@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { CITIES, COUNTRIES, cityBySlug, countryBySlug, zoneInfo } from "@/sections/time/model";
+import { CITIES, COUNTRIES, cityBySlug, countryBySlug, zoneInfo } from "@/sections/time/lib/model";
 import { loadPlaces, parseOffsetQuery, searchPlaces } from "@/sections/time/lib/places";
 import { sunDay } from "@/sections/time/lib/sun";
 import { fmtOffset, nextTransition, offsetSlug, parseOffsetSlug, transitions, tzOffset, zoned, zonedToUtc } from "@/sections/time/lib/tz";

@@ -9,9 +9,9 @@ import { cn } from "@/lib/cn";
 import { Button } from "@/ui/button";
 import { Input } from "@/ui/field";
 import { CATEGORIES, CATEGORY_BY_SLUG, taggedFor } from "./data";
-import { KaomojiGrid } from "./KaomojiGrid";
-import { searchKaomoji } from "./search";
-import { addRecent, clearRecent, useRecentKaomoji } from "./use-recent";
+import { KaomojiGrid } from "./ui/KaomojiGrid";
+import { searchKaomoji } from "./lib/search";
+import { addRecent, clearRecent, useRecentKaomoji } from "./lib/use-recent";
 
 const T = {
   ru: {

@@ -7,12 +7,12 @@ import { parseYmd, ymdStr } from "@/sections/calendar/lib/dates";
 import { Button } from "@/ui/button";
 import { Slider } from "@/ui/field";
 import { Panel } from "@/ui/panel";
-import { PlaceSearch } from "./PlaceSearch";
+import { PlaceSearch } from "./ui/PlaceSearch";
 import { dayShift, diffShort, shortDate, placeParts } from "./lib/text";
 import { fmtOffset, pad2, zonedToUtc } from "./lib/tz";
 import { useStoredJson } from "./lib/storage";
 import { modernZone, useLocalZone, useMinute } from "./lib/use-now";
-import type { ConverterProps, Place } from "./types";
+import type { ConverterProps, Place } from "./lib/types";
 
 const T = {
   ru: {

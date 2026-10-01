@@ -5,7 +5,7 @@ import type { Locale } from "@/i18n/config";
 import { Checkbox, Input } from "@/ui/field";
 import { addPrefixSuffix, filterLines, joinLines, LINE_OPS, numberLines, removeEmptyLines, splitToLines, wrapText, type LineOp } from "./lib/lineTools";
 import { splitLines } from "./lib/textOps";
-import { countLabel, InlineSelect, InputPanel, OptionsBar, OutputPanel, TwoPane, TX } from "./shared";
+import { countLabel, InlineSelect, InputPanel, OptionsBar, OutputPanel, TwoPane, TX } from "./ui/shared";
 
 const T = {
   ru: {

@@ -7,8 +7,8 @@ import { formatNumber } from "@/i18n/format";
 import { cn } from "@/lib/cn";
 import { Button } from "@/ui/button";
 import { Field, Input } from "@/ui/field";
-import type { StrengthResult } from "./strength-core";
-import { humanDuration } from "./time";
+import type { StrengthResult } from "./lib/strength-core";
+import { humanDuration } from "./lib/time";
 
 const T = {
   ru: {
@@ -74,7 +74,7 @@ export default function StrengthChecker({ locale }: { locale: Locale }) {
     if (!pw) return;
     const timer = setTimeout(() => {
       if (!worker.current) {
-        worker.current = new Worker(new URL("./strength.worker.ts", import.meta.url), { type: "module" });
+        worker.current = new Worker(new URL("./lib/strength.worker.ts", import.meta.url), { type: "module" });
         worker.current.onmessage = (e: MessageEvent<{ id: number; result: StrengthResult; pw: string }>) => {
           if (e.data.id === seq.current) setRes({ for: pending.current, r: e.data.result });
         };

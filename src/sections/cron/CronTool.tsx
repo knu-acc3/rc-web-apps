@@ -7,10 +7,10 @@ import { useHydrated, useNow } from "@/sections/code/kit/hooks";
 import { CopyButton } from "@/ui/copy-button";
 import { Input, Select } from "@/ui/field";
 import { Notice, Panel } from "@/ui/panel";
-import { describe, fieldRows } from "./describe";
-import { CronError, MACROS, nextRuns, parseCron, type CronExpr, type Dialect } from "./engine";
-import { CronBuilder } from "./CronBuilder";
-import { isValidZone } from "./tz";
+import { describe, fieldRows } from "./lib/describe";
+import { CronError, MACROS, nextRuns, parseCron, type CronExpr, type Dialect } from "./lib/engine";
+import { CronBuilder } from "./ui/CronBuilder";
+import { isValidZone } from "./lib/tz";
 
 const T = {
   ru: {

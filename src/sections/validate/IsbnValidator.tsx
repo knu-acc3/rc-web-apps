@@ -3,7 +3,7 @@
 import { useId, useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { validateIsbn, type IsbnError } from "./lib/isbn";
-import { BigInput, Details, Problems, Verdict, type Row } from "./ui";
+import { BigInput, Details, Problems, Verdict, type Row } from "./ui/kit";
 
 const T = {
   ru: {

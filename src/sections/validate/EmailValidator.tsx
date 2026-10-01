@@ -4,7 +4,7 @@ import { useId, useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { Button } from "@/ui/button";
 import { checkEmail, ERRORS, type EmailIssue } from "./lib/email";
-import { BigInput, Details, Problems, Verdict, type Row } from "./ui";
+import { BigInput, Details, Problems, Verdict, type Row } from "./ui/kit";
 
 const T = {
   ru: {

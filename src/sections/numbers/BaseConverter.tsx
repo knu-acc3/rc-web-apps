@@ -8,10 +8,10 @@ import { CopyButton } from "@/ui/copy-button";
 import { Input, Select, Switch } from "@/ui/field";
 import { Panel } from "@/ui/panel";
 import { Segmented } from "@/ui/segmented";
-import { BaseSteps } from "./BaseSteps";
-import { baseName, baseShort, baseTitle, digitRange, readAs } from "./base-names";
-import { formatBase, formattedText, fromTwos, groupDigits, groupFrac, parseBase, signedRange, signedValue, toTwos, type Formatted } from "./bases";
-import { Details } from "./ui-bits";
+import { BaseSteps } from "./ui/BaseSteps";
+import { baseName, baseShort, baseTitle, digitRange, readAs } from "./data/base-names";
+import { formatBase, formattedText, fromTwos, groupDigits, groupFrac, parseBase, signedRange, signedValue, toTwos, type Formatted } from "./lib/bases";
+import { Details } from "./ui/ui-bits";
 
 export interface BaseConverterProps {
   locale: Locale;

@@ -15,7 +15,7 @@ import {
   ZALGO_AMOUNT,
   type MathStyleId,
   type StyleId,
-} from "@/sections/fonts/styles";
+} from "@/sections/fonts/lib/styles";
 
 const cps = (s: string) => Array.from(s, (c) => c.codePointAt(0)!);
 const cp1 = (id: StyleId, ch: string) => {

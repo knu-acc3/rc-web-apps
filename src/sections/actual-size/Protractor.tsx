@@ -6,7 +6,7 @@ import { formatNumber } from "@/i18n/format";
 import { Button } from "@/ui/button";
 import { Panel } from "@/ui/panel";
 import { Segmented } from "@/ui/segmented";
-import { angleAt, armsAngle, polar, snapAngle } from "./geometry";
+import { angleAt, armsAngle, polar, snapAngle } from "./lib/geometry";
 
 const T = {
   ru: {

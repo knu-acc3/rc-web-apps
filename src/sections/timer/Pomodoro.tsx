@@ -8,7 +8,7 @@ import { Button } from "@/ui/button";
 import { Switch } from "@/ui/field";
 import { useStoredJson } from "@/sections/time/lib/storage";
 import { useFullscreen, useWakeLock } from "@/sections/time/lib/use-fullscreen";
-import { TimerOptions, useAlertOptions } from "./TimerOptions";
+import { TimerOptions, useAlertOptions } from "./ui/TimerOptions";
 import { schedule, unlockAudio, type Scheduled } from "./lib/audio";
 import { clampInt, clock } from "./lib/format";
 import { useKeys } from "./lib/keys";

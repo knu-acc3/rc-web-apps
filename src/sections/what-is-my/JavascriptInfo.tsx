@@ -5,7 +5,7 @@ import type { ToolProps } from "../types";
 import { detectEs, ES_FEATURES, esLevel } from "./lib/features";
 import { jsEngine } from "./lib/ua";
 import { detectUa, useDetected } from "./lib/probe";
-import { COMMON, Facts, Hero, Pending, Stack } from "./ui";
+import { COMMON, Facts, Hero, Pending, Stack } from "./ui/kit";
 
 const T = {
   ru: {

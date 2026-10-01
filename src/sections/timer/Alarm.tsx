@@ -10,7 +10,7 @@ import { Notice } from "@/ui/panel";
 import { useStoredJson } from "@/sections/time/lib/storage";
 import { useNow } from "@/sections/time/lib/use-now";
 import { useWakeLock } from "@/sections/time/lib/use-fullscreen";
-import { TimerOptions, useAlertOptions } from "./TimerOptions";
+import { TimerOptions, useAlertOptions } from "./ui/TimerOptions";
 import { hasPlayed, schedule, unlockAudio, type Scheduled } from "./lib/audio";
 import { nextOccurrence } from "./lib/alarm";
 import { durationText } from "./lib/format";

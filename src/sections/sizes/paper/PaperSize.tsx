@@ -7,7 +7,7 @@ import { CopyButton } from "@/ui/copy-button";
 import { Field, Input, Select } from "@/ui/field";
 import { Panel } from "@/ui/panel";
 import { Segmented } from "@/ui/segmented";
-import { QuietFacts, plainSpaces } from "../ui";
+import { QuietFacts, plainSpaces } from "../ui/kit";
 import { COMMON_DPI, PAPER, PAPER_BY_SLUG, inchesOf, mmToPt, type PaperSeries } from "./data";
 
 const T = {

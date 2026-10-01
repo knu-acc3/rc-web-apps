@@ -4,8 +4,8 @@ import { useEffect, useId, useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { Field, Select, Textarea } from "@/ui/field";
 import { Badge, Panel } from "@/ui/panel";
-import { detectBot, type BotKind } from "./bots";
-import { UA_EXAMPLES } from "./ua-examples";
+import { detectBot, type BotKind } from "./data/bots";
+import { UA_EXAMPLES } from "./data/ua-examples";
 
 const T = {
   ru: {

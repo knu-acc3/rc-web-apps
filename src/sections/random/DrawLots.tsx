@@ -11,7 +11,7 @@ import { Notice } from "@/ui/panel";
 import { Segmented } from "@/ui/segmented";
 import { buildLots, clampCount, defaultMafia, LOTS_MAX, LOTS_MODES, type Lot, type LotsMode } from "./lib/lots";
 import { shuffle } from "./lib/rng";
-import { parseLines } from "./shared";
+import { parseLines } from "./ui/shared";
 
 const T = {
   ru: {

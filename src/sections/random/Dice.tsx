@@ -9,7 +9,7 @@ import { Field, Input, Select } from "@/ui/field";
 import { Panel } from "@/ui/panel";
 import { Segmented } from "@/ui/segmented";
 import { diceRange, diceStats, parseDice, rollDice, type DiceError, type DiceRoll } from "./lib/dice";
-import { HistoryPanel, pushHistory } from "./shared";
+import { HistoryPanel, pushHistory } from "./ui/shared";
 
 export interface DiceProps {
   locale: Locale;

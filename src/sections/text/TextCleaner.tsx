@@ -5,7 +5,7 @@ import type { Locale } from "@/i18n/config";
 import { formatNumber } from "@/i18n/format";
 import { Checkbox } from "@/ui/field";
 import { cleanText, countInvisible, type CleanOptions } from "./lib/clean";
-import { InlineSelect, InputPanel, MoreOptions, OptionsBar, OutputPanel, TwoPane } from "./shared";
+import { InlineSelect, InputPanel, MoreOptions, OptionsBar, OutputPanel, TwoPane } from "./ui/shared";
 
 export type CleanPreset = "default" | "line-breaks" | "spaces" | "html" | "invisible";
 

@@ -7,7 +7,7 @@ import { Button } from "@/ui/button";
 import { Field, Input, Switch } from "@/ui/field";
 import { Panel } from "@/ui/panel";
 import { randomInt } from "./lib/rng";
-import { HistoryPanel, pushHistory } from "./shared";
+import { HistoryPanel, pushHistory } from "./ui/shared";
 
 export interface YesNoProps {
   locale: Locale;

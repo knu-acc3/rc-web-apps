@@ -1,6 +1,6 @@
 import type { Locale } from "@/i18n/config";
 import type { Block, QA, ToolDef, VariantDef } from "@/registry/types";
-import { nf, tt } from "../shared";
+import { nf, tt } from "../lib/shared";
 import { allSizes, chartRows, footFromEu, footFromUs, footRangeForEu, sizeIn, type ShoeGroup } from "./engine";
 import { footRangeText, shoeLabel, sz } from "./format";
 

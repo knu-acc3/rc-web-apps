@@ -9,7 +9,7 @@ import { Button } from "@/ui/button";
 import { Notice, Panel } from "@/ui/panel";
 import { CHATTER_MS, estimatePollingRate, isChatter, nearestPollingRate } from "./lib/input-stats";
 import { useClientValue } from "./lib/client";
-import { MouseDiagram } from "./MouseDiagram";
+import { MouseDiagram } from "./ui/MouseDiagram";
 
 const T = {
   ru: {

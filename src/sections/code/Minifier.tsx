@@ -8,10 +8,10 @@ import { useLiveTask } from "@/sections/code/kit/hooks";
 import { outputLabels } from "@/sections/code/kit/labels";
 import { CodeOutput } from "@/ui/code-output";
 import { Switch } from "@/ui/field";
-import { ErrorBox, failOf, useCodeWorker } from "./ErrorBox";
-import { LANG_META, SAMPLES, type MinifyLang } from "./langs";
-import type { MinifyResult } from "./run";
-import { CODE_T } from "./text";
+import { ErrorBox, failOf, useCodeWorker } from "./ui/ErrorBox";
+import { LANG_META, SAMPLES, type MinifyLang } from "./lib/langs";
+import type { MinifyResult } from "./lib/run";
+import { CODE_T } from "./content/text";
 
 export interface MinifierProps {
   locale: Locale;

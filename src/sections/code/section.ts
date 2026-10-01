@@ -1,8 +1,8 @@
 import type { QA, ToolDef, VariantDef } from "@/registry/types";
 import { defineToolSection } from "@/registry/tool-section";
 import { registerTools, withRelated } from "@/sections/code/kit/related";
-import { DIALECT_PAGES } from "./dialects";
-import type { FormatLang, MinifyLang, ValidateLang } from "./langs";
+import { DIALECT_PAGES } from "./content/dialects";
+import type { FormatLang, MinifyLang, ValidateLang } from "./lib/langs";
 
 const HUE = 255;
 type L = { ru: string; en: string };

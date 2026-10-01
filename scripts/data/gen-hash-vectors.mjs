@@ -1,4 +1,4 @@
-// Generates src/sections/hash/vectors.json — digests of reference strings for every
+// Generates src/sections/hash/data/vectors.json — digests of reference strings for every
 // algorithm, shown as test-vector tables on the algorithm pages (server-rendered).
 // Verified against the runtime engine by tests/unit/hash-engine.test.ts.
 // Run: node scripts/data/gen-hash-vectors.mjs
@@ -39,6 +39,6 @@ for (const [id, fn] of Object.entries(algos)) {
   out[id] = [];
   for (const s of INPUTS) out[id].push(await fn(s));
 }
-const file = new URL("../../src/sections/hash/vectors.json", import.meta.url);
+const file = new URL("../../src/sections/hash/data/vectors.json", import.meta.url);
 writeFileSync(file, JSON.stringify({ inputs: INPUTS, digests: out }, null, 1) + "\n");
 console.log("wrote", file.pathname);

@@ -6,7 +6,7 @@ import { formatNumber, parseNumber } from "@/i18n/format";
 import { Field, Input } from "@/ui/field";
 import { Panel } from "@/ui/panel";
 import { Segmented } from "@/ui/segmented";
-import { QuietFacts, plainSpaces } from "../ui";
+import { QuietFacts, plainSpaces } from "../ui/kit";
 import { CM_PER_INCH, diagonalForAcuity, diagonalForAngle, screenDims, tvDistances } from "./engine";
 
 const T = {

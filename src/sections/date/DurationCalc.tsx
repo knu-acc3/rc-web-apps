@@ -8,7 +8,7 @@ import { Textarea } from "@/ui/field";
 import { Panel } from "@/ui/panel";
 import { Segmented } from "@/ui/segmented";
 import { formatDuration, sumDurations } from "./lib/engine";
-import { BigResult } from "./ui";
+import { BigResult } from "./ui/kit";
 
 const T = {
   ru: {

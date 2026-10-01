@@ -11,8 +11,8 @@ import { Button } from "@/ui/button";
 import { Dropzone } from "@/ui/dropzone";
 import { Select } from "@/ui/field";
 import { Panel } from "@/ui/panel";
-import { ALGO_BY_ID, ALGOS, algosForHexLength, type AlgoId } from "./algorithms";
-import { algoFromTag, parseSums, type SumEntry } from "./engine";
+import { ALGO_BY_ID, ALGOS, algosForHexLength, type AlgoId } from "./lib/algorithms";
+import { algoFromTag, parseSums, type SumEntry } from "./lib/engine";
 
 const T = {
   ru: {
@@ -73,7 +73,7 @@ function plan(file: File, entries: SumEntry[], forced: AlgoId | "auto"): { algo:
 export default function Checksum({ locale }: { locale: Locale }) {
   const t = T[locale];
   const id = useId();
-  const client = useWorkerClient(() => new Worker(new URL("./hash.worker.ts", import.meta.url), { type: "module" }));
+  const client = useWorkerClient(() => new Worker(new URL("./lib/hash.worker.ts", import.meta.url), { type: "module" }));
   const [text, setText] = useState("");
   const [forced, setForced] = useState<AlgoId | "auto">("auto");
   const [rows, setRows] = useState<Row[]>([]);

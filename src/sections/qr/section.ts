@@ -1,9 +1,9 @@
 import type { Locale } from "@/i18n/config";
 import { defineToolSection } from "@/registry/tool-section";
 import type { Block } from "@/registry/types";
-import { CAPACITY } from "./qr";
-import { QR_VARIANTS, variant } from "./texts";
-import { BARCODE_VARIANTS, CHECK_VARIANTS } from "./texts-barcode";
+import { CAPACITY } from "./lib/qr";
+import { QR_VARIANTS, variant } from "./content/texts";
+import { BARCODE_VARIANTS, CHECK_VARIANTS } from "./content/texts-barcode";
 
 function eccTable(l: Locale): Block {
   const ru = l === "ru";

@@ -23,22 +23,35 @@ Every tool and every variant is its own statically generated, indexable page (ru
 
 ## Folder layout
 ```
-app/[locale]/…                 generic routes for 1–3 path segments (/[section]/[slug]/[variant] are just segment names)
-src/config/brand.ts            site name, domain, verification ids
-src/i18n/                      locales, formatting (formatNumber, formatSmart, parseNumber, plural), UI dictionary
-src/registry/                  types, section registry, generic tool-section builder
-src/sections/<id>/             ONE FOLDER PER SECTION: section.ts, components.ts, tools (*.tsx), engines, data
+app/                           Next.js routes only (thin): [locale]/… pages, sitemaps, OG images, search index, 404
+proxy.ts                       every request: known page → render, old URL → 301, unknown → 404
+next.config.ts                 security headers (CSP), caching, build options
+src/config/                    brand.ts (site name, domain, verification ids), redirects.ts (old-site URL map)
+src/i18n/                      locales, number/date formatting, UI dictionary
+src/registry/                  page model types, section registry, defineToolSection() builder, layouts
+src/site/                      site chrome: layout, page renderer, blocks, header/footer, search, SEO helpers
+src/ui/                        design-system primitives (Button, Field, Segmented, Panel, Stage, Dropzone…)
+src/lib/                       tiny shared helpers (cn, clipboard, persist, favorites, recent, search)
+src/sections/<id>/             ONE FOLDER PER SECTION (pdf, image, timer, score, screen…):
+    section.ts                   the section: tools, pages, SEO texts
+    components.ts                id → dynamic import of each tool component
+    content/ or defs/            ToolDef texts (titles, how-to, FAQ, variants) when they are long
+    <Name>.tsx                   tool components ("use client", default export)
+    lib/ or engine/              pure logic, unit-tested (no React); workers live next to it (*.worker.ts)
+    data/                        static data tables (generated ones come from scripts/data)
+    ui/                          components shared by the section's tools
 src/sections/index.ts          list of all sections
 src/sections/components.ts     merged map of tool component loaders (source of truth for component ids)
 src/sections/tool-components.ts  GENERATED next/dynamic map (scripts/gen-tool-components.mjs, runs in prebuild)
-src/site/                      layout, page renderer, blocks, SEO helpers, search
-src/ui/                        design-system primitives (link.tsx = next/link without viewport prefetch)
-src/lib/                       small shared helpers (cn, clipboard, recent, search)
-src/config/redirects.ts        301 map from the previous site's URLs, applied by proxy.ts
-scripts/data/gen-*.mjs         build-time data generators (Unicode CLDR etc.) → JSON in src/sections/<id>/data/
-scripts/vendor-*.mjs           copy wasm/worker/font assets into public/vendor/ (prebuild)
-tests/unit/, tests/e2e/        vitest (registry invariants, engines) and Playwright smoke + axe
+scripts/                       build steps: gen-tool-components, vendor-*.mjs (wasm/worker/fonts → public/vendor), postbuild
+scripts/data/                  one-off data generators (Unicode CLDR etc.) → JSON in src/sections/<id>/data/
+public/                        static files: fonts, icons, sw.js (offline), robots; public/vendor is generated
+tests/unit/, tests/e2e/        vitest (registry invariants, SEO quality, engines) and Playwright (smoke, axe, phones)
+docs/                          ARCHITECTURE.md (this file), PLAN.md (current plan), SECURITY-AUDIT.md, REBUILD-2026.md (history)
 ```
+Tool state that should survive a reload uses `usePersistentState(key, initial, validator)` from `src/lib/persist.ts`
+(keys `<tool>:v1[:<variant>]`). Full-screen modes use `useStage()` + `<StageLayer>` from `src/ui/stage.tsx`.
+`npm run knip` reports unused files, exports and dependencies — keep it clean (it runs in `npm run verify`).
 
 ## How a page is produced
 `resolvePage(locale, segments)` finds the section that owns the first segment and calls `SectionDef.resolve()`, which returns a `PageModel` (`src/registry/types.ts`):

@@ -1,6 +1,6 @@
 import type { Locale } from "@/i18n/config";
 import type { Block, QA, ToolDef, VariantDef } from "@/registry/types";
-import { nf, nfix, tt } from "../shared";
+import { nf, nfix, tt } from "../lib/shared";
 import { ringSizes, usToDiameter, type RingSizes, type RingSystem } from "./engine";
 
 const mmU = (l: Locale) => tt(l, "мм", "mm");

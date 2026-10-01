@@ -10,7 +10,7 @@ import { CopyButton } from "@/ui/copy-button";
 import { Field, Select, Textarea } from "@/ui/field";
 import { Notice, Panel, PanelHeader } from "@/ui/panel";
 import { drawSecretSanta, SANTA_MAX, SANTA_MIN, type SantaError } from "./lib/santa";
-import { parseLines } from "./shared";
+import { parseLines } from "./ui/shared";
 
 export interface SecretSantaProps {
   locale: Locale;

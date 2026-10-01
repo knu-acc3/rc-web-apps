@@ -6,7 +6,7 @@ import type { Locale } from "@/i18n/config";
 import { cn } from "@/lib/cn";
 import { Button } from "@/ui/button";
 import { useFullscreen, useWakeLock } from "@/sections/time/lib/use-fullscreen";
-import { TimerOptions, useAlertOptions } from "./TimerOptions";
+import { TimerOptions, useAlertOptions } from "./ui/TimerOptions";
 import { hasPlayed, schedule, unlockAudio, type Scheduled } from "./lib/audio";
 import { clampInt, clock, durationShort, durationText, hms } from "./lib/format";
 import { useKeys } from "./lib/keys";

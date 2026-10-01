@@ -9,7 +9,7 @@ import { CopyButton } from "@/ui/copy-button";
 import { Field, Select, Switch, Textarea } from "@/ui/field";
 import { Panel, PanelHeader } from "@/ui/panel";
 import { sample, shuffle } from "./lib/rng";
-import { HistoryPanel, parseLines, pushHistory } from "./shared";
+import { HistoryPanel, parseLines, pushHistory } from "./ui/shared";
 
 export interface ListPickerProps {
   locale: Locale;

@@ -1,8 +1,8 @@
 import type { QA, ToolDef } from "@/registry/types";
 import { defineToolSection } from "@/registry/tool-section";
 import { registerTools, withRelated } from "@/sections/code/kit/related";
-import type { ConvertOptions, Fmt } from "./convert";
-import { FORMAT_META } from "./samples";
+import type { ConvertOptions, Fmt } from "./lib/convert";
+import { FORMAT_META } from "./content/samples";
 
 const HUE = 235;
 type L = { ru: string; en: string };

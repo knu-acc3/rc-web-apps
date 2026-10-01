@@ -3,8 +3,8 @@ import type { Block, LinkItem, PageModel, QA } from "@/registry/types";
 import { fmtDate } from "@/sections/calendar/lib/dates";
 import { pairList, zoneBySlug, type ZoneDef } from "../data/zones";
 import { fmtOffset, transitions, tzOffset, zoned } from "../lib/tz";
-import { BUILD_NOW, cityBySlug, cityIn, cityLabel, clientCity, clientZone, diffShort, durationWords, type City } from "../model";
-import type { ConverterProps } from "../types";
+import { BUILD_NOW, cityBySlug, cityIn, cityLabel, clientCity, clientZone, diffShort, durationWords, type City } from "../lib/model";
+import type { ConverterProps } from "../lib/types";
 import { home, HUE, hm } from "./common";
 
 type End = { slug: string; city?: City; zone?: ZoneDef };

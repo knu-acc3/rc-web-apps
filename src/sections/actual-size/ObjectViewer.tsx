@@ -7,11 +7,11 @@ import { formatNumber } from "@/i18n/format";
 import { Button } from "@/ui/button";
 import { Select, Switch } from "@/ui/field";
 import { Notice } from "@/ui/panel";
-import { ObjectArt, ObjectOutline } from "./art";
-import { CalibrationBar } from "./CalibrationBar";
-import { MM_PER_INCH } from "./calibration";
-import { DEVICE_SHAPES, ROUND_SHAPES, type ClientObj } from "./types";
-import { useCalibration } from "./use-calibration";
+import { ObjectArt, ObjectOutline } from "./ui/art";
+import { CalibrationBar } from "./ui/CalibrationBar";
+import { MM_PER_INCH } from "./lib/calibration";
+import { DEVICE_SHAPES, ROUND_SHAPES, type ClientObj } from "./lib/types";
+import { useCalibration } from "./lib/use-calibration";
 
 const T = {
   ru: {

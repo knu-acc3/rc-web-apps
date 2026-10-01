@@ -8,7 +8,7 @@ import { Button } from "@/ui/button";
 import { Field, Input, Textarea } from "@/ui/field";
 import { Segmented } from "@/ui/segmented";
 import { attr } from "./lib/serp";
-import { FieldGrid, Issues, More, Output, type FieldSpec, type Fields } from "./ui";
+import { FieldGrid, Issues, More, Output, type FieldSpec, type Fields } from "./ui/kit";
 
 type Platform = "telegram" | "whatsapp" | "facebook" | "x" | "vk";
 

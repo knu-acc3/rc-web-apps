@@ -4,7 +4,7 @@ import type { Locale } from "@/i18n/config";
 import { Panel } from "@/ui/panel";
 import type { ToolProps } from "../types";
 import { detectUa, nav, useDetected } from "./lib/probe";
-import { COMMON, Facts, Hint, Pending, Stack } from "./ui";
+import { COMMON, Facts, Hint, Pending, Stack } from "./ui/kit";
 
 type Signal = "on" | "off" | "unsupported";
 

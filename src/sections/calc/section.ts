@@ -1,7 +1,7 @@
 import { defineToolSection } from "@/registry/tool-section";
-import * as algebra from "./group-algebra";
-import * as expr from "./group-expr";
-import * as numbers from "./group-numbers";
+import * as algebra from "./content/group-algebra";
+import * as expr from "./content/group-expr";
+import * as numbers from "./content/group-numbers";
 import { percentTool } from "./percent/def";
 
 /** Navigation group only (no landing page): "Математика" is not a search query by itself. */

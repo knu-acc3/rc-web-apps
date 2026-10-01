@@ -1,7 +1,7 @@
 import type { Locale } from "@/i18n/config";
 import type { Block, QA, ToolDef, VariantDef } from "@/registry/types";
-import { convertInt, divisionSteps, expansionTerms } from "../bases";
-import { superscript } from "../scientific";
+import { convertInt, divisionSteps, expansionTerms } from "../lib/bases";
+import { superscript } from "../lib/scientific";
 
 type B = 2 | 8 | 10 | 16;
 

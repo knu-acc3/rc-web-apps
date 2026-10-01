@@ -24,4 +24,6 @@ export const components: ComponentMap = {
   "image/svg": () => import("./tools/Svg"),
   "image/pixel-art": () => import("./tools/PixelArt"),
   "image/compare": () => import("./tools/Compare"),
+  "image/passport": () => import("./tools/PassportPhoto"),
+  "image/id-copy": () => import("./tools/IdCopy"),
 };

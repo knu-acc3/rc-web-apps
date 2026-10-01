@@ -1,6 +1,6 @@
 import type { Locale } from "@/i18n/config";
 import type { Block, QA, ToolDef, VariantDef } from "@/registry/types";
-import { nf, tt } from "../shared";
+import { nf, tt } from "../lib/shared";
 import { CM_PER_INCH, TV_SIZES, diagonalForAngle, screenDims, tvDistances } from "./engine";
 
 const m = (l: Locale, v: number) => `${nf(l, v, 1)} ${tt(l, "м", "m")}`;

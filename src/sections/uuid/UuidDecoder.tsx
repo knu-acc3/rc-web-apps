@@ -6,7 +6,7 @@ import { formatDate, formatNumber } from "@/i18n/format";
 import { CodeEditor } from "@/sections/code/kit/CodeEditor";
 import { useHydrated } from "@/sections/code/kit/hooks";
 import { Badge } from "@/ui/panel";
-import { decodeId, type IdInfo } from "./engine";
+import { decodeId, type IdInfo } from "./lib/engine";
 
 const T = {
   ru: {

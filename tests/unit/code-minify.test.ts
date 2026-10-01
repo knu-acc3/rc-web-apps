@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { gzipSize, minifyCss } from "@/sections/code/cssmin";
+import { gzipSize, minifyCss } from "@/sections/code/lib/cssmin";
 
 describe("CSS minifier", () => {
   const m = (s: string) => minifyCss(s);

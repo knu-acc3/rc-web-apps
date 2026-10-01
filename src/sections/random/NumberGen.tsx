@@ -9,7 +9,7 @@ import { CopyButton } from "@/ui/copy-button";
 import { Field, Input, Select, Switch } from "@/ui/field";
 import { Panel, PanelHeader } from "@/ui/panel";
 import { generateNumbers, MAX_COUNT, MAX_DECIMALS, numberGrid, type NumberError } from "./lib/numbers";
-import { HistoryPanel, pushHistory } from "./shared";
+import { HistoryPanel, pushHistory } from "./ui/shared";
 
 export interface NumberGenProps {
   locale: Locale;

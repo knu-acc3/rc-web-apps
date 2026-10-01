@@ -2,8 +2,8 @@ import { tr, type Locale } from "@/i18n/config";
 import { plural } from "@/i18n/format";
 import { defineToolSection } from "@/registry/tool-section";
 import type { Block, LinkItem, PageModel, SectionDef, ToolDef } from "@/registry/types";
-import { CAT_IDS, OBJECTS, toClient, type ObjDef } from "./objects";
-import { CATS, objectVariants } from "./pages";
+import { CAT_IDS, OBJECTS, toClient, type ObjDef } from "./data/objects";
+import { CATS, objectVariants } from "./content/pages";
 
 const ID = "actual-size";
 const HUE = 60;

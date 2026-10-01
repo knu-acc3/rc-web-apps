@@ -4,8 +4,8 @@ import { useId, useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { Field, Select } from "@/ui/field";
 import { buildSchema, missing, SCHEMA_TYPES, scriptTag, type SchemaType } from "./lib/jsonld";
-import { SCHEMA_FIELDS, SCHEMA_NAME } from "./schema-fields";
-import { FieldGrid, Issues, More, Output, type Fields } from "./ui";
+import { SCHEMA_FIELDS, SCHEMA_NAME } from "./content/schema-fields";
+import { FieldGrid, Issues, More, Output, type Fields } from "./ui/kit";
 
 const T = {
   ru: {

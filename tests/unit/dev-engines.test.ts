@@ -1,11 +1,11 @@
 import { describe, expect, it } from "vitest";
 import { base64ToBytes, utf8Encode } from "@/sections/code/kit/bytes";
-import { detectBot } from "@/sections/dev/bots";
-import { applySymbolic, fromSymbolic, notes, parseOctal, toChmodSymbolic, toOctal, toSymbolic, umask } from "@/sections/dev/chmod";
-import { parseCurl, shellSplit, toAxios, toFetch, toPython } from "@/sections/dev/curl";
-import { escapeCsv, escapeJs, escapeRegex, escapeShell, escapeSql, unescapeCsv, unescapeJs, unescapeShell, unescapeSql } from "@/sections/dev/escape";
-import { htmlToJsx, jsxAttrName, styleToObject } from "@/sections/dev/htmljsx";
-import { asymVerify, cleanToken, generateKeyPair, hmacSign, hmacVerify, parseJwt, parseKey, signJwt, timeStatus } from "@/sections/dev/jwt";
+import { detectBot } from "@/sections/dev/data/bots";
+import { applySymbolic, fromSymbolic, notes, parseOctal, toChmodSymbolic, toOctal, toSymbolic, umask } from "@/sections/dev/lib/chmod";
+import { parseCurl, shellSplit, toAxios, toFetch, toPython } from "@/sections/dev/lib/curl";
+import { escapeCsv, escapeJs, escapeRegex, escapeShell, escapeSql, unescapeCsv, unescapeJs, unescapeShell, unescapeSql } from "@/sections/dev/lib/escape";
+import { htmlToJsx, jsxAttrName, styleToObject } from "@/sections/dev/lib/htmljsx";
+import { asymVerify, cleanToken, generateKeyPair, hmacSign, hmacVerify, parseJwt, parseKey, signJwt, timeStatus } from "@/sections/dev/lib/jwt";
 
 describe("chmod", () => {
   it("octal ↔ symbolic incl. special bits", () => {

@@ -5,7 +5,7 @@ import type { Locale } from "@/i18n/config";
 import { CopyButton } from "@/ui/copy-button";
 import { Field, Input, Select } from "@/ui/field";
 import { buildUtm, parseUtm, utmWarnings, UTM_KEYS, type UtmKey, type UtmParams } from "./lib/utm";
-import { Issues } from "./ui";
+import { Issues } from "./ui/kit";
 
 export type UtmPreset = "" | "yandex" | "google" | "vk" | "telegram" | "email";
 

@@ -1,10 +1,10 @@
 import { createHash, createHmac, pbkdf2Sync, scryptSync } from "node:crypto";
 import { describe, expect, it } from "vitest";
 import { utf8Encode } from "@/sections/code/kit/bytes";
-import { ALGOS, algosForHexLength, HMACS } from "@/sections/hash/algorithms";
-import { algoFromTag, digestMatches, formatDigest, hashBlob, hashBytes, normalizeExpected, parseSums } from "@/sections/hash/engine";
-import { argon2Check, argon2Hash, bcryptCheck, bcryptHash, parsePbkdf2, parseScrypt, pbkdf2Check, pbkdf2Hash, pbkdf2Raw, scryptCheck, scryptHash, scryptRaw } from "@/sections/hash/kdf";
-import VECTORS from "@/sections/hash/vectors.json";
+import { ALGOS, algosForHexLength, HMACS } from "@/sections/hash/lib/algorithms";
+import { algoFromTag, digestMatches, formatDigest, hashBlob, hashBytes, normalizeExpected, parseSums } from "@/sections/hash/lib/engine";
+import { argon2Check, argon2Hash, bcryptCheck, bcryptHash, parsePbkdf2, parseScrypt, pbkdf2Check, pbkdf2Hash, pbkdf2Raw, scryptCheck, scryptHash, scryptRaw } from "@/sections/hash/lib/kdf";
+import VECTORS from "@/sections/hash/data/vectors.json";
 
 const u = (s: string) => utf8Encode(s);
 

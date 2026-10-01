@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { CATEGORIES, CATEGORY_BY_SLUG, DISAPPROVAL, EXTRA_TAGS, LENNY, SHRUG, TABLE_BACK, TABLE_FLIP, TOTAL } from "@/sections/kaomoji/data";
-import { searchKaomoji } from "@/sections/kaomoji/search";
+import { searchKaomoji } from "@/sections/kaomoji/lib/search";
 
 /** Duplicate check ignores all whitespace: "( ^ ω ^ )" and "(^ω^)" are the same kaomoji. */
 const norm = (s: string) => s.replace(/\s+/gu, "");

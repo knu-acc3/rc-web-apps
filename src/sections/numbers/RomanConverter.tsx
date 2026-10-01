@@ -8,8 +8,8 @@ import { CopyButton } from "@/ui/copy-button";
 import { Input, Switch } from "@/ui/field";
 import { Panel } from "@/ui/panel";
 import { num } from "./content/text";
-import { parseDecimalInput } from "./parse";
-import { BAR, parseRoman, partText, ROMAN_MAX, romanGlyphs, romanParts, toRoman, VINCULUM_MAX, type RomanIssue } from "./roman";
+import { parseDecimalInput } from "./lib/parse";
+import { BAR, parseRoman, partText, ROMAN_MAX, romanGlyphs, romanParts, toRoman, VINCULUM_MAX, type RomanIssue } from "./lib/roman";
 
 export interface RomanConverterProps {
   locale: Locale;

@@ -8,7 +8,7 @@ import { field, toInput } from "../../calc/kit/num";
 import { CalcGrid, Disclaimer, Explain, FieldRow, InlineToggle, NumField, OptionsRow, ResultMain, Stack, ToolActions } from "../../calc/kit/ui";
 import { useQueryState } from "../../calc/kit/url-state";
 import { whtrCategory } from "../engines/body";
-import { WHTR_LABEL } from "../labels";
+import { WHTR_LABEL } from "../lib/labels";
 
 const T = {
   ru: {

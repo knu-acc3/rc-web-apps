@@ -10,7 +10,7 @@ import { Field, Select, Switch, Textarea } from "@/ui/field";
 import { Panel, PanelHeader } from "@/ui/panel";
 import { shuffle } from "./lib/rng";
 import { splitIntoTeams, type Team } from "./lib/teams";
-import { parseLines } from "./shared";
+import { parseLines } from "./ui/shared";
 
 export interface TeamsProps {
   locale: Locale;

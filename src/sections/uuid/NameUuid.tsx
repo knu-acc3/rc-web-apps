@@ -7,7 +7,7 @@ import { CodeOutput } from "@/ui/code-output";
 import { CopyButton } from "@/ui/copy-button";
 import { Field, Input, Select, Switch, Textarea } from "@/ui/field";
 import { Panel } from "@/ui/panel";
-import { formatUuid, NAMESPACES, parseUuid, uuidNameBased, type NamespaceId } from "./engine";
+import { formatUuid, NAMESPACES, parseUuid, uuidNameBased, type NamespaceId } from "./lib/engine";
 
 const T = {
   ru: {

@@ -17,8 +17,8 @@ import {
   zonePath,
   type City,
   type Country,
-} from "../model";
-import type { ZonesTableProps, ZoneTimeProps } from "../types";
+} from "../lib/model";
+import type { ZonesTableProps, ZoneTimeProps } from "../lib/types";
 import { cityLink, home, HUE, hm } from "./common";
 import { pairsWith } from "./pair";
 

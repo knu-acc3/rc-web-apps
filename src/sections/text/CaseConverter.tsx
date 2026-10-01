@@ -5,7 +5,7 @@ import type { Locale } from "@/i18n/config";
 import { Checkbox } from "@/ui/field";
 import { Segmented } from "@/ui/segmented";
 import { CASE_IDS, convertCase, type CaseId } from "./lib/case";
-import { InputPanel, OptionsBar, OutputPanel, TwoPane } from "./shared";
+import { InputPanel, OptionsBar, OutputPanel, TwoPane } from "./ui/shared";
 
 const CASE_LABELS: Record<CaseId, { ru: string; en: string }> = {
   upper: { ru: "ВСЕ ЗАГЛАВНЫЕ", en: "UPPER CASE" },

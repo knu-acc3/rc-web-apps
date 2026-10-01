@@ -3,7 +3,7 @@
 import type { ToolProps } from "../types";
 import type { BitnessInfo, OsNote } from "./lib/ua";
 import { detectUa, useDetected } from "./lib/probe";
-import { COMMON, Facts, Hero, Hint, sourceLabel, Stack } from "./ui";
+import { COMMON, Facts, Hero, Hint, sourceLabel, Stack } from "./ui/kit";
 
 const T = {
   ru: {
