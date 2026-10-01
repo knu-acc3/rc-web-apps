@@ -6,6 +6,7 @@ import type { ComponentType } from "react";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const TOOL_COMPONENTS: Record<string, ComponentType<any>> = {
+  "about/clear-data": dynamic(() => import("@/sections/about/ClearData")),
   "actual-size/calibrate": dynamic(() => import("@/sections/actual-size/Calibrate")),
   "actual-size/object": dynamic(() => import("@/sections/actual-size/ObjectViewer")),
   "actual-size/protractor": dynamic(() => import("@/sections/actual-size/Protractor")),

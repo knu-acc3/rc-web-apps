@@ -3,6 +3,7 @@
 import { RotateCcw } from "lucide-react";
 import { useEffect, useId, useMemo, useRef, useState } from "react";
 import type { Locale } from "@/i18n/config";
+import { Presentable } from "@/ui/fullscreen";
 import { count, formatNumber } from "@/i18n/format";
 import { Button } from "@/ui/button";
 import { Field, Select } from "@/ui/field";
@@ -167,12 +168,12 @@ export default function Coin({ locale, coins: coins0 = 1 }: CoinProps) {
 
   return (
     <div className="flex flex-col gap-4">
-      <Panel className="flex flex-col items-center gap-5 p-4 sm:p-6">
+      <Presentable locale={locale} className="flex flex-col items-center gap-5 rounded-[0.75rem] border border-line bg-surface p-4 sm:p-6" fullClassName="rounded-none border-0 [&_.coin-one]:size-[min(60vw,45vh)]!">
         <div className="flex flex-wrap items-center justify-center gap-4 [perspective:900px]">
           {Array.from({ length: coins }, (_, i) => (
             <div
               key={i}
-              className={coins === 1 ? "relative size-40 sm:size-48" : "relative size-20 sm:size-24"}
+              className={coins === 1 ? "coin-one relative size-40 sm:size-48" : "relative size-20 sm:size-24"}
               style={{
                 transformStyle: "preserve-3d",
                 transform: `rotateX(${angles[i]}deg)`,
@@ -208,7 +209,7 @@ export default function Coin({ locale, coins: coins0 = 1 }: CoinProps) {
           </div>
           {!last && !flipping && <div className="text-sm text-fg-3">{t.idle}</div>}
         </div>
-      </Panel>
+      </Presentable>
 
       <div className="grid gap-4 md:grid-cols-2">
         <Panel>

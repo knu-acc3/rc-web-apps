@@ -3,6 +3,7 @@
 import { ArrowUpDown } from "lucide-react";
 import { useId, useRef, useState, type KeyboardEvent } from "react";
 import type { Locale } from "@/i18n/config";
+import { Presentable } from "@/ui/fullscreen";
 import { count as countOf, formatNumber, parseNumber } from "@/i18n/format";
 import { Button } from "@/ui/button";
 import { CopyButton } from "@/ui/copy-button";
@@ -170,13 +171,13 @@ export default function NumberGen({ locale, min = 1, max = 100, count = 1, decim
         </Button>
       </Panel>
 
-      <Panel>
+      <Presentable locale={locale} className="rounded-[0.75rem] border border-line bg-surface">
         <PanelHeader
           title={values && values.length > 1 ? `${t.results} · ${countOf(locale, values.length, t.values)}` : t.result}
           actions={values && <CopyButton value={text} label={t.copy} copiedLabel={t.copied} variant="ghost" />}
         />
         <div className="px-4 py-4">
-          <div aria-live="polite" className={values && values.length === 1 ? "tabular text-center text-5xl font-bold tracking-tight break-all text-fg sm:text-6xl" : "tabular max-h-80 overflow-y-auto text-lg leading-relaxed break-words text-fg scrollbar-thin"}>
+          <div aria-live="polite" className={values && values.length === 1 ? "fs-big tabular text-center text-5xl font-bold tracking-tight break-all text-fg sm:text-6xl" : "tabular max-h-80 overflow-y-auto text-lg leading-relaxed break-words text-fg scrollbar-thin"}>
             {error ? "" : text}
           </div>
           {error && (
@@ -186,7 +187,7 @@ export default function NumberGen({ locale, min = 1, max = 100, count = 1, decim
           )}
           {!values && !error && <p className="text-center text-sm text-fg-3">{t.idle}</p>}
         </div>
-      </Panel>
+      </Presentable>
 
       <HistoryPanel title={t.history} items={history} onClear={() => setHistory([])} clearLabel={t.clear} emptyLabel={t.empty} />
     </div>

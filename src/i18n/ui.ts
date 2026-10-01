@@ -74,6 +74,7 @@ const ru = {
   footerTheme: "Оформление",
   favorites: "Избранное",
   nextSteps: "Дальше",
+  family: "Похожие инструменты рядом",
 } as const;
 
 type UiDict = { [K in keyof typeof ru]: (typeof ru)[K] extends readonly string[] ? readonly string[] : string };
@@ -151,6 +152,7 @@ const en: UiDict = {
   footerTheme: "Theme",
   favorites: "Favourites",
   nextSteps: "Next",
+  family: "Neighbouring tools",
 };
 
 const DICTS: Record<Locale, UiDict> = { ru, en };

@@ -35,7 +35,7 @@ const DOCS: Record<string, Doc> = {
       ru: [
         "Инструменты сайта работают локально в вашем браузере. Тексты, файлы, изображения и документы, которые вы обрабатываете, не передаются на наши серверы и не сохраняются нами.",
         "Это не просто обещание: сайт отдаёт заголовок безопасности Content-Security-Policy, который технически запрещает страницам отправлять данные на другие сайты. Проверить легко: откройте инструмент и воспользуйтесь им один раз (чтобы браузер загрузил его код), затем отключите интернет, например режимом «В самолёте», — инструмент продолжит работать с новыми данными. На компьютере можно открыть инструменты разработчика (F12) → вкладка «Сеть» и убедиться, что при работе с вашими данными новых запросов нет.",
-        "Некоторые настройки (тема оформления, недавно открытые инструменты, заметки и списки задач) хранятся только в локальном хранилище вашего браузера. Вы можете удалить их, очистив данные сайта в браузере.",
+        "Некоторые настройки (тема оформления, недавно открытые инструменты, заметки и списки задач) хранятся только в локальном хранилище вашего браузера. Удалить их можно кнопкой на этой странице или очистив данные сайта в браузере.",
         "Чтобы открытые инструменты работали и без интернета, браузер сохраняет копии страниц и файлов самого сайта (код, шрифты, модули обработки). Ваши тексты, файлы и результаты туда не попадают. Копии удаляются вместе с данными сайта.",
         "Сервер сайта, как и любой веб-сервер, может вести технические журналы запросов (IP-адрес, адрес страницы, время) для обеспечения работы и защиты от злоупотреблений. Эти данные не используются для идентификации пользователей.",
         "Если на сайте включена веб-аналитика, она собирает обезличенную статистику посещений. Сторонние рекламные трекеры не используются.",
@@ -44,7 +44,7 @@ const DOCS: Record<string, Doc> = {
       en: [
         "The tools on this site run locally in your browser. Texts, files, images and documents you process are not sent to our servers and are not stored by us.",
         "This is not just a promise: the site sends a Content-Security-Policy header that technically forbids its pages to send data to other sites. It's easy to check: open a tool and use it once (so the browser loads its code), then switch off the internet, for example with airplane mode — the tool keeps working with new data. On a computer, open the developer tools (F12) → Network tab and see that no new requests are made while you work with your data.",
-        "Some preferences (theme, recently used tools, notes and to-do lists) are stored only in your browser's local storage. You can remove them by clearing site data in your browser.",
+        "Some preferences (theme, recently used tools, notes and to-do lists) are stored only in your browser's local storage. You can delete them with the button on this page or by clearing site data in your browser.",
         "So that tools you have opened keep working offline, your browser keeps copies of the site's own pages and files (code, fonts, processing modules). Your texts, files and results are never stored there. The copies are removed together with the site data.",
         "Like any web server, our server may keep technical request logs (IP address, page URL, time) to operate the service and prevent abuse. This data is not used to identify users.",
         "If web analytics is enabled, it collects anonymous visit statistics. No third-party advertising trackers are used.",
@@ -104,6 +104,8 @@ export const aboutSection: SectionDef = {
       description: tr(doc.description, locale),
       breadcrumbs: crumbs,
       blocks: [{ type: "text", paragraphs: doc.body[locale] }],
+      // The privacy page lets people see and delete what the site keeps on their device.
+      tool: key === "privacy" ? { id: "about/clear-data" } : undefined,
       schemaType: "WebPage",
     };
   },

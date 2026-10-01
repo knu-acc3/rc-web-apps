@@ -2,6 +2,7 @@
 
 import { useId, useMemo, useRef, useState } from "react";
 import type { Locale } from "@/i18n/config";
+import { Presentable } from "@/ui/fullscreen";
 import { formatNumber } from "@/i18n/format";
 import { cn } from "@/lib/cn";
 import { Button } from "@/ui/button";
@@ -176,7 +177,7 @@ export default function Dice({ locale, notation: notation0 = "1d6" }: DiceProps)
         </Button>
       </Panel>
 
-      <Panel className="flex flex-col items-center gap-4 p-4 sm:p-5">
+      <Presentable locale={locale} className="rounded-[0.75rem] border border-line bg-surface flex flex-col items-center gap-4 p-4 sm:p-5">
         {roll ? (
           <div className="flex max-w-full flex-wrap justify-center gap-2" aria-hidden>
             {roll.groups.flatMap((g, gi) => g.faces.map((f, i) => <DieFace key={`${gi}-${i}`} value={f} sides={g.sides} negative={g.sign < 0} />))}
@@ -191,12 +192,12 @@ export default function Dice({ locale, notation: notation0 = "1d6" }: DiceProps)
         )}
         <div className="text-center">
           <div className="text-[0.8125rem] font-medium text-fg-2">{t.total}</div>
-          <div aria-live="polite" className="tabular min-h-12 text-5xl font-bold tracking-tight text-fg">
+          <div aria-live="polite" className="fs-big tabular min-h-12 text-5xl font-bold tracking-tight text-fg">
             {roll ? formatNumber(locale, roll.total) : ""}
           </div>
           {roll?.detail && <div className="tabular mt-1 max-w-full text-sm break-words text-fg-3">{roll.detail}</div>}
         </div>
-      </Panel>
+      </Presentable>
 
       <HistoryPanel title={t.history} items={history} onClear={() => setHistory([])} clearLabel={t.clear} emptyLabel={t.empty} />
     </div>

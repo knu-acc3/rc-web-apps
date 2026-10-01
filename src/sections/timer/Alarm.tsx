@@ -9,7 +9,7 @@ import { Switch } from "@/ui/field";
 import { Notice } from "@/ui/panel";
 import { useStoredJson } from "@/sections/time/lib/storage";
 import { useNow } from "@/sections/time/lib/use-now";
-import { useWakeLock } from "@/sections/time/lib/use-fullscreen";
+import { useWakeLock } from "@/ui/stage";
 import { TimerOptions, useAlertOptions } from "./ui/TimerOptions";
 import { hasPlayed, schedule, unlockAudio, type Scheduled } from "./lib/audio";
 import { nextOccurrence } from "./lib/alarm";

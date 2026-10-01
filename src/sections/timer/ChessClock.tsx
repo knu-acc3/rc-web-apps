@@ -6,7 +6,7 @@ import type { Locale } from "@/i18n/config";
 import { cn } from "@/lib/cn";
 import { Button } from "@/ui/button";
 import { Select } from "@/ui/field";
-import { useWakeLock } from "@/sections/time/lib/use-fullscreen";
+import { useWakeLock } from "@/ui/stage";
 import { schedule, scheduleTick, unlockAudio } from "./lib/audio";
 import { clock } from "./lib/format";
 import { useKeys } from "./lib/keys";

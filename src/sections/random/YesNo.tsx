@@ -2,10 +2,10 @@
 
 import { useId, useRef, useState } from "react";
 import type { Locale } from "@/i18n/config";
+import { Presentable } from "@/ui/fullscreen";
 import { cn } from "@/lib/cn";
 import { Button } from "@/ui/button";
 import { Field, Input, Switch } from "@/ui/field";
-import { Panel } from "@/ui/panel";
 import { randomInt } from "./lib/rng";
 import { HistoryPanel, pushHistory } from "./ui/shared";
 
@@ -63,7 +63,7 @@ export default function YesNo({ locale, maybe: maybe0 = false }: YesNoProps) {
 
   return (
     <div className="flex flex-col gap-4">
-      <Panel className="flex flex-col items-center gap-5 p-4 sm:p-6">
+      <Presentable locale={locale} className="rounded-[0.75rem] border border-line bg-surface flex flex-col items-center gap-5 p-4 sm:p-6">
         <Field label={t.question} htmlFor={`${id}-q`} className="w-full">
           <Input
             id={`${id}-q`}
@@ -81,7 +81,7 @@ export default function YesNo({ locale, maybe: maybe0 = false }: YesNoProps) {
         <div
           aria-live="polite"
           className={cn(
-            "flex min-h-32 w-full items-center justify-center rounded-[1rem] text-6xl font-bold tracking-tight transition-colors duration-150 sm:min-h-40 sm:text-7xl",
+            "fs-big flex min-h-32 w-full items-center justify-center rounded-[1rem] text-6xl font-bold tracking-tight transition-colors duration-150 sm:min-h-40 sm:text-7xl",
             answer ? TONE[answer.a] : "bg-surface-2 text-fg-3",
           )}
         >
@@ -91,7 +91,7 @@ export default function YesNo({ locale, maybe: maybe0 = false }: YesNoProps) {
           {t.ask}
         </Button>
         <Switch label={t.maybe} checked={maybe} onChange={(e) => setMaybe(e.target.checked)} />
-      </Panel>
+      </Presentable>
       <HistoryPanel title={t.history} items={history} onClear={() => setHistory([])} clearLabel={t.clear} emptyLabel={t.empty} />
     </div>
   );

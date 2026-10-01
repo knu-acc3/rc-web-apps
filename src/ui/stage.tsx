@@ -12,7 +12,7 @@ import { cn } from "@/lib/cn";
  */
 
 /** Keep the screen on while `enabled` (Screen Wake Lock API; silently no-op when unsupported). */
-function useWakeLock(enabled: boolean) {
+export function useWakeLock(enabled: boolean) {
   useEffect(() => {
     if (!enabled) return;
     const nav = navigator as Navigator & { wakeLock?: { request(type: "screen"): Promise<{ release(): Promise<void> }> } };

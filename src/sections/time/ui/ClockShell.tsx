@@ -6,7 +6,8 @@ import type { Locale } from "@/i18n/config";
 import { cn } from "@/lib/cn";
 import { Button } from "@/ui/button";
 import { Kbd } from "@/ui/panel";
-import { useFullscreen, useWakeLock } from "../lib/use-fullscreen";
+import { useFullscreen } from "@/ui/fullscreen";
+import { useWakeLock } from "@/ui/stage";
 
 const T = {
   ru: { full: "На весь экран", exit: "Выйти", key: "клавиша" },

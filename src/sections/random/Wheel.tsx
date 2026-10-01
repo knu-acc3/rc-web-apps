@@ -1,13 +1,15 @@
 "use client";
 
-import { ChevronDown, RotateCcw, Shuffle, Undo2 } from "lucide-react";
+import { ChevronDown, Maximize, Minimize, RotateCcw, Shuffle, Undo2 } from "lucide-react";
 import { useEffect, useId, useMemo, useRef, useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { count } from "@/i18n/format";
 import { cn } from "@/lib/cn";
 import { Button } from "@/ui/button";
 import { Field, Switch, Textarea } from "@/ui/field";
+import { useFullscreen } from "@/ui/fullscreen";
 import { Panel } from "@/ui/panel";
+import { typingTarget, useWakeLock } from "@/ui/stage";
 import { pickWeighted, randomFloat, randomInt, shuffle } from "./lib/rng";
 import { prefersReducedMotion, readStored, removeStored, writeStored } from "./lib/storage";
 import { easeOutQuart, mod360, sectorsFromWeights, targetRotation, winnerAt } from "./lib/wheel";
@@ -29,6 +31,8 @@ const MAX_LABEL = 80;
 const T = {
   ru: {
     spin: "Крутить колесо",
+    full: "На весь экран",
+    exitFull: "Выйти из полноэкранного режима",
     spinning: "Крутится…",
     result: "Выпало",
     idle: "Нажмите «Крутить колесо»",
@@ -50,6 +54,8 @@ const T = {
   },
   en: {
     spin: "Spin the wheel",
+    full: "Full screen",
+    exitFull: "Exit full screen",
     spinning: "Spinning…",
     result: "Result",
     idle: "Press “Spin the wheel”",
@@ -253,11 +259,38 @@ export default function Wheel({ locale, preset, entries: presetEntries, colors }
   }
 
   const winnerStillThere = !!result && entries.some((e) => e.id === result.id);
+  const { ref: fsRef, active: full, toggle: toggleFull } = useFullscreen<HTMLDivElement>();
+  useWakeLock(full);
+  // Space or Enter spins (on a projector there is often only a keyboard or a clicker).
+  const spinRef = useRef(spin);
+  useEffect(() => {
+    spinRef.current = spin;
+  });
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if ((e.key !== " " && e.key !== "Enter") || e.ctrlKey || e.metaKey || e.altKey || typingTarget(e)) return;
+      if ((e.target as HTMLElement | null)?.closest("button, a, [role=radio], [role=switch]")) return;
+      e.preventDefault();
+      spinRef.current();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
 
   return (
     <div className="grid gap-4 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)]">
-      <Panel className="flex flex-col items-center gap-4 p-4 sm:p-5">
-        <div className="relative mt-3 aspect-square w-full max-w-[27.5rem]">
+      <Panel ref={fsRef} className={cn("relative flex flex-col items-center gap-4 p-4 sm:p-5", full && "justify-center rounded-none border-0")}>
+        <Button
+          size="icon-sm"
+          variant="ghost"
+          onClick={() => void toggleFull()}
+          aria-label={full ? t.exitFull : t.full}
+          title={full ? t.exitFull : t.full}
+          className="absolute right-2 top-2 z-10"
+        >
+          {full ? <Minimize aria-hidden /> : <Maximize aria-hidden />}
+        </Button>
+        <div className={cn("relative mt-3 aspect-square w-full", full ? "max-w-[min(70vh,92vw)]" : "max-w-[27.5rem]")}>
           <WheelPointer />
           {/* The wheel surface is a mouse shortcut; the button below is the accessible control. */}
           {/* Clip the rotating square so its corners never create page overflow. */}
@@ -270,7 +303,7 @@ export default function Wheel({ locale, preset, entries: presetEntries, colors }
         <Button variant="primary" size="lg" onClick={spin} disabled={spinning || entries.length < 2} className="w-full sm:w-auto sm:min-w-60">
           {spinning ? t.spinning : t.spin}
         </Button>
-        <div className="flex min-h-[5.25rem] w-full flex-col items-center justify-center gap-1 rounded-[0.625rem] bg-surface-2 px-4 py-3 text-center">
+        <div className={cn("flex min-h-[5.25rem] w-full flex-col items-center justify-center gap-1 rounded-[0.625rem] bg-surface-2 px-4 py-3 text-center", full && "max-w-xl")}>
           <div className="text-[0.8125rem] font-medium text-fg-2">{t.result}</div>
           <div aria-live="polite" className="min-h-8 text-2xl font-semibold break-words text-fg">
             {result && !spinning ? result.label : ""}

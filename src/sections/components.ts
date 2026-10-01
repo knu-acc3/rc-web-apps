@@ -1,4 +1,5 @@
 import type { ComponentMap } from "./types";
+import { components as about } from "./about/components";
 import { components as convert } from "./convert/components";
 import { components as pdf } from "./pdf/components";
 import { components as image } from "./image/components";
@@ -48,6 +49,7 @@ import { components as whatIsMy } from "./what-is-my/components";
 
 /** Tool component loaders, merged from every section. */
 export const COMPONENTS: ComponentMap = {
+  ...about,
   ...convert,
   ...pdf,
   ...image,

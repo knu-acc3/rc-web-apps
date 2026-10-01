@@ -8,7 +8,7 @@ import { downloadText } from "@/lib/clipboard";
 import { Button } from "@/ui/button";
 import { CopyButton } from "@/ui/copy-button";
 import { Kbd } from "@/ui/panel";
-import { useFullscreen } from "@/sections/time/lib/use-fullscreen";
+import { useFullscreen } from "@/ui/fullscreen";
 import { clock } from "./lib/format";
 import { useKeys } from "./lib/keys";
 import { nowMs } from "./lib/now";

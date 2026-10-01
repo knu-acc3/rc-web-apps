@@ -15,6 +15,7 @@ import { ToolMount } from "./tool-mount";
 import { RecentTracker } from "./recent-tracker";
 import { PageActions } from "./page-actions";
 import { Icon } from "@/ui/icon";
+import { FamilyTabs } from "./family-tabs";
 
 /**
  * Every page: a tinted "stage" in the section colour with the title and the tool (the one thing to look at),
@@ -49,12 +50,13 @@ export function PageView({ page, locale }: { page: PageModel; locale: Locale }) 
 
           {page.tool && (
             <div className={cn(centred && "mx-auto max-w-3xl")}>
+              {(page.kind === "tool" || page.kind === "variant") && <FamilyTabs slug={page.path[0]} locale={locale} />}
               <p className="js-note mb-4 rounded-[0.75rem] bg-warn-soft px-4 py-3 text-sm text-warn">
                 <TriangleAlert className="mr-1.5 inline size-4 align-[-3px]" aria-hidden />
                 {t.oldBrowser}
               </p>
               <ToolMount tool={page.tool} locale={locale} />
-              {page.kind !== "hub" && <RecentTracker path={page.path} title={page.h1} locale={locale} />}
+              {page.kind !== "hub" && page.kind !== "static" && <RecentTracker path={page.path} title={page.h1} locale={locale} />}
               {next.length > 0 && (
                 <nav aria-label={t.nextSteps} className={cn("mt-5 flex flex-wrap items-center gap-2", centred && "justify-center")}>
                   <span className="mr-1 text-sm font-medium text-fg-3">{t.nextSteps}:</span>
