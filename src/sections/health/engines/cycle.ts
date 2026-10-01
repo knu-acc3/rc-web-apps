@@ -4,7 +4,7 @@
  * same "adjusted LMP" = EDD − 280 days, so cycle length affects the due date and the age consistently.
  */
 
-export const TERM = 280;
+const TERM = 280;
 
 export type DatingMethod = "lmp" | "conception" | "ivf3" | "ivf5" | "ultrasound";
 
@@ -16,7 +16,7 @@ export const eddFromIvf = (transfer: number, embryoDay: 3 | 5) => transfer + (em
 /** Ultrasound dating: EDD = scan date + (280 − gestational age at the scan). */
 export const eddFromUltrasound = (scan: number, weeks: number, days: number) => scan + TERM - (weeks * 7 + days);
 
-export const adjustedLmp = (edd: number) => edd - TERM;
+const adjustedLmp = (edd: number) => edd - TERM;
 /** Gestational age in days on `today`. */
 export const gestationalAge = (edd: number, today: number) => today - adjustedLmp(edd);
 export const splitWeeks = (days: number) => ({ weeks: Math.floor(days / 7), days: ((days % 7) + 7) % 7 });
@@ -35,7 +35,7 @@ export function pregnancyMonth(week: number): number {
   return i === -1 ? 9 : i + 1;
 }
 
-export interface KeyDates {
+interface KeyDates {
   conception: number;
   endT1: number;
   endT2: number;

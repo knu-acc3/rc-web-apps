@@ -16,8 +16,8 @@ export interface Env {
   resample?(src: AnyCanvas, dw: number, dh: number): Promise<AnyCanvas>;
 }
 
-export const MAX_SIDE = 32767;
-export const MAX_AREA = 268_000_000;
+const MAX_SIDE = 32767;
+const MAX_AREA = 268_000_000;
 
 export function ctx2d(c: AnyCanvas): Ctx2D {
   const ctx = c.getContext("2d") as Ctx2D | null;
@@ -400,7 +400,7 @@ function drawWatermark(ctx: Ctx2D, W: number, H: number, wm: WatermarkSpec, env:
 /* ───────────── text ───────────── */
 
 /** Split text into lines that fit `maxWidth` (words; very long words are broken). */
-export function wrapLines(ctx: Ctx2D, text: string, maxWidth: number): string[] {
+function wrapLines(ctx: Ctx2D, text: string, maxWidth: number): string[] {
   const out: string[] = [];
   for (const para of text.split(/\r?\n/)) {
     const words = para.split(/\s+/).filter(Boolean);

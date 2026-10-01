@@ -4,7 +4,7 @@
  * that (the old editor silently mapped every extra colour to index 0).
  */
 
-export interface IndexedFrame {
+interface IndexedFrame {
   index: Uint8Array;
   palette: number[][];
   transparentIndex: number;

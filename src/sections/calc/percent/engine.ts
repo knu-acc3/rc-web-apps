@@ -11,10 +11,6 @@ export const PERCENT_MODES = [
 ] as const;
 export type PercentMode = (typeof PERCENT_MODES)[number];
 
-export function isPercentMode(v: string): v is PercentMode {
-  return (PERCENT_MODES as readonly string[]).includes(v);
-}
-
 /** Default inputs per mode (a, b) — also used for SSR of the variant pages. */
 export const PERCENT_DEFAULTS: Record<PercentMode, [number, number]> = {
   "x-percent-of-y": [15, 200],
@@ -26,7 +22,7 @@ export const PERCENT_DEFAULTS: Record<PercentMode, [number, number]> = {
   "percentage-points": [12, 16],
 };
 
-export type PercentResult =
+type PercentResult =
   | { ok: true; value: number; unit: "num" | "pct" | "pp"; relative?: number; delta?: number }
   | { ok: false; error: "div0" };
 

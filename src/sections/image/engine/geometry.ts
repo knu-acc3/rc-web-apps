@@ -27,7 +27,7 @@ export interface ResizeSpec {
   allowUpscale?: boolean;
 }
 
-export interface ResizePlan {
+interface ResizePlan {
   /** Output canvas size */
   w: number;
   h: number;
@@ -110,11 +110,6 @@ export function planResize(srcW: number, srcH: number, spec: ResizeSpec): Resize
 /** Millimetres → pixels at a DPI. */
 export function mmToPx(mm: number, dpi: number): number {
   return Math.round((mm / 25.4) * dpi);
-}
-
-/** Pixels → centimetres at a DPI. */
-export function pxToCm(px: number, dpi: number): number {
-  return (px / dpi) * 2.54;
 }
 
 /** Greatest common divisor, for aspect labels. */

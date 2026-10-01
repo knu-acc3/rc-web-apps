@@ -9,7 +9,7 @@ import { Segmented } from "@/ui/segmented";
 import { Tabs } from "@/ui/tabs";
 import { CHECKER_STYLE } from "@/sections/color/ui/ColorField";
 
-export type StageBg = "light" | "dark" | "checker";
+type StageBg = "light" | "dark" | "checker";
 
 const STAGE_T = {
   ru: { bg: "Фон превью", light: "Светлый", dark: "Тёмный", checker: "Шахматка" },
@@ -75,7 +75,7 @@ const CODE_T = {
   en: { copy: "Copy", copied: "Copied", download: "Download", code: "Code" },
 } as const;
 
-export interface CodeTab {
+interface CodeTab {
   id: string;
   label: string;
   code: string;

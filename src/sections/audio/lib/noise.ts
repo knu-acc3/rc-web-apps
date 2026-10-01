@@ -9,14 +9,31 @@
 export type NoiseColor = "white" | "pink" | "brown" | "blue" | "violet";
 export const NOISE_COLORS: readonly NoiseColor[] = ["white", "pink", "brown", "blue", "violet"];
 
-/** Plain ES2017 source of the generator class `NoiseCore` (no imports, no closures). */
-export const NOISE_CORE_SRC = `
+/**
+ * The generator. Plain code with no imports or closures: the AudioWorklet module gets its source text
+ * (`NoiseCore.toString()`), so the same class runs in the worklet, on the main thread and in tests — and no
+ * `eval`/`new Function` is needed (the Content Security Policy forbids them).
+ */
 class NoiseCore {
-  constructor(color, seed) {
+  // `declare`: no class-field code is emitted, so the compiled class needs no helpers outside its own text.
+  declare s: number;
+  declare color: NoiseColor;
+  declare b0: number;
+  declare b1: number;
+  declare b2: number;
+  declare b3: number;
+  declare b4: number;
+  declare b5: number;
+  declare b6: number;
+  declare brown: number;
+  declare prevW: number;
+  declare prevP: number;
+
+  constructor(color: NoiseColor, seed: number) {
     this.s = (seed >>> 0) || 0x9e3779b9;
     this.setColor(color);
   }
-  setColor(color) {
+  setColor(color: NoiseColor) {
     this.color = color;
     this.b0 = this.b1 = this.b2 = this.b3 = this.b4 = this.b5 = this.b6 = 0;
     this.brown = 0;
@@ -32,7 +49,7 @@ class NoiseCore {
     this.s = x >>> 0;
     return this.s / 2147483648 - 1;
   }
-  pink(w) {
+  pink(w: number): number {
     // Paul Kellet's refined pink filter (accurate to ±0.05 dB above 9.2 Hz at 44.1 kHz)
     this.b0 = 0.99886 * this.b0 + w * 0.0555179;
     this.b1 = 0.99332 * this.b1 + w * 0.0750759;
@@ -44,7 +61,7 @@ class NoiseCore {
     this.b6 = w * 0.115926;
     return out * 0.11;
   }
-  next() {
+  next(): number {
     const w = this.rand();
     switch (this.color) {
       case "pink":
@@ -71,14 +88,14 @@ class NoiseCore {
         return w * 0.35;
     }
   }
-  fill(arr) {
+  fill(arr: Float32Array) {
     for (let i = 0; i < arr.length; i++) arr[i] = this.next();
   }
 }
-`;
 
 /** AudioWorklet module source: stereo noise with independent channels. */
-export const NOISE_WORKLET_SRC = `${NOISE_CORE_SRC}
+// A class expression bound to the name: the minifier may rename the class itself.
+export const NOISE_WORKLET_SRC = `const NoiseCore = (${NoiseCore.toString()});
 class NoiseProcessor extends AudioWorkletProcessor {
   constructor(options) {
     super();
@@ -103,19 +120,9 @@ class NoiseProcessor extends AudioWorkletProcessor {
 registerProcessor("noise-generator", NoiseProcessor);
 `;
 
-export interface NoiseCore {
-  setColor(color: NoiseColor): void;
-  next(): number;
-  fill(arr: Float32Array): void;
-}
-
-type NoiseCoreCtor = new (color: NoiseColor, seed: number) => NoiseCore;
-let ctor: NoiseCoreCtor | null = null;
-
 /** Instantiate the generator on the main thread (tests, ScriptProcessor fallback). */
 export function createNoise(color: NoiseColor, seed: number): NoiseCore {
-  ctor ??= new Function(`${NOISE_CORE_SRC}; return NoiseCore;`)() as NoiseCoreCtor;
-  return new ctor(color, seed);
+  return new NoiseCore(color, seed);
 }
 
 /** Spectral slope of each colour in dB per octave. */

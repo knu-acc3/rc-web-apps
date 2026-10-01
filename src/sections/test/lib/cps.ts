@@ -15,7 +15,7 @@ export function roundCps(v: number): number {
   return Math.round(v * 100) / 100;
 }
 
-export type CpsRank = "relaxed" | "casual" | "average" | "fast" | "very-fast" | "butterfly" | "superhuman";
+type CpsRank = "relaxed" | "casual" | "average" | "fast" | "very-fast" | "butterfly" | "superhuman";
 
 /** Lower bound (inclusive) of each rank, ascending. */
 export const CPS_RANKS: readonly { id: CpsRank; min: number }[] = [

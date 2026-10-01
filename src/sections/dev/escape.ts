@@ -1,6 +1,3 @@
-/** String escaping for common targets, both directions where meaningful. */
-
-export type EscapeTarget = "js" | "json" | "sql" | "regex" | "html" | "shell" | "csv" | "xml";
 
 export function escapeJs(s: string, quote: "'" | '"' | "`" = '"'): string {
   let out = "";

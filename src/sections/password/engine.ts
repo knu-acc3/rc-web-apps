@@ -17,7 +17,7 @@ export function randomInt(n: number, rng: RandomSource): number {
   }
 }
 
-export function pick<T>(items: readonly T[], rng: RandomSource): T {
+function pick<T>(items: readonly T[], rng: RandomSource): T {
   return items[randomInt(items.length, rng)];
 }
 
@@ -177,7 +177,7 @@ export function toBase64(bytes: Uint8Array, url = false): string {
   return url ? s.replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "") : s;
 }
 
-export interface PassphraseOptions {
+interface PassphraseOptions {
   words: number;
   separator: string;
   capitalize: boolean;
@@ -201,10 +201,10 @@ export function passphraseEntropy(listSize: number, o: PassphraseOptions): numbe
 
 /* ───── pronounceable ("memorable") passwords ───── */
 
-export const CONSONANTS = "bdfghjklmnprstvz";
-export const VOWELS = "aeiou";
+const CONSONANTS = "bdfghjklmnprstvz";
+const VOWELS = "aeiou";
 
-export interface MemorableOptions {
+interface MemorableOptions {
   words: number;
   syllables: number;
   digits: number;

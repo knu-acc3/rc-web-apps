@@ -23,7 +23,7 @@ export function parseMac(input: string): { ok: true; bytes: number[] } | { ok: f
 
 const h2 = (b: number) => b.toString(16).padStart(2, "0");
 
-export interface MacFormats {
+interface MacFormats {
   colon: string;
   hyphen: string;
   cisco: string;
@@ -42,7 +42,7 @@ export function macFormats(bytes: number[], upper = false): MacFormats {
   };
 }
 
-export interface MacBits {
+interface MacBits {
   /** I/G bit: 1 = group (multicast) address */
   multicast: boolean;
   /** U/L bit: 1 = locally administered */

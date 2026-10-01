@@ -1,7 +1,7 @@
 /* Keyword density: tokenisation with ё→е, RU/EN stop words, light stemming and 1–3-grams
    that never cross sentence boundaries or start/end with a stop word. */
 
-export const STOP_RU = new Set(
+const STOP_RU = new Set(
   (
     "а без более бы был была были было быть в вам вас ведь весь во вот все всё всего всех вы где да даже для до его ее её ей ему если есть еще ещё же за и из или им их к как какая какой когда кто ли либо мне может мы на над надо наш не него нее неё нет ни них но ну о об однако он она они оно от очень по под после при про раз с свой свою себя со так также такой там те тем то того тоже той только том ты у уже хотя чего чей чем что чтобы чье эта эти это этого этой этом этот я ваш ваша ваше ваши будет будут может можно нужно тот та тех этих всем всеми между через потому поэтому где-то кто-то что-то тоже здесь тут него нам нас им ими ему ей её вами тебе тебя себе меня мой моя мое моё мои твой твоя твое твоё твои наша наше наши который которая которое которые которых котором которой которого"
   )
@@ -9,13 +9,13 @@ export const STOP_RU = new Set(
     .map((w) => w.replace(/ё/g, "е")),
 );
 
-export const STOP_EN = new Set(
+const STOP_EN = new Set(
   "a about above after again against all am an and any are as at be because been before being below between both but by can could did do does doing down during each few for from further had has have having he her here hers herself him himself his how i if in into is it its itself just me more most my myself no nor not now of off on once only or other our ours ourselves out over own same she should so some such than that the their theirs them themselves then there these they this those through to too under until up very was we were what when where which while who whom why will with would you your yours yourself yourselves also may might must shall one ones us let get got".split(
     " ",
   ),
 );
 
-export function isStop(w: string): boolean {
+function isStop(w: string): boolean {
   return STOP_RU.has(w) || STOP_EN.has(w);
 }
 
@@ -56,13 +56,13 @@ export function tokenize(text: string): string[][] {
     .filter((s) => s.length);
 }
 
-export interface Phrase {
+interface Phrase {
   phrase: string;
   count: number;
   density: number;
 }
 
-export interface Analysis {
+interface Analysis {
   words: number;
   unique: number;
   stopShare: number;

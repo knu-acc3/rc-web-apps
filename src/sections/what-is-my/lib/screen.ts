@@ -2,7 +2,7 @@
  * Pure screen / display helpers (no DOM access) — safe on the server and in unit tests.
  */
 
-export interface NamedResolution {
+interface NamedResolution {
   /** Landscape width in physical pixels. */
   w: number;
   h: number;
@@ -41,7 +41,7 @@ export const RESOLUTIONS: readonly NamedResolution[] = [
 
 const isInt = (x: number) => Math.abs(x - Math.round(x)) < 1e-6;
 
-export interface PhysicalSize {
+interface PhysicalSize {
   w: number;
   h: number;
   /** True when the value had to be rounded or snapped (fractional scaling). */
@@ -72,7 +72,7 @@ export function physicalSize(cssW: number, cssH: number, dpr: number): PhysicalS
   return { w: Math.round(rw), h: Math.round(rh), approx: !exact };
 }
 
-export interface ResolutionName {
+interface ResolutionName {
   name: string;
   alias?: string;
   /** True for an exact well-known resolution, false for a size class estimate. */
@@ -127,7 +127,7 @@ const COMMON_RATIOS: readonly [string, number][] = [
   ["32:9", 32 / 9],
 ];
 
-export interface AspectRatio {
+interface AspectRatio {
   /** Reduced fraction, e.g. "683:384". */
   exact: string;
   /** Nearest marketing ratio within 2.5 %, e.g. "16:9" (orientation preserved). */
@@ -154,7 +154,7 @@ export function aspectRatio(w: number, h: number): AspectRatio {
   return { exact, common: label };
 }
 
-export type BreakpointSystem = "tailwind" | "bootstrap";
+type BreakpointSystem = "tailwind" | "bootstrap";
 
 const BREAKPOINTS: Record<BreakpointSystem, readonly [string, number][]> = {
   tailwind: [
@@ -186,8 +186,8 @@ export function breakpoint(width: number, system: BreakpointSystem): string {
 /* ───────────── DPI / PPI ───────────── */
 
 /** CSS reference resolution: 1 CSS inch = 96 CSS px. */
-export const CSS_DPI = 96;
-export const MM_PER_INCH = 25.4;
+const CSS_DPI = 96;
+const MM_PER_INCH = 25.4;
 
 /** "Logical" DPI the OS uses for scaling (NOT the physical pixel density). */
 export function logicalDpi(dpr: number): number {
@@ -219,7 +219,7 @@ export const CALIBRATION_KEY = "actual-size:calibration";
 /** devicePixelRatio at calibration time: {"at": <same as calibration.at>, "dpr": number}. */
 export const CALIBRATION_DPR_KEY = "actual-size:calibration-dpr";
 
-export interface Calibration {
+interface Calibration {
   v: 1;
   /** CSS pixels per physical millimetre. */
   pxPerMm: number;

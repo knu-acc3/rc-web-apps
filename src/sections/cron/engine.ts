@@ -227,7 +227,7 @@ function dowMatches(f: ParsedField, y: number, M: number, d: number): boolean {
  * bit sets — so "*∕2" still restricts days); if both are restricted, EITHER may match (OR).
  * Quartz: exactly one of them is "?", only the other one counts.
  */
-export function dayMatches(e: CronExpr, y: number, M: number, d: number): boolean {
+function dayMatches(e: CronExpr, y: number, M: number, d: number): boolean {
   const { dom, dow } = e.fields;
   if (e.dialect === "quartz") return dom.raw === "?" ? dowMatches(dow, y, M, d) : domMatches(dom, y, M, d);
   const a = domMatches(dom, y, M, d);
@@ -238,7 +238,7 @@ export function dayMatches(e: CronExpr, y: number, M: number, d: number): boolea
 const nextIn = (vals: number[], from: number) => vals.find((v) => v >= from);
 
 /** Next matching wall time ≥ `w` (inclusive), or null within `maxYears`. */
-export function nextWall(e: CronExpr, w: Wall, maxYears = 30): Wall | null {
+function nextWall(e: CronExpr, w: Wall, maxYears = 30): Wall | null {
   const F = e.fields;
   let { y, M, d, h, m, s } = w;
   const yearOk = (yy: number) => F.year.star || F.year.values.includes(yy);
@@ -349,7 +349,7 @@ function addSecond(w: Wall): Wall {
   return { y: t.getUTCFullYear(), M: t.getUTCMonth() + 1, d: t.getUTCDate(), h: t.getUTCHours(), m: t.getUTCMinutes(), s: t.getUTCSeconds() };
 }
 
-export interface Run {
+interface Run {
   ms: number;
   wall: Wall;
   gap?: boolean;

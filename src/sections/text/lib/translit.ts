@@ -120,7 +120,7 @@ interface StandardDef {
   ascii: boolean;
 }
 
-export const STANDARDS: Record<StandardId, StandardDef> = {
+const STANDARDS: Record<StandardId, StandardDef> = {
   "gost-a": { tables: { ru: GOST_A, uk: GOST_A, kk: GOST_A }, fallback: KK_LATIN, reversible: true, ascii: false },
   "gost-b": { tables: { ru: GOST_B, uk: GOST_B_UK, kk: GOST_B }, fallback: KK_ASCII, reversible: true, ascii: true },
   icao: { tables: { ru: ICAO, uk: ICAO, kk: ICAO }, fallback: KK_ASCII, reversible: false, ascii: true },
@@ -158,7 +158,7 @@ const isUpperLetter = (c: string | undefined) => !!c && c !== c.toLowerCase() &&
 const isLowerLetter = (c: string | undefined) => !!c && c !== c.toUpperCase() && c === c.toLowerCase();
 const isLetter = (c: string | undefined) => !!c && /[\p{L}\p{M}'’ʼ]/u.test(c);
 
-export interface TranslitOptions {
+interface TranslitOptions {
   lang?: LangOption;
 }
 
@@ -303,7 +303,7 @@ const SLUG_RU: Table = {
 
 const LATIN_FOLD: Record<string, string> = { ß: "ss", æ: "ae", œ: "oe", ø: "o", ł: "l", đ: "d", ð: "d", þ: "th", ı: "i", ħ: "h" };
 
-export interface SlugOptions {
+interface SlugOptions {
   lang?: LangOption;
   separator?: "-" | "_";
   /** Cut at a word boundary to at most this many characters (0 = no limit). */

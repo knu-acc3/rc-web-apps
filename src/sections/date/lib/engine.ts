@@ -2,12 +2,12 @@
  * Date calculators: age, differences, adding periods, Unix time, durations and
  * work hours. Pure functions over civil dates (see calendar/lib/dates).
  */
-import { addDays, addMonths, addYears, cmpYmd, dayNumOf, diffDays, isoWeekday, isLeap, type Ymd } from "@/sections/calendar/lib/dates";
+import { addDays, addMonths, addYears, cmpYmd, diffDays, isoWeekday, isLeap, type Ymd } from "@/sections/calendar/lib/dates";
 import { addWorkingDays, countWorkingDays, type HolidayCountry } from "@/sections/calendar/lib/holidays";
 
 /* ───────────── age ───────────── */
 
-export interface Age {
+interface Age {
   years: number;
   months: number;
   days: number;
@@ -23,7 +23,7 @@ export interface Age {
 }
 
 /** Anniversary of `birth` in `year`, clamping Feb 29 to Feb 28 in common years. */
-export function anniversary(birth: Ymd, year: number): Ymd {
+function anniversary(birth: Ymd, year: number): Ymd {
   if (birth.m === 2 && birth.d === 29 && !isLeap(year)) return { y: year, m: 2, d: 28 };
   return { y: year, m: birth.m, d: birth.d };
 }
@@ -62,7 +62,7 @@ export function age(birth: Ymd, on: Ymd): Age | null {
 
 /* ───────────── differences ───────────── */
 
-export interface Difference {
+interface Difference {
   /** Signed calendar days b − a. */
   days: number;
   /** Days counting both ends (|days| + 1). */
@@ -116,13 +116,12 @@ export function addPeriod(from: Ymd, n: number, unit: AddUnit, country: HolidayC
 }
 
 export const weekdayOf = (x: Ymd): number => isoWeekday(x.y, x.m, x.d);
-export const epochDay = dayNumOf;
 
 /* ───────────── Unix time ───────────── */
 
 export type TsUnit = "s" | "ms" | "us" | "ns";
 
-export interface ParsedTs {
+interface ParsedTs {
   /** Milliseconds since the epoch (may be fractional for µs/ns). */
   ms: number;
   unit: TsUnit;

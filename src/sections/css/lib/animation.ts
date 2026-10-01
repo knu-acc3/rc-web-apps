@@ -1,6 +1,6 @@
 import { round } from "./tokens";
 
-export interface AnimPreset {
+interface AnimPreset {
   slug: string;
   /** Keyframe blocks inside @keyframes { … } */
   keyframes: string;

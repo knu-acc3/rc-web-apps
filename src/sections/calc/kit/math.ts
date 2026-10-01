@@ -20,6 +20,3 @@ export function toMinor(n: number): number {
   return Math.sign(n) * Math.round(Number((Math.abs(n) * 100).toPrecision(15))) || 0;
 }
 
-export function clamp(n: number, lo: number, hi: number): number {
-  return Math.min(hi, Math.max(lo, n));
-}

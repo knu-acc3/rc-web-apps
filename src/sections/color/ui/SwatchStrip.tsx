@@ -7,7 +7,7 @@ import { copyText } from "@/lib/clipboard";
 import { readableTextColor, toHex, type Color } from "../lib/color";
 import { CHECKER_STYLE } from "./ColorField";
 
-export interface StripItem {
+interface StripItem {
   color: Color;
   /** Small caption above the hex (e.g. "50", "+30°"). */
   caption?: string;

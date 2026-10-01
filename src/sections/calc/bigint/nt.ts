@@ -2,7 +2,7 @@
 
 export const babs = (a: bigint) => (a < 0n ? -a : a);
 
-export interface EuclidStep {
+interface EuclidStep {
   a: bigint;
   b: bigint;
   q: bigint;
@@ -49,7 +49,7 @@ export function parseIntList(text: string): { values: bigint[]; invalid: string[
 
 /* ───────────── primality ───────────── */
 
-export function modpow(base: bigint, exp: bigint, mod: bigint): bigint {
+function modpow(base: bigint, exp: bigint, mod: bigint): bigint {
   let r = 1n;
   let b = base % mod;
   let e = exp;

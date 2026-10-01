@@ -7,7 +7,7 @@ import { KZ, type SalaryBreakdown, type SalaryYear } from "../engines/salary-kz"
 export const tg = (locale: Locale, v: number) => `${formatNumber(locale, v, { maximumFractionDigits: 0 })} ₸`;
 const pct = (locale: Locale, r: number) => `${formatNumber(locale, r * 100, { maximumFractionDigits: 2 })}${locale === "ru" ? " %" : "%"}`;
 
-export interface LineItem {
+interface LineItem {
   key: string;
   label: string;
   /** Short explanation of the base and rate. */

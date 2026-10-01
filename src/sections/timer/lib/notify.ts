@@ -4,7 +4,7 @@ import { useEffect, useRef, useSyncExternalStore } from "react";
 
 /* ───────────── browser notifications (permission on demand) ───────────── */
 
-export function notificationsSupported(): boolean {
+function notificationsSupported(): boolean {
   return typeof window !== "undefined" && "Notification" in window;
 }
 

@@ -16,7 +16,7 @@ export function useWorkerClient(factory: () => Worker): WorkerClient {
   return client;
 }
 
-export interface LiveState<R> {
+interface LiveState<R> {
   /** Result for the current key (undefined while pending or on error). */
   value: R | undefined;
   /** Error for the current key. */

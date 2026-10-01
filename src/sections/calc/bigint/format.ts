@@ -15,7 +15,7 @@ export function fmtBig(locale: Locale, n: bigint): string {
 }
 
 const SUP: Record<string, string> = { "0": "⁰", "1": "¹", "2": "²", "3": "³", "4": "⁴", "5": "⁵", "6": "⁶", "7": "⁷", "8": "⁸", "9": "⁹" };
-export const sup = (n: number | bigint) => String(n).split("").map((c) => SUP[c] ?? c).join("");
+const sup = (n: number | bigint) => String(n).split("").map((c) => SUP[c] ?? c).join("");
 
 /** "2³ · 3² · 5" */
 export function factorText(f: [bigint, number][]): string {

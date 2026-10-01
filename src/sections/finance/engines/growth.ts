@@ -7,7 +7,7 @@
 
 export type Compounding = "yearly" | "semiannual" | "quarterly" | "monthly" | "daily" | "continuous";
 export const COMPOUNDINGS: readonly Compounding[] = ["yearly", "semiannual", "quarterly", "monthly", "daily", "continuous"];
-export const PERIODS_PER_YEAR: Record<Exclude<Compounding, "continuous">, number> = { yearly: 1, semiannual: 2, quarterly: 4, monthly: 12, daily: 365 };
+const PERIODS_PER_YEAR: Record<Exclude<Compounding, "continuous">, number> = { yearly: 1, semiannual: 2, quarterly: 4, monthly: 12, daily: 365 };
 
 /** Monthly growth factor for a nominal annual rate (percent) compounded `comp` times a year. */
 export function monthlyFactor(ratePct: number, comp: Compounding = "monthly"): number {
@@ -18,13 +18,13 @@ export function monthlyFactor(ratePct: number, comp: Compounding = "monthly"): n
 }
 
 /** Monthly factor from an effective annual return (percent), e.g. 7 % a year → 1.07^(1/12). */
-export function monthlyFromAnnual(ratePct: number): number {
+function monthlyFromAnnual(ratePct: number): number {
   return Math.pow(1 + ratePct / 100, 1 / 12);
 }
 
 /* ───────────── Compound interest ───────────── */
 
-export interface CompoundInput {
+interface CompoundInput {
   principal: number;
   rate: number;
   years: number;
@@ -35,7 +35,7 @@ export interface CompoundInput {
   timing?: "start" | "end";
 }
 
-export interface YearRow {
+interface YearRow {
   year: number;
   /** Cumulative money put in (principal + contributions). */
   invested: number;
@@ -44,7 +44,7 @@ export interface YearRow {
   balance: number;
 }
 
-export interface CompoundResult {
+interface CompoundResult {
   rows: YearRow[];
   final: number;
   invested: number;
@@ -78,7 +78,7 @@ export function compound(input: CompoundInput): CompoundResult {
 
 /* ───────────── Investment ───────────── */
 
-export interface InvestInput {
+interface InvestInput {
   initial: number;
   monthly: number;
   /** Yearly increase of the monthly contribution, percent. */
@@ -92,7 +92,7 @@ export interface InvestInput {
   years: number;
 }
 
-export interface InvestRow extends YearRow {
+interface InvestRow extends YearRow {
   /** Balance in today's money. */
   real: number;
 }
@@ -116,7 +116,7 @@ export function invest(input: InvestInput): { rows: InvestRow[]; final: number; 
 
 /* ───────────── Retirement ───────────── */
 
-export interface RetirementInput {
+interface RetirementInput {
   age: number;
   retireAge: number;
   endAge: number;
@@ -132,7 +132,7 @@ export interface RetirementInput {
   income: number;
 }
 
-export interface RetirementResult {
+interface RetirementResult {
   /** Balance at retirement (nominal). */
   nestEgg: number;
   /** Nest egg in today's money. */

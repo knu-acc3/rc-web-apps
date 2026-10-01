@@ -46,6 +46,9 @@ function decoder(encoding: string) {
   return (bytes: Uint8Array | number[]) => td.decode(bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes));
 }
 
+/** Largest single file we unpack in the browser (declared size). */
+const MAX_EXTRACT = 2 * 1024 ** 3;
+
 scope.onmessage = async (e) => {
   const m = e.data;
   try {
@@ -69,6 +72,9 @@ scope.onmessage = async (e) => {
     } else if (m.op === "extract") {
       const f = opened?.file(m.path);
       if (!f) throw new Error("NOT_FOUND");
+      // A "zip bomb" entry can claim gigabytes; the tab would run out of memory instead of failing cleanly.
+      const size = (f as unknown as { _data?: { uncompressedSize?: number } })._data?.uncompressedSize ?? 0;
+      if (size > MAX_EXTRACT) throw new Error("TOO_BIG");
       const blob = await f.async("blob", (meta) => scope.postMessage({ id: m.id, progress: meta.percent / 100 }));
       scope.postMessage({ id: m.id, done: blob });
     }

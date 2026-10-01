@@ -3,7 +3,7 @@ import { div, isZero, type Q } from "./rational";
 
 /** Linear systems 2×2 and 3×3 by Cramer's rule (exact), with a rank check for singular systems. */
 
-export type SystemResult =
+type SystemResult =
   | { kind: "one"; x: Q[]; D: Q; Di: Q[] }
   | { kind: "none"; D: Q }
   | { kind: "infinite"; D: Q; rank: number };

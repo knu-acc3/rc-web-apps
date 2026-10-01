@@ -8,7 +8,6 @@
  */
 
 export type ClothingChart = "women-tops" | "women-bottoms" | "men-tops" | "men-bottoms" | "men-shirts";
-export const CLOTHING_CHARTS: ClothingChart[] = ["women-tops", "women-bottoms", "men-tops", "men-bottoms", "men-shirts"];
 
 export interface WomenRow {
   ru: number;
@@ -38,7 +37,7 @@ export interface MenRow {
   w: number;
 }
 
-export interface ShirtRow {
+interface ShirtRow {
   collar: number;
   collarIn: number;
   int: string;

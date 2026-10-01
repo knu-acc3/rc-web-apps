@@ -1,5 +1,5 @@
 /** Material Design 2 color palette (2014–2018 guidelines): 19 families, 50–900 plus A100–A700 accents. */
-export interface MaterialFamily {
+interface MaterialFamily {
   slug: string;
   name: string;
   shades: Readonly<Record<string, string>>;

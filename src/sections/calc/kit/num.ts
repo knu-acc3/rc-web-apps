@@ -10,7 +10,7 @@ import { formatNumber, formatSmart, parseNumber } from "@/i18n/format";
 
 export type NumErr = "nan" | "min" | "max" | "int" | "gt";
 
-export interface NumOpts {
+interface NumOpts {
   /** Inclusive lower bound. */
   min?: number;
   /** Inclusive upper bound. */
@@ -51,7 +51,7 @@ export function readNum(locale: Locale, text: string, o: NumOpts = {}): NumResul
 }
 
 /** Human-readable message for a validation error. */
-export function numErrText(locale: Locale, err: NumErr | null, o: NumOpts = {}): string | undefined {
+function numErrText(locale: Locale, err: NumErr | null, o: NumOpts = {}): string | undefined {
   if (!err) return undefined;
   const f = (n: number | undefined) => (n === undefined ? "" : formatSmart(locale, n));
   if (locale === "ru") {

@@ -21,7 +21,7 @@ function segmenter(granularity: Granularity, locale = "ru"): Intl.Segmenter {
 
 /* ───────────── line endings ───────────── */
 
-export const EOL_RE = /\r\n|\r|\n/;
+const EOL_RE = /\r\n|\r|\n/;
 
 /** Convert CRLF / CR line endings to LF. */
 export function normalizeNewlines(s: string): string {
@@ -50,7 +50,7 @@ export function graphemeCount(s: string): number {
 }
 
 /** Reverse a string by grapheme clusters: emoji, flags and accents survive. */
-export function reverseGraphemes(s: string): string {
+function reverseGraphemes(s: string): string {
   return graphemes(s).reverse().join("");
 }
 
@@ -63,13 +63,13 @@ export function isEmojiGrapheme(g: string): boolean {
 
 /* ───────────── words ───────────── */
 
-export interface WordToken {
+interface WordToken {
   word: string;
   index: number;
 }
 
 /** Word-like segments (letters/digits in any script; CJK split by dictionary). */
-export function wordTokens(s: string, locale = "ru"): WordToken[] {
+function wordTokens(s: string, locale = "ru"): WordToken[] {
   const out: WordToken[] = [];
   for (const seg of segmenter("word", locale).segment(s)) {
     if (seg.isWordLike) out.push({ word: seg.segment, index: seg.index });
@@ -77,7 +77,7 @@ export function wordTokens(s: string, locale = "ru"): WordToken[] {
   return out;
 }
 
-export function words(s: string, locale = "ru"): string[] {
+function words(s: string, locale = "ru"): string[] {
   return wordTokens(s, locale).map((t) => t.word);
 }
 
@@ -114,7 +114,7 @@ export function paragraphs(s: string): string[] {
 
 /* ───────────── statistics ───────────── */
 
-export interface TextStats {
+interface TextStats {
   /** User-perceived characters (grapheme clusters). */
   chars: number;
   /** Characters without any whitespace. */
@@ -144,8 +144,8 @@ export interface TextStats {
   avgWordLength: number;
 }
 
-export const READING_WPM = 200;
-export const SPEAKING_WPM = 130;
+const READING_WPM = 200;
+const SPEAKING_WPM = 130;
 const CJK_RE = /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Hangul}]/u;
 
 export function utf8Bytes(s: string): number {
@@ -214,7 +214,7 @@ export function textStats(s: string, locale = "ru"): TextStats {
 
 /* ───────────── word frequency ───────────── */
 
-export const STOP_WORDS: Record<"ru" | "en", ReadonlySet<string>> = {
+const STOP_WORDS: Record<"ru" | "en", ReadonlySet<string>> = {
   ru: new Set(
     "а без более бы был была были было быть в вам вас весь во вот все всего всех вы где да даже для до его ее её если есть ещё еще же за здесь и из или им их к как ко когда кто ли либо меня мне может мы на над надо наш не него нее неё нет ни них но ну о об однако он она они оно от очень по под при про с со так также такой там те тем то того тоже той только том ты у уже хотя чего чей чем что чтобы чье чья эта эти это этого этой этом этот я".split(
       " ",
@@ -227,7 +227,7 @@ export const STOP_WORDS: Record<"ru" | "en", ReadonlySet<string>> = {
   ),
 };
 
-export interface FrequencyOptions {
+interface FrequencyOptions {
   locale?: string;
   ignoreCase?: boolean;
   excludeStopWords?: boolean;
@@ -237,7 +237,7 @@ export interface FrequencyOptions {
   ngram?: 1 | 2 | 3;
 }
 
-export interface FrequencyRow {
+interface FrequencyRow {
   word: string;
   count: number;
   /** Share of all counted tokens, 0..1 */
@@ -280,7 +280,7 @@ export function wordFrequency(s: string, opts: FrequencyOptions = {}): { rows: F
 export type BlankMode = "keep" | "dedupe" | "remove";
 export type DedupeMode = "first" | "unique" | "duplicates";
 
-export interface DedupeOptions {
+interface DedupeOptions {
   ignoreCase?: boolean;
   /** Compare lines ignoring leading/trailing whitespace; output is trimmed too. */
   trim?: boolean;
@@ -293,7 +293,7 @@ export interface DedupeOptions {
   locale?: string;
 }
 
-export interface DedupeResult {
+interface DedupeResult {
   text: string;
   inputLines: number;
   outputLines: number;
@@ -351,7 +351,7 @@ export function removeDuplicateLines(s: string, opts: DedupeOptions = {}): Dedup
 
 export type SortMode = "alpha" | "natural" | "numeric" | "length" | "random" | "reverse";
 
-export interface SortOptions {
+interface SortOptions {
   mode?: SortMode;
   descending?: boolean;
   ignoreCase?: boolean;
@@ -386,7 +386,7 @@ export function firstNumber(line: string): number | null {
 }
 
 /** Unbiased integer in [0, n) from crypto.getRandomValues (rejection sampling). */
-export function cryptoRandomInt(n: number): number {
+function cryptoRandomInt(n: number): number {
   if (n <= 1) return 0;
   const buf = new Uint32Array(1);
   const limit = Math.floor(0x100000000 / n) * n;
@@ -487,7 +487,7 @@ export function reverseText(s: string, mode: ReverseMode, locale = "ru"): string
 
 /* ───────────── regex helpers ───────────── */
 
-export function escapeRegExp(s: string): string {
+function escapeRegExp(s: string): string {
   return s.replace(/[.*+?^${}()|[\]\\/-]/g, "\\$&");
 }
 

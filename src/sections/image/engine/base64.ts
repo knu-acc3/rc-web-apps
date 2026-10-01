@@ -7,7 +7,7 @@ export function bytesToBase64(bytes: Uint8Array): string {
   return btoa(out);
 }
 
-export interface ParsedInput {
+interface ParsedInput {
   bytes: Uint8Array;
   /** MIME declared in a data URI (may be wrong — detect from bytes). */
   declared?: string;

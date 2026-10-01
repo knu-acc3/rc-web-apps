@@ -21,9 +21,9 @@ export function cupDiff(cup: EuCup): [number, number] {
 
 export const ukBand = (eu: number) => 28 + ((eu - 60) / 5) * 2;
 export const frBand = (eu: number) => eu + 15;
-export const underbustRange = (eu: number): [number, number] => [eu - 2, eu + 2];
+const underbustRange = (eu: number): [number, number] => [eu - 2, eu + 2];
 
-export interface BraSize {
+interface BraSize {
   band: number;
   cup: EuCup;
   eu: string;

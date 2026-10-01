@@ -48,7 +48,7 @@ export const DEFAULT_FLEX: FlexState = {
 };
 
 /** Declarations of an item that differ from the defaults (only these are emitted). */
-export function flexItemDecls(it: FlexItem): string[] {
+function flexItemDecls(it: FlexItem): string[] {
   const out: string[] = [];
   if (it.grow !== 0 || it.shrink !== 1 || it.basis !== "auto") {
     if (it.grow === 1 && it.shrink === 1 && it.basis === "0%") out.push("flex: 1;");
@@ -60,7 +60,7 @@ export function flexItemDecls(it: FlexItem): string[] {
   return out;
 }
 
-export function flexContainerDecls(s: FlexState): string[] {
+function flexContainerDecls(s: FlexState): string[] {
   const out = ["display: flex;"];
   if (s.direction !== "row") out.push(`flex-direction: ${s.direction};`);
   if (s.wrap !== "nowrap") out.push(`flex-wrap: ${s.wrap};`);
@@ -161,7 +161,7 @@ export function gridItemDecls(it: GridItem, areas: string[][]): string[] {
   return out;
 }
 
-export function gridContainerDecls(s: GridState): string[] {
+function gridContainerDecls(s: GridState): string[] {
   const out = ["display: grid;"];
   if (s.columns.trim()) out.push(`grid-template-columns: ${s.columns.trim()};`);
   if (s.rows.trim()) out.push(`grid-template-rows: ${s.rows.trim()};`);

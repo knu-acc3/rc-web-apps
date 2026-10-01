@@ -64,7 +64,7 @@ export function CurrencySelect({ id, locale, value, onChange }: { id: string; lo
   return <InlineSelect id={id} label={T[locale].currency} value={value} onChange={onChange} options={CURRENCIES.map((c) => ({ value: c, label: CURRENCY_SYMBOL[c] }))} />;
 }
 
-export interface ExtraColumn {
+interface ExtraColumn {
   label: string;
   values: number[];
 }

@@ -4,7 +4,7 @@
  * The entropy-coded image data is copied byte for byte — pixels never change.
  */
 
-export interface JpegSegment {
+interface JpegSegment {
   marker: number;
   /** Offset of the 0xFF marker byte. */
   start: number;
@@ -15,7 +15,7 @@ export interface JpegSegment {
   dataEnd: number;
 }
 
-export interface ParsedJpeg {
+interface ParsedJpeg {
   segments: JpegSegment[];
   /** Offset right after EOI (bytes after it are a trailer, e.g. MPF images). */
   eoiEnd: number;
@@ -32,7 +32,7 @@ const EOI = 0xd9;
 
 const standalone = (m: number) => m === 0x01 || (m >= 0xd0 && m <= 0xd7);
 
-export function isJpeg(b: Uint8Array): boolean {
+function isJpeg(b: Uint8Array): boolean {
   return b.length > 3 && b[0] === 0xff && b[1] === 0xd8 && b[2] === 0xff;
 }
 
@@ -114,7 +114,7 @@ function concat(parts: Uint8Array[]): Uint8Array {
   return out;
 }
 
-export interface StripReport {
+interface StripReport {
   removed: string[];
   bytesBefore: number;
   bytesAfter: number;
@@ -164,7 +164,7 @@ export function stripJpegMetadata(b: Uint8Array): { bytes: Uint8Array; report: S
 
 /* ───────────── JFIF density (DPI) ───────────── */
 
-export interface Density {
+interface Density {
   unit: "none" | "dpi" | "dpcm";
   x: number;
   y: number;
@@ -441,7 +441,7 @@ export function transformJpegLossless(b: Uint8Array, flip: boolean, rot: number)
 }
 
 /** Stored pixel size from the SOF segment (before EXIF orientation). */
-export function jpegSize(b: Uint8Array): { width: number; height: number } | null {
+function jpegSize(b: Uint8Array): { width: number; height: number } | null {
   const { segments } = parseJpeg(b, true);
   const sof = segments.find((s) => s.marker >= 0xc0 && s.marker <= 0xcf && s.marker !== 0xc4 && s.marker !== 0xc8 && s.marker !== 0xcc);
   if (!sof || sof.dataEnd - sof.dataStart < 5) return null;

@@ -36,7 +36,6 @@ export function isoWeekday(y: number, m: number, d: number): number {
   // 1970-01-01 was a Thursday (ISO 4).
   return ((((dayNum(y, m, d) + 3) % 7) + 7) % 7) + 1;
 }
-export const isWeekend = (x: Ymd): boolean => isoWeekday(x.y, x.m, x.d) >= 6;
 
 export function addDays(x: Ymd, n: number): Ymd {
   return fromDayNum(dayNumOf(x) + n);
@@ -54,7 +53,6 @@ export const addYears = (x: Ymd, n: number): Ymd => addMonths(x, n * 12);
 /** b − a in days. */
 export const diffDays = (a: Ymd, b: Ymd): number => dayNumOf(b) - dayNumOf(a);
 export const cmpYmd = (a: Ymd, b: Ymd): number => dayNumOf(a) - dayNumOf(b);
-export const sameYmd = (a: Ymd, b: Ymd): boolean => a.y === b.y && a.m === b.m && a.d === b.d;
 
 const pad = (n: number, w = 2) => String(Math.abs(n)).padStart(w, "0");
 /** "2026-03-08" */
@@ -132,7 +130,7 @@ export const cap = (s: string): string => s.charAt(0).toUpperCase() + s.slice(1)
 export function monthName(locale: Locale, m: number): string {
   return locale === "ru" ? cap(MONTHS.ru[m - 1]) : MONTHS.en[m - 1];
 }
-export function weekdayName(locale: Locale, isoWd: number): string {
+function weekdayName(locale: Locale, isoWd: number): string {
   return locale === "ru" ? WEEKDAYS.ru[isoWd - 1] : WEEKDAYS.en[isoWd - 1];
 }
 
@@ -144,10 +142,6 @@ export function fmtDate(locale: Locale, x: Ymd, withYear = true): string {
 /** «воскресенье, 8 марта 2026» / «Sunday, March 8, 2026» */
 export function fmtDateLong(locale: Locale, x: Ymd, withYear = true): string {
   return `${weekdayName(locale, isoWeekday(x.y, x.m, x.d))}, ${fmtDate(locale, x, withYear)}`;
-}
-/** «08.03.2026» / «03/08/2026» */
-export function fmtDateNum(locale: Locale, x: Ymd): string {
-  return locale === "ru" ? `${pad(x.d)}.${pad(x.m)}.${x.y}` : `${pad(x.m)}/${pad(x.d)}/${x.y}`;
 }
 
 /* ───────────── movable feasts ───────────── */

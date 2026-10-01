@@ -32,7 +32,7 @@ export function aliasesOf(name: string): string[] {
 const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 const HEXU = (name: string) => NAMED_MAP.get(name)!.toUpperCase();
 
-export function namedLink(name: string, locale: Locale): LinkItem {
+function namedLink(name: string, locale: Locale): LinkItem {
   const info = NAMED_INFO[name];
   return { path: [SECTION, name], label: info.camel, hint: locale === "ru" ? `${cap(info.ru)} · ${HEXU(name)}` : HEXU(name) };
 }
@@ -243,21 +243,6 @@ export function namedPage(name: string, locale: Locale): PageModel | null {
     icon: "Palette",
     hue: HUE,
   };
-}
-
-export function namedGroupsBlocks(locale: Locale): Block[] {
-  const groups = new Map<string, string[]>();
-  for (const [n] of NAMED_COLORS) {
-    const g = NAMED_INFO[n].group;
-    if (!groups.has(g)) groups.set(g, []);
-    groups.get(g)!.push(n);
-  }
-  return [...groups.entries()].map(([g, names]) => ({
-    type: "links",
-    title: locale === "ru" ? `${GROUP_LABEL[g as keyof typeof GROUP_LABEL].ru} цвета CSS` : `${GROUP_LABEL[g as keyof typeof GROUP_LABEL].en} — CSS named colors`,
-    style: "chips",
-    items: names.map((n) => namedLink(n, locale)),
-  }));
 }
 
 export function namedSearch(locale: Locale) {

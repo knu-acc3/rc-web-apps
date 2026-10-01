@@ -58,7 +58,7 @@ export function complexText(locale: Locale, z: Complex, digits = 6): string {
 
 /* ───────────── linear ───────────── */
 
-export type LinearResult = { kind: "one"; x: number } | { kind: "none" } | { kind: "all" };
+type LinearResult = { kind: "one"; x: number } | { kind: "none" } | { kind: "all" };
 
 /** a·x + b = c */
 export function linear(a: number, b: number, c: number): LinearResult {
@@ -68,7 +68,7 @@ export function linear(a: number, b: number, c: number): LinearResult {
 
 /* ───────────── quadratic ───────────── */
 
-export interface QuadResult {
+interface QuadResult {
   D: number;
   roots: [Complex, Complex];
   /** Exact form when a, b, c are integers, e.g. "(3 ± √5) / 2", "−1 ± 2i". */
@@ -153,7 +153,7 @@ export function quadratic(locale: Locale, a: number, b: number, c: number): Quad
 
 /* ───────────── cubic ───────────── */
 
-export interface CubicResult {
+interface CubicResult {
   /** Discriminant of the depressed cubic: (q/2)² + (p/3)³ (> 0: one real root, = 0: multiple, < 0: three distinct real). */
   disc: number;
   roots: Complex[];

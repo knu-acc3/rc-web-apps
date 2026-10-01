@@ -17,7 +17,7 @@ const CSP = [
   "font-src 'self' data:",
   "media-src 'self' data: blob: mediastream:",
   "connect-src 'self' data: blob:",
-  "frame-src 'self' blob: data:",
+  "frame-src 'self' blob:",
   "object-src 'none'",
   "base-uri 'none'",
   "form-action 'self'",
@@ -31,7 +31,7 @@ const securityHeaders = [
   { key: "X-Content-Type-Options", value: "nosniff" },
   { key: "X-Frame-Options", value: "DENY" },
   { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
-  { key: "Permissions-Policy", value: "geolocation=(self), camera=(self), microphone=(self), payment=(), usb=(), interest-cohort=()" },
+  { key: "Permissions-Policy", value: "geolocation=(self), camera=(self), microphone=(self), display-capture=(self), payment=(), usb=(), serial=(), hid=(), bluetooth=(), browsing-topics=()" },
   { key: "Cross-Origin-Opener-Policy", value: "same-origin" },
 ];
 

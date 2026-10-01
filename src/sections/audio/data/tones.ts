@@ -1,7 +1,7 @@
 import type { L10n } from "@/i18n/config";
 
 /** Curated tone-generator frequencies with facts specific to each one. */
-export interface ToneDef {
+interface ToneDef {
   hz: number;
   title: L10n;
   h1: L10n;

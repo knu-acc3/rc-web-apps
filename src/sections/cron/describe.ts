@@ -246,10 +246,6 @@ const FIELD_NAME: Record<FieldName, { ru: string; en: string }> = {
   year: { ru: "Год", en: "Year" },
 };
 
-export function fieldLabel(f: FieldName, locale: Locale): string {
-  return FIELD_NAME[f][locale];
-}
-
 /** Row per field for the breakdown table: [field, raw, meaning]. */
 export function fieldRows(e: CronExpr, locale: Locale): [string, string, string][] {
   const ru = locale === "ru";

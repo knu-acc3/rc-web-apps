@@ -13,11 +13,6 @@ function ctor(): AudioContextCtor | null {
   return window.AudioContext ?? (window as unknown as { webkitAudioContext?: AudioContextCtor }).webkitAudioContext ?? null;
 }
 
-/** Whether the Web Audio API is available. */
-export function hasWebAudio(): boolean {
-  return ctor() !== null;
-}
-
 /**
  * Shared AudioContext for the page (created on first use). Browsers allow only a
  * few contexts, so all tools reuse this one. Returns null when unsupported.
@@ -107,14 +102,7 @@ export function fromDb(db: number): number {
   return Math.pow(10, db / 20);
 }
 
-/** Root mean square of a sample block. */
-export function rms(block: ArrayLike<number>): number {
-  let sum = 0;
-  for (let i = 0; i < block.length; i++) sum += block[i] * block[i];
-  return block.length ? Math.sqrt(sum / block.length) : 0;
-}
-
-export interface MicOptions {
+interface MicOptions {
   /**
    * Disable echo cancellation, noise suppression and automatic gain control.
    * Needed for measurements (dB meter, tuner); voice recording keeps them on.

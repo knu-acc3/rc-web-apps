@@ -55,7 +55,7 @@ const TABLE: Record<number, [string, string, string]> = {
 };
 
 export const ISLAMIC_YEARS = { min: 2000, max: 2040 } as const;
-export type IslamicEvent = "ramadan" | "fitr" | "adha";
+type IslamicEvent = "ramadan" | "fitr" | "adha";
 const COL: Record<IslamicEvent, number> = { ramadan: 0, fitr: 1, adha: 2 };
 
 /** All dates of the event in a Gregorian year (0, 1 or 2 dates); empty outside 2000–2040. */
@@ -65,7 +65,3 @@ export function islamicDates(event: IslamicEvent, y: number): Ymd[] {
   return row[COL[event]].split(" ").map((s) => ({ y, m: +s.slice(0, 2), d: +s.slice(2) }));
 }
 
-/** First occurrence of the event in a Gregorian year, or null. */
-export function islamicFirst(event: IslamicEvent, y: number): Ymd | null {
-  return islamicDates(event, y)[0] ?? null;
-}

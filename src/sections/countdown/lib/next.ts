@@ -21,7 +21,7 @@ export interface CountdownSpec {
   time?: string;
 }
 
-export interface Target {
+interface Target {
   start: number;
   end: number;
   state: "before" | "during" | "after";

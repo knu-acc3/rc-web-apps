@@ -1,6 +1,6 @@
 /* Screen colours: named fills, colour temperature and brightness. Pure, unit-tested. */
 
-export interface ScreenColor {
+interface ScreenColor {
   id: string;
   hex: string;
   ru: string;

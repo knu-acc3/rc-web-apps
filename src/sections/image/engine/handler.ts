@@ -18,12 +18,12 @@ function cloneCanvas(env: Env, c: AnyCanvas): AnyCanvas {
   return out;
 }
 
-export interface HandlerCtx {
+interface HandlerCtx {
   progress(v: number): void;
   signal?: AbortSignal;
 }
 
-export interface Handled {
+interface Handled {
   result: unknown;
   transfer: Transferable[];
 }
@@ -49,7 +49,7 @@ function getPica(): Promise<Pica> {
   return picaPromise;
 }
 
-export function makeEnv(scale = 1, assets?: Record<string, ImageBitmap>): Env {
+function makeEnv(scale = 1, assets?: Record<string, ImageBitmap>): Env {
   return {
     create: createCanvas,
     scale,
@@ -115,7 +115,7 @@ async function wasmDecode(blob: Blob, format: string, env: Env): Promise<AnyCanv
 }
 
 /** Decode a source to a canvas we own. */
-export async function decodeSrc(src: Src, env: Env): Promise<AnyCanvas> {
+async function decodeSrc(src: Src, env: Env): Promise<AnyCanvas> {
   if (src.kind === "blank") {
     const c = makeCanvas(env, src.w, src.h);
     paintBlank(ctx2d(c), c.width, c.height, src.background, src.gradient);

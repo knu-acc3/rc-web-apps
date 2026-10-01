@@ -1,6 +1,6 @@
 /** Paper formats. ISO 216 (A, B), ISO 269 (C envelopes), North American, SRA, JIS B. */
 
-export const MM_PER_INCH = 25.4;
+const MM_PER_INCH = 25.4;
 
 export type PaperSeries = "a" | "b" | "c" | "us" | "sra" | "env" | "jis";
 
@@ -72,7 +72,7 @@ export function mmToPt(mm: number): number {
   return (mm / MM_PER_INCH) * 72;
 }
 
-export function mmToIn(mm: number): number {
+function mmToIn(mm: number): number {
   return mm / MM_PER_INCH;
 }
 

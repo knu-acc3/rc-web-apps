@@ -98,9 +98,9 @@ export const zoneBySlug = new Map(ZONES.map((z) => [z.slug, z]));
 /* ───────────── converter pairs ───────────── */
 
 /** Cities of the main audience (RU/KZ/CIS) … */
-export const PAIR_HOME = ["moscow", "almaty", "astana", "kyiv", "minsk", "tashkent", "bishkek"];
+const PAIR_HOME = ["moscow", "almaty", "astana", "kyiv", "minsk", "tashkent", "bishkek"];
 /** … paired with the most searched world cities. */
-export const PAIR_WORLD = ["london", "new-york", "los-angeles", "chicago", "toronto", "berlin", "paris", "istanbul", "dubai", "delhi", "bangkok", "beijing", "singapore", "seoul", "tokyo", "sydney"];
+const PAIR_WORLD = ["london", "new-york", "los-angeles", "chicago", "toronto", "berlin", "paris", "istanbul", "dubai", "delhi", "bangkok", "beijing", "singapore", "seoul", "tokyo", "sydney"];
 /** Moscow ↔ neighbours. */
 const PAIR_MOSCOW = ["almaty", "astana", "kyiv", "minsk", "tashkent", "bishkek", "yekaterinburg", "novosibirsk", "vladivostok"];
 /** Zone ↔ zone pairs. */

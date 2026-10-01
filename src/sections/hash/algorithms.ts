@@ -68,7 +68,7 @@ export const ALGOS: AlgoDef[] = [
 
 export const ALGO_BY_ID = new Map(ALGOS.map((a) => [a.id, a]));
 
-export type HmacId = "hmac-md5" | "hmac-sha1" | "hmac-sha256" | "hmac-sha512" | "hmac-sha3-256";
+type HmacId = "hmac-md5" | "hmac-sha1" | "hmac-sha256" | "hmac-sha512" | "hmac-sha3-256";
 export const HMACS: { id: HmacId; algo: AlgoId; name: string; standard: string }[] = [
   { id: "hmac-sha256", algo: "sha256", name: "HMAC-SHA256", standard: "RFC 2104, RFC 4231" },
   { id: "hmac-sha512", algo: "sha512", name: "HMAC-SHA512", standard: "RFC 2104, RFC 4231" },

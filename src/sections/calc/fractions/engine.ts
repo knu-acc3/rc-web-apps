@@ -1,4 +1,4 @@
-import { add, bgcd, blcm, div, isInt, mul, q, sub, toText, type Q } from "../algebra/rational";
+import { bgcd, blcm, div, mul, q, toText, type Q } from "../algebra/rational";
 
 export type FracOp = "+" | "-" | "*" | "/";
 export const FRAC_OPS: readonly FracOp[] = ["+", "-", "*", "/"];
@@ -53,5 +53,3 @@ export function simplifySteps(n: bigint, d: bigint): { result: Q; gcd: bigint } 
   return { result, gcd: bgcd(n, d) };
 }
 
-export const evaluateOp = (a: Q, op: FracOp, b: Q): Q => (op === "+" ? add(a, b) : op === "-" ? sub(a, b) : op === "*" ? mul(a, b) : div(a, b));
-export { isInt };

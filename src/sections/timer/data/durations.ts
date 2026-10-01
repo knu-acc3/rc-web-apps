@@ -4,7 +4,7 @@ import type { Locale } from "@/i18n/config";
  * Timer variant durations (seconds). The first entries are the most searched and
  * are the ones shown as chips on the main timer page.
  */
-export const POPULAR: number[] = [
+const POPULAR: number[] = [
   60, 120, 180, 240, 300, 360, 420, 480, 540, 600, 720, 900, 1200, 1500, 1800, 2100, 2400, 2700, 3000, 3300, 3600,
   5, 10, 15, 20, 30, 45, 90,
   5400, 7200, 9000, 10800, 14400, 18000, 21600, 28800, 36000, 43200, 86400,
@@ -15,7 +15,7 @@ const EXTRA = [150, 4200, 4500, 4800, 6000, 12600, 25200, 32400, 39600];
 const HOURS = Array.from({ length: 12 }, (_, i) => (i + 1) * 3600);
 
 /** All variant durations, popular first, unique. */
-export const DURATIONS: number[] = [...new Set([...POPULAR, ...MINUTES, ...HOURS, ...EXTRA])];
+const DURATIONS: number[] = [...new Set([...POPULAR, ...MINUTES, ...HOURS, ...EXTRA])];
 
 /** Durations above an hour that people search in minutes ("таймер на 75 минут"). */
 const MINUTE_STYLE = new Set([4200, 4500, 4800, 6000]);

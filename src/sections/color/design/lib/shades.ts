@@ -32,7 +32,7 @@ const CURVES: readonly Curve[] = [
 const NEUTRAL_L = [0.985, 0.97, 0.922, 0.87, 0.708, 0.556, 0.439, 0.371, 0.269, 0.205, 0.145];
 const NEUTRAL_C = [0.065, 0.152, 0.283, 0.478, 0.87, 1, 0.935, 0.957, 0.891, 0.913, 0.913];
 
-export interface Shade {
+interface Shade {
   step: (typeof SHADE_STEPS)[number];
   color: Color;
   hex: string;
@@ -42,7 +42,7 @@ export interface Shade {
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 
 /** Lightness and relative chroma curves for a hue/chroma, interpolated between Tailwind families. */
-export function curvesFor(hue: number, chroma: number): { L: number[]; C: number[] } {
+function curvesFor(hue: number, chroma: number): { L: number[]; C: number[] } {
   const h = ((hue % 360) + 360) % 360;
   let i = CURVES.findIndex((c) => c[0] > h) - 1;
   if (i < 0) i = CURVES.length - 1; // wraps around 360°

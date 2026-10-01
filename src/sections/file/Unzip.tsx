@@ -35,6 +35,7 @@ const T = {
     notZip: "Это не ZIP-архив.",
     encrypted: "Архив защищён паролем. Зашифрованные ZIP-архивы не поддерживаются.",
     corrupt: "Архив повреждён или недокачан.",
+    tooBig: "Файл в архиве больше 2 ГБ — браузер не сможет распаковать его в память. Распакуйте архив программой на компьютере.",
     done: "Готово: файлы сохранены в выбранную папку.",
   },
   en: {
@@ -56,6 +57,7 @@ const T = {
     notZip: "This is not a ZIP archive.",
     encrypted: "The archive is password-protected. Encrypted ZIP archives are not supported.",
     corrupt: "The archive is damaged or incomplete.",
+    tooBig: "This file in the archive is over 2 GB — a browser can't unpack it into memory. Use an archiver on your computer.",
     done: "Done: files saved to the chosen folder.",
   },
 } as const;
@@ -117,7 +119,14 @@ export default function Unzip({ locale }: { locale: Locale }) {
   async function pick(path: string) {
     const w = worker.current;
     if (!w) return;
-    const blob = await w.extract(path);
+    let blob: Blob;
+    try {
+      blob = await w.extract(path);
+    } catch (e) {
+      const msg = (e as Error).message;
+      setProblem(msg === "TOO_BIG" ? t.tooBig : msg === "ENCRYPTED" ? t.encrypted : t.corrupt);
+      return;
+    }
     let text: string | null = null;
     if (TEXT.test(path) && !/\.svg$/i.test(path)) text = new TextDecoder().decode(await blob.slice(0, 64 * 1024).arrayBuffer());
     setSelected({ path, blob, text });

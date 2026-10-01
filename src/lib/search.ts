@@ -16,7 +16,7 @@ const TRANSLIT: Record<string, string> = {
   ъ: "", ы: "y", ь: "", э: "e", ю: "yu", я: "ya",
 };
 
-export function normalize(s: string): string {
+function normalize(s: string): string {
   return s
     .toLowerCase()
     .replace(/ё/g, "е")

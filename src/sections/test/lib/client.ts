@@ -26,7 +26,7 @@ function subscribeStore(cb: () => void) {
   };
 }
 
-export function readStored(key: string): string | null {
+function readStored(key: string): string | null {
   try {
     return window.localStorage.getItem(key);
   } catch {
@@ -44,7 +44,7 @@ export function writeStored(key: string, value: string): void {
 }
 
 /** A string kept in localStorage (null on the server and when absent). */
-export function useStored(key: string): string | null {
+function useStored(key: string): string | null {
   return useSyncExternalStore(
     subscribeStore,
     () => readStored(key),

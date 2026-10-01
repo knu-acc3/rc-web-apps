@@ -6,7 +6,7 @@ export type UtmKey = (typeof UTM_KEYS)[number];
 export type UtmParams = Partial<Record<UtmKey, string>>;
 
 /** encodeURIComponent that keeps {macro} and {{macro}} placeholders readable for ad platforms. */
-export function encodeValue(v: string): string {
+function encodeValue(v: string): string {
   return v
     .split(/(\{\{?[A-Za-z0-9_:.-]+\}?\})/)
     .map((part, i) => (i % 2 ? part : encodeURIComponent(part)))
@@ -48,7 +48,7 @@ export function parseUtm(url: string): UtmParams {
   return out;
 }
 
-export type UtmWarning = "upper" | "spaces" | "noScheme" | "gclid";
+type UtmWarning = "upper" | "spaces" | "noScheme" | "gclid";
 
 export function utmWarnings(url: string, p: UtmParams): UtmWarning[] {
   const w: UtmWarning[] = [];

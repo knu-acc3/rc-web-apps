@@ -43,7 +43,7 @@ export const STYLE_NAMES: Record<StyleId, L10n> = {
 export const PLATFORM_IDS = ["instagram", "telegram", "vk", "tiktok", "discord", "x-twitter", "steam", "whatsapp", "youtube", "pubg-free-fire"] as const;
 export type PlatformId = (typeof PLATFORM_IDS)[number];
 
-export interface PlatformDef {
+interface PlatformDef {
   /** "Инстаграм" / "Instagram" */
   name: L10n;
   /** Genitive after «для»: «для Инстаграма» */

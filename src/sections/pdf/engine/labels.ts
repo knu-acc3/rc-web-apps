@@ -15,7 +15,7 @@ export function pageLabel(format: NumberFormat, n: number, total: number, locale
   }
 }
 
-export interface NumberPlanOptions {
+interface NumberPlanOptions {
   format: NumberFormat;
   locale: "ru" | "en";
   /** Number printed on the first numbered page. */

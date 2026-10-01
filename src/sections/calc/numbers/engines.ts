@@ -68,7 +68,7 @@ export function roundTo(x: Q, step: Q, mode: RoundMode): Q {
   return mul(q(r), step);
 }
 
-export const pow10 = (e: number): Q => (e >= 0 ? q(10n ** BigInt(e)) : q(1n, 10n ** BigInt(-e)));
+const pow10 = (e: number): Q => (e >= 0 ? q(10n ** BigInt(e)) : q(1n, 10n ** BigInt(-e)));
 
 export const roundDecimals = (x: Q, digits: number, mode: RoundMode) => roundTo(x, pow10(-digits), mode);
 

@@ -65,7 +65,7 @@ export const EMOJI: Emoji[] = data.emoji.map((r, i) => ({
 
 export const bySlug = new Map(EMOJI.map((e) => [e.slug, e]));
 const strip = (s: string) => s.replace(/\u{FE0F}/gu, "");
-export const byGlyph = new Map(EMOJI.map((e) => [strip(e.glyph), e]));
+const byGlyph = new Map(EMOJI.map((e) => [strip(e.glyph), e]));
 export const findGlyph = (g: string) => byGlyph.get(strip(g));
 
 export const bySub = new Map<string, Emoji[]>();
@@ -82,7 +82,7 @@ export function graphemes(s: string): string[] {
 }
 
 /** Emoji of a glyph list that exist in the catalog (unknown glyphs are reported by unit tests). */
-export function listOf(s: string): Emoji[] {
+function listOf(s: string): Emoji[] {
   const out: Emoji[] = [];
   for (const g of graphemes(s)) {
     const e = findGlyph(g);

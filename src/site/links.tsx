@@ -58,7 +58,7 @@ export function LinkCards({ items, locale, className }: { items: LinkItem[]; loc
   );
 }
 
-export function ToolCard({ item, locale }: { item: LinkItem; locale: Locale }) {
+function ToolCard({ item, locale }: { item: LinkItem; locale: Locale }) {
   return (
     <Link href={href(locale, item.path)} className="card">
       {item.glyph ? (

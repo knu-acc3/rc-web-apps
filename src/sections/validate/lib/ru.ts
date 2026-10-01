@@ -6,7 +6,7 @@ const weighted = (d: number[], w: number[]) => w.reduce((s, x, i) => s + x * d[i
 
 export type RuError = "empty" | "chars" | "length" | "checksum" | "checksum2" | "zero";
 
-export interface InnResult {
+interface InnResult {
   valid: boolean;
   errors: RuError[];
   kind?: "legal" | "person";
@@ -18,10 +18,10 @@ const W10 = [2, 4, 10, 3, 5, 9, 4, 6, 8];
 const W11 = [7, 2, 4, 10, 3, 5, 9, 4, 6, 8];
 const W12 = [3, 7, 2, 4, 10, 3, 5, 9, 4, 6, 8];
 
-export function innCheck10(first9: string): number {
+function innCheck10(first9: string): number {
   return (weighted(digits(first9), W10) % 11) % 10;
 }
-export function innCheck12(first10: string): [number, number] {
+function innCheck12(first10: string): [number, number] {
   const a = (weighted(digits(first10), W11) % 11) % 10;
   const b = (weighted(digits(first10 + a), W12) % 11) % 10;
   return [a, b];
@@ -46,7 +46,7 @@ export function validateInn(input: string): InnResult {
   return { valid: false, errors: ["length"] };
 }
 
-export interface SnilsResult {
+interface SnilsResult {
   valid: boolean;
   errors: RuError[];
   formatted?: string;
@@ -55,7 +55,7 @@ export interface SnilsResult {
   expected?: string;
 }
 
-export function snilsCheck(first9: string): string {
+function snilsCheck(first9: string): string {
   const d = digits(first9);
   let sum = 0;
   for (let i = 0; i < 9; i++) sum += d[i] * (9 - i);
@@ -69,7 +69,7 @@ export function snilsCheck(first9: string): string {
   return String(c).padStart(2, "0");
 }
 
-export function formatSnils(s: string): string {
+function formatSnils(s: string): string {
   return `${s.slice(0, 3)}-${s.slice(3, 6)}-${s.slice(6, 9)} ${s.slice(9, 11)}`;
 }
 
@@ -86,7 +86,7 @@ export function validateSnils(input: string): SnilsResult {
   return { valid: ok, errors: ok ? [] : ["checksum"], formatted, expected: ok ? undefined : formatSnils(s.slice(0, 9) + c) };
 }
 
-export interface OgrnResult {
+interface OgrnResult {
   valid: boolean;
   errors: RuError[];
   kind?: "ogrn" | "ogrnip";
@@ -98,7 +98,7 @@ export interface OgrnResult {
 }
 
 /** Control digit: (number formed by the first n−1 digits mod (11 or 13)) mod 10, using BigInt for 14 digits. */
-export function ogrnCheck(body: string): number {
+function ogrnCheck(body: string): number {
   const mod = body.length === 12 ? 11n : 13n;
   return Number((BigInt(body) % mod) % 10n);
 }

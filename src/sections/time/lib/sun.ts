@@ -48,7 +48,7 @@ function cosHourAngle(lat: number, decl: number, zen = 90.833): number {
   return Math.cos(zen * RAD) / (Math.cos(lat * RAD) * Math.cos(decl * RAD)) - Math.tan(lat * RAD) * Math.tan(decl * RAD);
 }
 
-export interface SunDay {
+interface SunDay {
   /** UTC ms, null during polar day/night */
   sunrise: number | null;
   sunset: number | null;

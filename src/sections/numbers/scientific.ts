@@ -5,7 +5,7 @@
 import { parseDecimalInput } from "./parse";
 
 /** value = ±digits × 10^exp; digits has no leading/trailing zeros ("0" for zero). */
-export interface ExactDecimal {
+interface ExactDecimal {
   neg: boolean;
   digits: string;
   exp: number;
@@ -16,7 +16,7 @@ const TO_SUPER: Record<string, string> = { "0": "⁰", "1": "¹", "2": "²", "3"
 
 export const superscript = (n: number) => String(n).split("").map((c) => TO_SUPER[c] ?? c).join("");
 
-export const MAX_EXP = 100_000;
+const MAX_EXP = 100_000;
 
 function normalize(neg: boolean, digits: string, exp: number): ExactDecimal {
   let d = digits.replace(/^0+/, "");

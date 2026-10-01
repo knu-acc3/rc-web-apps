@@ -2,7 +2,7 @@
  * Main-thread source preparation: sniff the real format, detect animation,
  * rasterise SVG (needs <img>) and decode HEIC where the worker can't.
  */
-import { countGifFrames, detectFormat, FORMAT_META, isAnimated, type SniffedFormat } from "./detect";
+import { countGifFrames, detectFormat, isAnimated, type SniffedFormat } from "./detect";
 import type { Src } from "./types";
 
 export interface Prepared {
@@ -16,7 +16,7 @@ export interface Prepared {
   svgSize?: { w: number; h: number };
 }
 
-export class PrepareError extends Error {
+class PrepareError extends Error {
   constructor(
     public code: "UNSUPPORTED" | "PDF" | "PSD" | "JXL" | "DECODE_FAILED" | "SVG_INVALID" | "EMPTY",
     message = code,
@@ -27,7 +27,7 @@ export class PrepareError extends Error {
 
 let idCounter = 0;
 /** Stable-per-session id (not user-facing randomness). */
-export const newId = () => `s${Date.now().toString(36)}${(idCounter++).toString(36)}`;
+const newId = () => `s${Date.now().toString(36)}${(idCounter++).toString(36)}`;
 
 export async function readHead(file: Blob, n = 65536): Promise<Uint8Array> {
   return new Uint8Array(await file.slice(0, n).arrayBuffer());
@@ -117,7 +117,7 @@ async function decodeViaImg(blob: Blob): Promise<ImageBitmap> {
 }
 
 /** HEIC: native decoding (Safari 17+) first, libheif (heic-to) otherwise. */
-export async function decodeHeic(blob: Blob): Promise<ImageBitmap> {
+async function decodeHeic(blob: Blob): Promise<ImageBitmap> {
   try {
     return await createImageBitmap(blob);
   } catch {
@@ -128,7 +128,7 @@ export async function decodeHeic(blob: Blob): Promise<ImageBitmap> {
 }
 
 /** Decode on the main thread through <img> or libheif (fallback when the worker can't). */
-export async function decodeOnMain(p: Prepared): Promise<Src> {
+async function decodeOnMain(p: Prepared): Promise<Src> {
   const bitmap = p.format === "heic" ? await decodeHeic(p.file) : await decodeViaImg(p.file);
   return { kind: "bitmap", bitmap, format: p.format, id: p.id };
 }
@@ -161,7 +161,7 @@ export async function prepareFile(file: File): Promise<Prepared> {
   return { id, file, format, animated, frames };
 }
 
-export interface Materialized {
+interface Materialized {
   src: Src;
   transfer: Transferable[];
 }
@@ -192,6 +192,3 @@ export function baseName(name: string): string {
   return name.replace(/\.[^.]+$/, "") || "image";
 }
 
-export function formatLabel(format: SniffedFormat): string {
-  return FORMAT_META[format]?.label ?? format.toUpperCase();
-}

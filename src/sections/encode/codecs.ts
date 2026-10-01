@@ -7,7 +7,7 @@ import { Base64Error, base64ToBytes, bytesToBase64, utf8Encode } from "@/section
 import { fail, ok, type Codec, type CodecResult, type Opts } from "./types";
 
 /** Decode bytes as UTF-8; invalid sequences → keep bytes for a hex view / download. */
-export function bytesResult(b: Uint8Array, charset = "utf-8"): CodecResult {
+function bytesResult(b: Uint8Array, charset = "utf-8"): CodecResult {
   try {
     return ok(new TextDecoder(charset, { fatal: charset === "utf-8" }).decode(b));
   } catch {
@@ -17,7 +17,7 @@ export function bytesResult(b: Uint8Array, charset = "utf-8"): CodecResult {
 
 /* ───────────── Base64 ───────────── */
 
-export function wrapLines(s: string, width: number): string {
+function wrapLines(s: string, width: number): string {
   if (!width) return s;
   const out: string[] = [];
   for (let i = 0; i < s.length; i += width) out.push(s.slice(i, i + width));
@@ -164,7 +164,7 @@ const B32 = {
   hex: "0123456789ABCDEFGHIJKLMNOPQRSTUV",
   crockford: "0123456789ABCDEFGHJKMNPQRSTVWXYZ",
 } as const;
-export type Base32Variant = keyof typeof B32;
+type Base32Variant = keyof typeof B32;
 
 export function base32Encode(bytes: Uint8Array, variant: Base32Variant = "rfc4648", pad = variant !== "crockford"): string {
   const alpha = B32[variant];
@@ -221,7 +221,7 @@ export const base32: Codec = {
 /* ───────────── Base58 (Bitcoin alphabet) ───────────── */
 
 const B58 = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
-export const BASE58_MAX = 20000;
+const BASE58_MAX = 20000;
 
 export function base58Encode(bytes: Uint8Array): string {
   let zeros = 0;
@@ -394,7 +394,7 @@ export const base85: Codec = {
 
 /* ───────────── Unicode escapes ───────────── */
 
-export type EscapeStyle = "js" | "es6" | "html" | "css" | "python" | "uplus";
+type EscapeStyle = "js" | "es6" | "html" | "css" | "python" | "uplus";
 
 function escapeCp(cp: number, style: EscapeStyle): string {
   const hex = cp.toString(16).toUpperCase();

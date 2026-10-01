@@ -1,9 +1,9 @@
 import { percentile } from "./stats";
 
 /** Lowest level shown by the meters. */
-export const METER_FLOOR_DB = -60;
+const METER_FLOOR_DB = -60;
 /** dBFS value used for digital silence. */
-export const SILENCE_DB = -100;
+const SILENCE_DB = -100;
 
 /** RMS and absolute peak of a block of samples in [-1, 1]. */
 export function rmsPeak(samples: ArrayLike<number>): { rms: number; peak: number } {

@@ -14,7 +14,7 @@ export const b64url = (b: Uint8Array) => bytesToBase64(b, { urlSafe: true });
 
 export type ParseError = "empty" | "parts" | "jwe" | "header-b64" | "header-json" | "payload-b64" | "payload-json";
 
-export interface ParsedJwt {
+interface ParsedJwt {
   raw: string;
   header: Record<string, unknown>;
   payload: unknown;
@@ -137,7 +137,7 @@ function children(b: Uint8Array, t: Tlv): Tlv[] {
 }
 
 /** SubjectPublicKeyInfo from an X.509 certificate (DER). */
-export function spkiFromCertificate(der: Uint8Array): Uint8Array {
+function spkiFromCertificate(der: Uint8Array): Uint8Array {
   const cert = readTlv(der, 0);
   const tbs = children(der, cert)[0];
   const f = children(der, tbs);
@@ -158,13 +158,13 @@ function derLen(n: number): number[] {
 const tlv = (tag: number, body: Uint8Array | number[]) => new Uint8Array([tag, ...derLen(body.length), ...body]);
 
 /** Wrap a PKCS#1 RSAPublicKey ("BEGIN RSA PUBLIC KEY") into SubjectPublicKeyInfo. */
-export function spkiFromPkcs1(pkcs1: Uint8Array): Uint8Array {
+function spkiFromPkcs1(pkcs1: Uint8Array): Uint8Array {
   const algId = new Uint8Array([0x30, 0x0d, 0x06, 0x09, 0x2a, 0x86, 0x48, 0x86, 0xf7, 0x0d, 0x01, 0x01, 0x01, 0x05, 0x00]);
   const bitString = tlv(0x03, [0x00, ...pkcs1]);
   return tlv(0x30, [...algId, ...bitString]);
 }
 
-export type KeyInput = { kind: "spki" | "pkcs8"; der: Uint8Array } | { kind: "jwk"; jwk: JsonWebKey } | { kind: "error"; error: "pem" | "unsupported-pem" | "jwk" | "no-kid" };
+type KeyInput = { kind: "spki" | "pkcs8"; der: Uint8Array } | { kind: "jwk"; jwk: JsonWebKey } | { kind: "error"; error: "pem" | "unsupported-pem" | "jwk" | "no-kid" };
 
 export function parseKey(text: string, kid?: string): KeyInput {
   const t = text.trim();
@@ -206,7 +206,7 @@ export function parseKey(text: string, kid?: string): KeyInput {
   }
 }
 
-export function toPem(der: Uint8Array, label: string): string {
+function toPem(der: Uint8Array, label: string): string {
   const b = bytesToBase64(der);
   return `-----BEGIN ${label}-----\n${b.match(/.{1,64}/g)!.join("\n")}\n-----END ${label}-----`;
 }
@@ -215,7 +215,7 @@ export function toPem(der: Uint8Array, label: string): string {
 
 type AsymAlg = (typeof ASYM_ALGS)[number];
 
-export function webCryptoParams(alg: AsymAlg): { import: RsaHashedImportParams | EcKeyImportParams; sign: AlgorithmIdentifier | RsaPssParams | EcdsaParams } {
+function webCryptoParams(alg: AsymAlg): { import: RsaHashedImportParams | EcKeyImportParams; sign: AlgorithmIdentifier | RsaPssParams | EcdsaParams } {
   const bits = alg.slice(2) as "256" | "384" | "512";
   const hash = `SHA-${bits}`;
   if (alg.startsWith("RS")) return { import: { name: "RSASSA-PKCS1-v1_5", hash }, sign: { name: "RSASSA-PKCS1-v1_5" } };
@@ -242,7 +242,7 @@ export async function asymVerify(alg: AsymAlg, signingInput: string, signature: 
   return crypto.subtle.verify(webCryptoParams(alg).sign, k, base64ToBytes(signature) as BufferSource, utf8Encode(signingInput) as BufferSource);
 }
 
-export async function asymSign(alg: AsymAlg, signingInput: string, key: KeyInput): Promise<string> {
+async function asymSign(alg: AsymAlg, signingInput: string, key: KeyInput): Promise<string> {
   const k = await importKey(key, alg, "sign");
   const sig = await crypto.subtle.sign(webCryptoParams(alg).sign, k, utf8Encode(signingInput) as BufferSource);
   return b64url(new Uint8Array(sig));
@@ -273,7 +273,7 @@ export async function signJwt(header: Record<string, unknown>, payloadJson: stri
 
 export const TIME_CLAIMS = ["exp", "nbf", "iat", "auth_time", "updated_at"];
 
-export type TimeStatus = { exp?: "expired" | "valid"; nbf?: "future" | "ok"; iat?: "future" | "ok" };
+type TimeStatus = { exp?: "expired" | "valid"; nbf?: "future" | "ok"; iat?: "future" | "ok" };
 
 /** Time checks relative to `nowSec`, with a clock-skew tolerance in seconds. */
 export function timeStatus(payload: unknown, nowSec: number, skew = 0): TimeStatus {

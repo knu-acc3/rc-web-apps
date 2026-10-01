@@ -4,7 +4,7 @@ import type { Locale } from "@/i18n/config";
 import type { Block, QA, VariantDef } from "@/registry/types";
 import { appStorePayload, eventPayload, geoPayload, mailtoPayload, smsPayload, telPayload, whatsappPayload } from "./payloads";
 
-export interface VT {
+interface VT {
   name: string;
   title: string;
   h1: string;

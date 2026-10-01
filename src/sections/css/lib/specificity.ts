@@ -1,17 +1,17 @@
 import { splitTop } from "./tokens";
 
 /** (a, b, c): ids, classes/attributes/pseudo-classes, types/pseudo-elements. */
-export type Spec = [number, number, number];
+type Spec = [number, number, number];
 
 export type PartKind = "id" | "class" | "attribute" | "pseudo-class" | "pseudo-element" | "type" | "universal" | "nesting" | "functional";
 
-export interface Part {
+interface Part {
   text: string;
   kind: PartKind;
   spec: Spec;
 }
 
-export interface SelectorResult {
+interface SelectorResult {
   selector: string;
   spec: Spec;
   parts: Part[];

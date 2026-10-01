@@ -1,7 +1,7 @@
 import type { L10n } from "@/i18n/config";
 
 /** Facts about media formats, shown on conversion pages. */
-export interface FormatInfo {
+interface FormatInfo {
   label: string;
   kind: "video" | "audio" | "image";
   full: L10n;

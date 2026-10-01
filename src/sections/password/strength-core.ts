@@ -4,7 +4,7 @@ import * as common from "@zxcvbn-ts/language-common";
 import * as en from "@zxcvbn-ts/language-en";
 
 /** Common passwords of Russian-speaking users (typed in Latin, translit or Cyrillic) that aren't in the English lists. */
-export const RU_PASSWORDS = [
+const RU_PASSWORDS = [
   "qwerty", "ytrewq", "qwertyuiop", "asdfgh", "zxcvbn", "zaq12wsx", "1q2w3e4r", "1q2w3e", "1qaz2wsx", "q1w2e3r4", "parol", "parol123", "privet", "privet123", "lubov", "lyubov", "lublu", "iloveyou",
   "natasha", "masha", "sasha", "dasha", "katya", "olga", "marina", "svetlana", "tatyana", "irina", "elena", "andrey", "sergey", "dmitry", "aleksandr", "maksim", "ivan", "vladimir",
   "kotik", "zaika", "solnyshko", "rybka", "medved", "spartak", "zenit", "cska", "dinamo", "moskva", "rossiya", "russia", "kazakhstan", "almaty", "astana", "qazaqstan",
@@ -68,7 +68,7 @@ export type StrengthLocale = "ru" | "en";
 
 const cache = new Map<StrengthLocale, ZxcvbnFactory>();
 
-export function getZxcvbn(locale: StrengthLocale): ZxcvbnFactory {
+function getZxcvbn(locale: StrengthLocale): ZxcvbnFactory {
   let z = cache.get(locale);
   if (!z) {
     z = new ZxcvbnFactory({

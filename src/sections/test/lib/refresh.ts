@@ -1,7 +1,7 @@
 import { intervals, mean, median, stdDev } from "./stats";
 
 /** Refresh rates seen on real displays, ascending. */
-export const COMMON_RATES = [24, 30, 48, 50, 60, 72, 75, 85, 90, 100, 120, 144, 160, 165, 170, 175, 180, 200, 240, 280, 300, 360, 480, 500] as const;
+const COMMON_RATES = [24, 30, 48, 50, 60, 72, 75, 85, 90, 100, 120, 144, 160, 165, 170, 175, 180, 200, 240, 280, 300, 360, 480, 500] as const;
 
 export interface FrameStats {
   frames: number;
@@ -44,7 +44,7 @@ export function statsFromTimestamps(ts: readonly number[]): FrameStats | null {
   return frameStats(intervals(ts));
 }
 
-export interface Snap {
+interface Snap {
   /** Nearest common refresh rate. */
   rate: number;
   /** Relative distance from that rate (0.01 = 1 %). */

@@ -12,7 +12,7 @@ export const NNBSP = " ";
 
 export type TypoLang = "ru" | "en";
 
-export interface TypoOptions {
+interface TypoOptions {
   lang?: TypoLang;
   quotes?: boolean;
   dashes?: boolean;

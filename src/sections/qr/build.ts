@@ -195,7 +195,7 @@ export const DEFAULTS: Partial<Record<QrType, Fields>> = {
   app: { store: "apple" },
 };
 
-export interface Issue {
+interface Issue {
   level: "error" | "warn";
   text: string;
 }

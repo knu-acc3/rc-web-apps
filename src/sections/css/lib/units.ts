@@ -12,10 +12,10 @@ export interface UnitContext {
   viewport: number;
 }
 
-export const DEFAULT_CONTEXT: UnitContext = { root: 16, parent: 16, viewport: 1440 };
+const DEFAULT_CONTEXT: UnitContext = { root: 16, parent: 16, viewport: 1440 };
 
 /** How many px one unit is worth. 1pt = 1/72 in = 96/72 px. */
-export function pxPer(unit: CssUnit, ctx: UnitContext): number {
+function pxPer(unit: CssUnit, ctx: UnitContext): number {
   switch (unit) {
     case "px":
       return 1;
@@ -50,7 +50,7 @@ export interface ClampInput {
   root: number; // px
 }
 
-export interface ClampResult {
+interface ClampResult {
   css: string;
   /** Slope in vw and intercept in rem of the preferred value. */
   slopeVw: number;

@@ -28,7 +28,7 @@ function oklchToLinear(l: number, c: number, hDeg: number): Rgb {
 }
 
 /** OKLCH → hex, reducing chroma until the colour fits sRGB. */
-export function oklchHex(l: number, c: number, h: number): string {
+function oklchHex(l: number, c: number, h: number): string {
   let chroma = c;
   let rgb = oklchToLinear(l, chroma, h);
   for (let i = 0; i < 40 && rgb.some((v) => v < -0.0005 || v > 1.0005); i++) {
@@ -42,7 +42,7 @@ export function oklchHex(l: number, c: number, h: number): string {
 }
 
 /** Hue of an HSL colour (saturated, mid lightness) expressed on the OKLCH hue circle. */
-export function oklchHueOfHsl(hue: number): number {
+function oklchHueOfHsl(hue: number): number {
   const s = 0.75;
   const l = 0.5;
   const k = (n: number) => (n + hue / 30) % 12;

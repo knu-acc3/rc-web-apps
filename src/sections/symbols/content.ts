@@ -1,7 +1,7 @@
 import type { L10n } from "@/i18n/config";
 
 /** Texts of the symbol collections (/symbols/{id}); membership lives in scripts/data/gen-symbols-collections.mjs. */
-export interface CollectionMeta {
+interface CollectionMeta {
   /** Short label for chips and cards. */
   name: L10n;
   /** Main search phrase. */

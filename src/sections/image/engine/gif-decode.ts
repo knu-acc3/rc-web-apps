@@ -3,7 +3,7 @@
  * transparency and frame disposal (compositing like browsers do).
  */
 
-export interface GifHeader {
+interface GifHeader {
   width: number;
   height: number;
   /** 0 = forever, null = play once (no NETSCAPE extension) */
@@ -25,7 +25,7 @@ interface RawFrame {
   data: Uint8Array;
 }
 
-export interface GifFrameOut {
+interface GifFrameOut {
   index: number;
   /** Full-canvas RGBA after compositing (width × height × 4). */
   rgba: Uint8ClampedArray<ArrayBuffer>;

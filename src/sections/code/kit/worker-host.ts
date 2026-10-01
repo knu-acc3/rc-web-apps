@@ -30,13 +30,13 @@ export class Transfer<T> {
   ) {}
 }
 
-export interface HandlerContext {
+interface HandlerContext {
   /** Report progress (0…1). Throttle calls yourself for tight loops. */
   progress(value: number, info?: unknown): void;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type Handler = (payload: any, ctx: HandlerContext) => unknown;
+type Handler = (payload: any, ctx: HandlerContext) => unknown;
 
 interface Scope {
   postMessage(message: unknown, transfer?: Transferable[]): void;

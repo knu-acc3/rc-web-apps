@@ -46,7 +46,7 @@ function invert(o: Record<string, string>): Record<string, string> {
   return r;
 }
 
-export interface MorseEncoded extends CodecResult {
+interface MorseEncoded extends CodecResult {
   unknown: string[];
   substituted: string[];
 }
@@ -88,7 +88,7 @@ export function encodeMorse(text: string, o: Opts = {}): MorseEncoded {
   return { text: out, unknown: [...unknown], substituted: [...substituted], notes };
 }
 
-export function normalizeMorse(code: string): string {
+function normalizeMorse(code: string): string {
   return code.replace(/[·•∙⋅*]/g, ".").replace(/[−–—_]/g, "-");
 }
 

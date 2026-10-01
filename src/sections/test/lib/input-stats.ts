@@ -9,7 +9,7 @@ export function isChatter(intervalMs: number): boolean {
   return intervalMs >= 0 && intervalMs < CHATTER_MS;
 }
 
-export const MOUSE_POLLING_RATES = [125, 250, 500, 1000, 2000, 4000, 8000] as const;
+const MOUSE_POLLING_RATES = [125, 250, 500, 1000, 2000, 4000, 8000] as const;
 
 /**
  * Estimate the input report rate (Hz) from pointer event timestamps (ms).

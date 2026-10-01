@@ -9,7 +9,7 @@ import { copyText } from "@/lib/clipboard";
  * Quiet click-to-copy value: looks like text, shows a small copy icon on hover/focus.
  * Used for secondary results so the screen has no rows of buttons.
  */
-export function CopyText({ value, children, label, copiedLabel, className }: { value: string; children?: ReactNode; label: string; copiedLabel: string; className?: string }) {
+function CopyText({ value, children, label, copiedLabel, className }: { value: string; children?: ReactNode; label: string; copiedLabel: string; className?: string }) {
   const [copied, setCopied] = useState(false);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   useEffect(

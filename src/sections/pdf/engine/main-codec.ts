@@ -5,10 +5,12 @@
  */
 import { readJpegInfo, stripJpegOrientation } from "./image-info";
 
+/** @public — referenced as import("./main-codec").CodecRequest */
 export type CodecRequest =
   | { op: "recode"; kind: "jpeg" | "rgba"; data: ArrayBuffer; width: number; height: number; targetW: number; targetH: number; quality: number }
   | { op: "convert"; kind: string; data: ArrayBuffer };
 
+/** @public — referenced as import("./main-codec").ConvertResult */
 export interface ConvertResult {
   kind: "jpeg" | "png";
   bytes: ArrayBuffer;

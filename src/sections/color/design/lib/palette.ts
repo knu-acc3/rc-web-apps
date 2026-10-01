@@ -2,10 +2,9 @@ import { formatColor, fromOklch, harmony, toGamut, toHex, toOklch, type Color, t
 
 export type PaletteMode = Harmony | "random";
 export const PALETTE_MODES: readonly PaletteMode[] = ["analogous", "complementary", "triadic", "split-complementary", "tetradic", "square", "monochromatic", "random"];
-export const HARMONIES: readonly Harmony[] = ["complementary", "analogous", "triadic", "split-complementary", "tetradic", "square", "monochromatic"];
 
 /** Random source in [0, 1) — injected so the generator stays pure and testable. */
-export type Rand = () => number;
+type Rand = () => number;
 
 const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v));
 

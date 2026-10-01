@@ -6,7 +6,7 @@
 import { ruPluralIndex, type Gender } from "./words-ru";
 
 export const CASES = ["nom", "gen", "dat", "acc", "ins", "pre"] as const;
-export type Case = (typeof CASES)[number];
+type Case = (typeof CASES)[number];
 
 export const CASE_NAMES: Record<Case, { name: string; q: string }> = {
   nom: { name: "Именительный", q: "есть что?" },

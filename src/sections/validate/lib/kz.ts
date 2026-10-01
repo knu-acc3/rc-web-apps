@@ -15,7 +15,7 @@ export function kzCheckDigit(first11: string): number | null {
 
 export type KzError = "empty" | "chars" | "length" | "checksum" | "date" | "century" | "type" | "attr" | "month";
 
-export interface IinInfo {
+interface IinInfo {
   kind: "iin";
   valid: boolean;
   errors: KzError[];
@@ -25,7 +25,7 @@ export interface IinInfo {
   serial?: string;
 }
 
-export interface BinInfo {
+interface BinInfo {
   kind: "bin";
   valid: boolean;
   errors: KzError[];
@@ -45,7 +45,7 @@ function checksumOk(s: string): boolean {
   return c !== null && c === Number(s[11]);
 }
 
-export function isRealDate(y: number, m: number, d: number): boolean {
+function isRealDate(y: number, m: number, d: number): boolean {
   if (m < 1 || m > 12 || d < 1) return false;
   const dim = new Date(Date.UTC(y, m, 0)).getUTCDate();
   return d <= dim;

@@ -79,7 +79,7 @@ export function decodeEntities(s: string): string {
   return out;
 }
 
-export type HtmlMode = "basic" | "named" | "decimal" | "hex";
+type HtmlMode = "basic" | "named" | "decimal" | "hex";
 
 const BASIC: Record<string, string> = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" };
 

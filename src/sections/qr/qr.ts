@@ -3,9 +3,9 @@
 import type { encode as encodeFn } from "uqr";
 
 export type Ecc = "L" | "M" | "Q" | "H";
-export type QrMode = "numeric" | "alphanumeric" | "byte";
+type QrMode = "numeric" | "alphanumeric" | "byte";
 
-export interface QrMatrix {
+interface QrMatrix {
   version: number;
   size: number;
   data: boolean[][];
@@ -61,7 +61,7 @@ export function modulesPath(m: QrMatrix, margin = QUIET): string {
   return d;
 }
 
-export interface Look {
+interface Look {
   fg: string;
   bg: string;
   /** data: URL of a centered logo, or null. */
@@ -133,14 +133,14 @@ export async function qrPng(m: QrMatrix, look: Look, target: number, margin = QU
 
 /* ───── colour contrast ───── */
 
-export function parseHex(hex: string): [number, number, number] | null {
+function parseHex(hex: string): [number, number, number] | null {
   const m = hex.trim().match(/^#?([0-9a-f]{3}|[0-9a-f]{6})$/i);
   if (!m) return null;
   const h = m[1].length === 3 ? m[1].replace(/./g, "$&$&") : m[1];
   return [parseInt(h.slice(0, 2), 16), parseInt(h.slice(2, 4), 16), parseInt(h.slice(4, 6), 16)];
 }
 
-export function luminance([r, g, b]: [number, number, number]): number {
+function luminance([r, g, b]: [number, number, number]): number {
   const f = (c: number) => {
     const s = c / 255;
     return s <= 0.03928 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
@@ -148,7 +148,7 @@ export function luminance([r, g, b]: [number, number, number]): number {
   return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b);
 }
 
-export type ContrastIssue = "invalid" | "inverted" | "low" | null;
+type ContrastIssue = "invalid" | "inverted" | "low" | null;
 
 /** Scanners expect dark modules on a light background with enough contrast (WCAG ratio ≥ 4.5). */
 export function contrastCheck(fg: string, bg: string): { ratio: number; issue: ContrastIssue } {

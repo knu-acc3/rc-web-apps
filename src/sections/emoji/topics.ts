@@ -24,7 +24,7 @@ export interface TopicDef {
   region?: string;
 }
 
-export interface TopicAlias {
+interface TopicAlias {
   slug: string;
   name: L10n;
   to: ["group" | "subgroup", string];

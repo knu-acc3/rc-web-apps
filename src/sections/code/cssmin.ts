@@ -6,7 +6,7 @@
  * - nothing is renamed, reordered, lower-cased or vendor-prefixed
  */
 
-export interface CssMinOptions {
+interface CssMinOptions {
   /** keep /*! … *\/ comments (licenses); default true */
   keepImportant?: boolean;
 }

@@ -3,7 +3,7 @@ import type { Engine } from "./client";
 import { materialize, type Prepared } from "./source";
 import type { JobRequest, Op, OutputSpec, PixelsResult, PreviewResult, ProcessResult, Src } from "./types";
 
-export interface JobOpts {
+interface JobOpts {
   signal?: AbortSignal;
   onProgress?: (v: number) => void;
   svgWidth?: number;

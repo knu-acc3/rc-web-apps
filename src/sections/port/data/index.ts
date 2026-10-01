@@ -6,7 +6,7 @@ import type { PortDef } from "./types";
 export const PORTS: PortDef[] = [...PORTS_SYSTEM, ...PORTS_REGISTERED, ...PORTS_HIGH].sort((a, b) => a.port - b.port);
 export const PORT_BY_NUM = new Map(PORTS.map((p) => [p.port, p]));
 
-export type RangeKind = "system" | "registered" | "dynamic";
+type RangeKind = "system" | "registered" | "dynamic";
 /** RFC 6335 port ranges. */
 export function rangeOf(port: number): RangeKind {
   if (port <= 1023) return "system";

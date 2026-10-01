@@ -5,7 +5,7 @@
  */
 import type { L10n } from "@/i18n/config";
 
-export type FeatureGroup = "graphics" | "compute" | "media" | "devices" | "system" | "intl" | "css";
+type FeatureGroup = "graphics" | "compute" | "media" | "devices" | "system" | "intl" | "css";
 
 export const FEATURE_GROUPS: readonly { id: FeatureGroup; name: L10n }[] = [
   { id: "graphics", name: { ru: "Графика и видео", en: "Graphics & video" } },
@@ -17,7 +17,7 @@ export const FEATURE_GROUPS: readonly { id: FeatureGroup; name: L10n }[] = [
   { id: "css", name: { ru: "Возможности CSS", en: "CSS features" } },
 ];
 
-export interface FeatureDef {
+interface FeatureDef {
   id: string;
   group: FeatureGroup;
   name: L10n;
@@ -190,7 +190,7 @@ export function detectFeatures(list: readonly FeatureDef[] = FEATURES): Record<s
 
 /* ───────────── ECMAScript features ───────────── */
 
-export interface EsFeature {
+interface EsFeature {
   id: string;
   /** ECMAScript edition year; 0 = newer than ES2025 / proposal. */
   year: number;

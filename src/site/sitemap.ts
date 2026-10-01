@@ -2,7 +2,7 @@ import { SITE_URL } from "@/config/brand";
 import { href, LOCALES, X_DEFAULT_LOCALE } from "@/i18n/config";
 
 /** Build date used as lastmod (stable for the whole deployment). */
-export const BUILD_DATE = new Date().toISOString().slice(0, 10);
+const BUILD_DATE = new Date().toISOString().slice(0, 10);
 
 function esc(s: string): string {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");

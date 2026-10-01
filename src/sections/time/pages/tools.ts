@@ -9,7 +9,7 @@ import { citiesBySlugs, cityLink, home, HUE } from "./common";
 import { pairKeys } from "./pair";
 import { enSpoken, ruOfficial, ruSpoken } from "../lib/words";
 
-export interface TimeTool {
+interface TimeTool {
   slug: string;
   component: string;
   icon: string;
@@ -468,7 +468,6 @@ function labelOf(slug: string, locale: Locale): string {
 }
 
 export const TOOL_BY_SLUG = new Map(TIME_TOOLS.map((t) => [t.slug, t]));
-export const TOOL_SLUGS = TIME_TOOLS.map((t) => t.slug);
 
 export function toolLink(t: TimeTool, locale: Locale): LinkItem {
   return { path: [t.slug], label: t.name[locale], hint: t.lead[locale], icon: t.icon, hue: HUE };

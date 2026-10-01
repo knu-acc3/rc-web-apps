@@ -2,7 +2,7 @@
 
 type L = { ru: string; en: string };
 
-export interface DialectPage {
+interface DialectPage {
   slug: string;
   id: string;
   label: string;

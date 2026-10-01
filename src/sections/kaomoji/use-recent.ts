@@ -8,7 +8,7 @@ import { useSyncExternalStore } from "react";
  * and the list appears right after hydration. Falls back to memory when storage is blocked.
  */
 const KEY = "kaomoji:recent:v1";
-export const RECENT_MAX = 16;
+const RECENT_MAX = 16;
 const EMPTY: readonly string[] = [];
 const listeners = new Set<() => void>();
 let current: readonly string[] | null = null;

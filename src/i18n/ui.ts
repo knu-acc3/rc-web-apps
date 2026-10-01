@@ -159,4 +159,3 @@ export function ui(locale: Locale): UiDict {
   return DICTS[locale];
 }
 
-export type { UiDict };

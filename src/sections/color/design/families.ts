@@ -1,10 +1,10 @@
-import { contrastRatio, formatColor, formatRatio, hex, parseColor, readableTextColor, toHex, toOklch, WHITE, BLACK } from "../lib/color";
+import { contrastRatio, formatColor, formatRatio, hex, parseColor, readableTextColor, toHex, WHITE, BLACK } from "../lib/color";
 import { MATERIAL } from "./data/material";
 import { TAILWIND_V3 } from "./data/tailwind-v3";
 import { TAILWIND_V4, TAILWIND_V4_VERSION } from "./data/tailwind-v4";
 import type { FamilyData, FamilyRow } from "./FamilyPalette";
 
-export const TW_STEPS = ["50", "100", "200", "300", "400", "500", "600", "700", "800", "900", "950"];
+const TW_STEPS = ["50", "100", "200", "300", "400", "500", "600", "700", "800", "900", "950"];
 export const TW_NEUTRALS = new Set(["slate", "gray", "zinc", "neutral", "stone", "mauve", "olive", "mist", "taupe"]);
 /** Families in the order of the Tailwind docs (neutrals last). */
 export const TW_FAMILIES = [
@@ -41,4 +41,3 @@ export function mdFamily(slug: string): FamilyData {
 export const ratioW = (h: string) => `${formatRatio(contrastRatio(WHITE, parseColor(h)!))}:1`;
 export const ratioB = (h: string) => `${formatRatio(contrastRatio(BLACK, parseColor(h)!))}:1`;
 export const rgbOf = (h: string) => formatColor(parseColor(h)!, "rgb");
-export const hueOf = (oklch: string) => Math.round(toOklch(parseColor(oklch)!).h);

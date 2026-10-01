@@ -232,7 +232,7 @@ export function useBatch({ runner, settingsKey, concurrency = 2, delay = 350 }: 
 }
 
 /** Make file names unique inside a ZIP: "a.jpg", "a (2).jpg"… */
-export function uniqueNames(names: string[]): string[] {
+function uniqueNames(names: string[]): string[] {
   const seen = new Map<string, number>();
   return names.map((n) => {
     const k = n.toLowerCase();

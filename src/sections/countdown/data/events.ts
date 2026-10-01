@@ -503,4 +503,3 @@ export const EVENTS: EventDef[] = [
   },
 ];
 
-export const eventBySlug = new Map(EVENTS.map((e) => [e.slug, e]));

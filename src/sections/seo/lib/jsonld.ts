@@ -4,7 +4,7 @@ export type SchemaType = "article" | "product" | "faq" | "organization" | "local
 
 export const SCHEMA_TYPES: SchemaType[] = ["article", "product", "faq", "organization", "localBusiness", "breadcrumbs", "event", "recipe", "person", "video", "jobPosting", "softwareApp"];
 
-export type F = Record<string, string>;
+type F = Record<string, string>;
 type Obj = Record<string, unknown>;
 
 const S = "https://schema.org";
@@ -17,7 +17,7 @@ const lines = (s: string) =>
     .filter(Boolean);
 
 /** Drop empty strings, empty arrays and objects that only contain "@type". */
-export function clean<T>(x: T): T {
+function clean<T>(x: T): T {
   if (Array.isArray(x)) return x.map(clean).filter((y) => !isEmpty(y)) as T;
   if (x && typeof x === "object") {
     const out: Obj = {};
@@ -38,7 +38,7 @@ function isEmpty(x: unknown): boolean {
 }
 
 /** "1 500,50" → "1500.50"; returns "" for non-numbers. */
-export function money(s: string): string {
+function money(s: string): string {
   const t = s.replace(/[\s ]/g, "").replace(",", ".");
   return /^\d+(\.\d+)?$/.test(t) ? t : "";
 }
@@ -60,7 +60,7 @@ export function isoDuration(s: string, colon: "hm" | "ms" = "hm"): string {
 }
 
 /** Attach a UTC offset to a datetime-local value: "2026-10-15T19:00" + "+05:00". */
-export function withOffset(dt: string, offset: string): string {
+function withOffset(dt: string, offset: string): string {
   if (!dt) return "";
   if (/T\d{2}:\d{2}$/.test(dt)) return `${dt}:00${offset}`;
   return dt;
@@ -99,7 +99,7 @@ export function openingHours(text: string): Obj[] {
 }
 
 /** "Name | https://…" per line. */
-export function pairsOf(text: string): [string, string][] {
+function pairsOf(text: string): [string, string][] {
   return lines(text).map((l) => {
     const [a, ...b] = l.split("|");
     return [a.trim(), b.join("|").trim()];
@@ -312,7 +312,7 @@ export function buildSchema(type: SchemaType, f: F, offset = "+00:00"): Obj {
 }
 
 /** Required properties per Google's rich-result documentation. */
-export const REQUIRED: Record<SchemaType, string[][]> = {
+const REQUIRED: Record<SchemaType, string[][]> = {
   article: [["headline"]],
   product: [["name"], ["price", "rating"]],
   faq: [["qa"]],

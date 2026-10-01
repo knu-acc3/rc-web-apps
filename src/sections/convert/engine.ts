@@ -5,12 +5,12 @@ export interface ConvUnit {
   offset?: number;
 }
 
-export function toBase(u: ConvUnit, v: number): number {
+function toBase(u: ConvUnit, v: number): number {
   if (u.kind === "reciprocal") return v === 0 ? Infinity : u.factor / v;
   return v * u.factor + (u.offset ?? 0);
 }
 
-export function fromBase(u: ConvUnit, b: number): number {
+function fromBase(u: ConvUnit, b: number): number {
   if (u.kind === "reciprocal") return b === 0 ? Infinity : u.factor / b;
   return (b - (u.offset ?? 0)) / u.factor;
 }

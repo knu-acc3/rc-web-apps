@@ -1,12 +1,12 @@
 import { cubic, quadratic, type Complex } from "./poly";
-import { add, div, isZero, mul, neg, ONE, q, sub, toNumber, toText, ZERO, type Q } from "./rational";
+import { add, div, isZero, mul, neg, ONE, sub, toNumber, toText, ZERO, type Q } from "./rational";
 
 /** Exact matrix algebra on rationals. A matrix is Q[rows][cols]. */
 export type M = Q[][];
 
-export const dims = (a: M) => [a.length, a[0]?.length ?? 0] as const;
-export const clone = (a: M): M => a.map((r) => r.slice());
-export const identity = (n: number): M => Array.from({ length: n }, (_, i) => Array.from({ length: n }, (_, j) => (i === j ? ONE : ZERO)));
+const dims = (a: M) => [a.length, a[0]?.length ?? 0] as const;
+const clone = (a: M): M => a.map((r) => r.slice());
+const identity = (n: number): M => Array.from({ length: n }, (_, i) => Array.from({ length: n }, (_, j) => (i === j ? ONE : ZERO)));
 
 export function madd(a: M, b: M, minus = false): M | null {
   const [r, c] = dims(a);
@@ -55,7 +55,7 @@ export function det(a: M): Q | null {
   return d;
 }
 
-export interface RrefResult {
+interface RrefResult {
   R: M;
   rank: number;
   pivots: number[];
@@ -132,4 +132,3 @@ export function eigenvalues(a: M): { roots: Complex[]; charPoly: number[] } | nu
 }
 
 /** Parse a matrix cell ("3", "−1/2", "0,25", empty = 0). */
-export { q as rational };

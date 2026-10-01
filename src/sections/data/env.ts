@@ -1,7 +1,7 @@
 /** dotenv (.env) parsing and writing. */
 import { isObj, Num, Obj, type V } from "@/sections/code/kit/value";
 
-export interface EnvError {
+interface EnvError {
   line: number;
   code: "bad-line" | "unclosed-quote";
 }
@@ -60,7 +60,7 @@ function findClose(s: string, q: string): number {
   return -1;
 }
 
-export function envValue(v: V): string {
+function envValue(v: V): string {
   if (v === null) return "";
   if (typeof v === "boolean") return String(v);
   if (v instanceof Num) return v.raw;

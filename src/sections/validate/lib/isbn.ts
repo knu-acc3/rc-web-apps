@@ -1,13 +1,13 @@
 /* ISBN-10 and ISBN-13 check digits and conversion. */
 
-export function isbn10Check(first9: string): string {
+function isbn10Check(first9: string): string {
   let sum = 0;
   for (let i = 0; i < 9; i++) sum += Number(first9[i]) * (10 - i);
   const c = (11 - (sum % 11)) % 11;
   return c === 10 ? "X" : String(c);
 }
 
-export function isbn13Check(first12: string): string {
+function isbn13Check(first12: string): string {
   let sum = 0;
   for (let i = 0; i < 12; i++) sum += Number(first12[i]) * (i % 2 === 0 ? 1 : 3);
   return String((10 - (sum % 10)) % 10);
@@ -15,7 +15,7 @@ export function isbn13Check(first12: string): string {
 
 export type IsbnError = "empty" | "chars" | "length" | "checksum" | "prefix";
 
-export interface IsbnResult {
+interface IsbnResult {
   valid: boolean;
   errors: IsbnError[];
   kind?: 10 | 13;

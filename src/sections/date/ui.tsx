@@ -22,7 +22,7 @@ const FORMS = {
   h: { ru: ["час", "часа", "часов"], en: ["hour", "hours"] },
   min: { ru: ["минута", "минуты", "минут"], en: ["minute", "minutes"] },
 } as const;
-export type UnitKey = keyof typeof FORMS;
+type UnitKey = keyof typeof FORMS;
 
 /** «5 лет», «1 day» — with thin grouping for big numbers. */
 export function qty(locale: Locale, n: number, unit: UnitKey): string {

@@ -11,8 +11,8 @@ import { useState, type ReactNode } from "react";
 import { cn } from "@/lib/cn";
 import { niceTicks } from "./ticks";
 
-export type Tone = "accent" | "ok" | "warn" | "err" | "muted";
-export const TONE: Record<Tone, string> = {
+type Tone = "accent" | "ok" | "warn" | "err" | "muted";
+const TONE: Record<Tone, string> = {
   accent: "var(--accent)",
   ok: "var(--ok)",
   warn: "var(--warn)",
@@ -20,7 +20,7 @@ export const TONE: Record<Tone, string> = {
   muted: "var(--fg-3)",
 };
 
-export interface Series {
+interface Series {
   label: string;
   values: number[];
   tone: Tone;

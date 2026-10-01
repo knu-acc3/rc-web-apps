@@ -87,7 +87,7 @@ export const DEFAULT_GRADIENT: GradientState = {
   ],
 };
 
-export interface GradientPreset {
+interface GradientPreset {
   name: { ru: string; en: string };
   state: Partial<GradientState> & { stops: GradientStop[] };
 }

@@ -14,7 +14,7 @@ import { UI } from "./strings";
 
 export const VIDEO_ACCEPT =
   "video/*,.mp4,.m4v,.mov,.qt,.mkv,.webm,.avi,.wmv,.asf,.flv,.f4v,.3gp,.3g2,.ts,.mts,.m2ts,.mpg,.mpeg,.vob,.ogv";
-export const AUDIO_ACCEPT =
+const AUDIO_ACCEPT =
   "audio/*,.mp3,.wav,.m4a,.m4b,.aac,.flac,.ogg,.oga,.opus,.wma,.aif,.aiff,.amr,.ac3,.caf,.mka,.weba";
 export const MEDIA_ACCEPT = `${AUDIO_ACCEPT},${VIDEO_ACCEPT}`;
 

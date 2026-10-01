@@ -13,7 +13,7 @@ import { parseFfmpegTime } from "./time";
 
 const BASE = "/vendor/media/";
 /** Size of ffmpeg-core.wasm 0.12.10 (used when the server sends no Content-Length). */
-export const FFMPEG_CORE_BYTES = 32_232_419;
+const FFMPEG_CORE_BYTES = 32_232_419;
 
 let instance: FFmpeg | null = null;
 let loading: Promise<FFmpeg> | null = null;
@@ -27,7 +27,7 @@ export function isAbort(err: unknown): boolean {
 }
 
 /** Terminate the ffmpeg worker (frees its memory). The next job loads it again (from the HTTP cache). */
-export function disposeFfmpeg(): void {
+function disposeFfmpeg(): void {
   instance?.terminate();
   instance = null;
   loading = null;
@@ -51,7 +51,7 @@ async function fetchBlobUrl(url: string, type: string, signal: AbortSignal, onPr
 }
 
 /** Load (or reuse) the ffmpeg instance. `onProgress` reports the core download (0…1). */
-export async function loadFfmpeg(signal: AbortSignal, onProgress?: (f: number) => void): Promise<FFmpeg> {
+async function loadFfmpeg(signal: AbortSignal, onProgress?: (f: number) => void): Promise<FFmpeg> {
   if (signal.aborted) throw abortError();
   if (instance?.loaded) return instance;
   if (!loading) {
@@ -88,7 +88,7 @@ export async function loadFfmpeg(signal: AbortSignal, onProgress?: (f: number) =
   }
 }
 
-export interface FfRunOptions {
+interface FfRunOptions {
   signal: AbortSignal;
   /** Overall progress 0…1 (download is not included; see onDownload). */
   onProgress?: (f: number) => void;

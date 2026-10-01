@@ -65,7 +65,7 @@ export function toRoman(n: number, vinculum = false): string {
   return bar(toRomanStandard(Math.floor(n / 1000))) + toRomanStandard(n % 1000);
 }
 
-export interface RomanPart {
+interface RomanPart {
   /** Roman chunk as plain letters (without overline). */
   roman: string;
   value: number;
@@ -106,7 +106,7 @@ export type RomanIssue =
   | { kind: "order" }
   | { kind: "too-big" };
 
-export type RomanParse =
+type RomanParse =
   | { ok: true; value: number; canonical: string; vinculum: boolean }
   | { ok: false; error: "empty" }
   | { ok: false; error: "chars"; chars: string }

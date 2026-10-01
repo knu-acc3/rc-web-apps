@@ -145,7 +145,7 @@ function dropNulls(x: unknown, warn: (w: Warn) => void, path = ""): unknown {
 }
 
 /** First array of objects found breadth-first (e.g. <book> elements, or {"data": [...]}) — the table rows. */
-export function findRecords(v: V): V[] | null {
+function findRecords(v: V): V[] | null {
   const queue: V[] = [v];
   while (queue.length) {
     const x = queue.shift()!;

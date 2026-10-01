@@ -4,7 +4,7 @@ import { AUDIO_TARGETS, type Target } from "../engine/spec";
 import { FORMATS } from "./formats";
 import { AUDIO_PAIRS, VIDEO_PAIRS, type Pair } from "./pairs";
 
-export const pairSlug = (p: Pair) => `${p.from}-to-${p.to}`;
+const pairSlug = (p: Pair) => `${p.from}-to-${p.to}`;
 
 /** Targets that are encoded by the ffmpeg module (no WebCodecs encoder in browsers). */
 const FFMPEG_TARGETS = new Set(["mp3", "flac", "ogg"]);

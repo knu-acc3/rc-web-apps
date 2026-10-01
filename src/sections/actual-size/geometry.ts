@@ -3,7 +3,7 @@
 export const MM_PER_IN = 25.4;
 export type RulerUnit = "cm" | "in";
 
-export interface Tick {
+interface Tick {
   /** Position from zero, mm. */
   mm: number;
   /** 0 = major (labelled) … larger = finer. */

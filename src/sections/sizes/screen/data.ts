@@ -275,4 +275,3 @@ export const SCREENS: ScreenRes[] = [
   },
 ];
 
-export const SCREEN_BY_SLUG = new Map(SCREENS.map((s) => [screenSlug(s), s]));

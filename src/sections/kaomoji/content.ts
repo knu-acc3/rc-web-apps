@@ -2,7 +2,7 @@ import type { L10n, Locale } from "@/i18n/config";
 import type { QA } from "@/registry/types";
 
 /** Page texts of a category (server only — not imported by the client component). */
-export interface CategoryContent {
+interface CategoryContent {
   /** Main search phrase = h1. */
   h1: L10n;
   /** RU: follows "N японских смайликов …"; EN: adjective before "kaomoji". */

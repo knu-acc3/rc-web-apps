@@ -85,7 +85,7 @@ export function compressibleOf(t: TypeInfo): boolean {
   return isTextual(t.type) || COMPRESSIBLE_BINARY.test(t.type);
 }
 
-export interface CatDef {
+interface CatDef {
   id: MimeCat;
   slug: string;
   icon: string;

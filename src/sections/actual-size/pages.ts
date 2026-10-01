@@ -328,7 +328,7 @@ function faqOf(o: ObjDef, locale: Locale): QA[] {
 /** Objects offered in "Compare with" on every page. */
 const REF_SLUGS = ["bank-card", "10-tenge", "5-rubles", "1-euro", "us-quarter", "aa", "iphone-16", "a4"];
 
-export function refObjects(): ClientObj[] {
+function refObjects(): ClientObj[] {
   return REF_SLUGS.map((s) => OBJECTS.find((o) => o.slug === s)!).map((o) => toClient(o));
 }
 

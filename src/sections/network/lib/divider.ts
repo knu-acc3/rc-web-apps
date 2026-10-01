@@ -4,7 +4,7 @@ import { maskOf, type Cidr4 } from "./ipv4";
 
 export type DivideError = "too-many" | "no-fit" | "bad-count" | "bad-hosts";
 
-export interface EqualSplit {
+interface EqualSplit {
   newPrefix: number;
   subnets: Cidr4[];
   /** 2^k blocks created (≥ requested) */
@@ -36,14 +36,14 @@ export function prefixForHosts(hosts: number, pointToPoint = false): number | nu
   return k > 32 ? null : 32 - k;
 }
 
-export interface VlsmItem {
+interface VlsmItem {
   name: string;
   hosts: number;
   block: Cidr4;
   usable: number;
 }
 
-export interface VlsmResult {
+interface VlsmResult {
   items: VlsmItem[];
   free: Cidr4[];
   used: number;

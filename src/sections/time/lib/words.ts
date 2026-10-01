@@ -10,7 +10,7 @@ const TENS_GEN = ["", "", "двадцати", "тридцати", "сорока"
 const ORD_GEN = ["", "первого", "второго", "третьего", "четвёртого", "пятого", "шестого", "седьмого", "восьмого", "девятого", "десятого", "одиннадцатого", "двенадцатого"];
 
 /** Russian plural form: 1 минута, 2 минуты, 5 минут. */
-export function ruPlural(n: number, one: string, few: string, many: string): string {
+function ruPlural(n: number, one: string, few: string, many: string): string {
   const a = Math.abs(n) % 100;
   const b = a % 10;
   if (a > 10 && a < 20) return many;
@@ -20,7 +20,7 @@ export function ruPlural(n: number, one: string, few: string, many: string): str
 }
 
 /** Cardinal number 0–59 in words; `feminine` for "одна/две минуты". */
-export function ruNumber(n: number, feminine = false): string {
+function ruNumber(n: number, feminine = false): string {
   const fem = (w: string) => (feminine ? w.replace(/^один$/, "одна").replace(/^два$/, "две") : w);
   if (n < 20) return fem(UNITS_M[n]);
   const t = Math.floor(n / 10);

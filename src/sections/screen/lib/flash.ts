@@ -26,7 +26,7 @@ const SOS: boolean[] = (() => {
   return out;
 })();
 
-export const SOS_UNIT_S = 0.2;
+const SOS_UNIT_S = 0.2;
 /** Seconds one SOS signal takes, gaps included. */
 export const SOS_SECONDS = SOS.length * SOS_UNIT_S;
 

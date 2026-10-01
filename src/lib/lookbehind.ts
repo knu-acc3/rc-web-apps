@@ -5,7 +5,7 @@
  */
 
 /** The character (code point) right before index `i`, or "" at the start. */
-export function charBefore(s: string, i: number): string {
+function charBefore(s: string, i: number): string {
   if (i <= 0) return "";
   const lo = s.charCodeAt(i - 1);
   if (lo >= 0xdc00 && lo <= 0xdfff && i >= 2) {

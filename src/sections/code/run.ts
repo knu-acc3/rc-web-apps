@@ -139,7 +139,7 @@ export interface JsonNode {
 }
 
 /** Plain, cloneable tree for the tree view; children beyond `cap` per node are cut (count kept). */
-export function toTree(v: V, cap = 500, key?: string): JsonNode {
+function toTree(v: V, cap = 500, key?: string): JsonNode {
   if (v === null) return { t: "z", k: key, v: "null" };
   if (typeof v === "string") return { t: "s", k: key, v };
   if (typeof v === "boolean") return { t: "b", k: key, v: String(v) };

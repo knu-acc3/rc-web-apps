@@ -3,7 +3,7 @@
 export type Sex = "male" | "female";
 
 export const CM_PER_IN = 2.54;
-export const KG_PER_LB = 0.45359237;
+const KG_PER_LB = 0.45359237;
 export const ML_PER_FLOZ = 29.5735295625;
 
 export const ftInToCm = (ft: number, inch: number) => (ft * 12 + inch) * CM_PER_IN;
@@ -63,7 +63,7 @@ const IDEAL: Record<IdealFormula, Record<Sex, [number, number]>> = {
 };
 
 /** Inches over 5 ft (negative below 152.4 cm — the formulas are extrapolated there). */
-export const inchesOver5ft = (cm: number) => cm / CM_PER_IN - 60;
+const inchesOver5ft = (cm: number) => cm / CM_PER_IN - 60;
 
 export function idealWeight(formula: IdealFormula, sex: Sex, cm: number): number {
   const [base, per] = IDEAL[formula][sex];
@@ -86,13 +86,13 @@ export const ACTIVITIES: readonly Activity[] = ["sedentary", "light", "moderate"
 export const ACTIVITY_FACTOR: Record<Activity, number> = { sedentary: 1.2, light: 1.375, moderate: 1.55, active: 1.725, very: 1.9 };
 
 /** Approximate energy in 1 kg of body fat, kcal. */
-export const KCAL_PER_KG_FAT = 7700;
+const KCAL_PER_KG_FAT = 7700;
 /** Weekly weight change (kg) for a daily calorie surplus (+) or deficit (−). */
 export const weeklyChange = (dailyDelta: number) => (dailyDelta * 7) / KCAL_PER_KG_FAT;
 
 /* ───────────── Macros ───────────── */
 
-export interface MacroSplit {
+interface MacroSplit {
   protein: number;
   fat: number;
   carbs: number;
@@ -181,7 +181,7 @@ export function targetHr(maxHr: number, pct: number, restHr?: number | null): nu
 
 /* ───────────── Blood alcohol (Widmark) ───────────── */
 
-export const ETHANOL_DENSITY = 0.789;
+const ETHANOL_DENSITY = 0.789;
 export const WIDMARK_R: Record<Sex, number> = { male: 0.68, female: 0.55 };
 export const ELIMINATION = 0.15; // ‰ per hour (typical range 0.1–0.2)
 

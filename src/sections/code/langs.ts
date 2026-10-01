@@ -4,7 +4,7 @@ export type PrettierLang = "html" | "css" | "scss" | "less" | "javascript" | "ty
 export type FormatLang = PrettierLang | "xml" | "sql";
 export type MinifyLang = "json" | "css" | "javascript" | "html" | "xml" | "sql";
 export type ValidateLang = "json" | "yaml" | "xml";
-export type Lang = FormatLang | "json";
+type Lang = FormatLang | "json";
 
 export type IndentOpt = "2" | "4" | "tab";
 

@@ -2,7 +2,7 @@
 
 export type Brand = "visa" | "mastercard" | "mir" | "amex" | "unionpay" | "jcb" | "maestro" | "discover" | "diners";
 
-export interface BrandInfo {
+interface BrandInfo {
   id: Brand;
   name: string;
   lengths: number[];
@@ -96,7 +96,7 @@ export function formatCard(digits: string, brand: BrandInfo | null): string {
 
 export type CardError = "empty" | "chars" | "short" | "long" | "length" | "luhn";
 
-export interface CardResult {
+interface CardResult {
   digits: string;
   brand: BrandInfo | null;
   valid: boolean;

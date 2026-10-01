@@ -10,7 +10,7 @@ export function randomDelayMs(fill?: RandomFill): number {
   return randomInt(MIN_DELAY_MS, MAX_DELAY_MS, fill);
 }
 
-export interface ReactionStats {
+interface ReactionStats {
   count: number;
   average: number;
   median: number;

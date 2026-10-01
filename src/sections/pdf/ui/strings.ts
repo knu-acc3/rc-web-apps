@@ -136,8 +136,6 @@ export const S = {
   },
 } as const;
 
-export type Strings = (typeof S)[Locale];
-
 export function rangeErrorText(locale: Locale, e: RangeError, max: number): string {
   const r = S[locale].range;
   switch (e.code) {

@@ -15,7 +15,7 @@ export function facts(locale: Locale, title: L10n, rows: [L10n | string, L10n | 
 }
 
 /** Top text tools — linked from variant pages of small families. */
-export const CORE_TOOLS: { slug: string; name: L10n }[] = [
+const CORE_TOOLS: { slug: string; name: L10n }[] = [
   { slug: "word-counter", name: L("Счётчик символов", "Word counter") },
   { slug: "case-converter", name: L("Регистр текста", "Case converter") },
   { slug: "remove-duplicate-lines", name: L("Удалить дубликаты строк", "Remove duplicate lines") },

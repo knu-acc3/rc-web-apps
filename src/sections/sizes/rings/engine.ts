@@ -13,7 +13,7 @@ export const RING_SYSTEMS: RingSystem[] = ["ru", "us", "uk", "eu", "jp", "d", "c
 export const DIAMETER_RANGE: [number, number] = [12, 25];
 
 export const circumference = (d: number) => Math.PI * d;
-export const diameterFromCirc = (c: number) => c / Math.PI;
+const diameterFromCirc = (c: number) => c / Math.PI;
 
 export const usToDiameter = (us: number) => 11.63 + 0.8128 * us;
 export const diameterToUs = (d: number) => (d - 11.63) / 0.8128;
@@ -27,7 +27,7 @@ const LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 /** UK index: A = 0, A½ = 0.5 … Z = 25, Z+1 = 26 … */
 export const ukIndexFromCirc = (c: number) => (c - UK_A) / UK_STEP;
-export const circFromUkIndex = (i: number) => UK_A + i * UK_STEP;
+const circFromUkIndex = (i: number) => UK_A + i * UK_STEP;
 
 export function ukLabel(index: number): string {
   const i = Math.round(index * 2) / 2;

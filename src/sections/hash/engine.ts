@@ -28,7 +28,7 @@ import { sha512_256 } from "@noble/hashes/sha2.js";
 import { bytesToBase64, bytesToHex, hexToBytes } from "@/sections/code/kit/bytes";
 import { ALGO_BY_ID, type AlgoId } from "./algorithms";
 
-export interface StreamHasher {
+interface StreamHasher {
   update(data: Uint8Array): void;
   /** Lowercase hex digest */
   digest(): string;
@@ -91,7 +91,7 @@ function baseFactory(algo: AlgoId, bits?: number): Promise<IHasher> | null {
   }
 }
 
-export async function createHasher(algo: AlgoId, opts: { bits?: number; key?: Uint8Array } = {}): Promise<StreamHasher> {
+async function createHasher(algo: AlgoId, opts: { bits?: number; key?: Uint8Array } = {}): Promise<StreamHasher> {
   if (!ALGO_BY_ID.has(algo)) throw new Error(`Unknown algorithm ${algo}`);
   if (algo === "sha512-256") {
     if (opts.key) {
@@ -115,7 +115,7 @@ export async function hashBytes(algo: AlgoId, data: Uint8Array, opts: { bits?: n
 
 /* ───────────── streaming over Blob / File ───────────── */
 
-export const CHUNK = 8 * 1024 * 1024;
+const CHUNK = 8 * 1024 * 1024;
 
 /**
  * Hash a Blob chunk by chunk (never loads the whole file). `onProgress(doneBytes)` is

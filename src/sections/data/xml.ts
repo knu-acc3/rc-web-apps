@@ -7,7 +7,7 @@
 import { posOf } from "@/sections/code/kit/json";
 import { isObj, Num, Obj, type V } from "@/sections/code/kit/value";
 
-export interface XmlElement {
+interface XmlElement {
   name: string;
   attrs: [string, string][];
   children: (XmlElement | string)[];
@@ -26,7 +26,7 @@ export class XmlError extends Error {
 
 const ENT: Record<string, string> = { lt: "<", gt: ">", amp: "&", quot: '"', apos: "'" };
 
-export function decodeXmlEntities(s: string, unknown?: Set<string>): string {
+function decodeXmlEntities(s: string, unknown?: Set<string>): string {
   return s.replace(/&(#x[0-9a-fA-F]+|#\d+|[A-Za-z_][\w.-]*);/g, (m, e: string) => {
     if (e[0] === "#") {
       const cp = e[1] === "x" ? parseInt(e.slice(2), 16) : parseInt(e.slice(1), 10);
@@ -153,7 +153,7 @@ export function xmlToValue(el: XmlElement, o: { trim?: boolean } = {}): V {
 const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 const escAttr = (s: string) => esc(s).replace(/"/g, "&quot;");
 
-export function xmlName(k: string, warnings?: Set<string>): string {
+function xmlName(k: string, warnings?: Set<string>): string {
   let s = k.replace(/[^\w:.-]/g, "_");
   if (!/^[A-Za-z_:]/.test(s)) s = `_${s}`;
   if (/^xml/i.test(s) && s !== k) s = `_${s}`;

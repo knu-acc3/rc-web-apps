@@ -3,7 +3,7 @@
  * a normalised autocorrelation) and note/cents helpers. Pure, unit-tested.
  */
 
-export interface PitchResult {
+interface PitchResult {
   /** Fundamental frequency in Hz. */
   freq: number;
   /** 0…1 — how periodic the signal is (NSDF peak height). */
@@ -66,10 +66,10 @@ export function detectPitch(buf: Float32Array, sampleRate: number, minFreq = 30,
   return { freq: sampleRate / period, clarity: Math.min(1, clarity) };
 }
 
-export const NOTE_NAMES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"] as const;
+const NOTE_NAMES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"] as const;
 export const NOTE_NAMES_RU = ["До", "До♯", "Ре", "Ре♯", "Ми", "Фа", "Фа♯", "Соль", "Соль♯", "Ля", "Ля♯", "Си"] as const;
 
-export interface NoteInfo {
+interface NoteInfo {
   midi: number;
   name: string;
   octave: number;
@@ -83,7 +83,7 @@ export function midiToFreq(midi: number, a4 = 440): number {
   return a4 * Math.pow(2, (midi - 69) / 12);
 }
 
-export function freqToMidi(freq: number, a4 = 440): number {
+function freqToMidi(freq: number, a4 = 440): number {
   return 69 + 12 * Math.log2(freq / a4);
 }
 

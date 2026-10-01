@@ -37,7 +37,7 @@ export function missingRelated(): string[] {
   return [...missing];
 }
 
-export function relatedLinks(keys: readonly string[], locale: Locale): LinkItem[] {
+function relatedLinks(keys: readonly string[], locale: Locale): LinkItem[] {
   const out: LinkItem[] = [];
   for (const k of keys) {
     const m = LINKS.get(k);

@@ -56,20 +56,6 @@ export function lastWriteFailed(): boolean {
   return failed;
 }
 
-export function listKeys(prefix: string): string[] {
-  const out = new Set<string>();
-  try {
-    for (let i = 0; i < window.localStorage.length; i++) {
-      const k = window.localStorage.key(i);
-      if (k?.startsWith(prefix)) out.add(k);
-    }
-  } catch {
-    // storage unavailable
-  }
-  for (const k of memory.keys()) if (k.startsWith(prefix)) out.add(k);
-  return [...out];
-}
-
 /** Reactive string value of a localStorage key (null on the server and when absent). */
 export function useStoredString(key: string): string | null {
   return useSyncExternalStore(
@@ -79,12 +65,3 @@ export function useStoredString(key: string): string | null {
   );
 }
 
-const noopSubscribe = () => () => {};
-/** true after hydration on the client, false during SSR and hydration. */
-export function useHydrated(): boolean {
-  return useSyncExternalStore(
-    noopSubscribe,
-    () => true,
-    () => false,
-  );
-}

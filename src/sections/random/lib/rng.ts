@@ -11,7 +11,7 @@
  */
 
 /** Fills the given buffer with random bytes. */
-export type RandomSource = (buf: Uint8Array) => void;
+type RandomSource = (buf: Uint8Array) => void;
 
 const MAX_CHUNK = 65536; // getRandomValues limit per call
 
@@ -31,13 +31,6 @@ let source: RandomSource = cryptoSource;
  */
 export function setRandomSource(fn: RandomSource | null): void {
   source = fn ?? cryptoSource;
-}
-
-/** `n` random bytes. */
-export function randomBytes(n: number): Uint8Array {
-  const buf = new Uint8Array(n);
-  source(buf);
-  return buf;
 }
 
 const u32buf = new Uint8Array(4);
@@ -115,11 +108,6 @@ export function randomFloat(): number {
   const hi = randomUint32() >>> 11; // 21 bits
   const lo = randomUint32(); // 32 bits
   return (hi * TWO_32 + lo) / TWO_53;
-}
-
-/** Fair coin. */
-export function randomBool(): boolean {
-  return randomInt(2) === 1;
 }
 
 /** Uniformly random element. Throws on an empty array. */

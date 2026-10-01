@@ -16,15 +16,15 @@ export interface Box {
   height: number;
 }
 
-export type Rotation = 0 | 90 | 180 | 270;
+type Rotation = 0 | 90 | 180 | 270;
 
 /** Points per millimetre. */
-export const PT_PER_MM = 72 / 25.4;
+const PT_PER_MM = 72 / 25.4;
 export const mmToPt = (mm: number) => mm * PT_PER_MM;
 export const ptToMm = (pt: number) => pt / PT_PER_MM;
 
 /** Largest page side allowed by PDF viewers (200 inches at UserUnit 1). */
-export const MAX_PAGE_PT = 14400;
+const MAX_PAGE_PT = 14400;
 
 /** Portrait paper sizes in points. */
 export const PAPER = {
@@ -36,7 +36,7 @@ export const PAPER = {
 } as const satisfies Record<string, readonly [number, number]>;
 export type PaperId = keyof typeof PAPER;
 
-export const IDENTITY: Matrix = [1, 0, 0, 1, 0, 0];
+const IDENTITY: Matrix = [1, 0, 0, 1, 0, 0];
 
 export function normRotation(deg: number): Rotation {
   const r = (((Math.round(deg / 90) * 90) % 360) + 360) % 360;
@@ -71,20 +71,12 @@ export function apply(m: Matrix, x: number, y: number): [number, number] {
 export const translate = (x: number, y: number): Matrix => [1, 0, 0, 1, x, y];
 export const scaleM = (sx: number, sy = sx): Matrix => [sx, 0, 0, sy, 0, 0];
 
-/** Counter-clockwise rotation by `deg` degrees around the origin. */
-export function rotateM(deg: number): Matrix {
-  const r = (deg * Math.PI) / 180;
-  const c = Math.cos(r);
-  const s = Math.sin(r);
-  return [c, s, -s, c, 0, 0];
-}
-
 /**
  * Maps content of a w×h box (origin at its lower-left) to the box as it is
  * displayed after a clockwise rotation (PDF /Rotate semantics). The result
  * again has its lower-left corner at the origin.
  */
-export function rotationMatrix(w: number, h: number, rotate: number): Matrix {
+function rotationMatrix(w: number, h: number, rotate: number): Matrix {
   switch (normRotation(rotate)) {
     case 90:
       return [0, -1, 1, 0, 0, w];
@@ -124,7 +116,7 @@ export function clean(m: Matrix): Matrix {
 
 /* ───────────── n-up ───────────── */
 
-export interface NupGrid {
+interface NupGrid {
   cols: number;
   rows: number;
   sheetWidth: number;
@@ -133,7 +125,7 @@ export interface NupGrid {
   scale: number;
 }
 
-export interface NupInput {
+interface NupInput {
   /** Pages per sheet. */
   n: number;
   /** Sheet size in points, any orientation (the best one is chosen when `orientation` is "auto"). */
@@ -146,7 +138,7 @@ export interface NupInput {
 }
 
 /** Factor pairs [cols, rows] with cols·rows = n. */
-export function gridCandidates(n: number): [number, number][] {
+function gridCandidates(n: number): [number, number][] {
   const out: [number, number][] = [];
   for (let c = 1; c <= n; c++) if (n % c === 0) out.push([c, n / c]);
   return out;
@@ -214,17 +206,17 @@ export function placePageMatrix(w: number, h: number, rotate: number, x: number,
 
 /* ───────────── images → pages ───────────── */
 
-export const DEFAULT_DPI = 96;
+const DEFAULT_DPI = 96;
 
 /** Sane DPI or the default (96). */
-export function effectiveDpi(dpi: number | undefined | null): number {
+function effectiveDpi(dpi: number | undefined | null): number {
   return dpi && Number.isFinite(dpi) && dpi >= 10 && dpi <= 10000 ? dpi : DEFAULT_DPI;
 }
 
 export const pxToPt = (px: number, dpi: number) => (px * 72) / effectiveDpi(dpi);
 
 /** EXIF orientations 5–8 swap width and height. */
-export const orientationSwaps = (orientation: number) => orientation >= 5 && orientation <= 8;
+const orientationSwaps = (orientation: number) => orientation >= 5 && orientation <= 8;
 
 export interface ImageLayoutInput {
   /** Stored pixel size (before EXIF orientation). */
@@ -243,7 +235,7 @@ export interface ImageLayoutInput {
   scaleMode?: "fit" | "original";
 }
 
-export interface ImageLayout {
+interface ImageLayout {
   pageWidth: number;
   pageHeight: number;
   /** Displayed image rectangle on the page (points). */

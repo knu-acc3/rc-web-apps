@@ -11,7 +11,7 @@ export type LoanType = "annuity" | "diff";
 /** What an early repayment reduces: the remaining term (payment stays) or the payment (term stays). */
 export type ExtraMode = "term" | "payment";
 
-export interface LoanInput {
+interface LoanInput {
   /** Amount borrowed, currency units. */
   principal: number;
   /** Nominal annual rate, percent. */
@@ -62,7 +62,7 @@ function rnd(x: number): number {
 }
 
 /** Annuity payment in minor units for balance `s` (minor units), monthly rate `i`, `n` months. */
-export function annuityPaymentMinor(s: number, i: number, n: number): number {
+function annuityPaymentMinor(s: number, i: number, n: number): number {
   if (n <= 0) return s;
   if (i === 0) return rnd(s / n);
   return rnd((s * i) / (1 - Math.pow(1 + i, -n)));

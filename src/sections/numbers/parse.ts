@@ -1,5 +1,5 @@
 /** Exact decimal number typed by a user, kept as digits (no floating point). */
-export interface DecimalInput {
+interface DecimalInput {
   neg: boolean;
   int: bigint;
   /** Digits after the decimal separator exactly as typed ("" if none). */

@@ -20,7 +20,7 @@ const T = {
   },
 } as const;
 
-export interface StripItem {
+interface StripItem {
   key: string;
   name: string;
   bitmap: ImageBitmap | null;

@@ -17,7 +17,7 @@ export const OUT_MIME: Record<OutFormat, string> = {
   ico: "image/x-icon",
 };
 
-export interface Encoded {
+interface Encoded {
   bytes: Uint8Array;
   encoder: string;
 }
@@ -38,7 +38,7 @@ export async function canvasBlob(c: AnyCanvas, type: string, quality?: number): 
 const pixels = (c: AnyCanvas): RawImage => ctx2d(c).getImageData(0, 0, c.width, c.height);
 
 /** Paint `color` behind existing pixels (in place) — JPEG has no alpha. */
-export function flatten(c: AnyCanvas, color: string) {
+function flatten(c: AnyCanvas, color: string) {
   const ctx = ctx2d(c);
   ctx.save();
   ctx.globalCompositeOperation = "destination-over";
@@ -74,13 +74,13 @@ async function jsquashAvif(img: RawImage, quality: number): Promise<Uint8Array> 
   return encodeAvif(img, quality, img.width * img.height > 8e6 ? 8 : 6);
 }
 
-export async function oxipng(png: Uint8Array, level = 2): Promise<Uint8Array> {
+async function oxipng(png: Uint8Array, level = 2): Promise<Uint8Array> {
   const { optimisePng } = await import("./codecs");
   return optimisePng(png, level);
 }
 
 /** Reduce a canvas to at most `colors` colours (in place), like pngquant. */
-export async function quantizeCanvas(c: AnyCanvas, colors: number) {
+async function quantizeCanvas(c: AnyCanvas, colors: number) {
   const { quantize, applyPalette } = await import("gifenc");
   const ctx = ctx2d(c);
   const img = ctx.getImageData(0, 0, c.width, c.height);
@@ -105,7 +105,7 @@ export async function quantizeCanvas(c: AnyCanvas, colors: number) {
 }
 
 /** GIF (single frame) with 256-colour palette and 1-bit transparency. */
-export async function encodeGifFrame(c: AnyCanvas): Promise<Uint8Array> {
+async function encodeGifFrame(c: AnyCanvas): Promise<Uint8Array> {
   const { GIFEncoder, quantize, applyPalette } = await import("gifenc");
   const img = pixels(c);
   const d = img.data;

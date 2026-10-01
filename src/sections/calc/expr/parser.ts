@@ -17,7 +17,7 @@
 
 export type Angle = "deg" | "rad";
 
-export type Node =
+type Node =
   | { t: "num"; v: number }
   | { t: "x" }
   | { t: "const"; name: "pi" | "e" }
@@ -26,7 +26,7 @@ export type Node =
   | { t: "post"; op: "!" | "%"; a: Node }
   | { t: "fn"; name: FnName; args: Node[] };
 
-export type ErrCode = "empty" | "unexpected" | "unclosed" | "extra-paren" | "unknown" | "operand" | "operator" | "args" | "div0" | "domain" | "x";
+type ErrCode = "empty" | "unexpected" | "unclosed" | "extra-paren" | "unknown" | "operand" | "operator" | "args" | "div0" | "domain" | "x";
 
 export class ExprError extends Error {
   constructor(
@@ -63,7 +63,7 @@ const FNS = {
   nroot: 2,
   logb: 2,
 } as const;
-export type FnName = keyof typeof FNS;
+type FnName = keyof typeof FNS;
 const ALIASES: Record<string, string> = { arcsin: "asin", arccos: "acos", arctan: "atan", tg: "tan", ctg: "cot", sh: "sinh", ch: "cosh", th: "tanh", π: "pi" };
 const IDENTS = [...Object.keys(FNS), ...Object.keys(ALIASES), "mod", "pi", "e", "x"].sort((a, b) => b.length - a.length);
 
@@ -73,7 +73,7 @@ type Tok =
   | { k: "op"; v: string; pos: number }
   | { k: "(" | ")" | "sep"; pos: number };
 
-export interface ParseOptions {
+interface ParseOptions {
   decimalComma?: boolean;
   /** Allow the variable x (graph plotter). */
   allowX?: boolean;
@@ -322,7 +322,7 @@ export function parse(src: string, o: ParseOptions = {}): Node {
 
 /* ───────────── Evaluation ───────────── */
 
-export interface Env {
+interface Env {
   x?: number;
   angle?: Angle;
   /** Throw ExprError on domain errors / division by zero (calculator) instead of returning NaN (plotter). */
@@ -377,7 +377,7 @@ function snap(v: number): number {
   return Math.abs(v) < 1e-12 ? 0 : v;
 }
 
-export function evaluate(n: Node, env: Env = {}): number {
+function evaluate(n: Node, env: Env = {}): number {
   const deg = env.angle === "deg";
   const fail = (code: ErrCode) => {
     if (env.strict) throw new ExprError(code, 0);

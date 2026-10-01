@@ -15,7 +15,7 @@ function pad(n: number): string {
 }
 
 /** Local calendar date as "YYYY-MM-DD". */
-export function isoDate(d: Date): string {
+function isoDate(d: Date): string {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 }
 

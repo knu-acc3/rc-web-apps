@@ -41,7 +41,7 @@ export function kkPatronymic(father: string, gender: Gender): string {
   return father + (gender === "male" ? "ұлы" : "қызы");
 }
 
-export interface NameParts {
+interface NameParts {
   first: string;
   last?: string;
   patronymic?: string;

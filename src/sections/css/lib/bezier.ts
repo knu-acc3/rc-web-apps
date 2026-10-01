@@ -55,7 +55,7 @@ export function parseBezier(s: string): Bezier | null {
   return v as Bezier;
 }
 
-export const BEZIER_KEYWORDS: Record<string, Bezier> = {
+const BEZIER_KEYWORDS: Record<string, Bezier> = {
   linear: [0, 0, 1, 1],
   ease: [0.25, 0.1, 0.25, 1],
   "ease-in": [0.42, 0, 1, 1],
@@ -63,7 +63,7 @@ export const BEZIER_KEYWORDS: Record<string, Bezier> = {
   "ease-in-out": [0.42, 0, 0.58, 1],
 };
 
-export interface BezierPreset {
+interface BezierPreset {
   name: string;
   value: Bezier;
 }

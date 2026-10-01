@@ -15,10 +15,6 @@ export interface MatchResult {
   capped: boolean;
 }
 
-export function compile(pattern: string, flags: string): RegExp {
-  return new RegExp(pattern, flags);
-}
-
 /** All matches (or the first one without g/y), at most `cap`. Zero-length matches advance by one code point with u/v. */
 export function findAll(pattern: string, flags: string, text: string, cap = 10000): MatchResult {
   const global = flags.includes("g") || flags.includes("y");

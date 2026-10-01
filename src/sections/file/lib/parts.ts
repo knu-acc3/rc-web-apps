@@ -23,7 +23,7 @@ export function partName(name: string, index: number, count: number): string {
   return `${name}.${String(index + 1).padStart(digits, "0")}`;
 }
 
-export interface ParsedPart {
+interface ParsedPart {
   base: string;
   index: number;
 }
@@ -39,7 +39,7 @@ export function parsePart(name: string): ParsedPart | null {
   return null;
 }
 
-export interface JoinPlan {
+interface JoinPlan {
   /** Indices into the input list in joining order. */
   order: number[];
   /** Output file name. */

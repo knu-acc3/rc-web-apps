@@ -10,7 +10,7 @@ export function addPrefixSuffix(s: string, prefix: string, suffix: string, skipE
     .join("\n");
 }
 
-export interface NumberOptions {
+interface NumberOptions {
   start?: number;
   step?: number;
   /** Template: {n} is replaced by the number, e.g. "{n}. ", "{n}) ", "[{n}] " */
@@ -103,7 +103,7 @@ export function wrapText(s: string, width: number, breakWords = false): string {
     .join("\n");
 }
 
-export interface FilterOptions {
+interface FilterOptions {
   query: string;
   /** keep lines that contain the query, or remove them */
   mode: "keep" | "remove";

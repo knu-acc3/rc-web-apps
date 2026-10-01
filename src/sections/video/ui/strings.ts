@@ -138,8 +138,6 @@ export const UI = {
   },
 } as const;
 
-export type UiStrings = (typeof UI)[Locale];
-
 /** Map an engine error to a user-facing message. */
 export function errorText(locale: Locale, err: unknown): string {
   const e = UI[locale].errors;

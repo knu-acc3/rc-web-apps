@@ -1,6 +1,6 @@
 import type { Locale } from "@/i18n/config";
 
-export interface TemplateGroup {
+interface TemplateGroup {
   title: string;
   items: string[];
 }

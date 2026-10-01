@@ -136,7 +136,7 @@ export function minifyHtml(html: string, o: { keepComments?: boolean; minifyCss?
 
 type XTok = { t: "open" | "close" | "self" | "decl" | "comment" | "cdata" | "doctype" | "text"; v: string; name?: string };
 
-export function tokenizeXml(xml: string): XTok[] {
+function tokenizeXml(xml: string): XTok[] {
   const src = xml.replace(/^\ufeff/, "");
   const toks: XTok[] = [];
   let i = 0;

@@ -7,7 +7,7 @@ import { cn } from "@/lib/cn";
 import { copyText } from "@/lib/clipboard";
 import { formatColor, type Color, type ColorFormat } from "../lib/color";
 
-export const FORMAT_LABEL: Record<ColorFormat, string> = {
+const FORMAT_LABEL: Record<ColorFormat, string> = {
   hex: "HEX",
   rgb: "RGB",
   hsl: "HSL",

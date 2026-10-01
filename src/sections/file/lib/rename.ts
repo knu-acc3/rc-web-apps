@@ -21,14 +21,14 @@ export interface RenameOptions {
 
 export const DEFAULT_RENAME: RenameOptions = { pattern: "{name}", start: 1, pad: 0, find: "", replace: "", regex: false, caseMode: "keep", translit: false, spaces: "keep" };
 
-export interface RenameInput {
+interface RenameInput {
   name: string;
   lastModified: number;
 }
 
 export type RenameError = "empty" | "illegal" | "reserved" | "duplicate" | "long";
 
-export interface RenameResult {
+interface RenameResult {
   name: string;
   error?: RenameError;
 }

@@ -783,16 +783,6 @@ export const LIBRARY: LibPattern[] = [
   },
 ];
 
-export const CATEGORY_NAME: Record<Category, L> = {
-  web: { ru: "Интернет и сеть", en: "Web and network" },
-  id: { ru: "Идентификаторы", en: "Identifiers" },
-  code: { ru: "Код и файлы", en: "Code and files" },
-  text: { ru: "Текст", en: "Text" },
-  numbers: { ru: "Числа и номера", en: "Numbers" },
-  datetime: { ru: "Даты и время", en: "Dates and times" },
-  "ru-kz": { ru: "Россия и Казахстан", en: "Russia and Kazakhstan" },
-};
-
 /** Flags to preload into the tester: full patterns are tested line by line. */
 export function testerFlags(p: LibPattern): string {
   const base = new Set(p.flags.split(""));

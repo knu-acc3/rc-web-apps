@@ -11,7 +11,7 @@ import countriesJson from "./data/countries.json";
 import zoneNamesJson from "./data/zone-names.json";
 import { ZONES, type ZoneDef } from "./data/zones";
 import { durationWords } from "./lib/text";
-import { fmtOffset, offsetSlug, tzOffset, zoned, zoneYear, type Transition, type ZoneYearInfo } from "./lib/tz";
+import { fmtOffset, offsetSlug, zoned, zoneYear, type Transition, type ZoneYearInfo } from "./lib/tz";
 
 export interface City {
   slug: string;
@@ -101,7 +101,7 @@ export function countryName(cc: string, locale: Locale): string {
 }
 
 /** Qualifier for ambiguous names: «Хайдарабад (Пакистан)», «Тунис (город)». */
-export function cityQualifier(c: City, locale: Locale): string {
+function cityQualifier(c: City, locale: Locale): string {
   const dupName = locale === "ru" ? (ruNameCount.get(c.ru) ?? 0) > 1 : (enNameCount.get(c.en) ?? 0) > 1;
   if (dupName) return countryName(c.cc, locale);
   if (locale === "ru" && countryRuIn.has(c.ruIn)) return "город";
@@ -139,15 +139,7 @@ export function zoneInfo(tz: string, year = BUILD_YEAR): ZoneYearInfo {
   return v;
 }
 
-/** Offset of a zone at build time. */
-export const offsetAtBuild = (tz: string): number => tzOffset(tz, BUILD_NOW);
-
 export { diffShort, durationWords } from "./lib/text";
-
-/** Offset label for both seasons: "UTC+3" or "UTC+0 / UTC+1". */
-export function offsetsLabel(info: ZoneYearInfo): string {
-  return info.std === info.dst ? fmtOffset(info.std) : `${fmtOffset(info.std)} / ${fmtOffset(info.dst)}`;
-}
 
 /** Common abbreviation of a zone at a given offset (English CLDR short names for US/EU/AU zones, our table otherwise). */
 const ABBR_BY_TZ: Record<string, Record<number, string>> = {
@@ -203,7 +195,7 @@ function cityByZoneCc(tz: string): string | undefined {
 
 /* ───────────── DST texts ───────────── */
 
-export interface DstText {
+interface DstText {
   /** one-line summary for leads/descriptions */
   short: string;
   /** full sentence(s) for facts */
@@ -250,7 +242,7 @@ export function dstText(tz: string, locale: Locale, year = BUILD_YEAR): DstText 
 
 /* ───────────── zones ↔ places ───────────── */
 
-export const zoneBySlugMap = new Map(ZONES.map((z) => [z.slug, z]));
+const zoneBySlugMap = new Map(ZONES.map((z) => [z.slug, z]));
 
 /** Zone page path; "utc" is served by the UTC time tool. */
 export function zonePath(z: ZoneDef): string[] {
@@ -304,7 +296,7 @@ export function joinList(items: string[], locale: Locale, max = 8): string {
 }
 
 /** Compact place record passed to client components. */
-export interface ClientPlace {
+interface ClientPlace {
   key: string;
   name: string;
   /** country or hint */

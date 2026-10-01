@@ -1,7 +1,7 @@
 /** Sleep cycles: bedtimes for a wake-up time and wake-up times for a bedtime (minutes since midnight). */
 
-export const DAY_MIN = 1440;
-export const norm = (m: number) => ((Math.round(m) % DAY_MIN) + DAY_MIN) % DAY_MIN;
+const DAY_MIN = 1440;
+const norm = (m: number) => ((Math.round(m) % DAY_MIN) + DAY_MIN) % DAY_MIN;
 
 /** "07:30" → 450; null when invalid. */
 export function parseHm(s: string): number | null {

@@ -39,11 +39,6 @@ export const div = (a: Q, b: Q) => {
 };
 export const neg = (a: Q): Q => ({ n: -a.n, d: a.d });
 export const isZero = (a: Q) => a.n === 0n;
-export const eq = (a: Q, b: Q) => a.n === b.n && a.d === b.d;
-export const cmp = (a: Q, b: Q) => {
-  const x = a.n * b.d - b.n * a.d;
-  return x < 0n ? -1 : x > 0n ? 1 : 0;
-};
 export const isInt = (a: Q) => a.d === 1n;
 
 /** Accurate conversion to a float even for huge numerators/denominators. */
@@ -63,7 +58,7 @@ export function toText(a: Q, minus = "−"): string {
   return a.d === 1n ? `${s}${babs(a.n)}` : `${s}${babs(a.n)}/${a.d}`;
 }
 
-export interface Mixed {
+interface Mixed {
   negative: boolean;
   whole: bigint;
   num: bigint;

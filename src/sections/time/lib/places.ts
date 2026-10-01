@@ -15,7 +15,7 @@ export interface PlaceEntry extends Place {
   rank: number;
 }
 
-export function norm(s: string): string {
+function norm(s: string): string {
   return s
     .toLowerCase()
     .replace(/ё/g, "е")

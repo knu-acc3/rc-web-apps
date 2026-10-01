@@ -8,7 +8,6 @@ import {
   applyFades,
   applyGain,
   changeSpeed,
-  concatChannels,
   dbToGain,
   frames,
   normalizeGain,
@@ -150,14 +149,3 @@ export async function encodePcm(pcm: Pcm, target: AudioTarget, bitrate: number, 
   return new Blob([buf], { type: format.mimeType });
 }
 
-/** Decode several files and join them (resampled to the first file's rate), with a crossfade. */
-export async function mergePcm(files: Blob[], crossfade: number, progress: Progress): Promise<Pcm> {
-  const list: Pcm[] = [];
-  for (let i = 0; i < files.length; i++) {
-    list.push(await decodePcm(files[i], (p) => progress((i + p) / files.length)));
-  }
-  const sr = list[0].sampleRate;
-  const channels = Math.max(...list.map((p) => p.channels.length));
-  const clips = list.map((p) => remix(resample(p.channels, p.sampleRate, sr), channels));
-  return { channels: concatChannels(clips, Math.round(crossfade * sr)), sampleRate: sr };
-}

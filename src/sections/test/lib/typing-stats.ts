@@ -7,7 +7,7 @@
  */
 
 /** Standard "word" length used by WPM (characters incl. spaces). */
-export const CHARS_PER_WORD = 5;
+const CHARS_PER_WORD = 5;
 
 export const TYPING_DURATIONS = [60, 180, 300] as const;
 /** 0 = type the whole text (no time limit). */
@@ -32,7 +32,7 @@ export function accuracy(keystrokes: number, wrongKeystrokes: number): number {
 }
 
 /** Characters that are treated as equal while typing (ё = е, typographic quotes and dashes). */
-export function normalizeChar(c: string): string {
+function normalizeChar(c: string): string {
   switch (c) {
     case "ё":
       return "е";
@@ -59,11 +59,11 @@ export function normalizeChar(c: string): string {
   }
 }
 
-export function charsMatch(typed: string, expected: string): boolean {
+function charsMatch(typed: string, expected: string): boolean {
   return normalizeChar(typed) === normalizeChar(expected);
 }
 
-export interface InputDiff {
+interface InputDiff {
   /** Index where the change starts. */
   at: number;
   /** Number of characters removed from the previous value. */
@@ -124,9 +124,9 @@ export function countUncorrected(input: string, target: string): number {
   return Math.min(input.length, target.length) - countCorrect(input, target);
 }
 
-export type CharState = "ok" | "err" | "todo";
+type CharState = "ok" | "err" | "todo";
 
-export interface Run {
+interface Run {
   state: CharState;
   text: string;
 }

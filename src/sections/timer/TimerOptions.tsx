@@ -10,8 +10,8 @@ import { useStoredJson } from "@/sections/time/lib/storage";
 import { schedule, SOUND_IDS, type SoundId } from "./lib/audio";
 import { requestNotifications, useNotificationsSupported } from "./lib/notify";
 
-export type SoundChoice = SoundId | "off";
-export interface AlertOptions {
+type SoundChoice = SoundId | "off";
+interface AlertOptions {
   sound: SoundChoice;
   notify: boolean;
 }
@@ -53,10 +53,6 @@ const DEFAULTS: AlertOptions = { sound: "beep", notify: false };
 export function useAlertOptions(): [AlertOptions, (o: AlertOptions) => void] {
   const [o, set] = useStoredJson<AlertOptions>("timer:alerts:v1", DEFAULTS, isOpts);
   return [o, set];
-}
-
-export function soundLabel(locale: Locale, s: SoundChoice): string {
-  return T[locale][s];
 }
 
 /** One quiet row: sound, notification, full screen. */

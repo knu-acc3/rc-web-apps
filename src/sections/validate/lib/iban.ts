@@ -3,7 +3,7 @@ import { IBAN_BY_CODE, type IbanCountry } from "../data/iban-countries";
 
 export type IbanError = "empty" | "chars" | "country" | "length" | "structure" | "checksum";
 
-export interface IbanResult {
+interface IbanResult {
   /** Upper-case, no spaces */
   iban: string;
   valid: boolean;
@@ -19,7 +19,7 @@ export interface IbanResult {
   expectedCheck?: string;
 }
 
-export function normalize(input: string): string {
+function normalize(input: string): string {
   return input.replace(/^IBAN[:\s]*/i, "").replace(/[\s\-.]/g, "").toUpperCase();
 }
 

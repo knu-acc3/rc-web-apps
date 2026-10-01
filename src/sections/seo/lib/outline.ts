@@ -1,14 +1,14 @@
 /* Heading outline (H1–H6) extracted from HTML without a DOM, plus structural issues;
    and the llms.txt builder. */
 
-export interface Heading {
+interface Heading {
   level: number;
   text: string;
 }
 
 const ENTITIES: Record<string, string> = { amp: "&", lt: "<", gt: ">", quot: '"', apos: "'", nbsp: " ", laquo: "«", raquo: "»", mdash: "—", ndash: "–", hellip: "…" };
 
-export function decodeEntities(s: string): string {
+function decodeEntities(s: string): string {
   return s.replace(/&(#x[0-9a-f]+|#\d+|[a-z]+);/gi, (m, e: string) => {
     if (e[0] === "#") {
       const n = e[1].toLowerCase() === "x" ? parseInt(e.slice(2), 16) : parseInt(e.slice(1), 10);
@@ -63,7 +63,7 @@ export function outlineIssues(hs: Heading[]): OutlineIssue[] {
 
 /* ───── llms.txt (llmstxt.org) ───── */
 
-export interface LlmsInput {
+interface LlmsInput {
   name: string;
   summary: string;
   details: string;

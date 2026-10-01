@@ -38,7 +38,7 @@ function range(a: number, b: number): number[] {
 }
 
 /** Build year: only for the default view of /calendar and labels; pages are year-specific. */
-export const BUILD_YEAR = new Date().getFullYear();
+const BUILD_YEAR = new Date().getFullYear();
 
 const home = (locale: Locale): Crumb => ({ name: ui(locale).home, path: [] });
 const calCrumb = (locale: Locale): Crumb => ({ name: locale === "ru" ? "Календарь" : "Calendar", path: ["calendar"] });

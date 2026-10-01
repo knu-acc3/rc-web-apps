@@ -49,6 +49,7 @@ export function releasePdfjs(): void {
   }, 1000);
 }
 
+/** @public — read through a dynamic import() in use-pdf-files.ts */
 export class PasswordNeeded extends Error {
   constructor(public incorrect: boolean) {
     super(incorrect ? "incorrect-password" : "password-required");
@@ -82,7 +83,7 @@ export async function openDocument(bytes: ArrayBuffer, password?: string): Promi
   }
 }
 
-export interface RenderOptions {
+interface RenderOptions {
   /** Extra clockwise rotation on top of the page's own /Rotate. */
   rotate?: number;
   /** Fill colour behind the page (default white). */
@@ -119,8 +120,6 @@ export function releaseCanvas(canvas: HTMLCanvasElement | OffscreenCanvas | null
 export function canvasToBlob(canvas: HTMLCanvasElement, type: string, quality?: number): Promise<Blob> {
   return new Promise((resolve, reject) => canvas.toBlob((b) => (b ? resolve(b) : reject(new Error("toBlob failed"))), type, quality));
 }
-
-export const isRenderCancel = (e: unknown) => (e as { name?: string })?.name === "RenderingCancelledException";
 
 /** Size of a page as displayed (after /Rotate), in points. */
 export async function pageSize(doc: PDFDocumentProxy, index: number): Promise<{ width: number; height: number }> {

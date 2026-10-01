@@ -39,16 +39,6 @@ function formatter(tz: string): Intl.DateTimeFormat {
   return f;
 }
 
-/** Is the zone known to this engine (or to our alias table)? */
-export function isKnownZone(tz: string): boolean {
-  try {
-    new Intl.DateTimeFormat("en-US", { timeZone: tz });
-    return true;
-  } catch {
-    return tz in ALIASES;
-  }
-}
-
 /**
  * Kazakhstan moved to a single zone UTC+5 on 2024-03-01 (tzdata 2024a).
  * Browsers with older tzdata still show UTC+6 for these zones — correct them.
@@ -213,27 +203,5 @@ export function parseOffsetSlug(slug: string): number | null {
   return m[1] === "plus" ? v : -v;
 }
 
-/** Difference b − a in minutes as a short human string: "+3 ч", "−7 ч 30 мин", "0". */
-export function fmtDiff(min: number, locale: "ru" | "en", signed = true): string {
-  if (min === 0) return locale === "ru" ? "0 ч" : "0 h";
-  const sign = signed ? (min < 0 ? MINUS : "+") : "";
-  const a = Math.abs(min);
-  const h = Math.floor(a / 60);
-  const m = a % 60;
-  const hs = locale === "ru" ? "ч" : "h";
-  const ms = locale === "ru" ? "мин" : "min";
-  return `${sign}${h ? `${h} ${hs}` : ""}${h && m ? " " : ""}${m ? `${m} ${ms}` : ""}`;
-}
-
 export const pad2 = (n: number): string => String(n).padStart(2, "0");
 
-/** "14:05" or "14:05:09"; 12-hour when `h12`. */
-export function fmtClock(p: { h: number; mi: number; s?: number }, withSeconds = false, h12 = false): string {
-  let h = p.h;
-  let suffix = "";
-  if (h12) {
-    suffix = h < 12 ? " AM" : " PM";
-    h = h % 12 || 12;
-  }
-  return `${h12 ? h : pad2(h)}:${pad2(p.mi)}${withSeconds && p.s !== undefined ? `:${pad2(p.s)}` : ""}${suffix}`;
-}

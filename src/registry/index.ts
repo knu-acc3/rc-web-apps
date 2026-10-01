@@ -50,7 +50,7 @@ export function resolvePage(locale: Locale, segments: string[]): PageModel | nul
  * ("Килограммы в унции | кг в унции конвертер"). Sections write "A — B" or "A: B"; the first separator
  * becomes " | ".
  */
-export function seoTitle(title: string): string {
+function seoTitle(title: string): string {
   if (title.includes(" | ")) return title;
   const dash = title.indexOf(" — ");
   if (dash > 0) return `${title.slice(0, dash)} | ${title.slice(dash + 3)}`;
@@ -82,11 +82,11 @@ export function sectionsByCategory(locale: Locale) {
 }
 
 /** Landing page of a section: its hub, or null for navigation-only groups. */
-export function sectionHub(s: SectionDef): string[] | null {
+function sectionHub(s: SectionDef): string[] | null {
   return s.hubPath === undefined ? [s.id] : s.hubPath;
 }
 
-export function sectionTools(s: SectionDef, locale: Locale): LinkItem[] {
+function sectionTools(s: SectionDef, locale: Locale): LinkItem[] {
   return withSectionLook(s, s.tools ? s.tools(locale) : s.featured(locale));
 }
 
@@ -138,7 +138,7 @@ export function linkFor(locale: Locale, path: string[]): LinkItem | null {
   return { path: page.path, label: page.h1, hint: page.lead ?? page.description, icon: page.icon ?? s?.icon, hue: s?.hue };
 }
 
-export interface CatalogGroup {
+interface CatalogGroup {
   id: string;
   label: string;
   icon: string;

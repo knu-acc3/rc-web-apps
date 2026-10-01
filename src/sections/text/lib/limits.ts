@@ -7,17 +7,17 @@ import { graphemes, isEmojiGrapheme } from "./textOps";
 /* ───────────── SMS ───────────── */
 
 /** GSM 03.38 basic character set (7-bit default alphabet), excluding ESC. */
-export const GSM7_BASIC =
+const GSM7_BASIC =
   "@£$¥èéùìòÇ\nØø\rÅåΔ_ΦΓΛΩΠΨΣΘΞÆæßÉ !\"#¤%&'()*+,-./0123456789:;<=>?¡ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÑÜ§¿abcdefghijklmnopqrstuvwxyzäöñüà";
 /** GSM 03.38 extension table: each costs 2 septets (ESC + char). */
-export const GSM7_EXTENDED = "\f^{}\\[~]|€";
+const GSM7_EXTENDED = "\f^{}\\[~]|€";
 
 const BASIC = new Set(GSM7_BASIC);
 const EXT = new Set(GSM7_EXTENDED);
 
-export type SmsEncoding = "GSM-7" | "UCS-2";
+type SmsEncoding = "GSM-7" | "UCS-2";
 
-export interface SmsInfo {
+interface SmsInfo {
   encoding: SmsEncoding;
   /** Septets (GSM-7) or UTF-16 code units (UCS-2). */
   units: number;
@@ -89,8 +89,8 @@ const LIGHT_RANGES: [number, number][] = [
   [0x2010, 0x201f],
   [0x2032, 0x2037],
 ];
-export const X_LIMIT = 280;
-export const X_URL_LENGTH = 23;
+const X_LIMIT = 280;
+const X_URL_LENGTH = 23;
 
 const URL_RE =
   /(?:https?:\/\/|www\.)[^\s<>"«»]+|\b[a-z0-9][a-z0-9-]*(?:\.[a-z0-9-]+)*\.(?:com|net|org|ru|kz|рф|io|dev|app|me|co|info|biz|ua|by|uz|de|uk|us|tv|ai|gg|ly|to)\b(?:\/[^\s<>"«»]*)?/giu;
@@ -100,7 +100,7 @@ function cpWeight(cp: number): number {
   return 2;
 }
 
-export interface XCount {
+interface XCount {
   weighted: number;
   remaining: number;
   urls: number;

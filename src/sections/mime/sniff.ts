@@ -1,6 +1,6 @@
 /* File type detection by content ("magic bytes"). Pure functions — no DOM, unit-tested. */
 
-export interface Magic {
+interface Magic {
   /** Extensions this signature identifies (first = canonical). */
   exts: string[];
   mime: string;

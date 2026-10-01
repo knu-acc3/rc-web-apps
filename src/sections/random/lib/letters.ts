@@ -1,10 +1,10 @@
 import { sample, randomInt } from "./rng";
 
 export type AlphabetId = "ru" | "en" | "kk";
-export type LetterKind = "vowel" | "consonant" | "sign";
+type LetterKind = "vowel" | "consonant" | "sign";
 export type LetterFilter = "all" | "vowels" | "consonants";
 
-export interface Alphabet {
+interface Alphabet {
   id: AlphabetId;
   letters: readonly string[];
   vowels: readonly string[];
@@ -40,7 +40,7 @@ export const ALPHABETS: Record<AlphabetId, Alphabet> = {
   },
 };
 
-export function letterKind(a: Alphabet, letter: string): LetterKind {
+function letterKind(a: Alphabet, letter: string): LetterKind {
   if (a.vowels.includes(letter)) return "vowel";
   if (a.signs.includes(letter)) return "sign";
   return "consonant";

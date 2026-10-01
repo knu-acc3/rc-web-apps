@@ -45,7 +45,7 @@ export const SAMPLE: Record<Symbology, string> = {
 
 export type BarcodeError = "empty" | "digits" | "length" | "check" | "ascii" | "code39" | "codabar" | "upceNs" | "tooLong";
 
-export type BarcodeResult =
+type BarcodeResult =
   | { ok: true; value: string; check?: string; added?: boolean }
   | { ok: false; error: BarcodeError; expected?: string };
 

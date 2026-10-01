@@ -9,13 +9,3 @@ export const cryptoRng: Rng = (n) => {
   return out;
 };
 
-/** Uniform integer in [0, max) without modulo bias (rejection sampling on 32-bit words). */
-export function randomInt(max: number, rng: Rng = cryptoRng): number {
-  if (!Number.isInteger(max) || max <= 0 || max > 2 ** 32) throw new RangeError("max out of range");
-  const limit = Math.floor(2 ** 32 / max) * max;
-  for (;;) {
-    const b = rng(4);
-    const v = ((b[0] << 24) >>> 0) + (b[1] << 16) + (b[2] << 8) + b[3];
-    if (v < limit) return v % max;
-  }
-}

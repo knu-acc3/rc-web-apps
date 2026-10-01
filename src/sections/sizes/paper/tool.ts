@@ -41,7 +41,7 @@ const SERIES_USES: Record<string, Txt> = {
   c: { ru: "Конверты и папки для листов серии A того же номера.", en: "Envelopes and folders for A-series sheets of the same number." },
 };
 
-export const usesOf = (p: PaperFormat): Txt => USES[p.slug] ?? SERIES_USES[p.series] ?? SERIES_USES.a;
+const usesOf = (p: PaperFormat): Txt => USES[p.slug] ?? SERIES_USES[p.series] ?? SERIES_USES.a;
 
 /* ───────────── text helpers ───────────── */
 

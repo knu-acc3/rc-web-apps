@@ -71,13 +71,13 @@ export function shellSplit(input: string): string[] {
   return out;
 }
 
-export interface FormField {
+interface FormField {
   name: string;
   value: string;
   file?: string;
 }
 
-export interface CurlRequest {
+interface CurlRequest {
   url: string;
   method: string;
   headers: [string, string][];

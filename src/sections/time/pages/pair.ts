@@ -20,7 +20,7 @@ function endOf(slug: string): End | null {
   return city ? { slug, city } : null;
 }
 
-export const pairKey = (a: string, b: string) => `${a}-to-${b}`;
+const pairKey = (a: string, b: string) => `${a}-to-${b}`;
 
 const PAIRS = new Map<string, [End, End]>();
 for (const [a, b] of pairList()) {
@@ -29,7 +29,6 @@ for (const [a, b] of pairList()) {
   if (ea && eb) PAIRS.set(pairKey(a, b), [ea, eb]);
 }
 export const pairKeys = (): string[] => [...PAIRS.keys()];
-export const hasPair = (key: string): boolean => PAIRS.has(key);
 
 /* ───────────── helpers ───────────── */
 

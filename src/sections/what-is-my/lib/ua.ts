@@ -50,7 +50,7 @@ const BRAND_NAMES: Record<string, string> = {
   "Android Browser": "Android Browser",
 };
 
-export const normalizeBrowserName = (name: string) => BRAND_NAMES[name] ?? name;
+const normalizeBrowserName = (name: string) => BRAND_NAMES[name] ?? name;
 
 const GENERIC_CHROMIUM = new Set(["Chrome", "Chromium", "Chrome Headless", "Chrome WebView", "Mobile Chrome"]);
 
@@ -146,7 +146,7 @@ export function windowsFromPlatformVersion(pv: string): string | null {
 }
 
 /** "14.5.0" → "14.5", "15.0.0" → "15" */
-export function shortVersion(v: string): string {
+function shortVersion(v: string): string {
   const parts = v.split(".");
   while (parts.length > 1 && /^0*$/.test(parts[parts.length - 1])) parts.pop();
   return parts.slice(0, 2).join(".");
@@ -303,7 +303,7 @@ export function detectBitness(ua: string, h: Hints | null, platform = ""): Bitne
 
 /* ───────────── GPU ───────────── */
 
-export interface GpuName {
+interface GpuName {
   vendor: string | null;
   model: string;
   /** Graphics API used by the browser (Direct3D 11, Metal, Vulkan, OpenGL). */

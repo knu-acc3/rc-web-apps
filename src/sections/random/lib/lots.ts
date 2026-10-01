@@ -5,7 +5,7 @@ export const LOTS_MODES: LotsMode[] = ["custom", "straws", "numbers", "mafia"];
 
 export const LOTS_MAX = 100;
 
-export interface LotsOptions {
+interface LotsOptions {
   /** Custom: one lot per line. */
   lines: string[];
   /** Straws / numbers / mafia: how many players (cards). */

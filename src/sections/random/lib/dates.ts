@@ -17,7 +17,7 @@ export function dayToDate(day: number, minute = 0): Date {
 }
 
 /** 0 = Sunday … 6 = Saturday */
-export const weekday = (day: number) => dayToDate(day).getUTCDay();
+const weekday = (day: number) => dayToDate(day).getUTCDay();
 export const isWeekend = (day: number) => {
   const w = weekday(day);
   return w === 0 || w === 6;

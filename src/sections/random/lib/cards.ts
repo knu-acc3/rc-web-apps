@@ -7,7 +7,7 @@ export interface Card {
   suit: Suit;
 }
 
-export const SUITS: readonly Suit[] = ["S", "H", "D", "C"];
+const SUITS: readonly Suit[] = ["S", "H", "D", "C"];
 export const SUIT_SYMBOL: Record<Suit, string> = { S: "♠", H: "♥", D: "♦", C: "♣" };
 export const isRed = (s: Suit) => s === "H" || s === "D";
 

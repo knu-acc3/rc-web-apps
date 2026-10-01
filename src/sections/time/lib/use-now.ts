@@ -67,17 +67,8 @@ export function useLocalZone(): string | null {
   return useSyncExternalStore(noop, localZone, nullSnapshot);
 }
 
-/** true after hydration. */
-export function useHydrated(): boolean {
-  return useSyncExternalStore(
-    noop,
-    () => true,
-    () => false,
-  );
-}
-
 /** Legacy ids some engines still return → current IANA names (for display and matching). */
-export const MODERN_ZONE: Record<string, string> = {
+const MODERN_ZONE: Record<string, string> = {
   "Europe/Kiev": "Europe/Kyiv",
   "Asia/Calcutta": "Asia/Kolkata",
   "Asia/Saigon": "Asia/Ho_Chi_Minh",

@@ -4,7 +4,7 @@ import { isObj, Num, Obj, type V } from "@/sections/code/kit/value";
 
 export type ArrayMode = "index" | "join" | "json";
 
-export interface FlattenOptions {
+interface FlattenOptions {
   separator?: string;
   arrays?: ArrayMode;
 }
@@ -18,7 +18,7 @@ function cell(v: V): string {
 }
 
 /** Flatten one record into [path, cell] pairs (iterative, no recursion over rows). */
-export function flatten(v: V, o: FlattenOptions = {}): [string, string][] {
+function flatten(v: V, o: FlattenOptions = {}): [string, string][] {
   const sep = o.separator ?? ".";
   const mode = o.arrays ?? "index";
   const out: [string, string][] = [];
@@ -58,7 +58,7 @@ export function recordsToRows(value: V, o: FlattenOptions = {}): string[][] {
 
 const JSON_NUM = /^-?(?:0|[1-9]\d*)(?:\.\d+)?(?:[eE][-+]?\d+)?$/;
 
-export interface TypedOptions {
+interface TypedOptions {
   /** Convert numbers, true/false and empty cells */
   typed?: boolean;
   /** Treat empty cells as null (else "") */
@@ -68,7 +68,7 @@ export interface TypedOptions {
   separator?: string;
 }
 
-export function typedCell(s: string, o: TypedOptions): V {
+function typedCell(s: string, o: TypedOptions): V {
   if (!o.typed) return s;
   if (s === "") return o.emptyAsNull ? null : "";
   if (JSON_NUM.test(s)) return new Num(s); // lossless: big integers keep their digits

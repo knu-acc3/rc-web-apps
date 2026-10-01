@@ -1,7 +1,7 @@
 import type { Locale } from "@/i18n/config";
 import type { Block, QA, ToolDef, VariantDef } from "@/registry/types";
 import { nf, tt } from "../shared";
-import { JEANS_LENGTH, MEN, SHIRTS, WOMEN, span, type ClothingChart, type MenRow, type WomenRow } from "./data";
+import { JEANS_LENGTH, MEN, SHIRTS, WOMEN, span, type MenRow, type WomenRow } from "./data";
 
 const rng = (v: number) => {
   const [a, b] = span(v);
@@ -505,4 +505,3 @@ export const clothingTool: ToolDef = {
   blocks: (l) => [womenTable(l, "tops"), womenTable(l, "bottoms"), menTable(l, "tops"), menTable(l, "bottoms"), measureBlock(l)],
 };
 
-export type { ClothingChart };

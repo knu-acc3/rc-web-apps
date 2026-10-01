@@ -1,12 +1,12 @@
 /* sitemap.xml generation per sitemaps.org: XML escaping, 50,000 URLs / 50 MB per file,
    sitemap index for larger sets. */
 
-export const MAX_URLS = 50_000;
-export const MAX_BYTES = 50 * 1024 * 1024;
+const MAX_URLS = 50_000;
+const MAX_BYTES = 50 * 1024 * 1024;
 
 export type ChangeFreq = "" | "always" | "hourly" | "daily" | "weekly" | "monthly" | "yearly" | "never";
 
-export interface SitemapOptions {
+interface SitemapOptions {
   lastmod?: string;
   changefreq?: ChangeFreq;
   /** "" = omit, "auto" = by path depth, or a fixed "0.0"–"1.0". */
@@ -17,7 +17,7 @@ export function xmlEscape(s: string): string {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/'/g, "&apos;").replace(/"/g, "&quot;");
 }
 
-export interface UrlCheck {
+interface UrlCheck {
   urls: string[];
   invalid: string[];
   duplicates: number;
@@ -63,7 +63,7 @@ function autoPriority(url: string): string {
   return ["1.0", "0.8", "0.6", "0.5"][Math.min(depth, 3)];
 }
 
-export function urlEntry(url: string, o: SitemapOptions): string {
+function urlEntry(url: string, o: SitemapOptions): string {
   let s = `  <url>\n    <loc>${xmlEscape(url)}</loc>\n`;
   if (o.lastmod) s += `    <lastmod>${xmlEscape(o.lastmod)}</lastmod>\n`;
   if (o.changefreq) s += `    <changefreq>${o.changefreq}</changefreq>\n`;
@@ -74,7 +74,7 @@ export function urlEntry(url: string, o: SitemapOptions): string {
 const HEAD = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n';
 const TAIL = "</urlset>\n";
 
-export interface SitemapFile {
+interface SitemapFile {
   name: string;
   xml: string;
   count: number;

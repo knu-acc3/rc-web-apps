@@ -7,7 +7,7 @@ import { cn } from "@/lib/cn";
 import { CopyButton } from "@/ui/copy-button";
 import { Field, Input } from "@/ui/field";
 
-export type Tone = "ok" | "err" | "warn" | "idle";
+type Tone = "ok" | "err" | "warn" | "idle";
 
 const L = {
   ru: { copyAll: "Копировать всё", copied: "Скопировано", details: "Подробности" },

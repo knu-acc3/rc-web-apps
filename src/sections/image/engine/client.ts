@@ -6,7 +6,7 @@
  */
 import type { JobRequest, WorkerIn, WorkerOut } from "./types";
 
-export interface RunOptions {
+interface RunOptions {
   signal?: AbortSignal;
   onProgress?: (value: number) => void;
   transfer?: Transferable[];
@@ -29,7 +29,7 @@ interface Slot {
   last?: string;
 }
 
-export class AbortedError extends Error {
+class AbortedError extends Error {
   constructor() {
     super("Aborted");
     this.name = "AbortError";

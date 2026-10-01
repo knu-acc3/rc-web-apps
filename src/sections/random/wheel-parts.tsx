@@ -14,7 +14,7 @@ export interface WheelEntry {
   color?: string;
 }
 
-export const entryColor = (e: WheelEntry, i: number, n: number) => e.color ?? paletteColor(i, n);
+const entryColor = (e: WheelEntry, i: number, n: number) => e.color ?? paletteColor(i, n);
 
 const R = 98;
 

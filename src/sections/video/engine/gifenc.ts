@@ -1,6 +1,6 @@
 /** Typed loader for `gifenc` (the package ships without type declarations). */
 
-export interface GifFrameOptions {
+interface GifFrameOptions {
   palette?: number[][];
   /** Frame delay in milliseconds (gifenc stores it in 1/100 s). */
   delay?: number;
@@ -11,14 +11,14 @@ export interface GifFrameOptions {
   dispose?: number;
 }
 
-export interface GifEncoderApi {
+interface GifEncoderApi {
   writeFrame(index: Uint8Array, width: number, height: number, opts?: GifFrameOptions): void;
   finish(): void;
   bytes(): Uint8Array;
   bytesView(): Uint8Array;
 }
 
-export interface GifencModule {
+interface GifencModule {
   GIFEncoder(opts?: { auto?: boolean; initialCapacity?: number }): GifEncoderApi;
   quantize(rgba: Uint8Array | Uint8ClampedArray, maxColors: number, opts?: { format?: "rgb565" | "rgb444" | "rgba4444"; oneBitAlpha?: boolean | number; clearAlpha?: boolean }): number[][];
   applyPalette(rgba: Uint8Array | Uint8ClampedArray, palette: number[][], format?: "rgb565" | "rgb444" | "rgba4444"): Uint8Array;

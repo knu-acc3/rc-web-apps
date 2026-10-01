@@ -2,7 +2,7 @@
 
 export type Preset = "basic" | "wordpress" | "bitrix" | "opencart" | "joomla" | "modx" | "disallowAll";
 
-export const PRESETS: Record<Preset, string[]> = {
+const PRESETS: Record<Preset, string[]> = {
   basic: ["User-agent: *", "Disallow:"],
   wordpress: ["User-agent: *", "Disallow: /wp-admin/", "Allow: /wp-admin/admin-ajax.php", "Disallow: /wp-login.php", "Disallow: /?s=", "Disallow: /search/", "Disallow: /*?replytocom=", "Disallow: /trackback/"],
   bitrix: [
@@ -90,7 +90,7 @@ export const AI_BOTS: [string, string][] = [
   ["Meta-ExternalAgent", "Meta"],
 ];
 
-export interface RobotsOptions {
+interface RobotsOptions {
   preset: Preset;
   sitemap: string;
   blockAi: boolean;

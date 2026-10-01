@@ -15,7 +15,7 @@ export interface DiceExpr {
 
 export type DiceError = "empty" | "syntax" | "count" | "sides" | "total" | "const";
 
-export const DICE_LIMITS = { maxCount: 100, maxSides: 1000, maxTotalDice: 200, maxConst: 100000 } as const;
+const DICE_LIMITS = { maxCount: 100, maxSides: 1000, maxTotalDice: 200, maxConst: 100000 } as const;
 
 const TERM = /^(\d*)[dк](\d+|%)$/i;
 
@@ -50,7 +50,7 @@ export function parseDice(input: string): { ok: true; expr: DiceExpr } | { ok: f
   return { ok: true, expr: { terms, text: formatDice(terms) } };
 }
 
-export function formatDice(terms: readonly DiceTerm[]): string {
+function formatDice(terms: readonly DiceTerm[]): string {
   return terms
     .map((t, i) => {
       const body = t.kind === "dice" ? `${t.count}d${t.sides}` : String(t.value);
@@ -148,7 +148,7 @@ export function diceDistribution(expr: DiceExpr, maxRange = 20000): { min: numbe
   return { min: offset, ways: dist, outcomes };
 }
 
-export function convolve(a: readonly bigint[], b: readonly bigint[]): bigint[] {
+function convolve(a: readonly bigint[], b: readonly bigint[]): bigint[] {
   const out = new Array<bigint>(a.length + b.length - 1).fill(0n);
   for (let i = 0; i < a.length; i++) {
     if (a[i] === 0n) continue;

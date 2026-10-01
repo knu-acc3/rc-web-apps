@@ -90,7 +90,7 @@ function regexAllowed(prev: Tok | undefined): boolean {
   return false;
 }
 
-export function tokenizeJs(src: string, keepLicense = true): Tok[] {
+function tokenizeJs(src: string, keepLicense = true): Tok[] {
   const toks: Tok[] = [];
   let i = 0;
   const n = src.length;

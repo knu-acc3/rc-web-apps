@@ -46,7 +46,7 @@ function concat(parts: Uint8Array[]): Uint8Array {
 
 /* ───────────── PNG ───────────── */
 
-export interface PngChunk {
+interface PngChunk {
   type: string;
   /** offset of the length field */
   start: number;
@@ -56,7 +56,7 @@ export interface PngChunk {
   length: number;
 }
 
-export function isPng(b: Uint8Array): boolean {
+function isPng(b: Uint8Array): boolean {
   return b.length > 8 && b[0] === 0x89 && b[1] === 0x50 && b[2] === 0x4e && b[3] === 0x47;
 }
 
@@ -148,7 +148,7 @@ const put32le = (b: Uint8Array, o: number, v: number) => {
   b[o + 3] = (v >>> 24) & 255;
 };
 
-export function isWebp(b: Uint8Array): boolean {
+function isWebp(b: Uint8Array): boolean {
   return b.length > 12 && ascii(b, 0, 4) === "RIFF" && ascii(b, 8, 4) === "WEBP";
 }
 
@@ -181,7 +181,7 @@ export function stripWebpMetadata(b: Uint8Array): { bytes: Uint8Array; removed: 
 
 /* ───────────── ICO ───────────── */
 
-export interface IcoImage {
+interface IcoImage {
   width: number;
   height: number;
   /** PNG-encoded image */

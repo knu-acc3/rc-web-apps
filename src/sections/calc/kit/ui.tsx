@@ -106,7 +106,7 @@ export function NumField({
   );
 }
 
-export interface Option<T extends string> {
+interface Option<T extends string> {
   value: T;
   label: string;
 }
@@ -239,7 +239,7 @@ export function Stack({ children, className }: { children: ReactNode; className?
 
 /* ───────────── Results ───────────── */
 
-export interface ResultRow {
+interface ResultRow {
   label: ReactNode;
   value: ReactNode;
   hint?: ReactNode;
@@ -465,19 +465,6 @@ export function Disclaimer({ locale, kind, children, className }: { locale: Loca
       <Info className="mt-0.5 size-4 shrink-0" aria-hidden />
       <span>{children ?? (kind ? K[locale][kind] : null)}</span>
     </Notice>
-  );
-}
-
-/** Small label chips (e.g. «Неделя 12 · 2-й триместр»). */
-export function InlineFacts({ items, className }: { items: ReactNode[]; className?: string }) {
-  return (
-    <div className={cn("mt-3 flex flex-wrap gap-2", className)}>
-      {items.map((x, i) => (
-        <span key={i} className="inline-flex items-center rounded-full bg-surface px-3 py-1 text-[0.8125rem] font-medium text-fg-2">
-          {x}
-        </span>
-      ))}
-    </div>
   );
 }
 

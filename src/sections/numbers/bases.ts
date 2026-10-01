@@ -5,17 +5,17 @@
  */
 
 export const DIGITS = "0123456789abcdefghijklmnopqrstuvwxyz";
-export const MAX_INPUT_DIGITS = 4096;
+const MAX_INPUT_DIGITS = 4096;
 
 /** value = ±(int + num/den), 0 ≤ num < den. */
-export interface BaseValue {
+interface BaseValue {
   neg: boolean;
   int: bigint;
   num: bigint;
   den: bigint;
 }
 
-export type BaseParse =
+type BaseParse =
   | { ok: true; value: BaseValue; base: number; prefix: string | null; hasFrac: boolean }
   | { ok: false; error: "empty" | "digit" | "too-long" | "format"; char?: string; base: number };
 
@@ -149,9 +149,6 @@ export function groupFrac(s: string, size: number, sep = " "): string {
   for (let i = 0; i < s.length; i += size) out.push(s.slice(i, i + size));
   return out.join(sep);
 }
-
-export const TWOS_BITS = [8, 16, 32, 64] as const;
-export type TwosBits = (typeof TWOS_BITS)[number];
 
 export function signedRange(bits: number): [bigint, bigint] {
   const half = 1n << BigInt(bits - 1);

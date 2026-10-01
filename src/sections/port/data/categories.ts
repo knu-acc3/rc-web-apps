@@ -1,6 +1,6 @@
 import type { PortCat } from "./types";
 
-export interface CatDef {
+interface CatDef {
   id: PortCat;
   icon: string;
   ru: { name: string; title: string; h1: string; desc: string; lead: string; sec: string };

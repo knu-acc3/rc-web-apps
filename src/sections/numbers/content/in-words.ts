@@ -7,7 +7,7 @@ import { enCardinal, enOrdinal, enOrdinalSuffix } from "../words-en";
 import { capitalize, ruCardinal, ruOrdinal, ruPlural } from "../words-ru";
 import { fit, num } from "./text";
 
-export const WORD_NUMBERS: number[] = [
+const WORD_NUMBERS: number[] = [
   ...Array.from({ length: 25 }, (_, i) => i + 1),
   30, 31, 32, 33, 35, 36, 40, 44, 45, 50, 55, 60, 64, 66, 70, 77, 80, 88, 90, 99,
   100, 101, 111, 120, 128, 150, 200, 250, 256, 300, 365, 400, 500, 512, 600, 700, 800, 900, 999,

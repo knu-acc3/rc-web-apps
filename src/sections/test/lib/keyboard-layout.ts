@@ -4,7 +4,7 @@
  * which names the physical key regardless of the active layout.
  */
 
-export interface KeyDef {
+interface KeyDef {
   code: string;
   x: number;
   y: number;

@@ -5,8 +5,8 @@
  */
 import { base64ToBytes, bytesToBase64 } from "@/sections/code/kit/bytes";
 
-export const ENCODE_CHUNK = 3 * 1024 * 1024; // multiple of 3
-export const DECODE_CHUNK = 4 * 1024 * 1024; // multiple of 4
+const ENCODE_CHUNK = 3 * 1024 * 1024; // multiple of 3
+const DECODE_CHUNK = 4 * 1024 * 1024; // multiple of 4
 
 export async function encodeBlob(
   blob: Blob,
@@ -26,7 +26,7 @@ export async function encodeBlob(
 }
 
 /** Parse "data:image/png;base64,…" → mime + payload offset. */
-export function parseDataUri(text: string): { mime?: string; offset: number } {
+function parseDataUri(text: string): { mime?: string; offset: number } {
   const m = /^\s*data:([^;,]*)(?:;[^,]*)?;base64,/i.exec(text.slice(0, 256));
   return m ? { mime: m[1] || undefined, offset: m[0].length } : { offset: 0 };
 }
@@ -66,19 +66,3 @@ export function sniffMime(b: Uint8Array): string {
   return "application/octet-stream";
 }
 
-const EXT: Record<string, string> = {
-  "image/png": "png",
-  "image/jpeg": "jpg",
-  "image/gif": "gif",
-  "image/webp": "webp",
-  "image/avif": "avif",
-  "image/svg+xml": "svg",
-  "image/x-icon": "ico",
-  "application/pdf": "pdf",
-  "application/zip": "zip",
-  "audio/mpeg": "mp3",
-  "audio/ogg": "ogg",
-  "audio/wav": "wav",
-  "text/plain": "txt",
-};
-export const extFor = (mime?: string) => (mime && EXT[mime]) || "bin";

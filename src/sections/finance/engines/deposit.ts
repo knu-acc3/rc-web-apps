@@ -9,7 +9,7 @@ import { addMonths, daysInYearOf } from "../../calc/kit/dates";
 
 export type Capitalization = "monthly" | "quarterly" | "end";
 
-export interface DepositInput {
+interface DepositInput {
   amount: number;
   /** Nominal annual rate, percent. */
   annualRate: number;
@@ -21,7 +21,7 @@ export interface DepositInput {
   withdrawal?: number;
 }
 
-export interface DepositRow {
+interface DepositRow {
   month: number;
   /** Day number of the end of this month (anniversary). */
   date: number;
@@ -36,7 +36,7 @@ export interface DepositRow {
   balance: number;
 }
 
-export interface DepositResult {
+interface DepositResult {
   rows: DepositRow[];
   end: number;
   days: number;

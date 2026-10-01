@@ -20,7 +20,7 @@ import {
 import type { CountryTimeProps, Place } from "../types";
 import { cityLink, home, HUE, SECTION_ID, timeCrumb } from "./common";
 
-export interface ZoneGroup {
+interface ZoneGroup {
   std: number;
   dst: number;
   hasDst: boolean;
@@ -30,7 +30,7 @@ export interface ZoneGroup {
 }
 
 /** Zones of a country grouped by standard offset (the usual meaning of "a time zone"). */
-export function zoneGroups(c: Country): ZoneGroup[] {
+function zoneGroups(c: Country): ZoneGroup[] {
   const map = new Map<number, ZoneGroup>();
   const cities = citiesOf(c.cc);
   for (const tz of c.zones) {

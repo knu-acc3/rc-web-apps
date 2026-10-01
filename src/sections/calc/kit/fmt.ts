@@ -6,10 +6,6 @@ import { formatNumber, formatSmart } from "@/i18n/format";
 export type Currency = "KZT" | "RUB" | "USD" | "EUR";
 export const CURRENCIES: readonly Currency[] = ["KZT", "RUB", "USD", "EUR"];
 export const CURRENCY_SYMBOL: Record<Currency, string> = { KZT: "₸", RUB: "₽", USD: "$", EUR: "€" };
-export const CURRENCY_NAME: Record<Locale, Record<Currency, string>> = {
-  ru: { KZT: "Тенге (₸)", RUB: "Рубли (₽)", USD: "Доллары ($)", EUR: "Евро (€)" },
-  en: { KZT: "Tenge (₸)", RUB: "Rubles (₽)", USD: "Dollars ($)", EUR: "Euro (€)" },
-};
 /** Name of the minor unit, for texts like «округление до тиынов». */
 export const MINOR_UNIT: Record<Locale, Record<Currency, string>> = {
   ru: { KZT: "тиын", RUB: "копейка", USD: "цент", EUR: "цент" },

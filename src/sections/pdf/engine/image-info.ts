@@ -4,7 +4,7 @@
  * still giving pages the correct physical size and orientation.
  */
 
-export interface ImageInfo {
+interface ImageInfo {
   format: "jpeg" | "png";
   width: number;
   height: number;
@@ -149,10 +149,6 @@ export function readPngInfo(b: Uint8Array): ImageInfo | null {
   }
   if (!width || !height) return null;
   return { format: "png", width, height, dpiX, dpiY, orientation: 1, alpha };
-}
-
-export function readImageInfo(b: Uint8Array): ImageInfo | null {
-  return readJpegInfo(b) ?? readPngInfo(b);
 }
 
 /** Copy of a JPEG with its EXIF orientation reset to 1 (PDF viewers ignore EXIF). */

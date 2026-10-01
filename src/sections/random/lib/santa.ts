@@ -11,7 +11,7 @@ import { randomInt } from "./rng";
 
 export type SantaError = "few" | "impossible" | "noRecipient" | "noGiver" | "tooConstrained";
 
-export type SantaResult =
+type SantaResult =
   | { ok: true; assignment: number[] }
   | { ok: false; error: SantaError; person?: number };
 

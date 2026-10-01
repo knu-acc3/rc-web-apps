@@ -15,7 +15,7 @@ export function wifiPayload(o: { ssid: string; password?: string; security: Wifi
 }
 
 /** Escape a vCard 3.0 text value (RFC 2426): backslash, comma, semicolon and newlines. */
-export function escapeVcard(s: string): string {
+function escapeVcard(s: string): string {
   return s.replace(/\\/g, "\\\\").replace(/,/g, "\\,").replace(/;/g, "\\;").replace(/\r?\n/g, "\\n");
 }
 
@@ -41,7 +41,7 @@ export function foldLine(line: string): string {
   return out.join("\r\n ");
 }
 
-export interface VCard {
+interface VCard {
   firstName?: string;
   lastName?: string;
   org?: string;
@@ -124,12 +124,12 @@ export function geoPayload(lat: number, lon: number, label?: string): string {
 }
 
 /** Escape an iCalendar TEXT value (RFC 5545 §3.3.11). */
-export function escapeIcal(s: string): string {
+function escapeIcal(s: string): string {
   return s.replace(/\\/g, "\\\\").replace(/;/g, "\\;").replace(/,/g, "\\,").replace(/\r?\n/g, "\\n");
 }
 
 /** "2026-10-15T19:00" → "20261015T190000" (floating local time); "2026-10-15" → "20261015". */
-export function icalDate(v: string): string {
+function icalDate(v: string): string {
   const m = v.match(/^(\d{4})-(\d{2})-(\d{2})(?:T(\d{2}):(\d{2}))?/);
   if (!m) return "";
   return m[4] ? `${m[1]}${m[2]}${m[3]}T${m[4]}${m[5]}00` : `${m[1]}${m[2]}${m[3]}`;
@@ -152,7 +152,7 @@ export function eventPayload(o: { title: string; start: string; end?: string; al
 
 /* ───── ГОСТ Р 56042-2014 (Russian bank transfer QR) ───── */
 
-export interface GostPayment {
+interface GostPayment {
   Name: string;
   PersonalAcc: string;
   BankName: string;
@@ -165,7 +165,7 @@ export interface GostPayment {
   Purpose?: string;
 }
 
-export type GostError = "Name" | "PersonalAcc" | "BankName" | "BIC" | "CorrespAcc" | "PayeeINN" | "KPP" | "Sum" | "Purpose" | "pipe";
+type GostError = "Name" | "PersonalAcc" | "BankName" | "BIC" | "CorrespAcc" | "PayeeINN" | "KPP" | "Sum" | "Purpose" | "pipe";
 
 /** Account control key against BIC (Bank of Russia rules): weights 7,1,3 over 23 digits, sum of last digits ≡ 0 (mod 10). */
 export function accountKeyOk(bic: string, account: string, correspondent = false): boolean {
@@ -213,7 +213,7 @@ export function gostPayload(p: GostPayment): string {
 
 /* ───── EPC069-12 SEPA credit transfer ("GiroCode") ───── */
 
-export interface EpcPayment {
+interface EpcPayment {
   name: string;
   iban: string;
   bic?: string;
@@ -225,9 +225,9 @@ export interface EpcPayment {
   info?: string;
 }
 
-export type EpcError = "name" | "iban" | "bic" | "amount" | "purpose" | "reference" | "text" | "both" | "info" | "size";
+type EpcError = "name" | "iban" | "bic" | "amount" | "purpose" | "reference" | "text" | "both" | "info" | "size";
 
-export function epcAmount(amount: string): string | null {
+function epcAmount(amount: string): string | null {
   const s = amount.trim().replace(",", ".");
   if (!/^\d{1,9}(\.\d{1,2})?$/.test(s)) return null;
   const n = Number(s);

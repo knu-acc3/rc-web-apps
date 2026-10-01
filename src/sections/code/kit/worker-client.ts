@@ -12,7 +12,7 @@
  * The worker file must call `serve({...handlers})` from ./worker-host.
  */
 
-export class JobCancelled extends Error {
+class JobCancelled extends Error {
   constructor() {
     super("Job cancelled");
     this.name = "JobCancelled";
@@ -40,7 +40,7 @@ export class JobError extends Error {
 
 export const isCancelled = (e: unknown): e is JobCancelled => e instanceof JobCancelled;
 
-export interface RunOptions {
+interface RunOptions {
   /** Terminate the worker and reject with JobTimeout after this many ms. */
   timeoutMs?: number;
   /** Transferable objects to move (not copy) into the worker. */

@@ -117,9 +117,6 @@ export const EXTRA_TAGS: Readonly<Record<string, readonly string[]>> = {
 /** Unique kaomoji count across all categories. */
 export const TOTAL = CATEGORIES.reduce((n, c) => n + c.items.length, 0);
 
-/** Main category slug of every kaomoji. */
-export const CATEGORY_OF: ReadonlyMap<string, string> = new Map(CATEGORIES.flatMap((c) => c.items.map((k) => [k, c.slug] as const)));
-
 /** Kaomoji from other categories tagged with `slug`. */
 export function taggedFor(slug: string): string[] {
   return Object.entries(EXTRA_TAGS)

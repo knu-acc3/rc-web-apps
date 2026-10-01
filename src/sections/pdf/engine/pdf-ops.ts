@@ -29,7 +29,7 @@ import {
   type PDFFont,
   type PDFPage,
 } from "@cantoo/pdf-lib";
-import { copyPagesInto, duplicatePage } from "./copy";
+import { copyPagesInto } from "./copy";
 import {
   PAPER,
   anchorPosition,
@@ -87,7 +87,7 @@ export async function saveDoc(doc: PDFDocument, opts: { updateFieldAppearances?:
 
 /* ───────────── page geometry ───────────── */
 
-export interface PageGeometry {
+interface PageGeometry {
   /** Visible area (CropBox clipped to MediaBox) in user space. */
   crop: Box;
   rotate: 0 | 90 | 180 | 270;
@@ -190,13 +190,12 @@ export function rotatePages(doc: PDFDocument, rotations: readonly { index: numbe
   }
 }
 
-export { duplicatePage };
 
 /* ───────────── fonts ───────────── */
 
 /** Characters Helvetica (WinAnsi) can draw; anything else needs an embedded font. */
 const WIN_ANSI = /^[\x20-\x7e -ÿ–—‘’‚“”„†‡•…‰‹›€™ŒœŠšŸŽžƒˆ˜]*$/;
-export const isWinAnsi = (text: string) => WIN_ANSI.test(text);
+const isWinAnsi = (text: string) => WIN_ANSI.test(text);
 
 type Fontkit = Parameters<PDFDocument["registerFontkit"]>[0];
 let fontkitPromise: Promise<Fontkit> | null = null;
@@ -242,7 +241,7 @@ export async function textFont(doc: PDFDocument, text: string, fontBytes?: Uint8
 
 export type RGB = [number, number, number];
 
-export interface TextStampStyle {
+interface TextStampStyle {
   size: number;
   color: RGB;
   opacity: number;

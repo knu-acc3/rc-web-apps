@@ -20,7 +20,7 @@ export interface FfInput {
 const CRF: Record<string, number> = { high: 20, medium: 23, low: 28 };
 
 /** Map ffprobe codec names to the ids used everywhere else (mediabunny ids). */
-export function fromFfprobeCodec(name: string): string {
+function fromFfprobeCodec(name: string): string {
   const map: Record<string, string> = { h264: "avc", hevc: "hevc", vp8: "vp8", vp9: "vp9", av1: "av1", prores: "prores", aac: "aac", mp3: "mp3", opus: "opus", vorbis: "vorbis", flac: "flac", ac3: "ac3", eac3: "eac3", dts: "dts", pcm_s16le: "pcm-s16", pcm_s24le: "pcm-s24" };
   return map[name] ?? name;
 }

@@ -15,7 +15,7 @@ const NAME: Record<B, { gen: string; acc: string; nom: string; en: string; short
 const SUB: Record<string, string> = { "0": "₀", "1": "₁", "2": "₂", "3": "₃", "4": "₄", "5": "₅", "6": "₆", "7": "₇", "8": "₈", "9": "₉" };
 const sub = (b: number) => String(b).split("").map((c) => SUB[c]).join("");
 
-export const PAIRS: { slug: string; from: B; to: B; value: string }[] = [
+const PAIRS: { slug: string; from: B; to: B; value: string }[] = [
   { slug: "binary-to-decimal", from: 2, to: 10, value: "101010" },
   { slug: "decimal-to-binary", from: 10, to: 2, value: "42" },
   { slug: "hex-to-decimal", from: 16, to: 10, value: "FF" },

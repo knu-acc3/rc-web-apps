@@ -6,7 +6,7 @@ import { readKey, subscribeStorage, writeKey } from "../text/lib/storage";
 const LISTS = "todo:v1:lists";
 const ITEMS = (listId: string) => `todo:v1:items:${listId}`;
 
-export interface TodoList {
+interface TodoList {
   id: string;
   name: string;
 }

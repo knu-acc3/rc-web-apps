@@ -2,11 +2,11 @@
 
 export type Sport = "default" | "basketball" | "volleyball" | "football" | "hockey" | "table-tennis" | "badminton" | "quiz";
 
-export const SPORT_IDS: Sport[] = ["default", "basketball", "volleyball", "football", "hockey", "table-tennis", "badminton", "quiz"];
+const SPORT_IDS: Sport[] = ["default", "basketball", "volleyball", "football", "hockey", "table-tennis", "badminton", "quiz"];
 
 type L = { ru: string; en: string };
 
-export interface SportConfig {
+interface SportConfig {
   /** Score buttons; a tap on the big number adds the first one. */
   steps: number[];
   /** Small per-team number: sets won, games, team fouls. */
@@ -39,9 +39,9 @@ export const SPORTS: Record<Sport, SportConfig> = {
 
 export const isSport = (s: unknown): s is Sport => typeof s === "string" && (SPORT_IDS as string[]).includes(s);
 
-export const MAX_SCORE = 9999;
-export const MIN_COUNTER = -999999;
-export const MAX_COUNTER = 9999999;
+const MAX_SCORE = 9999;
+const MIN_COUNTER = -999999;
+const MAX_COUNTER = 9999999;
 
 export const clampScore = (n: number) => Math.max(0, Math.min(MAX_SCORE, Math.round(n)));
 export const clampCounter = (n: number) => Math.max(MIN_COUNTER, Math.min(MAX_COUNTER, Math.round(n)));

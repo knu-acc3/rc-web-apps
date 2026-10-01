@@ -50,7 +50,7 @@ export const COMMON = {
   },
 } as const;
 
-export type Common = (typeof COMMON)[Locale];
+type Common = (typeof COMMON)[Locale];
 
 export function sourceLabel(c: Common, s: "hints" | "ua" | "platform" | null): string {
   return s === "hints" ? c.hints : s === "ua" ? c.uaString : s === "platform" ? c.platform : c.unknown;
@@ -107,7 +107,7 @@ export function Hero({
   );
 }
 
-export interface Row {
+interface Row {
   k: ReactNode;
   /** null → "Detecting…" */
   v: ReactNode | null;

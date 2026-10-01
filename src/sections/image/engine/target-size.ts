@@ -4,12 +4,12 @@
  * injected, so the search is unit-testable.
  */
 
-export interface Encoded<T> {
+interface Encoded<T> {
   size: number;
   value: T;
 }
 
-export interface QualitySearch<T> {
+interface QualitySearch<T> {
   /** Best (highest) quality that fits, or the minimum quality when nothing fits. */
   quality: number;
   result: Encoded<T>;
@@ -17,7 +17,7 @@ export interface QualitySearch<T> {
   tries: number;
 }
 
-export interface SearchOptions {
+interface SearchOptions {
   min?: number;
   max?: number;
   signal?: AbortSignal;
@@ -70,7 +70,7 @@ export function nextScale(scale: number, size: number, targetBytes: number): num
   return scale * Math.min(0.9, Math.max(0.3, ratio * 0.92));
 }
 
-export interface FitResult<T> extends QualitySearch<T> {
+interface FitResult<T> extends QualitySearch<T> {
   scale: number;
 }
 

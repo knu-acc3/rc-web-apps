@@ -42,11 +42,11 @@ export function instantToWall(ms: number, tz: string): Wall {
 const wallMs = (w: Wall) => Date.UTC(w.y, w.M - 1, w.d, w.h, w.m, w.s);
 
 /** Offset of `tz` from UTC at instant `ms`, in milliseconds (wall − UTC). */
-export function offsetAt(ms: number, tz: string): number {
+function offsetAt(ms: number, tz: string): number {
   return wallMs(instantToWall(ms, tz)) - Math.floor(ms / 1000) * 1000;
 }
 
-export interface Resolved {
+interface Resolved {
   ms: number;
   /** The wall time didn't exist (spring-forward gap) and was moved after the gap. */
   gap?: boolean;

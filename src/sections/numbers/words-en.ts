@@ -8,9 +8,9 @@ const ONES = ["zero", "one", "two", "three", "four", "five", "six", "seven", "ei
 const TENS = ["", "", "twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety"];
 const SCALES = ["", "thousand", "million", "billion", "trillion", "quadrillion"];
 
-export const EN_MAX = 10n ** 18n - 1n;
+const EN_MAX = 10n ** 18n - 1n;
 
-export interface EnOptions {
+interface EnOptions {
   /** British "and" after hundreds and before a final 1–99. */
   british?: boolean;
 }

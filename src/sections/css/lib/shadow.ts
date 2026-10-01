@@ -15,7 +15,7 @@ export interface ShadowLayer {
 
 export type ShadowKind = "box" | "text";
 
-export interface ParseResult {
+interface ParseResult {
   layers: ShadowLayer[];
   error: string | null;
 }
@@ -76,7 +76,7 @@ export function parseShadow(value: string, kind: ShadowKind): ParseResult {
   return { layers, error: null };
 }
 
-export function layerCss(l: ShadowLayer, kind: ShadowKind): string {
+function layerCss(l: ShadowLayer, kind: ShadowKind): string {
   const parts = [fmtLength(l.x), fmtLength(l.y), fmtLength(l.blur)];
   if (kind === "box" && l.spread.value !== 0) parts.push(fmtLength(l.spread));
   const color = l.color.trim() || "currentcolor";
@@ -95,4 +95,3 @@ export function shadowCss(layers: ShadowLayer[], kind: ShadowKind): string {
   return `${prop}:\n${layers.map((l, i) => `  ${layerCss(l, kind)}${i === layers.length - 1 ? ";" : ","}`).join("\n")}`;
 }
 
-export const px = (value: number): Length => ({ value, unit: value === 0 ? "" : "px" });

@@ -59,8 +59,6 @@ const data = raw as unknown as {
   chars: Record<string, Row>;
 };
 
-export const SOURCE = data.source;
-
 export const SYMS = new Map<string, Sym>();
 for (const [hex, r] of Object.entries(data.chars)) {
   const cp = parseInt(hex, 16);

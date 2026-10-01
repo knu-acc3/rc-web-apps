@@ -99,7 +99,7 @@ export async function copyPagesInto(dest: PDFDocument, src: PDFDocument, indices
 }
 
 /** Duplicate a page that already lives in `doc`: content/resources are shared, annotations cloned. */
-export function duplicatePage(doc: PDFDocument, page: PDFPage): PDFPage {
+function duplicatePage(doc: PDFDocument, page: PDFPage): PDFPage {
   const ref = doc.context.nextRef();
   const leaf = page.node.clone(doc.context);
   leaf.delete(PDFName.of("Parent"));

@@ -443,7 +443,7 @@ export function detectBytes(b: Uint8Array): Detected | null {
 }
 
 /** How many bytes `sniffFile` reads first. ISO 9660 needs ~36 KB. */
-export const SNIFF_BYTES = 40 * 1024;
+const SNIFF_BYTES = 40 * 1024;
 
 /**
  * Detect the type of a Blob/File. Reads the head, looks behind ID3 tags and counts

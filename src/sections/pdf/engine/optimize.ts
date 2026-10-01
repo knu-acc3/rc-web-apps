@@ -106,14 +106,14 @@ function remapRefs(doc: PDFDocument, map: Map<PDFRef, PDFRef>) {
   if (t.Info instanceof PDFRef && map.has(t.Info)) t.Info = map.get(t.Info)!;
 }
 
-export async function deflate(bytes: Uint8Array): Promise<Uint8Array> {
+async function deflate(bytes: Uint8Array): Promise<Uint8Array> {
   const stream = new Blob([bytes as BlobPart]).stream().pipeThrough(new CompressionStream("deflate"));
   return new Uint8Array(await new Response(stream).arrayBuffer());
 }
 
 /* ───────────── lossless ───────────── */
 
-export interface LosslessStats {
+interface LosslessStats {
   removedObjects: number;
   compressedStreams: number;
   mergedDuplicates: number;
@@ -208,9 +208,9 @@ export interface ImageCodec<B extends Bitmap = Bitmap> {
   encodeJpeg(src: B, width: number, height: number, quality: number): Promise<Uint8Array>;
 }
 
-export type ImageSkipReason = "not-image" | "mask" | "bits" | "decode" | "colorspace" | "filter" | "small" | "huge" | "used-as-mask";
+type ImageSkipReason = "not-image" | "mask" | "bits" | "decode" | "colorspace" | "filter" | "small" | "huge" | "used-as-mask";
 
-export interface ImageCandidate {
+interface ImageCandidate {
   kind: "jpeg" | "flate";
   width: number;
   height: number;
@@ -320,7 +320,7 @@ export function unpredictPng(data: Uint8Array, bpp: number, rowLen: number): Uin
   return out;
 }
 
-export function toRgba(samples: Uint8Array, components: 1 | 3, pixels: number): Uint8ClampedArray {
+function toRgba(samples: Uint8Array, components: 1 | 3, pixels: number): Uint8ClampedArray {
   const out = new Uint8ClampedArray(pixels * 4);
   for (let i = 0, j = 0; i < pixels; i++, j += 4) {
     if (components === 3) {
@@ -335,14 +335,14 @@ export function toRgba(samples: Uint8Array, components: 1 | 3, pixels: number): 
   return out;
 }
 
-export interface RecompressOptions {
+interface RecompressOptions {
   /** JPEG quality 0–1. */
   quality: number;
   /** Longest side in pixels after downscaling. */
   maxSide: number;
 }
 
-export interface RecompressStats {
+interface RecompressStats {
   images: number;
   changed: number;
   bytesBefore: number;

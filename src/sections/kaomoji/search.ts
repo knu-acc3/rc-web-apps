@@ -1,12 +1,12 @@
 import { CATEGORIES, EXTRA_TAGS, type KaomojiCategory } from "./data";
 
-export interface Hit {
+interface Hit {
   k: string;
   /** Main category of the kaomoji. */
   cat: string;
 }
 
-export const normalize = (s: string) => s.toLowerCase().replace(/ё/g, "е").trim();
+const normalize = (s: string) => s.toLowerCase().replace(/ё/g, "е").trim();
 
 /** Search words of a category in both languages, normalised. */
 const WORDS = new Map<string, string[]>(

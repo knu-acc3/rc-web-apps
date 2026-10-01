@@ -43,7 +43,7 @@ export const ERRORS: ReadonlySet<EmailIssue> = new Set<EmailIssue>([
   "spaces",
 ]);
 
-export interface EmailResult {
+interface EmailResult {
   valid: boolean;
   issues: EmailIssue[];
   local: string;
@@ -59,7 +59,7 @@ const QUOTED = /^"(?:[\x20\x21\x23-\x5b\x5d-\x7e]|\\[\x20-\x7e])*"$/;
 const LABEL = /^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/i;
 
 /** Convert a domain to ASCII (punycode) with the WHATWG URL parser; null if it can't be a host name. */
-export function toAsciiDomain(domain: string): string | null {
+function toAsciiDomain(domain: string): string | null {
   try {
     return new URL(`http://${domain}`).hostname;
   } catch {
@@ -80,7 +80,7 @@ function distance(a: string, b: string): number {
   return d[a.length][b.length];
 }
 
-export function suggestDomain(domain: string): string | undefined {
+function suggestDomain(domain: string): string | undefined {
   const d = domain.toLowerCase();
   if (POPULAR.includes(d)) return undefined;
   let best: string | undefined;

@@ -5,7 +5,7 @@
  */
 import type { FilterId } from "../data/types";
 
-export interface Pixels {
+interface Pixels {
   data: Uint8ClampedArray;
   width: number;
   height: number;
@@ -23,7 +23,7 @@ export interface FilterParams {
   size?: number;
 }
 
-export interface FilterDef {
+interface FilterDef {
   id: FilterId;
   min: number;
   max: number;
@@ -75,7 +75,7 @@ function applyMatrix(d: Uint8ClampedArray, m: M3, offset: [number, number, numbe
   }
 }
 
-export function sepiaMatrix(a: number): M3 {
+function sepiaMatrix(a: number): M3 {
   const k = 1 - a;
   return [
     0.393 + 0.607 * k,
@@ -90,7 +90,7 @@ export function sepiaMatrix(a: number): M3 {
   ];
 }
 
-export function saturateMatrix(s: number): M3 {
+function saturateMatrix(s: number): M3 {
   return [
     0.213 + 0.787 * s,
     0.715 - 0.715 * s,
@@ -104,7 +104,7 @@ export function saturateMatrix(s: number): M3 {
   ];
 }
 
-export function hueMatrix(deg: number): M3 {
+function hueMatrix(deg: number): M3 {
   const a = (deg * Math.PI) / 180;
   const c = Math.cos(a);
   const s = Math.sin(a);

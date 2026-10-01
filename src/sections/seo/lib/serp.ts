@@ -15,7 +15,7 @@ export const FONTS = {
   description: "14px Arial, sans-serif",
 };
 
-export const ELLIPSIS = " ...";
+const ELLIPSIS = " ...";
 
 /**
  * Cut `text` so that it fits into `max` pixels, preferring a word boundary, and append an

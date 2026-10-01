@@ -57,7 +57,7 @@ export function SexToggle({ locale, value, onChange }: { locale: Locale; value: 
 }
 
 /** Query keys used by BodyFields: u (unit system), h (cm), w (kg), ft, in, lb. */
-export type BodyKeys = "u" | "h" | "w" | "ft" | "in" | "lb";
+type BodyKeys = "u" | "h" | "w" | "ft" | "in" | "lb";
 type BodyValues = Record<BodyKeys, string>;
 
 export function bodyDefaults(locale: Locale, cm: number, kg: number): BodyValues {
@@ -65,7 +65,7 @@ export function bodyDefaults(locale: Locale, cm: number, kg: number): BodyValues
   return { u: "m", h: toInput(locale, cm), w: toInput(locale, kg), ft: String(ft), in: toInput(locale, Math.round(inch)), lb: toInput(locale, Math.round(kgToLb(kg))) };
 }
 
-export interface BodyParsed {
+interface BodyParsed {
   cm: number | null;
   kg: number | null;
   errors: { h?: string; w?: string; ft?: string; in?: string; lb?: string };

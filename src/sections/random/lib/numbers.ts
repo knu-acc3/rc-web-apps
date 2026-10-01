@@ -3,7 +3,7 @@ import { randomInt, sampleIndices } from "./rng";
 export const MAX_COUNT = 10000;
 export const MAX_DECIMALS = 6;
 
-export interface NumberSpec {
+interface NumberSpec {
   min: number;
   max: number;
   /** 0 = integers; otherwise numbers on a grid with this many decimal places. */

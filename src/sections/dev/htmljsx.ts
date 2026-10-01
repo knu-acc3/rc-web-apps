@@ -13,7 +13,7 @@ type Node =
 const VOID = new Set(["area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta", "param", "source", "track", "wbr"]);
 const RAW = new Set(["script", "style", "textarea", "pre"]);
 
-export function parseHtml(html: string): Node[] {
+function parseHtml(html: string): Node[] {
   const root: Node & { t: "el" } = { t: "el", name: "#root", attrs: [], kids: [] };
   const stack: (Node & { t: "el" })[] = [root];
   const top = () => stack[stack.length - 1];
@@ -214,7 +214,7 @@ export function styleToObject(css: string): string {
   return `{{ ${entries.join(", ")} }}`;
 }
 
-export interface JsxOptions {
+interface JsxOptions {
   /** value/checked/selected → defaultValue/defaultChecked/defaultSelected (uncontrolled) */
   uncontrolled?: boolean;
   /** Wrap in a function component */
@@ -222,7 +222,7 @@ export interface JsxOptions {
   indent?: number;
 }
 
-export interface JsxResult {
+interface JsxResult {
   code: string;
   warnings: string[];
 }

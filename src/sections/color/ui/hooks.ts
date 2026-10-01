@@ -5,7 +5,7 @@ import { useSyncExternalStore } from "react";
 const noop = () => () => {};
 
 /** SSR-safe media query (false on the server and during hydration). */
-export function useMediaQuery(query: string): boolean {
+function useMediaQuery(query: string): boolean {
   return useSyncExternalStore(
     (cb) => {
       const m = window.matchMedia(query);

@@ -4,12 +4,12 @@
  * opt-in CSV-injection guard that never touches numbers.
  */
 
-export interface CsvError {
+interface CsvError {
   code: "unclosed-quote" | "quote-in-field";
   line: number;
 }
 
-export interface CsvParsed {
+interface CsvParsed {
   rows: string[][];
   delimiter: string;
   errors: CsvError[];
@@ -110,7 +110,7 @@ export function parseCsv(input: string, o: { delimiter?: string; maxRows?: numbe
 
 const NUMERIC = /^[-+]?(?:\d+[.,]?\d*|[.,]\d+)(?:e[-+]?\d+)?$/i;
 
-export interface CsvWriteOptions {
+interface CsvWriteOptions {
   delimiter?: string;
   /** Quote every field */
   quoteAll?: boolean;

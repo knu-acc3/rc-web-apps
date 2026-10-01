@@ -74,11 +74,11 @@ function isShouting(s: string): boolean {
   return upper / letters.length > 0.8;
 }
 
-export const EN_SMALL_WORDS = new Set(
+const EN_SMALL_WORDS = new Set(
   "a an and as at but by en for from if in into nor of on onto or per so the to up upon via vs vs. with yet".split(" "),
 );
 
-export interface CaseOptions {
+interface CaseOptions {
   locale?: string;
   /** Title case: keep English articles/short prepositions in lowercase (AP/Chicago style). */
   smallWords?: boolean;
@@ -125,7 +125,7 @@ export function toSentenceCase(s: string, opts: CaseOptions = {}): string {
   return out;
 }
 
-export function toAlternating(s: string, startUpper = false): string {
+function toAlternating(s: string, startUpper = false): string {
   let up = startUpper;
   let out = "";
   for (const ch of s) {
@@ -137,7 +137,7 @@ export function toAlternating(s: string, startUpper = false): string {
   return out;
 }
 
-export function toInverse(s: string): string {
+function toInverse(s: string): string {
   let out = "";
   for (const ch of s) {
     const lo = ch.toLowerCase();

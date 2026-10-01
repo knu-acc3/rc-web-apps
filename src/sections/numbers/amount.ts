@@ -147,7 +147,7 @@ export interface Money {
   rounded: boolean;
 }
 
-export type MoneyParse = { ok: true; money: Money } | { ok: false; error: "empty" | "invalid" | "negative" | "too-big" };
+type MoneyParse = { ok: true; money: Money } | { ok: false; error: "empty" | "invalid" | "negative" | "too-big" };
 
 /** Parse an amount and round it to whole kopecks/cents (half-up, exact decimal arithmetic). */
 export function parseMoney(input: string): MoneyParse {
@@ -172,13 +172,13 @@ export function parseMoney(input: string): MoneyParse {
 export type MinorStyle = "digits" | "words" | "none";
 export type Wrap = "none" | "contract" | "paren";
 
-export interface AmountOptions {
+interface AmountOptions {
   minor: MinorStyle;
   wrap: Wrap;
   capitalize: boolean;
 }
 
-export const DEFAULT_AMOUNT_OPTIONS: AmountOptions = { minor: "digits", wrap: "none", capitalize: true };
+const DEFAULT_AMOUNT_OPTIONS: AmountOptions = { minor: "digits", wrap: "none", capitalize: true };
 
 const two = (n: number) => String(n).padStart(2, "0");
 

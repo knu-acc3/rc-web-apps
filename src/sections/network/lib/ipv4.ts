@@ -1,7 +1,7 @@
 /* IPv4 math on unsigned 32-bit numbers (stored in JS numbers, always normalised with >>> 0). */
 
 export type V4Error = "empty" | "format" | "octet" | "leading-zero" | "prefix" | "mask";
-export type Result<T, E = V4Error> = { ok: true; value: T } | { ok: false; error: E };
+type Result<T, E = V4Error> = { ok: true; value: T } | { ok: false; error: E };
 
 const OCTET = /^\d{1,3}$/;
 
@@ -42,7 +42,7 @@ export function prefixOfMask(mask: number): number | null {
   return p;
 }
 
-export interface V4Input {
+interface V4Input {
   ip: number;
   prefix: number;
   /** True when the text contained "/n" or a mask. */
@@ -82,8 +82,8 @@ export function parseV4Input(input: string, defaultPrefix = 32): Result<V4Input>
   return { ok: true, value: { ip: ip.value, prefix: p, explicit: true } };
 }
 
-export type V4Class = "A" | "B" | "C" | "D" | "E";
-export function classOf(ip: number): V4Class {
+type V4Class = "A" | "B" | "C" | "D" | "E";
+function classOf(ip: number): V4Class {
   const o = ip >>> 24;
   if (o < 128) return "A";
   if (o < 192) return "B";
@@ -92,7 +92,7 @@ export function classOf(ip: number): V4Class {
   return "E";
 }
 
-export interface V4Info {
+interface V4Info {
   ip: number;
   prefix: number;
   mask: number;

@@ -27,7 +27,7 @@ export class JobError extends Error {
   }
 }
 
-export function hasWebCodecs(): boolean {
+function hasWebCodecs(): boolean {
   return typeof VideoDecoder !== "undefined" && typeof AudioDecoder !== "undefined";
 }
 

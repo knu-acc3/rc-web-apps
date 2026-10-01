@@ -12,7 +12,7 @@ import { cn } from "@/lib/cn";
  */
 
 /** Keep the screen on while `enabled` (Screen Wake Lock API; silently no-op when unsupported). */
-export function useWakeLock(enabled: boolean) {
+function useWakeLock(enabled: boolean) {
   useEffect(() => {
     if (!enabled) return;
     const nav = navigator as Navigator & { wakeLock?: { request(type: "screen"): Promise<{ release(): Promise<void> }> } };
@@ -43,7 +43,7 @@ export function useWakeLock(enabled: boolean) {
 
 const IDLE_MS = 2500;
 
-export interface Stage {
+interface Stage {
   open: boolean;
   ref: React.RefObject<HTMLDivElement | null>;
   /** Call from a click/key handler: fullscreen needs the user gesture. */

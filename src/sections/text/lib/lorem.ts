@@ -20,10 +20,9 @@ import {
 
 export type LoremLang = "latin" | "russian" | "cyrillic" | "english";
 export type LoremUnit = "paragraphs" | "sentences" | "words" | "list";
-export const LOREM_LANGS: LoremLang[] = ["latin", "russian", "cyrillic", "english"];
 
 /** mulberry32 — small, fast, deterministic PRNG. */
-export function prng(seed: number): () => number {
+function prng(seed: number): () => number {
   let a = seed >>> 0;
   return () => {
     a = (a + 0x6d2b79f5) >>> 0;
@@ -178,7 +177,7 @@ function listItem(lang: LoremLang, r: Rnd): string {
   return cap(Array.from({ length: between(r, 2, 5) }, () => pick(r, vocab)).join(" "));
 }
 
-export interface LoremOptions {
+interface LoremOptions {
   lang: LoremLang;
   unit: LoremUnit;
   count: number;

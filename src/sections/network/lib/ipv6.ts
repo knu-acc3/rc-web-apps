@@ -2,7 +2,7 @@
 import { parseIPv4, toDotted } from "./ipv4";
 
 export type V6Error = "empty" | "format" | "group" | "double-colon" | "ipv4" | "prefix";
-export type Result6<T> = { ok: true; value: T } | { ok: false; error: V6Error };
+type Result6<T> = { ok: true; value: T } | { ok: false; error: V6Error };
 
 const ALL = (1n << 128n) - 1n;
 
@@ -62,7 +62,7 @@ export function parseIPv6(input: string): Result6<{ value: bigint; zone?: string
   return { ok: true, value: { value: v, zone } };
 }
 
-export function groupsOf(v: bigint): number[] {
+function groupsOf(v: bigint): number[] {
   const out: number[] = [];
   for (let i = 7; i >= 0; i--) out.push(Number((v >> BigInt(i * 16)) & 0xffffn));
   return out;
@@ -113,7 +113,7 @@ export function mask6(prefix: number): bigint {
   return (ALL << BigInt(128 - prefix)) & ALL;
 }
 
-export interface V6Input {
+interface V6Input {
   value: bigint;
   prefix: number;
   explicit: boolean;
@@ -138,7 +138,7 @@ export function parseV6Input(input: string, defaultPrefix = 128): Result6<V6Inpu
   return { ok: true, value: { value: r.value.value, zone: r.value.zone, prefix, explicit } };
 }
 
-export interface V6Info {
+interface V6Info {
   value: bigint;
   prefix: number;
   network: bigint;
@@ -169,7 +169,3 @@ export function mapV4(n: number): bigint {
   return MAPPED_PREFIX | BigInt(n >>> 0);
 }
 
-/** Human form of 2^k: exact below 2^53, otherwise "2^k ≈ 3.4×10^38". */
-export function pow2Text(k: number): string {
-  return `2^${k}`;
-}

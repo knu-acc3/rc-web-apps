@@ -28,7 +28,7 @@ export function partsOf(day: number): { y: number; m: number; d: number; weekday
   return { y: dt.getUTCFullYear(), m: dt.getUTCMonth() + 1, d: dt.getUTCDate(), weekday: (dt.getUTCDay() + 6) % 7 };
 }
 
-export function isLeap(y: number): boolean {
+function isLeap(y: number): boolean {
   return (y % 4 === 0 && y % 100 !== 0) || y % 400 === 0;
 }
 

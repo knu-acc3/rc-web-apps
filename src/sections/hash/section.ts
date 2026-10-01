@@ -10,7 +10,7 @@ import VECTORS from "./vectors.json";
 const HUE = 280;
 const DIGESTS = VECTORS.digests as Record<string, string[]>;
 
-export const algoSlug = (a: AlgoDef) => (a.family === "crc" ? `${a.id}-calculator` : `${a.id}-hash-generator`);
+const algoSlug = (a: AlgoDef) => (a.family === "crc" ? `${a.id}-calculator` : `${a.id}-hash-generator`);
 const b64len = (bits: number) => Math.ceil(bits / 8 / 3) * 4;
 
 const STATUS: Record<AlgoDef["status"], { ru: string; en: string }> = {

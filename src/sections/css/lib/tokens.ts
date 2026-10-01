@@ -29,7 +29,7 @@ export function splitTop(value: string, sep: "," | "/" | " "): string[] {
   return out.map((s) => s.trim()).filter((s, i, a) => sep !== " " || s !== "" || a.length === 1);
 }
 
-export const LENGTH_UNITS = [
+const LENGTH_UNITS = [
   "px", "em", "rem", "%", "vw", "vh", "vmin", "vmax", "svw", "svh", "lvw", "lvh", "dvw", "dvh",
   "ch", "ex", "cap", "ic", "lh", "rlh", "pt", "pc", "cm", "mm", "q", "in", "cqw", "cqh", "cqi", "cqb", "cqmin", "cqmax",
 ] as const;

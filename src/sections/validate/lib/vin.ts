@@ -5,7 +5,7 @@ const TRANSLIT: Record<string, number> = {
 };
 const WEIGHTS = [8, 7, 6, 5, 4, 3, 2, 10, 0, 9, 8, 7, 6, 5, 4, 3, 2];
 
-export function vinValue(ch: string): number {
+function vinValue(ch: string): number {
   return /\d/.test(ch) ? Number(ch) : TRANSLIT[ch];
 }
 
@@ -38,7 +38,7 @@ export function modelYears(code: string): [number, number] | null {
 
 export type VinError = "empty" | "length" | "chars" | "ioq" | "check";
 
-export interface VinResult {
+interface VinResult {
   vin: string;
   errors: VinError[];
   /** Structure is valid (length, characters). */

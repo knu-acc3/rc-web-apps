@@ -4,7 +4,7 @@ import { round } from "./tokens";
 
 export type Point = [number, number];
 
-export interface ClipShape {
+interface ClipShape {
   slug: string;
   /** Polygon points in % (x, y), or a ready basic-shape function. */
   points?: Point[];
@@ -57,7 +57,6 @@ export function shapeCss(s: ClipShape): string {
 /* ───────────── CSS triangle ───────────── */
 
 export type TriangleDir = "up" | "down" | "left" | "right" | "top-left" | "top-right" | "bottom-left" | "bottom-right";
-export const TRIANGLE_DIRS: TriangleDir[] = ["up", "down", "left", "right", "top-left", "top-right", "bottom-left", "bottom-right"];
 
 /** Classic zero-size element with borders. */
 export function triangleBorderCss(dir: TriangleDir, w: number, h: number, color: string): string {

@@ -2,7 +2,7 @@
 
 export type InstrumentId = "chromatic" | "guitar" | "bass" | "ukulele" | "violin" | "balalaika" | "dombra";
 
-export interface Instrument {
+interface Instrument {
   id: InstrumentId;
   /** Strings from the lowest-numbered (thickest for guitar) as players name them. */
   strings: string[];

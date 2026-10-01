@@ -93,7 +93,7 @@ export const GENERATOR_HOWTO: L10nList = {
 
 /* ───────────── platforms ───────────── */
 
-export interface PlatformText extends PageText {
+interface PlatformText extends PageText {
   facts: [string, string][];
 }
 
@@ -675,7 +675,7 @@ export const PLATFORM_TEXT: Record<PlatformId, Record<Locale, PlatformText>> = {
 
 /* ───────────── invisible character ───────────── */
 
-export interface InvisibleText extends PageText {
+interface InvisibleText extends PageText {
   tips: string[];
 }
 

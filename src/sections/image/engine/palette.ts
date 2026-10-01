@@ -146,7 +146,7 @@ export function rgbToHsl(r: number, g: number, b: number): [number, number, numb
 }
 
 /** Parse "#abc" / "#aabbcc" (case-insensitive) → [r,g,b] or null. */
-export function parseHex(input: string): [number, number, number] | null {
+function parseHex(input: string): [number, number, number] | null {
   const s = input.trim().replace(/^#/, "");
   if (/^[0-9a-f]{3}$/i.test(s)) return [0, 1, 2].map((i) => parseInt(s[i] + s[i], 16)) as [number, number, number];
   if (/^[0-9a-f]{6}$/i.test(s)) return [0, 2, 4].map((i) => parseInt(s.slice(i, i + 2), 16)) as [number, number, number];

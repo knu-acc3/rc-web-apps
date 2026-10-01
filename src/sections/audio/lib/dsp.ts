@@ -27,7 +27,7 @@ export function peak(ch: Channels): number {
 }
 
 /** RMS over all channels. */
-export function rmsOf(ch: Channels): number {
+function rmsOf(ch: Channels): number {
   let sum = 0;
   let n = 0;
   for (const c of ch) {
@@ -38,7 +38,6 @@ export function rmsOf(ch: Channels): number {
 }
 
 export const dbToGain = (db: number) => Math.pow(10, db / 20);
-export const gainToDb = (g: number) => (g > 0 ? 20 * Math.log10(g) : -Infinity);
 
 /** Multiply in place; returns the number of samples that had to be clipped to ±1. */
 export function applyGain(ch: Channels, gain: number, limit = true): number {
@@ -66,7 +65,7 @@ export function rmsNormalizeGain(ch: Channels, targetDb: number): number {
   return r > 0 ? dbToGain(targetDb) / r : 1;
 }
 
-export type FadeCurve = "linear" | "exp" | "equal-power";
+type FadeCurve = "linear" | "exp" | "equal-power";
 
 function curve(x: number, kind: FadeCurve): number {
   if (kind === "linear") return x;

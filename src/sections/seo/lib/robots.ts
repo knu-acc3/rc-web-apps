@@ -4,15 +4,15 @@
    - the longest matching path wins; on a tie Allow wins;
    - "*" matches any sequence, "$" anchors the end. */
 
-export type RuleType = "allow" | "disallow";
+type RuleType = "allow" | "disallow";
 
-export interface Rule {
+interface Rule {
   type: RuleType;
   path: string;
   line: number;
 }
 
-export interface Group {
+interface Group {
   agents: string[];
   rules: Rule[];
   line: number;
@@ -37,7 +37,7 @@ export interface Lint {
   text: string;
 }
 
-export interface Robots {
+interface Robots {
   groups: Group[];
   sitemaps: string[];
   lint: Lint[];
@@ -149,7 +149,7 @@ export function selectGroup(robots: Robots, userAgent: string): { agent: string;
   return { agent, rules };
 }
 
-export interface Verdict {
+interface Verdict {
   allowed: boolean;
   agent: string | null;
   rule: Rule | null;

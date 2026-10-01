@@ -4,7 +4,7 @@ import type { InstrumentId } from "./instruments";
 
 /* ───────────── noise colours ───────────── */
 
-export interface NoiseInfo {
+interface NoiseInfo {
   color: NoiseColor;
   name: L10n;
   title: L10n;
@@ -136,7 +136,7 @@ export const NOISES: NoiseInfo[] = [
 
 /* ───────────── metronome tempos ───────────── */
 
-export interface BpmInfo {
+interface BpmInfo {
   bpm: number;
   style: L10n;
 }
@@ -160,7 +160,7 @@ export const BPMS: BpmInfo[] = [
 
 /* ───────────── tuner instruments ───────────── */
 
-export interface InstrumentText {
+interface InstrumentText {
   id: Exclude<InstrumentId, "chromatic">;
   name: L10n;
   title: L10n;

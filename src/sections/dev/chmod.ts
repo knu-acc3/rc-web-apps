@@ -54,7 +54,7 @@ export function fromSymbolic(input: string): number | null {
   return m;
 }
 
-export class ChmodError extends Error {
+class ChmodError extends Error {
   constructor(
     message: string,
     readonly clause: string,
@@ -132,7 +132,7 @@ export function umask(mask: number): { file: number; dir: number } {
   return { file: 0o666 & ~mask, dir: 0o777 & ~mask };
 }
 
-export interface Rights {
+interface Rights {
   read: boolean;
   write: boolean;
   exec: boolean;
@@ -155,7 +155,7 @@ export type NoteCode =
   | "private"
   | "owner-cant-read";
 
-export interface Note {
+interface Note {
   code: NoteCode;
   level: "danger" | "warn" | "info";
 }

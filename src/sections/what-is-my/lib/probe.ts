@@ -38,7 +38,7 @@ interface GpuAdapterLike {
   isFallbackAdapter?: boolean;
 }
 
-export type Nav = Navigator & {
+type Nav = Navigator & {
   userAgentData?: UaDataLike;
   deviceMemory?: number;
   globalPrivacyControl?: boolean;
@@ -75,7 +75,7 @@ export function useDetected<T>(detect: () => T | Promise<T>, nonce = 0): T | nul
 
 /* ───────────── live stores for useSyncExternalStore ───────────── */
 
-export interface LiveStore<T> {
+interface LiveStore<T> {
   subscribe: (cb: () => void) => () => void;
   getSnapshot: () => T;
   getServerSnapshot: () => T | null;
@@ -132,7 +132,7 @@ function onDprChange(cb: () => void): () => void {
 
 const mq = (q: string) => typeof window.matchMedia === "function" && window.matchMedia(q).matches;
 
-export interface ScreenSnapshot {
+interface ScreenSnapshot {
   cssW: number;
   cssH: number;
   availW: number;
@@ -181,7 +181,7 @@ function subscribeScreen(cb: () => void): () => void {
 
 export const screenStore = liveStore(readScreen, subscribeScreen);
 
-export interface ViewportSnapshot {
+interface ViewportSnapshot {
   innerW: number;
   innerH: number;
   clientW: number;
@@ -241,7 +241,7 @@ export const clockStore: LiveStore<number> = {
   getServerSnapshot: () => null,
 };
 
-export interface PointerSnapshot {
+interface PointerSnapshot {
   maxTouchPoints: number;
   pointer: "fine" | "coarse" | "none" | null;
   anyPointer: ("fine" | "coarse")[];

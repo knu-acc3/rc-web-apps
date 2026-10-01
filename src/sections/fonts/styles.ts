@@ -51,15 +51,15 @@ export type CyrSupport = "full" | "partial" | "none";
 export type ZalgoLevel = "light" | "medium" | "heavy";
 export const ZALGO_LEVELS: readonly ZalgoLevel[] = ["light", "medium", "heavy"];
 
-export interface StyleOptions {
+interface StyleOptions {
   /** Seed for zalgo/glitch. The same seed always gives the same output. */
   seed?: number;
   zalgo?: ZalgoLevel;
 }
 
-export type StyleKind = "math" | "letters" | "enclosed" | "flip" | "combining" | "random";
+type StyleKind = "math" | "letters" | "enclosed" | "flip" | "combining" | "random";
 
-export interface StyleInfo {
+interface StyleInfo {
   id: StyleId;
   kind: StyleKind;
   cyr: CyrSupport;
@@ -103,7 +103,7 @@ export function graphemes(text: string): string[] {
 
 const EMOJI_RE = /\p{Extended_Pictographic}|\p{Regional_Indicator}|\u{20E3}|\u{FE0F}/u;
 /** Emoji graphemes (incl. ZWJ sequences, flags and keycaps) are never modified. */
-export const isEmoji = (g: string) => EMOJI_RE.test(g);
+const isEmoji = (g: string) => EMOJI_RE.test(g);
 const isSpace = (g: string) => /^\s+$/u.test(g);
 const isLineBreak = (g: string) => /^[\r\n\u{2028}\u{2029}]+$/u.test(g);
 const CYR_RE = /\p{Script=Cyrillic}/u;
@@ -159,7 +159,7 @@ export type MathStyleId =
   | "sans-italic"
   | "sans-bold-italic";
 
-export interface MathDef {
+interface MathDef {
   /** Code point of capital A (small a is always capital A + 26). */
   upper: number;
   /** Code point of digit zero, when the style has digits. */
@@ -234,7 +234,7 @@ function smallCapsMap(): CharMap {
 /* ───────────── Superscript / subscript ───────────── */
 
 /** Letters and digits with a superscript form. Missing: q/Q (only the rare 𐞥 U+107A5 exists). */
-export const SUPERSCRIPT: Record<string, number> = {
+const SUPERSCRIPT: Record<string, number> = {
   a: 0x1d43, b: 0x1d47, c: 0x1d9c, d: 0x1d48, e: 0x1d49, f: 0x1da0, g: 0x1d4d, h: 0x02b0, i: 0x2071, j: 0x02b2, k: 0x1d4f, l: 0x02e1, m: 0x1d50,
   n: 0x207f, o: 0x1d52, p: 0x1d56, r: 0x02b3, s: 0x02e2, t: 0x1d57, u: 0x1d58, v: 0x1d5b, w: 0x02b7, x: 0x02e3, y: 0x02b8, z: 0x1dbb,
   A: 0x1d2c, B: 0x1d2e, D: 0x1d30, E: 0x1d31, G: 0x1d33, H: 0x1d34, I: 0x1d35, J: 0x1d36, K: 0x1d37, L: 0x1d38, M: 0x1d39, N: 0x1d3a, O: 0x1d3c,
@@ -248,7 +248,7 @@ export const SUPERSCRIPT_CAPS_AS_SMALL = ["C", "F", "S", "X", "Y", "Z"];
 export const SUPERSCRIPT_MISSING = ["Q", "q"];
 
 /** Letters with a subscript form (only 17 exist); capitals use the same small subscripts. */
-export const SUBSCRIPT: Record<string, number> = {
+const SUBSCRIPT: Record<string, number> = {
   a: 0x2090, e: 0x2091, h: 0x2095, i: 0x1d62, j: 0x2c7c, k: 0x2096, l: 0x2097, m: 0x2098, n: 0x2099, o: 0x2092, p: 0x209a, r: 0x1d63, s: 0x209b,
   t: 0x209c, u: 0x1d64, v: 0x1d65, x: 0x2093,
   "0": 0x2080, "1": 0x2081, "2": 0x2082, "3": 0x2083, "4": 0x2084, "5": 0x2085, "6": 0x2086, "7": 0x2087, "8": 0x2088, "9": 0x2089,
@@ -309,7 +309,7 @@ const FLIP_LATIN: [string, string][] = [
  * their capitals) look the same when turned and stay as they are; б в д й л ц
  * щ ъ ы ь ю я and a few capitals have no good look-alike and stay unchanged.
  */
-export const FLIP_CYRILLIC: [string, string][] = [
+const FLIP_CYRILLIC: [string, string][] = [
   ["а", "ɐ"], ["г", "˩"], ["е", "ǝ"], ["з", "ɛ"], ["к", "ʞ"], ["м", "w"], ["п", "u"], ["р", "d"], ["с", "ɔ"], ["т", "ʇ"], ["у", "ʎ"], ["ч", "һ"],
   ["һ", "ч"], ["ш", "m"], ["э", "є"], ["є", "э"], ["і", "ᴉ"],
   ["А", "∀"], ["В", "ꓭ"], ["Г", "˩"], ["Е", "Ǝ"], ["З", "Ɛ"], ["К", "ꓘ"], ["Л", "V"], ["М", "W"], ["П", "⊔"], ["Р", "Ԁ"], ["С", "Ɔ"], ["Т", "⊥"],
@@ -331,7 +331,7 @@ const MIRROR_PAIRS: [string, string][] = [
   ["?", "⸮"],
 ];
 /** Cyrillic mirror look-alikes; symmetric letters (А Д Ж Н О П Т Ф Х Ш…) need no change. */
-export const MIRROR_CYRILLIC: [string, string][] = [
+const MIRROR_CYRILLIC: [string, string][] = [
   ["Я", "R"], ["я", "ʀ"], ["И", "N"], ["и", "ᴎ"], ["Е", "Ǝ"], ["е", "ɘ"], ["С", "Ɔ"], ["с", "ɔ"], ["З", "Ɛ"], ["з", "ɛ"], ["Э", "Є"], ["э", "є"],
   ["Є", "Э"], ["є", "э"], ["Р", "ꟼ"], ["р", "q"], ["Г", "⅂"], ["К", "ꓘ"],
 ];

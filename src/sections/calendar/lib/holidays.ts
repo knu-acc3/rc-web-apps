@@ -10,11 +10,10 @@
  *   decree transfers are not included.
  */
 import type { L10n } from "@/i18n/config";
-import { addDays, dayNum, dayNumOf, fromDayNum, isoWeekday, parseYmd, ymdStr, type Ymd } from "./dates";
+import { addDays, dayNum, dayNumOf, fromDayNum, isoWeekday, parseYmd, type Ymd } from "./dates";
 import { islamicDates, ISLAMIC_YEARS } from "./islamic";
 
 export type HolidayCountry = "ru" | "kz";
-export const HOLIDAY_COUNTRIES: HolidayCountry[] = ["ru", "kz"];
 
 export interface Holiday {
   ymd: Ymd;
@@ -27,16 +26,16 @@ export interface Holiday {
 
 /** work: normal working day; short: working day shortened by 1 h (RU pre-holiday); workSat: weekend day made working by decree;
  *  weekend: Sat/Sun; holiday: public holiday by law; off: extra day off (automatic or decree transfer). */
-export type DayType = "work" | "short" | "workSat" | "weekend" | "holiday" | "off";
+type DayType = "work" | "short" | "workSat" | "weekend" | "holiday" | "off";
 
-export interface Transfer {
+interface Transfer {
   from: Ymd;
   to: Ymd;
   /** true = automatic rule (holiday on a weekend), false = government decree */
   auto: boolean;
 }
 
-export interface ProdYear {
+interface ProdYear {
   country: HolidayCountry;
   year: number;
   holidays: Holiday[];
@@ -250,7 +249,7 @@ export function productionYear(country: HolidayCountry, year: number): ProdYear 
   return py;
 }
 
-export const isWorkType = (t: DayType): boolean => t === "work" || t === "short" || t === "workSat";
+const isWorkType = (t: DayType): boolean => t === "work" || t === "short" || t === "workSat";
 
 /** Working day in the given country's calendar; `null` country = plain Mon–Fri. */
 export function isWorkingDay(country: HolidayCountry | null, x: Ymd): boolean {
@@ -284,7 +283,7 @@ export function addWorkingDays(country: HolidayCountry | null, from: Ymd, n: num
   return x;
 }
 
-export interface MonthNorm {
+interface MonthNorm {
   month: number;
   calendarDays: number;
   workDays: number;
@@ -338,9 +337,3 @@ export function yearNorm(country: HolidayCountry, year: number): MonthNorm {
   };
 }
 
-/** Holidays of both countries for quick client-side lookup, as "YYYY-MM-DD" → name. */
-export function holidayMap(country: HolidayCountry, year: number): Record<string, L10n> {
-  const out: Record<string, L10n> = {};
-  for (const x of productionYear(country, year).holidays) out[ymdStr(x.ymd)] = x.name;
-  return out;
-}

@@ -26,7 +26,6 @@ export class Obj {
 export type V = null | boolean | string | Num | V[] | Obj;
 
 export const isObj = (v: V | undefined): v is Obj => v instanceof Obj;
-export const isNum = (v: V | undefined): v is Num => v instanceof Num;
 
 /** Plain JS value → V (numbers via String()). */
 export function fromJs(x: unknown): V {

@@ -33,7 +33,7 @@ import {
   type PreparedImage,
 } from "./pdf-ops";
 
-export interface RunEnv {
+interface RunEnv {
   /** Turn any non-JPEG/PNG image (WebP, HEIC, AVIF, GIF, BMP) into an embeddable JPEG/PNG. */
   convertImage?: (bytes: Uint8Array, kind: string) => Promise<PreparedImage>;
   codec?: ImageCodec<Bitmap>;
@@ -53,7 +53,7 @@ async function saveLoaded(doc: PDFDocument, opts?: { updateFieldAppearances?: bo
   return saveDoc(doc, opts);
 }
 
-export async function prepareImage(input: ImageInput, env: RunEnv): Promise<PreparedImage> {
+async function prepareImage(input: ImageInput, env: RunEnv): Promise<PreparedImage> {
   const bytes = u8(input.bytes);
   const kind = sniffImage(bytes);
   if (kind === "jpeg") {

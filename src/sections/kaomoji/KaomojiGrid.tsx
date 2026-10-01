@@ -7,7 +7,7 @@ import s from "./KaomojiGrid.module.css";
 const WIDE = /[ᄀ-ᅟ─-◿⺀-꓏가-힣豈-﫿︰-﹏！-｠￠-￦]/u;
 
 /** Approximate width in Latin-letter units; combining marks take no space. */
-export function visualWidth(k: string): number {
+function visualWidth(k: string): number {
   let w = 0;
   for (const ch of k) w += /\p{M}/u.test(ch) ? 0 : WIDE.test(ch) ? 2 : 1;
   return w;

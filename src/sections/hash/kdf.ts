@@ -28,11 +28,6 @@ export async function bcryptCheck(password: string, hash: string): Promise<boole
   return bcryptVerify({ password: utf8Encode(password), hash: h.replace(/^\$2[bxy]\$/, "$2a$") });
 }
 
-export function bcryptInfo(hash: string): { cost: number } | null {
-  const m = /^\$2[abxy]\$(\d{2})\$/.exec(hash.trim());
-  return m ? { cost: Number(m[1]) } : null;
-}
-
 /* ───────────── Argon2id ───────────── */
 
 export interface Argon2Params {

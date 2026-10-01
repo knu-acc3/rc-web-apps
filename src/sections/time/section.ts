@@ -6,7 +6,7 @@ import { CITIES, COUNTRIES, cityBySlug, cityIn, cityLabel, countryBySlug, countr
 import { cityPage } from "./pages/city";
 import { HUE } from "./pages/common";
 import { countryPage } from "./pages/country";
-import { pairKey, pairKeys, pairPage } from "./pages/pair";
+import { pairKeys, pairPage } from "./pages/pair";
 import { TIME_TOOLS, TOOL_BY_SLUG, timeToolPage, toolLink } from "./pages/tools";
 import { zonePage, zoneSlugs, zonesHub } from "./pages/zone";
 
@@ -121,4 +121,3 @@ export const timeSection: SectionDef = {
   },
 };
 
-export { pairKey };

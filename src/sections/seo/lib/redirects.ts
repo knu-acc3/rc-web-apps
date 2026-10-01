@@ -3,13 +3,13 @@
 export type Server = "htaccess" | "nginx" | "nextjs";
 export type Code = 301 | 302 | 307 | 308;
 
-export interface Pair {
+interface Pair {
   from: string;
   to: string;
   line: number;
 }
 
-export interface Parsed {
+interface Parsed {
   pairs: Pair[];
   bad: number[];
 }
@@ -32,7 +32,7 @@ export function parsePairs(text: string): Parsed {
 }
 
 /** Split an old URL into decoded path and raw query (host is dropped). */
-export function source(from: string): { path: string; query: string } {
+function source(from: string): { path: string; query: string } {
   let s = from.trim();
   const m = s.match(/^[a-z][a-z0-9+.-]*:\/\/[^/?#]+(.*)$/i);
   if (m) s = m[1] || "/";
@@ -117,7 +117,7 @@ export function nextjs(pairs: Pair[], code: Code): string {
   return ["// next.config.js", "module.exports = {", "  async redirects() {", "    return [", `${items.join(",\n")}${items.length ? "," : ""}`, "    ];", "  },", "};"].join("\n");
 }
 
-export interface RedirectIssue {
+interface RedirectIssue {
   kind: "chain" | "loop" | "duplicate" | "self";
   line: number;
 }

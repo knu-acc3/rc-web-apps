@@ -2,7 +2,7 @@ import { flexItem, gridItem, type FlexState, type GridState } from "./layout";
 
 /* ───────────── box-shadow ───────────── */
 
-export interface ShadowPreset {
+interface ShadowPreset {
   slug: string;
   value: string;
   /** Preview page background and box color. */
@@ -23,7 +23,7 @@ export const MATERIAL_ELEVATION: [number, string][] = [
 ];
 
 /** Tailwind CSS v4 shadow tokens (theme.css of tailwindcss 4.x). */
-export const TAILWIND_SHADOWS: Record<string, string> = {
+const TAILWIND_SHADOWS: Record<string, string> = {
   sm: "0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)",
   md: "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)",
   lg: "0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)",
@@ -48,7 +48,7 @@ export const SHADOW_PRESETS: ShadowPreset[] = [
 
 /* ───────────── text-shadow ───────────── */
 
-export interface TextShadowPreset {
+interface TextShadowPreset {
   slug: string;
   value: string;
   color: string;
@@ -209,7 +209,7 @@ const RU_LABELS: Record<string, string> = {
   Small: "Малый",
 };
 
-export function localizeLabel(label: string, locale: "ru" | "en"): string {
+function localizeLabel(label: string, locale: "ru" | "en"): string {
   if (locale === "en") return label;
   return RU_LABELS[label] ?? label.replace(/^Card (\d+)$/, "Карточка $1");
 }

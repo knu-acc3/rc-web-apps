@@ -5,7 +5,7 @@ import { even, type Crop } from "./spec";
 
 export type AspectMode = "crop" | "fit";
 
-export interface AspectPlan {
+interface AspectPlan {
   /** Crop rectangle in display pixels (crop mode only). */
   crop?: Crop;
   width: number;

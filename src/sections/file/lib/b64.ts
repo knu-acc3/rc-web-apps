@@ -15,7 +15,7 @@ export function base64ToBytes(b64: string): Uint8Array {
   return out;
 }
 
-export interface ParsedBase64 {
+interface ParsedBase64 {
   /** Clean standard Base64 with padding. */
   data: string;
   /** MIME type from a data: URI, if any. */

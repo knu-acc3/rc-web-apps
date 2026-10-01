@@ -7,7 +7,6 @@ import { bytesToHex, hexToBytes, utf8Encode } from "@/sections/code/kit/bytes";
 import { cryptoRng, type Rng } from "@/sections/code/kit/random";
 
 export type { Rng };
-export { cryptoRng };
 
 /* ───────────── UUID basics ───────────── */
 
@@ -23,9 +22,9 @@ export const NAMESPACES = {
 export type NamespaceId = keyof typeof NAMESPACES;
 
 /** 100-ns intervals between 1582-10-15 (Gregorian epoch) and 1970-01-01. */
-export const GREGORIAN_OFFSET = 0x01b21dd213814000n;
+const GREGORIAN_OFFSET = 0x01b21dd213814000n;
 
-export function bytesToUuid(b: Uint8Array): string {
+function bytesToUuid(b: Uint8Array): string {
   const h = bytesToHex(b);
   return `${h.slice(0, 8)}-${h.slice(8, 12)}-${h.slice(12, 16)}-${h.slice(16, 20)}-${h.slice(20, 32)}`;
 }
@@ -198,10 +197,10 @@ export function formatUuid(uuid: string, f: UuidFormat): string {
 
 /* ───────────── ULID ───────────── */
 
-export const CROCKFORD = "0123456789ABCDEFGHJKMNPQRSTVWXYZ";
+const CROCKFORD = "0123456789ABCDEFGHJKMNPQRSTVWXYZ";
 const ULID_RE = /^[0-7][0-9A-HJKMNP-TV-Z]{25}$/i;
 
-export function isUlid(s: string): boolean {
+function isUlid(s: string): boolean {
   return ULID_RE.test(s.trim());
 }
 
@@ -337,7 +336,7 @@ export class ObjectIdGenerator {
   }
 }
 
-export function objectIdSeconds(id: string): number {
+function objectIdSeconds(id: string): number {
   return parseInt(id.trim().slice(0, 8), 16);
 }
 
@@ -363,7 +362,7 @@ export type IdInfo =
   | { type: "nanoid"; canonical: string; length: number }
   | { type: "invalid"; reason: "empty" | "format" | "ulid-overflow" };
 
-export function uuidVersionOf(b: Uint8Array): number {
+function uuidVersionOf(b: Uint8Array): number {
   return b[6] >> 4;
 }
 

@@ -14,14 +14,14 @@ export interface PlatformLimit {
   soft?: boolean;
 }
 
-export interface Platform {
+interface Platform {
   id: string;
   name: L10n;
   limits: PlatformLimit[];
 }
 
 /** Limits that are published by the platforms themselves or widely documented. */
-export const PLATFORMS: Platform[] = [
+const PLATFORMS: Platform[] = [
   {
     id: "x-twitter",
     name: { ru: "X (Twitter)", en: "X (Twitter)" },

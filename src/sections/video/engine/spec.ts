@@ -7,7 +7,7 @@ export type VideoTarget = "mp4" | "webm" | "mov" | "mkv";
 export type AudioTarget = "mp3" | "wav" | "m4a" | "aac" | "ogg" | "opus" | "flac";
 export type Target = VideoTarget | AudioTarget | "gif";
 
-export const VIDEO_TARGETS: readonly VideoTarget[] = ["mp4", "webm", "mov", "mkv"];
+const VIDEO_TARGETS: readonly VideoTarget[] = ["mp4", "webm", "mov", "mkv"];
 export const AUDIO_TARGETS: readonly AudioTarget[] = ["mp3", "wav", "m4a", "aac", "ogg", "opus", "flac"];
 
 export const isVideoTarget = (t: string): t is VideoTarget => (VIDEO_TARGETS as readonly string[]).includes(t);
@@ -29,7 +29,7 @@ export const TARGET_MIME: Record<Target, string> = {
 };
 
 export type Rotation = 0 | 90 | 180 | 270;
-export type Fit = "contain" | "cover" | "fill";
+type Fit = "contain" | "cover" | "fill";
 export type QualityLevel = "high" | "medium" | "low";
 
 export interface Crop {
@@ -107,7 +107,7 @@ export interface JobResult {
   duration?: number;
 }
 
-export interface TrackInfo {
+interface TrackInfo {
   codec: string | null;
   canDecode: boolean;
   bitrate: number | null;

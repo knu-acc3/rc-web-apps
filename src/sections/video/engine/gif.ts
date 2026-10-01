@@ -4,7 +4,7 @@
  */
 
 /** Browsers clamp GIF frame delays below 2 cs (20 ms) to 10 cs, so 50 fps is the real maximum. */
-export const GIF_MAX_FPS = 50;
+const GIF_MAX_FPS = 50;
 export const GIF_MIN_DELAY_CS = 2;
 
 /** Output size for a GIF: keep aspect ratio, never upscale, at least 16 px. */

@@ -68,21 +68,25 @@ function randInt(max: number): number {
   }
 }
 
+const escapeHtml = (s: string) => s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]!);
+
+/** Print a table through a hidden frame. The frame can't run scripts (sandbox) — only print. */
 function printHtml(title: string, body: string) {
   const frame = document.createElement("iframe");
   frame.setAttribute("aria-hidden", "true");
+  frame.setAttribute("sandbox", "allow-same-origin allow-modals");
   frame.style.position = "fixed";
   frame.style.width = "0";
   frame.style.height = "0";
   frame.style.border = "0";
-  frame.srcdoc = `<!doctype html><html><head><meta charset="utf-8"><title>${title}</title><style>
+  frame.srcdoc = `<!doctype html><html><head><meta charset="utf-8"><title>${escapeHtml(title)}</title><style>
     body{font-family:system-ui,sans-serif;margin:24px;color:#111}
     h1{font-size:22px;margin:0 0 16px}
     table{border-collapse:collapse}
     td,th{border:1px solid #999;padding:6px 10px;text-align:center;font-size:16px;font-variant-numeric:tabular-nums}
     th{background:#eee}
     .rows td{text-align:left;font-size:20px;border:0;padding:4px 24px 4px 0}
-  </style></head><body><h1>${title}</h1>${body}</body></html>`;
+  </style></head><body><h1>${escapeHtml(title)}</h1>${body}</body></html>`;
   frame.onload = () => {
     frame.contentWindow?.focus();
     frame.contentWindow?.print();

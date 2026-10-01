@@ -8,7 +8,7 @@ export type Lang = "js" | "python" | "php" | "java" | "go" | "csharp";
 
 export type Warning = "py-unicode-props" | "py-lookbehind" | "go-lookaround" | "go-backref" | "sticky" | "flag-v" | "java-unicode-escape" | "cs-unicode-escape";
 
-export interface Exported {
+interface Exported {
   code: string;
   warnings: Warning[];
 }

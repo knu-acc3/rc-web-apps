@@ -4,7 +4,7 @@ import type * as Lpn from "libphonenumber-js/max";
 
 export type PhoneLib = Pick<typeof Lpn, "parsePhoneNumberFromString" | "validatePhoneNumberLength">;
 
-export interface PhoneResult {
+interface PhoneResult {
   /** Parsed at all */
   parsed: boolean;
   valid: boolean;

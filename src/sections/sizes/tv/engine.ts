@@ -41,7 +41,7 @@ export function diagonalForAcuity(distanceM: number, rows: number): number {
   return distanceM / one;
 }
 
-export interface TvDistances {
+interface TvDistances {
   smpte: number;
   thx: number;
   hd: number;

@@ -1,6 +1,6 @@
 /* Range ↔ CIDR conversion for IPv4 (bits = 32) and IPv6 (bits = 128) using BigInt. */
 
-export interface Block {
+interface Block {
   start: bigint;
   prefix: number;
 }

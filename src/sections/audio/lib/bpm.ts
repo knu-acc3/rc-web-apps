@@ -3,9 +3,9 @@
  */
 
 /** A pause longer than this starts a new measurement. */
-export const TAP_RESET_MS = 2000;
+const TAP_RESET_MS = 2000;
 /** Only the most recent taps are used, so tempo changes are followed. */
-export const TAP_WINDOW = 16;
+const TAP_WINDOW = 16;
 
 /** Add a tap time (ms); returns the new list (reset after a long pause). */
 export function addTap(taps: number[], now: number, resetMs = TAP_RESET_MS, window = TAP_WINDOW): number[] {
@@ -14,7 +14,7 @@ export function addTap(taps: number[], now: number, resetMs = TAP_RESET_MS, wind
   return [...taps, now].slice(-window);
 }
 
-export interface TapTempo {
+interface TapTempo {
   bpm: number;
   /** Mean interval between taps, ms. */
   interval: number;
@@ -40,9 +40,6 @@ export function tempoFromTaps(taps: number[], tolerance = 0.15): TapTempo | null
   const variance = use.reduce((a, b) => a + (b - mean) ** 2, 0) / use.length;
   return { bpm: 60000 / mean, interval: mean, used: use.length, spread: Math.sqrt(variance) / mean };
 }
-
-/** Beat duration in ms for a tempo. */
-export const beatMs = (bpm: number) => 60000 / bpm;
 
 /** Note lengths in ms at a tempo (quarter note = one beat). */
 export function noteLengths(bpm: number): { whole: number; half: number; quarter: number; eighth: number; sixteenth: number; tripletEighth: number; dottedEighth: number } {

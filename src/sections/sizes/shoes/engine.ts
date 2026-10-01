@@ -23,15 +23,15 @@ export const FOOT_RANGE: Record<ShoeGroup, [number, number]> = {
 
 const half = (n: number) => Number((Math.round(n * 2 + 1e-9) / 2).toFixed(1));
 
-export const euRaw = (f: number) => 1.5 * f + 2;
+const euRaw = (f: number) => 1.5 * f + 2;
 export const footFromEu = (eu: number) => (eu - 2) / 1.5;
 
 /** Raw UK value: adult scale for adults, child scale for kids. */
-export const ukRaw = (f: number, g: ShoeGroup) => (3 * f) / 2.54 - (g === "kids" ? 10.5 : 23.5);
-export const footFromUk = (uk: number, g: ShoeGroup) => ((uk + (g === "kids" ? 10.5 : 23.5)) * 2.54) / 3;
+const ukRaw = (f: number, g: ShoeGroup) => (3 * f) / 2.54 - (g === "kids" ? 10.5 : 23.5);
+const footFromUk = (uk: number, g: ShoeGroup) => ((uk + (g === "kids" ? 10.5 : 23.5)) * 2.54) / 3;
 
 const usOffset = (g: ShoeGroup) => (g === "men" ? 1 : g === "women" ? 2 : 0.5);
-export const usRaw = (f: number, g: ShoeGroup) => ukRaw(f, g) + usOffset(g);
+const usRaw = (f: number, g: ShoeGroup) => ukRaw(f, g) + usOffset(g);
 export const footFromUs = (us: number, g: ShoeGroup) => footFromUk(us - usOffset(g), g);
 
 const ruOffset = (g: ShoeGroup) => (g === "kids" ? 0 : 1);
@@ -68,7 +68,7 @@ export function sizeIn(system: ShoeSystem, f: number, g: ShoeGroup): number {
   }
 }
 
-export interface ShoeSizes {
+interface ShoeSizes {
   foot: number;
   eu: number;
   ru: number;
@@ -102,7 +102,7 @@ export function footRangeForEu(eu: number): [number, number] {
   return [footFromEu(eu - 0.5), footFromEu(eu + 0.5)];
 }
 
-export interface ShoeRow extends ShoeSizes {
+interface ShoeRow extends ShoeSizes {
   /** Foot-length interval (cm) of the row. */
   range: [number, number];
 }

@@ -17,7 +17,7 @@
 export type SalaryYear = 2025 | 2026;
 export const SALARY_YEARS: readonly SalaryYear[] = [2026, 2025];
 
-export interface KzConstants {
+interface KzConstants {
   year: SalaryYear;
   mrp: number;
   mzp: number;
@@ -96,7 +96,7 @@ export const KZ: Record<SalaryYear, KzConstants> = {
   },
 };
 
-export interface SalaryOptions {
+interface SalaryOptions {
   /** Standard deduction (only at the main place of work, on the employee's application). */
   deduction?: boolean;
 }
@@ -122,7 +122,7 @@ export interface SalaryBreakdown {
 }
 
 /** Round half up to whole tenge (robust to float noise). */
-export function tenge(x: number): number {
+function tenge(x: number): number {
   return Math.round(Number(x.toPrecision(15)) + 1e-9);
 }
 

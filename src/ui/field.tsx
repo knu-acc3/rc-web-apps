@@ -1,8 +1,6 @@
 import type { ComponentProps, ReactNode } from "react";
 import { cn } from "@/lib/cn";
 
-/** Base look of text inputs/selects (see .control in globals.css). */
-export const controlClass = "control";
 type CtlSize = "sm" | "md" | "lg";
 const ctlSize: Record<CtlSize, string> = { sm: "h-9 text-sm pointer-coarse:h-10", md: "h-10 text-[0.9375rem] pointer-coarse:h-11", lg: "h-12 text-lg font-semibold" };
 

@@ -1,6 +1,6 @@
 import type { L10n } from "@/i18n/config";
 
-export interface InvisibleChar {
+interface InvisibleChar {
   cp: number;
   /** Official Unicode name. */
   name: string;

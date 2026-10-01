@@ -1,5 +1,5 @@
 /** "Nice" axis ticks (1, 2, 2.5, 5 × 10ⁿ steps) covering [min, max]. Pure; used by the SVG charts. */
-export function niceStep(range: number, target = 5): number {
+function niceStep(range: number, target = 5): number {
   if (!(range > 0) || !Number.isFinite(range)) return 1;
   const raw = range / Math.max(1, target);
   const mag = 10 ** Math.floor(Math.log10(raw));
@@ -8,7 +8,7 @@ export function niceStep(range: number, target = 5): number {
   return f * mag;
 }
 
-export interface Ticks {
+interface Ticks {
   min: number;
   max: number;
   step: number;

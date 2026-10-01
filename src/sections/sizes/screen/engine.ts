@@ -13,7 +13,7 @@ export function reduceRatio(w: number, h: number): [number, number] {
   return [Math.round(w) / g, Math.round(h) / g];
 }
 
-export interface NamedRatio {
+interface NamedRatio {
   label: string;
   w: number;
   h: number;
@@ -22,7 +22,7 @@ export interface NamedRatio {
 }
 
 /** Ratios people actually use. "21:9" is a marketing label for 64:27, 43:18 and 12:5 panels. */
-export const COMMON_RATIOS: NamedRatio[] = [
+const COMMON_RATIOS: NamedRatio[] = [
   { label: "1:1", w: 1, h: 1, tol: 0.005 },
   { label: "5:4", w: 5, h: 4, tol: 0.005 },
   { label: "4:3", w: 4, h: 3, tol: 0.005 },
@@ -37,7 +37,7 @@ export const COMMON_RATIOS: NamedRatio[] = [
   { label: "32:9", w: 32, h: 9, tol: 0.005 },
 ];
 
-export interface RatioMatch {
+interface RatioMatch {
   /** Label in landscape form ("16:9"). */
   label: string;
   /** Label oriented like the input ("9:16" for portrait). */
@@ -97,7 +97,7 @@ export const widthFor = (rw: number, rh: number, h: number) => (h * rw) / rh;
 export const roundEven = (n: number) => 2 * Math.round(n / 2);
 
 /** Standard names of resolutions (landscape key "WxH"). */
-export const RESOLUTION_NAMES: Record<string, string> = {
+const RESOLUTION_NAMES: Record<string, string> = {
   "640x480": "VGA",
   "800x600": "SVGA",
   "1024x768": "XGA",

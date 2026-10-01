@@ -5,7 +5,7 @@ const r2 = (x: number) => cents(x) / 100;
 
 /* ───────────── VAT ───────────── */
 
-export interface VatPreset {
+interface VatPreset {
   id: string;
   country: "kz" | "ru";
   year: number;
@@ -21,7 +21,7 @@ export const VAT_PRESETS: VatPreset[] = [
   { id: "ru-10", country: "ru", year: 2026, rate: 10 },
 ];
 
-export interface VatResult {
+interface VatResult {
   net: number;
   vat: number;
   gross: number;
@@ -65,7 +65,7 @@ export function stackedDiscount(pcts: number[]): number {
 
 /* ───────────── Tips ───────────── */
 
-export interface TipResult {
+interface TipResult {
   tip: number;
   total: number;
   /** What each person pays; the shares always add up to `collected`. */
@@ -131,7 +131,7 @@ export const marginToMarkup = (m: number) => (m >= 100 ? Infinity : (m / (100 - 
 
 /* ───────────── Break-even ───────────── */
 
-export interface BreakEven {
+interface BreakEven {
   units: number;
   /** Units rounded up to a whole item. */
   unitsCeil: number;

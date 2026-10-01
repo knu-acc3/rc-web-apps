@@ -23,7 +23,7 @@ import { downloadZip, type BatchItem, type BatchResult, type useBatch } from "./
 type Batch = ReturnType<typeof useBatch>;
 
 /** URL to show the original: the file itself when the browser can display it, else a worker preview. */
-export function useOriginalUrl(p: Prepared | undefined, maxSide = 2048): string | null {
+function useOriginalUrl(p: Prepared | undefined, maxSide = 2048): string | null {
   const getEngine = useEngine();
   const direct = useMemo(() => (p && displayable(p.format) ? URL.createObjectURL(p.file) : null), [p]);
   useEffect(

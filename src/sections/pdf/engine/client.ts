@@ -2,7 +2,7 @@
 import type { Job, JobResult, WorkerMessage } from "./jobs";
 import type { PdfErrorCode } from "./pdf-ops";
 
-export class JobError extends Error {
+class JobError extends Error {
   constructor(
     public code: PdfErrorCode | "generic" | "cancelled",
     message: string,

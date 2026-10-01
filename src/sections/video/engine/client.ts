@@ -23,7 +23,7 @@ export interface Hooks {
   onDownload?: (p: number) => void;
 }
 
-export class EngineError extends Error {
+class EngineError extends Error {
   constructor(public code: string, public fallback?: FallbackReason, message?: string) {
     super(message ?? code);
   }
@@ -37,7 +37,7 @@ type Pending = {
 };
 
 /** A dedicated media worker. One per job (or per editor session). */
-export class MediaWorker {
+class MediaWorker {
   private w: Worker;
   private seq = 0;
   private pending = new Map<number, Pending>();
@@ -100,10 +100,6 @@ async function withWorker<T>(signal: AbortSignal, fn: (w: MediaWorker) => Promis
     signal.removeEventListener("abort", onAbort);
     w.terminate();
   }
-}
-
-export function supportsWebCodecs(): boolean {
-  return typeof window !== "undefined" && "VideoEncoder" in window && "AudioDecoder" in window;
 }
 
 const EMPTY_INFO: MediaInfo = { readable: false, container: null, mime: null, duration: null, video: null, audio: null };

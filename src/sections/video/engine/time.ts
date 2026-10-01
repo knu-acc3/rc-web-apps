@@ -52,7 +52,7 @@ export function ffTime(seconds: number): string {
   return formatTime(Math.max(0, seconds), 3, true).padStart(12, "0");
 }
 
-export interface TimeRange {
+interface TimeRange {
   start: number;
   end: number;
 }

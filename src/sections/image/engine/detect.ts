@@ -5,7 +5,7 @@
 
 export type SniffedFormat = "jpg" | "png" | "gif" | "webp" | "avif" | "heic" | "bmp" | "ico" | "cur" | "tiff" | "svg" | "jxl" | "psd" | "pdf";
 
-export interface FormatMeta {
+interface FormatMeta {
   mime: string;
   ext: string;
   label: string;
@@ -150,9 +150,6 @@ export function isAnimated(b: Uint8Array, format: SniffedFormat | null): boolean
   if (format === "avif") return (ftypBrands(b) ?? []).includes("avis");
   return false;
 }
-
-/** Formats this section can decode (with the help of lazy decoders). */
-export const DECODABLE = new Set<SniffedFormat>(["jpg", "png", "gif", "webp", "avif", "heic", "bmp", "ico", "cur", "tiff", "svg"]);
 
 /** `accept` attribute for image inputs (HEIC/TIFF often have no MIME on Windows). */
 export const IMAGE_ACCEPT = "image/*,.heic,.heif,.avif,.tif,.tiff,.jfif,.pjpeg,.pjp,.ico,.cur,.bmp,.svg,.webp";

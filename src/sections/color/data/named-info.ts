@@ -3,7 +3,7 @@
  * a natural Russian name and the hue group (the grouping used by W3C/W3Schools
  * color tables). Hex values come from lib/named.ts.
  */
-export type HueGroup = "red" | "pink" | "orange" | "yellow" | "green" | "cyan" | "blue" | "purple" | "brown" | "white" | "gray";
+type HueGroup = "red" | "pink" | "orange" | "yellow" | "green" | "cyan" | "blue" | "purple" | "brown" | "white" | "gray";
 
 export const HUE_GROUPS: readonly HueGroup[] = ["red", "pink", "orange", "yellow", "green", "cyan", "blue", "purple", "brown", "white", "gray"];
 
@@ -21,7 +21,7 @@ export const GROUP_LABEL: Record<HueGroup, { ru: string; en: string }> = {
   gray: { ru: "Серые и чёрный", en: "Grays and black" },
 };
 
-export interface NamedInfo {
+interface NamedInfo {
   camel: string;
   ru: string;
   group: HueGroup;

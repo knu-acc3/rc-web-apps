@@ -12,7 +12,7 @@
  *   hsv()/hsb() and cmyk()/device-cmyk().
  * - Everything is pure and SSR-safe.
  */
-import { NAMED_ALIASES, NAMED_COLORS, NAMED_MAP } from "./named";
+import { NAMED_COLORS, NAMED_MAP } from "./named";
 
 export interface Color {
   r: number;
@@ -40,7 +40,7 @@ const mul = (m: Mat3, v: Vec3): Vec3 => [
   m[2][0] * v[0] + m[2][1] * v[1] + m[2][2] * v[2],
 ];
 /** Normalize a hue to [0, 360). */
-export const normHue = (h: number) => {
+const normHue = (h: number) => {
   if (!Number.isFinite(h)) return 0;
   const x = h % 360;
   return x < 0 ? x + 360 : x === 360 ? 0 : x;
@@ -104,18 +104,18 @@ const D50_WHITE: Vec3 = [0.3457 / 0.3585, 1, (1 - 0.3457 - 0.3585) / 0.3585];
 const rgbVec = (c: Color): Vec3 => [c.r, c.g, c.b];
 const fromVec = (v: Vec3, alpha = 1): Color => ({ r: v[0], g: v[1], b: v[2], alpha });
 
-export function toLinearRgb(c: Color): Vec3 {
+function toLinearRgb(c: Color): Vec3 {
   return [toLinear(c.r), toLinear(c.g), toLinear(c.b)];
 }
-export function fromLinearRgb(v: Vec3, alpha = 1): Color {
+function fromLinearRgb(v: Vec3, alpha = 1): Color {
   return fromVec([fromLinear(v[0]), fromLinear(v[1]), fromLinear(v[2])], alpha);
 }
 
 /** CIE XYZ (D65) */
-export function toXyz(c: Color): Vec3 {
+function toXyz(c: Color): Vec3 {
   return mul(LIN_SRGB_TO_XYZ, toLinearRgb(c));
 }
-export function fromXyz(xyz: Vec3, alpha = 1): Color {
+function fromXyz(xyz: Vec3, alpha = 1): Color {
   return fromLinearRgb(mul(XYZ_TO_LIN_SRGB, xyz), alpha);
 }
 
@@ -139,7 +139,7 @@ export function toHsl(c: Color): { h: number; s: number; l: number } {
   const s = d === 0 || l <= 0 || l >= 1 ? 0 : (max - l) / Math.min(l, 1 - l);
   return { h: hueOf(r, g, b, max, d), s, l };
 }
-export function fromHsl(h: number, s: number, l: number, alpha = 1): Color {
+function fromHsl(h: number, s: number, l: number, alpha = 1): Color {
   h = normHue(h);
   s = clamp(s);
   l = clamp(l);
@@ -169,11 +169,11 @@ export function fromHsv(h: number, s: number, v: number, alpha = 1): Color {
   return { r: f(5), g: f(3), b: f(1), alpha };
 }
 
-export function toHwb(c: Color): { h: number; w: number; b: number } {
+function toHwb(c: Color): { h: number; w: number; b: number } {
   const hsv = toHsv(c);
   return { h: hsv.h, w: Math.min(c.r, c.g, c.b), b: 1 - Math.max(c.r, c.g, c.b) };
 }
-export function fromHwb(h: number, w: number, bl: number, alpha = 1): Color {
+function fromHwb(h: number, w: number, bl: number, alpha = 1): Color {
   w = clamp(w);
   bl = clamp(bl);
   if (w + bl >= 1) {
@@ -186,7 +186,7 @@ export function fromHwb(h: number, w: number, bl: number, alpha = 1): Color {
 }
 
 /** Naive (device-independent, no ICC profile) CMYK, channels 0…1. */
-export function toCmyk(c: Color): { c: number; m: number; y: number; k: number } {
+function toCmyk(c: Color): { c: number; m: number; y: number; k: number } {
   const r = clamp(c.r);
   const g = clamp(c.g);
   const b = clamp(c.b);
@@ -194,7 +194,7 @@ export function toCmyk(c: Color): { c: number; m: number; y: number; k: number }
   if (k >= 1) return { c: 0, m: 0, y: 0, k: 1 };
   return { c: (1 - r - k) / (1 - k), m: (1 - g - k) / (1 - k), y: (1 - b - k) / (1 - k), k };
 }
-export function fromCmyk(cy: number, m: number, y: number, k: number, alpha = 1): Color {
+function fromCmyk(cy: number, m: number, y: number, k: number, alpha = 1): Color {
   cy = clamp(cy);
   m = clamp(m);
   y = clamp(y);
@@ -215,7 +215,7 @@ export function toLab(c: Color): { l: number; a: number; b: number } {
   });
   return { l: 116 * f[1] - 16, a: 500 * (f[0] - f[1]), b: 200 * (f[1] - f[2]) };
 }
-export function fromLab(l: number, a: number, b: number, alpha = 1): Color {
+function fromLab(l: number, a: number, b: number, alpha = 1): Color {
   const f1 = (l + 16) / 116;
   const f0 = a / 500 + f1;
   const f2 = f1 - b / 200;
@@ -225,18 +225,18 @@ export function fromLab(l: number, a: number, b: number, alpha = 1): Color {
   const xyz50: Vec3 = [x * D50_WHITE[0], y * D50_WHITE[1], z * D50_WHITE[2]];
   return fromXyz(mul(D50_TO_D65, xyz50), alpha);
 }
-export function toLch(c: Color): { l: number; c: number; h: number } {
+function toLch(c: Color): { l: number; c: number; h: number } {
   const { l, a, b } = toLab(c);
   return { l, c: Math.hypot(a, b), h: normHue((Math.atan2(b, a) * 180) / Math.PI) };
 }
-export function fromLch(l: number, ch: number, h: number, alpha = 1): Color {
+function fromLch(l: number, ch: number, h: number, alpha = 1): Color {
   const r = (normHue(h) * Math.PI) / 180;
   return fromLab(l, Math.max(0, ch) * Math.cos(r), Math.max(0, ch) * Math.sin(r), alpha);
 }
 
 /* OKLab / OKLCH (Björn Ottosson) — L 0…1 */
 
-export function toOklab(c: Color): { l: number; a: number; b: number } {
+function toOklab(c: Color): { l: number; a: number; b: number } {
   const [r, g, b] = toLinearRgb(c);
   const l_ = Math.cbrt(0.4122214708 * r + 0.5363325363 * g + 0.0514459929 * b);
   const m_ = Math.cbrt(0.2119034982 * r + 0.6806995451 * g + 0.1073969566 * b);
@@ -247,7 +247,7 @@ export function toOklab(c: Color): { l: number; a: number; b: number } {
     b: 0.0259040371 * l_ + 0.7827717662 * m_ - 0.808675766 * s_,
   };
 }
-export function fromOklab(L: number, a: number, b: number, alpha = 1): Color {
+function fromOklab(L: number, a: number, b: number, alpha = 1): Color {
   const l_ = L + 0.3963377774 * a + 0.2158037573 * b;
   const m_ = L - 0.1055613458 * a - 0.0638541728 * b;
   const s_ = L - 0.0894841775 * a - 1.291485548 * b;
@@ -275,11 +275,11 @@ export function fromOklch(l: number, ch: number, h: number, alpha = 1): Color {
 }
 
 /* Display P3 */
-export function toP3(c: Color): Vec3 {
+function toP3(c: Color): Vec3 {
   const lin = mul(XYZ_TO_LIN_P3, toXyz(c));
   return [fromLinear(lin[0]), fromLinear(lin[1]), fromLinear(lin[2])];
 }
-export function fromP3(r: number, g: number, b: number, alpha = 1): Color {
+function fromP3(r: number, g: number, b: number, alpha = 1): Color {
   return fromXyz(mul(LIN_P3_TO_XYZ, [toLinear(r), toLinear(g), toLinear(b)]), alpha);
 }
 
@@ -288,7 +288,7 @@ export function fromP3(r: number, g: number, b: number, alpha = 1): Color {
 export function inGamut(c: Color, eps = 1e-5): boolean {
   return c.r >= -eps && c.r <= 1 + eps && c.g >= -eps && c.g <= 1 + eps && c.b >= -eps && c.b <= 1 + eps;
 }
-export function clip(c: Color): Color {
+function clip(c: Color): Color {
   return { r: clamp(c.r), g: clamp(c.g), b: clamp(c.b), alpha: clamp(c.alpha) };
 }
 /** Euclidean distance in OKLab (ΔEOK). ~0.02 is a just-noticeable difference. */
@@ -529,16 +529,9 @@ export function parseColor(input: string, bare?: ColorFormat): Color | null {
   return null;
 }
 
-/** The canonical CSS name for a named color (aliases resolved), or null. */
-export function canonicalName(name: string): string | null {
-  const n = name.toLowerCase();
-  if (!NAMED_MAP.has(n)) return null;
-  return NAMED_ALIASES[n] ?? n;
-}
-
 /* ───────────── formatting ───────────── */
 
-export interface FormatOptions {
+interface FormatOptions {
   /** rgb()/hsl(): comma syntax (default true). */
   legacy?: boolean;
   /** hex: uppercase (default true). */
@@ -625,7 +618,7 @@ export function formatColor(c: Color, format: ColorFormat, opts: FormatOptions =
 /* ───────────── compositing & contrast ───────────── */
 
 /** Source-over compositing of `top` onto `bottom` in gamma-encoded sRGB (what browsers do). */
-export function composite(top: Color, bottom: Color): Color {
+function composite(top: Color, bottom: Color): Color {
   const t = clip(top);
   const b = clip(bottom);
   const a = t.alpha + b.alpha * (1 - t.alpha);
@@ -635,7 +628,7 @@ export function composite(top: Color, bottom: Color): Color {
 }
 
 /** WCAG 2.x relative luminance of the (clipped, opaque) color. */
-export function luminance(c: Color): number {
+function luminance(c: Color): number {
   const [r, g, b] = toLinearRgb(clip(c));
   return 0.2126 * r + 0.7152 * g + 0.0722 * b;
 }
@@ -700,7 +693,7 @@ const APCA = {
 } as const;
 
 /** APCA screen luminance Y of a clipped opaque sRGB color. */
-export function apcaY(c: Color): number {
+function apcaY(c: Color): number {
   const x = clip(c);
   return APCA.sRco * x.r ** APCA.mainTRC + APCA.sGco * x.g ** APCA.mainTRC + APCA.sBco * x.b ** APCA.mainTRC;
 }
@@ -867,7 +860,3 @@ export function hex(s: string): Color {
   return c;
 }
 
-/** True when two colors are identical at 8-bit precision (alpha included). */
-export function sameRgb(a: Color, b: Color): boolean {
-  return toHex(a, { alpha: true }) === toHex(b, { alpha: true });
-}

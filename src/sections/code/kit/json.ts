@@ -7,7 +7,7 @@
  */
 import { Num, Obj, type V } from "./value";
 
-export type JsonErrorCode =
+type JsonErrorCode =
   | "empty"
   | "unexpected-token"
   | "unexpected-end"
@@ -22,7 +22,7 @@ export type JsonErrorCode =
 
 export type JsonWarningCode = "dup-key" | "comment" | "trailing-comma" | "single-quote" | "bom";
 
-export interface Pos {
+interface Pos {
   line: number;
   col: number;
   offset: number;
@@ -66,7 +66,7 @@ export function posOf(text: string, offset: number): Pos {
 }
 
 /** Deeper documents get a clear "too-deep" error instead of a stack overflow. */
-export const MAX_DEPTH = 1000;
+const MAX_DEPTH = 1000;
 
 export function parseJson(text: string, opts: { lenient?: boolean } = {}): { value: V; warnings: JsonWarning[] } {
   const lenient = !!opts.lenient;
@@ -260,7 +260,7 @@ export function parseJson(text: string, opts: { lenient?: boolean } = {}): { val
   return { value: v, warnings };
 }
 
-export interface StringifyOptions {
+interface StringifyOptions {
   /** 0 = minified; a number of spaces; or "\t" */
   indent?: number | "\t";
   sortKeys?: boolean;

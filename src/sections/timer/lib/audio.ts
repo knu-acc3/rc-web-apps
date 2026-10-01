@@ -27,10 +27,6 @@ export function unlockAudio(): AudioContext | null {
   }
 }
 
-export function audioContext(): AudioContext | null {
-  return ctx;
-}
-
 export interface Scheduled {
   /** Audio-clock time of the first note. */
   at: number;

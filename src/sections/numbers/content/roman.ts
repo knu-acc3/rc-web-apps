@@ -12,7 +12,7 @@ function pickTitle(candidates: string[]): string {
   return candidates.find((c) => c.length <= 60) ?? candidates[candidates.length - 1];
 }
 
-export const ROMAN_NUMBERS: number[] = (() => {
+const ROMAN_NUMBERS: number[] = (() => {
   const set = new Set<number>();
   for (let n = 1; n <= 100; n++) set.add(n);
   for (let n = 1900; n <= 2100; n++) set.add(n);

@@ -26,14 +26,14 @@ function subscribe(cb: () => void) {
 const clientSnap = () => window.location.search;
 const serverSnap = () => null;
 
-export interface QueryOptions<K extends string> {
+interface QueryOptions<K extends string> {
   /** Allowed values for enum-like keys (mode, unit…); anything else in the URL falls back to the default. */
   enums?: Partial<Record<K, readonly string[]>>;
   /** Longest value written to / read from the URL (default 1500 chars). Longer values stay local. */
   maxLength?: number;
 }
 
-export interface QueryApi<K extends string> {
+interface QueryApi<K extends string> {
   /** Current values (defaults ← URL ← user edits). */
   v: Record<K, string>;
   /** Merge a patch into the state (and, debounced, into the URL). */
