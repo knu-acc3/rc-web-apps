@@ -1,5 +1,6 @@
 import type { L10n, Locale } from "@/i18n/config";
 import type { QA } from "@/registry/types";
+import { EXTRA_WHEEL_PRESETS } from "./wheel-presets-extra";
 
 /** Curated wheel presets: each one is its own page /spin-the-wheel/{slug}. */
 export interface WheelPreset {
@@ -774,4 +775,5 @@ export const WHEEL_PRESETS: WheelPreset[] = [
       ],
     },
   },
+  ...EXTRA_WHEEL_PRESETS,
 ];

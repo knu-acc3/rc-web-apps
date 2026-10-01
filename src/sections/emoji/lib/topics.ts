@@ -1,4 +1,5 @@
 import type { L10n } from "@/i18n/config";
+import { EXTRA_TOPICS } from "./topics-extra";
 
 /**
  * Curated emoji collections (/emoji/topic/{slug}). Membership = whole subgroups +
@@ -586,9 +587,11 @@ export const TOPICS: TopicDef[] = [
     },
     region: "oceania",
   },
+  ...EXTRA_TOPICS,
 ];
 
 export const ALIASES: TopicAlias[] = [
+  { slug: "science", name: { ru: "Наука", en: "Science" }, to: ["subgroup", "science"] },
   { slug: "hearts", name: { ru: "Сердечки", en: "Hearts" }, to: ["subgroup", "heart"] },
   { slug: "faces-angry", name: { ru: "Злые смайлики", en: "Angry faces" }, to: ["subgroup", "face-negative"] },
   { slug: "smileys", name: { ru: "Смайлики", en: "Smileys" }, to: ["group", "smileys-emotion"] },
