@@ -12,7 +12,7 @@ import { Dropzone } from "@/ui/dropzone";
 import { Select } from "@/ui/field";
 import { Panel } from "@/ui/panel";
 import { ALGO_BY_ID, ALGOS, algosForHexLength, type AlgoId } from "./lib/algorithms";
-import { algoFromTag, parseSums, type SumEntry } from "./lib/engine";
+import { algoFromTag, parseSums, type SumEntry } from "./lib/digest";
 
 const T = {
   ru: {

@@ -5,6 +5,8 @@
  */
 import { PDFArray, PDFDict, PDFName, PDFNumber, concatTransformationMatrix, degrees, fill, popGraphicsState, pushGraphicsState, rectangle, rgb, setFillingGrayscaleColor, setGraphicsState, type PDFDocument, type PDFPage } from "@cantoo/pdf-lib";
 import { PAPER, apply, clean, compose, invert, scaleM, translate, type Box, type Matrix, type PaperId } from "./geometry";
+import type { EditItem } from "./edit-types";
+import { EDIT_LINE_HEIGHT } from "./edit-types";
 import { inVisualSpace, pageGeometry } from "./pdf-ops";
 
 /** Crop in visual space as fractions of the page: left, top, right, bottom edges (0–1, from the top-left). */
@@ -133,14 +135,6 @@ export function transformPages(doc: PDFDocument, op: TransformOp, indices?: read
 }
 
 /* ───────────── add text / white-out ───────────── */
-
-/** Something placed on a page in the editor. Coordinates are fractions of the page as displayed, origin top-left. */
-export type EditItem =
-  | { kind: "text"; page: number; x: number; y: number; text: string; size: number; color: [number, number, number] }
-  | { kind: "box"; page: number; x: number; y: number; w: number; h: number; color: [number, number, number] };
-
-/** Line height used both by the editor's text boxes and in the PDF. */
-export const EDIT_LINE_HEIGHT = 1.25;
 
 /** Draw editor items: boxes first (to cover old content), then text on top. */
 export function drawEdits(doc: PDFDocument, items: readonly EditItem[], font: import("@cantoo/pdf-lib").PDFFont) {

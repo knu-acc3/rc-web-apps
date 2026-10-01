@@ -7,7 +7,7 @@ import { cn } from "@/lib/cn";
 import { Button } from "@/ui/button";
 import { Segmented } from "@/ui/segmented";
 import { loadUnicodeFont } from "./engine/client";
-import { EDIT_LINE_HEIGHT, type EditItem } from "./engine/transform";
+import { EDIT_LINE_HEIGHT, type EditItem } from "./engine/edit-types";
 import { PageStage } from "./sign/PageStage";
 import { PrimaryButton, workerJob } from "./ui/bits";
 import { FilePanel } from "./ui/FilePanel";
@@ -82,7 +82,6 @@ export default function EditTool({ locale, tool = "text" }: { locale: Locale; to
   const pdf = usePdfFiles({ thumbnails: false });
   const job = useJob(locale);
   const file = pdf.ready[0] ?? null;
-  useEditorFont();
   return (
     <div className="flex flex-col gap-4">
       <FilePanel locale={locale} pdf={pdf} disabled={job.running} />
@@ -93,6 +92,7 @@ export default function EditTool({ locale, tool = "text" }: { locale: Locale; to
 
 function Editor({ locale, file, job, tool0, onClear }: { locale: Locale; file: PdfFile; job: ReturnType<typeof useJob>; tool0: "text" | "box"; onClear: () => void }) {
   const t = T[locale];
+  useEditorFont(); // only now: the font (~500 KB) isn't needed until a PDF is open
   const [page, setPage] = useState(0);
   const [tool, setTool] = useState<"text" | "box">(tool0);
   const [items, setItems] = useState<EditItem[]>([]);

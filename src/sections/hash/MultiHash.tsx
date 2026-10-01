@@ -8,7 +8,7 @@ import { useLiveTask, useWorkerClient } from "@/sections/code/kit/hooks";
 import { Select } from "@/ui/field";
 import { Panel } from "@/ui/panel";
 import { ALGOS, type AlgoId } from "./lib/algorithms";
-import { formatDigest, type OutFormat } from "./lib/engine";
+import { formatDigest, type OutFormat } from "./lib/digest";
 import { decodeInput, INPUT_ENC_LABEL, type InputEncoding } from "./lib/input";
 
 const T = {

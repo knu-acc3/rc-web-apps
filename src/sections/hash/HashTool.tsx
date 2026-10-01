@@ -14,7 +14,7 @@ import { Field, Input, Select } from "@/ui/field";
 import { Notice, Panel } from "@/ui/panel";
 import { Segmented } from "@/ui/segmented";
 import { ALGO_BY_ID, type AlgoId } from "./lib/algorithms";
-import { digestMatches, formatDigest, type OutFormat } from "./lib/engine";
+import { digestMatches, formatDigest, type OutFormat } from "./lib/digest";
 import { decodeInput, INPUT_ENC_LABEL, type InputEncoding } from "./lib/input";
 
 const T = {

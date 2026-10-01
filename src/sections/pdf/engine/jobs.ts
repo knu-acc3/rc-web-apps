@@ -1,5 +1,6 @@
 /** Messages exchanged with the pdf-lib worker. Types only — safe to import anywhere. */
-import type { EditItem, TransformOp } from "./transform";
+import type { EditItem } from "./edit-types";
+import type { TransformOp } from "./transform";
 import type { ImagesLayout, MetaFields, NupOptions, PageNumberOptions, PageRef, Placement, ProtectOptions, TextWatermark, ImageStamp, DocInfo, FormFieldInfo, PdfErrorCode } from "./pdf-ops";
 
 export interface SourceFile {
