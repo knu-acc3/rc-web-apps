@@ -12,4 +12,6 @@ export const components: ComponentMap = {
   "time/flip": () => import("./FlipClock"),
   "time/analog": () => import("./AnalogClock"),
   "time/utc": () => import("./UtcNow"),
+  "time/night": () => import("./NightClock"),
+  "time/teach": () => import("./TeachingClock"),
 };

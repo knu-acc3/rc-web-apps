@@ -526,7 +526,7 @@ export function ObjectArt({ o }: { o: ClientObj }) {
               const n = ring === 1 ? 6 : 12;
               const a = (k / n) * Math.PI * 2;
               const rr = ring * r * 0.34;
-              return <Circle key={i} cx={r + rr * Math.cos(a)} cy={r + rr * Math.sin(a)} r={r * 0.07} cls={MUTED} sw={0} />;
+              return <Circle key={i} cx={Math.round((r + rr * Math.cos(a)) * 1000) / 1000} cy={Math.round((r + rr * Math.sin(a)) * 1000) / 1000} r={r * 0.07} cls={MUTED} sw={0} />;
             })}
           {o.label && (
             <>

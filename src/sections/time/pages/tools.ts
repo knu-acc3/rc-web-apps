@@ -1,11 +1,13 @@
 import type { L10n, L10nList, Locale } from "@/i18n/config";
 import { ui } from "@/i18n/ui";
+import { isResolvingRelated, resolveRelatedKey } from "@/registry/tool-section";
 import type { Block, LinkItem, PageModel, QA } from "@/registry/types";
 import { DEFAULT_FAVORITES } from "../data/zones";
 import { CITIES, COUNTRIES, cityLabel, clientCity, countryPath } from "../model";
 import type { ConverterProps, WorldClockProps } from "../types";
 import { citiesBySlugs, cityLink, home, HUE } from "./common";
 import { pairKeys } from "./pair";
+import { enSpoken, ruOfficial, ruSpoken } from "../lib/words";
 
 export interface TimeTool {
   slug: string;
@@ -301,6 +303,121 @@ export const TIME_TOOLS: TimeTool[] = [
     keywords: { ru: ["часы со стрелками", "циферблат онлайн"], en: ["clock face", "clock with hands"] },
   },
   {
+    slug: "night-clock",
+    component: "time/night",
+    icon: "Moon",
+    name: { ru: "Ночные часы", en: "Night clock" },
+    title: { ru: "Ночные часы на экран | часы для тумбочки с тусклыми цифрами", en: "Night Clock — Dim Bedside Clock for Your Screen" },
+    h1: { ru: "Ночные часы онлайн", en: "Night clock online" },
+    description: {
+      ru: "Ночные часы на телефон или планшет: тусклые красные, янтарные или зелёные цифры на чёрном фоне, регулировка яркости, дата и защита экрана от выгорания.",
+      en: "A night clock for a phone or tablet: dim red, amber or green digits on black, adjustable brightness, the date and screen burn-in protection.",
+    },
+    lead: { ru: "Тусклые цифры на чёрном экране — видно время ночью, но свет не мешает спать.", en: "Dim digits on a black screen — you can see the time at night, but the light won't keep you awake." },
+    howTo: {
+      ru: ["Выберите цвет цифр — красный меньше всего мешает сну — и яркость.", "Нажмите «На весь экран» и положите телефон на тумбочку, лучше на зарядку.", "Яркость меняется прямо в полноэкранном режиме: коснитесь экрана и нажмите луну или солнце."],
+      en: ["Pick a digit colour — red disturbs sleep least — and the brightness.", "Press Full screen and put the phone on the nightstand, ideally on a charger.", "Change brightness in full screen: tap the screen and press the moon or the sun."],
+    },
+    about: {
+      ru: [
+        "Синий и белый свет сильнее всего сбивает внутренние часы организма, а тусклый красный почти не мешает. Поэтому у ночных часов по умолчанию красные цифры на чёрном фоне: на OLED-экране чёрные пиксели не светятся вовсе.",
+        "Чтобы цифры не «выжгли» экран за ночь, раз в минуту они плавно сдвигаются на несколько пикселей. Пока часы открыты на весь экран, телефон не гаснет.",
+      ],
+      en: [
+        "Blue and white light upset the body clock the most, while dim red light barely does. That's why the night clock defaults to red digits on black: on an OLED screen the black pixels don't light up at all.",
+        "To keep the digits from burning into the screen overnight, they drift a few pixels once a minute. The phone stays awake while the clock is full screen.",
+      ],
+    },
+    faq: {
+      ru: [
+        { q: "Не разрядится ли телефон за ночь?", a: "Экран будет включён всю ночь, поэтому лучше поставить телефон на зарядку. На OLED-экране чёрный фон почти не тратит энергию." },
+        { q: "Какой цвет лучше для сна?", a: "Красный или янтарный при низкой яркости. Белый и голубой свет сильнее подавляет мелатонин." },
+        { q: "Почему экран всё равно гаснет?", a: "Не все браузеры позволяют сайту держать экран включённым. В Chrome, Edge и Safari 16.4+ это работает; иначе увеличьте время автоблокировки в настройках телефона." },
+      ],
+      en: [
+        { q: "Won't the battery run down overnight?", a: "The screen stays on all night, so charge the phone. On OLED screens the black background uses almost no power." },
+        { q: "Which colour is best for sleep?", a: "Red or amber at low brightness. White and blue light suppress melatonin more." },
+        { q: "Why does the screen still turn off?", a: "Not every browser lets a site keep the screen on. Chrome, Edge and Safari 16.4+ do; otherwise increase auto-lock time in your phone settings." },
+      ],
+    },
+    related: ["online-clock", "flip-clock", "alarm-clock", "noise-generator"],
+    keywords: { ru: ["ночные часы", "часы для тумбочки", "прикроватные часы", "часы на ночь"], en: ["night clock", "bedside clock", "nightstand clock"] },
+    blocks: (locale) => [
+      {
+        type: "facts",
+        title: locale === "ru" ? "Какой свет меньше мешает сну" : "Which light disturbs sleep least",
+        rows:
+          locale === "ru"
+            ? [
+                ["Красный, янтарный", "почти не влияет на выработку мелатонина"],
+                ["Зелёный", "заметнее, но мягче белого"],
+                ["Белый, голубой", "сильнее всего сбивает внутренние часы"],
+              ]
+            : [
+                ["Red, amber", "barely affects melatonin"],
+                ["Green", "more noticeable, but softer than white"],
+                ["White, blue", "upsets the body clock the most"],
+              ],
+      },
+    ],
+  },
+  {
+    slug: "learn-to-tell-time",
+    component: "time/teach",
+    icon: "GraduationCap",
+    name: { ru: "Учимся определять время", en: "Learn to tell time" },
+    title: { ru: "Учимся определять время по часам | учебные часы для детей", en: "Learn to Tell Time — Interactive Teaching Clock" },
+    h1: { ru: "Учимся определять время по часам", en: "Learn to tell the time" },
+    description: {
+      ru: "Интерактивные учебные часы для детей: двигайте стрелки и смотрите, как время называется словами — «четверть третьего», «без двадцати четыре». Есть тренажёр с заданиями.",
+      en: "An interactive teaching clock for kids: move the hands and see the time in words — quarter past two, twenty to four. With practice quizzes.",
+    },
+    lead: { ru: "Двигайте стрелки — часы покажут время цифрами и словами. Потом проверьте себя в тренажёре.", en: "Move the hands to see the time in digits and words. Then test yourself with the quizzes." },
+    howTo: {
+      ru: ["В режиме «Изучать» тяните стрелки: короткая красная — часы, длинная синяя — минуты.", "Под часами время написано цифрами и словами, как его говорят: «половина пятого».", "В режимах «Сколько времени?» и «Поставь стрелки» ребёнок решает задания, а сложность растёт от целых часов до минут."],
+      en: ["In Explore mode drag the hands: the short red one is hours, the long blue one minutes.", "Below the clock the time is written in digits and in words, the way people say it.", "In What time is it? and Set the clock, kids solve tasks from whole hours up to single minutes."],
+    },
+    about: {
+      ru: [
+        "По-русски время по стрелкам называют иначе, чем по электронным часам: 15:40 — это «без двадцати четыре», а 2:15 — «четверть третьего». Часы показывают оба варианта, поэтому ребёнок сразу видит связь.",
+        "Синие цифры по краю циферблата подсказывают минуты: 1 — это 5 минут, 3 — 15, 6 — 30. Когда ребёнок освоится, подсказку можно выключить.",
+      ],
+      en: [
+        "On a clock face we say the time differently from a digital display: 3:40 is twenty to four and 2:15 is quarter past two. The clock shows both, so kids see the link right away.",
+        "Blue numbers around the edge show the minutes: 1 means 5 minutes, 3 means 15, 6 means 30. Turn the hint off once your child is confident.",
+      ],
+    },
+    faq: {
+      ru: [
+        { q: "С какого возраста учить время по часам?", a: "Обычно с 5–7 лет: сначала целые часы, потом половины и четверти, затем 5 минут и минуты. В тренажёре так и устроены уровни сложности." },
+        { q: "Как объяснить «без двадцати четыре»?", a: "После половины часа считают, сколько минут осталось до следующего часа: 15:40 — до четырёх осталось двадцать минут, поэтому «без двадцати четыре»." },
+        { q: "Почему часовая стрелка стоит между цифрами?", a: "Она движется постепенно: в половине третьего она ровно посередине между 2 и 3. Часы показывают это так же, как настоящие." },
+      ],
+      en: [
+        { q: "At what age do kids learn to tell time?", a: "Usually at 5–7: whole hours first, then half and quarter hours, then 5 minutes and single minutes. The quiz levels follow that order." },
+        { q: "How do I explain “twenty to four”?", a: "After half past, we count the minutes left until the next hour: at 3:40 there are twenty minutes to four." },
+        { q: "Why is the hour hand between two numbers?", a: "It moves gradually: at half past two it is exactly halfway between 2 and 3, just like on a real clock." },
+      ],
+    },
+    related: ["analog-clock", "online-clock", "timer", "random-number-generator"],
+    keywords: { ru: ["учебные часы", "часы для детей", "учимся определять время", "как определять время по часам", "тренажёр часы"], en: ["teaching clock", "learn to tell time", "clock for kids", "telling time practice"] },
+    wide: true,
+    blocks: (locale) => {
+      const rows: [number, number][] = [[3, 0], [3, 5], [3, 15], [3, 30], [3, 40], [3, 45], [3, 55], [12, 0], [0, 15]];
+      return [
+        {
+          type: "table",
+          title: locale === "ru" ? "Как называть время по-русски" : "Saying the time in English",
+          head: locale === "ru" ? ["Цифрами", "Говорят", "Официально"] : ["Digits", "We say"],
+          rows: rows.map(([h, m]) => {
+            const hh = locale === "ru" ? h + (h === 3 ? 12 : 0) : h;
+            return locale === "ru" ? [`${String(hh).padStart(2, "0")}:${String(m).padStart(2, "0")}`, ruSpoken(hh, m), ruOfficial(hh, m)] : [`${h === 0 ? 12 : h}:${String(m).padStart(2, "0")}`, enSpoken(h, m)];
+          }),
+        },
+      ];
+    },
+  },
+  {
     slug: "utc-time",
     component: "time/utc",
     icon: "Globe2",
@@ -362,7 +479,8 @@ function relatedLink(key: string, locale: Locale): LinkItem | null {
   const t = TOOL_BY_SLUG.get(key);
   if (t) return toolLink(t, locale);
   if (key === "time-zones") return { path: ["time-zones"], label: locale === "ru" ? "Часовые пояса мира" : "World time zones", hint: locale === "ru" ? "Все пояса от UTC−12 до UTC+14 и текущее время в каждом" : "Every zone from UTC−12 to UTC+14 with its current time", icon: "Globe", hue: HUE };
-  return null;
+  // Tools of other sections (timer, noise generator…); skipped while building a page only for a link.
+  return isResolvingRelated() ? null : resolveRelatedKey(key, locale);
 }
 
 export function timeToolPage(t: TimeTool, locale: Locale): PageModel {

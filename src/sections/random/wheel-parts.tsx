@@ -20,7 +20,8 @@ const R = 98;
 
 function point(angleDeg: number, r: number): [number, number] {
   const a = (angleDeg * Math.PI) / 180;
-  return [r * Math.sin(a), -r * Math.cos(a)];
+  // Rounded: the server and the browser must print identical SVG coordinates (hydration).
+  return [Math.round(r * Math.sin(a) * 1000) / 1000, Math.round(-r * Math.cos(a) * 1000) / 1000];
 }
 
 function slicePath(start: number, end: number): string {

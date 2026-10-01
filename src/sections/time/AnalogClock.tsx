@@ -86,7 +86,7 @@ export default function AnalogClock({ locale }: NowProps) {
         {NUMS.map((n) => {
           const a = (n * 30 * Math.PI) / 180;
           return (
-            <text key={n} x={100 + 67 * Math.sin(a)} y={100 - 67 * Math.cos(a)} textAnchor="middle" dominantBaseline="central" className="fill-fg text-[0.9375rem] font-semibold">
+            <text key={n} x={Math.round((100 + 67 * Math.sin(a)) * 100) / 100} y={Math.round((100 - 67 * Math.cos(a)) * 100) / 100} textAnchor="middle" dominantBaseline="central" className="fill-fg text-[0.9375rem] font-semibold">
               {n}
             </text>
           );
