@@ -196,6 +196,7 @@ export const TOOL_COMPONENTS: Record<string, ComponentType<any>> = {
   "pdf/split": dynamic(() => import("@/sections/pdf/SplitTool")),
   "pdf/to-images": dynamic(() => import("@/sections/pdf/PdfToImagesTool")),
   "pdf/to-text": dynamic(() => import("@/sections/pdf/ToTextTool")),
+  "pdf/transform": dynamic(() => import("@/sections/pdf/TransformTool")),
   "pdf/unlock": dynamic(() => import("@/sections/pdf/UnlockTool")),
   "pdf/watermark": dynamic(() => import("@/sections/pdf/WatermarkTool")),
   "port/check": dynamic(() => import("@/sections/port/PortCheck")),

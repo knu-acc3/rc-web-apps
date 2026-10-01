@@ -1,4 +1,5 @@
 /** Messages exchanged with the pdf-lib worker. Types only — safe to import anywhere. */
+import type { TransformOp } from "./transform";
 import type { ImagesLayout, MetaFields, NupOptions, PageNumberOptions, PageRef, Placement, ProtectOptions, TextWatermark, ImageStamp, DocInfo, FormFieldInfo, PdfErrorCode } from "./pdf-ops";
 
 export interface SourceFile {
@@ -30,7 +31,9 @@ export type Job =
   | { type: "fill-form"; source: SourceFile; values: Record<string, string | boolean | string[]>; flatten: boolean; font?: ArrayBuffer | null }
   | { type: "sign"; source: SourceFile; image: ArrayBuffer; placements: Placement[] }
   | { type: "protect"; source: SourceFile; options: ProtectOptions }
-  | { type: "unlock"; source: SourceFile };
+  | { type: "unlock"; source: SourceFile }
+  /** In-place page transforms (mirror, grayscale, crop, paper size); `pages` = 0-based indices, all when omitted. */
+  | { type: "transform"; source: SourceFile; op: TransformOp; pages?: number[]; preview?: number };
 
 export interface OutputFile {
   name: string;

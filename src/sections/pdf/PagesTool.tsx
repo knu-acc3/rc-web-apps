@@ -1,7 +1,7 @@
 "use client";
 
 import { ArrowDownUp, Copy, FileOutput, RotateCcw, RotateCw, Save, Trash2 } from "lucide-react";
-import { useMemo, useRef, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import type { Locale } from "@/i18n/config";
 import { formatNumber } from "@/i18n/format";
 import { Button } from "@/ui/button";
@@ -17,7 +17,7 @@ import { S, pagesCount } from "./ui/strings";
 import { useJob, type Job } from "./ui/use-job";
 import { usePdfFiles, type PdfFile } from "./ui/use-pdf-files";
 
-export type PagesMode = "organize" | "delete" | "extract" | "rotate";
+export type PagesMode = "organize" | "delete" | "extract" | "rotate" | "reverse" | "blank";
 
 const T = {
   ru: {
@@ -40,6 +40,13 @@ const T = {
       n ? `Повернутся выбранные страницы: ${formatNumber("ru", n)} из ${formatNumber("ru", total)}` : `Повернутся все ${pagesCount("ru", total)}. Чтобы повернуть только некоторые — выберите их.`,
     rotateBtn: "Повернуть PDF",
     organizeInfo: (n: number) => `В новом файле: ${pagesCount("ru", n)}`,
+    reverseInfo: (n: number) => `Страницы пойдут с ${formatNumber("ru", n)}-й по 1-ю`,
+    reverseBtn: "Сохранить в обратном порядке",
+    scanning: (done: number, total: number) => `Проверяем страницы: ${formatNumber("ru", done)} из ${formatNumber("ru", total)}…`,
+    blankFound: (n: number, total: number) => (n ? `Пустых страниц: ${formatNumber("ru", n)} из ${formatNumber("ru", total)}. Нажмите на страницу, чтобы оставить или убрать её.` : "Пустых страниц не найдено"),
+    blankBtn: (n: number) => `Удалить пустые: ${pagesCount("ru", n)}`,
+    sensitivity: "Что считать пустой страницей",
+    levels: { strict: "Совсем белую", normal: "Почти белую", scan: "Скан с пятнами" },
   },
   en: {
     selected: (n: number) => `Selected: ${n}`,
@@ -61,6 +68,13 @@ const T = {
       n ? `Selected pages will rotate: ${formatNumber("en", n)} of ${formatNumber("en", total)}` : `All ${pagesCount("en", total)} will rotate. Select pages to rotate only some.`,
     rotateBtn: "Rotate PDF",
     organizeInfo: (n: number) => `${pagesCount("en", n)} in the new file`,
+    reverseInfo: (n: number) => `Pages will run from ${formatNumber("en", n)} back to 1`,
+    reverseBtn: "Save in reverse order",
+    scanning: (done: number, total: number) => `Checking pages: ${formatNumber("en", done)} of ${formatNumber("en", total)}…`,
+    blankFound: (n: number, total: number) => (n ? `Blank pages: ${formatNumber("en", n)} of ${formatNumber("en", total)}. Tap a page to keep or remove it.` : "No blank pages found"),
+    blankBtn: (n: number) => `Remove blank: ${pagesCount("en", n)}`,
+    sensitivity: "What counts as blank",
+    levels: { strict: "Pure white", normal: "Nearly white", scan: "Scan with specks" },
   },
 } as const;
 
@@ -95,6 +109,26 @@ function PagesBody({ locale, mode, angle0, file, job, onClear }: { locale: Local
   const [angle, setAngle] = useState<90 | 180 | 270>(angle0);
   const [separate, setSeparate] = useState(false);
   const [result, setResult] = useState<OutputItem[] | null>(null);
+  // Blank pages: share of dark pixels per page (null while scanning), then a threshold picks the blank ones.
+  const [ink, setInk] = useState<{ done: number; values: number[] } | null>(null);
+  const [level, setLevel] = useState<BlankLevel>("normal");
+
+  useEffect(() => {
+    if (mode !== "blank" || !file.doc) return;
+    let live = true;
+    (async () => {
+      const m = await import("./engine/pdfjs");
+      const values: number[] = [];
+      for (let i = 1; i <= count && live; i++) {
+        values.push(await inkShare(m, file, i));
+        if (live) setInk({ done: i, values: values.slice() });
+      }
+      if (live) setSelected(new Set(blankKeys(values, "normal")));
+    })().catch(() => {});
+    return () => {
+      live = false;
+    };
+  }, [mode, file, count]);
 
   const setPages = (next: GridPage[]) => {
     setEdited({ file: fileId, pages: next });
@@ -191,6 +225,31 @@ function PagesBody({ locale, mode, angle0, file, job, onClear }: { locale: Local
             (i) => (separate ? `${base}-page-${keep[i]}.pdf` : `${base}-pages-${formatPageRanges(keep).replace(/, /g, "_")}.pdf`.slice(0, 120)),
           ),
       };
+    } else if (mode === "reverse") {
+      info = t.reverseInfo(count);
+      action = {
+        label: t.reverseBtn,
+        icon: <ArrowDownUp aria-hidden />,
+        disabled: count < 2,
+        go: () =>
+          run(
+            () => ({ type: "assemble", sources: source(), outputs: [{ name: "r", pages: pages.slice().reverse().map((p) => ({ src: 0, index: p.index })) }], keepInfo: true }),
+            () => `${base}-reversed.pdf`,
+          ),
+      };
+    } else if (mode === "blank") {
+      const n = selected.size;
+      info = !ink || ink.done < count ? t.scanning(ink?.done ?? 0, count) : n >= count ? t.cantDeleteAll : t.blankFound(n, count);
+      action = {
+        label: t.blankBtn(n),
+        icon: <Trash2 aria-hidden />,
+        disabled: !n || n >= count || !ink || ink.done < count,
+        go: () =>
+          run(
+            () => ({ type: "assemble", sources: source(), outputs: [{ name: "b", pages: pages.filter((p) => !selected.has(p.key)).map((p) => ({ src: 0, index: p.index })) }], keepInfo: true }),
+            () => `${base}-no-blank-pages.pdf`,
+          ),
+      };
     } else {
       info = t.rotateScope(selected.size, count);
       const targets = pages.filter((p) => selected.size === 0 || selected.has(p.key));
@@ -255,6 +314,19 @@ function PagesBody({ locale, mode, angle0, file, job, onClear }: { locale: Local
           {selected.size ? s.selectNone : t.selectAll}
         </Button>
       </OptionsRow>
+    ) : mode === "reverse" ? null : mode === "blank" ? (
+      <OptionsRow className="items-center!">
+        <Segmented
+          label={t.sensitivity}
+          value={level}
+          onChange={(v) => {
+            setLevel(v);
+            setResult(null);
+            if (ink) setSelected(new Set(blankKeys(ink.values, v)));
+          }}
+          options={(["strict", "normal", "scan"] as const).map((v) => ({ value: v, label: t.levels[v] }))}
+        />
+      </OptionsRow>
     ) : mode === "rotate" ? (
       <OptionsRow className="items-center!">
         <Segmented
@@ -297,15 +369,15 @@ function PagesBody({ locale, mode, angle0, file, job, onClear }: { locale: Local
     <>
       <PageGrid
         locale={locale}
-        pages={pages.map(rotated)}
+        pages={mode === "reverse" ? pages.slice().reverse() : pages.map(rotated)}
         thumbsOf={() => file.thumbs}
         label={(p) => formatNumber(locale, p.index + 1)}
         selected={selected}
-        mark={mode === "delete" ? "delete" : "select"}
-        onToggle={toggle}
+        mark={mode === "delete" || mode === "blank" ? "delete" : "select"}
+        onToggle={mode === "reverse" ? undefined : toggle}
         onMove={mode === "organize" ? (from, to) => setPages(moveItem(pages, from, to)) : undefined}
         onRotate={mode === "organize" ? (key, d) => setPages(pages.map((p) => (p.key === key ? { ...p, rotate: (p.rotate + d + 360) % 360 } : p))) : undefined}
-        onDelete={mode === "organize" ? (key) => pages.length > 1 && setPages(pages.filter((p) => p.key !== key)) : mode === "delete" ? (key) => toggle(key, false) : undefined}
+        onDelete={mode === "organize" ? (key) => pages.length > 1 && setPages(pages.filter((p) => p.key !== key)) : mode === "delete" || mode === "blank" ? (key) => toggle(key, false) : undefined}
         toolbar={toolbar}
       />
       <p className="text-lg font-semibold text-fg">{info}</p>
@@ -317,4 +389,27 @@ function PagesBody({ locale, mode, angle0, file, job, onClear }: { locale: Local
       {result && <ResultCard locale={locale} items={result} originalSize={result.length === 1 ? file.size : undefined} zipName={`${base}-pages.zip`} onReset={reset} />}
     </>
   );
+}
+
+type BlankLevel = "strict" | "normal" | "scan";
+/** Largest share of dark pixels a page may have and still count as blank. */
+const BLANK_LIMIT: Record<BlankLevel, number> = { strict: 0.0002, normal: 0.002, scan: 0.012 };
+
+/** Keys (0-based indices) of pages whose ink share is under the level's limit. */
+export function blankKeys(values: readonly number[], level: BlankLevel): string[] {
+  return values.flatMap((v, i) => (v <= BLANK_LIMIT[level] ? [String(i)] : []));
+}
+
+/** Share of clearly non-white pixels on a page rendered small (≈ 300 px on the long side). */
+async function inkShare(m: typeof import("./engine/pdfjs"), file: PdfFile, pageNo: number): Promise<number> {
+  const page = await file.doc!.getPage(pageNo);
+  const vp = page.getViewport({ scale: 1 });
+  const canvas = await m.renderPage(page, Math.min(1, 300 / Math.max(vp.width, vp.height)));
+  const data = canvas.getContext("2d")!.getImageData(0, 0, canvas.width, canvas.height).data;
+  let dark = 0;
+  for (let k = 0; k < data.length; k += 4) if (data[k + 3] > 16 && Math.min(data[k], data[k + 1], data[k + 2]) < 200) dark++;
+  const share = dark / (data.length / 4);
+  m.releaseCanvas(canvas);
+  page.cleanup();
+  return share;
 }

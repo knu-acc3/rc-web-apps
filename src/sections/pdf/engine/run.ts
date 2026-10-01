@@ -6,6 +6,7 @@
 import type { PDFDocument } from "@cantoo/pdf-lib";
 import { readJpegInfo, readPngInfo, sniffImage } from "./image-info";
 import type { ImageInput, Job, JobResult, OutputFile, SourceFile } from "./jobs";
+import { transformPages } from "./transform";
 import { collectGarbage, optimizeLossless, recompressImages, type Bitmap, type ImageCodec } from "./optimize";
 import {
   PdfError,
@@ -72,6 +73,19 @@ export async function prepareImage(input: ImageInput, env: RunEnv): Promise<Prep
 
 export async function runJob(job: Job, env: RunEnv = {}, progress: (p: number) => void = () => {}): Promise<JobResult> {
   switch (job.type) {
+    case "transform": {
+      const src = await open(job.source);
+      if (job.preview !== undefined) {
+        const doc = await assemble([src], [{ src: 0, index: job.preview }]);
+        const op = job.op.kind === "crop" && job.op.boxes ? { ...job.op, boxes: [job.op.boxes[job.preview] ?? null] } : job.op;
+        transformPages(doc, op);
+        return { files: [{ name: "preview.pdf", bytes: await saveDoc(doc) }] };
+      }
+      transformPages(src, job.op, job.pages);
+      progress(0.8);
+      return { files: [{ name: "transformed.pdf", bytes: await saveLoaded(src) }] };
+    }
+
     case "assemble": {
       const sources: PDFDocument[] = [];
       for (const s of job.sources) sources.push(await open(s));

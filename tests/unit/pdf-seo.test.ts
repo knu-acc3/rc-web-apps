@@ -7,7 +7,7 @@ import { pdfSection } from "@/sections/pdf/section";
 describe("pdf section SEO", () => {
   const paths = sectionPaths(pdfSection);
 
-  it("publishes the hub, 25 tools and their variants", () => {
+  it("publishes the hub, 32 tools and their variants", () => {
     expect(paths.length).toBeGreaterThanOrEqual(50);
     expect(paths.some((p) => p.join("/") === "pdf")).toBe(true);
   });
