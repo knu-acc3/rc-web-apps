@@ -7,7 +7,7 @@ import type { Locale } from "@/i18n/config";
 import { formatNumber, plural } from "@/i18n/format";
 import { downloadBlob } from "@/lib/clipboard";
 import { Button } from "@/ui/button";
-import { Checkbox, Field, Select, Textarea } from "@/ui/field";
+import { Field, Select, Switch, Textarea } from "@/ui/field";
 import { Dropzone } from "@/ui/dropzone";
 import { Notice } from "@/ui/panel";
 import { Segmented } from "@/ui/segmented";
@@ -146,7 +146,7 @@ export default function QrBatch({ locale, look, ecc }: { locale: Locale; look: L
           spellCheck={false}
         />
       </Field>
-      <Dropzone compact accept=".csv,.txt,text/csv,text/plain" onFiles={(fs) => fs[0] && readFile(fs[0])} title={t.drop} hint={t.dropHint} />
+      <Dropzone locale={locale} compact accept=".csv,.txt,text/csv,text/plain" onFiles={(fs) => fs[0] && readFile(fs[0])} title={t.drop} hint={t.dropHint} />
 
       {width > 1 && (
         <div className="flex flex-wrap items-end gap-4">
@@ -169,14 +169,13 @@ export default function QrBatch({ locale, look, ecc }: { locale: Locale; look: L
               ))}
             </Select>
           </Field>
-          <div className="pb-2">
-            <Checkbox label={t.header} checked={header} onChange={(e) => setHeader(e.target.checked)} />
-          </div>
+          <Switch label={t.header} checked={header} onChange={(e) => setHeader(e.target.checked)} className="pb-0.5" />
         </div>
       )}
 
       <div className="flex flex-wrap items-center gap-3">
         <Segmented<"png" | "svg">
+          size="lg"
           label={t.format}
           value={format}
           onChange={setFormat}
@@ -186,12 +185,12 @@ export default function QrBatch({ locale, look, ecc }: { locale: Locale; look: L
           ]}
         />
         {running ? (
-          <Button variant="outline" onClick={() => (cancel.current = true)}>
+          <Button variant="outlined" size="lg" onClick={() => (cancel.current = true)}>
             {t.cancel}
           </Button>
         ) : (
-          <Button variant="primary" onClick={run} disabled={!items.length || !!contrast.issue}>
-            <Download className="size-4" aria-hidden />
+          <Button variant="filled" size="lg" onClick={run} disabled={!items.length || !!contrast.issue}>
+            <Download aria-hidden />
             {t.make(items.length)}
           </Button>
         )}
@@ -199,7 +198,9 @@ export default function QrBatch({ locale, look, ecc }: { locale: Locale; look: L
 
       {running && (
         <div className="flex flex-col gap-1.5">
-          <progress className="h-2 w-full accent-[var(--accent)]" value={status.done} max={status.total} />
+          <div className="h-2 w-full overflow-hidden rounded-full bg-surface-2" role="progressbar" aria-valuemin={0} aria-valuemax={status.total} aria-valuenow={status.done}>
+            <div className="h-full rounded-full bg-accent transition-[width] duration-200" style={{ width: `${status.total ? (status.done / status.total) * 100 : 0}%` }} />
+          </div>
           <span className="text-sm text-fg-3">{t.progress(status.done, status.total)}</span>
         </div>
       )}

@@ -1,21 +1,22 @@
 "use client";
 
 import { Circle, Download, Pause, Play, Square } from "lucide-react";
-import { useCallback, useEffect, useId, useRef, useState, useSyncExternalStore } from "react";
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import type { Locale } from "@/i18n/config";
 import { formatBytes } from "@/i18n/format";
 import { downloadBlob } from "@/lib/clipboard";
 import { cssColor, getAudioContext, mediaErrorKind, openMicrophone, stopStream } from "@/tools/files/audio/lib/audio";
-import { Button } from "@/ui/button";
-import { Checkbox, Field, Select } from "@/ui/field";
+import { Button, IconButton } from "@/ui/button";
+import { Switch } from "@/ui/field";
 import { Notice, Panel } from "@/ui/panel";
+import { Segmented } from "@/ui/segmented";
 import { runJob } from "../shared/client";
 import type { JobResult, Target } from "../shared/spec";
 import { formatTime } from "../shared/time";
+import { Fab } from "./ui/Fab";
 import { useJob } from "./ui/hooks";
 import { JobProgress } from "./ui/Progress";
 import { ResultCard } from "./ui/ResultCard";
-import { UI } from "./ui/strings";
 
 type Mode = "screen" | "webcam" | "voice";
 
@@ -30,7 +31,7 @@ const T = {
     mic: "Микрофон",
     quality: "Качество",
     mirror: "Зеркальный предпросмотр",
-    clean: "Шумоподавление и эхо­подавление",
+    clean: "Шумоподавление",
     format: "Формат записи",
     recording: "Идёт запись",
     paused: "Пауза",
@@ -60,7 +61,7 @@ const T = {
     mic: "Microphone",
     quality: "Quality",
     mirror: "Mirror preview",
-    clean: "Noise and echo suppression",
+    clean: "Noise suppression",
     format: "Recording format",
     recording: "Recording",
     paused: "Paused",
@@ -101,8 +102,6 @@ type State = { phase: "idle" } | { phase: "starting" } | { phase: "recording"; p
 
 function RecorderInner({ locale, mode }: { locale: Locale; mode: Mode }) {
   const t = T[locale];
-  const u = UI[locale];
-  const id = useId();
   const canScreen = useSyncExternalStore(noop, () => !!navigator.mediaDevices?.getDisplayMedia, () => true);
   const fmt = useSyncExternalStore(noop, () => pickTypeLabel(mode), () => "");
   const [state, setState] = useState<State>({ phase: "idle" });
@@ -322,109 +321,121 @@ function RecorderInner({ locale, mode }: { locale: Locale; mode: Mode }) {
   if (mode === "screen" && !canScreen) return <Notice tone="warn">{t.noScreen}</Notice>;
   const idle = state.phase === "idle" || state.phase === "starting";
 
-  return (
-    <div className="flex flex-col gap-4">
-      <Panel className="flex flex-col items-center gap-4 p-5">
-        {mode !== "voice" ? (
-          <div className="w-full overflow-hidden rounded-[0.625rem] bg-black">
-            <video ref={live} muted playsInline aria-label={t.live} className={`aspect-video w-full object-contain ${mode === "webcam" && mirror ? "-scale-x-100" : ""} ${recording ? "" : "hidden"}`} />
-            {!recording && <div className="flex aspect-video w-full items-center justify-center text-sm text-white/70">{t.note[mode]}</div>}
-          </div>
-        ) : (
-          <canvas ref={scope} className="h-24 w-full rounded-[0.625rem] bg-surface-2" aria-hidden />
-        )}
-        <div className="flex flex-col items-center gap-1" aria-live="polite">
-          <span className="tabular text-5xl font-semibold tracking-tight text-fg">{formatTime(recording ? elapsed : 0, 1)}</span>
+  const fab =
+    state.phase === "finalizing" ? (
+      <p className="flex h-24 items-center text-sm text-fg-3 sm:h-28">{t.finalizing}</p>
+    ) : idle ? (
+      <Fab label={t.start[mode]} icon={<Circle className="fill-current" aria-hidden />} onClick={start} disabled={state.phase === "starting"} />
+    ) : recording ? (
+      <div className="flex items-start justify-center gap-6">
+        <span className="w-20 sm:w-24" aria-hidden />
+        <Fab label={t.stop} icon={<Square className="fill-current" aria-hidden />} onClick={stop} active />
+        <div className="flex w-20 justify-center pt-4 sm:w-24 sm:pt-6">
+          <IconButton variant="tonal" size="lg" label={paused ? t.resume : t.pause} icon={paused ? <Play aria-hidden /> : <Pause aria-hidden />} onClick={togglePause} selected={paused} />
+        </div>
+      </div>
+    ) : (
+      <Fab label={t.again} icon={<Circle className="fill-current" aria-hidden />} onClick={() => setState({ phase: "idle" })} />
+    );
+
+  const controls = (
+    <Panel className="flex min-w-0 flex-col items-center gap-5 p-4 sm:p-6">
+      {mode === "voice" && <canvas ref={scope} className="h-24 w-full rounded-[1rem] bg-surface-2 sm:h-32" aria-hidden />}
+      <div className="flex flex-col items-center gap-1" aria-live="polite">
+        <span className={`tabular text-5xl font-bold tracking-tight sm:text-6xl ${recording && !paused ? "text-fg" : "text-fg-2"}`}>{formatTime(recording ? elapsed : 0, 1)}</span>
+        <span className={`inline-flex h-5 items-center gap-1.5 text-sm ${paused ? "text-fg-3" : "text-err"}`}>
           {recording && (
-            <span className={`inline-flex items-center gap-1.5 text-sm ${paused ? "text-fg-3" : "text-err"}`}>
-              <Circle className="size-2.5 fill-current" aria-hidden />
-              {paused ? t.paused : t.recording}
-            </span>
-          )}
-        </div>
-        <div className="flex flex-wrap justify-center gap-2">
-          {state.phase === "finalizing" ? (
-            <p className="text-sm text-fg-3">{t.finalizing}</p>
-          ) : idle ? (
-            <Button variant="primary" size="lg" onClick={start} disabled={state.phase === "starting"}>
-              <Circle className="fill-current" aria-hidden />
-              {t.start[mode]}
-            </Button>
-          ) : recording ? (
             <>
-              <Button variant="danger" size="lg" onClick={stop}>
-                <Square className="fill-current" aria-hidden />
-                {t.stop}
-              </Button>
-              <Button variant="outline" size="lg" onClick={togglePause}>
-                {paused ? <Play aria-hidden /> : <Pause aria-hidden />}
-                {paused ? t.resume : t.pause}
-              </Button>
+              <Circle className={`size-2.5 fill-current ${paused ? "" : "motion-safe:animate-pulse"}`} aria-hidden />
+              {paused ? t.paused : t.recording}
             </>
-          ) : (
-            <Button variant="outline" size="lg" onClick={() => setState({ phase: "idle" })}>
-              <Circle aria-hidden />
-              {t.again}
-            </Button>
           )}
+        </span>
+      </div>
+      {fab}
+      {idle && (
+        <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
+          {mode === "screen" && <Switch label={t.systemAudio} checked={sysAudio} onChange={(e) => setSysAudio(e.target.checked)} />}
+          {mode !== "voice" && <Switch label={t.mic} checked={mic} onChange={(e) => setMic(e.target.checked)} />}
+          {mode === "webcam" && <Switch label={t.mirror} checked={mirror} onChange={(e) => setMirror(e.target.checked)} />}
+          {mode === "voice" && <Switch label={t.clean} checked={clean} onChange={(e) => setClean(e.target.checked)} />}
         </div>
-        {idle && (
-          <div className="flex flex-wrap items-end justify-center gap-x-5 gap-y-3">
-            {mode === "screen" && <Checkbox label={t.systemAudio} checked={sysAudio} onChange={(e) => setSysAudio(e.target.checked)} />}
-            {mode !== "voice" && <Checkbox label={t.mic} checked={mic} onChange={(e) => setMic(e.target.checked)} />}
-            {mode === "webcam" && (
-              <>
-                <Checkbox label={t.mirror} checked={mirror} onChange={(e) => setMirror(e.target.checked)} />
-                <Field label={t.quality} htmlFor={`${id}-q`} className="w-28">
-                  <Select id={`${id}-q`} size="sm" value={String(height)} onChange={(e) => setHeight(Number(e.target.value))}>
-                    <option value="480">480p</option>
-                    <option value="720">720p</option>
-                    <option value="1080">1080p</option>
-                  </Select>
-                </Field>
-              </>
-            )}
-            {mode === "voice" && <Checkbox label={t.clean} checked={clean} onChange={(e) => setClean(e.target.checked)} />}
-          </div>
-        )}
-        {fmt && idle && (
-          <p className="text-[0.8125rem] text-fg-3">
-            {t.format}: {fmt} · {u.localNote}
-          </p>
-        )}
-      </Panel>
+      )}
+      {idle && mode === "webcam" && (
+        <Segmented
+          label={t.quality}
+          size="sm"
+          value={String(height) as "480" | "720" | "1080"}
+          onChange={(x) => setHeight(Number(x))}
+          options={[
+            { value: "480", label: "480p" },
+            { value: "720", label: "720p" },
+            { value: "1080", label: "1080p" },
+          ]}
+        />
+      )}
+      {fmt && idle && (
+        <p className="text-[0.8125rem] text-fg-3">
+          {t.format}: {fmt}
+        </p>
+      )}
+    </Panel>
+  );
 
+  const after = (
+    <>
       {error && <Notice tone="err">{error}</Notice>}
-
       {state.phase === "done" && (
         <ResultCard blob={state.blob} name={state.name} locale={locale} kind={mode === "voice" ? "audio" : "video"}>
-          <div className="flex flex-wrap gap-2">
-            {mode === "voice" ? (
-              <>
-                <Button variant="outline" size="sm" onClick={() => saveAs("mp3")} disabled={convert.running}>
-                  {t.toMp3}
-                </Button>
-                <Button variant="outline" size="sm" onClick={() => saveAs("wav")} disabled={convert.running}>
-                  {t.toWav}
-                </Button>
-              </>
-            ) : (
-              !state.blob.type.includes("mp4") && (
-                <Button variant="outline" size="sm" onClick={() => saveAs("mp4")} disabled={convert.running}>
+          {(mode === "voice" || !state.blob.type.includes("mp4")) && (
+            <div className="flex flex-wrap gap-2">
+              {mode === "voice" ? (
+                <>
+                  <Button variant="outlined" size="sm" onClick={() => saveAs("mp3")} disabled={convert.running}>
+                    {t.toMp3}
+                  </Button>
+                  <Button variant="outlined" size="sm" onClick={() => saveAs("wav")} disabled={convert.running}>
+                    {t.toWav}
+                  </Button>
+                </>
+              ) : (
+                <Button variant="outlined" size="sm" onClick={() => saveAs("mp4")} disabled={convert.running}>
                   {t.toMp4}
                 </Button>
-              )
-            )}
-          </div>
+              )}
+            </div>
+          )}
           <JobProgress job={convert} locale={locale} onCancel={convert.cancel} />
           {converted && convert.status === "done" && (
-            <Button variant="primary" onClick={() => downloadBlob(converted.blob, converted.name)} className="self-start">
+            <Button variant="tonal" onClick={() => downloadBlob(converted.blob, converted.name)} className="self-start">
               <Download aria-hidden />
-              {converted.name} · {formatBytes(locale, converted.blob.size)}
+              <span className="truncate">
+                {converted.name} · {formatBytes(locale, converted.blob.size)}
+              </span>
             </Button>
           )}
         </ResultCard>
       )}
+    </>
+  );
+
+  if (mode === "voice")
+    return (
+      <div className="flex flex-col gap-4">
+        {controls}
+        {after}
+      </div>
+    );
+  return (
+    <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] lg:gap-6">
+      <div className="min-w-0 overflow-hidden rounded-[1.25rem] bg-black">
+        <video ref={live} muted playsInline aria-label={t.live} className={`aspect-video w-full object-contain ${mode === "webcam" && mirror ? "-scale-x-100" : ""} ${recording ? "" : "hidden"}`} />
+        {!recording && <div className="flex aspect-video w-full items-center justify-center px-6 text-center text-sm text-white/70">{t.note[mode]}</div>}
+      </div>
+      <div className="flex min-w-0 flex-col gap-4">
+        {controls}
+        {after}
+      </div>
     </div>
   );
 }

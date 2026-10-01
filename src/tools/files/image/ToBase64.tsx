@@ -9,13 +9,14 @@ import { downloadText } from "@/lib/clipboard";
 import { Button } from "@/ui/button";
 import { CopyButton } from "@/ui/copy-button";
 import { Dropzone } from "@/ui/dropzone";
-import { Switch } from "@/ui/field";
+import { Field, Switch } from "@/ui/field";
 import { Notice, Panel } from "@/ui/panel";
 import { Segmented } from "@/ui/segmented";
 import { base64Length, bytesToBase64, svgToDataUri } from "./lib/base64";
 import { detectFormat, FORMAT_META, IMAGE_ACCEPT, type SniffedFormat } from "./lib/detect";
 import { baseName, displayable } from "./lib/source";
-import { checker } from "./ui/controls";
+import { checker, replaceDrop } from "./ui/controls";
+import { OptionsBar, ToolColumns } from "./ui/OptionsBar";
 import { errorText, S } from "./ui/strings";
 
 const T = {
@@ -142,7 +143,7 @@ export default function ToBase64({ locale }: { locale: Locale }) {
           accept={IMAGE_ACCEPT}
           title={s.dropOne}
           hint={s.dropHint}
-         
+          locale={locale}
         />
         {error ? <Notice tone="err">{errorText(locale, error)}</Notice> : null}
       </div>
@@ -151,84 +152,93 @@ export default function ToBase64({ locale }: { locale: Locale }) {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex flex-wrap items-end gap-x-4 gap-y-3 rounded-[0.75rem] border border-line bg-surface px-4 py-3">
-        <Segmented
-          wrap
-          label={t.as}
-          value={kind}
-          onChange={setKind}
-          options={[
-            { value: "uri", label: t.dataUri },
-            { value: "raw", label: t.raw },
-            { value: "css", label: t.css },
-            { value: "html", label: t.html },
-            { value: "md", label: t.md },
-          ]}
-        />
-        {data.format === "svg" && kind !== "raw" && <Switch label={t.svgUrl} checked={svgUrl} onChange={(e) => setSvgUrl(e.target.checked)} />}
-      </div>
-      <Panel className="overflow-hidden">
-        <div className="flex flex-col gap-4 p-4 sm:flex-row">
-          {url && (
-            <div className={`flex size-32 shrink-0 items-center justify-center overflow-hidden rounded-[0.5rem] border border-line ${checker}`}>
-              <img
-                src={url}
-                alt={alt}
-                className="max-h-full max-w-full object-contain"
-                onLoad={(e) => setDims({ w: e.currentTarget.naturalWidth, h: e.currentTarget.naturalHeight })}
-              />
-            </div>
-          )}
-          <div className="min-w-0 flex-1" aria-live="polite">
-            <p className="tabular text-2xl font-semibold tracking-tight text-fg">
-              {formatBytes(locale, value.length)} <span className="text-base font-normal text-fg-3">{t.length(value.length)}</span>
-            </p>
-            <p className="tabular text-sm text-fg-2">
-              {file.name} · {formatBytes(locale, data.bytes)} → +
-              {formatNumber(locale, ((base64Length(data.bytes) - data.bytes) / Math.max(1, data.bytes)) * 100, { maximumFractionDigits: 0 })} %
-              {dims ? ` · ${dims.w}×${dims.h}` : ""}
-            </p>
-            <p className="text-sm text-fg-2">
-              {t.detected}: <span className="font-medium text-fg">{data.format ? FORMAT_META[data.format].label : "—"}</span> ({mime})
-            </p>
-            {!data.format && <p className="text-sm text-warn">{t.notImage}</p>}
-            {mismatch && <p className="text-sm text-warn">{t.mismatch(ext!, FORMAT_META[data.format!].label)}</p>}
-          </div>
-        </div>
-        <div className="border-t border-line">
-          <div className="flex items-center justify-between gap-2 px-3 py-1.5">
-            <label htmlFor={`${id}-out`} className="text-sm font-semibold text-fg">
-              {t.output}
-            </label>
-            <div className="flex gap-1">
-              <Button variant="ghost" size="sm" onClick={() => downloadText(value, `${alt || "image"}-base64.txt`)}>
-                <Download aria-hidden />
-                <span className="max-sm:sr-only">{t.download}</span>
-              </Button>
-              <CopyButton value={() => value} label={t.copy} copiedLabel={t.copied} variant="primary" />
-            </div>
-          </div>
-          <textarea
-            id={`${id}-out`}
-            readOnly
-            value={shown}
-            rows={6}
-            spellCheck={false}
-            className="block min-h-32 w-full resize-y border-t border-line bg-transparent px-3 py-2.5 font-mono text-xs leading-relaxed text-fg-2 focus:outline-none"
+      <ToolColumns
+        rest={
+          <Dropzone
+            onFiles={(f) => {
+              setError(null);
+              setData(null);
+              setFile(f[0] ?? null);
+            }}
+            accept={IMAGE_ACCEPT}
+            className={replaceDrop}
+            title={s.dropOne}
+            locale={locale}
           />
-          {value.length > PREVIEW_LIMIT && <p className="border-t border-line px-3 py-2 text-[0.8125rem] text-fg-3">{t.truncated}</p>}
-        </div>
-      </Panel>
-      <Dropzone
-        onFiles={(f) => {
-          setError(null);
-          setData(null);
-          setFile(f[0] ?? null);
-        }}
-        accept={IMAGE_ACCEPT}
-        compact
-        title={s.dropOne}
-      />
+        }
+        side={
+          <OptionsBar locale={locale}>
+            <Field label={t.as}>
+              <Segmented
+                label={t.as}
+                value={kind}
+                onChange={setKind}
+                options={[
+                  { value: "uri", label: t.dataUri },
+                  { value: "raw", label: t.raw },
+                  { value: "css", label: t.css },
+                  { value: "html", label: t.html },
+                  { value: "md", label: t.md },
+                ]}
+              />
+            </Field>
+            {data.format === "svg" && kind !== "raw" && <Switch label={t.svgUrl} checked={svgUrl} onChange={(e) => setSvgUrl(e.target.checked)} />}
+          </OptionsBar>
+        }
+      >
+        <Panel className="flex min-w-0 flex-col gap-4 p-4 sm:p-5">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+            {url && (
+              <div className={`flex size-28 shrink-0 items-center justify-center overflow-hidden rounded-[1rem] ${checker}`}>
+                <img
+                  src={url}
+                  alt={alt}
+                  className="max-h-full max-w-full object-contain"
+                  onLoad={(e) => setDims({ w: e.currentTarget.naturalWidth, h: e.currentTarget.naturalHeight })}
+                />
+              </div>
+            )}
+            <div className="min-w-0 flex-1" aria-live="polite">
+              <p className="tabular text-2xl font-semibold tracking-tight text-fg sm:text-3xl">
+                {formatBytes(locale, value.length)} <span className="text-base font-normal text-fg-3">{t.length(value.length)}</span>
+              </p>
+              <p className="tabular text-sm text-fg-2">
+                {file.name} · {formatBytes(locale, data.bytes)} → +
+                {formatNumber(locale, ((base64Length(data.bytes) - data.bytes) / Math.max(1, data.bytes)) * 100, { maximumFractionDigits: 0 })} %
+                {dims ? ` · ${dims.w}×${dims.h}` : ""}
+              </p>
+              <p className="text-sm text-fg-2">
+                {t.detected}: <span className="font-medium text-fg">{data.format ? FORMAT_META[data.format].label : "—"}</span> ({mime})
+              </p>
+              {!data.format && <p className="text-sm text-warn">{t.notImage}</p>}
+              {mismatch && <p className="text-sm text-warn">{t.mismatch(ext!, FORMAT_META[data.format!].label)}</p>}
+            </div>
+          </div>
+          <div className="flex flex-col gap-2">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <label htmlFor={`${id}-out`} className="text-sm font-semibold text-fg">
+                {t.output}
+              </label>
+              <div className="flex flex-wrap gap-2">
+                <Button variant="text" onClick={() => downloadText(value, `${alt || "image"}-base64.txt`)}>
+                  <Download aria-hidden />
+                  <span className="max-sm:sr-only">{t.download}</span>
+                </Button>
+                <CopyButton value={() => value} label={t.copy} copiedLabel={t.copied} variant="primary" />
+              </div>
+            </div>
+            <textarea
+              id={`${id}-out`}
+              readOnly
+              value={shown}
+              rows={6}
+              spellCheck={false}
+              className="block min-h-32 w-full resize-y rounded-[1rem] bg-surface-2 px-3.5 py-3 font-mono text-xs leading-relaxed text-fg-2 focus:outline-2 focus:outline-accent"
+            />
+            {value.length > PREVIEW_LIMIT && <p className="text-[0.8125rem] text-fg-3">{t.truncated}</p>}
+          </div>
+        </Panel>
+      </ToolColumns>
     </div>
   );
 }

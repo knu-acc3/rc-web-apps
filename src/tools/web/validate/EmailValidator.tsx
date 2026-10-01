@@ -4,7 +4,7 @@ import { useId, useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { Button } from "@/ui/button";
 import { checkEmail, ERRORS, type EmailIssue } from "./lib/email";
-import { BigInput, Details, Problems, Verdict, type Row } from "./ui/kit";
+import { BigInput, Details, Layout, Problems, type Row, Verdict } from "./ui/kit";
 
 const T = {
   ru: {
@@ -93,8 +93,7 @@ export default function EmailValidator({ locale }: { locale: Locale }) {
   if (r.asciiDomain) rows.push({ label: t.ascii, value: r.asciiDomain, mono: true });
 
   return (
-    <div className="flex flex-col gap-4">
-      <BigInput id={`${id}-e`} label={t.label} value={text} onChange={setText} inputMode="email" placeholder="name@example.com" invalid={!empty && !r.valid} />
+    <Layout input={<BigInput id={`${id}-e`} label={t.label} value={text} onChange={setText} inputMode="email" placeholder="name@example.com" invalid={!empty && !r.valid} />} note={t.note}>
       {!empty && (
         <Verdict tone={!r.valid ? "err" : notes.length ? "warn" : "ok"} title={!r.valid ? t.invalid : notes.length ? t.validWarn : t.valid}>
           <Problems items={[...errors, ...notes].map((i) => t.issues[i])} />
@@ -103,7 +102,7 @@ export default function EmailValidator({ locale }: { locale: Locale }) {
               <span>
                 {t.didYouMean} <span className="font-mono font-semibold text-fg">{`${r.local}@${r.suggestion}`}</span>?
               </span>
-              <Button size="sm" variant="outline" onClick={() => setText(`${r.local}@${r.suggestion}`)}>
+              <Button size="sm" variant="tonal" onClick={() => setText(`${r.local}@${r.suggestion}`)}>
                 {t.fix}
               </Button>
             </div>
@@ -111,7 +110,6 @@ export default function EmailValidator({ locale }: { locale: Locale }) {
         </Verdict>
       )}
       <Details rows={rows} locale={locale} />
-      <p className="text-sm text-fg-3">{t.note}</p>
-    </div>
+    </Layout>
   );
 }

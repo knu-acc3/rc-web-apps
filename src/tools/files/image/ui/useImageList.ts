@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { previewFile } from "../lib/run";
 import { prepareFile, type Prepared } from "../lib/source";
 import { useEngine } from "./hooks";
+import { useWorkspace } from "./useWorkspace";
 
 export interface ListImage {
   key: string;
@@ -19,7 +20,7 @@ let seq = 0;
 /**
  * Ordered list of images with decoded preview bitmaps (≤ maxSide), for
  * editors that compose several images (collage, GIF). Bitmaps are closed on
- * removal and unmount.
+ * removal and unmount. The list is kept in the tab's workspace (`ws`).
  */
 export function useImageList(maxSide: number, limit = 100) {
   const getEngine = useEngine();
@@ -83,5 +84,8 @@ export function useImageList(maxSide: number, limit = 100) {
     setErrors([]);
   }, []);
 
-  return { items, add, remove, move, clear, errors, loading: loading > 0 };
+  // The photos stay in the tab's workspace for the next photo tool (and come back from the previous one).
+  const ws = useWorkspace({ files: items.map((i) => i.prepared.file), mode: "sync", settled: loading === 0, restore: (files) => void add(files) });
+
+  return { items, add, remove, move, clear, errors, loading: loading > 0, ws };
 }

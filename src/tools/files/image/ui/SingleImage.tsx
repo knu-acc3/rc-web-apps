@@ -5,15 +5,18 @@ import { useCallback, useEffect, useRef, useState, type ReactNode } from "react"
 import type { Locale } from "@/i18n/config";
 import { formatBytes } from "@/i18n/format";
 import { downloadBlob } from "@/lib/clipboard";
-import { Button } from "@/ui/button";
+import { Button, IconButton } from "@/ui/button";
 import { Dropzone } from "@/ui/dropzone";
 import { Notice, Panel } from "@/ui/panel";
 import { isAbort } from "../lib/client";
 import { IMAGE_ACCEPT } from "../lib/detect";
 import { prepareFile, type Prepared } from "../lib/source";
-import { OptionsBar } from "./OptionsBar";
-import { ProgressBar } from "./controls";
+import { ProgressBar, replaceDrop } from "./controls";
+import type { HandoffId } from "./handoff-targets";
+import { OptionsBar, ToolColumns } from "./OptionsBar";
 import { errorText, S } from "./strings";
+import { useWorkspace } from "./useWorkspace";
+import { NextMenu, RestoringPlaceholder, WorkspaceBar } from "./Workspace";
 
 /** A single dropped/pasted file, prepared (format sniffed). */
 export function useSingleFile() {
@@ -45,7 +48,12 @@ export function useSingleFile() {
   return { prepared, error, loading, load, reset };
 }
 
-/** Export state: run an async job with progress + cancel, then download. */
+type ExportJob = (signal: AbortSignal, onProgress: (v: number) => void) => Promise<{ blob: Blob; name: string } | null>;
+
+/**
+ * Export state: run an async job with progress + cancel, then download. With `{ download: false }` the result is only
+ * returned (the "Next" menu hands it to another tool).
+ */
 export function useExport() {
   const [busy, setBusy] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -53,7 +61,7 @@ export function useExport() {
   const [last, setLast] = useState<{ size: number; name: string } | null>(null);
   const ac = useRef<AbortController | null>(null);
   useEffect(() => () => ac.current?.abort(), []);
-  const run = useCallback(async (job: (signal: AbortSignal, onProgress: (v: number) => void) => Promise<{ blob: Blob; name: string } | null>) => {
+  const run = useCallback(async (job: ExportJob, opts: { download?: boolean } = {}): Promise<{ blob: Blob; name: string } | null> => {
     ac.current?.abort();
     const c = new AbortController();
     ac.current = c;
@@ -62,12 +70,15 @@ export function useExport() {
     setProgress(0);
     try {
       const out = await job(c.signal, setProgress);
-      if (out && !c.signal.aborted) {
+      if (!out || c.signal.aborted) return null;
+      if (opts.download !== false) {
         downloadBlob(out.blob, out.name);
         setLast({ size: out.blob.size, name: out.name });
       }
+      return out;
     } catch (e) {
       if (!isAbort(e)) setError(e);
+      return null;
     } finally {
       if (ac.current === c) {
         setBusy(false);
@@ -84,8 +95,9 @@ export function useExport() {
 }
 
 /**
- * Layout for single-image editors: dropzone until a file is loaded, then the
- * stage (focal point) with a result line and one primary Download button.
+ * Layout for single-image editors: drop zone until a file is loaded, then — from `lg` — the settings card on the left
+ * and the stage (focal point) with the result line and one filled Download button on the right (first on phones).
+ * Opened files are added to the tab's workspace (never removed), so the next photo tool can open them too.
  */
 export function SingleImageShell({
   locale,
@@ -98,6 +110,8 @@ export function SingleImageShell({
   exportLabel,
   extra,
   more,
+  next = false,
+  self,
 }: {
   locale: Locale;
   file: ReturnType<typeof useSingleFile>;
@@ -105,76 +119,106 @@ export function SingleImageShell({
   stage: ReactNode;
   /** Big result figure (e.g. "1080 × 1080 px"). */
   figure: ReactNode;
-  onExport: () => void;
+  /** Export; with `download = false` it only returns the result (for the "Next" menu). */
+  onExport: (download?: boolean) => Promise<{ blob: Blob; name: string } | null> | null | void;
   exp: ReturnType<typeof useExport>;
   exportLabel?: string;
   extra?: ReactNode;
   more?: ReactNode;
+  /** Offer "Next ▾" (hand the result to another photo tool). */
+  next?: boolean;
+  self?: HandoffId;
 }) {
   const t = S(locale);
+  const { load } = file;
+  const ws = useWorkspace({
+    files: file.prepared ? [file.prepared.file] : [],
+    mode: "append",
+    accept: IMAGE_ACCEPT,
+    restore: (files, sel) => void load(files[sel] ?? files[0]),
+  });
+
   if (!file.prepared) {
     return (
       <div className="flex flex-col gap-3">
-        <Dropzone onFiles={(f) => f[0] && file.load(f[0])} accept={IMAGE_ACCEPT} title={t.dropOne} hint={t.dropHint} />
-        {file.loading && (
-          <p className="flex items-center gap-2 text-sm text-fg-2">
-            <Loader2 className="size-4 animate-spin" aria-hidden />
-            {t.reading}
-          </p>
+        {ws.restoring || file.loading ? (
+          <RestoringPlaceholder locale={locale} text={ws.restoring ? undefined : t.reading} />
+        ) : (
+          <Dropzone onFiles={(f) => f[0] && load(f[0])} accept={IMAGE_ACCEPT} title={t.dropOne} hint={t.dropHint} locale={locale} />
         )}
         {file.error ? <Notice tone="err">{errorText(locale, file.error)}</Notice> : null}
       </div>
     );
   }
+  const side = options ? (
+    <OptionsBar more={more} locale={locale}>
+      {options}
+    </OptionsBar>
+  ) : undefined;
   return (
     <div className="flex flex-col gap-4">
-      {options && (
-        <OptionsBar more={more} locale={locale}>
-          {options}
-        </OptionsBar>
-      )}
-      <Panel className="overflow-hidden">
-        <div className="p-3 sm:p-4">{stage}</div>
-        <div className="flex flex-col gap-3 border-t border-line px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
-          <div className="min-w-0" aria-live="polite">
-            <div className="tabular text-2xl font-semibold tracking-tight text-fg">{figure}</div>
-            <p className="truncate text-sm text-fg-3">
-              {file.prepared.file.name}
-              {exp.last ? ` · ${exp.last.name} — ${formatBytes(locale, exp.last.size)}` : ""}
-            </p>
-          </div>
-          <div className="flex flex-wrap items-center justify-end gap-2 sm:shrink-0">
-            <Button variant="ghost" size="sm" onClick={file.reset}>
-              <X aria-hidden />
-              {t.remove}
-            </Button>
-            {exp.busy ? (
-              <Button variant="secondary" size="lg" onClick={exp.cancel}>
-                <Loader2 className="animate-spin" aria-hidden />
-                {t.cancel} · {Math.round(exp.progress * 100)} %
-              </Button>
-            ) : (
-              <Button variant="primary" size="lg" className="flex-1 sm:flex-none" onClick={onExport}>
-                <Download aria-hidden />
-                {exportLabel ?? t.download}
-              </Button>
-            )}
-          </div>
-        </div>
-        {exp.busy && <ProgressBar value={exp.progress} className="rounded-none" />}
-        {(exp.error || extra || file.prepared.animated) && (
-          <div className="flex flex-col gap-1 border-t border-line px-4 py-2.5 text-[0.8125rem]">
-            {file.prepared.animated && <p className="text-warn">{t.animatedWarn}</p>}
-            {exp.error ? (
-              <p className="text-err" role="alert">
-                {errorText(locale, exp.error)}
+      <WorkspaceBar
+        locale={locale}
+        count={ws.restored}
+        onStartOver={() => {
+          ws.startOver();
+          file.reset();
+        }}
+      />
+      <ToolColumns
+        side={side}
+        rest={<Dropzone onFiles={(f) => f[0] && load(f[0])} accept={IMAGE_ACCEPT} title={t.dropOne} locale={locale} className={replaceDrop} />}
+      >
+        <Panel className="flex min-w-0 flex-col gap-3 p-3 sm:gap-4 sm:p-4">
+          {stage}
+          {exp.busy && <ProgressBar value={exp.progress} />}
+          <div className="flex flex-col gap-3 px-1 sm:flex-row sm:items-center sm:justify-between">
+            <div className="min-w-0" aria-live="polite">
+              <div className="tabular text-2xl font-semibold tracking-tight text-fg sm:text-3xl">{figure}</div>
+              <p className="truncate text-sm text-fg-3">
+                {file.prepared.file.name}
+                {exp.last ? ` · ${exp.last.name} — ${formatBytes(locale, exp.last.size)}` : ""}
               </p>
-            ) : null}
-            {extra}
+            </div>
+            <div className="flex flex-wrap items-center gap-2 sm:shrink-0 sm:justify-end">
+              <IconButton label={t.remove} icon={<X aria-hidden />} onClick={file.reset} />
+              {next && (
+                <NextMenu
+                  locale={locale}
+                  self={self}
+                  disabled={exp.busy}
+                  getFiles={async () => {
+                    const out = await onExport(false);
+                    return out ? [new File([out.blob], out.name, { type: out.blob.type, lastModified: Date.now() })] : null;
+                  }}
+                />
+              )}
+              {exp.busy ? (
+                <Button variant="tonal" size="lg" className="flex-1 sm:flex-none" onClick={exp.cancel}>
+                  <Loader2 className="animate-spin" aria-hidden />
+                  {t.cancel} · {Math.round(exp.progress * 100)} %
+                </Button>
+              ) : (
+                <Button variant="filled" size="lg" className="flex-1 sm:flex-none" onClick={() => void onExport()}>
+                  <Download aria-hidden />
+                  {exportLabel ?? t.download}
+                </Button>
+              )}
+            </div>
           </div>
-        )}
-      </Panel>
-      <Dropzone onFiles={(f) => f[0] && file.load(f[0])} accept={IMAGE_ACCEPT} compact title={t.dropOne} />
+          {(exp.error || extra || file.prepared.animated) && (
+            <div className="flex flex-col gap-1 px-1 text-[0.8125rem]">
+              {file.prepared.animated && <p className="text-warn">{t.animatedWarn}</p>}
+              {exp.error ? (
+                <p className="text-err" role="alert">
+                  {errorText(locale, exp.error)}
+                </p>
+              ) : null}
+              {extra}
+            </div>
+          )}
+        </Panel>
+      </ToolColumns>
     </div>
   );
 }

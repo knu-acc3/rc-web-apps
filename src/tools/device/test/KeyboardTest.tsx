@@ -5,7 +5,7 @@ import { useEffect, useReducer, useRef, useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { cn } from "@/lib/cn";
 import { Button } from "@/ui/button";
-import { Badge, Panel, PanelHeader } from "@/ui/panel";
+import { Badge, Panel, PanelHeader, Stat } from "@/ui/panel";
 import { Segmented } from "@/ui/segmented";
 import { KeyboardVisual, type LabelMode } from "./ui/KeyboardVisual";
 import { KEY_LOCATIONS, KEYBOARD, KEYBOARD_CODES, NAV_KEYS } from "./lib/keyboard-layout";
@@ -200,7 +200,7 @@ export default function KeyboardTest({ locale }: { locale: Locale }) {
           ]}
         />
         <span className="flex-1" />
-        <Button variant="outline" onClick={() => dispatch({ type: "reset" })}>
+        <Button variant="tonal" onClick={() => dispatch({ type: "reset" })}>
           <RotateCcw aria-hidden />
           {t.reset}
         </Button>
@@ -216,20 +216,20 @@ export default function KeyboardTest({ locale }: { locale: Locale }) {
           onBlur={() => setFocused(false)}
           className={cn("outline-none", focused && "ring-2 ring-inset ring-accent/40")}
         >
-          <p className={cn("border-b border-line px-4 py-2.5 text-sm", focused ? "bg-accent-soft text-accent" : "text-fg-2")}>{focused ? t.focusOn : t.focusOff}</p>
-          <div className="overflow-x-auto p-3 scrollbar-thin sm:p-4">
+          <p className={cn("px-4 py-2.5 text-sm transition-colors sm:px-5", focused ? "bg-accent-soft text-accent" : "bg-surface-2 text-fg-2")}>{focused ? t.focusOn : t.focusOff}</p>
+          <div className="scrollbar-thin overflow-x-auto p-3 sm:p-5">
             <KeyboardVisual down={state.down} ever={state.ever} labels={labels} />
           </div>
         </div>
-        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-line px-4 py-2.5 text-[0.8125rem] text-fg-2">
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 px-4 pb-3 text-[0.8125rem] text-fg-2 sm:px-5">
           <span className="inline-flex items-center gap-1.5">
             <span className="size-3 rounded-[0.1875rem] bg-accent" aria-hidden /> {t.legendDown}
           </span>
           <span className="inline-flex items-center gap-1.5">
-            <span className="size-3 rounded-[0.1875rem] border border-ok/50 bg-ok-soft" aria-hidden /> {t.legendEver}
+            <span className="size-3 rounded-[0.1875rem] bg-ok-soft ring-1 ring-ok/40" aria-hidden /> {t.legendEver}
           </span>
           <span className="inline-flex items-center gap-1.5">
-            <span className="size-3 rounded-[0.1875rem] border border-line-strong bg-surface" aria-hidden /> {t.legendNone}
+            <span className="size-3 rounded-[0.1875rem] bg-surface-2 ring-1 ring-line-strong" aria-hidden /> {t.legendNone}
           </span>
           {state.locks && (
             <span className="ml-auto inline-flex flex-wrap items-center gap-1.5">
@@ -242,18 +242,11 @@ export default function KeyboardTest({ locale }: { locale: Locale }) {
         </div>
       </Panel>
 
-      <p className="flex flex-wrap items-baseline justify-center gap-x-6 gap-y-1 text-[0.9375rem] text-fg-2">
-        <span>
-          {t.held}: <span className="tabular text-xl font-semibold text-fg">{state.down.size}</span>
-        </span>
-        <span>
-          {t.maxHeld}: <span className="tabular text-xl font-semibold text-fg">{state.maxHeld}</span>
-          {state.maxHeld < 2 && <span className="text-fg-3"> ({t.maxHint})</span>}
-        </span>
-        <span>
-          {t.tested}: <span className="tabular text-xl font-semibold text-fg">{testedOnLayout}</span> {t.of(TOTAL)}
-        </span>
-      </p>
+      <div className="grid grid-cols-3 gap-2 sm:gap-3">
+        <Stat size="md" label={t.held} value={state.down.size} />
+        <Stat size="md" label={t.maxHeld} value={state.maxHeld} sub={state.maxHeld < 2 ? t.maxHint : undefined} />
+        <Stat size="md" label={t.tested} value={testedOnLayout} sub={t.of(TOTAL)} />
+      </div>
 
       {state.extra.length > 0 && (
         <div className="flex flex-wrap items-center gap-2">
@@ -296,13 +289,27 @@ export default function KeyboardTest({ locale }: { locale: Locale }) {
             <table className="w-full text-left text-sm tabular">
               <thead className="bg-surface-2 text-fg-2">
                 <tr>
-                  <th scope="col" className="px-3 py-2 font-semibold">{t.colType}</th>
-                  <th scope="col" className="px-3 py-2 font-semibold">key</th>
-                  <th scope="col" className="px-3 py-2 font-semibold">code</th>
-                  <th scope="col" className="px-3 py-2 font-semibold">keyCode</th>
-                  <th scope="col" className="px-3 py-2 font-semibold">location</th>
-                  <th scope="col" className="px-3 py-2 font-semibold">{t.colRepeat}</th>
-                  <th scope="col" className="px-3 py-2 font-semibold">{t.colMods}</th>
+                  <th scope="col" className="px-3 py-2 font-semibold">
+                    {t.colType}
+                  </th>
+                  <th scope="col" className="px-3 py-2 font-semibold">
+                    key
+                  </th>
+                  <th scope="col" className="px-3 py-2 font-semibold">
+                    code
+                  </th>
+                  <th scope="col" className="px-3 py-2 font-semibold">
+                    keyCode
+                  </th>
+                  <th scope="col" className="px-3 py-2 font-semibold">
+                    location
+                  </th>
+                  <th scope="col" className="px-3 py-2 font-semibold">
+                    {t.colRepeat}
+                  </th>
+                  <th scope="col" className="px-3 py-2 font-semibold">
+                    {t.colMods}
+                  </th>
                 </tr>
               </thead>
               <tbody>

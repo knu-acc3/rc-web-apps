@@ -11,6 +11,7 @@ import { formatTime } from "../shared/time";
 import { VIDEO_ACCEPT } from "./ui/FilePicker";
 import { Filmstrip } from "./ui/Filmstrip";
 import { useJob, useProbe } from "./ui/hooks";
+import { Setting } from "./ui/options";
 import { JobProgress } from "./ui/Progress";
 import { RangeSelector, TimeInput } from "./ui/RangeSelector";
 import { ResultCard } from "./ui/ResultCard";
@@ -26,10 +27,10 @@ const T = {
     length: "Длина фрагмента",
     playSel: "Проиграть фрагмент",
     mode: "Режим",
-    fast: "Быстро, без перекодирования",
+    fast: "Быстро",
     precise: "Точно до кадра",
-    fastHint: "Разрез по ближайшим ключевым кадрам: начало может сдвинуться на долю секунды, качество не меняется.",
-    preciseHint: "Видео перекодируется, поэтому границы совпадут до кадра. Занимает больше времени.",
+    fastHint: "Без потери качества; начало может сдвинуться к ближайшему ключевому кадру",
+    preciseHint: "Видео перекодируется — дольше, но границы точно до кадра",
     trim: "Обрезать видео",
     preview: "Предпросмотр видео",
   },
@@ -40,10 +41,10 @@ const T = {
     length: "Clip length",
     playSel: "Play selection",
     mode: "Mode",
-    fast: "Fast, no re-encoding",
+    fast: "Fast",
     precise: "Frame-accurate",
-    fastHint: "Cuts at the nearest key frames: the start may shift by a fraction of a second, quality is untouched.",
-    preciseHint: "The video is re-encoded so the cut lands on the exact frame. Takes longer.",
+    fastHint: "Lossless; the start may snap to the nearest key frame",
+    preciseHint: "Re-encodes the video — slower, but cuts on the exact frame",
     trim: "Trim video",
     preview: "Video preview",
   },
@@ -122,11 +123,11 @@ export default function VideoTrim({ locale }: { locale: Locale }) {
                 <div className="grid grid-cols-2 items-end gap-3 sm:grid-cols-[1fr_1fr_auto_auto]">
                   <TimeInput label={t.start} value={range.start} max={duration} onCommit={(v) => setRange(Math.min(v, range.end - 0.1), range.end)} />
                   <TimeInput label={t.end} value={range.end} max={duration} onCommit={(v) => setRange(range.start, Math.max(v, range.start + 0.1))} />
-                  <div className="col-span-2 flex items-center justify-between gap-3 sm:col-span-1 sm:flex-col sm:items-start sm:gap-0.5">
+                  <div className="flex flex-col sm:items-start">
                     <span className="text-sm text-fg-3">{t.length}</span>
-                    <span className="tabular text-2xl font-semibold text-fg">{formatTime(length, 2)}</span>
+                    <span className="tabular text-2xl font-bold tracking-tight text-fg">{formatTime(length, 2)}</span>
                   </div>
-                  <Button variant="outline" onClick={() => player.current?.playRange(range.start, range.end)} className="col-span-2 sm:col-span-1">
+                  <Button variant="tonal" onClick={() => player.current?.playRange(range.start, range.end)}>
                     <Play aria-hidden />
                     {t.playSel}
                   </Button>
@@ -142,7 +143,7 @@ export default function VideoTrim({ locale }: { locale: Locale }) {
         )
       }
       options={
-        <div className="flex flex-col gap-1.5">
+        <Setting label={t.mode}>
           <Segmented
             label={t.mode}
             value={precise ? "precise" : "fast"}
@@ -154,10 +155,9 @@ export default function VideoTrim({ locale }: { locale: Locale }) {
               { value: "fast", label: t.fast },
               { value: "precise", label: t.precise },
             ]}
-            size="sm"
           />
           <p className="text-[0.8125rem] text-fg-3">{precise ? t.preciseHint : t.fastHint}</p>
-        </div>
+        </Setting>
       }
       action={{ label: t.trim, onClick: run, disabled: !(length > 0), icon: <Scissors aria-hidden /> }}
       status={<JobProgress job={job} locale={locale} onCancel={job.cancel} onRetry={run} />}

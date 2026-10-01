@@ -14,7 +14,7 @@ import { detectFormat } from "./lib/detect";
 import { gifInfo } from "./lib/gif-decode";
 import { baseName, readHead } from "./lib/source";
 import type { GifFramesResult } from "./lib/types";
-import { checker, ProgressBar } from "./ui/controls";
+import { checker, ProgressBar, replaceDrop } from "./ui/controls";
 import { useEngine } from "./ui/hooks";
 import { errorText, S } from "./ui/strings";
 import { downloadZip } from "./ui/useBatch";
@@ -109,17 +109,19 @@ export default function GifFrames({ locale }: { locale: Locale }) {
   const fname = (i: number) => `${name}-frame-${String(i + 1).padStart(Math.max(3, pad), "0")}.png`;
 
   if (!file) {
-    return <Dropzone onFiles={(f) => setFile(f[0] ?? null)} accept="image/gif,.gif" title={t.drop} hint={t.hint} />;
+    return <Dropzone onFiles={(f) => setFile(f[0] ?? null)} accept="image/gif,.gif" title={t.drop} hint={t.hint} locale={locale} />;
   }
 
   const loopText = info ? (info.loop === null ? t.once : info.loop === 0 ? t.forever : t.times(info.loop)) : "";
   const zeroDelay = info?.delays.some((d) => d <= 10);
   return (
     <div className="flex flex-col gap-4">
-      <Panel className="overflow-hidden">
-        <div className="flex flex-col gap-3 px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
+      <Panel className="flex flex-col gap-3 p-4 sm:p-5">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div aria-live="polite">
-            <p className="tabular text-2xl font-semibold tracking-tight text-fg">{info ? `${info.frames} ${plural(locale, info.frames, t.frames)}` : "—"}</p>
+            <p className="tabular text-2xl font-semibold tracking-tight text-fg sm:text-3xl">
+              {info ? `${info.frames} ${plural(locale, info.frames, t.frames)}` : "—"}
+            </p>
             {info && (
               <p className="tabular text-sm text-fg-3">
                 {info.width}×{info.height} px · {t.duration} {formatNumber(locale, info.duration / 1000, { maximumFractionDigits: 2 })}{" "}
@@ -128,7 +130,7 @@ export default function GifFrames({ locale }: { locale: Locale }) {
             )}
           </div>
           <Button
-            variant="primary"
+            variant="filled"
             size="lg"
             disabled={!frames.length}
             onClick={() =>
@@ -142,8 +144,8 @@ export default function GifFrames({ locale }: { locale: Locale }) {
             {busy ? `${t.extracting} ${Math.round(progress * 100)} %` : t.all}
           </Button>
         </div>
-        {busy && <ProgressBar value={progress} className="rounded-none" />}
-        {zeroDelay && <p className="border-t border-line px-4 py-2.5 text-[0.8125rem] text-warn">{t.zeroDelay}</p>}
+        {busy && <ProgressBar value={progress} />}
+        {zeroDelay && <p className="text-[0.8125rem] text-warn">{t.zeroDelay}</p>}
       </Panel>
 
       {frames.length > 0 && (
@@ -156,7 +158,7 @@ export default function GifFrames({ locale }: { locale: Locale }) {
                   type="button"
                   onClick={() => downloadBlob(f.blob, fname(i))}
                   aria-label={t.frame(i + 1, f.delay)}
-                  className={`group flex w-full flex-col overflow-hidden rounded-[0.5rem] border border-line text-left hover:border-accent ${checker}`}
+                  className={`group flex w-full flex-col overflow-hidden rounded-[0.875rem] text-left shadow-elev-1 transition-[box-shadow,transform] hover:-translate-y-0.5 hover:shadow-elev-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent ${checker}`}
                 >
                   <img src={f.url} alt="" loading="lazy" className="aspect-square w-full object-contain" />
                   <span className="tabular flex justify-between bg-surface px-2 py-1 text-[0.75rem] text-fg-2">
@@ -172,7 +174,7 @@ export default function GifFrames({ locale }: { locale: Locale }) {
         </section>
       )}
       {error ? <Notice tone="err">{error instanceof Error && error.message === "NOT_GIF" ? t.notGif : errorText(locale, error)}</Notice> : null}
-      <Dropzone onFiles={(f) => setFile(f[0] ?? null)} accept="image/gif,.gif" compact title={t.drop} />
+      <Dropzone onFiles={(f) => setFile(f[0] ?? null)} accept="image/gif,.gif" title={t.drop} locale={locale} className={replaceDrop} />
       <p className="sr-only">{S(locale).processingIn}</p>
     </div>
   );

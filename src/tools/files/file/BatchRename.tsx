@@ -1,26 +1,33 @@
 "use client";
 
-import { FileArchive } from "lucide-react";
+import { FileArchive, Plus } from "lucide-react";
 import { useId, useMemo, useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { count } from "@/i18n/format";
 import { cn } from "@/lib/cn";
 import { Button } from "@/ui/button";
 import { Dropzone } from "@/ui/dropzone";
-import { Checkbox, Field, Input, Select } from "@/ui/field";
+import { Field, Input, Switch } from "@/ui/field";
+import { Fold } from "@/ui/fold";
+import { NumberInput } from "@/ui/number-input";
 import { Notice, Panel, PanelHeader } from "@/ui/panel";
+import { Segmented } from "@/ui/segmented";
 import { useJob } from "@/tools/files/video/ui/hooks";
 import { JobProgress } from "@/tools/files/video/ui/Progress";
 import { ResultCard } from "@/tools/files/video/ui/ResultCard";
+import { Setting } from "@/tools/files/video/ui/options";
 import { UI } from "@/tools/files/video/ui/strings";
-import { DEFAULT_RENAME, regexError, renameAll, type CaseMode, type RenameError, type RenameOptions, type SpaceMode } from "./lib/rename";
+import { DEFAULT_RENAME, regexError, renameAll, type RenameError, type RenameOptions } from "./lib/rename";
 import { buildZip } from "./lib/zip-client";
 
 const T = {
   ru: {
     drop: "Перетащите файлы сюда или нажмите, чтобы выбрать",
     pattern: "Шаблон имени",
-    patternHint: "{name} — исходное имя, {n} — номер, {n:3} — номер с нулями (001), {date} и {time} — дата и время изменения файла. Расширение сохраняется.",
+    patternHint: "Расширение сохраняется",
+    tokens: "Вставить в шаблон",
+    tokenTitles: { "{name}": "Исходное имя", "{n}": "Номер", "{n:3}": "Номер с нулями: 001", "{date}": "Дата изменения файла", "{time}": "Время изменения файла" } as Record<string, string>,
+    more: "Регистр, пробелы, порядок, нумерация",
     find: "Найти",
     replace: "Заменить на",
     regex: "Регулярное выражение",
@@ -31,28 +38,31 @@ const T = {
     upper: "ПРОПИСНЫЕ",
     title: "Каждое Слово",
     spaces: "Пробелы",
-    spKeep: "оставить",
-    spDash: "заменить на -",
-    spUnder: "заменить на _",
-    spRemove: "удалить",
+    spKeep: "Оставить",
+    spDash: "Заменить на -",
+    spUnder: "Заменить на _",
+    spRemove: "Удалить",
     translit: "Транслитерация (Привет → Privet)",
     sort: "Порядок",
-    added: "как добавлены",
-    byName: "по имени",
-    byDate: "по дате",
+    added: "Как добавлены",
+    byName: "По имени",
+    byDate: "По дате",
     files: ["файл", "файла", "файлов"],
     old: "Было",
     now: "Станет",
     errors: { empty: "пустое имя", illegal: "недопустимые символы", reserved: "зарезервированное имя Windows", duplicate: "повторяется", long: "слишком длинное" } as Record<RenameError, string>,
     fix: "Исправьте имена с ошибками, чтобы скачать архив.",
-    run: "Скачать ZIP с новыми именами",
-    note: "Браузер не может переименовать файлы прямо на диске, поэтому переименованные копии скачиваются в ZIP-архиве без сжатия.",
+    run: "Скачать ZIP",
+    note: "Браузер не может переименовать файлы на диске — копии с новыми именами скачаются в ZIP.",
     clear: "Очистить",
   },
   en: {
     drop: "Drop files here or click to choose",
     pattern: "Name pattern",
-    patternHint: "{name} — original name, {n} — number, {n:3} — zero-padded number (001), {date} and {time} — file modification date and time. The extension is kept.",
+    patternHint: "The extension is kept",
+    tokens: "Insert into the pattern",
+    tokenTitles: { "{name}": "Original name", "{n}": "Number", "{n:3}": "Zero-padded number: 001", "{date}": "File modification date", "{time}": "File modification time" } as Record<string, string>,
+    more: "Case, spaces, order, numbering",
     find: "Find",
     replace: "Replace with",
     regex: "Regular expression",
@@ -63,26 +73,27 @@ const T = {
     upper: "UPPERCASE",
     title: "Title Case",
     spaces: "Spaces",
-    spKeep: "keep",
-    spDash: "replace with -",
-    spUnder: "replace with _",
-    spRemove: "remove",
+    spKeep: "Keep",
+    spDash: "Replace with -",
+    spUnder: "Replace with _",
+    spRemove: "Remove",
     translit: "Transliterate Cyrillic (Привет → Privet)",
     sort: "Order",
-    added: "as added",
-    byName: "by name",
-    byDate: "by date",
+    added: "As added",
+    byName: "By name",
+    byDate: "By date",
     files: ["file", "files"],
     old: "Before",
     now: "After",
     errors: { empty: "empty name", illegal: "illegal characters", reserved: "reserved Windows name", duplicate: "duplicate", long: "too long" } as Record<RenameError, string>,
     fix: "Fix the names with errors to download the archive.",
-    run: "Download ZIP with new names",
-    note: "Browsers can't rename files directly on disk, so the renamed copies are downloaded in an uncompressed ZIP archive.",
+    run: "Download ZIP",
+    note: "Browsers can't rename files on disk — copies with the new names download as a ZIP.",
     clear: "Clear",
   },
 } as const;
 
+const TOKENS = ["{name}", "{n}", "{n:3}", "{date}", "{time}"];
 let seq = 0;
 
 export default function BatchRename({ locale }: { locale: Locale }) {
@@ -119,10 +130,12 @@ export default function BatchRename({ locale }: { locale: Locale }) {
     );
   };
 
+  const insert = (token: string) => set({ pattern: o.pattern + token });
   return (
     <div className="flex flex-col gap-4">
       <Dropzone
         multiple
+        locale={locale}
         onFiles={(fs) => {
           job.reset();
           setFiles((l) => [...l, ...fs.map((file) => ({ id: ++seq, file }))]);
@@ -131,65 +144,102 @@ export default function BatchRename({ locale }: { locale: Locale }) {
         compact={files.length > 0}
       />
       {files.length > 0 && (
-        <>
-          <Field label={t.pattern} htmlFor={`${id}-p`} hint={t.patternHint}>
-            <Input id={`${id}-p`} value={o.pattern} onChange={(e) => set({ pattern: e.target.value })} size="lg" className="font-mono" spellCheck={false} autoComplete="off" />
-          </Field>
-          <div className="flex flex-wrap items-end gap-3">
-            <Field label={t.find} htmlFor={`${id}-f`} error={reErr ?? undefined} className="w-44">
-              <Input id={`${id}-f`} size="sm" value={o.find} onChange={(e) => set({ find: e.target.value })} aria-invalid={!!reErr} className="font-mono" />
-            </Field>
-            <Field label={t.replace} htmlFor={`${id}-r`} className="w-44">
-              <Input id={`${id}-r`} size="sm" value={o.replace} onChange={(e) => set({ replace: e.target.value })} className="font-mono" />
-            </Field>
-            <Checkbox label={t.regex} checked={o.regex} onChange={(e) => set({ regex: e.target.checked })} className="pb-1.5" />
+        <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-6">
+          <div className="flex min-w-0 flex-col gap-4">
+            <Panel className="flex min-w-0 flex-col gap-5 p-4 sm:p-5">
+              <Field label={t.pattern} htmlFor={`${id}-p`} hint={t.patternHint}>
+                <Input id={`${id}-p`} value={o.pattern} onChange={(e) => set({ pattern: e.target.value })} size="lg" className="font-mono" spellCheck={false} autoComplete="off" />
+                <div className="flex flex-wrap gap-2" role="group" aria-label={t.tokens}>
+                  {TOKENS.map((k) => (
+                    <button key={k} type="button" className="chip font-mono" title={t.tokenTitles[k]} onClick={() => insert(k)}>
+                      <Plus className="size-3.5" aria-hidden />
+                      {k}
+                    </button>
+                  ))}
+                </div>
+              </Field>
+              <div className="grid gap-3 sm:grid-cols-2">
+                <Field label={t.find} htmlFor={`${id}-f`} error={reErr ?? undefined}>
+                  <Input id={`${id}-f`} value={o.find} onChange={(e) => set({ find: e.target.value })} aria-invalid={!!reErr} className="font-mono" />
+                </Field>
+                <Field label={t.replace} htmlFor={`${id}-r`}>
+                  <Input id={`${id}-r`} value={o.replace} onChange={(e) => set({ replace: e.target.value })} className="font-mono" />
+                </Field>
+              </div>
+              <Switch label={t.regex} checked={o.regex} onChange={(e) => set({ regex: e.target.checked })} className="-mt-2" />
+              <Fold variant="inline" title={t.more} className="text-sm">
+                <div className="flex flex-col gap-5">
+                  <Setting label={t.caseLabel}>
+                    <Segmented
+                      label={t.caseLabel}
+                      size="sm"
+                      value={o.caseMode}
+                      onChange={(x) => set({ caseMode: x })}
+                      options={[
+                        { value: "keep", label: t.keep },
+                        { value: "lower", label: t.lower },
+                        { value: "upper", label: t.upper },
+                        { value: "title", label: t.title },
+                      ]}
+                    />
+                  </Setting>
+                  <Setting label={t.spaces}>
+                    <Segmented
+                      label={t.spaces}
+                      size="sm"
+                      value={o.spaces}
+                      onChange={(x) => set({ spaces: x })}
+                      options={[
+                        { value: "keep", label: t.spKeep },
+                        { value: "-", label: "→ -", title: t.spDash },
+                        { value: "_", label: "→ _", title: t.spUnder },
+                        { value: "remove", label: t.spRemove },
+                      ]}
+                    />
+                  </Setting>
+                  <Setting label={t.sort}>
+                    <Segmented
+                      label={t.sort}
+                      size="sm"
+                      value={order}
+                      onChange={(x) => (setOrder(x), job.reset())}
+                      options={[
+                        { value: "added", label: t.added },
+                        { value: "name", label: t.byName },
+                        { value: "date", label: t.byDate },
+                      ]}
+                    />
+                  </Setting>
+                  <Field label={t.start} htmlFor={`${id}-n`}>
+                    <NumberInput id={`${id}-n`} locale={locale} value={o.start} min={0} max={999999} onChange={(v) => set({ start: Math.max(0, Math.round(v ?? 0)) })} className="max-w-48" />
+                  </Field>
+                  <Switch label={t.translit} checked={o.translit} onChange={(e) => set({ translit: e.target.checked })} />
+                </div>
+              </Fold>
+              {bad > 0 && <Notice tone="warn">{t.fix}</Notice>}
+              {job.status !== "done" && !job.running && (
+                <Button variant="filled" size="xl" fullWidth onClick={run} disabled={bad > 0 || !!reErr}>
+                  <FileArchive aria-hidden />
+                  <span className="truncate">{t.run}</span>
+                </Button>
+              )}
+              <p className="-mt-2 text-[0.8125rem] text-fg-3">{t.note}</p>
+              <JobProgress job={job} locale={locale} onCancel={job.cancel} onRetry={run} />
+            </Panel>
+            {job.status === "done" && job.result && <ResultCard blob={job.result} name="renamed.zip" locale={locale} kind="file" onReset={job.reset} resetLabel={UI[locale].edit} />}
           </div>
-          <details className="text-sm">
-            <summary className="cursor-pointer text-fg-3 hover:text-fg">
-              {t.caseLabel}, {t.spaces.toLowerCase()}, {locale === "ru" ? "транслитерация, нумерация, порядок" : "transliteration, numbering, order"}
-            </summary>
-            <div className="mt-3 flex flex-wrap items-end gap-3">
-              <Field label={t.caseLabel} htmlFor={`${id}-c`} className="w-40">
-                <Select id={`${id}-c`} size="sm" value={o.caseMode} onChange={(e) => set({ caseMode: e.target.value as CaseMode })}>
-                  <option value="keep">{t.keep}</option>
-                  <option value="lower">{t.lower}</option>
-                  <option value="upper">{t.upper}</option>
-                  <option value="title">{t.title}</option>
-                </Select>
-              </Field>
-              <Field label={t.spaces} htmlFor={`${id}-s`} className="w-44">
-                <Select id={`${id}-s`} size="sm" value={o.spaces} onChange={(e) => set({ spaces: e.target.value as SpaceMode })}>
-                  <option value="keep">{t.spKeep}</option>
-                  <option value="-">{t.spDash}</option>
-                  <option value="_">{t.spUnder}</option>
-                  <option value="remove">{t.spRemove}</option>
-                </Select>
-              </Field>
-              <Field label={t.start} htmlFor={`${id}-n`} className="w-28">
-                <Input id={`${id}-n`} size="sm" inputMode="numeric" value={String(o.start)} onChange={(e) => set({ start: Math.max(0, Number(e.target.value.replace(/\D/g, "")) || 0) })} className="tabular" />
-              </Field>
-              <Field label={t.sort} htmlFor={`${id}-o`} className="w-40">
-                <Select id={`${id}-o`} size="sm" value={order} onChange={(e) => (setOrder(e.target.value as typeof order), job.reset())}>
-                  <option value="added">{t.added}</option>
-                  <option value="name">{t.byName}</option>
-                  <option value="date">{t.byDate}</option>
-                </Select>
-              </Field>
-              <Checkbox label={t.translit} checked={o.translit} onChange={(e) => set({ translit: e.target.checked })} className="pb-1.5" />
-            </div>
-          </details>
 
-          <Panel>
+          <Panel className="min-w-0 overflow-hidden">
             <PanelHeader
               title={count(locale, files.length, t.files)}
               actions={
-                <Button size="sm" variant="ghost" onClick={() => (setFiles([]), job.reset())}>
+                <Button size="sm" variant="text" onClick={() => (setFiles([]), job.reset())}>
                   {t.clear}
                 </Button>
               }
             />
-            <div className="max-h-96 overflow-auto">
-              <table className="w-full text-sm">
+            <div className="max-h-[32rem] overflow-auto">
+              <table className="w-full table-fixed text-sm">
                 <thead className="sticky top-0 bg-surface-2 text-left text-fg-2">
                   <tr>
                     <th className="px-4 py-2 font-medium">{t.old}</th>
@@ -201,10 +251,10 @@ export default function BatchRename({ locale }: { locale: Locale }) {
                     const r = results[i];
                     return (
                       <tr key={f.id}>
-                        <td className="max-w-0 truncate px-4 py-1.5 text-fg-3" title={f.file.name}>
+                        <td className="truncate px-4 py-2 text-fg-3" title={f.file.name}>
                           {f.file.name}
                         </td>
-                        <td className={cn("max-w-0 px-4 py-1.5", r.error ? "text-err" : r.name !== f.file.name ? "font-medium text-fg" : "text-fg-2")} title={r.name}>
+                        <td className={cn("px-4 py-2", r.error ? "text-err" : r.name !== f.file.name ? "font-semibold text-fg" : "text-fg-2")} title={r.name}>
                           <span className="block truncate">{r.name}</span>
                           {r.error && <span className="text-[0.75rem]">{t.errors[r.error]}</span>}
                         </td>
@@ -215,17 +265,7 @@ export default function BatchRename({ locale }: { locale: Locale }) {
               </table>
             </div>
           </Panel>
-          {bad > 0 && <Notice tone="warn">{t.fix}</Notice>}
-          {job.status !== "done" && (
-            <Button variant="primary" size="lg" onClick={run} disabled={job.running || bad > 0 || !!reErr} className="w-full sm:w-auto sm:self-start">
-              <FileArchive aria-hidden />
-              {t.run}
-            </Button>
-          )}
-          <p className="-mt-2 text-[0.8125rem] text-fg-3">{t.note}</p>
-          <JobProgress job={job} locale={locale} onCancel={job.cancel} onRetry={run} />
-          {job.status === "done" && job.result && <ResultCard blob={job.result} name="renamed.zip" locale={locale} kind="file" onReset={job.reset} resetLabel={UI[locale].edit} />}
-        </>
+        </div>
       )}
     </div>
   );

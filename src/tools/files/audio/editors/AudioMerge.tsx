@@ -1,12 +1,11 @@
 "use client";
 
 import { ArrowDown, ArrowUp, Combine, X } from "lucide-react";
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { count, formatBytes, formatNumber } from "@/i18n/format";
-import { Button } from "@/ui/button";
+import { Button, IconButton } from "@/ui/button";
 import { Dropzone } from "@/ui/dropzone";
-import { Field, Select } from "@/ui/field";
 import { Panel } from "@/ui/panel";
 import { AudioSession } from "@/tools/files/shared/client";
 import type { AudioTarget, JobResult } from "@/tools/files/shared/spec";
@@ -14,11 +13,12 @@ import { MEDIA_ACCEPT } from "@/tools/files/video/ui/FilePicker";
 import { useJob } from "@/tools/files/video/ui/hooks";
 import { JobProgress } from "@/tools/files/video/ui/Progress";
 import { ResultCard } from "@/tools/files/video/ui/ResultCard";
+import { ChoiceChips, Setting, StepSlider } from "@/tools/files/video/ui/options";
 import { UI } from "@/tools/files/video/ui/strings";
 
 const T = {
   ru: {
-    add: "Перетащите аудиофайлы сюда или нажмите, чтобы добавить (в порядке склейки)",
+    add: "Перетащите аудиофайлы сюда или нажмите, чтобы добавить",
     files: ["файл", "файла", "файлов"],
     up: "Выше",
     down: "Ниже",
@@ -32,7 +32,7 @@ const T = {
     need: "Добавьте хотя бы два файла",
   },
   en: {
-    add: "Drop audio files here or click to add (in joining order)",
+    add: "Drop audio files here or click to add",
     files: ["file", "files"],
     up: "Move up",
     down: "Move down",
@@ -48,13 +48,14 @@ const T = {
 } as const;
 
 const TARGETS: AudioTarget[] = ["mp3", "wav", "m4a", "ogg", "opus", "flac"];
+const CROSSFADES = [0, 0.5, 1, 2, 3, 5, 8];
+const BITRATES = [128, 160, 192, 256, 320].map((k) => k * 1000);
 const LABEL: Record<string, string> = { mp3: "MP3", wav: "WAV", m4a: "M4A", ogg: "OGG", opus: "Opus", flac: "FLAC" };
 let seq = 0;
 
 export default function AudioMerge({ locale }: { locale: Locale }) {
   const t = T[locale];
   const u = UI[locale];
-  const id = useId();
   const [items, setItems] = useState<{ id: number; file: File }[]>([]);
   const [crossfade, setCrossfade] = useState(0);
   const [target, setTarget] = useState<AudioTarget>("mp3");
@@ -93,101 +94,77 @@ export default function AudioMerge({ locale }: { locale: Locale }) {
   const total = items.reduce((a, b) => a + b.file.size, 0);
 
   return (
-    <div className="flex flex-col gap-4">
-      <Dropzone
-        onFiles={(fs) => {
-          touch();
-          setItems((l) => [...l, ...fs.map((file) => ({ id: ++seq, file }))]);
-        }}
-        accept={MEDIA_ACCEPT}
-        multiple
-        title={t.add}
-        hint={u.localNote}
-        compact={items.length > 0}
-      />
-      {items.length > 0 && (
-        <Panel>
-          <ol className="divide-y divide-line">
-            {items.map((c, i) => (
-              <li key={c.id} className="flex items-center gap-2 px-4 py-2.5">
-                <span className="tabular w-6 shrink-0 text-sm text-fg-3">{i + 1}</span>
-                <span className="min-w-0 flex-1">
-                  <span className="block truncate text-fg" title={c.file.name}>
-                    {c.file.name}
+    <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-6">
+      <div className="flex min-w-0 flex-col gap-4">
+        <Dropzone
+          onFiles={(fs) => {
+            touch();
+            setItems((l) => [...l, ...fs.map((file) => ({ id: ++seq, file }))]);
+          }}
+          accept={MEDIA_ACCEPT}
+          multiple
+          locale={locale}
+          title={t.add}
+          hint={u.audioFormats}
+          compact={items.length > 0}
+        />
+        {items.length > 0 && (
+          <Panel>
+            <ol className="divide-y divide-line">
+              {items.map((c, i) => (
+                <li key={c.id} className="flex items-center gap-1 py-2 pl-4 pr-2 motion-safe:animate-[menu-in_200ms_var(--ease-emph)]">
+                  <span className="tabular flex size-7 shrink-0 items-center justify-center rounded-full bg-accent-container text-[0.8125rem] font-semibold text-on-accent-container">{i + 1}</span>
+                  <span className="ml-2 min-w-0 flex-1">
+                    <span className="block truncate text-fg" title={c.file.name}>
+                      {c.file.name}
+                    </span>
+                    <span className="tabular text-[0.8125rem] text-fg-3">{formatBytes(locale, c.file.size)}</span>
                   </span>
-                  <span className="text-[0.8125rem] text-fg-3">{formatBytes(locale, c.file.size)}</span>
-                </span>
-                <Button size="icon-sm" variant="ghost" onClick={() => move(i, -1)} disabled={i === 0 || job.running} aria-label={`${t.up}: ${c.file.name}`} title={t.up}>
-                  <ArrowUp aria-hidden />
-                </Button>
-                <Button size="icon-sm" variant="ghost" onClick={() => move(i, 1)} disabled={i === items.length - 1 || job.running} aria-label={`${t.down}: ${c.file.name}`} title={t.down}>
-                  <ArrowDown aria-hidden />
-                </Button>
-                <Button
-                  size="icon-sm"
-                  variant="ghost"
-                  onClick={() => {
-                    touch();
-                    session.current?.drop(`f${c.id}`);
-                    setItems((l) => l.filter((x) => x.id !== c.id));
-                  }}
-                  disabled={job.running}
-                  aria-label={`${u.remove}: ${c.file.name}`}
-                  title={u.remove}
-                >
-                  <X aria-hidden />
-                </Button>
-              </li>
-            ))}
-          </ol>
-          <p className="border-t border-line px-4 py-3 text-sm text-fg-2">
-            {count(locale, items.length, t.files)} · {formatBytes(locale, total)}
-          </p>
-        </Panel>
-      )}
-      {items.length > 0 && (
-        <div className="flex flex-wrap items-end gap-3">
-          <Field label={t.crossfade} htmlFor={`${id}-x`} className="w-44">
-            <Select id={`${id}-x`} size="sm" value={String(crossfade)} onChange={(e) => (setCrossfade(Number(e.target.value)), touch())}>
-              {[0, 0.5, 1, 2, 3, 5, 8].map((x) => (
-                <option key={x} value={x}>
-                  {x ? `${formatNumber(locale, x)} ${t.sec}` : t.none}
-                </option>
+                  <IconButton size="sm" label={`${t.up}: ${c.file.name}`} title={t.up} icon={<ArrowUp aria-hidden />} onClick={() => move(i, -1)} disabled={i === 0 || job.running} />
+                  <IconButton size="sm" label={`${t.down}: ${c.file.name}`} title={t.down} icon={<ArrowDown aria-hidden />} onClick={() => move(i, 1)} disabled={i === items.length - 1 || job.running} />
+                  <IconButton
+                    size="sm"
+                    label={`${u.remove}: ${c.file.name}`}
+                    title={u.remove}
+                    icon={<X aria-hidden />}
+                    onClick={() => {
+                      touch();
+                      session.current?.drop(`f${c.id}`);
+                      setItems((l) => l.filter((x) => x.id !== c.id));
+                    }}
+                    disabled={job.running}
+                  />
+                </li>
               ))}
-            </Select>
-          </Field>
-          <Field label={t.format} htmlFor={`${id}-t`} className="w-32">
-            <Select id={`${id}-t`} size="sm" value={target} onChange={(e) => (setTarget(e.target.value as AudioTarget), touch())}>
-              {TARGETS.map((x) => (
-                <option key={x} value={x}>
-                  {LABEL[x]}
-                </option>
-              ))}
-            </Select>
-          </Field>
+            </ol>
+          </Panel>
+        )}
+      </div>
+      <div className="flex min-w-0 flex-col gap-4">
+        <Panel className="flex min-w-0 flex-col gap-5 p-4 sm:p-5">
+          <div className="flex flex-wrap items-baseline justify-between gap-x-3">
+            <span className="text-2xl font-bold tracking-tight text-fg">{count(locale, items.length, t.files)}</span>
+            {items.length > 0 && <span className="tabular text-fg-2">{formatBytes(locale, total)}</span>}
+          </div>
+          <StepSlider label={t.crossfade} value={crossfade} steps={CROSSFADES} format={(x) => (x ? `${formatNumber(locale, x)} ${t.sec}` : t.none)} onChange={(x) => (setCrossfade(x), touch())} />
+          <Setting label={t.format}>
+            <ChoiceChips label={t.format} value={target} onChange={(x) => (setTarget(x), touch())} options={TARGETS.map((x) => ({ value: x, label: LABEL[x] }))} />
+          </Setting>
           {target !== "wav" && target !== "flac" && (
-            <Field label={t.bitrate} htmlFor={`${id}-b`} className="w-36">
-              <Select id={`${id}-b`} size="sm" value={String(bitrate)} onChange={(e) => (setBitrate(Number(e.target.value)), touch())}>
-                {[128, 160, 192, 256, 320].filter((k) => target !== "opus" || k <= 256).map((k) => (
-                  <option key={k} value={k * 1000}>
-                    {k} {t.kbps}
-                  </option>
-                ))}
-              </Select>
-            </Field>
+            <StepSlider label={t.bitrate} value={bitrate} steps={BITRATES.filter((k) => target !== "opus" || k <= 256000)} format={(k) => `${k / 1000} ${t.kbps}`} onChange={(x) => (setBitrate(x), touch())} />
           )}
-        </div>
-      )}
-      {!job.result && items.length > 0 && (
-        <Button variant="primary" size="lg" onClick={run} disabled={job.running || items.length < 2} className="w-full sm:w-auto sm:self-start">
-          <Combine aria-hidden />
-          {items.length < 2 ? t.need : t.run}
-        </Button>
-      )}
-      <JobProgress job={job} locale={locale} onCancel={job.cancel} onRetry={run} />
-      {job.status === "done" && job.result && (
-        <ResultCard blob={job.result.blob} name={`merged.${target}`} locale={locale} kind="audio" result={job.result} onReset={job.reset} resetLabel={u.edit} />
-      )}
+          {!job.result && !job.running && (
+            <Button variant="filled" size="xl" fullWidth onClick={run} disabled={items.length < 2}>
+              <Combine aria-hidden />
+              <span className="truncate">{items.length < 2 ? t.need : t.run}</span>
+            </Button>
+          )}
+          <JobProgress job={job} locale={locale} onCancel={job.cancel} onRetry={run} />
+        </Panel>
+        {job.status === "done" && job.result && (
+          <ResultCard blob={job.result.blob} name={`merged.${target}`} locale={locale} kind="audio" result={job.result} onReset={job.reset} resetLabel={u.edit} />
+        )}
+      </div>
     </div>
   );
 }

@@ -11,7 +11,7 @@ import { IMAGE_ACCEPT } from "./lib/detect";
 import { previewFile } from "./lib/run";
 import { prepareFile, type Prepared } from "./lib/source";
 import { CompareSlider } from "./ui/CompareSlider";
-import { checker, RangeField } from "./ui/controls";
+import { checker, RangeField, replaceDrop } from "./ui/controls";
 import { useEngine } from "./ui/hooks";
 import { errorText } from "./ui/strings";
 
@@ -149,12 +149,13 @@ export default function Compare({ locale }: { locale: Locale }) {
       <Dropzone
         onFiles={load(set)}
         accept={IMAGE_ACCEPT}
-        compact
+        className={replaceDrop}
+        locale={locale}
         title={`${label}: ${side.prepared.file.name}`}
         hint={`${side.w}×${side.h} · ${formatBytes(locale, side.prepared.file.size)} · ${t.replace}`}
       />
     ) : (
-      <Dropzone onFiles={load(set)} accept={IMAGE_ACCEPT} title={drop} hint={label} className="min-h-40" />
+      <Dropzone onFiles={load(set)} accept={IMAGE_ACCEPT} title={drop} hint={label} className="min-h-40" locale={locale} />
     );
 
   const ready = a && b;
@@ -167,10 +168,9 @@ export default function Compare({ locale }: { locale: Locale }) {
       </div>
       {ready && (
         <>
-          <div className="flex flex-wrap items-end gap-x-4 gap-y-3 rounded-[0.75rem] border border-line bg-surface px-4 py-3">
+          <Panel className="flex flex-wrap items-end gap-x-6 gap-y-4 p-4 sm:p-5">
             <Field label={t.mode}>
               <Segmented
-                wrap
                 label={t.mode}
                 value={mode}
                 onChange={setMode}
@@ -182,16 +182,16 @@ export default function Compare({ locale }: { locale: Locale }) {
               />
             </Field>
             {mode === "diff" && (
-              <div className="w-56">
+              <div className="w-full max-w-xs">
                 <RangeField label={t.threshold} value={threshold} onChange={setThreshold} min={0} max={128} locale={locale} />
               </div>
             )}
-          </div>
-          <Panel className="overflow-hidden">
-            <div className="p-3 sm:p-4">
+          </Panel>
+          <Panel className="flex flex-col gap-3 p-3 sm:gap-4 sm:p-4">
+            <div>
               {mode === "diff" ? (
                 diff ? (
-                  <div className={`flex justify-center overflow-auto rounded-[0.625rem] border border-line ${checker}`}>
+                  <div className={`flex justify-center overflow-auto rounded-[1rem] ${checker}`}>
                     {/* eslint-disable-next-line @next/next/no-img-element -- blob: URL */}
                     <img src={diff.url} alt={t.diffHint} className="block h-auto max-h-[70vh] max-w-full" />
                   </div>
@@ -200,9 +200,9 @@ export default function Compare({ locale }: { locale: Locale }) {
                 <CompareSlider before={a.url} after={b.url} locale={locale} beforeLabel="A" afterLabel="B" mode={mode === "side" ? "side" : "slider"} />
               )}
             </div>
-            <div className="border-t border-line px-4 py-3" aria-live="polite">
+            <div className="px-1" aria-live="polite">
               {mode === "diff" && diff ? (
-                <p className="tabular text-2xl font-semibold tracking-tight text-fg">
+                <p className="tabular text-2xl font-semibold tracking-tight text-fg sm:text-3xl">
                   {diff.share === 0 ? t.same : `${formatNumber(locale, diff.share * 100, { maximumFractionDigits: diff.share < 0.01 ? 3 : 1 })} % ${t.changed}`}
                 </p>
               ) : (

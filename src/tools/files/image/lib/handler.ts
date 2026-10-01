@@ -232,6 +232,8 @@ async function processJob(req: Extract<JobRequest, { type: "process" }>, hc: Han
     ext: EXT[out.format],
     width,
     height,
+    srcWidth: srcW,
+    srcHeight: srcH,
     quality,
     scale,
     missedTarget,

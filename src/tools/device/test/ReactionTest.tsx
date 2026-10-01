@@ -121,13 +121,7 @@ export default function ReactionTest({ locale }: { locale: Locale }) {
   const ms = (n: number) => formatNumber(locale, n, { maximumFractionDigits: 0 });
 
   const tone =
-    phase === "waiting"
-      ? "bg-[#c62828] text-white"
-      : phase === "go"
-        ? "bg-[#12a150] text-white"
-        : phase === "early"
-          ? "bg-warn-soft text-warn"
-          : "bg-surface-2 text-fg hover:bg-line";
+    phase === "waiting" ? "bg-[#c62828] text-white" : phase === "go" ? "bg-[#12a150] text-white" : phase === "early" ? "bg-warn-soft text-warn" : "bg-accent-soft text-on-accent-container hover:shadow-[var(--elev-2)]";
 
   return (
     <div className="flex flex-col gap-4">
@@ -144,7 +138,10 @@ export default function ReactionTest({ locale }: { locale: Locale }) {
             press(e.timeStamp);
           }
         }}
-        className={cn("flex min-h-80 w-full touch-manipulation select-none flex-col items-center justify-center gap-3 rounded-[1rem] px-6 py-10 text-center sm:min-h-96", tone)}
+        className={cn(
+          "flex min-h-80 w-full touch-manipulation select-none flex-col items-center justify-center gap-3 rounded-[1.25rem] px-6 py-10 text-center shadow-[var(--elev-1)] transition-[background-color,transform] duration-75 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent active:scale-[0.99] sm:min-h-96 lg:min-h-[28rem]",
+          tone,
+        )}
       >
         {phase === "idle" && (
           <>
@@ -175,7 +172,10 @@ export default function ReactionTest({ locale }: { locale: Locale }) {
         {Array.from({ length: REACTION_ATTEMPTS }, (_, i) => (
           <span
             key={i}
-            className={cn("tabular flex h-9 min-w-16 items-center justify-center rounded-full border px-3 text-sm", times[i] !== undefined ? "border-line bg-surface text-fg" : "border-dashed border-line-strong text-fg-3")}
+            className={cn(
+              "tabular flex h-9 min-w-16 items-center justify-center rounded-full px-3 text-sm transition-colors",
+              times[i] !== undefined ? "bg-accent-soft font-semibold text-on-accent-container" : "bg-surface-2 text-fg-3",
+            )}
           >
             {times[i] !== undefined ? `${ms(times[i])} ${t.ms}` : i + 1}
           </span>
@@ -186,13 +186,22 @@ export default function ReactionTest({ locale }: { locale: Locale }) {
         {phase === "done" && stats && (
           <>
             <span>
-              {t.average}: <span className="tabular font-semibold text-fg">{ms(stats.average)} {t.ms}</span>
+              {t.average}:{" "}
+              <span className="tabular text-xl font-bold text-fg">
+                {ms(stats.average)} {t.ms}
+              </span>
             </span>
             <span>
-              {t.best}: <span className="tabular font-semibold text-fg">{ms(stats.best)} {t.ms}</span>
+              {t.best}:{" "}
+              <span className="tabular font-semibold text-fg">
+                {ms(stats.best)} {t.ms}
+              </span>
             </span>
             <span>
-              {t.worst}: <span className="tabular font-semibold text-fg">{ms(stats.worst)} {t.ms}</span>
+              {t.worst}:{" "}
+              <span className="tabular font-semibold text-fg">
+                {ms(stats.worst)} {t.ms}
+              </span>
             </span>
             <Badge tone="accent">{t.ratings[reactionRating(stats.average)]}</Badge>
             <span className="sr-only">{t.summary(ms(stats.average), ms(stats.best))}</span>
@@ -203,7 +212,7 @@ export default function ReactionTest({ locale }: { locale: Locale }) {
 
       {times.length > 0 && phase !== "done" && (
         <div className="flex justify-center">
-          <Button variant="ghost" size="sm" onClick={restart}>
+          <Button variant="tonal" onClick={restart}>
             <RotateCcw aria-hidden />
             {t.again}
           </Button>

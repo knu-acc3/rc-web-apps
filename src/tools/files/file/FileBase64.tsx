@@ -1,18 +1,19 @@
 "use client";
 
-import { Download } from "lucide-react";
+import { Download, File as FileIcon, FolderOpen } from "lucide-react";
 import { useDeferredValue, useEffect, useId, useMemo, useRef, useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { formatBytes } from "@/i18n/format";
 import { downloadBlob, downloadText } from "@/lib/clipboard";
-import { Button } from "@/ui/button";
+import { Button, buttonClass } from "@/ui/button";
 import { CopyButton } from "@/ui/copy-button";
 import { Dropzone } from "@/ui/dropzone";
-import { Checkbox, Textarea } from "@/ui/field";
-import { Badge, Notice, Panel } from "@/ui/panel";
+import { Field, Switch, Textarea } from "@/ui/field";
+import { Badge, Panel } from "@/ui/panel";
 import { Segmented } from "@/ui/segmented";
 import { Tabs } from "@/ui/tabs";
 import { base64ToBytes, parseBase64, wrapLines } from "./lib/b64";
+import { Setting } from "@/tools/files/video/ui/options";
 import { detectBytes } from "./lib/magic";
 
 const T = {
@@ -26,15 +27,14 @@ const T = {
     copy: "Копировать",
     copied: "Скопировано",
     download: "Скачать .txt",
-    preview: "Показано начало: {n} из {total}. Кнопки копируют и скачивают весь текст.",
+    preview: "Показано начало: {n} из {total}. Копируется и скачивается весь текст.",
     input: "Вставьте Base64 или data:URI",
     placeholder: "data:image/png;base64,iVBORw0KGgo… или просто iVBORw0KGgo…",
     invalid: "Это не Base64: допустимы буквы A–Z, a–z, цифры, + / (или - _) и = в конце.",
-    type: "Тип",
     unknown: "Неизвестный формат",
     save: "Скачать файл",
-    grows: "Base64 увеличивает размер примерно на треть: {a} → {b}.",
     other: "Другой файл",
+    result: "Результат",
   },
   en: {
     tabs: "Direction",
@@ -50,11 +50,10 @@ const T = {
     input: "Paste Base64 or a data: URI",
     placeholder: "data:image/png;base64,iVBORw0KGgo… or just iVBORw0KGgo…",
     invalid: "This isn't Base64: only A–Z, a–z, digits, + / (or - _) and trailing = are allowed.",
-    type: "Type",
     unknown: "Unknown format",
     save: "Download file",
-    grows: "Base64 makes data about a third larger: {a} → {b}.",
     other: "Another file",
+    result: "Result",
   },
 } as const;
 
@@ -96,7 +95,7 @@ function Encoder({ locale }: { locale: Locale }) {
     return `<img src="${uri}" alt="">`;
   }, [url, fmt, wrap]);
 
-  if (!file) return <Dropzone onFiles={(fs) => fs[0] && setFile(fs[0])} title={t.drop} />;
+  if (!file) return <Dropzone onFiles={(fs) => fs[0] && setFile(fs[0])} locale={locale} title={t.drop} />;
   const shown = output.length > PREVIEW ? output.slice(0, PREVIEW) + "…" : output;
   const opts: { value: Fmt; label: string }[] = [
     { value: "b64", label: "Base64" },
@@ -105,34 +104,46 @@ function Encoder({ locale }: { locale: Locale }) {
   ];
 
   return (
-    <div className="flex flex-col gap-3">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="min-w-0 text-sm text-fg-2">
-          <span className="font-medium text-fg">{file.name}</span> · {t.grows.replace("{a}", formatBytes(locale, file.size)).replace("{b}", formatBytes(locale, Math.ceil(file.size / 3) * 4))}
-        </div>
-        <label className="cursor-pointer text-sm text-accent hover:underline">
-          {t.other}
-          <input type="file" className="sr-only" onChange={(e) => (e.target.files?.[0] && setFile(e.target.files[0]), (e.target.value = ""))} />
-        </label>
-      </div>
-      <div className="flex flex-wrap items-center gap-3">
-        <Segmented label={t.format} value={fmt} onChange={setFmt} size="sm" options={opts} />
-        {fmt === "b64" && <Checkbox label={t.wrap} checked={wrap} onChange={(e) => setWrap(e.target.checked)} />}
-      </div>
-      <Panel className="overflow-hidden">
-        <div className="flex items-center justify-between gap-2 border-b border-line px-3 py-1.5">
-          <span className="tabular text-sm text-fg-2">{formatBytes(locale, output.length)}</span>
-          <div className="flex gap-1">
-            <Button variant="ghost" size="sm" onClick={() => downloadText(output, `${file.name}.base64.txt`)} disabled={!output}>
-              <Download aria-hidden />
-              <span className="max-sm:sr-only">{t.download}</span>
-            </Button>
-            <CopyButton value={() => output} label={t.copy} copiedLabel={t.copied} variant="primary" />
+    <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] lg:gap-6">
+      <Panel className="flex min-w-0 flex-col gap-5 p-4 sm:p-5">
+        <div className="flex items-center gap-3">
+          <span className="flex size-11 shrink-0 items-center justify-center rounded-[0.875rem] bg-accent-container text-on-accent-container">
+            <FileIcon className="size-5" aria-hidden />
+          </span>
+          <div className="min-w-0 flex-1">
+            <div className="truncate font-semibold text-fg" title={file.name}>
+              {file.name}
+            </div>
+            <div className="tabular text-sm text-fg-3">
+              {formatBytes(locale, file.size)} → {formatBytes(locale, Math.ceil(file.size / 3) * 4)}
+            </div>
           </div>
+          <label title={t.other} className={buttonClass("tonal", "sm", "cursor-pointer focus-within:outline-2 focus-within:outline-accent")}>
+            <FolderOpen aria-hidden />
+            <span className="max-sm:sr-only">{t.other}</span>
+            <input type="file" className="sr-only" onChange={(e) => (e.target.files?.[0] && setFile(e.target.files[0]), (e.target.value = ""))} />
+          </label>
         </div>
-        <textarea readOnly value={shown} aria-label="Base64" spellCheck={false} className="block h-64 w-full resize-y bg-transparent px-3 py-2 font-mono text-[0.8125rem] break-all text-fg focus:outline-none" />
+        <Setting label={t.format}>
+          <Segmented label={t.format} value={fmt} onChange={setFmt} options={opts} />
+        </Setting>
+        {fmt === "b64" && <Switch label={t.wrap} checked={wrap} onChange={(e) => setWrap(e.target.checked)} />}
+        <div className="flex flex-col gap-2">
+          <CopyButton value={() => output} label={t.copy} copiedLabel={t.copied} variant="primary" size="md" className="h-14! w-full text-lg! [--btn-r:1.75rem]! [&_svg]:size-6!" />
+          <Button variant="outlined" onClick={() => downloadText(output, `${file.name}.base64.txt`)} disabled={!output}>
+            <Download aria-hidden />
+            {t.download}
+          </Button>
+        </div>
       </Panel>
-      {output.length > PREVIEW && <p className="text-[0.8125rem] text-fg-3">{t.preview.replace("{n}", formatBytes(locale, PREVIEW)).replace("{total}", formatBytes(locale, output.length))}</p>}
+      <Panel className="flex min-w-0 flex-col overflow-hidden">
+        <div className="flex items-center justify-between gap-2 border-b border-line px-4 py-2.5">
+          <span className="text-sm font-medium text-fg-2">{t.result}</span>
+          <span className="tabular text-sm text-fg-3">{formatBytes(locale, output.length)}</span>
+        </div>
+        <textarea readOnly value={shown} aria-label={t.result} spellCheck={false} className="block h-64 w-full resize-y bg-transparent px-4 py-3 font-mono text-[0.8125rem] break-all text-fg focus:outline-none lg:h-96" />
+        {output.length > PREVIEW && <p className="border-t border-line px-4 py-2 text-[0.8125rem] text-fg-3">{t.preview.replace("{n}", formatBytes(locale, PREVIEW)).replace("{total}", formatBytes(locale, output.length))}</p>}
+      </Panel>
     </div>
   );
 }
@@ -166,32 +177,30 @@ function Decoder({ locale }: { locale: Locale }) {
   const ext = decoded && !decoded.error ? decoded.det?.ext || "bin" : "bin";
 
   return (
-    <div className="flex flex-col gap-3">
-      <label htmlFor={`${id}-in`} className="text-sm font-medium text-fg-2">
-        {t.input}
-      </label>
-      <Textarea id={`${id}-in`} value={text} onChange={(e) => setText(e.target.value)} placeholder={t.placeholder} className="h-40 break-all" />
-      {decoded?.error && <Notice tone="err">{t.invalid}</Notice>}
-      {decoded && !decoded.error && (
-        <Panel className="flex flex-col gap-3 p-4">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div aria-live="polite">
-              <div className="text-xl font-semibold text-fg">{decoded.det?.name ?? t.unknown}</div>
-              <div className="mt-1 flex flex-wrap gap-1.5">
-                <Badge>{formatBytes(locale, decoded.blob.size)}</Badge>
-                <Badge>{decoded.mime}</Badge>
-              </div>
+    <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-6">
+      <Field label={t.input} htmlFor={`${id}-in`} error={decoded?.error ? t.invalid : undefined}>
+        <Textarea id={`${id}-in`} value={text} onChange={(e) => setText(e.target.value)} placeholder={t.placeholder} className="h-48 break-all lg:h-72" />
+      </Field>
+      {decoded && !decoded.error ? (
+        <Panel className="flex min-w-0 flex-col gap-4 p-4 motion-safe:animate-[menu-in_240ms_var(--ease-emph)] sm:p-5">
+          <div aria-live="polite">
+            <div className="text-2xl font-bold tracking-tight text-fg">{decoded.det?.name ?? t.unknown}</div>
+            <div className="mt-2 flex flex-wrap gap-1.5">
+              <Badge>{formatBytes(locale, decoded.blob.size)}</Badge>
+              <Badge>{decoded.mime}</Badge>
             </div>
-            <Button variant="primary" onClick={() => downloadBlob(decoded.blob, `decoded.${ext}`)}>
-              <Download aria-hidden />
-              {t.save}
-            </Button>
           </div>
           {isImage && (
             // eslint-disable-next-line @next/next/no-img-element
-            <img ref={img} alt="" className="max-h-72 w-auto max-w-full self-start rounded-[0.5rem] bg-[repeating-conic-gradient(#8882_0_25%,transparent_0_50%)] bg-[length:16px_16px]" />
+            <img ref={img} alt="" className="max-h-72 w-auto max-w-full self-start rounded-[0.75rem] bg-[repeating-conic-gradient(#8882_0_25%,transparent_0_50%)] bg-[length:16px_16px]" />
           )}
+          <Button variant="filled" size="xl" fullWidth onClick={() => downloadBlob(decoded.blob, `decoded.${ext}`)}>
+            <Download aria-hidden />
+            {t.save}
+          </Button>
         </Panel>
+      ) : (
+        <div className="hidden lg:block" />
       )}
     </div>
   );

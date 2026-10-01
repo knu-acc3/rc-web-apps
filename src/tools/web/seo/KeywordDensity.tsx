@@ -3,9 +3,10 @@
 import { useDeferredValue, useId, useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { formatNumber } from "@/i18n/format";
-import { Checkbox, Field, Textarea } from "@/ui/field";
+import { Field, Switch, Textarea } from "@/ui/field";
 import { Segmented } from "@/ui/segmented";
 import { analyze } from "./lib/keywords";
+import { Split } from "./ui/kit";
 
 type N = "1" | "2" | "3";
 
@@ -67,11 +68,30 @@ export default function KeywordDensity({ locale }: { locale: Locale }) {
   const fmt = (x: number, d = 0) => formatNumber(locale, x, { maximumFractionDigits: d, minimumFractionDigits: d });
 
   return (
-    <div className="flex flex-col gap-5">
-      <Field label={t.text} htmlFor={`${id}-t`} aside={deferred ? <span className="text-[0.8125rem] text-fg-3">{t.chars(fmt(a.chars), fmt(a.charsNoSpaces))}</span> : undefined}>
-        <Textarea id={`${id}-t`} value={text} onChange={(e) => setText(e.target.value)} rows={10} placeholder={t.ph} />
-      </Field>
-
+    <Split
+      input={
+        <>
+          <Field label={t.text} htmlFor={`${id}-t`} aside={deferred ? <span className="text-[0.8125rem] text-fg-3">{t.chars(fmt(a.chars), fmt(a.charsNoSpaces))}</span> : undefined}>
+            <Textarea id={`${id}-t`} value={text} onChange={(e) => setText(e.target.value)} rows={12} placeholder={t.ph} />
+          </Field>
+          <div className="flex flex-col gap-1">
+            <Segmented<N>
+              label={t.n}
+              value={n}
+              onChange={setN}
+              options={[
+                { value: "1", label: t.one },
+                { value: "2", label: t.two },
+                { value: "3", label: t.three },
+              ]}
+            />
+            <Switch label={t.stem} checked={stemming} onChange={(e) => setStemming(e.target.checked)} className="mt-2" />
+            <Switch label={t.stop} checked={stop} onChange={(e) => setStop(e.target.checked)} />
+          </div>
+          <p className="text-sm text-fg-3">{t.hint}</p>
+        </>
+      }
+    >
       <div aria-live="polite" className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         {(
           [
@@ -81,26 +101,11 @@ export default function KeywordDensity({ locale }: { locale: Locale }) {
             [t.nausea, fmt(a.nausea, 2)],
           ] as const
         ).map(([k, v]) => (
-          <div key={k} className="rounded-[0.75rem] bg-surface-2 px-4 py-3">
+          <div key={k} className="rounded-[1rem] bg-accent-soft px-4 py-3">
             <div className="text-[0.8125rem] text-fg-3">{k}</div>
             <div className="text-2xl font-semibold text-fg tabular-nums">{v}</div>
           </div>
         ))}
-      </div>
-
-      <div className="flex flex-wrap items-center gap-x-5 gap-y-3">
-        <Segmented<N>
-          label={t.n}
-          value={n}
-          onChange={setN}
-          options={[
-            { value: "1", label: t.one },
-            { value: "2", label: t.two },
-            { value: "3", label: t.three },
-          ]}
-        />
-        <Checkbox label={t.stem} checked={stemming} onChange={(e) => setStemming(e.target.checked)} />
-        <Checkbox label={t.stop} checked={stop} onChange={(e) => setStop(e.target.checked)} />
       </div>
 
       {!deferred.trim() ? (
@@ -133,7 +138,6 @@ export default function KeywordDensity({ locale }: { locale: Locale }) {
           </table>
         </div>
       )}
-      <p className="text-sm text-fg-3">{t.hint}</p>
-    </div>
+    </Split>
   );
 }

@@ -3,7 +3,7 @@
 import { useId, useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { validateVin, type Region, type VinError } from "./lib/vin";
-import { BigInput, Details, Problems, Verdict, type Row } from "./ui/kit";
+import { BigInput, Details, Layout, Problems, type Row, Verdict } from "./ui/kit";
 
 const T = {
   ru: {
@@ -12,19 +12,31 @@ const T = {
     ok: "VIN корректен, контрольная цифра сходится",
     okNoCheck: "Структура VIN корректна",
     bad: "VIN с ошибкой",
-    checkWarn: (exp: string) => `Контрольная цифра (9-й символ) должна быть ${exp}. Для автомобилей для рынка Северной Америки это ошибка; у европейских и азиатских машин 9-й символ часто не контрольный — тогда несовпадение нормально.`,
+    checkWarn: (exp: string) =>
+      `Контрольная цифра (9-й символ) должна быть ${exp}. Для автомобилей для рынка Северной Америки это ошибка; у европейских и азиатских машин 9-й символ часто не контрольный — тогда несовпадение нормально.`,
     wmi: "WMI — производитель (1–3)",
     vds: "VDS — описание модели (4–9)",
     vis: "VIS — экземпляр (10–17)",
     region: "Регион сборки",
-    regions: { africa: "Африка (A–H)", asia: "Азия (J–R)", europe: "Европа (S–Z), включая Россию (X, Z)", "north-america": "Северная Америка (1–5)", oceania: "Океания (6–7)", "south-america": "Южная Америка (8–9)", unknown: "не определён" } as Record<Region, string>,
+    regions: {
+      africa: "Африка (A–H)",
+      asia: "Азия (J–R)",
+      europe: "Европа (S–Z), включая Россию (X, Z)",
+      "north-america": "Северная Америка (1–5)",
+      oceania: "Океания (6–7)",
+      "south-america": "Южная Америка (8–9)",
+      unknown: "не определён",
+    } as Record<Region, string>,
     year: "Модельный год (10-й символ)",
     years: (a: number, b: number) => `${a} или ${b}`,
     noYear: "код не используется для года",
     plant: "Код завода (11-й символ)",
     serial: "Серийный номер (12–17)",
     check: "Контрольная цифра (9-й символ)",
-    errors: { empty: "Введите VIN", length: "В VIN ровно 17 символов", chars: "Допустимы только латинские буквы и цифры", ioq: "Буквы I, O и Q в VIN не используются, чтобы их не путали с 1 и 0", check: "" } as Record<VinError, string>,
+    errors: { empty: "Введите VIN", length: "В VIN ровно 17 символов", chars: "Допустимы только латинские буквы и цифры", ioq: "Буквы I, O и Q в VIN не используются, чтобы их не путали с 1 и 0", check: "" } as Record<
+      VinError,
+      string
+    >,
     note: "Инструмент проверяет структуру VIN и контрольную цифру, определяет регион по первому символу и модельный год. Марку, комплектацию и историю автомобиля по VIN он не ищет — для этого нужны базы производителей и сервисы проверки истории.",
   },
   en: {
@@ -33,19 +45,26 @@ const T = {
     ok: "Valid VIN, check digit matches",
     okNoCheck: "The VIN structure is valid",
     bad: "Invalid VIN",
-    checkWarn: (exp: string) => `The check digit (9th character) should be ${exp}. For vehicles built for North America that's an error; many European and Asian vehicles don't use position 9 as a check digit, so a mismatch is normal there.`,
+    checkWarn: (exp: string) =>
+      `The check digit (9th character) should be ${exp}. For vehicles built for North America that's an error; many European and Asian vehicles don't use position 9 as a check digit, so a mismatch is normal there.`,
     wmi: "WMI — manufacturer (1–3)",
     vds: "VDS — vehicle attributes (4–9)",
     vis: "VIS — vehicle identifier (10–17)",
     region: "Region",
-    regions: { africa: "Africa (A–H)", asia: "Asia (J–R)", europe: "Europe (S–Z)", "north-america": "North America (1–5)", oceania: "Oceania (6–7)", "south-america": "South America (8–9)", unknown: "unknown" } as Record<Region, string>,
+    regions: { africa: "Africa (A–H)", asia: "Asia (J–R)", europe: "Europe (S–Z)", "north-america": "North America (1–5)", oceania: "Oceania (6–7)", "south-america": "South America (8–9)", unknown: "unknown" } as Record<
+      Region,
+      string
+    >,
     year: "Model year (10th character)",
     years: (a: number, b: number) => `${a} or ${b}`,
     noYear: "not a model-year code",
     plant: "Plant code (11th character)",
     serial: "Serial number (12–17)",
     check: "Check digit (9th character)",
-    errors: { empty: "Enter a VIN", length: "A VIN has exactly 17 characters", chars: "Latin letters and digits only", ioq: "The letters I, O and Q are never used, to avoid confusion with 1 and 0", check: "" } as Record<VinError, string>,
+    errors: { empty: "Enter a VIN", length: "A VIN has exactly 17 characters", chars: "Latin letters and digits only", ioq: "The letters I, O and Q are never used, to avoid confusion with 1 and 0", check: "" } as Record<
+      VinError,
+      string
+    >,
     note: "The tool checks the VIN structure and check digit and decodes the region and model year. It doesn't look up the make, trim or vehicle history — that needs manufacturer databases and history services.",
   },
 } as const;
@@ -70,8 +89,7 @@ export default function VinValidator({ locale }: { locale: Locale }) {
   }
   const tone = empty ? "idle" : structural.length ? "err" : r.checkOk ? "ok" : "warn";
   return (
-    <div className="flex flex-col gap-4">
-      <BigInput id={`${id}-n`} label={t.label} value={text} onChange={(v) => setText(v.toUpperCase())} hint={t.hint} invalid={!empty && structural.length > 0} />
+    <Layout input={<BigInput id={`${id}-n`} label={t.label} value={text} onChange={(v) => setText(v.toUpperCase())} hint={t.hint} invalid={!empty && structural.length > 0} />} note={t.note}>
       {!empty && (
         <Verdict tone={tone} title={structural.length ? t.bad : r.checkOk ? t.ok : t.okNoCheck} value={r.valid ? r.vin : undefined}>
           <Problems items={structural.map((e) => t.errors[e])} />
@@ -79,7 +97,6 @@ export default function VinValidator({ locale }: { locale: Locale }) {
         </Verdict>
       )}
       <Details rows={rows} locale={locale} />
-      <p className="text-sm text-fg-3">{t.note}</p>
-    </div>
+    </Layout>
   );
 }

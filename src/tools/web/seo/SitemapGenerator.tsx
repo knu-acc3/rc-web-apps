@@ -9,7 +9,7 @@ import { Button } from "@/ui/button";
 import { Dropzone } from "@/ui/dropzone";
 import { Field, Input, Select, Textarea } from "@/ui/field";
 import { buildSitemaps, collectUrls, type ChangeFreq } from "./lib/sitemap";
-import { Issues, More, Output } from "./ui/kit";
+import { Issues, More, Output, Split } from "./ui/kit";
 
 const T = {
   ru: {
@@ -117,12 +117,62 @@ export default function SitemapGenerator({ locale }: { locale: Locale }) {
   if (c.hosts.length > 1) warnings.push(t.hosts(c.hosts.slice(0, 4).join(", ")));
 
   return (
-    <div className="flex flex-col gap-5">
-      <Field label={t.urls} htmlFor={`${id}-u`} aside={c.urls.length ? <span className="text-[0.8125rem] text-fg-3">{t.stats(c.urls.length, built?.files.length ?? 0)}</span> : undefined}>
-        <Textarea id={`${id}-u`} value={text} onChange={(e) => setText(e.target.value)} rows={8} className="font-mono text-sm" spellCheck={false} placeholder={"https://example.com/\nhttps://example.com/about\nhttps://example.com/blog/post-1"} />
-      </Field>
-      <Dropzone compact accept=".txt,.csv,text/plain,text/csv" onFiles={(fs) => fs[0] && readFile(fs[0])} title={t.drop} hint={t.dropHint} />
-
+    <Split
+      input={
+        <>
+          <Field label={t.urls} htmlFor={`${id}-u`} aside={c.urls.length ? <span className="text-[0.8125rem] text-fg-3">{t.stats(c.urls.length, built?.files.length ?? 0)}</span> : undefined}>
+            <Textarea
+              id={`${id}-u`}
+              value={text}
+              onChange={(e) => setText(e.target.value)}
+              rows={8}
+              className="font-mono text-sm"
+              spellCheck={false}
+              placeholder={"https://example.com/\nhttps://example.com/about\nhttps://example.com/blog/post-1"}
+            />
+          </Field>
+          <Dropzone locale={locale} compact accept=".txt,.csv,text/plain,text/csv" onFiles={(fs) => fs[0] && readFile(fs[0])} title={t.drop} hint={t.dropHint} />
+          <More label={t.more}>
+            <div className="flex flex-col gap-4">
+              <div className="grid gap-4 sm:grid-cols-3">
+                <Field label={t.lastmod} htmlFor={`${id}-l`}>
+                  <Select id={`${id}-l`} value={lastmod === "" || lastmod === "today" ? lastmod : "date"} onChange={(e) => setLastmod(e.target.value === "date" ? new Date().toISOString().slice(0, 10) : e.target.value)}>
+                    <option value="">{t.none}</option>
+                    <option value="today">{t.today}</option>
+                    <option value="date">YYYY-MM-DD</option>
+                  </Select>
+                </Field>
+                <Field label={t.changefreq} htmlFor={`${id}-f`}>
+                  <Select id={`${id}-f`} value={freq} onChange={(e) => setFreq(e.target.value as ChangeFreq)}>
+                    {FREQ.map((f) => (
+                      <option key={f} value={f}>
+                        {f || t.none}
+                      </option>
+                    ))}
+                  </Select>
+                </Field>
+                <Field label={t.priority} htmlFor={`${id}-pr`}>
+                  <Select id={`${id}-pr`} value={priority} onChange={(e) => setPriority(e.target.value)}>
+                    <option value="">{t.none}</option>
+                    <option value="auto">{t.auto}</option>
+                    {["1.0", "0.8", "0.5"].map((p) => (
+                      <option key={p} value={p}>
+                        {p}
+                      </option>
+                    ))}
+                  </Select>
+                </Field>
+              </div>
+              {lastmod !== "" && lastmod !== "today" && <Input type="date" value={lastmod} onChange={(e) => setLastmod(e.target.value)} aria-label={t.lastmod} className="w-fit" />}
+              <Field label={t.base} htmlFor={`${id}-b`} hint={t.baseHint}>
+                <Input id={`${id}-b`} value={base} onChange={(e) => setBase(e.target.value)} placeholder="https://example.com" inputMode="url" className="font-mono" spellCheck={false} autoComplete="off" />
+              </Field>
+              <p className="text-sm text-fg-3">{t.moreHint}</p>
+            </div>
+          </More>
+        </>
+      }
+    >
       <div aria-live="polite" className="flex flex-col gap-2 empty:hidden">
         {warnings.length > 0 && <Issues items={warnings} />}
         {multi && <Issues tone="neutral" items={[t.split]} />}
@@ -130,67 +180,24 @@ export default function SitemapGenerator({ locale }: { locale: Locale }) {
 
       {built &&
         (multi ? (
-          <div className="flex flex-col gap-3">
+          <>
+            <Button variant="filled" size="lg" onClick={zip} loading={busy} className="w-fit">
+              {!busy && <Download aria-hidden />}
+              {t.zip}
+            </Button>
             <Output locale={locale} value={preview} title="sitemap_index.xml" filename="sitemap_index.xml" mime="application/xml" rows={8} />
-            <div>
-              <Button variant="primary" onClick={zip} disabled={busy}>
-                <Download className="size-4" aria-hidden />
-                {t.zip}
-              </Button>
-            </div>
-          </div>
+          </>
         ) : (
-          <div className="flex flex-col gap-3">
-            <Output locale={locale} value={preview} title={t.out} filename={big ? undefined : "sitemap.xml"} mime="application/xml" rows={12} />
+          <>
             {big && (
-              <div>
-                <Button variant="primary" onClick={() => downloadText(full, "sitemap.xml", "application/xml")}>
-                  <Download className="size-4" aria-hidden />
-                  {t.download}
-                </Button>
-              </div>
+              <Button variant="filled" size="lg" onClick={() => downloadText(full, "sitemap.xml", "application/xml")} className="w-fit">
+                <Download aria-hidden />
+                {t.download}
+              </Button>
             )}
-          </div>
+            <Output locale={locale} value={preview} title={t.out} filename={big ? undefined : "sitemap.xml"} mime="application/xml" rows={12} />
+          </>
         ))}
-
-      <More label={t.more}>
-        <div className="flex flex-col gap-4">
-          <div className="grid gap-4 sm:grid-cols-3">
-            <Field label={t.lastmod} htmlFor={`${id}-l`}>
-              <Select id={`${id}-l`} value={lastmod === "" || lastmod === "today" ? lastmod : "date"} onChange={(e) => setLastmod(e.target.value === "date" ? new Date().toISOString().slice(0, 10) : e.target.value)}>
-                <option value="">{t.none}</option>
-                <option value="today">{t.today}</option>
-                <option value="date">YYYY-MM-DD</option>
-              </Select>
-            </Field>
-            <Field label={t.changefreq} htmlFor={`${id}-f`}>
-              <Select id={`${id}-f`} value={freq} onChange={(e) => setFreq(e.target.value as ChangeFreq)}>
-                {FREQ.map((f) => (
-                  <option key={f} value={f}>
-                    {f || t.none}
-                  </option>
-                ))}
-              </Select>
-            </Field>
-            <Field label={t.priority} htmlFor={`${id}-pr`}>
-              <Select id={`${id}-pr`} value={priority} onChange={(e) => setPriority(e.target.value)}>
-                <option value="">{t.none}</option>
-                <option value="auto">{t.auto}</option>
-                {["1.0", "0.8", "0.5"].map((p) => (
-                  <option key={p} value={p}>
-                    {p}
-                  </option>
-                ))}
-              </Select>
-            </Field>
-          </div>
-          {lastmod !== "" && lastmod !== "today" && <Input type="date" value={lastmod} onChange={(e) => setLastmod(e.target.value)} aria-label={t.lastmod} className="w-48" />}
-          <Field label={t.base} htmlFor={`${id}-b`} hint={t.baseHint}>
-            <Input id={`${id}-b`} value={base} onChange={(e) => setBase(e.target.value)} placeholder="https://example.com" inputMode="url" className="font-mono" spellCheck={false} autoComplete="off" />
-          </Field>
-          <p className="text-sm text-fg-3">{t.moreHint}</p>
-        </div>
-      </More>
-    </div>
+    </Split>
   );
 }

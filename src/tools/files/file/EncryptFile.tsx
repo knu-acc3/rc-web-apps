@@ -4,14 +4,14 @@ import { Download, Eye, EyeOff, FileLock2, FileText, LockOpen, RotateCcw, Shuffl
 import { useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { formatBytes } from "@/i18n/format";
-import { cn } from "@/lib/cn";
 import { downloadBlob } from "@/lib/clipboard";
-import { Button } from "@/ui/button";
+import { Button, IconButton } from "@/ui/button";
 import { CopyButton } from "@/ui/copy-button";
 import { Dropzone } from "@/ui/dropzone";
 import { Field, Input, Textarea } from "@/ui/field";
 import { Notice, Panel } from "@/ui/panel";
 import { Segmented } from "@/ui/segmented";
+import { ProgressBar } from "@/tools/files/video/ui/Progress";
 import { CryptError, decrypt, decryptText, encrypt, encryptText, isEncrypted, passwordBits } from "./lib/crypt";
 
 const T = {
@@ -29,6 +29,7 @@ const T = {
     mismatch: "Пароли не совпадают",
     strength: (bits: number) => (bits < 40 ? "Слабый пароль — его можно подобрать" : bits < 70 ? "Средний пароль" : "Надёжный пароль"),
     forget: "Запишите пароль: без него файл не расшифровать — ни нам, ни кому-либо ещё.",
+    forgetText: "Запишите пароль: без него текст не расшифровать — ни нам, ни кому-либо ещё.",
     goEnc: "Зашифровать файл",
     goDec: "Расшифровать файл",
     goEncText: "Зашифровать текст",
@@ -67,6 +68,7 @@ const T = {
     mismatch: "Passwords don't match",
     strength: (bits: number) => (bits < 40 ? "Weak — it could be guessed" : bits < 70 ? "Fair password" : "Strong password"),
     forget: "Write the password down: without it nobody — including us — can decrypt the file.",
+    forgetText: "Write the password down: without it nobody — including us — can decrypt the text.",
     goEnc: "Encrypt file",
     goDec: "Decrypt file",
     goEncText: "Encrypt text",
@@ -154,140 +156,165 @@ export default function EncryptFile({ locale, kind = "file" }: { locale: Locale;
   }
 
   const strengthTone = bits < 40 ? "text-err" : bits < 70 ? "text-warn" : "text-ok";
+  const action = kind === "text" ? (mode === "enc" ? t.goEncText : t.goDecText) : mode === "enc" ? t.goEnc : t.goDec;
 
   return (
     <div className="flex flex-col gap-4">
       <Segmented
         label={t.mode}
         value={mode}
+        size="lg"
         onChange={(v) => {
           setMode(v);
           reset();
         }}
         options={[
-          { value: "enc", label: <span className="inline-flex items-center gap-1.5"><FileLock2 className="size-4" aria-hidden />{t.enc}</span> },
-          { value: "dec", label: <span className="inline-flex items-center gap-1.5"><LockOpen className="size-4" aria-hidden />{t.dec}</span> },
+          { value: "enc", label: t.enc, icon: <FileLock2 className="size-4 shrink-0" aria-hidden /> },
+          { value: "dec", label: t.dec, icon: <LockOpen className="size-4 shrink-0" aria-hidden /> },
         ]}
       />
 
-      {kind === "file" ? (
-        file ? (
-          <Panel className="flex items-center gap-3 px-4 py-3">
-            <FileText className="size-5 shrink-0 text-accent" aria-hidden />
-            <div className="min-w-0 flex-1">
-              <div className="truncate font-medium">{file.name}</div>
-              <div className="text-sm text-fg-3">{formatBytes(locale, file.size)}</div>
-            </div>
-            <Button
-              size="sm"
-              variant="ghost"
-              onClick={() => {
-                setFile(null);
-                reset();
-              }}
-            >
-              <RotateCcw aria-hidden />
-              <span className="max-sm:sr-only">{t.another}</span>
-            </Button>
-          </Panel>
-        ) : (
-          <Dropzone onFiles={(fs) => fs[0] && pick(fs[0])} title={t.drop} hint={t.dropHint} />
-        )
-      ) : (
-        <Field label={mode === "enc" ? t.textIn : t.cipherIn} htmlFor="crypt-text">
-          <Textarea
-            id="crypt-text"
-            value={text}
-            onChange={(e) => {
-              setText(e.target.value);
-              reset();
-            }}
-            placeholder={mode === "enc" ? t.textInPh : t.cipherPh}
-            className="min-h-28 font-sans text-[0.9375rem]"
-          />
-        </Field>
-      )}
-
-      {kind === "file" && file && mode === "dec" && !out && !error && <Notice>{t.detected}</Notice>}
-
-      <div className="grid gap-3 sm:grid-cols-2">
-        <Field
-          label={t.password}
-          htmlFor="crypt-pw"
-          hint={mode === "enc" && pw ? <span className={strengthTone}>{t.strength(bits)}</span> : undefined}
-          aside={
-            mode === "enc" ? (
-              <button
-                type="button"
-                className="inline-flex items-center gap-1 text-sm text-accent hover:underline"
-                onClick={async () => {
-                  const p = await suggest(locale);
-                  setPw(p);
-                  setPw2(p);
-                  setVisible(true);
+      <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-6">
+        <div className="flex min-w-0 flex-col gap-4">
+          {kind === "file" ? (
+            file ? (
+              <Panel className="flex items-center gap-3 p-4 sm:p-5">
+                <span className="flex size-11 shrink-0 items-center justify-center rounded-[0.875rem] bg-accent-container text-on-accent-container">
+                  <FileText className="size-5" aria-hidden />
+                </span>
+                <div className="min-w-0 flex-1">
+                  <div className="truncate font-semibold text-fg" title={file.name}>
+                    {file.name}
+                  </div>
+                  <div className="tabular text-sm text-fg-3">{formatBytes(locale, file.size)}</div>
+                </div>
+                <Button
+                  size="sm"
+                  variant="tonal"
+                  onClick={() => {
+                    setFile(null);
+                    reset();
+                  }}
+                >
+                  <RotateCcw aria-hidden />
+                  <span className="max-[22rem]:sr-only">{t.another}</span>
+                </Button>
+              </Panel>
+            ) : (
+              <Dropzone onFiles={(fs) => fs[0] && pick(fs[0])} locale={locale} title={t.drop} hint={t.dropHint} />
+            )
+          ) : (
+            <Field label={mode === "enc" ? t.textIn : t.cipherIn} htmlFor="crypt-text">
+              <Textarea
+                id="crypt-text"
+                value={text}
+                onChange={(e) => {
+                  setText(e.target.value);
                   reset();
                 }}
-              >
-                <Shuffle className="size-3.5" aria-hidden />
-                {t.generate}
-              </button>
-            ) : undefined
-          }
-        >
-          <div className="relative">
-            <Input
-              id="crypt-pw"
-              type={visible ? "text" : "password"}
-              autoComplete={mode === "enc" ? "new-password" : "current-password"}
-              value={pw}
-              onChange={(e) => {
-                setPw(e.target.value);
-                reset();
-              }}
-              className="w-full pr-11"
-            />
-            <button type="button" onClick={() => setVisible((v) => !v)} aria-label={visible ? t.hide : t.show} title={visible ? t.hide : t.show} className="absolute inset-y-0 right-0 flex w-11 items-center justify-center text-fg-3 hover:text-fg">
-              {visible ? <EyeOff className="size-4" aria-hidden /> : <Eye className="size-4" aria-hidden />}
-            </button>
-          </div>
-        </Field>
-        {needRepeat && (
-          <Field label={t.repeat} htmlFor="crypt-pw2" error={pw2 && pw !== pw2 ? t.mismatch : undefined}>
-            <Input id="crypt-pw2" type="password" autoComplete="new-password" value={pw2} onChange={(e) => setPw2(e.target.value)} />
-          </Field>
-        )}
-      </div>
-      {mode === "enc" && <p className="flex items-start gap-2 text-sm text-fg-2"><ShieldCheck className="mt-0.5 size-4 shrink-0 text-ok" aria-hidden />{t.forget}</p>}
-
-      <Button size="lg" variant="primary" className="w-full sm:w-auto sm:self-start" disabled={!ready || busy !== null} onClick={run}>
-        {mode === "enc" ? <FileLock2 aria-hidden /> : <LockOpen aria-hidden />}
-        {busy !== null ? (mode === "enc" ? t.working : t.workingDec) : kind === "text" ? (mode === "enc" ? t.goEncText : t.goDecText) : mode === "enc" ? t.goEnc : t.goDec}
-      </Button>
-      {busy !== null && kind === "file" && (
-        <div className="h-2 overflow-hidden rounded-full bg-surface-2" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(busy * 100)}>
-          <div className="h-full bg-accent transition-[width]" style={{ width: `${Math.max(3, busy * 100)}%` }} />
+                placeholder={mode === "enc" ? t.textInPh : t.cipherPh}
+                className="min-h-40 font-sans text-[0.9375rem] lg:min-h-56"
+              />
+            </Field>
+          )}
+          {kind === "file" && file && mode === "dec" && !out && !error && <Notice>{t.detected}</Notice>}
         </div>
-      )}
-      {error && <Notice tone="err">{error}</Notice>}
 
-      {out?.blob && out.name && (
-        <Panel className="flex flex-wrap items-center gap-3 px-4 py-3">
-          <ShieldCheck className={cn("size-5 shrink-0", "text-ok")} aria-hidden />
-          <div className="min-w-0 flex-1">
-            <div className="truncate font-medium">{out.name}</div>
-            <div className="text-sm text-fg-3">{formatBytes(locale, out.blob.size)}</div>
-          </div>
-          <Button variant="primary" onClick={() => downloadBlob(out.blob!, out.name!)}>
-            <Download aria-hidden />
-            {t.download}
-          </Button>
-        </Panel>
-      )}
-      {out?.text !== undefined && (
-        <Field label={t.result} aside={<CopyButton value={out.text} label={t.copy} copiedLabel={t.copied} variant="ghost" compact />}>
-          <Textarea readOnly value={out.text} className="min-h-28 font-mono text-sm" />
-        </Field>
-      )}
+        <div className="flex min-w-0 flex-col gap-4">
+          <Panel className="flex min-w-0 flex-col gap-5 p-4 sm:p-5">
+            <Field
+              label={t.password}
+              htmlFor="crypt-pw"
+              hint={mode === "enc" && pw ? <span className={strengthTone}>{t.strength(bits)}</span> : undefined}
+              aside={
+                mode === "enc" ? (
+                  <Button
+                    variant="text"
+                    size="sm"
+                    className="-my-2 -mr-3"
+                    onClick={async () => {
+                      const p = await suggest(locale);
+                      setPw(p);
+                      setPw2(p);
+                      setVisible(true);
+                      reset();
+                    }}
+                  >
+                    <Shuffle aria-hidden />
+                    {t.generate}
+                  </Button>
+                ) : undefined
+              }
+            >
+              <div className="relative">
+                <Input
+                  id="crypt-pw"
+                  type={visible ? "text" : "password"}
+                  autoComplete={mode === "enc" ? "new-password" : "current-password"}
+                  value={pw}
+                  onChange={(e) => {
+                    setPw(e.target.value);
+                    reset();
+                  }}
+                  className="w-full pr-12"
+                />
+                <IconButton size="sm" label={visible ? t.hide : t.show} icon={visible ? <EyeOff aria-hidden /> : <Eye aria-hidden />} onClick={() => setVisible((v) => !v)} selected={visible} className="absolute right-1 top-1/2 -translate-y-1/2" />
+              </div>
+            </Field>
+            {needRepeat && (
+              <Field label={t.repeat} htmlFor="crypt-pw2" error={pw2 && pw !== pw2 ? t.mismatch : undefined}>
+                <Input id="crypt-pw2" type="password" autoComplete="new-password" value={pw2} onChange={(e) => setPw2(e.target.value)} />
+              </Field>
+            )}
+            {mode === "enc" && (
+              <p className="-mt-1 flex items-start gap-2 text-[0.8125rem] text-fg-2">
+                <ShieldCheck className="mt-0.5 size-4 shrink-0 text-ok" aria-hidden />
+                {kind === "text" ? t.forgetText : t.forget}
+              </p>
+            )}
+            {busy === null ? (
+              <Button size="xl" variant="filled" fullWidth disabled={!ready} onClick={run}>
+                {mode === "enc" ? <FileLock2 aria-hidden /> : <LockOpen aria-hidden />}
+                <span className="truncate">{action}</span>
+              </Button>
+            ) : (
+              <div className="flex flex-col gap-2 rounded-[1rem] bg-surface-2 px-4 py-3">
+                <span className="text-sm font-medium text-fg-2">{mode === "enc" ? t.working : t.workingDec}</span>
+                {kind === "file" && <ProgressBar value={Math.max(0.03, busy)} label={mode === "enc" ? t.working : t.workingDec} className="bg-surface!" />}
+              </div>
+            )}
+            {error && <Notice tone="err">{error}</Notice>}
+          </Panel>
+
+          {out?.blob && out.name && (
+            <Panel className="flex flex-col gap-4 p-4 motion-safe:animate-[menu-in_260ms_var(--ease-emph)] sm:p-5">
+              <div className="flex items-center gap-3">
+                <span className="flex size-11 shrink-0 items-center justify-center rounded-full bg-ok-soft text-ok">
+                  <ShieldCheck className="size-6" aria-hidden />
+                </span>
+                <div className="min-w-0 flex-1" aria-live="polite">
+                  <div className="truncate font-semibold text-fg" title={out.name}>
+                    {out.name}
+                  </div>
+                  <div className="tabular text-sm text-fg-3">{formatBytes(locale, out.blob.size)}</div>
+                </div>
+              </div>
+              <Button variant="filled" size="xl" fullWidth onClick={() => downloadBlob(out.blob!, out.name!)}>
+                <Download aria-hidden />
+                {t.download}
+              </Button>
+            </Panel>
+          )}
+          {out?.text !== undefined && (
+            <Panel className="flex flex-col gap-3 p-4 motion-safe:animate-[menu-in_260ms_var(--ease-emph)] sm:p-5">
+              <Field label={t.result} htmlFor="crypt-out">
+                <Textarea id="crypt-out" readOnly value={out.text} className="min-h-28 font-mono text-sm" />
+              </Field>
+              <CopyButton value={out.text} label={t.copy} copiedLabel={t.copied} variant="primary" size="md" className="h-14! w-full text-lg! [--btn-r:1.75rem]! [&_svg]:size-6!" />
+            </Panel>
+          )}
+        </div>
+      </div>
     </div>
   );
 }

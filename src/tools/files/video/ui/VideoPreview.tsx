@@ -91,7 +91,7 @@ export const VideoPreview = forwardRef<
 
   const broken = failed === file;
   return (
-    <div className={cn("relative overflow-hidden rounded-[0.75rem] bg-black", className)}>
+    <div className={cn("relative overflow-hidden rounded-[1rem] bg-black", className)}>
       <video ref={el} controls playsInline preload="metadata" aria-label={label} className={cn("block max-h-[55vh] w-full", broken && "hidden")} style={style} />
       {broken && (
         <div className="aspect-video w-full">

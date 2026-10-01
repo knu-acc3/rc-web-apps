@@ -9,6 +9,7 @@ import { Button } from "@/ui/button";
 import { CopyButton } from "@/ui/copy-button";
 import { Dropzone } from "@/ui/dropzone";
 import { Field, Select } from "@/ui/field";
+import { Fold } from "@/ui/fold";
 import { Notice, Panel } from "@/ui/panel";
 import { stripPngMetadata, stripWebpMetadata } from "./lib/container";
 import { IMAGE_ACCEPT } from "./lib/detect";
@@ -19,6 +20,8 @@ import { sameFormat } from "./ui/format";
 import { useEngine } from "./ui/hooks";
 import { errorText, S } from "./ui/strings";
 import { downloadZip } from "./ui/useBatch";
+import { useWorkspace } from "./ui/useWorkspace";
+import { RestoringPlaceholder, WorkspaceBar } from "./ui/Workspace";
 
 const T = {
   ru: {
@@ -193,6 +196,14 @@ export default function Exif({ locale }: { locale: Locale }) {
   const [done, setDone] = useState<{ lossless: boolean; size: number } | null>(null);
   const [error, setError] = useState<unknown>(null);
   const cur = items[sel];
+  // The photos stay in the tab's workspace for the next photo tool (and come back from the previous one).
+  const ws = useWorkspace({
+    files: items.map((i) => i.prepared.file),
+    mode: "sync",
+    accept: IMAGE_ACCEPT,
+    settled: !loading,
+    restore: (files) => void add(files),
+  });
 
   async function add(files: File[]) {
     setLoading(true);
@@ -259,12 +270,10 @@ export default function Exif({ locale }: { locale: Locale }) {
   if (!items.length) {
     return (
       <div className="flex flex-col gap-3">
-        <Dropzone onFiles={add} accept={IMAGE_ACCEPT} multiple title={s.dropMany} hint={s.dropHint} />
-        {loading && (
-          <p className="flex items-center gap-2 text-sm text-fg-2">
-            <Loader2 className="size-4 animate-spin" aria-hidden />
-            {t.reading}
-          </p>
+        {ws.restoring || loading ? (
+          <RestoringPlaceholder locale={locale} text={ws.restoring ? undefined : t.reading} />
+        ) : (
+          <Dropzone onFiles={add} accept={IMAGE_ACCEPT} multiple title={s.dropMany} hint={s.dropHint} locale={locale} />
         )}
         {error ? <Notice tone="err">{errorText(locale, error)}</Notice> : null}
       </div>
@@ -301,9 +310,19 @@ export default function Exif({ locale }: { locale: Locale }) {
 
   return (
     <div className="flex flex-col gap-4">
+      <WorkspaceBar
+        locale={locale}
+        count={ws.restored}
+        onStartOver={() => {
+          ws.startOver();
+          setItems([]);
+          setSel(0);
+          setDone(null);
+        }}
+      />
       {items.length > 1 && (
-        <div className="flex flex-wrap items-end gap-3 rounded-[0.75rem] border border-line bg-surface px-4 py-3">
-          <Field label={t.file} htmlFor={`${id}-f`} className="min-w-56 flex-1">
+        <Panel className="flex flex-col gap-3 p-4 sm:flex-row sm:items-end">
+          <Field label={t.file} htmlFor={`${id}-f`} className="min-w-0 flex-1">
             <Select
               id={`${id}-f`}
               value={String(sel)}
@@ -319,93 +338,94 @@ export default function Exif({ locale }: { locale: Locale }) {
               ))}
             </Select>
           </Field>
-          <Button variant="secondary" onClick={removeAll} disabled={busy}>
+          <Button variant="tonal" onClick={removeAll} disabled={busy}>
             <Download aria-hidden />
             {t.removeAll}
           </Button>
-        </div>
+        </Panel>
       )}
 
-      <Panel className="overflow-hidden">
-        <div className="flex flex-col gap-3 px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
+      <Panel className="flex flex-col gap-5 p-4 sm:p-5">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div aria-live="polite" className="min-w-0">
-            <p className="tabular text-2xl font-semibold tracking-tight text-fg">{count ? `${count} ${plural(locale, count, t.tags)}` : t.noMeta}</p>
+            <p className="tabular text-2xl font-semibold tracking-tight text-fg sm:text-3xl">
+              {count ? `${count} ${plural(locale, count, t.tags)}` : t.noMeta}
+            </p>
             <p className="truncate text-sm text-fg-3">
               {cur.prepared.file.name} · {formatBytes(locale, cur.prepared.file.size)}
             </p>
           </div>
-          <Button variant="primary" size="lg" onClick={removeOne} disabled={busy}>
+          <Button variant="filled" size="lg" onClick={removeOne} disabled={busy}>
             {busy ? <Loader2 className="animate-spin" aria-hidden /> : <Eraser aria-hidden />}
             {t.remove}
           </Button>
         </div>
         {done && (
-          <p className="border-t border-line px-4 py-2.5 text-[0.8125rem] text-ok">
+          <Notice tone="ok">
             {done.lossless ? t.lossless : t.reencoded} · {formatBytes(locale, done.size)}
-          </p>
+          </Notice>
         )}
-        <div className="border-t border-line px-4 py-3">
-          <h2 className="mb-2 flex items-center gap-1.5 text-sm font-semibold text-fg">
-            <MapPin className="size-4 text-accent" aria-hidden />
-            {t.gps}
-          </h2>
-          {cur.gps ? (
-            <dl className="grid gap-2 text-sm sm:grid-cols-3">
-              <div>
-                <dt className="text-fg-3">{t.decimal}</dt>
-                <dd className="flex items-center gap-1 font-mono text-fg">
-                  {cur.gps.latitude.toFixed(6)}, {cur.gps.longitude.toFixed(6)}
-                  <CopyButton
-                    value={`${cur.gps.latitude.toFixed(6)}, ${cur.gps.longitude.toFixed(6)}`}
-                    size="icon-sm"
-                    variant="ghost"
-                    label={locale === "ru" ? "Копировать" : "Copy"}
-                    copiedLabel={locale === "ru" ? "Скопировано" : "Copied"}
-                  />
-                </dd>
-              </div>
-              <div>
-                <dt className="text-fg-3">{t.dms}</dt>
-                <dd className="font-mono text-fg">
-                  {dms(cur.gps.latitude, "N", "S")} {dms(cur.gps.longitude, "E", "W")}
-                </dd>
-              </div>
-              {typeof cur.gps.altitude === "number" && (
+        <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)]">
+          <section className="flex flex-col gap-2">
+            <h2 className="flex items-center gap-1.5 text-sm font-semibold text-fg">
+              <MapPin className="size-4 text-accent" aria-hidden />
+              {t.gps}
+            </h2>
+            {cur.gps ? (
+              <dl className="grid gap-3 rounded-[1rem] bg-surface-2 p-4 text-sm">
                 <div>
-                  <dt className="text-fg-3">{t.altitude}</dt>
-                  <dd className="text-fg">{formatNumber(locale, cur.gps.altitude, { maximumFractionDigits: 1 })} m</dd>
+                  <dt className="text-fg-3">{t.decimal}</dt>
+                  <dd className="flex flex-wrap items-center gap-1 break-all font-mono text-fg">
+                    {cur.gps.latitude.toFixed(6)}, {cur.gps.longitude.toFixed(6)}
+                    <CopyButton
+                      value={`${cur.gps.latitude.toFixed(6)}, ${cur.gps.longitude.toFixed(6)}`}
+                      size="icon-sm"
+                      variant="ghost"
+                      label={locale === "ru" ? "Копировать" : "Copy"}
+                      copiedLabel={locale === "ru" ? "Скопировано" : "Copied"}
+                    />
+                  </dd>
                 </div>
-              )}
-            </dl>
-          ) : (
-            <p className="text-sm text-fg-3">{t.noGps}</p>
+                <div>
+                  <dt className="text-fg-3">{t.dms}</dt>
+                  <dd className="break-all font-mono text-fg">
+                    {dms(cur.gps.latitude, "N", "S")} {dms(cur.gps.longitude, "E", "W")}
+                  </dd>
+                </div>
+                {typeof cur.gps.altitude === "number" && (
+                  <div>
+                    <dt className="text-fg-3">{t.altitude}</dt>
+                    <dd className="text-fg">{formatNumber(locale, cur.gps.altitude, { maximumFractionDigits: 1 })} m</dd>
+                  </div>
+                )}
+              </dl>
+            ) : (
+              <p className="text-sm text-fg-3">{t.noGps}</p>
+            )}
+          </section>
+          {summary.length > 0 && (
+            <section className="flex min-w-0 flex-col gap-2">
+              <h2 className="text-sm font-semibold text-fg">{t.summary}</h2>
+              <dl className="grid gap-x-6 text-sm sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
+                {summary.map(([k, v]) => (
+                  <div key={k} className="flex justify-between gap-3 border-b border-line py-1.5">
+                    <dt className="shrink-0 text-fg-3">{k}</dt>
+                    <dd className="min-w-0 break-words text-right text-fg">{v}</dd>
+                  </div>
+                ))}
+              </dl>
+            </section>
           )}
         </div>
-        {summary.length > 0 && (
-          <div className="border-t border-line">
-            <h2 className="px-4 pt-3 text-sm font-semibold text-fg">{t.summary}</h2>
-            <dl className="grid gap-x-6 px-4 py-2 text-sm sm:grid-cols-2">
-              {summary.map(([k, v]) => (
-                <div key={k} className="flex justify-between gap-3 border-b border-line py-1.5 last:border-0">
-                  <dt className="text-fg-3">{k}</dt>
-                  <dd className="min-w-0 text-right text-fg">{v}</dd>
-                </div>
-              ))}
-            </dl>
-          </div>
-        )}
       </Panel>
 
       {count > 0 && (
-        <details className="rounded-[0.75rem] border border-line bg-surface">
-          <summary className="cursor-pointer px-4 py-3 text-sm font-semibold text-fg">
-            {t.all} ({count})
-          </summary>
+        <Fold title={`${t.all} (${count})`} bodyClassName="flex flex-col gap-4 px-2 pb-3 pt-1 sm:px-3">
           {Object.entries(tags).map(([group, values]) =>
             values && typeof values === "object" && Object.keys(values).length ? (
-              <div key={group} className="border-t border-line">
-                <h3 className="bg-surface-2 px-4 py-2 text-[0.8125rem] font-semibold text-fg-2">{t.group[group] ?? group}</h3>
-                <div tabIndex={0} className="tbl rounded-none! border-0!">
+              <section key={group} className="flex min-w-0 flex-col gap-1">
+                <h3 className="px-2 text-[0.8125rem] font-semibold text-fg-2">{t.group[group] ?? group}</h3>
+                <div tabIndex={0} className="tbl rounded-none! bg-transparent! shadow-none!">
                   <table>
                     <tbody>
                       {Object.entries(values).map(([k, v]) => (
@@ -417,14 +437,14 @@ export default function Exif({ locale }: { locale: Locale }) {
                     </tbody>
                   </table>
                 </div>
-              </div>
+              </section>
             ) : null,
           )}
-        </details>
+        </Fold>
       )}
 
       {error ? <Notice tone="err">{errorText(locale, error)}</Notice> : null}
-      <Dropzone onFiles={add} accept={IMAGE_ACCEPT} multiple compact title={s.addMore} />
+      <Dropzone onFiles={add} accept={IMAGE_ACCEPT} multiple compact title={s.addMore} locale={locale} />
     </div>
   );
 }

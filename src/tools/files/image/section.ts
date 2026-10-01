@@ -215,7 +215,7 @@ const cropVariants = (): VariantDef[] =>
           });
         return blocks;
       },
-      r.ratio.join(":"),
+      // no glyph: the name already is the ratio ("1:1 1:1" otherwise)
     ),
   );
 
@@ -357,7 +357,10 @@ export const imageSection = defineToolSection({
               "Поставьте на фото дату съёмки оранжевыми цифрами, как на плёночной «мыльнице». Дата берётся из EXIF, её можно поменять. Без регистрации и водяных знаков.",
               "Stamp the shooting date on a photo in orange digits, like an old point-and-shoot film camera. The date comes from EXIF and can be changed. No sign-up, no watermark.",
             ),
-            lead: L("Загрузите фото — дата съёмки появится в углу, как на снимках из 90-х.", "Upload a photo — the shooting date appears in the corner, like a 90s print."),
+            lead: L(
+              "Загрузите фото — дата съёмки появится в углу, как на снимках из 90-х.",
+              "Upload a photo — the shooting date appears in the corner, like a 90s print.",
+            ),
             props: { mode: "date" },
             blocks: (l) => [
               {

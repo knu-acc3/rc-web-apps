@@ -2,11 +2,12 @@
 
 import { useId, useState } from "react";
 import type { Locale } from "@/i18n/config";
-import { Field, Input, Select, Switch, Textarea } from "@/ui/field";
+import { Field, Input, Switch, Textarea } from "@/ui/field";
 import { buildRobots, type Preset } from "./lib/presets";
 import { parseRobots } from "./lib/robots";
 import { lintText } from "./content/robots-text";
-import { Issues, Output } from "./ui/kit";
+import { Issues, Output, Split } from "./ui/kit";
+import { ChipChoice } from "../shared/ChipChoice";
 
 const NAMES: Record<Preset, Record<Locale, string>> = {
   basic: { ru: "Открыть весь сайт", en: "Allow everything" },
@@ -51,32 +52,27 @@ export default function RobotsGenerator({ locale, preset: initial = "basic", blo
   const lint = parseRobots(text).lint.filter((l) => !(preset === "disallowAll" && l.code === "blockAll"));
 
   return (
-    <div className="flex flex-col gap-5">
-      <div className="grid gap-4 sm:grid-cols-2">
-        <Field label={t.preset} htmlFor={`${id}-p`}>
-          <Select id={`${id}-p`} value={preset} onChange={(e) => setPreset(e.target.value as Preset)}>
-            {(Object.keys(NAMES) as Preset[]).map((p) => (
-              <option key={p} value={p}>
-                {NAMES[p][locale]}
-              </option>
-            ))}
-          </Select>
-        </Field>
-        <Field label={t.sitemap} htmlFor={`${id}-s`}>
-          <Input id={`${id}-s`} value={sitemap} onChange={(e) => setSitemap(e.target.value)} placeholder="https://example.com/sitemap.xml" inputMode="url" className="font-mono" spellCheck={false} autoComplete="off" />
-        </Field>
-      </div>
-
+    <Split
+      input={
+        <>
+          <div role="group" aria-labelledby={`${id}-p`} className="flex flex-col gap-2">
+            <span id={`${id}-p`} className="text-sm font-medium text-fg-2">
+              {t.preset}
+            </span>
+            <ChipChoice wrap label={t.preset} value={preset} onChange={setPreset} options={(Object.keys(NAMES) as Preset[]).map((p) => ({ value: p, label: NAMES[p][locale] }))} />
+          </div>
+          <Field label={t.sitemap} htmlFor={`${id}-s`}>
+            <Input id={`${id}-s`} value={sitemap} onChange={(e) => setSitemap(e.target.value)} placeholder="https://example.com/sitemap.xml" inputMode="url" className="font-mono" spellCheck={false} autoComplete="off" />
+          </Field>
+          <Switch label={t.ai} checked={ai} onChange={(e) => setAi(e.target.checked)} />
+          <Field label={t.extra} htmlFor={`${id}-e`} hint={t.extraHint}>
+            <Textarea id={`${id}-e`} value={extra} onChange={(e) => setExtra(e.target.value)} rows={3} className="font-mono text-sm" spellCheck={false} placeholder={"/cart/\n/*?sort="} />
+          </Field>
+        </>
+      }
+    >
       <Output locale={locale} value={text} title={t.out} filename="robots.txt" rows={Math.min(24, Math.max(8, text.split("\n").length))} />
-
       <div aria-live="polite">{lint.length ? <Issues items={lint.map((l) => lintText(locale, l))} /> : <Issues tone="ok" items={[t.ok]} />}</div>
-
-      <div className="flex flex-col gap-4">
-        <Switch label={t.ai} checked={ai} onChange={(e) => setAi(e.target.checked)} />
-        <Field label={t.extra} htmlFor={`${id}-e`} hint={t.extraHint}>
-          <Textarea id={`${id}-e`} value={extra} onChange={(e) => setExtra(e.target.value)} rows={3} className="font-mono text-sm" spellCheck={false} placeholder={"/cart/\n/*?sort="} />
-        </Field>
-      </div>
-    </div>
+    </Split>
   );
 }

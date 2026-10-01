@@ -5,7 +5,7 @@ import { ZoomIn, ZoomOut } from "lucide-react";
 import { useRef, useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { cn } from "@/lib/cn";
-import { Segmented } from "@/ui/segmented";
+import { IconButton } from "@/ui/button";
 import { checker } from "./controls";
 import { S } from "./strings";
 
@@ -51,19 +51,15 @@ export function CompareSlider({
     <div className={cn("flex flex-col gap-2", className)}>
       <div className="flex items-center justify-between gap-2">
         <span className="text-[0.8125rem] text-fg-3">{t.dragHint}</span>
-        <Segmented
-          wrap
+        <IconButton
           size="sm"
-          label={t.zoom}
-          value={zoom}
-          onChange={setZoom}
-          options={[
-            { value: "fit", label: <ZoomOut className="size-4" aria-label={t.fit} />, title: t.fit },
-            { value: "actual", label: <ZoomIn className="size-4" aria-label={t.actual} />, title: t.actual },
-          ]}
+          label={zoom === "fit" ? t.actual : t.fit}
+          icon={zoom === "fit" ? <ZoomIn aria-hidden /> : <ZoomOut aria-hidden />}
+          selected={zoom === "actual"}
+          onClick={() => setZoom((z) => (z === "fit" ? "actual" : "fit"))}
         />
       </div>
-      <div className={cn("overflow-auto rounded-[0.625rem] border border-line", checker, zoom === "fit" && "max-h-[70vh]")}>
+      <div className={cn("overflow-auto rounded-[1rem]", checker, zoom === "fit" && "max-h-[70vh]")}>
         {side ? (
           <div className="grid grid-cols-2 gap-1">
             <img src={before} alt={beforeLabel ?? t.before} className={cn("block h-auto", zoom === "fit" ? "w-full" : "max-w-none")} />
@@ -73,7 +69,9 @@ export function CompareSlider({
           <div
             ref={box}
             className="relative mx-auto touch-none select-none"
-            style={inner ?? { width: "100%", aspectRatio: nat ? `${nat.w} / ${nat.h}` : undefined }}
+            style={
+              inner ?? { width: "100%", maxWidth: nat ? `calc(64vh * ${nat.w / nat.h})` : undefined, aspectRatio: nat ? `${nat.w} / ${nat.h}` : undefined }
+            }
             onPointerDown={(e) => {
               dragging.current = true;
               e.currentTarget.setPointerCapture(e.pointerId);

@@ -3,7 +3,7 @@
 import { useId, useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { validateInn, validateOgrn, validateSnils, type RuError } from "./lib/ru";
-import { BigInput, Details, Problems, Verdict, type Row } from "./ui/kit";
+import { BigInput, Details, Layout, Problems, type Row, Verdict } from "./ui/kit";
 
 type Kind = "inn" | "snils" | "ogrn";
 
@@ -31,7 +31,17 @@ const T = {
     ogrnKind: { ogrn: "ОГРН — юридическое лицо", ogrnip: "ОГРНИП — индивидуальный предприниматель" },
     year: "Год присвоения номера",
     sign: "Признак (1-я цифра)",
-    signs: { 1: "ОГРН юрлица", 5: "ОГРН юрлица", 3: "ОГРНИП индивидуального предпринимателя", 2: "другой государственный регистрационный номер", 4: "другой государственный регистрационный номер", 6: "другой государственный регистрационный номер", 7: "другой государственный регистрационный номер", 8: "другой государственный регистрационный номер", 9: "другой государственный регистрационный номер" } as Record<number, string>,
+    signs: {
+      1: "ОГРН юрлица",
+      5: "ОГРН юрлица",
+      3: "ОГРНИП индивидуального предпринимателя",
+      2: "другой государственный регистрационный номер",
+      4: "другой государственный регистрационный номер",
+      6: "другой государственный регистрационный номер",
+      7: "другой государственный регистрационный номер",
+      8: "другой государственный регистрационный номер",
+      9: "другой государственный регистрационный номер",
+    } as Record<number, string>,
     note: "Проверяются длина и контрольные цифры по алгоритмам ФНС и СФР. Кому принадлежит номер и действует ли организация, можно узнать только в официальных сервисах (ЕГРЮЛ, «Прозрачный бизнес») — отсюда ничего не отправляется.",
   },
   en: {
@@ -57,7 +67,17 @@ const T = {
     ogrnKind: { ogrn: "OGRN — legal entity", ogrnip: "OGRNIP — sole proprietor" },
     year: "Year the number was assigned",
     sign: "Sign (1st digit)",
-    signs: { 1: "company OGRN", 5: "company OGRN", 3: "sole proprietor OGRNIP", 2: "other state registration number", 4: "other state registration number", 6: "other state registration number", 7: "other state registration number", 8: "other state registration number", 9: "other state registration number" } as Record<number, string>,
+    signs: {
+      1: "company OGRN",
+      5: "company OGRN",
+      3: "sole proprietor OGRNIP",
+      2: "other state registration number",
+      4: "other state registration number",
+      6: "other state registration number",
+      7: "other state registration number",
+      8: "other state registration number",
+      9: "other state registration number",
+    } as Record<number, string>,
     note: "Length and check digits are verified using the Federal Tax Service and Social Fund algorithms. Who owns the number and whether the company is active can only be checked in official registries — nothing is sent from here.",
   },
 } as const;
@@ -104,15 +124,13 @@ export default function RuIdValidator({ locale, kind, value }: { locale: Locale;
   const messages = errors.map((e) => (e === "length" ? t.errors.length[kind] : t.errors[e]));
 
   return (
-    <div className="flex flex-col gap-4">
-      <BigInput id={`${id}-n`} label={t.label[kind]} value={text} onChange={setText} hint={t.hint[kind]} inputMode="numeric" invalid={!empty && !valid} />
+    <Layout input={<BigInput id={`${id}-n`} label={t.label[kind]} value={text} onChange={setText} hint={t.hint[kind]} inputMode="numeric" invalid={!empty && !valid} />} note={t.note}>
       {!empty && (
         <Verdict tone={valid ? "ok" : "err"} title={valid ? t.ok[kind] : t.bad[kind]} value={shown}>
           <Problems items={messages} />
         </Verdict>
       )}
       {!empty && errors[0] !== "chars" && errors[0] !== "length" && <Details rows={rows} locale={locale} />}
-      <p className="text-sm text-fg-3">{t.note}</p>
-    </div>
+    </Layout>
   );
 }

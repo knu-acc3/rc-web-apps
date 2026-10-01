@@ -1,15 +1,16 @@
 "use client";
 
 import { Maximize, Minus, Plus, TriangleAlert } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import type { Locale } from "@/i18n/config";
 import Link from "@/ui/link";
 import { href } from "@/i18n/config";
 import { Button } from "@/ui/button";
-import { Checkbox, Select, Slider } from "@/ui/field";
-import { Kbd } from "@/ui/panel";
+import { Checkbox, Field, Select, Slider } from "@/ui/field";
+import { Kbd, Notice, Panel } from "@/ui/panel";
 import { Segmented } from "@/ui/segmented";
 import { StageLayer, useStage } from "@/ui/stage";
+import { BarButton } from "./ui/BarButton";
 
 const T = {
   ru: {
@@ -66,6 +67,7 @@ const DURATIONS = [5, 10, 20, 30, 60];
 
 export default function StuckPixelFixer({ locale }: { locale: Locale }) {
   const t = T[locale];
+  const id = useId();
   const [area, setArea] = useState<"square" | "full">("square");
   const [size, setSize] = useState(160);
   const [minutes, setMinutes] = useState(10);
@@ -132,52 +134,60 @@ export default function StuckPixelFixer({ locale }: { locale: Locale }) {
       const cur = p ?? { x: window.innerWidth / 2 - size / 2, y: window.innerHeight / 2 - size / 2 };
       return { x: Math.max(0, Math.min(window.innerWidth - size, cur.x + dx)), y: Math.max(0, Math.min(window.innerHeight - size, cur.y + dy)) };
     });
-  const iconBtn = "flex size-9 items-center justify-center rounded-full hover:bg-white/15";
-
   return (
     <div className="flex flex-col gap-5">
-      <div className="flex flex-col gap-4 rounded-[1rem] border border-line bg-surface p-4 sm:p-5">
-        <Segmented label={t.area} value={area} onChange={setArea} options={[{ value: "square", label: t.square }, { value: "full", label: t.full }]} />
-        {area === "square" && (
-          <label className="flex flex-col gap-2">
-            <span className="flex justify-between text-sm font-medium text-fg-2">
-              {t.size}
-              <span className="tabular-nums text-fg">{size} px</span>
-            </span>
-            <Slider min={40} max={400} step={20} value={size} onChange={(e) => setSize(Number(e.target.value))} />
-          </label>
-        )}
-        <label className="flex max-w-xs flex-col gap-2 text-sm font-medium text-fg-2">
-          {t.duration}
-          <Select value={minutes} onChange={(e) => setMinutes(Number(e.target.value))}>
-            {DURATIONS.map((m) => (
-              <option key={m} value={m}>
-                {t.min(m)}
-              </option>
-            ))}
-          </Select>
-        </label>
-        <div className="rounded-[0.75rem] bg-warn-soft px-4 py-3 text-sm text-warn">
-          <p className="flex items-center gap-1.5 font-semibold">
-            <TriangleAlert className="size-4 shrink-0" aria-hidden />
-            {t.warnTitle}
-          </p>
-          <p className="mt-1">{t.warn}</p>
-          <Checkbox className="mt-2 text-sm text-warn" label={t.ack} checked={ack} onChange={(e) => setAck(e.target.checked)} />
+      <Panel className="flex flex-col gap-5 p-4 sm:p-6">
+        <div className="grid items-start gap-x-8 gap-y-5 lg:grid-cols-2">
+          <div className="flex flex-col gap-5">
+            <Segmented
+              size="lg"
+              label={t.area}
+              value={area}
+              onChange={setArea}
+              options={[
+                { value: "square", label: t.square },
+                { value: "full", label: t.full },
+              ]}
+            />
+            {area === "square" && (
+              <label className="flex flex-col gap-2">
+                <span className="flex items-baseline justify-between text-sm font-medium text-fg-2">
+                  {t.size}
+                  <span className="text-lg font-bold text-fg tabular-nums">{size} px</span>
+                </span>
+                <Slider min={40} max={400} step={20} value={size} onChange={(e) => setSize(Number(e.target.value))} format={(v) => `${v} px`} />
+              </label>
+            )}
+            <Field label={t.duration} htmlFor={`${id}-min`}>
+              <Select id={`${id}-min`} value={minutes} onChange={(e) => setMinutes(Number(e.target.value))} className="w-fit">
+                {DURATIONS.map((m) => (
+                  <option key={m} value={m}>
+                    {t.min(m)}
+                  </option>
+                ))}
+              </Select>
+            </Field>
+          </div>
+          <Notice tone="warn">
+            <p className="flex items-center gap-1.5 font-semibold">
+              <TriangleAlert className="size-4 shrink-0" aria-hidden />
+              {t.warnTitle}
+            </p>
+            <p className="mt-1">{t.warn}</p>
+            <Checkbox className="mt-2 text-sm text-warn" label={t.ack} checked={ack} onChange={(e) => setAck(e.target.checked)} />
+          </Notice>
         </div>
-        <div>
-          <Button variant="primary" size="lg" onClick={start} disabled={!ack}>
-            <Maximize aria-hidden />
-            {t.start}
-          </Button>
-        </div>
+        <Button variant="filled" size="xl" onClick={start} disabled={!ack} className="w-fit">
+          <Maximize aria-hidden />
+          {t.start}
+        </Button>
         {done && (
-          <p className="rounded-[0.75rem] bg-ok-soft px-4 py-3 text-sm text-ok">
+          <Notice tone="ok">
             {t.done}{" "}
             <Link href={href(locale, ["dead-pixel-test"])} className="font-medium underline underline-offset-2">
               {t.check}
             </Link>
-          </p>
+          </Notice>
         )}
         <p className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-sm text-fg-3 pointer-coarse:hidden">
           <span>
@@ -190,7 +200,7 @@ export default function StuckPixelFixer({ locale }: { locale: Locale }) {
             <Kbd>Esc</Kbd> {t.exit}
           </span>
         </p>
-      </div>
+      </Panel>
 
       <StageLayer
         stage={stage}
@@ -216,12 +226,8 @@ export default function StuckPixelFixer({ locale }: { locale: Locale }) {
             {area === "square" && (
               <>
                 <span className="hidden opacity-80 sm:inline">{t.drag}</span>
-                <button type="button" className={iconBtn} onClick={() => setSize((s) => Math.max(40, s - 20))} aria-label={t.smaller} title={t.smaller}>
-                  <Minus className="size-5" aria-hidden />
-                </button>
-                <button type="button" className={iconBtn} onClick={() => setSize((s) => Math.min(400, s + 20))} aria-label={t.bigger} title={t.bigger}>
-                  <Plus className="size-5" aria-hidden />
-                </button>
+                <BarButton label={t.smaller} icon={<Minus aria-hidden />} onClick={() => setSize((s) => Math.max(40, s - 20))} />
+                <BarButton label={t.bigger} icon={<Plus aria-hidden />} onClick={() => setSize((s) => Math.min(400, s + 20))} />
               </>
             )}
           </>

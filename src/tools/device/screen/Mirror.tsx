@@ -1,16 +1,17 @@
 "use client";
 
 import { Camera, FlipHorizontal2, Maximize, Pause, Play, SwitchCamera } from "lucide-react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import type { Locale } from "@/i18n/config";
 import { cn } from "@/lib/cn";
 import { Button } from "@/ui/button";
 import { Slider, Switch } from "@/ui/field";
-import { Kbd } from "@/ui/panel";
+import { Kbd, Panel } from "@/ui/panel";
 import { StageLayer, typingTarget, useStage } from "@/ui/stage";
 import { hasGetUserMedia, mediaErrorStatus, stopStream, type MediaStatus } from "../test/lib/media";
 import { MediaStatusNotice, PermissionHelp } from "../test/ui/PermissionHelp";
 import { whiteAt, rgbToHex } from "./lib/color";
+import { BarButton } from "./ui/BarButton";
 
 const T = {
   ru: {
@@ -129,39 +130,39 @@ export default function Mirror({ locale }: { locale: Locale }) {
   });
 
   return (
-    <div className="flex flex-col gap-5">
-      <div className="overflow-hidden rounded-[1rem] border border-line-strong" style={frame(false)}>
-        <div className="relative flex aspect-[4/3] w-full items-center justify-center overflow-hidden bg-black sm:aspect-[16/9]">
-          <video ref={videoRef} autoPlay playsInline muted className={cn("size-full object-cover transition-transform", !live && "hidden")} style={videoStyle} />
-          {!live && (
-            <div className="flex flex-col items-center gap-3 p-6 text-center text-white">
-              <Camera className="size-10 opacity-80" aria-hidden />
-              <Button variant="primary" size="lg" onClick={() => void start(facing)} disabled={status === "requesting"}>
-                {t.start}
-              </Button>
-              <p className="max-w-md text-sm opacity-80">{t.hint}</p>
-            </div>
-          )}
+    <div className={cn("grid items-start gap-4 lg:gap-6", live && "lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]")}>
+      <div className="flex min-w-0 flex-col gap-4">
+        <div className="overflow-hidden rounded-[1.25rem] shadow-[var(--shadow-card)]" style={frame(false)}>
+          <div className="relative flex aspect-[4/3] w-full items-center justify-center overflow-hidden bg-black sm:aspect-[16/9]">
+            <video ref={videoRef} autoPlay playsInline muted className={cn("size-full object-cover transition-transform", !live && "hidden")} style={videoStyle} />
+            {!live && (
+              <div className="flex flex-col items-center gap-4 p-6 text-center text-white">
+                <span aria-hidden className="flex size-16 items-center justify-center rounded-full bg-white/12">
+                  <Camera className="size-8" />
+                </span>
+                <Button variant="filled" size="xl" onClick={() => void start(facing)} loading={status === "requesting"}>
+                  {status !== "requesting" && <Camera aria-hidden />}
+                  {t.start}
+                </Button>
+                <p className="max-w-md text-sm opacity-80">{t.hint}</p>
+              </div>
+            )}
+          </div>
         </div>
-      </div>
-
-      {status !== "idle" && status !== "live" && status !== "requesting" && <MediaStatusNotice locale={locale} kind="camera" status={status} />}
-      <PermissionHelp locale={locale} kind="camera" open={status === "denied"} />
-
-      {live && (
-        <div className="flex flex-col gap-4">
+        {live && (
           <div className="flex flex-wrap gap-2">
-            <Button variant="primary" onClick={stage.enter}>
+            <Button variant="filled" size="lg" onClick={stage.enter}>
               <Maximize aria-hidden />
               {t.full}
             </Button>
-            <Button variant="secondary" onClick={() => setFrozen((f) => !f)} aria-pressed={frozen}>
+            <Button variant="tonal" size="lg" onClick={() => setFrozen((f) => !f)} aria-pressed={frozen}>
               {frozen ? <Play aria-hidden /> : <Pause aria-hidden />}
               {frozen ? t.live : t.freeze}
             </Button>
             {cameras > 1 && (
               <Button
-                variant="secondary"
+                variant="tonal"
+                size="lg"
                 onClick={() => {
                   const next = facing === "user" ? "environment" : "user";
                   setFacing(next);
@@ -174,40 +175,37 @@ export default function Mirror({ locale }: { locale: Locale }) {
               </Button>
             )}
           </div>
-          <Switch label={<span className="inline-flex items-center gap-1.5"><FlipHorizontal2 className="size-4" aria-hidden />{t.mirror}</span>} checked={mirror} onChange={(e) => setMirror(e.target.checked)} />
-          <div className="grid gap-4 sm:grid-cols-2">
-            <label className="flex flex-col gap-2">
-              <span className="flex justify-between text-sm font-medium text-fg-2">
-                {t.zoom}
-                <span className="tabular-nums text-fg">×{zoom.toFixed(1)}</span>
+        )}
+        {status !== "idle" && status !== "live" && status !== "requesting" && <MediaStatusNotice locale={locale} kind="camera" status={status} />}
+        <PermissionHelp locale={locale} kind="camera" open={status === "denied"} />
+      </div>
+
+      {live && (
+        <Panel className="flex min-w-0 flex-col gap-5 p-4 sm:p-6">
+          <Switch
+            label={
+              <span className="inline-flex items-center gap-1.5">
+                <FlipHorizontal2 className="size-4" aria-hidden />
+                {t.mirror}
               </span>
-              <Slider min={1} max={4} step={0.1} value={zoom} onChange={(e) => setZoom(Number(e.target.value))} />
-            </label>
-            <label className="flex flex-col gap-2">
-              <span className="flex justify-between text-sm font-medium text-fg-2">
-                {t.bright}
-                <span className="tabular-nums text-fg">{bright}%</span>
-              </span>
-              <Slider min={50} max={200} step={5} value={bright} onChange={(e) => setBright(Number(e.target.value))} />
-            </label>
-            <label className="flex flex-col gap-2">
-              <span className="flex justify-between text-sm font-medium text-fg-2">
-                {t.light}
-                <span className="tabular-nums text-fg">{light}</span>
-              </span>
-              <Slider min={0} max={20} step={1} value={light} onChange={(e) => setLight(Number(e.target.value))} />
-              <span className="text-xs text-fg-3">{t.lightHint}</span>
-            </label>
-            {light > 0 && (
-              <label className="flex flex-col gap-2">
-                <span className="flex justify-between text-sm font-medium text-fg-2">
-                  {t.warmth}
-                  <span className="tabular-nums text-fg">{kelvin} K</span>
-                </span>
-                <Slider min={2700} max={7500} step={100} value={kelvin} onChange={(e) => setKelvin(Number(e.target.value))} />
-              </label>
-            )}
-          </div>
+            }
+            checked={mirror}
+            onChange={(e) => setMirror(e.target.checked)}
+          />
+          <SliderRow label={t.zoom} value={`×${zoom.toFixed(1)}`}>
+            <Slider min={1} max={4} step={0.1} value={zoom} onChange={(e) => setZoom(Number(e.target.value))} format={(v) => `×${v.toFixed(1)}`} />
+          </SliderRow>
+          <SliderRow label={t.bright} value={`${bright}%`}>
+            <Slider min={50} max={200} step={5} value={bright} onChange={(e) => setBright(Number(e.target.value))} format={(v) => `${v}%`} />
+          </SliderRow>
+          <SliderRow label={t.light} value={String(light)} hint={t.lightHint}>
+            <Slider min={0} max={20} step={1} value={light} onChange={(e) => setLight(Number(e.target.value))} />
+          </SliderRow>
+          {light > 0 && (
+            <SliderRow label={t.warmth} value={`${kelvin} K`}>
+              <Slider min={2700} max={7500} step={100} value={kelvin} onChange={(e) => setKelvin(Number(e.target.value))} format={(v) => `${v} K`} />
+            </SliderRow>
+          )}
           <p className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-sm text-fg-3 pointer-coarse:hidden">
             <span>
               <Kbd>F</Kbd> {t.full.toLowerCase()}
@@ -222,7 +220,7 @@ export default function Mirror({ locale }: { locale: Locale }) {
               <Kbd>Esc</Kbd> {t.exit}
             </span>
           </p>
-        </div>
+        </Panel>
       )}
 
       <StageLayer
@@ -241,12 +239,8 @@ export default function Mirror({ locale }: { locale: Locale }) {
         bar={
           <>
             <span className="font-semibold">{t.stage}</span>
-            <button type="button" className="flex size-9 items-center justify-center rounded-full hover:bg-white/15" onClick={() => setFrozen((f) => !f)} aria-label={frozen ? t.live : t.freeze} title={frozen ? t.live : t.freeze}>
-              {frozen ? <Play className="size-5" aria-hidden /> : <Pause className="size-5" aria-hidden />}
-            </button>
-            <button type="button" className="flex size-9 items-center justify-center rounded-full hover:bg-white/15" onClick={() => setMirror((m) => !m)} aria-label={t.mirror} title={t.mirror}>
-              <FlipHorizontal2 className="size-5" aria-hidden />
-            </button>
+            <BarButton label={frozen ? t.live : t.freeze} icon={frozen ? <Play aria-hidden /> : <Pause aria-hidden />} onClick={() => setFrozen((f) => !f)} />
+            <BarButton label={t.mirror} icon={<FlipHorizontal2 aria-hidden />} onClick={() => setMirror((m) => !m)} />
           </>
         }
       >
@@ -265,5 +259,18 @@ export default function Mirror({ locale }: { locale: Locale }) {
         </div>
       </StageLayer>
     </div>
+  );
+}
+
+function SliderRow({ label, value, hint, children }: { label: string; value: string; hint?: string; children: ReactNode }) {
+  return (
+    <label className="flex flex-col gap-2">
+      <span className="flex items-baseline justify-between gap-2 text-sm font-medium text-fg-2">
+        {label}
+        <span className="text-lg font-bold text-fg tabular-nums">{value}</span>
+      </span>
+      {children}
+      {hint && <span className="text-xs text-fg-3">{hint}</span>}
+    </label>
   );
 }

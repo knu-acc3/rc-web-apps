@@ -3,7 +3,7 @@
 import { useId, useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { validateIsbn, type IsbnError } from "./lib/isbn";
-import { BigInput, Details, Problems, Verdict, type Row } from "./ui/kit";
+import { BigInput, Details, Layout, Problems, type Row, Verdict } from "./ui/kit";
 
 const T = {
   ru: {
@@ -16,7 +16,13 @@ const T = {
     isbn13: "ISBN-13",
     expected: "Правильная контрольная цифра даёт",
     no10: "нет (у ISBN с префиксом 979 нет 10-значной формы)",
-    errors: { empty: "Введите ISBN", chars: "Допустимы цифры и X в конце ISBN-10", length: "В ISBN 10 или 13 цифр", checksum: "Контрольная цифра не сходится — вероятно, опечатка", prefix: "ISBN-13 начинается с 978 или 979; другой префикс — это EAN-13 не книги" } as Record<IsbnError, string>,
+    errors: {
+      empty: "Введите ISBN",
+      chars: "Допустимы цифры и X в конце ISBN-10",
+      length: "В ISBN 10 или 13 цифр",
+      checksum: "Контрольная цифра не сходится — вероятно, опечатка",
+      prefix: "ISBN-13 начинается с 978 или 979; другой префикс — это EAN-13 не книги",
+    } as Record<IsbnError, string>,
     note: "Проверяется контрольная цифра и выполняется перевод между ISBN-10 и ISBN-13. Название книги по номеру инструмент не ищет — для этого нужен запрос к каталогу.",
   },
   en: {
@@ -29,7 +35,13 @@ const T = {
     isbn13: "ISBN-13",
     expected: "The correct check digit gives",
     no10: "none (979-prefixed ISBNs have no 10-digit form)",
-    errors: { empty: "Enter an ISBN", chars: "Digits only, plus X at the end of an ISBN-10", length: "An ISBN has 10 or 13 digits", checksum: "The check digit doesn't match — probably a typo", prefix: "ISBN-13 starts with 978 or 979; other prefixes are non-book EAN-13 codes" } as Record<IsbnError, string>,
+    errors: {
+      empty: "Enter an ISBN",
+      chars: "Digits only, plus X at the end of an ISBN-10",
+      length: "An ISBN has 10 or 13 digits",
+      checksum: "The check digit doesn't match — probably a typo",
+      prefix: "ISBN-13 starts with 978 or 979; other prefixes are non-book EAN-13 codes",
+    } as Record<IsbnError, string>,
     note: "The check digit is verified and ISBN-10 ↔ ISBN-13 conversion is done. The tool doesn't look up titles — that would need a catalogue request.",
   },
 } as const;
@@ -48,15 +60,13 @@ export default function IsbnValidator({ locale }: { locale: Locale }) {
   }
   if (r.expected) rows.push({ label: t.expected, value: r.expected, mono: true });
   return (
-    <div className="flex flex-col gap-4">
-      <BigInput id={`${id}-n`} label={t.label} value={text} onChange={setText} hint={t.hint} invalid={!empty && !r.valid} />
+    <Layout input={<BigInput id={`${id}-n`} label={t.label} value={text} onChange={setText} hint={t.hint} invalid={!empty && !r.valid} />} note={t.note}>
       {!empty && (
         <Verdict tone={r.valid ? "ok" : "err"} title={r.valid ? t.ok : t.bad} value={r.valid ? r.normalized : undefined}>
           <Problems items={r.errors.map((e) => t.errors[e])} />
         </Verdict>
       )}
       <Details rows={rows} locale={locale} />
-      <p className="text-sm text-fg-3">{t.note}</p>
-    </div>
+    </Layout>
   );
 }

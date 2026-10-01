@@ -1,14 +1,14 @@
 "use client";
 
-import { Camera, CameraOff, ExternalLink, RotateCcw } from "lucide-react";
+import { Camera, CameraOff, ExternalLink, Image as ImageIcon, RotateCcw, ScanLine } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { formatNumber } from "@/i18n/format";
 import { cn } from "@/lib/cn";
-import { Button } from "@/ui/button";
+import { Button, buttonClass } from "@/ui/button";
 import { CopyButton } from "@/ui/copy-button";
 import { Dropzone } from "@/ui/dropzone";
-import { Notice } from "@/ui/panel";
+import { Badge, Notice, Panel } from "@/ui/panel";
 import { Segmented } from "@/ui/segmented";
 import { parsePayload, type PayloadKind } from "./lib/payloads";
 import { formatName, nativeDetector, zxingDetector, type Detect, type Detected } from "./lib/scan";
@@ -57,7 +57,44 @@ const T = {
       epc: "Платёж SEPA (EPC)",
       text: "Текст",
     } as Record<PayloadKind, string>,
-    field: { S: "Сеть", P: "Пароль", T: "Шифрование", H: "Скрытая сеть", FN: "Имя", N: "Имя", TEL: "Телефон", EMAIL: "Email", ORG: "Компания", TITLE: "Должность", URL: "Сайт", ADR: "Адрес", NOTE: "Заметка", TO: "Кому", TEXT: "Текст", LAT: "Широта", LON: "Долгота", SUMMARY: "Название", DTSTART: "Начало", DTEND: "Окончание", LOCATION: "Место", DESCRIPTION: "Описание", Name: "Получатель", PersonalAcc: "Счёт", BankName: "Банк", BIC: "БИК", CorrespAcc: "Корр. счёт", PayeeINN: "ИНН", KPP: "КПП", Sum: "Сумма", Purpose: "Назначение", IBAN: "IBAN", Amount: "Сумма", Reference: "Ссылка", Text: "Назначение", Info: "Комментарий" } as Record<string, string>,
+    field: {
+      S: "Сеть",
+      P: "Пароль",
+      T: "Шифрование",
+      H: "Скрытая сеть",
+      FN: "Имя",
+      N: "Имя",
+      TEL: "Телефон",
+      EMAIL: "Email",
+      ORG: "Компания",
+      TITLE: "Должность",
+      URL: "Сайт",
+      ADR: "Адрес",
+      NOTE: "Заметка",
+      TO: "Кому",
+      TEXT: "Текст",
+      LAT: "Широта",
+      LON: "Долгота",
+      SUMMARY: "Название",
+      DTSTART: "Начало",
+      DTEND: "Окончание",
+      LOCATION: "Место",
+      DESCRIPTION: "Описание",
+      Name: "Получатель",
+      PersonalAcc: "Счёт",
+      BankName: "Банк",
+      BIC: "БИК",
+      CorrespAcc: "Корр. счёт",
+      PayeeINN: "ИНН",
+      KPP: "КПП",
+      Sum: "Сумма",
+      Purpose: "Назначение",
+      IBAN: "IBAN",
+      Amount: "Сумма",
+      Reference: "Ссылка",
+      Text: "Назначение",
+      Info: "Комментарий",
+    } as Record<string, string>,
     rub: (k: string) => `${formatNumber("ru", Number(k) / 100, { minimumFractionDigits: 2 })} ₽`,
     privacy: "Распознавание идёт на вашем устройстве — изображение с камеры никуда не отправляется.",
   },
@@ -101,7 +138,44 @@ const T = {
       epc: "SEPA payment (EPC)",
       text: "Text",
     } as Record<PayloadKind, string>,
-    field: { S: "Network", P: "Password", T: "Security", H: "Hidden network", FN: "Name", N: "Name", TEL: "Phone", EMAIL: "Email", ORG: "Company", TITLE: "Job title", URL: "Website", ADR: "Address", NOTE: "Note", TO: "To", TEXT: "Text", LAT: "Latitude", LON: "Longitude", SUMMARY: "Title", DTSTART: "Starts", DTEND: "Ends", LOCATION: "Location", DESCRIPTION: "Description", Name: "Payee", PersonalAcc: "Account", BankName: "Bank", BIC: "BIK", CorrespAcc: "Correspondent account", PayeeINN: "INN", KPP: "KPP", Sum: "Amount", Purpose: "Purpose", IBAN: "IBAN", Amount: "Amount", Reference: "Reference", Text: "Remittance", Info: "Note" } as Record<string, string>,
+    field: {
+      S: "Network",
+      P: "Password",
+      T: "Security",
+      H: "Hidden network",
+      FN: "Name",
+      N: "Name",
+      TEL: "Phone",
+      EMAIL: "Email",
+      ORG: "Company",
+      TITLE: "Job title",
+      URL: "Website",
+      ADR: "Address",
+      NOTE: "Note",
+      TO: "To",
+      TEXT: "Text",
+      LAT: "Latitude",
+      LON: "Longitude",
+      SUMMARY: "Title",
+      DTSTART: "Starts",
+      DTEND: "Ends",
+      LOCATION: "Location",
+      DESCRIPTION: "Description",
+      Name: "Payee",
+      PersonalAcc: "Account",
+      BankName: "Bank",
+      BIC: "BIK",
+      CorrespAcc: "Correspondent account",
+      PayeeINN: "INN",
+      KPP: "KPP",
+      Sum: "Amount",
+      Purpose: "Purpose",
+      IBAN: "IBAN",
+      Amount: "Amount",
+      Reference: "Reference",
+      Text: "Remittance",
+      Info: "Note",
+    } as Record<string, string>,
     rub: (k: string) => `${formatNumber("en", Number(k) / 100, { minimumFractionDigits: 2 })} RUB`,
     privacy: "Recognition runs on your device — camera images are never uploaded.",
   },
@@ -225,17 +299,18 @@ export default function QrScanner({ locale, source = "camera", all = false }: { 
   return (
     <div className="flex flex-col gap-4">
       <Segmented<Mode>
+        size="lg"
         label={t.mode}
         value={mode}
         onChange={switchMode}
         options={[
-          { value: "camera", label: t.camera },
-          { value: "image", label: t.image },
+          { value: "camera", label: t.camera, icon: <Camera className="size-5" aria-hidden /> },
+          { value: "image", label: t.image, icon: <ImageIcon className="size-5" aria-hidden /> },
         ]}
       />
 
       {mode === "camera" ? (
-        <div className={cn("relative mx-auto aspect-[4/3] w-full max-w-[35rem] overflow-hidden rounded-[0.75rem] bg-surface-2", result && cam === "off" && "hidden")}>
+        <div className={cn("relative mx-auto aspect-[4/3] w-full max-w-[40rem] overflow-hidden rounded-[1.25rem] bg-surface-2", result && cam === "off" && "hidden")}>
           <video ref={video} playsInline muted className={cn("size-full object-cover", cam !== "on" && "invisible")} />
           {cam === "on" && (
             <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
@@ -244,23 +319,26 @@ export default function QrScanner({ locale, source = "camera", all = false }: { 
             </div>
           )}
           {cam !== "on" && (
-            <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 p-6 text-center">
-              <Button variant="primary" size="lg" onClick={start} disabled={cam === "starting"}>
-                <Camera className="size-5" aria-hidden />
+            <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 p-6 text-center">
+              <span aria-hidden className="flex size-16 items-center justify-center rounded-full bg-accent-soft text-accent">
+                <ScanLine className="size-8" />
+              </span>
+              <Button variant="filled" size="xl" onClick={start} loading={cam === "starting"}>
+                {cam !== "starting" && <Camera aria-hidden />}
                 {cam === "starting" ? t.starting : t.start}
               </Button>
               <p className="max-w-sm text-sm text-fg-3">{t.privacy}</p>
             </div>
           )}
           {cam === "on" && (
-            <Button variant="secondary" size="sm" onClick={stop} className="absolute top-3 right-3">
+            <Button variant="elevated" onClick={stop} className="absolute top-3 right-3">
               <CameraOff className="size-4" aria-hidden />
               {t.stop}
             </Button>
           )}
         </div>
       ) : (
-        !result && <Dropzone accept="image/*" onFiles={(fs) => fs[0] && readImage(fs[0])} title={t.drop} hint={t.dropHint} disabled={img === "reading"} />
+        !result && <Dropzone locale={locale} accept="image/*" onFiles={(fs) => fs[0] && readImage(fs[0])} title={t.drop} hint={t.dropHint} disabled={img === "reading"} />
       )}
 
       <div aria-live="polite" className="flex flex-col gap-3 empty:hidden">
@@ -268,49 +346,48 @@ export default function QrScanner({ locale, source = "camera", all = false }: { 
         {img === "reading" && <Notice>{t.reading}</Notice>}
         {img === "none" && <Notice tone="warn">{t.none}</Notice>}
         {result && parsed && (
-          <section className="rounded-[0.75rem] border border-line bg-surface p-4 sm:p-5">
+          <Panel className="p-4 motion-safe:animate-[menu-in_200ms_ease-out] sm:p-6">
             <div className="flex flex-wrap items-center gap-2 text-sm text-fg-3">
-              <span className="font-medium text-fg-2">{t.kind[parsed.kind]}</span>
-              <span aria-hidden>·</span>
+              <Badge tone="accent">{t.kind[parsed.kind]}</Badge>
               <span>{formatName(result.format)}</span>
             </div>
-            <p className="mt-2 max-h-60 overflow-auto font-mono text-lg break-all whitespace-pre-wrap text-fg select-all">{result.text}</p>
+            <p className="mt-3 max-h-60 overflow-auto font-mono text-xl break-all whitespace-pre-wrap text-fg select-all">{result.text}</p>
             {url && (
               <p className="mt-2 text-sm text-fg-2">
                 {t.domain} <strong className="font-semibold text-fg">{url.host}</strong>
               </p>
             )}
             <div className="mt-4 flex flex-wrap gap-2">
-              <CopyButton value={result.text} label={t.copy} copiedLabel={t.copied} variant="primary" showLabel />
+              <CopyButton value={result.text} label={t.copy} copiedLabel={t.copied} variant="primary" size="md" showLabel />
               {url && (
-                <a href={url.href} target="_blank" rel="noopener noreferrer nofollow" className="inline-flex h-10 items-center gap-2 rounded-[0.625rem] border border-line bg-surface px-4 text-[0.9375rem] text-fg hover:border-line-strong hover:bg-surface-2">
-                  <ExternalLink className="size-4" aria-hidden />
+                <a href={url.href} target="_blank" rel="noopener noreferrer nofollow" className={buttonClass("tonal", "md")}>
+                  <ExternalLink aria-hidden />
                   {t.open}
                 </a>
               )}
               <Button
-                variant="ghost"
+                variant="outlined"
                 onClick={() => {
                   setResult(null);
                   setImg("idle");
                   if (mode === "camera") void start();
                 }}
               >
-                <RotateCcw className="size-4" aria-hidden />
+                <RotateCcw aria-hidden />
                 {t.again}
               </Button>
             </div>
             {parsed.fields.length > 0 && parsed.kind !== "url" && (
-              <dl className="mt-4 grid gap-x-8 border-t border-line pt-3 sm:grid-cols-2">
+              <dl className="mt-5 grid gap-2 sm:grid-cols-2">
                 {parsed.fields.map(([k, v], i) => (
-                  <div key={`${k}-${i}`} className="flex min-w-0 flex-col py-1.5">
+                  <div key={`${k}-${i}`} className="flex min-w-0 flex-col rounded-[1rem] bg-surface-2 px-4 py-2.5">
                     <dt className="text-[0.8125rem] text-fg-3">{t.field[k] ?? k}</dt>
                     <dd className="text-[0.9375rem] break-all text-fg select-all">{parsed.kind === "gost" && k === "Sum" && /^\d+$/.test(v) ? t.rub(v) : v}</dd>
                   </div>
                 ))}
               </dl>
             )}
-          </section>
+          </Panel>
         )}
       </div>
     </div>

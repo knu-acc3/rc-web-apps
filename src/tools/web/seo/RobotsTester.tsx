@@ -7,7 +7,7 @@ import { cn } from "@/lib/cn";
 import { Field, Input, Select, Textarea } from "@/ui/field";
 import { isAllowed, parseRobots } from "./lib/robots";
 import { lintText } from "./content/robots-text";
-import { Issues } from "./ui/kit";
+import { Issues, Split } from "./ui/kit";
 
 const AGENTS = ["Googlebot", "Googlebot-Image", "Googlebot-News", "Bingbot", "YandexBot", "YandexImages", "GPTBot", "ClaudeBot", "*"];
 
@@ -72,31 +72,36 @@ export default function RobotsTester({ locale }: { locale: Locale }) {
   const isRobots = /\/robots\.txt$/.test(url.trim().split("?")[0]);
 
   return (
-    <div className="flex flex-col gap-5">
-      <div className="grid gap-4 sm:grid-cols-[minmax(0,1fr)_12.5rem]">
-        <Field label={t.url} htmlFor={`${id}-u`}>
-          <Input id={`${id}-u`} value={url} onChange={(e) => setUrl(e.target.value)} size="lg" className="font-mono" inputMode="url" spellCheck={false} autoComplete="off" />
-        </Field>
-        <Field label={t.agent} htmlFor={`${id}-a`}>
-          <Select id={`${id}-a`} value={agent} onChange={(e) => setAgent(e.target.value)} size="lg">
-            {AGENTS.map((a) => (
-              <option key={a} value={a}>
-                {a}
-              </option>
-            ))}
-            <option value="other">{t.other}</option>
-          </Select>
-        </Field>
-      </div>
-      {agent === "other" && (
-        <Field label={t.custom} htmlFor={`${id}-c`}>
-          <Input id={`${id}-c`} value={custom} onChange={(e) => setCustom(e.target.value)} className="font-mono" spellCheck={false} autoComplete="off" placeholder="MyCrawler" />
-        </Field>
-      )}
-
-      <div aria-live="polite" className={cn("rounded-[0.75rem] px-4 py-4 sm:px-5", v.allowed ? "bg-ok-soft" : "bg-err-soft")}>
-        <div className={cn("flex items-center gap-2 text-2xl font-semibold", v.allowed ? "text-ok" : "text-err")}>
-          {v.allowed ? <CircleCheck className="size-7" aria-hidden /> : <CircleX className="size-7" aria-hidden />}
+    <Split
+      input={
+        <>
+          <Field label={t.url} htmlFor={`${id}-u`}>
+            <Input id={`${id}-u`} value={url} onChange={(e) => setUrl(e.target.value)} size="lg" className="font-mono" inputMode="url" spellCheck={false} autoComplete="off" />
+          </Field>
+          <Field label={t.agent} htmlFor={`${id}-a`}>
+            <Select id={`${id}-a`} value={agent} onChange={(e) => setAgent(e.target.value)}>
+              {AGENTS.map((a) => (
+                <option key={a} value={a}>
+                  {a}
+                </option>
+              ))}
+              <option value="other">{t.other}</option>
+            </Select>
+          </Field>
+          {agent === "other" && (
+            <Field label={t.custom} htmlFor={`${id}-c`}>
+              <Input id={`${id}-c`} value={custom} onChange={(e) => setCustom(e.target.value)} className="font-mono" spellCheck={false} autoComplete="off" placeholder="MyCrawler" />
+            </Field>
+          )}
+          <Field label={t.robots} htmlFor={`${id}-r`} hint={t.how}>
+            <Textarea id={`${id}-r`} value={text} onChange={(e) => setText(e.target.value)} rows={12} className="font-mono text-sm" spellCheck={false} />
+          </Field>
+        </>
+      }
+    >
+      <div aria-live="polite" className={cn("rounded-[1.25rem] p-5 sm:p-6", v.allowed ? "bg-ok-soft" : "bg-err-soft")}>
+        <div className={cn("flex items-center gap-2.5 text-2xl font-bold sm:text-3xl", v.allowed ? "text-ok" : "text-err")}>
+          {v.allowed ? <CircleCheck className="size-8 shrink-0" aria-hidden /> : <CircleX className="size-8 shrink-0" aria-hidden />}
           {v.allowed ? t.allowed : t.blocked}
         </div>
         <div className="mt-2 flex flex-col gap-0.5 text-[0.9375rem] text-fg-2">
@@ -110,12 +115,7 @@ export default function RobotsTester({ locale }: { locale: Locale }) {
           )}
         </div>
       </div>
-
-      <Field label={t.robots} htmlFor={`${id}-r`} hint={t.how}>
-        <Textarea id={`${id}-r`} value={text} onChange={(e) => setText(e.target.value)} rows={12} className="font-mono text-sm" spellCheck={false} />
-      </Field>
-
       {robots.lint.length > 0 && <Issues items={robots.lint.map((l) => lintText(locale, l))} />}
-    </div>
+    </Split>
   );
 }

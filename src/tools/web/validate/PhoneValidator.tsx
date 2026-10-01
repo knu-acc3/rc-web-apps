@@ -5,7 +5,7 @@ import { useEffect, useId, useMemo, useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { Field, Select } from "@/ui/field";
 import { analyzePhone, type PhoneLib } from "./lib/phone";
-import { BigInput, Details, Problems, Verdict, type Row } from "./ui/kit";
+import { BigInput, Details, Layout, Problems, type Row, Verdict } from "./ui/kit";
 
 const T = {
   ru: {
@@ -24,8 +24,26 @@ const T = {
     national: "Национальный формат",
     uri: "Ссылка tel:",
     code: "Код страны",
-    types: { MOBILE: "мобильный", FIXED_LINE: "стационарный", FIXED_LINE_OR_MOBILE: "стационарный или мобильный", TOLL_FREE: "бесплатный (8-800)", PREMIUM_RATE: "платный", SHARED_COST: "с разделённой оплатой", VOIP: "IP-телефония", PERSONAL_NUMBER: "персональный", PAGER: "пейджер", UAN: "единый номер организации", VOICEMAIL: "голосовая почта" } as Record<string, string>,
-    len: { TOO_SHORT: "Слишком мало цифр", TOO_LONG: "Слишком много цифр", INVALID_LENGTH: "Неверное число цифр", INVALID_COUNTRY: "Не удалось определить страну — добавьте код, например +7", NOT_A_NUMBER: "Это не похоже на номер телефона" } as Record<string, string>,
+    types: {
+      MOBILE: "мобильный",
+      FIXED_LINE: "стационарный",
+      FIXED_LINE_OR_MOBILE: "стационарный или мобильный",
+      TOLL_FREE: "бесплатный (8-800)",
+      PREMIUM_RATE: "платный",
+      SHARED_COST: "с разделённой оплатой",
+      VOIP: "IP-телефония",
+      PERSONAL_NUMBER: "персональный",
+      PAGER: "пейджер",
+      UAN: "единый номер организации",
+      VOICEMAIL: "голосовая почта",
+    } as Record<string, string>,
+    len: {
+      TOO_SHORT: "Слишком мало цифр",
+      TOO_LONG: "Слишком много цифр",
+      INVALID_LENGTH: "Неверное число цифр",
+      INVALID_COUNTRY: "Не удалось определить страну — добавьте код, например +7",
+      NOT_A_NUMBER: "Это не похоже на номер телефона",
+    } as Record<string, string>,
     note: "Проверка идёт по открытой базе правил нумерации Google libphonenumber прямо в браузере: номер никуда не отправляется. Существует ли номер и кому он принадлежит, так узнать нельзя.",
   },
   en: {
@@ -44,8 +62,26 @@ const T = {
     national: "National format",
     uri: "tel: link",
     code: "Country code",
-    types: { MOBILE: "mobile", FIXED_LINE: "fixed line", FIXED_LINE_OR_MOBILE: "fixed line or mobile", TOLL_FREE: "toll-free", PREMIUM_RATE: "premium rate", SHARED_COST: "shared cost", VOIP: "VoIP", PERSONAL_NUMBER: "personal number", PAGER: "pager", UAN: "universal access number", VOICEMAIL: "voicemail" } as Record<string, string>,
-    len: { TOO_SHORT: "Too few digits", TOO_LONG: "Too many digits", INVALID_LENGTH: "Wrong number of digits", INVALID_COUNTRY: "Can't tell the country — add a code like +1", NOT_A_NUMBER: "This doesn't look like a phone number" } as Record<string, string>,
+    types: {
+      MOBILE: "mobile",
+      FIXED_LINE: "fixed line",
+      FIXED_LINE_OR_MOBILE: "fixed line or mobile",
+      TOLL_FREE: "toll-free",
+      PREMIUM_RATE: "premium rate",
+      SHARED_COST: "shared cost",
+      VOIP: "VoIP",
+      PERSONAL_NUMBER: "personal number",
+      PAGER: "pager",
+      UAN: "universal access number",
+      VOICEMAIL: "voicemail",
+    } as Record<string, string>,
+    len: {
+      TOO_SHORT: "Too few digits",
+      TOO_LONG: "Too many digits",
+      INVALID_LENGTH: "Wrong number of digits",
+      INVALID_COUNTRY: "Can't tell the country — add a code like +1",
+      NOT_A_NUMBER: "This doesn't look like a phone number",
+    } as Record<string, string>,
     note: "Checked against Google's open libphonenumber numbering rules right in your browser; the number isn't sent anywhere. Whether the number exists or who owns it can't be known this way.",
   },
 } as const;
@@ -95,26 +131,37 @@ export default function PhoneValidator({ locale, country = "KZ", value, countrie
   const title = !r ? t.loading : r.otherCountry ? t.other(names(r.country!), names(country)) : r.valid ? t.valid : r.possible ? t.possible : t.invalid;
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="grid gap-3 sm:grid-cols-[1fr_16rem]">
-        <BigInput id={`${id}-n`} label={t.number} value={text} onChange={setText} inputMode="tel" placeholder={cc === "KZ" ? "+7 701 234 56 78" : cc === "RU" ? "+7 912 345 67 89" : "+1 201 555 0123"} invalid={!!r && !r.valid} />
-        <Field label={t.country} htmlFor={`${id}-c`} hint={t.countryHint}>
-          <Select id={`${id}-c`} value={cc} onChange={(e) => setCc(e.target.value)} size="lg">
-            {countries.map(([c, n]) => (
-              <option key={c} value={c}>
-                {n}
-              </option>
-            ))}
-          </Select>
-        </Field>
-      </div>
+    <Layout
+      input={
+        <>
+          <BigInput
+            id={`${id}-n`}
+            label={t.number}
+            value={text}
+            onChange={setText}
+            inputMode="tel"
+            placeholder={cc === "KZ" ? "+7 701 234 56 78" : cc === "RU" ? "+7 912 345 67 89" : "+1 201 555 0123"}
+            invalid={!!r && !r.valid}
+          />
+          <Field label={t.country} htmlFor={`${id}-c`} hint={t.countryHint}>
+            <Select id={`${id}-c`} value={cc} onChange={(e) => setCc(e.target.value)} size="lg">
+              {countries.map(([c, n]) => (
+                <option key={c} value={c}>
+                  {n}
+                </option>
+              ))}
+            </Select>
+          </Field>
+        </>
+      }
+      note={t.note}
+    >
       {(text.trim() || !lib) && (
         <Verdict tone={tone} title={title} value={r?.valid ? r.international : undefined}>
           {r && !r.valid && r.lengthIssue && <Problems items={[t.len[r.lengthIssue] ?? r.lengthIssue]} />}
         </Verdict>
       )}
       <Details rows={rows} locale={locale} />
-      <p className="text-sm text-fg-3">{t.note}</p>
-    </div>
+    </Layout>
   );
 }

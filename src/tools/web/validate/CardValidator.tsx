@@ -3,7 +3,7 @@
 import { useId, useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { validateCard, type CardError } from "./lib/card";
-import { BigInput, Details, Problems, Verdict, type Row } from "./ui/kit";
+import { BigInput, Details, Layout, Problems, type Row, Verdict } from "./ui/kit";
 
 const T = {
   ru: {
@@ -74,15 +74,13 @@ export default function CardValidator({ locale, value = "4111 1111 1111 1111" }:
     if (r.digits.length >= 6) rows.push({ label: t.iin, value: r.digits.slice(0, 6), mono: true });
   }
   return (
-    <div className="flex flex-col gap-4">
-      <BigInput id={`${id}-card`} label={t.label} value={text} onChange={setText} hint={t.hint} inputMode="numeric" invalid={!empty && !r.valid} />
+    <Layout input={<BigInput id={`${id}-card`} label={t.label} value={text} onChange={setText} hint={t.hint} inputMode="numeric" invalid={!empty && !r.valid} />} note={t.note}>
       {!empty && (
         <Verdict tone={r.valid ? "ok" : "err"} title={r.valid ? `${t.valid}${r.brand ? ` · ${r.brand.name}` : ""}` : t.invalid} value={r.valid ? r.formatted : undefined}>
           <Problems items={r.errors.map((e) => t.errors[e])} />
         </Verdict>
       )}
       <Details rows={rows} locale={locale} />
-      <p className="text-sm text-fg-3">{t.note}</p>
-    </div>
+    </Layout>
   );
 }

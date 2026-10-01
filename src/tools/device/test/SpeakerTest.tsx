@@ -118,7 +118,13 @@ function pinkNoise(ctx: AudioContext): AudioBuffer {
   const buf = ctx.createBuffer(1, n, ctx.sampleRate);
   const out = buf.getChannelData(0);
   const rnd = new Uint32Array(16384);
-  let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
+  let b0 = 0,
+    b1 = 0,
+    b2 = 0,
+    b3 = 0,
+    b4 = 0,
+    b5 = 0,
+    b6 = 0;
   for (let i = 0; i < n; i++) {
     const k = i % rnd.length;
     if (k === 0) crypto.getRandomValues(rnd);
@@ -376,8 +382,7 @@ export default function SpeakerTest({ locale }: { locale: Locale }) {
     if (r?.master && r.ctx) r.master.gain.setTargetAtTime(volToGain(v), r.ctx.currentTime, 0.02);
   }
 
-  const fmtHz = (f: number) =>
-    f >= 1000 ? `${formatNumber(locale, f / 1000, { maximumFractionDigits: f >= 10000 ? 1 : 2 })} ${t.khz}` : `${formatNumber(locale, f, { maximumFractionDigits: 0 })} ${t.hz}`;
+  const fmtHz = (f: number) => (f >= 1000 ? `${formatNumber(locale, f / 1000, { maximumFractionDigits: f >= 10000 ? 1 : 2 })} ${t.khz}` : `${formatNumber(locale, f, { maximumFractionDigits: 0 })} ${t.hz}`);
   const sides: Side[] = ["left", "center", "right"];
 
   return (
@@ -385,176 +390,190 @@ export default function SpeakerTest({ locale }: { locale: Locale }) {
       {failed && <Notice tone="err">{t.notSupported}</Notice>}
 
       <div className="flex items-center gap-3 px-1">
-        <Volume2 aria-hidden className="size-4 shrink-0 text-fg-3" />
-        <label htmlFor={`${id}-vol`} className="shrink-0 text-sm text-fg-2">
+        <Volume2 aria-hidden className="size-5 shrink-0 text-fg-2" />
+        <label htmlFor={`${id}-vol`} className="shrink-0 text-sm font-medium text-fg-2">
           {t.volume}
         </label>
-        <Slider id={`${id}-vol`} min={0} max={100} step={1} value={volume} onChange={(e) => changeVolume(Number(e.target.value))} className="max-w-72" />
-        <span className="tabular w-12 shrink-0 text-sm text-fg-2">{volume} %</span>
+        <Slider id={`${id}-vol`} min={0} max={100} step={1} value={volume} onChange={(e) => changeVolume(Number(e.target.value))} format={(v) => `${v} %`} className="max-w-96" />
+        <span className="tabular w-14 shrink-0 text-base font-semibold text-fg">{volume} %</span>
       </div>
 
-      <Panel>
-        <PanelHeader
-          title={t.channels}
-          actions={<Segmented size="sm" label={t.sound} value={sound} onChange={setSound} options={[{ value: "tone", label: t.tone }, { value: "noise", label: t.noise }]} />}
-        />
-        <div className="flex flex-col gap-4 p-4 sm:p-5">
-          <div className="grid grid-cols-3 gap-2 sm:gap-3">
-            {sides.map((s) => (
-              <button
-                key={s}
-                type="button"
-                onClick={() => playSide(s)}
-                aria-pressed={playing === s}
-                className={cn(
-                  "flex min-h-28 flex-col items-center justify-center gap-2 rounded-[0.75rem] border px-2 py-4 text-[0.9375rem] font-semibold transition-colors duration-150",
-                  playing === s ? "border-accent bg-accent text-accent-fg" : "border-line bg-surface-2 text-fg hover:border-accent",
-                )}
-              >
-                <Volume2 aria-hidden className={cn("size-7", s === "left" && "-scale-x-100")} />
-                <span>{t[s]}</span>
-                {playing === s && <span className="text-xs font-normal opacity-80">{t.playing}</span>}
-              </button>
-            ))}
-          </div>
-          <p className="text-sm text-fg-3">{t.channelHint}</p>
-          <div className="flex flex-col gap-2">
-            <div className="flex flex-wrap items-center gap-3">
-              <Button variant={playing === "pan" ? "danger" : "secondary"} onClick={() => (playing === "pan" ? stopChannel() : playPan())}>
-                {playing === "pan" ? <Square aria-hidden /> : <AudioWaveform aria-hidden />}
-                {playing === "pan" ? t.sweepStop : t.sweep}
-              </Button>
-              <span className="text-sm text-fg-3">{t.sweepHint}</span>
-            </div>
-            <div className="relative mx-3 h-8" aria-hidden>
-              <div className="absolute inset-x-0 top-1/2 h-1 -translate-y-1/2 rounded-full bg-surface-2" />
-              <span className="absolute left-0 top-1/2 -translate-y-1/2 text-xs font-semibold text-fg-3">L</span>
-              <span className="absolute right-0 top-1/2 -translate-y-1/2 text-xs font-semibold text-fg-3">R</span>
-              <span
-                ref={dotRef}
-                className={cn("absolute top-1/2 size-5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-accent transition-opacity", playing === "pan" ? "opacity-100" : "opacity-0")}
-                style={{ left: "0%" }}
+      <div className="grid items-start gap-4 lg:grid-cols-2 lg:gap-6">
+        <Panel>
+          <PanelHeader
+            title={t.channels}
+            actions={
+              <Segmented
+                size="sm"
+                label={t.sound}
+                value={sound}
+                onChange={setSound}
+                options={[
+                  { value: "tone", label: t.tone },
+                  { value: "noise", label: t.noise },
+                ]}
               />
+            }
+          />
+          <div className="flex flex-col gap-4 p-4 sm:p-5">
+            <div className="grid grid-cols-3 gap-2 sm:gap-3">
+              {sides.map((s) => (
+                <button
+                  key={s}
+                  type="button"
+                  onClick={() => playSide(s)}
+                  aria-pressed={playing === s}
+                  className={cn(
+                    "flex min-h-32 flex-col items-center justify-center gap-2 rounded-[1rem] px-2 py-4 text-base font-semibold transition-[background-color,color,box-shadow,transform] duration-150 active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent",
+                    playing === s ? "bg-accent text-accent-fg shadow-[var(--elev-2)]" : "bg-accent-soft text-on-accent-container hover:shadow-[var(--elev-1)]",
+                  )}
+                >
+                  <Volume2 aria-hidden className={cn("size-8", s === "left" && "-scale-x-100", playing === s && "motion-safe:animate-pulse")} />
+                  <span>{t[s]}</span>
+                  {playing === s && <span className="text-xs font-normal opacity-80">{t.playing}</span>}
+                </button>
+              ))}
+            </div>
+            <p className="text-sm text-fg-3">{t.channelHint}</p>
+            <div className="flex flex-col gap-2">
+              <div className="flex flex-wrap items-center gap-3">
+                <Button variant={playing === "pan" ? "danger" : "tonal"} onClick={() => (playing === "pan" ? stopChannel() : playPan())}>
+                  {playing === "pan" ? <Square aria-hidden /> : <AudioWaveform aria-hidden />}
+                  {playing === "pan" ? t.sweepStop : t.sweep}
+                </Button>
+                <span className="text-sm text-fg-3">{t.sweepHint}</span>
+              </div>
+              <div className="relative mx-3 h-8" aria-hidden>
+                <div className="absolute inset-x-0 top-1/2 h-1 -translate-y-1/2 rounded-full bg-surface-2" />
+                <span className="absolute left-0 top-1/2 -translate-y-1/2 text-xs font-semibold text-fg-3">L</span>
+                <span className="absolute right-0 top-1/2 -translate-y-1/2 text-xs font-semibold text-fg-3">R</span>
+                <span
+                  ref={dotRef}
+                  className={cn("absolute top-1/2 size-5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-accent transition-opacity", playing === "pan" ? "opacity-100" : "opacity-0")}
+                  style={{ left: "0%" }}
+                />
+              </div>
             </div>
           </div>
-        </div>
-      </Panel>
+        </Panel>
 
-      <Panel>
-        <PanelHeader title={t.gen} />
-        <div className="flex flex-col gap-4 p-4 sm:p-5">
-          <Notice tone="warn" className="leading-relaxed">
-            {t.warn}
-          </Notice>
-          <div className="text-center">
-            <div className="tabular text-4xl font-semibold tracking-tight text-fg sm:text-5xl">{fmtHz(freq)}</div>
-          </div>
-          <Field label={t.freqSlider} htmlFor={`${id}-fs`}>
-            <Slider
-              id={`${id}-fs`}
-              min={0}
-              max={1000}
-              step={1}
-              value={toSlider(freq)}
-              disabled={genMode === "sweep"}
-              aria-valuetext={fmtHz(freq)}
-              onChange={(e) => {
-                const f = Math.round(fromSlider(Number(e.target.value)));
-                setFreqText(String(f));
-                changeFreq(f);
-              }}
-            />
-          </Field>
-          <div className="flex flex-wrap gap-1.5">
-            {PRESET_HZ.map((f) => (
-              <button
-                key={f}
-                type="button"
-                className={cn("chip h-8! px-3! text-[0.8125rem]!", Math.round(freq) === f && "border-accent! text-accent!")}
+        <Panel>
+          <PanelHeader title={t.gen} />
+          <div className="flex flex-col gap-4 p-4 sm:p-5">
+            <Notice tone="warn" className="leading-relaxed">
+              {t.warn}
+            </Notice>
+            <div className="text-center">
+              <div className="tabular text-5xl font-bold tracking-tight text-fg sm:text-6xl">{fmtHz(freq)}</div>
+            </div>
+            <Field label={t.freqSlider} htmlFor={`${id}-fs`}>
+              <Slider
+                id={`${id}-fs`}
+                min={0}
+                max={1000}
+                step={1}
+                value={toSlider(freq)}
                 disabled={genMode === "sweep"}
-                onClick={() => {
+                aria-valuetext={fmtHz(freq)}
+                onChange={(e) => {
+                  const f = Math.round(fromSlider(Number(e.target.value)));
                   setFreqText(String(f));
                   changeFreq(f);
                 }}
-              >
-                {fmtHz(f)}
-              </button>
-            ))}
-          </div>
-          <div className="grid gap-3 sm:grid-cols-[10rem_minmax(0,1fr)_minmax(0,1fr)]">
-            <Field label={t.freq} htmlFor={`${id}-fi`}>
-              <Input
-                id={`${id}-fi`}
-                inputMode="decimal"
-                value={freqText}
-                disabled={genMode === "sweep"}
-                className="tabular"
-                onChange={(e) => {
-                  setFreqText(e.target.value);
-                  const n = parseNumber(e.target.value);
-                  if (n !== null && n >= F_MIN && n <= F_MAX) changeFreq(n);
-                }}
-                aria-invalid={(() => {
-                  const n = parseNumber(freqText);
-                  return n === null || n < F_MIN || n > F_MAX;
-                })()}
               />
             </Field>
-            <div className="flex min-w-0 flex-col gap-1.5">
-              <span className="text-sm font-medium text-fg-2">{t.wave}</span>
-              <Segmented
-                size="sm"
-                label={t.wave}
-                value={wave}
-                onChange={(w) => {
-                  setWave(w);
-                  const r = resRef.current;
-                  if (r?.gen) r.gen.osc.type = w;
-                }}
-                options={(["sine", "triangle", "square", "sawtooth"] as const).map((w) => ({ value: w, label: t.waves[w] }))}
-              />
+            <div className="flex flex-wrap gap-2">
+              {PRESET_HZ.map((f) => (
+                <button
+                  key={f}
+                  type="button"
+                  className="chip"
+                  aria-pressed={Math.round(freq) === f}
+                  disabled={genMode === "sweep"}
+                  onClick={() => {
+                    setFreqText(String(f));
+                    changeFreq(f);
+                  }}
+                >
+                  {fmtHz(f)}
+                </button>
+              ))}
             </div>
-            <div className="flex min-w-0 flex-col gap-1.5">
-              <span className="text-sm font-medium text-fg-2">{t.out}</span>
-              <Segmented
-                size="sm"
-                label={t.out}
-                value={genSide}
-                onChange={(s) => {
-                  setGenSide(s);
-                  const r = resRef.current;
-                  if (r?.gen && r.ctx) r.gen.pan.pan.setTargetAtTime(s === "left" ? -1 : s === "right" ? 1 : 0, r.ctx.currentTime, 0.02);
-                }}
-                options={sides.map((s) => ({ value: s, label: t[s] }))}
-              />
+            <div className="flex flex-wrap items-start gap-x-6 gap-y-4">
+              <Field label={t.freq} htmlFor={`${id}-fi`} className="w-36">
+                <Input
+                  id={`${id}-fi`}
+                  inputMode="decimal"
+                  value={freqText}
+                  disabled={genMode === "sweep"}
+                  className="tabular"
+                  onChange={(e) => {
+                    setFreqText(e.target.value);
+                    const n = parseNumber(e.target.value);
+                    if (n !== null && n >= F_MIN && n <= F_MAX) changeFreq(n);
+                  }}
+                  aria-invalid={(() => {
+                    const n = parseNumber(freqText);
+                    return n === null || n < F_MIN || n > F_MAX;
+                  })()}
+                />
+              </Field>
+              <div className="flex min-w-0 flex-col gap-1.5">
+                <span className="text-sm font-medium text-fg-2">{t.wave}</span>
+                <Segmented
+                  size="sm"
+                  label={t.wave}
+                  value={wave}
+                  onChange={(w) => {
+                    setWave(w);
+                    const r = resRef.current;
+                    if (r?.gen) r.gen.osc.type = w;
+                  }}
+                  options={(["sine", "triangle", "square", "sawtooth"] as const).map((w) => ({ value: w, label: t.waves[w] }))}
+                />
+              </div>
+              <div className="flex min-w-0 flex-col gap-1.5">
+                <span className="text-sm font-medium text-fg-2">{t.out}</span>
+                <Segmented
+                  size="sm"
+                  label={t.out}
+                  value={genSide}
+                  onChange={(s) => {
+                    setGenSide(s);
+                    const r = resRef.current;
+                    if (r?.gen && r.ctx) r.gen.pan.pan.setTargetAtTime(s === "left" ? -1 : s === "right" ? 1 : 0, r.ctx.currentTime, 0.02);
+                  }}
+                  options={sides.map((s) => ({ value: s, label: t[s] }))}
+                />
+              </div>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {genMode === "tone" ? (
+                <Button variant="danger" size="lg" onClick={stopGen}>
+                  <Square aria-hidden />
+                  {t.stop}
+                </Button>
+              ) : (
+                <Button variant="filled" size="lg" onClick={() => startGen("tone")}>
+                  <Play aria-hidden />
+                  {t.play}
+                </Button>
+              )}
+              {genMode === "sweep" ? (
+                <Button variant="danger" size="lg" onClick={stopGen}>
+                  <Square aria-hidden />
+                  {t.stop}
+                </Button>
+              ) : (
+                <Button variant="tonal" size="lg" onClick={() => startGen("sweep")}>
+                  <AudioWaveform aria-hidden />
+                  {t.fsweep}
+                </Button>
+              )}
             </div>
           </div>
-          <div className="flex flex-wrap gap-2">
-            {genMode === "tone" ? (
-              <Button variant="danger" onClick={stopGen}>
-                <Square aria-hidden />
-                {t.stop}
-              </Button>
-            ) : (
-              <Button variant="primary" onClick={() => startGen("tone")}>
-                <Play aria-hidden />
-                {t.play}
-              </Button>
-            )}
-            {genMode === "sweep" ? (
-              <Button variant="danger" onClick={stopGen}>
-                <Square aria-hidden />
-                {t.stop}
-              </Button>
-            ) : (
-              <Button variant="secondary" onClick={() => startGen("sweep")}>
-                <AudioWaveform aria-hidden />
-                {t.fsweep}
-              </Button>
-            )}
-          </div>
-        </div>
-      </Panel>
+        </Panel>
+      </div>
 
       {info && (
         <dl className="facts">

@@ -8,7 +8,7 @@ import { Badge, Notice } from "@/ui/panel";
 import { adjacent, cidr4, maskOf, parseV4Input, supernets, toBinary, toDotted, toHex, v4Info } from "./lib/ipv4";
 import { compress, expand, isV4Mapped, parseV6Input, reverse4, reverse6, v6Info } from "./lib/ipv6";
 import { MULTICAST_SCOPE, special4, special6, type SpecialRange } from "./lib/special";
-import { bigFmt, DetailList, err4, err6, ResultCard, type ValueRow } from "./ui/shared";
+import { bigFmt, DetailList, err4, err6, ResultCard, Split, type ValueRow } from "./ui/shared";
 
 const T = {
   ru: {
@@ -115,37 +115,30 @@ export default function IpCalculator({ locale, value = "192.168.1.10/24" }: { lo
   const error = v4 && !v4.ok ? err4(locale, v4.error) : v6 && !v6.ok ? err6(locale, v6.error) : null;
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="grid gap-3 sm:grid-cols-[1fr_15rem]">
-        <Field label={t.input} htmlFor={`${id}-ip`} hint={t.inputHint}>
-          <Input
-            id={`${id}-ip`}
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            size="lg"
-            className="font-mono"
-            spellCheck={false}
-            autoComplete="off"
-            autoCapitalize="off"
-            aria-invalid={!!error}
-          />
-        </Field>
-        {!isV6 && (
-          <Field label={t.prefix} htmlFor={`${id}-p`}>
-            <Select id={`${id}-p`} value={prefixShown} onChange={(e) => onPrefix(Number(e.target.value))} size="lg">
-              {Array.from({ length: 33 }, (_, p) => 32 - p).map((p) => (
-                <option key={p} value={p}>
-                  /{p} — {toDotted(maskOf(p))}
-                </option>
-              ))}
-            </Select>
+    <Split
+      input={
+        <>
+          <Field label={t.input} htmlFor={`${id}-ip`} hint={t.inputHint}>
+            <Input id={`${id}-ip`} value={text} onChange={(e) => setText(e.target.value)} size="lg" className="font-mono" spellCheck={false} autoComplete="off" autoCapitalize="off" aria-invalid={!!error} />
           </Field>
-        )}
-      </div>
+          {!isV6 && (
+            <Field label={t.prefix} htmlFor={`${id}-p`}>
+              <Select id={`${id}-p`} value={prefixShown} onChange={(e) => onPrefix(Number(e.target.value))} size="lg">
+                {Array.from({ length: 33 }, (_, p) => 32 - p).map((p) => (
+                  <option key={p} value={p}>
+                    /{p} — {toDotted(maskOf(p))}
+                  </option>
+                ))}
+              </Select>
+            </Field>
+          )}
+        </>
+      }
+    >
       {error && <Notice tone="err">{error}</Notice>}
       {v4?.ok && <V4Result locale={locale} ip={v4.value.ip} prefix={v4.value.prefix} />}
       {v6?.ok && <V6Result locale={locale} value={v6.value.value} prefix={v6.value.prefix} zone={v6.value.zone} />}
-    </div>
+    </Split>
   );
 }
 

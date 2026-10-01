@@ -3,7 +3,7 @@
 import { useId, useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { detectKz, kzCheckDigit, parseBin, parseIin, type KzError } from "./lib/kz";
-import { BigInput, Details, Problems, Verdict, type Row } from "./ui/kit";
+import { BigInput, Details, Layout, Problems, type Row, Verdict } from "./ui/kit";
 
 const MONTHS = {
   ru: ["января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября", "ноября", "декабря"],
@@ -115,15 +115,13 @@ export default function IinValidator({ locale, value = "900515312349" }: { local
   }
 
   return (
-    <div className="flex flex-col gap-4">
-      <BigInput id={`${id}-n`} label={t.label} value={text} onChange={setText} hint={t.hint} inputMode="numeric" invalid={!empty && !r.valid} />
+    <Layout input={<BigInput id={`${id}-n`} label={t.label} value={text} onChange={setText} hint={t.hint} inputMode="numeric" invalid={!empty && !r.valid} />} note={t.note}>
       {!empty && (
         <Verdict tone={r.valid ? "ok" : "err"} title={r.valid ? (kind === "bin" ? t.binOk : t.iinOk) : kind === "bin" ? t.binBad : t.iinBad} value={r.valid ? clean : undefined}>
           <Problems items={r.errors.map((e) => t.errors[e])} />
         </Verdict>
       )}
       {!empty && r.errors[0] !== "chars" && r.errors[0] !== "length" && <Details rows={rows} locale={locale} />}
-      <p className="text-sm text-fg-3">{t.note}</p>
-    </div>
+    </Layout>
   );
 }

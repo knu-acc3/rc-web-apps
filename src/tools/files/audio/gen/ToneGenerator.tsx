@@ -4,10 +4,15 @@ import { Minus, Play, Plus, Square } from "lucide-react";
 import { useEffect, useId, useRef, useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { formatNumber, parseNumber } from "@/i18n/format";
-import { Button } from "@/ui/button";
-import { Field, Input, Slider } from "@/ui/field";
+import { cn } from "@/lib/cn";
+import { IconButton } from "@/ui/button";
+import { Field, Slider } from "@/ui/field";
+import { NumberInput } from "@/ui/number-input";
 import { Notice, Panel } from "@/ui/panel";
+import { ScrollRow } from "@/ui/scroll-row";
 import { Segmented } from "@/ui/segmented";
+import { Fab } from "@/tools/files/video/ui/Fab";
+import { Setting } from "@/tools/files/video/ui/options";
 import { fadeOutAndStop, mediaErrorKind, resumeAudio, smoothSet } from "../lib/audio";
 import { NOTE_NAMES_RU, noteOf } from "../lib/pitch";
 
@@ -16,7 +21,10 @@ const MAX = 22000;
 
 const T = {
   ru: {
-    freq: "Частота, Гц",
+    freqLabel: "Частота",
+    presets: "Частые частоты",
+    khz: "кГц",
+    sec: "с",
     slider: "Частота (логарифмическая шкала)",
     wave: "Форма волны",
     sine: "Синус",
@@ -30,21 +38,24 @@ const T = {
     right: "Правый",
     mode: "Режим",
     steady: "Постоянный тон",
-    sweep: "Свип (плавный переход)",
-    from: "От, Гц",
-    to: "До, Гц",
-    time: "За, секунд",
+    sweep: "Свип",
+    from: "От",
+    to: "До",
+    time: "За время",
     play: "Воспроизвести",
     stop: "Остановить",
     note: "Ближайшая нота",
     down: "Ниже на полутон",
     up: "Выше на полутон",
-    safety: "Начинайте с малой громкости. Высокие частоты и громкий тон в наушниках могут повредить слух. Динамики телефонов и ноутбуков обычно не воспроизводят частоты ниже 100–200 Гц.",
+    safety: "Начинайте с малой громкости: громкий тон в наушниках может повредить слух.",
     noAudio: "Браузер не поддерживает Web Audio.",
     bad: "Введите частоту от 1 до 22 000 Гц",
   },
   en: {
-    freq: "Frequency, Hz",
+    freqLabel: "Frequency",
+    presets: "Common frequencies",
+    khz: "kHz",
+    sec: "s",
     slider: "Frequency (logarithmic scale)",
     wave: "Waveform",
     sine: "Sine",
@@ -59,15 +70,15 @@ const T = {
     mode: "Mode",
     steady: "Steady tone",
     sweep: "Sweep",
-    from: "From, Hz",
-    to: "To, Hz",
-    time: "Over, seconds",
+    from: "From",
+    to: "To",
+    time: "Over",
     play: "Play",
     stop: "Stop",
     note: "Nearest note",
     down: "Down a semitone",
     up: "Up a semitone",
-    safety: "Start at a low volume. High frequencies and loud tones in headphones can damage hearing. Phone and laptop speakers usually can't reproduce frequencies below 100–200 Hz.",
+    safety: "Start at a low volume: a loud tone in headphones can damage hearing.",
     noAudio: "This browser doesn't support Web Audio.",
     bad: "Enter a frequency from 1 to 22,000 Hz",
   },
@@ -75,6 +86,8 @@ const T = {
 
 const toSlider = (f: number) => Math.log(f / MIN) / Math.log(MAX / MIN);
 const fromSlider = (x: number) => MIN * Math.pow(MAX / MIN, x);
+/** Quick picks under the slider: the ends of hearing, speaker checks, concert A, a kilohertz. */
+const MARKS = [20, 100, 440, 1000, 10000, 20000];
 const round = (f: number) => (f >= 100 ? Math.round(f) : Math.round(f * 10) / 10);
 
 interface Voice {
@@ -167,74 +180,99 @@ function ToneGeneratorInner({ locale, freq: freq0 = 440 }: { locale: Locale; fre
   const n = noteOf(freq);
   const noteName = locale === "ru" ? `${n.name}${n.octave} (${NOTE_NAMES_RU[(n.midi % 12 + 12) % 12]})` : `${n.name}${n.octave}`;
 
+  const hz = locale === "ru" ? "Гц" : "Hz";
+  const pct = (v: number) => `${Math.round(v * 100)}%`;
   return (
-    <div className="flex flex-col gap-4">
-      <Panel className="flex flex-col gap-5 p-5">
-        {mode === "steady" ? (
-          <div className="flex flex-col items-center gap-3">
-            <div className="flex w-full max-w-sm items-center gap-2">
-              <Button variant="outline" size="icon" onClick={() => setF(freq / Math.pow(2, 1 / 12))} aria-label={t.down} title={t.down}>
-                <Minus aria-hidden />
-              </Button>
-              <label htmlFor={`${id}-f`} className="sr-only">
-                {t.freq}
-              </label>
-              <Input
-                id={`${id}-f`}
-                value={shown}
-                inputMode="decimal"
-                autoComplete="off"
-                aria-invalid={invalid}
-                onChange={(e) => {
-                  setText(e.target.value);
-                  const v = parseNumber(e.target.value);
-                  if (v !== null && v >= MIN && v <= MAX) setFreq(v);
-                }}
-                onBlur={() => setText(null)}
-                className="tabular h-16! min-w-0 flex-1 text-center text-[clamp(1.5rem,9vw,2.25rem)]! font-semibold"
-              />
-              <span className="text-xl text-fg-2 sm:text-2xl">{locale === "ru" ? "Гц" : "Hz"}</span>
-              <Button variant="outline" size="icon" onClick={() => setF(freq * Math.pow(2, 1 / 12))} aria-label={t.up} title={t.up}>
-                <Plus aria-hidden />
-              </Button>
+    <div className="flex flex-col gap-3">
+      <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] lg:gap-6">
+        <Panel className="flex min-w-0 flex-col items-center gap-6 p-4 sm:p-6">
+          {mode === "steady" ? (
+            <div className="flex w-full flex-col gap-1">
+              <div className="flex items-center justify-between gap-3">
+                <label htmlFor={`${id}-f`} className="text-sm font-medium text-fg-2">
+                  {t.freqLabel}
+                </label>
+                <span className="text-sm text-fg-3">
+                  {t.note}: <span className="font-semibold text-fg-2">{noteName}</span>
+                  {Math.abs(n.cents) >= 1 ? ` ${n.cents > 0 ? "+" : "−"}${formatNumber(locale, Math.abs(Math.round(n.cents)))} ¢` : ""}
+                </span>
+              </div>
+              <div className="flex items-center justify-center gap-2 py-2 sm:gap-4">
+                <IconButton variant="tonal" size="lg" label={t.down} icon={<Minus aria-hidden />} onClick={() => setF(freq / Math.pow(2, 1 / 12))} />
+                <div className={cn("flex min-w-0 items-baseline gap-2 border-b-2 border-dashed pb-1 transition-colors focus-within:border-solid focus-within:border-accent", invalid ? "border-err" : "border-line-strong hover:border-outline")}>
+                  <input
+                    id={`${id}-f`}
+                    value={shown}
+                    inputMode="decimal"
+                    autoComplete="off"
+                    spellCheck={false}
+                    aria-invalid={invalid}
+                    onFocus={(e) => e.target.select()}
+                    onChange={(e) => {
+                      setText(e.target.value);
+                      const v = parseNumber(e.target.value);
+                      if (v !== null && v >= MIN && v <= MAX) setFreq(v);
+                    }}
+                    onBlur={() => setText(null)}
+                    style={{ width: `${Math.max(3, shown.length) + 0.5}ch` }}
+                    className="tabular min-w-0 max-w-[8ch] bg-transparent text-center text-5xl font-bold tracking-tight text-fg outline-none sm:text-6xl"
+                  />
+                  <span className="text-2xl font-semibold text-fg-2">{hz}</span>
+                </div>
+                <IconButton variant="tonal" size="lg" label={t.up} icon={<Plus aria-hidden />} onClick={() => setF(freq * Math.pow(2, 1 / 12))} />
+              </div>
+              {invalid && (
+                <p className="text-center text-sm text-err" role="alert">
+                  {t.bad}
+                </p>
+              )}
+              <Slider aria-label={t.slider} aria-valuetext={`${formatNumber(locale, freq)} ${hz}`} min={0} max={1} step={0.0005} value={toSlider(freq)} format={() => `${formatNumber(locale, freq)} ${hz}`} onChange={(e) => setF(fromSlider(Number(e.target.value)))} />
+              <ScrollRow label={t.presets} className="mt-2" rowClassName="justify-center-safe">
+                {MARKS.map((m) => (
+                  <button key={m} type="button" className="chip tabular shrink-0" aria-pressed={freq === m} onClick={() => setF(m)}>
+                    {m >= 1000 ? `${formatNumber(locale, m / 1000)} ${t.khz}` : `${m} ${hz}`}
+                  </button>
+                ))}
+              </ScrollRow>
             </div>
-            {invalid && <p className="text-sm text-err">{t.bad}</p>}
-            <Slider aria-label={t.slider} min={0} max={1} step={0.0005} value={toSlider(freq)} onChange={(e) => setF(fromSlider(Number(e.target.value)))} className="max-w-xl" />
-            <p className="text-sm text-fg-3">
-              {t.note}: <span className="font-medium text-fg-2">{noteName}</span>
-              {Math.abs(n.cents) >= 1 ? ` ${n.cents > 0 ? "+" : "−"}${formatNumber(locale, Math.abs(Math.round(n.cents)))} ¢` : ""}
-            </p>
+          ) : (
+            <div className="grid w-full gap-4 sm:grid-cols-3">
+              <Field label={t.from} htmlFor={`${id}-s1`}>
+                <NumberInput id={`${id}-s1`} locale={locale} value={sweep.from} min={MIN} max={MAX} step={10} stepper={false} suffix={hz} onChange={(v) => v !== null && setSweep((s) => ({ ...s, from: v }))} />
+              </Field>
+              <Field label={t.to} htmlFor={`${id}-s2`}>
+                <NumberInput id={`${id}-s2`} locale={locale} value={sweep.to} min={MIN} max={MAX} step={10} stepper={false} suffix={hz} onChange={(v) => v !== null && setSweep((s) => ({ ...s, to: v }))} />
+              </Field>
+              <Field label={t.time} htmlFor={`${id}-s3`}>
+                <NumberInput id={`${id}-s3`} locale={locale} value={sweep.time} min={1} max={600} step={1} suffix={t.sec} onChange={(v) => v !== null && setSweep((s) => ({ ...s, time: Math.max(1, v) }))} />
+              </Field>
+            </div>
+          )}
+          <Fab label={playing ? t.stop : t.play} icon={playing ? <Square className="fill-current" aria-hidden /> : <Play className="fill-current" aria-hidden />} onClick={playing ? stop : play} active={playing} disabled={!playing && mode === "steady" && invalid} />
+        </Panel>
+        <Panel className="flex min-w-0 flex-col gap-5 p-4 sm:p-5">
+          <Setting label={t.mode}>
+            <Segmented label={t.mode} value={mode} onChange={(x) => (playing && stop(), setMode(x))} options={[{ value: "steady", label: t.steady }, { value: "sweep", label: t.sweep }]} />
+          </Setting>
+          <Setting label={t.wave}>
+            <Segmented label={t.wave} value={wave as "sine"} onChange={(x) => setWave(x as OscillatorType)} options={(["sine", "square", "triangle", "sawtooth"] as const).map((w) => ({ value: w as "sine", label: t[w] }))} />
+          </Setting>
+          <Setting label={t.channel}>
+            <Segmented label={t.channel} value={channel} fill onChange={setChannel} options={[{ value: "both", label: t.both }, { value: "left", label: t.left }, { value: "right", label: t.right }]} />
+          </Setting>
+          <div className="flex min-w-0 flex-col">
+            <div className="flex items-baseline justify-between gap-3">
+              <label htmlFor={`${id}-v`} className="text-sm font-medium text-fg-2">
+                {t.volume}
+              </label>
+              <output htmlFor={`${id}-v`} className="tabular text-lg font-semibold text-fg">
+                {pct(volume)}
+              </output>
+            </div>
+            <Slider id={`${id}-v`} min={0} max={1} step={0.01} value={volume} format={pct} aria-valuetext={pct(volume)} onChange={(e) => setVolume(Number(e.target.value))} />
           </div>
-        ) : (
-          <div className="grid grid-cols-3 gap-3">
-            <Field label={t.from} htmlFor={`${id}-s1`}>
-              <Input id={`${id}-s1`} inputMode="decimal" value={String(sweep.from)} onChange={(e) => setSweep((s) => ({ ...s, from: parseNumber(e.target.value) ?? s.from }))} className="tabular" />
-            </Field>
-            <Field label={t.to} htmlFor={`${id}-s2`}>
-              <Input id={`${id}-s2`} inputMode="decimal" value={String(sweep.to)} onChange={(e) => setSweep((s) => ({ ...s, to: parseNumber(e.target.value) ?? s.to }))} className="tabular" />
-            </Field>
-            <Field label={t.time} htmlFor={`${id}-s3`}>
-              <Input id={`${id}-s3`} inputMode="decimal" value={String(sweep.time)} onChange={(e) => setSweep((s) => ({ ...s, time: Math.max(1, parseNumber(e.target.value) ?? s.time) }))} className="tabular" />
-            </Field>
-          </div>
-        )}
-        <div className="flex justify-center">
-          <Button variant={playing ? "danger" : "primary"} size="lg" onClick={playing ? stop : play} disabled={!playing && mode === "steady" && invalid} className="min-w-48">
-            {playing ? <Square className="fill-current" aria-hidden /> : <Play className="fill-current" aria-hidden />}
-            {playing ? t.stop : t.play}
-          </Button>
-        </div>
-        <div className="flex flex-wrap items-end justify-center gap-x-5 gap-y-3 border-t border-line pt-4">
-          <Segmented label={t.wave} value={wave as "sine"} onChange={(x) => setWave(x as OscillatorType)} size="sm" options={(["sine", "square", "triangle", "sawtooth"] as const).map((w) => ({ value: w as "sine", label: t[w] }))} />
-          <Segmented label={t.channel} value={channel} onChange={setChannel} size="sm" options={[{ value: "both", label: t.both }, { value: "left", label: t.left }, { value: "right", label: t.right }]} />
-          <Segmented label={t.mode} value={mode} onChange={(x) => (playing && stop(), setMode(x))} size="sm" options={[{ value: "steady", label: t.steady }, { value: "sweep", label: t.sweep }]} />
-          <label className="flex items-center gap-2 text-sm text-fg-2">
-            {t.volume}
-            <Slider min={0} max={1} step={0.01} value={volume} onChange={(e) => setVolume(Number(e.target.value))} className="w-32" aria-label={t.volume} />
-            <span className="tabular w-10">{Math.round(volume * 100)}%</span>
-          </label>
-        </div>
-      </Panel>
+        </Panel>
+      </div>
       {error && <Notice tone="err">{error}</Notice>}
       <p className="text-sm text-fg-3">{t.safety}</p>
     </div>

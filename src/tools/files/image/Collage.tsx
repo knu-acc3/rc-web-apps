@@ -1,14 +1,13 @@
 "use client";
 
-import { Download, Loader2, Settings2 } from "lucide-react";
-import { useEffect, useId, useMemo, useRef, useState } from "react";
+import { Download, Loader2 } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { formatBytes } from "@/i18n/format";
-import { cn } from "@/lib/cn";
 import { downloadBlob } from "@/lib/clipboard";
 import { Button } from "@/ui/button";
 import { Dropzone } from "@/ui/dropzone";
-import { Field, Select } from "@/ui/field";
+import { Field } from "@/ui/field";
 import { Notice, Panel } from "@/ui/panel";
 import { Segmented } from "@/ui/segmented";
 import { cellsOf, layoutsFor, placeCells, type Layout } from "./lib/collage";
@@ -17,10 +16,13 @@ import { roundRectPath } from "./lib/pipeline";
 import type { OutFormat } from "./lib/types";
 import { checker, ColorField, RangeField } from "./ui/controls";
 import { encodeMainCanvas } from "./ui/encodeMain";
+import { OUT_LABEL } from "./ui/format";
 import { FrameStrip } from "./ui/FrameStrip";
 import { useEngine } from "./ui/hooks";
+import { OptionsBar, ToolColumns } from "./ui/OptionsBar";
 import { errorText, S } from "./ui/strings";
 import { useImageList, type ListImage } from "./ui/useImageList";
+import { RestoringPlaceholder, WorkspaceBar } from "./ui/Workspace";
 
 const T = {
   ru: {
@@ -105,7 +107,6 @@ function LayoutIcon({ layout }: { layout: Layout }) {
 export default function Collage({ locale }: { locale: Locale }) {
   const t = T[locale];
   const s = S(locale);
-  const id = useId();
   const getEngine = useEngine();
   const list = useImageList(2048, 9);
   const [layoutId, setLayoutId] = useState<string>("");
@@ -164,101 +165,113 @@ export default function Collage({ locale }: { locale: Locale }) {
     list.add(files);
   };
 
+  const bar = (
+    <WorkspaceBar
+      locale={locale}
+      count={list.ws.restored}
+      onStartOver={() => {
+        list.ws.startOver();
+        list.clear();
+      }}
+    />
+  );
+
   if (!list.items.length) {
     return (
       <div className="flex flex-col gap-3">
-        <Dropzone onFiles={add} accept={IMAGE_ACCEPT} multiple title={s.dropMany} hint={t.need} />
-        {list.loading && <Loader2 className="size-5 animate-spin text-accent" aria-label={s.reading} />}
+        {list.ws.restoring || list.loading ? (
+          <RestoringPlaceholder locale={locale} text={list.ws.restoring ? undefined : s.reading} />
+        ) : (
+          <Dropzone onFiles={add} accept={IMAGE_ACCEPT} multiple title={s.dropMany} hint={t.need} locale={locale} />
+        )}
       </div>
     );
   }
 
+  const side = (
+    <OptionsBar
+      locale={locale}
+      more={
+        <>
+          <RangeField label={t.pad} value={pad} onChange={setPad} min={0} max={10} step={0.5} unit="%" locale={locale} />
+          <RangeField label={t.radius} value={radius} onChange={setRadius} min={0} max={100} unit="%" locale={locale} />
+          <ColorField label={t.bg} value={bg} onChange={setBg} locale={locale} />
+          <Field label={t.width}>
+            <Segmented
+              label={t.width}
+              value={String(width)}
+              onChange={(v) => setWidth(Number(v))}
+              options={WIDTHS.map((w) => ({ value: String(w), label: `${w} px` }))}
+            />
+          </Field>
+          <Field label={t.format}>
+            <Segmented
+              label={t.format}
+              value={format}
+              onChange={setFormat}
+              options={(["jpg", "png", "webp"] as const).map((f) => ({ value: f, label: OUT_LABEL[f] }))}
+            />
+          </Field>
+        </>
+      }
+    >
+      <Field label={t.layout}>
+        <div role="radiogroup" aria-label={t.layout} className="flex flex-wrap gap-2">
+          {layouts.map((l, i) => (
+            <button
+              key={l.id}
+              type="button"
+              role="radio"
+              aria-checked={l === layout}
+              aria-label={t.layoutN(i + 1)}
+              title={t.layoutN(i + 1)}
+              onClick={() => setLayoutId(l.id)}
+              className="chip min-h-11 px-2.5"
+            >
+              <LayoutIcon layout={l} />
+            </button>
+          ))}
+        </div>
+      </Field>
+      <Field label={t.ratio}>
+        <Segmented label={t.ratio} value={ratio} onChange={setRatio} options={RATIOS.map((x) => ({ value: x.value, label: x.value }))} />
+      </Field>
+      <RangeField label={t.gap} value={gap} onChange={setGap} min={0} max={8} step={0.5} unit="%" locale={locale} />
+    </OptionsBar>
+  );
+
   return (
     <div className="flex flex-col gap-4">
-      <div className="rounded-[0.75rem] border border-line bg-surface">
-        <div className="flex flex-wrap items-end gap-x-4 gap-y-3 px-4 py-3">
-          <div className="flex flex-col gap-1.5">
-            <span className="text-sm font-medium text-fg-2">{t.layout}</span>
-            <div role="radiogroup" aria-label={t.layout} className="flex flex-wrap gap-1">
-              {layouts.map((l, i) => (
-                <button
-                  key={l.id}
-                  type="button"
-                  role="radio"
-                  aria-checked={l === layout}
-                  aria-label={t.layoutN(i + 1)}
-                  title={t.layoutN(i + 1)}
-                  onClick={() => setLayoutId(l.id)}
-                  className={cn(
-                    "flex size-10 items-center justify-center rounded-[0.5rem] border",
-                    l === layout ? "border-accent bg-accent-soft text-accent" : "border-line text-fg-3 hover:text-fg",
-                  )}
-                >
-                  <LayoutIcon layout={l} />
-                </button>
-              ))}
+      {bar}
+      <ToolColumns
+        side={side}
+        rest={
+          <>
+            <FrameStrip items={list.items} onMove={list.move} onRemove={list.remove} onAdd={add} locale={locale} label={t.photos} />
+            {overflow && <Notice tone="warn">{t.max}</Notice>}
+            {error ? <Notice tone="err">{errorText(locale, error)}</Notice> : null}
+            {list.errors.length > 0 && <Notice tone="warn">{errorText(locale, list.errors[list.errors.length - 1])}</Notice>}
+          </>
+        }
+      >
+        <Panel className="flex min-w-0 flex-col gap-3 p-3 sm:gap-4 sm:p-4">
+          <div className={`flex justify-center rounded-[1rem] p-3 sm:p-4 ${checker}`}>
+            <canvas ref={canvasRef} role="img" aria-label={t.photos} className="block h-auto max-h-[62vh] w-auto max-w-full rounded-[0.25rem] shadow-elev-1" />
+          </div>
+          <div className="flex flex-col gap-3 px-1 sm:flex-row sm:items-center sm:justify-between">
+            <div aria-live="polite">
+              <p className="tabular text-2xl font-semibold tracking-tight text-fg sm:text-3xl">
+                {width} × {H} px
+              </p>
+              <p className="text-sm text-fg-3">{last ? `${format.toUpperCase()} · ${formatBytes(locale, last)}` : n < 2 ? t.need : format.toUpperCase()}</p>
             </div>
+            <Button variant="filled" size="lg" onClick={download} disabled={busy || n < 2}>
+              {busy ? <Loader2 className="animate-spin" aria-hidden /> : <Download aria-hidden />}
+              {t.download}
+            </Button>
           </div>
-          <Field label={t.ratio}>
-            <Segmented wrap label={t.ratio} value={ratio} onChange={setRatio} options={RATIOS.map((x) => ({ value: x.value, label: x.value }))} />
-          </Field>
-          <div className="w-40">
-            <RangeField label={t.gap} value={gap} onChange={setGap} min={0} max={8} step={0.5} unit="%" locale={locale} />
-          </div>
-        </div>
-        <details className="border-t border-line">
-          <summary className="flex cursor-pointer items-center gap-2 px-4 py-2.5 text-sm text-fg-2 hover:text-fg">
-            <Settings2 className="size-4" aria-hidden />
-            {locale === "ru" ? "Дополнительно" : "More options"}
-          </summary>
-          <div className="grid gap-4 px-4 pb-4 pt-1 sm:grid-cols-2">
-            <RangeField label={t.pad} value={pad} onChange={setPad} min={0} max={10} step={0.5} unit="%" locale={locale} />
-            <RangeField label={t.radius} value={radius} onChange={setRadius} min={0} max={100} unit="%" locale={locale} />
-            <ColorField label={t.bg} value={bg} onChange={setBg} locale={locale} />
-            <div className="grid grid-cols-2 gap-3">
-              <Field label={t.width} htmlFor={`${id}-w`}>
-                <Select id={`${id}-w`} value={width} onChange={(e) => setWidth(Number(e.target.value))}>
-                  {WIDTHS.map((w) => (
-                    <option key={w} value={w}>
-                      {w} px
-                    </option>
-                  ))}
-                </Select>
-              </Field>
-              <Field label={t.format} htmlFor={`${id}-f`}>
-                <Select id={`${id}-f`} value={format} onChange={(e) => setFormat(e.target.value as OutFormat)}>
-                  <option value="jpg">JPG</option>
-                  <option value="png">PNG</option>
-                  <option value="webp">WebP</option>
-                </Select>
-              </Field>
-            </div>
-          </div>
-        </details>
-      </div>
-
-      <Panel className="overflow-hidden">
-        <div className={`flex justify-center p-3 sm:p-4 ${checker}`}>
-          <canvas ref={canvasRef} role="img" aria-label={t.photos} className="block h-auto max-h-[62vh] w-auto max-w-full rounded-[0.25rem]" />
-        </div>
-        <div className="flex flex-col gap-3 border-t border-line px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
-          <div aria-live="polite">
-            <p className="tabular text-2xl font-semibold tracking-tight text-fg">
-              {width} × {H} px
-            </p>
-            <p className="text-sm text-fg-3">{last ? `${format.toUpperCase()} · ${formatBytes(locale, last)}` : n < 2 ? t.need : format.toUpperCase()}</p>
-          </div>
-          <Button variant="primary" size="lg" onClick={download} disabled={busy || n < 2}>
-            {busy ? <Loader2 className="animate-spin" aria-hidden /> : <Download aria-hidden />}
-            {t.download}
-          </Button>
-        </div>
-      </Panel>
-
-      <FrameStrip items={list.items} onMove={list.move} onRemove={list.remove} onAdd={add} locale={locale} label={t.photos} />
-      {overflow && <Notice tone="warn">{t.max}</Notice>}
-      {error ? <Notice tone="err">{errorText(locale, error)}</Notice> : null}
-      {list.errors.length > 0 && <Notice tone="warn">{errorText(locale, list.errors[list.errors.length - 1])}</Notice>}
+        </Panel>
+      </ToolColumns>
     </div>
   );
 }

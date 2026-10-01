@@ -82,7 +82,7 @@ export default function Filters({ locale, filter: initial = "grayscale" }: Filte
   const paramLabel = filter === "black-and-white" ? t.threshold : filter === "pixelate" ? t.block : PARAM_LABEL[def.unit][locale];
   const options = (
     <>
-      <Field label={t.filter} htmlFor={`${id}-f`} className="w-60">
+      <Field label={t.filter} htmlFor={`${id}-f`}>
         <Select id={`${id}-f`} value={filter} onChange={(e) => choose(e.target.value as FilterId)}>
           {FILTER_IDS.map((f) => (
             <option key={f} value={f}>
@@ -91,18 +91,16 @@ export default function Filters({ locale, filter: initial = "grayscale" }: Filte
           ))}
         </Select>
       </Field>
-      <div className="min-w-52 flex-1">
-        <RangeField
-          label={paramLabel}
-          value={params.amount}
-          onChange={(v) => setParams((x) => ({ ...x, amount: v }))}
-          min={def.min}
-          max={def.max}
-          step={def.step}
-          unit={def.unit === "lv" ? "" : def.unit}
-          locale={locale}
-        />
-      </div>
+      <RangeField
+        label={paramLabel}
+        value={params.amount}
+        onChange={(v) => setParams((x) => ({ ...x, amount: v }))}
+        min={def.min}
+        max={def.max}
+        step={def.step}
+        unit={def.unit === "lv" ? "" : def.unit}
+        locale={locale}
+      />
     </>
   );
 
@@ -142,6 +140,7 @@ export default function Filters({ locale, filter: initial = "grayscale" }: Filte
 
   return (
     <BatchWorkspace
+      self="filters"
       locale={locale}
       batch={batch}
       options={options}

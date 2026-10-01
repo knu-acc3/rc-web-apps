@@ -15,10 +15,12 @@ import { luminance, rgbToHex, rgbToHsl, type PaletteColor } from "./lib/palette"
 import { materialize } from "./lib/source";
 import { pixelsOf } from "./lib/run";
 import type { PixelsResult } from "./lib/types";
-import { checker, RangeField } from "./ui/controls";
+import { checker, RangeField, replaceDrop } from "./ui/controls";
 import { useDebounced, useEngine } from "./ui/hooks";
 import { useSingleFile } from "./ui/SingleImage";
 import { errorText, S } from "./ui/strings";
+import { useWorkspace } from "./ui/useWorkspace";
+import { RestoringPlaceholder, WorkspaceBar } from "./ui/Workspace";
 
 const T = {
   ru: {
@@ -73,6 +75,9 @@ export default function Colors({ locale }: { locale: Locale }) {
   const palKey = p ? `${p.id}:${debCount}` : "";
   const palette = palState && palState.key === palKey ? palState.colors : null;
   const cursor = cursorState && p && cursorState.id === p.id ? cursorState : null;
+  const { load } = file;
+  // The photo stays in the tab's workspace for the next photo tool (and comes back from the previous one).
+  const ws = useWorkspace({ files: p ? [p.file] : [], mode: "append", accept: IMAGE_ACCEPT, restore: (files, i) => void load(files[i] ?? files[0]) });
 
   useEffect(() => {
     if (!p) return;
@@ -124,7 +129,11 @@ export default function Colors({ locale }: { locale: Locale }) {
   if (!p) {
     return (
       <div className="flex flex-col gap-3">
-        <Dropzone onFiles={(f) => f[0] && file.load(f[0])} accept={IMAGE_ACCEPT} title={s.dropOne} hint={s.dropHint} />
+        {ws.restoring || file.loading ? (
+          <RestoringPlaceholder locale={locale} text={ws.restoring ? undefined : s.reading} />
+        ) : (
+          <Dropzone onFiles={(f) => f[0] && file.load(f[0])} accept={IMAGE_ACCEPT} title={s.dropOne} hint={s.dropHint} locale={locale} />
+        )}
         {file.error ? <Notice tone="err">{errorText(locale, file.error)}</Notice> : null}
       </div>
     );
@@ -153,80 +162,78 @@ export default function Colors({ locale }: { locale: Locale }) {
 
   return (
     <div className="flex flex-col gap-4">
-      <Panel className="overflow-hidden">
-        <div className="grid gap-4 p-3 sm:p-4 md:grid-cols-[minmax(0,1fr)_16.25rem]">
-          <div className={cn("relative flex min-h-56 items-center justify-center overflow-hidden rounded-[0.625rem] border border-line", checker)}>
-            {!px && <Loader2 className="size-6 animate-spin text-accent" aria-hidden />}
-            <div className={cn("relative", !px && "hidden")}>
-              <canvas
-                ref={canvasRef}
-                tabIndex={0}
-                role="img"
-                aria-label={`${t.image}. ${t.pickHint}`}
-                className="block max-h-[60vh] max-w-full cursor-crosshair touch-none"
-                onPointerDown={(e) => {
-                  e.currentTarget.setPointerCapture(e.pointerId);
-                  pickAt(e.clientX, e.clientY);
-                }}
-                onPointerMove={(e) => e.buttons && pickAt(e.clientX, e.clientY)}
-                onKeyDown={(e) => {
-                  if (!px || !cursor) return;
-                  const st = e.shiftKey ? 10 : 1;
-                  const d =
-                    e.key === "ArrowLeft"
-                      ? [-st, 0]
-                      : e.key === "ArrowRight"
-                        ? [st, 0]
-                        : e.key === "ArrowUp"
-                          ? [0, -st]
-                          : e.key === "ArrowDown"
-                            ? [0, st]
-                            : null;
-                  if (!d) return;
-                  e.preventDefault();
-                  setCursor({
-                    id: cursor.id,
-                    x: Math.min(px.width - 1, Math.max(0, cursor.x + d[0])),
-                    y: Math.min(px.height - 1, Math.max(0, cursor.y + d[1])),
-                  });
-                }}
+      <WorkspaceBar
+        locale={locale}
+        count={ws.restored}
+        onStartOver={() => {
+          ws.startOver();
+          file.reset();
+        }}
+      />
+      <Panel className="grid gap-4 p-3 sm:p-4 lg:grid-cols-[minmax(0,1fr)_18rem] 2xl:grid-cols-[minmax(0,1fr)_22rem]">
+        <div className={cn("relative flex min-h-56 items-center justify-center overflow-hidden rounded-[1rem]", checker)}>
+          {!px && <Loader2 className="size-6 animate-spin text-accent" aria-hidden />}
+          <div className={cn("relative", !px && "hidden")}>
+            <canvas
+              ref={canvasRef}
+              tabIndex={0}
+              role="img"
+              aria-label={`${t.image}. ${t.pickHint}`}
+              className="block max-h-[65vh] max-w-full cursor-crosshair touch-none"
+              onPointerDown={(e) => {
+                e.currentTarget.setPointerCapture(e.pointerId);
+                pickAt(e.clientX, e.clientY);
+              }}
+              onPointerMove={(e) => e.buttons && pickAt(e.clientX, e.clientY)}
+              onKeyDown={(e) => {
+                if (!px || !cursor) return;
+                const st = e.shiftKey ? 10 : 1;
+                const d =
+                  e.key === "ArrowLeft" ? [-st, 0] : e.key === "ArrowRight" ? [st, 0] : e.key === "ArrowUp" ? [0, -st] : e.key === "ArrowDown" ? [0, st] : null;
+                if (!d) return;
+                e.preventDefault();
+                setCursor({
+                  id: cursor.id,
+                  x: Math.min(px.width - 1, Math.max(0, cursor.x + d[0])),
+                  y: Math.min(px.height - 1, Math.max(0, cursor.y + d[1])),
+                });
+              }}
+            />
+            {px && cursor && (
+              <span
+                aria-hidden
+                className="pointer-events-none absolute size-5 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white shadow-[0_0_0_1px_rgb(0_0_0/0.5)]"
+                style={{ left: `${((cursor.x + 0.5) / px.width) * 100}%`, top: `${((cursor.y + 0.5) / px.height) * 100}%` }}
               />
-              {px && cursor && (
-                <span
-                  aria-hidden
-                  className="pointer-events-none absolute size-5 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white shadow-[0_0_0_1px_rgb(0_0_0/0.5)]"
-                  style={{ left: `${((cursor.x + 0.5) / px.width) * 100}%`, top: `${((cursor.y + 0.5) / px.height) * 100}%` }}
-                />
-              )}
-            </div>
-          </div>
-          <div className="flex flex-col gap-3" aria-live="polite">
-            <p className="text-sm font-medium text-fg-2">{t.picked}</p>
-            {picked ? (
-              <>
-                <div className="h-24 rounded-[0.625rem] border border-line" style={{ background: picked.hex }} />
-                <p className="tabular text-3xl font-semibold tracking-tight text-fg">{picked.hex}</p>
-                <ul className="flex flex-col gap-1 text-sm">
-                  {[picked.hex, picked.rgb, picked.hsl].map((v) => (
-                    <li key={v} className="flex items-center justify-between gap-2">
-                      <code className="text-fg-2">{v}</code>
-                      <CopyButton value={v} size="icon-sm" variant="ghost" label={t.copy} copiedLabel={t.copied} />
-                    </li>
-                  ))}
-                </ul>
-              </>
-            ) : (
-              <p className="text-sm text-fg-3">—</p>
             )}
-            <p className="text-[0.8125rem] text-fg-3">{t.pickHint}</p>
           </div>
+        </div>
+        <div className="flex flex-col gap-3 px-1" aria-live="polite">
+          <p className="text-sm font-medium text-fg-2">{t.picked}</p>
+          {picked ? (
+            <>
+              <div className="h-24 rounded-[1rem] shadow-[inset_0_0_0_1px_rgb(0_0_0/0.08)] motion-safe:transition-colors" style={{ background: picked.hex }} />
+              <p className="tabular text-4xl font-semibold tracking-tight text-fg">{picked.hex}</p>
+              <ul className="flex flex-col gap-1 text-sm">
+                {[picked.hex, picked.rgb, picked.hsl].map((v) => (
+                  <li key={v} className="flex items-center justify-between gap-2">
+                    <code className="break-all text-fg-2">{v}</code>
+                    <CopyButton value={v} size="icon-sm" variant="ghost" label={t.copy} copiedLabel={t.copied} />
+                  </li>
+                ))}
+              </ul>
+            </>
+          ) : (
+            <p className="text-sm text-fg-3">—</p>
+          )}
+          <p className="text-[0.8125rem] text-fg-3">{t.pickHint}</p>
         </div>
       </Panel>
 
-      <Panel className="overflow-hidden">
-        <div className="flex flex-wrap items-end justify-between gap-3 border-b border-line px-4 py-3">
-          <h2 className="text-sm font-semibold text-fg">{t.palette}</h2>
-          <div className="w-56">
+      <Panel className="flex flex-col gap-4 p-4 sm:p-5">
+        <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
+          <h2 className="text-base font-semibold text-fg">{t.palette}</h2>
+          <div className="w-full max-w-xs">
             <RangeField label={t.count} value={count} onChange={setCount} min={3} max={16} locale={locale} />
           </div>
         </div>
@@ -235,7 +242,7 @@ export default function Colors({ locale }: { locale: Locale }) {
             <Loader2 className="size-5 animate-spin text-accent" aria-hidden />
           </div>
         ) : (
-          <ul className="flex flex-wrap gap-2 p-3">
+          <ul className="grid grid-cols-[repeat(auto-fill,minmax(6rem,1fr))] gap-2">
             {palette.map((c, i) => {
               const hex = hexes[i];
               const dark = luminance(c.r, c.g, c.b) < 0.4;
@@ -248,7 +255,7 @@ export default function Colors({ locale }: { locale: Locale }) {
                     }}
                     aria-label={t.copyHex(hex)}
                     className={cn(
-                      "flex h-20 w-24 flex-col justify-end rounded-[0.625rem] border border-line p-2 text-left text-xs font-medium",
+                      "flex h-20 w-full flex-col justify-end rounded-[1rem] p-2.5 text-left text-xs font-medium shadow-[inset_0_0_0_1px_rgb(0_0_0/0.08)] transition-transform hover:-translate-y-0.5 active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent",
                       dark ? "text-white" : "text-black",
                     )}
                     style={{ background: hex }}
@@ -261,10 +268,9 @@ export default function Colors({ locale }: { locale: Locale }) {
             })}
           </ul>
         )}
-        <div className="border-t border-line">
-          <div className="flex items-center justify-between gap-2 px-3 py-1.5">
+        <div className="flex flex-col gap-2">
+          <div className="flex flex-wrap items-center justify-between gap-2">
             <Segmented
-              wrap
               label={t.export}
               value={fmt}
               onChange={setFmt}
@@ -275,7 +281,7 @@ export default function Colors({ locale }: { locale: Locale }) {
                 { value: "json", label: t.json },
               ]}
             />
-            <CopyButton value={exportText} label={t.copy} copiedLabel={t.copied} variant="ghost" />
+            <CopyButton value={exportText} label={t.copy} copiedLabel={t.copied} variant="secondary" />
           </div>
           <label htmlFor={`${id}-exp`} className="sr-only">
             {t.export}
@@ -286,12 +292,12 @@ export default function Colors({ locale }: { locale: Locale }) {
             value={exportText}
             rows={Math.min(10, exportText.split("\n").length)}
             spellCheck={false}
-            className="block w-full resize-y border-t border-line bg-transparent px-3 py-2.5 font-mono text-xs leading-relaxed text-fg-2 focus:outline-none"
+            className="block w-full resize-y rounded-[1rem] bg-surface-2 px-3.5 py-3 font-mono text-xs leading-relaxed text-fg-2 focus:outline-2 focus:outline-accent"
           />
         </div>
       </Panel>
       {error ? <Notice tone="err">{errorText(locale, error)}</Notice> : null}
-      <Dropzone onFiles={(f) => f[0] && file.load(f[0])} accept={IMAGE_ACCEPT} compact title={s.dropOne} />
+      <Dropzone onFiles={(f) => f[0] && file.load(f[0])} accept={IMAGE_ACCEPT} title={s.dropOne} locale={locale} className={replaceDrop} />
     </div>
   );
 }

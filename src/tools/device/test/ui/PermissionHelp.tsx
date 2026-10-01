@@ -1,7 +1,7 @@
 "use client";
 
-import { ChevronDown } from "lucide-react";
 import type { Locale } from "@/i18n/config";
+import { Fold } from "@/ui/fold";
 import { Notice } from "@/ui/panel";
 import type { MediaStatus } from "../lib/media";
 
@@ -58,17 +58,13 @@ const T = {
 export function PermissionHelp({ locale, kind, open = false }: { locale: Locale; kind: Kind; open?: boolean }) {
   const t = T[locale];
   return (
-    <details className="group rounded-[0.625rem] border border-line bg-surface" open={open}>
-      <summary className="flex items-center justify-between gap-3 px-4 py-3 text-sm font-medium text-fg">
-        {t.title(kind)}
-        <ChevronDown className="size-4 shrink-0 text-fg-3 transition-transform duration-150 group-open:rotate-180" aria-hidden />
-      </summary>
-      <ul className="flex list-disc flex-col gap-1.5 px-4 pb-4 pl-8 text-sm leading-relaxed text-fg-2">
+    <Fold title={t.title(kind)} open={open}>
+      <ul className="flex list-disc flex-col gap-1.5 pl-4 text-sm leading-relaxed text-fg-2">
         {t.steps(kind).map((s, i) => (
           <li key={i}>{s}</li>
         ))}
       </ul>
-    </details>
+    </Fold>
   );
 }
 

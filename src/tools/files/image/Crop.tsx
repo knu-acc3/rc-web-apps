@@ -3,12 +3,11 @@
 import { useId, useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { Field, Select } from "@/ui/field";
-import { Segmented } from "@/ui/segmented";
 import { applyAspect, centeredAspectRect, roundRect, type Rect } from "./lib/geometry";
 import { processFile, toBlob } from "./lib/run";
 import { baseName } from "./lib/source";
 import type { Op, OutFormat } from "./lib/types";
-import { ColorField, NumberField } from "./ui/controls";
+import { ChipGroup, ColorField, NumberField } from "./ui/controls";
 import { DEFAULT_QUALITY, LOSSY, OUT_LABEL, sameFormat } from "./ui/format";
 import { useEngine } from "./ui/hooks";
 import { ImageStage } from "./ui/ImageStage";
@@ -115,39 +114,36 @@ export default function Crop({ locale, ratio: presetRatio, shape = "rect" }: Cro
     setRect(applyAspect(next, aspect, W, H));
   };
 
-  const doExport = () => {
+  const doExport = (download = true) => {
     const p = file.prepared;
-    if (!p || !r) return;
-    exp.run(async (signal, onProgress) => {
-      const fmt: OutFormat = out === "same" ? (circle && sameFormat(p.format) === "jpg" ? "png" : sameFormat(p.format)) : out;
-      const ops: Op[] = [{ t: "crop", rect: r }];
-      if (circle) ops.push({ t: "circle", fill: fmt === "jpg" ? { kind: "color", color: bg } : { kind: "transparent" } });
-      if (outSize) ops.push({ t: "size", w: outSize, h: Math.round((outSize * r.h) / r.w) });
-      const res = await processFile(
-        getEngine(),
-        p,
-        ops,
-        { format: fmt, quality: LOSSY.has(fmt) ? 92 : DEFAULT_QUALITY[fmt], background: bg },
-        { signal, onProgress },
-      );
-      return { blob: toBlob(res), name: `${baseName(p.file.name)}-${circle ? "circle" : "cropped"}.${res.ext}` };
-    });
+    if (!p || !r) return null;
+    return exp.run(
+      async (signal, onProgress) => {
+        const fmt: OutFormat = out === "same" ? (circle && sameFormat(p.format) === "jpg" ? "png" : sameFormat(p.format)) : out;
+        const ops: Op[] = [{ t: "crop", rect: r }];
+        if (circle) ops.push({ t: "circle", fill: fmt === "jpg" ? { kind: "color", color: bg } : { kind: "transparent" } });
+        if (outSize) ops.push({ t: "size", w: outSize, h: Math.round((outSize * r.h) / r.w) });
+        const res = await processFile(
+          getEngine(),
+          p,
+          ops,
+          { format: fmt, quality: LOSSY.has(fmt) ? 92 : DEFAULT_QUALITY[fmt], background: bg },
+          { signal, onProgress },
+        );
+        return { blob: toBlob(res), name: `${baseName(p.file.name)}-${circle ? "circle" : "cropped"}.${res.ext}` };
+      },
+      { download },
+    );
   };
 
   const options = (
     <>
       {!circle && (
         <Field label={t.ratio}>
-          <Segmented
-            wrap
-            label={t.ratio}
-            value={ratioKey}
-            onChange={chooseRatio}
-            options={ratios.map(([k]) => ({ value: k, label: k === "free" ? t.free : k }))}
-          />
+          <ChipGroup label={t.ratio} value={ratioKey} onChange={chooseRatio} options={ratios.map(([k]) => ({ value: k, label: k === "free" ? t.free : k }))} />
         </Field>
       )}
-      <Field label={t.output} htmlFor={`${id}-out`} className="w-40">
+      <Field label={t.output} htmlFor={`${id}-out`}>
         <Select id={`${id}-out`} value={out} onChange={(e) => setOut(e.target.value as "same" | OutFormat)}>
           <option value="same">{t.same}</option>
           {(["jpg", "png", "webp"] as const).map((f) => (
@@ -157,17 +153,17 @@ export default function Crop({ locale, ratio: presetRatio, shape = "rect" }: Cro
           ))}
         </Select>
       </Field>
-      {circle && <NumberField label={t.size} value={outSize} onChange={setOutSize} min={16} max={8192} suffix="px" placeholder={t.original} className="w-40" />}
+      {circle && <NumberField label={t.size} value={outSize} onChange={setOutSize} min={16} max={8192} suffix="px" placeholder={t.original} locale={locale} />}
     </>
   );
 
   const more = r ? (
     <>
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 sm:col-span-2">
-        <NumberField label={t.x} value={r.x} onChange={setNum("x")} min={0} max={W} suffix="px" />
-        <NumberField label={t.y} value={r.y} onChange={setNum("y")} min={0} max={H} suffix="px" />
-        <NumberField label={t.w} value={r.w} onChange={setNum("w")} min={1} max={W} suffix="px" />
-        <NumberField label={t.h} value={r.h} onChange={setNum("h")} min={1} max={H} suffix="px" />
+      <div className="grid grid-cols-2 gap-3">
+        <NumberField label={t.x} value={r.x} onChange={setNum("x")} min={0} max={W} suffix="px" locale={locale} />
+        <NumberField label={t.y} value={r.y} onChange={setNum("y")} min={0} max={H} suffix="px" locale={locale} />
+        <NumberField label={t.w} value={r.w} onChange={setNum("w")} min={1} max={W} suffix="px" locale={locale} />
+        <NumberField label={t.h} value={r.h} onChange={setNum("h")} min={1} max={H} suffix="px" locale={locale} />
       </div>
       {(circle || out === "jpg") && <ColorField label={circle ? t.bg : `${s.background} (JPG)`} value={bg} onChange={setBg} locale={locale} />}
     </>
@@ -182,6 +178,8 @@ export default function Crop({ locale, ratio: presetRatio, shape = "rect" }: Cro
       exp={exp}
       exportLabel={t.download}
       onExport={doExport}
+      next
+      self="crop"
       figure={r ? `${outSize ?? r.w} × ${outSize ? Math.round((outSize * r.h) / r.w) : r.h} px` : "—"}
       stage={
         <ImageStage bitmap={bitmap} srcWidth={W} locale={locale}>

@@ -1,22 +1,21 @@
 "use client";
 
-import { CheckCircle2, ChevronDown, Download, FileArchive, Loader2, Play, X } from "lucide-react";
-import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
+import { CheckCircle2, Download, FileArchive, Play, X } from "lucide-react";
+import { useCallback, useEffect, useId, useRef, useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { count, formatBytes, formatNumber } from "@/i18n/format";
 import { downloadBlob } from "@/lib/clipboard";
 import { sniffFile, type Detected } from "@/tools/files/file/lib/magic";
-import { Button } from "@/ui/button";
-import { cn } from "@/lib/cn";
+import { Button, IconButton } from "@/ui/button";
 import { Dropzone } from "@/ui/dropzone";
-import { Checkbox, Field, Select } from "@/ui/field";
+import { Field, Select, Switch } from "@/ui/field";
+import { Fold } from "@/ui/fold";
 import { Badge, Notice, Panel, PanelHeader } from "@/ui/panel";
-import { Segmented } from "@/ui/segmented";
 import { probeMedia, runGifToVideo, runJob, type Hooks } from "../shared/client";
 import { isAbort } from "../shared/ffmpeg";
 import { even, FFMPEG_ENCODED, isAudioTarget, isVideoTarget, outputName, planFor, type AudioSpec, type GifSpec, type JobResult, type JobSpec, type MediaInfo, type Plan, type Target, type VideoTarget } from "../shared/spec";
 import { useWebCodecs } from "./ui/hooks";
-import { AudioOptions, FORMAT_LABEL, GIF_DEFAULT, GifOptions } from "./ui/options";
+import { AudioOptions, ChoiceChips, FORMAT_LABEL, GIF_DEFAULT, GifOptions, Setting } from "./ui/options";
 import { MEDIA_ACCEPT, VIDEO_ACCEPT } from "./ui/FilePicker";
 import { ProgressBar } from "./ui/Progress";
 import { sizeChange } from "./ui/ResultCard";
@@ -51,7 +50,7 @@ const T = {
       unknown: "",
     } as Record<Plan, string>,
     waiting: "В очереди",
-    ffmpegNote: "Для MP3, FLAC и OGG (Vorbis), а также для форматов, которые браузер не читает (AVI, WMV, FLV…), используется модуль ffmpeg: при первом запуске он загружается с этого сайта (до 31 МБ), затем берётся из кэша.",
+    ffmpegNote: "Для MP3, FLAC, OGG и форматов, которые браузер не читает (AVI, WMV, FLV…), один раз загрузится модуль ffmpeg — до 31 МБ.",
     gifIn: "GIF-анимация",
     settings: "Настройки",
     compat: "Максимальная совместимость (H.264)",
@@ -79,7 +78,7 @@ const T = {
       unknown: "",
     } as Record<Plan, string>,
     waiting: "Queued",
-    ffmpegNote: "MP3, FLAC and OGG (Vorbis) output, and formats the browser can't read (AVI, WMV, FLV…), use the ffmpeg module: it is downloaded from this site on first use (up to 31 MB) and cached afterwards.",
+    ffmpegNote: "MP3, FLAC, OGG and formats the browser can't read (AVI, WMV, FLV…) load the ffmpeg module once — up to 31 MB.",
     gifIn: "GIF animation",
     settings: "Settings",
     compat: "Maximum compatibility (H.264)",
@@ -275,86 +274,86 @@ function MediaConverterInner({ locale, kind, to, targets }: MediaConverterProps)
 
   const accept = kind === "audio" ? MEDIA_ACCEPT : `${VIDEO_ACCEPT},.gif,image/gif,image/webp,image/apng`;
   const inputs = kind === "audio" ? t.inputsAudio : t.inputsVideo;
-  const options = useMemo(() => targets.map((x) => ({ value: x, label: FORMAT_LABEL[x] })), [targets]);
+  const onlyDone = done.length === 1 ? done[0] : null;
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex flex-col gap-2">
-        <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
-          <span className="text-sm font-medium text-fg-2">{t.format}</span>
-          <Segmented label={t.format} value={target} onChange={setTarget} options={options} wrap />
-        </div>
-        <details className="group">
-          <summary className="inline-flex cursor-pointer items-center gap-1 text-sm text-fg-3 hover:text-fg">
-            <ChevronDown className="size-4 transition-transform group-open:rotate-180" aria-hidden />
-            {t.settings}: {settingsSummary}
-          </summary>
-          <div className="mt-3">
-            {target === "gif" ? (
-              <GifOptions locale={locale} value={gif} onChange={setGif} disabled={busy} />
-            ) : isAudioTarget(target) ? (
-              <AudioOptions locale={locale} target={target} value={audio} onChange={setAudio} disabled={busy} />
-            ) : (
-              <div className="flex flex-wrap items-end gap-x-5 gap-y-3">
-                <Field label={t.resolution} htmlFor={`${id}-res`} className="w-48">
-                  <Select id={`${id}-res`} size="sm" value={String(height)} disabled={busy} onChange={(e) => setHeight(Number(e.target.value))}>
-                    <option value="0">{t.original}</option>
-                    {RESOLUTIONS.map((r) => (
-                      <option key={r} value={r}>
-                        {r === 2160 ? "4K (2160p)" : `${r}p`}
-                      </option>
-                    ))}
-                  </Select>
-                </Field>
-                <Checkbox label={t.compat} checked={compat} disabled={busy} onChange={(e) => setCompat(e.target.checked)} className="pb-1.5" />
-                <Checkbox label={t.mute} checked={mute} disabled={busy} onChange={(e) => setMute(e.target.checked)} className="pb-1.5" />
-              </div>
-            )}
-          </div>
-        </details>
-      </div>
-
-      <Dropzone onFiles={addFiles} accept={accept} multiple title={u.chooseFiles} hint={`${inputs}. ${u.localNote}.`} compact={items.length > 0} className={cn(!items.length && "max-sm:order-first")} />
-
-      {webcodecs === false && <Notice tone="warn">{u.noWebCodecs}</Notice>}
-      {needsFfmpeg && <Notice>{t.ffmpegNote}</Notice>}
-
-      {items.length > 0 && (
-        <Panel>
-          <PanelHeader
-            title={`${t.queue}: ${count(locale, items.length, t.files)}`}
-            actions={
-              <>
-                {done.length > 1 && (
-                  <Button size="sm" variant="ghost" onClick={zipAll}>
-                    <FileArchive aria-hidden />
-                    <span className="max-sm:sr-only">{t.zip}</span>
-                  </Button>
-                )}
-                {done.length > 0 && !busy && (
-                  <Button size="sm" variant="ghost" onClick={() => setItems((l) => l.filter((x) => x.status !== "done"))}>
+    <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-6">
+      <div className="flex min-w-0 flex-col gap-4">
+        <Dropzone onFiles={addFiles} accept={accept} multiple locale={locale} title={u.chooseFiles} hint={inputs} compact={items.length > 0} />
+        {webcodecs === false && <Notice tone="warn">{u.noWebCodecs}</Notice>}
+        {items.length > 0 && (
+          <Panel>
+            <PanelHeader
+              title={`${t.queue}: ${count(locale, items.length, t.files)}`}
+              actions={
+                done.length > 0 &&
+                !busy && (
+                  <Button size="sm" variant="text" onClick={() => setItems((l) => l.filter((x) => x.status !== "done"))}>
                     {t.clear}
                   </Button>
-                )}
-              </>
-            }
-          />
-          <ul className="divide-y divide-line">
-            {items.map((it) => (
-              <QueueRow key={it.id} item={it} locale={locale} plan={it.info ? planFor(it.info, specFor(it)) : "unknown"} onRemove={() => remove(it.id)} onCancel={() => cancel(it.id)} gifIn={isAnimatedImage(it) ? t.gifIn : null} planText={t.plan} waiting={t.waiting} />
-            ))}
-          </ul>
-        </Panel>
-      )}
-      {pending.length > 0 && (
-        <Button variant="primary" size="lg" onClick={runAll} disabled={busy} className="w-full sm:w-auto sm:self-start">
-          {busy ? <Loader2 className="animate-spin" aria-hidden /> : <Play aria-hidden />}
-          {pending.length > 1 ? `${t.convertAll} (${pending.length})` : t.convert} → {FORMAT_LABEL[target]}
-        </Button>
-      )}
+                )
+              }
+            />
+            <ul className="divide-y divide-line">
+              {items.map((it) => (
+                <QueueRow key={it.id} item={it} locale={locale} plan={it.info ? planFor(it.info, specFor(it)) : "unknown"} onRemove={() => remove(it.id)} onCancel={() => cancel(it.id)} gifIn={isAnimatedImage(it) ? t.gifIn : null} planText={t.plan} waiting={t.waiting} />
+              ))}
+            </ul>
+          </Panel>
+        )}
+      </div>
+
+      <Panel className="flex min-w-0 flex-col gap-5 p-4 sm:p-5">
+        <Setting label={t.format}>
+          <ChoiceChips label={t.format} value={target} onChange={setTarget} size="lg" options={targets.map((x) => ({ value: x, label: SHORT[x], title: FORMAT_LABEL[x] }))} />
+        </Setting>
+        <Fold variant="inline" title={`${t.settings}: ${settingsSummary}`} className="text-sm">
+          {target === "gif" ? (
+            <GifOptions locale={locale} value={gif} onChange={setGif} disabled={busy} />
+          ) : isAudioTarget(target) ? (
+            <AudioOptions locale={locale} target={target} value={audio} onChange={setAudio} disabled={busy} />
+          ) : (
+            <div className="flex flex-col gap-4">
+              <Field label={t.resolution} htmlFor={`${id}-res`}>
+                <Select id={`${id}-res`} value={String(height)} disabled={busy} onChange={(e) => setHeight(Number(e.target.value))}>
+                  <option value="0">{t.original}</option>
+                  {RESOLUTIONS.map((r) => (
+                    <option key={r} value={r}>
+                      {r === 2160 ? "4K (2160p)" : `${r}p`}
+                    </option>
+                  ))}
+                </Select>
+              </Field>
+              <Switch label={t.compat} checked={compat} disabled={busy} onChange={(e) => setCompat(e.target.checked)} />
+              <Switch label={t.mute} checked={mute} disabled={busy} onChange={(e) => setMute(e.target.checked)} />
+            </div>
+          )}
+        </Fold>
+        {pending.length > 0 || busy || !items.length ? (
+          <Button variant="filled" size="xl" fullWidth onClick={runAll} disabled={busy || !pending.length} loading={busy}>
+            {!busy && <Play aria-hidden />}
+            <span className="truncate">
+              {pending.length > 1 ? `${t.convertAll} (${pending.length})` : t.convert} → {FORMAT_LABEL[target]}
+            </span>
+          </Button>
+        ) : onlyDone ? (
+          <Button variant="filled" size="xl" fullWidth onClick={() => downloadBlob(onlyDone.result!.blob, onlyDone.name)}>
+            <Download aria-hidden />
+            <span className="truncate">{u.download}</span>
+          </Button>
+        ) : done.length > 1 ? (
+          <Button variant="filled" size="xl" fullWidth onClick={zipAll}>
+            <FileArchive aria-hidden />
+            <span className="truncate">{t.zip}</span>
+          </Button>
+        ) : null}
+        {needsFfmpeg && <p className="text-[0.8125rem] text-fg-3">{t.ffmpegNote}</p>}
+      </Panel>
     </div>
   );
 }
+
+const SHORT: Record<Target, string> = { mp4: "MP4", webm: "WebM", mov: "MOV", mkv: "MKV", gif: "GIF", mp3: "MP3", wav: "WAV", m4a: "M4A", aac: "AAC", ogg: "OGG", opus: "Opus", flac: "FLAC" };
 
 function QueueRow({
   item,
@@ -379,7 +378,7 @@ function QueueRow({
   const running = item.status === "running";
   const stageText = item.stage === "download" ? u.downloadingEngine : item.engine === "ffmpeg" ? u.ffmpegWork : u.processing;
   return (
-    <li className="flex flex-col gap-2 px-4 py-3">
+    <li className="flex flex-col gap-2 px-4 py-3 motion-safe:animate-[menu-in_200ms_var(--ease-emph)]">
       <div className="flex items-start gap-3">
         <div className="min-w-0 flex-1">
           <div className="truncate font-medium text-fg" title={item.file.name}>
@@ -392,18 +391,16 @@ function QueueRow({
           </div>
         </div>
         {item.status === "done" && item.result ? (
-          <Button size="sm" variant="ghost" className="text-accent" onClick={() => downloadBlob(item.result!.blob, item.name)}>
+          <Button size="sm" variant="tonal" onClick={() => downloadBlob(item.result!.blob, item.name)} aria-label={`${u.download}: ${item.name}`}>
             <Download aria-hidden />
             <span className="max-sm:sr-only">{u.download}</span>
           </Button>
         ) : running ? (
-          <Button size="sm" variant="ghost" onClick={onCancel}>
+          <Button size="sm" variant="text" onClick={onCancel}>
             {u.cancel}
           </Button>
         ) : null}
-        <Button size="icon-sm" variant="ghost" onClick={onRemove} aria-label={`${u.remove}: ${item.file.name}`} title={u.remove}>
-          <X aria-hidden />
-        </Button>
+        <IconButton size="sm" label={`${u.remove}: ${item.file.name}`} title={u.remove} icon={<X aria-hidden />} onClick={onRemove} />
       </div>
       {running && (
         <div className="flex flex-col gap-1">

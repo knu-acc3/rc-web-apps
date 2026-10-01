@@ -3,9 +3,8 @@
 import { Download, Loader2, RotateCw, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { Locale } from "@/i18n/config";
-import { cn } from "@/lib/cn";
 import { downloadBlob } from "@/lib/clipboard";
-import { Button } from "@/ui/button";
+import { Button, IconButton } from "@/ui/button";
 import { Dropzone } from "@/ui/dropzone";
 import { Switch } from "@/ui/field";
 import { Notice, Panel } from "@/ui/panel";
@@ -43,7 +42,7 @@ const T = {
     jpg: "JPG (A4)",
     make: "Скачать копию на одном листе",
     busy: "Собираем лист…",
-    hint: "Подгоните рамку по краям документа. Обе стороны лягут на лист A4 в натуральную величину — печатайте без масштабирования.",
+    hint: "Подгоните рамку по краям документа и печатайте A4 без масштабирования",
     needOne: "Добавьте хотя бы одну сторону.",
   },
   en: {
@@ -60,7 +59,7 @@ const T = {
     jpg: "JPG (A4)",
     make: "Download the one-page copy",
     busy: "Building the sheet…",
-    hint: "Fit the frame to the document's edges. Both sides go onto an A4 sheet at actual size — print without scaling.",
+    hint: "Fit the frame to the document's edges and print the A4 without scaling",
     needOne: "Add at least one side.",
   },
 } as const;
@@ -96,10 +95,22 @@ function ResultThumb({ bitmap, scale, state, doc }: { bitmap: ImageBitmap | null
     const dh = odd ? W : H;
     ctx.drawImage(bitmap, r.x * scale, r.y * scale, r.w * scale, r.h * scale, -dw / 2, -dh / 2, dw, dh);
   };
-  return <canvas ref={draw} className="h-auto w-28 rounded-[0.25rem] border border-line-strong bg-white" aria-hidden />;
+  return <canvas ref={draw} className="h-auto w-28 rounded-[0.375rem] bg-white shadow-elev-1" aria-hidden />;
 }
 
-function Side({ locale, label, doc, file, onState }: { locale: Locale; label: string; doc: Doc; file: ReturnType<typeof useSingleFile>; onState: (s: SideState) => void }) {
+function Side({
+  locale,
+  label,
+  doc,
+  file,
+  onState,
+}: {
+  locale: Locale;
+  label: string;
+  doc: Doc;
+  file: ReturnType<typeof useSingleFile>;
+  onState: (s: SideState) => void;
+}) {
   const t = T[locale];
   const { bitmap, info } = usePreviewBitmap(file.prepared ?? undefined, 1600);
   const d = DOCS[doc];
@@ -126,27 +137,36 @@ function Side({ locale, label, doc, file, onState }: { locale: Locale; label: st
     <Panel className="flex flex-col gap-3 p-3 sm:p-4">
       <div className="flex items-center justify-between gap-2">
         <h3 className="font-semibold">{label}</h3>
-        {file.prepared && (
-          <Button size="icon-sm" variant="ghost" aria-label={t.remove} title={t.remove} onClick={file.reset}>
-            <X aria-hidden />
-          </Button>
-        )}
+        {file.prepared && <IconButton size="sm" label={t.remove} icon={<X aria-hidden />} onClick={file.reset} />}
       </div>
       {file.prepared ? (
         <>
           <ImageStage bitmap={bitmap} srcWidth={W} locale={locale} maxHeightVh={45}>
-            {(factor) => state.rect && <RectEditor rect={state.rect} onChange={(r) => setState({ ...state, rect: r })} imgW={W} imgH={H} factor={factor} aspect={aspectOf(state.rot)} locale={locale} label={t.frame} />}
+            {(factor) =>
+              state.rect && (
+                <RectEditor
+                  rect={state.rect}
+                  onChange={(r) => setState({ ...state, rect: r })}
+                  imgW={W}
+                  imgH={H}
+                  factor={factor}
+                  aspect={aspectOf(state.rot)}
+                  locale={locale}
+                  label={t.frame}
+                />
+              )
+            }
           </ImageStage>
           <div className="flex items-center gap-3">
             <ResultThumb bitmap={bitmap} scale={info?.scale ?? 1} state={state} doc={doc} />
-            <Button variant="outline" size="sm" onClick={turn}>
+            <Button variant="tonal" size="sm" onClick={turn}>
               <RotateCw aria-hidden />
               {t.turn}
             </Button>
           </div>
         </>
       ) : (
-        <Dropzone onFiles={(f) => f[0] && file.load(f[0])} accept={IMAGE_ACCEPT} title={t.drop} compact />
+        <Dropzone onFiles={(f) => f[0] && file.load(f[0])} accept={IMAGE_ACCEPT} title={t.drop} locale={locale} className="min-h-40" />
       )}
       {file.loading && <Loader2 className="size-4 animate-spin text-fg-3" aria-hidden />}
     </Panel>
@@ -192,7 +212,10 @@ export default function IdCopy({ locale, doc: doc0 = "id" }: { locale: Locale; d
         const p = f.prepared!;
         const r = roundRect(s.rect!, s.w, s.h);
         const odd = s.rot % 2 === 1;
-        const ops: Op[] = [{ t: "crop", rect: r }, { t: "size", w: mmToPx(odd ? d.h : d.w, DPI), h: mmToPx(odd ? d.w : d.h, DPI) }];
+        const ops: Op[] = [
+          { t: "crop", rect: r },
+          { t: "size", w: mmToPx(odd ? d.h : d.w, DPI), h: mmToPx(odd ? d.w : d.h, DPI) },
+        ];
         if (s.rot) ops.push({ t: "orient", flip: false, rot: s.rot });
         if (gray) ops.push({ t: "filter", id: "grayscale", params: { amount: 100 } });
         const res = await processFile(getEngine(), p, ops, { format: "jpg", quality: 92, background: "#ffffff" });
@@ -223,17 +246,25 @@ export default function IdCopy({ locale, doc: doc0 = "id" }: { locale: Locale; d
 
   return (
     <div className="flex flex-col gap-4">
-      <Segmented wrap label={t.doc} value={doc} onChange={setDoc} options={(["id", "passport"] as const).map((v) => ({ value: v, label: t.docs[v] }))} />
+      <Segmented label={t.doc} value={doc} onChange={setDoc} options={(["id", "passport"] as const).map((v) => ({ value: v, label: t.docs[v] }))} />
       <div className="grid gap-4 lg:grid-cols-2">
         <Side locale={locale} label={t.sides[doc][0]} doc={doc} file={front} onState={setA} />
         <Side locale={locale} label={t.sides[doc][1]} doc={doc} file={back} onState={setB} />
       </div>
       <p className="text-sm text-fg-3">{t.hint}</p>
       <div className="flex flex-wrap items-center gap-x-5 gap-y-3">
-        <Segmented label={t.format} value={format} onChange={setFormat} options={[{ value: "pdf", label: t.pdf }, { value: "jpg", label: t.jpg }]} />
+        <Segmented
+          label={t.format}
+          value={format}
+          onChange={setFormat}
+          options={[
+            { value: "pdf", label: t.pdf },
+            { value: "jpg", label: t.jpg },
+          ]}
+        />
         <Switch label={t.gray} checked={gray} onChange={(e) => setGray(e.target.checked)} />
       </div>
-      <Button size="lg" variant="primary" className={cn("w-full sm:w-auto sm:self-start")} disabled={busy || (!front.prepared && !back.prepared)} onClick={make}>
+      <Button size="lg" variant="filled" className="w-full sm:w-auto sm:self-start" disabled={busy || (!front.prepared && !back.prepared)} onClick={make}>
         {busy ? <Loader2 className="animate-spin" aria-hidden /> : <Download aria-hidden />}
         {busy ? t.busy : t.make}
       </Button>

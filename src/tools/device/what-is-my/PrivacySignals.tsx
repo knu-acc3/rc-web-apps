@@ -1,7 +1,7 @@
 "use client";
 
 import type { Locale } from "@/i18n/config";
-import { Panel } from "@/ui/panel";
+import { Notice } from "@/ui/panel";
 import type { ToolProps } from "../../types";
 import { detectUa, nav, useDetected } from "./lib/probe";
 import { COMMON, Facts, Hint, Pending, Stack } from "./ui/kit";
@@ -69,9 +69,9 @@ function Big({ locale, title, sub, state }: { locale: Locale; title: string; sub
   const t = T[locale];
   const tone = state === "on" ? "text-ok" : state === "off" ? "text-fg" : "text-fg-3";
   return (
-    <div className="rounded-[0.625rem] bg-surface-2 px-4 py-3">
+    <div className="rounded-[1.25rem] bg-accent-soft px-5 py-5 sm:px-6">
       <p className="text-sm font-medium text-fg-2">{title}</p>
-      <p className={`mt-1 text-2xl font-bold sm:text-3xl ${tone}`}>{state ? t.state[state] : <Pending locale={locale} />}</p>
+      <p className={`mt-1 text-3xl font-bold sm:text-4xl ${tone}`}>{state ? t.state[state] : <Pending locale={locale} />}</p>
       <p className="mt-1 text-sm text-fg-3">{sub}</p>
     </div>
   );
@@ -84,15 +84,13 @@ export default function PrivacySignals({ locale }: ToolProps) {
   const u = useDetected(detectUa);
   return (
     <Stack>
-      <Panel className="p-4 sm:p-5">
-        <div aria-live="polite" className="grid gap-3 sm:grid-cols-2">
-          <Big locale={locale} title={t.gpc} sub={t.gpcSub} state={d?.gpc ?? null} />
-          <Big locale={locale} title={t.dnt} sub={t.dntSub} state={d?.dnt ?? null} />
-        </div>
-        <noscript>
-          <p className="mt-3 rounded-[0.625rem] bg-warn-soft px-4 py-3 text-sm text-warn">{c.noscript}</p>
-        </noscript>
-      </Panel>
+      <div aria-live="polite" className="grid gap-4 sm:grid-cols-2">
+        <Big locale={locale} title={t.gpc} sub={t.gpcSub} state={d?.gpc ?? null} />
+        <Big locale={locale} title={t.dnt} sub={t.dntSub} state={d?.dnt ?? null} />
+      </div>
+      <noscript>
+        <Notice tone="warn">{c.noscript}</Notice>
+      </noscript>
       <Facts
         locale={locale}
         title={c.details}

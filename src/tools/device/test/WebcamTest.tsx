@@ -8,6 +8,7 @@ import { cn } from "@/lib/cn";
 import { downloadBlob } from "@/lib/clipboard";
 import { Button } from "@/ui/button";
 import { Field, Select, Switch } from "@/ui/field";
+import { Panel } from "@/ui/panel";
 
 import { useClientValue } from "./lib/client";
 import { hasGetUserMedia, listDevices, mediaErrorStatus, stopStream, type DeviceOption, type MediaStatus } from "./lib/media";
@@ -340,171 +341,167 @@ export default function WebcamTest({ locale }: { locale: Locale }) {
   const range = (x?: { min?: number; max?: number }, unit = "") => (x && x.max ? `${x.min != null ? nf(x.min, 1) : "?"} – ${nf(x.max, 1)}${unit ? ` ${unit}` : ""}` : "—");
 
   return (
-    <div className="flex flex-col gap-4">
-      {live && (
-        <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_minmax(0,13rem)_auto] sm:items-end">
-          <Field label={t.camera} htmlFor={`${id}-dev`}>
-            <Select
-              id={`${id}-dev`}
-              value={deviceId}
-              onChange={(e) => {
-                setDeviceId(e.target.value);
-                setProbe(null);
-                start(e.target.value, preset);
-              }}
-            >
-              {devices.length === 0 && <option value={deviceId}>{label || t.cameraN(1)}</option>}
-              {devices.map((d) => (
-                <option key={d.id} value={d.id}>
-                  {d.label}
-                </option>
-              ))}
-            </Select>
-          </Field>
-          <Field label={t.preset} htmlFor={`${id}-res`}>
-            <Select
-              id={`${id}-res`}
-              value={preset}
-              onChange={(e) => {
-                const v = e.target.value as PresetId;
-                setPreset(v);
-                start(deviceId, v);
-              }}
-            >
-              {PRESETS.map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.id === "max" ? t.presetMax : `${p.w}×${p.h}`}
-                </option>
-              ))}
-            </Select>
-          </Field>
-          <Button variant="outline" onClick={stop}>
-            <CameraOff aria-hidden />
-            {t.stop}
-          </Button>
+    <div className={cn("grid items-start gap-4 lg:gap-6", live && "lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]")}>
+      <div className="flex min-w-0 flex-col gap-3">
+        <div className={cn("relative overflow-hidden rounded-[1.25rem]", live ? "bg-black shadow-[var(--shadow-card)]" : "panel")}>
+          <video ref={videoRef} playsInline muted autoPlay className={cn("mx-auto block max-h-[75vh] w-full object-contain", mirror && "-scale-x-100", !live && "hidden")} />
+          {live && settings && (
+            <div className="absolute top-3 left-3 flex flex-wrap gap-1.5 text-sm font-semibold text-white tabular">
+              <span className="rounded-full bg-black/60 px-3 py-1">{w && h ? `${w}×${h}` : "—"}</span>
+              <span className="rounded-full bg-black/60 px-3 py-1">
+                {fps != null ? nf(fps, 0) : settings.frameRate ? nf(settings.frameRate, 0) : "—"} {t.fpsUnit}
+              </span>
+            </div>
+          )}
+          {!live && (
+            <div className="flex flex-col items-center gap-4 px-4 py-12 text-center sm:py-16">
+              <span className="flex size-20 items-center justify-center rounded-full bg-accent-soft text-accent" aria-hidden>
+                <Camera className="size-10" />
+              </span>
+              <Button variant="filled" size="xl" onClick={() => start(deviceId, preset)} disabled={!supported} loading={status === "requesting"}>
+                {status !== "requesting" && <Camera aria-hidden />}
+                {status === "requesting" ? t.starting : status === "idle" ? t.start : t.retry}
+              </Button>
+              <p className="max-w-md text-sm text-fg-3">{t.intro}</p>
+              <MediaStatusNotice locale={locale} kind="camera" status={supported ? status : "unsupported"} />
+            </div>
+          )}
         </div>
-      )}
-
-      <div className={cn("relative overflow-hidden rounded-[0.75rem]", live ? "bg-black" : "border border-line bg-surface")}>
-        <video ref={videoRef} playsInline muted autoPlay className={cn("mx-auto block max-h-[70vh] w-full object-contain", mirror && "-scale-x-100", !live && "hidden")} />
-        {live && settings && (
-          <div className="absolute left-3 top-3 flex flex-wrap gap-1.5 text-sm font-semibold text-white tabular">
-            <span className="rounded-full bg-black/60 px-3 py-1">{w && h ? `${w}×${h}` : "—"}</span>
-            <span className="rounded-full bg-black/60 px-3 py-1">
-              {fps != null ? nf(fps, 0) : settings.frameRate ? nf(settings.frameRate, 0) : "—"} {t.fpsUnit}
-            </span>
-          </div>
-        )}
-        {!live && (
-          <div className="flex flex-col items-center gap-4 px-4 py-12 text-center sm:py-16">
-            <span className="flex size-16 items-center justify-center rounded-full bg-accent-soft text-accent" aria-hidden>
-              <Camera className="size-8" />
-            </span>
-            <Button variant="primary" size="lg" onClick={() => start(deviceId, preset)} disabled={status === "requesting" || !supported}>
-              {status === "requesting" ? t.starting : status === "idle" ? t.start : t.retry}
+        {live && (
+          <div className="flex flex-wrap items-center gap-2">
+            <Button variant="filled" size="lg" onClick={snapshot}>
+              <Camera aria-hidden />
+              {t.snapshot}
             </Button>
-            <p className="max-w-md text-sm text-fg-3">{t.intro}</p>
-            <MediaStatusNotice locale={locale} kind="camera" status={supported ? status : "unsupported"} />
+            <Button variant="tonal" size="lg" onClick={stop}>
+              <CameraOff aria-hidden />
+              {t.stop}
+            </Button>
           </div>
         )}
+        <PermissionHelp locale={locale} kind="camera" open={status === "denied"} />
       </div>
 
       {live && (
-        <div className="flex flex-wrap items-center gap-3">
-          <Switch label={t.mirror} checked={mirror} onChange={(e) => setMirror(e.target.checked)} />
-          <span className="flex-1" />
-          <Button variant="ghost" onClick={runProbe} disabled={probing}>
-            <ListChecks aria-hidden />
-            {probing ? t.probing : t.probe}
-          </Button>
-          <Button variant="primary" onClick={snapshot}>
-            <Camera aria-hidden />
-            {t.snapshot}
-          </Button>
-        </div>
-      )}
-
-      {live && settings && (
-        <dl className="facts">
-          <div>
-            <dt>{t.resolution}</dt>
-            <dd className="tabular">
-              {w && h ? `${w}×${h} · ${formatNumber(locale, (w * h) / 1e6, { maximumFractionDigits: 1 })} MP · ${aspectLabel(w, h)}` : "—"}
-            </dd>
-          </div>
-          <div>
-            <dt>{t.fps}</dt>
-            <dd className="tabular">
-              {settings.frameRate ? `${nf(settings.frameRate, 1)} ${t.fpsUnit}` : "—"}
-              {fps != null && <span className="text-fg-3"> · {t.measured(nf(fps, 1))}</span>}
-            </dd>
-          </div>
-          <div>
-            <dt>{t.camera}</dt>
-            <dd>{label || "—"}</dd>
-          </div>
-          {caps && (caps.width || caps.frameRate) ? (
-            <>
+        <div className="flex min-w-0 flex-col gap-4">
+          <Panel className="flex flex-col gap-4 p-4 sm:p-6">
+            <Field label={t.camera} htmlFor={`${id}-dev`}>
+              <Select
+                id={`${id}-dev`}
+                value={deviceId}
+                onChange={(e) => {
+                  setDeviceId(e.target.value);
+                  setProbe(null);
+                  start(e.target.value, preset);
+                }}
+              >
+                {devices.length === 0 && <option value={deviceId}>{label || t.cameraN(1)}</option>}
+                {devices.map((d) => (
+                  <option key={d.id} value={d.id}>
+                    {d.label}
+                  </option>
+                ))}
+              </Select>
+            </Field>
+            <Field label={t.preset} htmlFor={`${id}-res`}>
+              <Select
+                id={`${id}-res`}
+                value={preset}
+                onChange={(e) => {
+                  const v = e.target.value as PresetId;
+                  setPreset(v);
+                  start(deviceId, v);
+                }}
+              >
+                {PRESETS.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.id === "max" ? t.presetMax : `${p.w}×${p.h}`}
+                  </option>
+                ))}
+              </Select>
+            </Field>
+            <Switch label={t.mirror} checked={mirror} onChange={(e) => setMirror(e.target.checked)} />
+            <Button variant="outlined" onClick={runProbe} loading={probing} className="w-fit">
+              {!probing && <ListChecks aria-hidden />}
+              {probing ? t.probing : t.probe}
+            </Button>
+          </Panel>
+          {settings && (
+            <dl className="facts">
               <div>
-                <dt>
-                  {t.caps}: {t.width.toLowerCase()} × {t.height.toLowerCase()}
-                </dt>
+                <dt>{t.resolution}</dt>
+                <dd className="tabular">{w && h ? `${w}×${h} · ${formatNumber(locale, (w * h) / 1e6, { maximumFractionDigits: 1 })} MP · ${aspectLabel(w, h)}` : "—"}</dd>
+              </div>
+              <div>
+                <dt>{t.fps}</dt>
                 <dd className="tabular">
-                  {range(caps.width)} × {range(caps.height, t.px)}
+                  {settings.frameRate ? `${nf(settings.frameRate, 1)} ${t.fpsUnit}` : "—"}
+                  {fps != null && <span className="text-fg-3"> · {t.measured(nf(fps, 1))}</span>}
                 </dd>
               </div>
               <div>
-                <dt>
-                  {t.caps}: {t.frameRate.toLowerCase()}
-                </dt>
-                <dd className="tabular">{range(caps.frameRate, t.fpsUnit)}</dd>
+                <dt>{t.camera}</dt>
+                <dd>{label || "—"}</dd>
               </div>
-              {caps.facingMode && caps.facingMode.length > 0 && (
+              {caps && (caps.width || caps.frameRate) ? (
+                <>
+                  <div>
+                    <dt>
+                      {t.caps}: {t.width.toLowerCase()} × {t.height.toLowerCase()}
+                    </dt>
+                    <dd className="tabular">
+                      {range(caps.width)} × {range(caps.height, t.px)}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>
+                      {t.caps}: {t.frameRate.toLowerCase()}
+                    </dt>
+                    <dd className="tabular">{range(caps.frameRate, t.fpsUnit)}</dd>
+                  </div>
+                  {caps.facingMode && caps.facingMode.length > 0 && (
+                    <div>
+                      <dt>{t.facing}</dt>
+                      <dd>{caps.facingMode.map((f) => t.facingMap[f] ?? f).join(", ")}</dd>
+                    </div>
+                  )}
+                </>
+              ) : (
                 <div>
-                  <dt>{t.facing}</dt>
-                  <dd>{caps.facingMode.map((f) => t.facingMap[f] ?? f).join(", ")}</dd>
+                  <dt>{t.caps}</dt>
+                  <dd className="text-fg-3">{t.capsNone}</dd>
                 </div>
               )}
-            </>
-          ) : (
-            <div>
-              <dt>{t.caps}</dt>
-              <dd className="text-fg-3">{t.capsNone}</dd>
-            </div>
+            </dl>
           )}
-        </dl>
+          {probe && (
+            <Panel className="flex flex-col gap-2 p-4 sm:p-5">
+              <h2 className="text-sm font-semibold text-fg">{t.probeTitle}</h2>
+              <p className="text-sm text-fg-3">{t.probeHint}</p>
+              <div tabIndex={0} className="tbl">
+                <table>
+                  <thead>
+                    <tr>
+                      <th scope="col">{t.requested}</th>
+                      <th scope="col">{t.result}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {probe.map((p) => (
+                      <tr key={`${p.w}x${p.h}`}>
+                        <td className="tabular">
+                          {p.w}×{p.h}
+                        </td>
+                        <td className={p.ok ? "text-ok" : "text-fg-3"}>{p.ok ? `✓ ${t.yes}` : p.got && p.got[0] ? `✗ ${t.got(p.got[0], p.got[1])}` : `✗ ${t.no}`}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </Panel>
+          )}
+        </div>
       )}
-
-      {probe && (
-        <section className="flex flex-col gap-2">
-          <h2 className="text-sm font-semibold text-fg">{t.probeTitle}</h2>
-          <p className="text-sm text-fg-3">{t.probeHint}</p>
-          <div tabIndex={0} className="tbl">
-            <table>
-              <thead>
-                <tr>
-                  <th scope="col">{t.requested}</th>
-                  <th scope="col">{t.result}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {probe.map((p) => (
-                  <tr key={`${p.w}x${p.h}`}>
-                    <td className="tabular">
-                      {p.w}×{p.h}
-                    </td>
-                    <td className={p.ok ? "text-ok" : "text-fg-3"}>
-                      {p.ok ? `✓ ${t.yes}` : p.got && p.got[0] ? `✗ ${t.got(p.got[0], p.got[1])}` : `✗ ${t.no}`}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </section>
-      )}
-
-      <PermissionHelp locale={locale} kind="camera" open={status === "denied"} />
     </div>
   );
 }

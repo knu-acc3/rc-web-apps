@@ -3,7 +3,8 @@
 import { plural } from "@/i18n/format";
 import type { ToolProps } from "../../types";
 import { CopyButton } from "@/ui/copy-button";
-import { Panel } from "@/ui/panel";
+import { Fold } from "@/ui/fold";
+import { Notice } from "@/ui/panel";
 import { isReducedUa } from "./lib/ua";
 import { detectUa, useDetected } from "./lib/probe";
 import { COMMON, Facts, Hint, Stack, YesNo } from "./ui/kit";
@@ -50,18 +51,18 @@ export default function UserAgentInfo({ locale }: ToolProps) {
   const p = u?.parsed;
   return (
     <Stack>
-      <Panel className="px-5 py-5 sm:px-7 sm:py-6">
-        <div className="flex items-start justify-between gap-3">
-          <p className="pt-1 text-sm text-fg-3">{t.label}</p>
-          {u ? <CopyButton value={u.ua} label={c.copy} copiedLabel={c.copied} size="sm" variant="ghost" className="-mr-2 -mt-1" compact /> : null}
-        </div>
-        <p aria-live="polite" className="mt-2 min-h-14 font-mono text-lg leading-relaxed break-words [overflow-wrap:anywhere] text-fg sm:text-xl">
+      <div className="min-w-0 rounded-[1.25rem] bg-accent-soft px-5 py-6 sm:px-7 sm:py-7">
+        <p className="text-sm font-medium text-fg-2">{t.label}</p>
+        <p aria-live="polite" className="mt-2 min-h-14 font-mono text-lg leading-relaxed break-words [overflow-wrap:anywhere] text-fg sm:text-xl lg:text-2xl">
           {u ? u.ua || "—" : <span className="font-sans text-fg-3">{c.detecting}</span>}
         </p>
+        {u ? <CopyButton value={u.ua} label={c.copy} copiedLabel={c.copied} size="md" variant="primary" className="mt-4" /> : null}
         <noscript>
-          <p className="mt-4 rounded-[0.625rem] bg-warn-soft px-4 py-3 text-sm text-warn">{c.noscript}</p>
+          <Notice tone="warn" className="mt-4">
+            {c.noscript}
+          </Notice>
         </noscript>
-      </Panel>
+      </div>
       <Facts
         locale={locale}
         title={t.parsed}
@@ -76,12 +77,9 @@ export default function UserAgentInfo({ locale }: ToolProps) {
         ]}
       />
       {u?.hintsRaw ? (
-        <details className="group">
-          <summary className="cursor-pointer text-sm font-semibold text-fg-2 hover:text-fg">{t.hints}</summary>
-          <pre className="mt-2 overflow-x-auto rounded-[0.625rem] bg-surface-2 px-4 py-3 font-mono text-[0.8125rem] leading-relaxed text-fg">
-            {JSON.stringify(u.hintsRaw, null, 2)}
-          </pre>
-        </details>
+        <Fold title={t.hints}>
+          <pre className="overflow-x-auto rounded-[1rem] bg-surface-2 px-4 py-3 font-mono text-[0.8125rem] leading-relaxed text-fg">{JSON.stringify(u.hintsRaw, null, 2)}</pre>
+        </Fold>
       ) : u ? (
         <Hint>{t.noHints}</Hint>
       ) : null}

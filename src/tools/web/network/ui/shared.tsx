@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import type { Locale } from "@/i18n/config";
 import { cn } from "@/lib/cn";
 import { CopyButton } from "@/ui/copy-button";
+import { Panel } from "@/ui/panel";
 import type { V4Error } from "../lib/ipv4";
 import type { V6Error } from "../lib/ipv6";
 
@@ -19,11 +20,21 @@ const L = {
   en: { copyAll: "Copy all", copied: "Copied", details: "Details" },
 } as const;
 
+/** Input card on the left, results on the right from `lg` (stacked on phones). */
+export function Split({ input, children }: { input: ReactNode; children?: ReactNode }) {
+  return (
+    <div className="grid items-start gap-4 lg:grid-cols-2 lg:gap-6">
+      <Panel className="flex min-w-0 flex-col gap-4 p-4 sm:p-6">{input}</Panel>
+      <div className="flex min-w-0 flex-col gap-4 empty:hidden">{children}</div>
+    </div>
+  );
+}
+
 /** The one prominent result of a tool: big value, one or two quiet lines under it. */
 export function ResultCard({ value, sub, badge, className }: { value: ReactNode; sub?: ReactNode; badge?: ReactNode; className?: string }) {
   return (
-    <div className={cn("rounded-[0.75rem] bg-surface-2 px-4 py-4 sm:px-5", className)}>
-      <div aria-live="polite" className="font-mono text-2xl font-semibold tracking-tight break-words [overflow-wrap:anywhere] text-fg sm:text-3xl">
+    <div className={cn("min-w-0 rounded-[1.25rem] bg-accent-soft p-5 sm:p-6", className)}>
+      <div aria-live="polite" className="font-mono text-2xl font-bold tracking-tight break-words [overflow-wrap:anywhere] text-fg sm:text-4xl">
         {value}
       </div>
       {sub && <div className="mt-1.5 text-[0.9375rem] text-fg-2">{sub}</div>}
@@ -37,12 +48,12 @@ export function DetailList({ rows, locale, title, className }: { rows: ValueRow[
   const t = L[locale];
   const text = rows.map((r) => `${r.label}: ${r.value}`).join("\n");
   return (
-    <section className={cn("rounded-[0.75rem] border border-line bg-surface", className)}>
-      <div className="flex min-h-11 items-center justify-between gap-2 border-b border-line px-4 py-1.5">
-        <h2 className="text-sm font-semibold text-fg-2">{title ?? t.details}</h2>
+    <Panel className={cn("p-4 sm:p-5", className)}>
+      <div className="flex min-h-10 items-center justify-between gap-2">
+        <h2 className="text-sm font-semibold text-fg">{title ?? t.details}</h2>
         <CopyButton value={text} label={t.copyAll} copiedLabel={t.copied} variant="ghost" />
       </div>
-      <dl className="grid gap-x-8 px-4 py-2.5 sm:grid-cols-2">
+      <dl className="mt-1 grid gap-x-8 sm:grid-cols-2">
         {rows.map((r) => (
           <div key={r.label} className="flex min-w-0 flex-col py-1.5">
             <dt className="text-[0.8125rem] text-fg-3">{r.label}</dt>
@@ -50,7 +61,7 @@ export function DetailList({ rows, locale, title, className }: { rows: ValueRow[
           </div>
         ))}
       </dl>
-    </section>
+    </Panel>
   );
 }
 

@@ -3,10 +3,12 @@
 import { Play, Square } from "lucide-react";
 import { useEffect, useId, useRef, useState } from "react";
 import type { Locale } from "@/i18n/config";
-import { Button } from "@/ui/button";
-import { Field, Select, Slider } from "@/ui/field";
+import { formatNumber } from "@/i18n/format";
+import { Slider } from "@/ui/field";
 import { Notice, Panel } from "@/ui/panel";
 import { Segmented } from "@/ui/segmented";
+import { Fab } from "@/tools/files/video/ui/Fab";
+import { ChoiceChips, Setting } from "@/tools/files/video/ui/options";
 import { formatTime } from "@/tools/files/shared/time";
 import { createNoise, NOISE_COLORS, NOISE_WORKLET_SRC, type NoiseColor } from "../lib/noise";
 import { fadeGain, resumeAudio, smoothSet } from "../lib/audio";
@@ -17,32 +19,32 @@ const T = {
     names: { white: "Белый", pink: "Розовый", brown: "Коричневый", blue: "Синий", violet: "Фиолетовый" } as Record<NoiseColor, string>,
     volume: "Громкость",
     timer: "Выключить через",
-    never: "не выключать",
+    never: "Не выключать",
     min: "мин",
     h: "ч",
     play: "Включить",
     stop: "Выключить",
     left: "Осталось",
     err: "Не удалось запустить звук в этом браузере.",
-    note: "Шум генерируется непрерывно, без повторяющегося фрагмента, поэтому в нём нет щелчков и заметных петель. Цвет и громкость можно менять не останавливая звук.",
   },
   en: {
     color: "Noise colour",
     names: { white: "White", pink: "Pink", brown: "Brown", blue: "Blue", violet: "Violet" } as Record<NoiseColor, string>,
     volume: "Volume",
     timer: "Stop after",
-    never: "never",
+    never: "Never",
     min: "min",
     h: "h",
     play: "Play",
     stop: "Stop",
     left: "Remaining",
     err: "Could not start audio in this browser.",
-    note: "The noise is generated continuously, without a repeating loop, so there are no clicks or audible seams. Colour and volume change without stopping the sound.",
   },
 } as const;
 
 const TIMERS = [0, 5, 15, 30, 45, 60, 90, 120, 240, 480];
+/** A dot of the noise's namesake colour next to its name. */
+const SWATCH: Record<NoiseColor, string> = { white: "#ffffff", pink: "#f4a6c4", brown: "#8d5a3b", blue: "#4a7bf7", violet: "#8b5cf6" };
 
 interface Chain {
   ctx: AudioContext;
@@ -167,39 +169,45 @@ function NoiseGeneratorInner({ locale, color: color0 = "white" }: { locale: Loca
     return () => clearInterval(h);
   }, [playing]);
 
+  const pct = (v: number) => `${Math.round(v * 100)}%`;
   return (
-    <div className="flex flex-col gap-4">
-      <Panel className="flex flex-col items-center gap-5 p-6">
-        <Segmented label={t.color} value={color} onChange={setColor} options={NOISE_COLORS.map((c) => ({ value: c, label: t.names[c] }))} wrap className="justify-center" />
-        <Button variant={playing ? "danger" : "primary"} size="lg" onClick={() => (playing ? stop() : play())} className="h-16! min-w-56 text-lg!">
-          {playing ? <Square className="fill-current" aria-hidden /> : <Play className="fill-current" aria-hidden />}
-          {playing ? t.stop : t.play}
-        </Button>
-        {left !== null && (
-          <p className="tabular text-2xl font-semibold text-fg">
-            <span className="text-sm font-normal text-fg-3">{t.left}: </span>
-            {formatTime(left, 0)}
-          </p>
-        )}
-        <div className="flex flex-wrap items-end justify-center gap-x-6 gap-y-3">
-          <label className="flex items-center gap-2 text-sm text-fg-2">
-            {t.volume}
-            <Slider min={0} max={1} step={0.01} value={volume} onChange={(e) => setVolume(Number(e.target.value))} className="w-40" aria-label={t.volume} />
-            <span className="tabular w-10">{Math.round(volume * 100)}%</span>
-          </label>
-          <Field label={t.timer} htmlFor={`${id}-t`} className="w-40">
-            <Select id={`${id}-t`} size="sm" value={String(timer)} onChange={(e) => setTimer(Number(e.target.value))}>
-              {TIMERS.map((m) => (
-                <option key={m} value={m}>
-                  {m === 0 ? t.never : m < 60 ? `${m} ${t.min}` : `${m / 60} ${t.h}`}
-                </option>
-              ))}
-            </Select>
-          </Field>
-        </div>
-      </Panel>
+    <div className="flex flex-col gap-3">
+      <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] lg:gap-6">
+        <Panel className="flex min-w-0 flex-col items-center gap-6 p-4 sm:p-6">
+          <Segmented
+            label={t.color}
+            value={color}
+            onChange={setColor}
+            size="lg"
+            className="justify-center"
+            options={NOISE_COLORS.map((c) => ({ value: c, label: t.names[c], icon: <span aria-hidden className="size-3 shrink-0 rounded-full ring-1 ring-black/10" style={{ background: SWATCH[c] }} /> }))}
+          />
+          <Fab label={playing ? t.stop : t.play} icon={playing ? <Square className="fill-current" aria-hidden /> : <Play className="fill-current" aria-hidden />} onClick={() => (playing ? stop() : play())} active={playing} />
+          {left !== null && (
+            <p className="tabular flex items-baseline gap-2 text-2xl font-bold text-fg" aria-live="off">
+              <span className="text-sm font-normal text-fg-3">{t.left}</span>
+              {formatTime(left, 0)}
+            </p>
+          )}
+        </Panel>
+        <Panel className="flex min-w-0 flex-col gap-5 p-4 sm:p-5">
+          <div className="flex min-w-0 flex-col">
+            <div className="flex items-baseline justify-between gap-3">
+              <label htmlFor={`${id}-v`} className="text-sm font-medium text-fg-2">
+                {t.volume}
+              </label>
+              <output htmlFor={`${id}-v`} className="tabular text-lg font-semibold text-fg">
+                {pct(volume)}
+              </output>
+            </div>
+            <Slider id={`${id}-v`} min={0} max={1} step={0.01} value={volume} format={pct} aria-valuetext={pct(volume)} onChange={(e) => setVolume(Number(e.target.value))} />
+          </div>
+          <Setting label={t.timer}>
+            <ChoiceChips label={t.timer} value={String(timer)} onChange={(x) => setTimer(Number(x))} options={TIMERS.map((m) => ({ value: String(m), label: m === 0 ? t.never : m < 60 ? `${m} ${t.min}` : `${formatNumber(locale, m / 60)} ${t.h}` }))} />
+          </Setting>
+        </Panel>
+      </div>
       {error && <Notice tone="err">{t.err}</Notice>}
-      <p className="text-sm text-fg-3">{t.note}</p>
     </div>
   );
 }

@@ -5,7 +5,7 @@ import type { Locale } from "@/i18n/config";
 import { plural } from "@/i18n/format";
 import { Field, Input, Select } from "@/ui/field";
 import { maskOf, parseIPv4, prefixOfMask, toBinary, toDotted, toHex, usableHosts } from "./lib/ipv4";
-import { bigFmt, DetailList, ResultCard } from "./ui/shared";
+import { bigFmt, DetailList, ResultCard, Split } from "./ui/shared";
 
 const T = {
   ru: {
@@ -68,29 +68,42 @@ export default function SubnetMask({ locale, prefix: p0 = 24 }: { locale: Locale
   const fitsText = parent !== undefined ? t.fits(bigFmt(locale, 2 ** (effective - parent)), plural(locale, 2 ** (effective - parent), t.netForms), parent) : null;
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="grid gap-3 sm:grid-cols-2">
-        <Field label={t.prefix} htmlFor={`${id}-p`}>
-          <Select
-            id={`${id}-p`}
-            value={effective}
-            onChange={(e) => {
-              setPrefix(Number(e.target.value));
-              setMaskText("");
-            }}
-            size="lg"
-          >
-            {Array.from({ length: 33 }, (_, i) => 32 - i).map((p) => (
-              <option key={p} value={p}>
-                /{p} — {toDotted(maskOf(p))}
-              </option>
-            ))}
-          </Select>
-        </Field>
-        <Field label={t.maskInput} htmlFor={`${id}-m`} error={maskErr}>
-          <Input id={`${id}-m`} value={maskText} onChange={(e) => setMaskText(e.target.value)} placeholder="255.255.255.0" size="lg" className="font-mono" autoComplete="off" spellCheck={false} aria-invalid={!!maskErr} />
-        </Field>
-      </div>
+    <Split
+      input={
+        <>
+          <Field label={t.prefix} htmlFor={`${id}-p`}>
+            <Select
+              id={`${id}-p`}
+              value={effective}
+              onChange={(e) => {
+                setPrefix(Number(e.target.value));
+                setMaskText("");
+              }}
+              size="lg"
+            >
+              {Array.from({ length: 33 }, (_, i) => 32 - i).map((p) => (
+                <option key={p} value={p}>
+                  /{p} — {toDotted(maskOf(p))}
+                </option>
+              ))}
+            </Select>
+          </Field>
+          <Field label={t.maskInput} htmlFor={`${id}-m`} error={maskErr}>
+            <Input
+              id={`${id}-m`}
+              value={maskText}
+              onChange={(e) => setMaskText(e.target.value)}
+              placeholder="255.255.255.0"
+              size="lg"
+              className="font-mono"
+              autoComplete="off"
+              spellCheck={false}
+              aria-invalid={!!maskErr}
+            />
+          </Field>
+        </>
+      }
+    >
       <ResultCard
         value={`${toDotted(mask)} = /${effective}`}
         sub={`${bigFmt(locale, usable)} ${plural(locale, usable, t.hostsForms)} · ${bigFmt(locale, total)} ${plural(locale, total, t.addrForms)} · wildcard ${toDotted(~mask >>> 0)}`}
@@ -107,6 +120,6 @@ export default function SubnetMask({ locale, prefix: p0 = 24 }: { locale: Locale
           ...(fitsText ? [{ label: t.fitTitle, value: fitsText, plain: true }] : []),
         ]}
       />
-    </div>
+    </Split>
   );
 }

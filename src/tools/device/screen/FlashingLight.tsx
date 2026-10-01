@@ -6,10 +6,11 @@ import type { Locale } from "@/i18n/config";
 import { cn } from "@/lib/cn";
 import { Button } from "@/ui/button";
 import { Checkbox, Slider } from "@/ui/field";
-import { Kbd } from "@/ui/panel";
-import { Segmented } from "@/ui/segmented";
+import { Kbd, Notice, Panel } from "@/ui/panel";
 import { StageLayer, typingTarget, useStage } from "@/ui/stage";
 import { SAFE_FLASH_HZ } from "./lib/color";
+import { BarButton } from "./ui/BarButton";
+import { Swatch } from "./ui/Swatch";
 import { FLASH_MODES, flashColor, flashesPerSecond, type FlashMode } from "./lib/flash";
 
 const T = {
@@ -115,59 +116,59 @@ export default function FlashingLight({ locale, mode: initial = "blink" }: { loc
   }
   const faster = (d: number) => setHz((h) => Math.round(Math.min(max, Math.max(0.5, h + d)) * 2) / 2);
 
-  const iconBtn = "flex size-9 items-center justify-center rounded-full hover:bg-white/15";
+  const running0 = running && !stage.open;
 
   return (
-    <div className="flex flex-col gap-5">
-      <div className="flex flex-col gap-4 rounded-[1rem] border border-line bg-surface p-4 sm:p-5">
-        <Segmented label={t.mode} value={mode} onChange={setMode} wrap options={FLASH_MODES.map((m) => ({ value: m, label: t.modes[m] }))} />
+    <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] lg:gap-6">
+      <Panel className="flex min-w-0 flex-col gap-6 p-4 sm:p-6 lg:col-start-2 lg:row-start-1">
+        <div role="group" aria-label={t.mode} className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+          {FLASH_MODES.map((m) => (
+            <button key={m} type="button" aria-pressed={m === mode} onClick={() => setMode(m)} className="chip h-11 justify-center text-[0.9375rem]!">
+              {t.modes[m]}
+            </button>
+          ))}
+        </div>
 
         {mode === "sos" ? (
           <p className="text-sm text-fg-2">{t.sosFixed}</p>
         ) : (
           <label className="flex flex-col gap-2">
-            <span className="flex items-center justify-between text-sm font-medium text-fg-2">
+            <span className="flex items-baseline justify-between gap-2 text-sm font-medium text-fg-2">
               <span>{t.speed}</span>
-              <span className="tabular-nums text-fg">
-                {speed.toLocaleString(locale)} <span className="font-normal text-fg-3">{t.perSec}</span>
+              <span className="text-right">
+                <span className={cn("text-xl font-bold tabular-nums", fast ? "text-warn" : "text-fg")}>{speed.toLocaleString(locale)}</span> <span className="font-normal text-fg-3">{t.perSec}</span>
               </span>
             </span>
-            <Slider min={0.5} max={max} step={0.5} value={speed} onChange={(e) => setHz(Number(e.target.value))} />
+            <Slider min={0.5} max={max} step={0.5} value={speed} onChange={(e) => setHz(Number(e.target.value))} format={(v) => v.toLocaleString(locale)} />
           </label>
         )}
 
         {(mode === "blink" || mode === "strobe" || mode === "sos" || mode === "two") && (
-          <div className="flex flex-wrap items-center gap-4 text-sm text-fg-2">
-            <label className="inline-flex items-center gap-2">
-              <input type="color" value={a} onChange={(e) => setA(e.target.value)} className="size-9 cursor-pointer rounded-[0.5rem] border border-line bg-surface p-0.5" />
-              {t.colorA}
-            </label>
-            {mode === "two" && (
-              <label className="inline-flex items-center gap-2">
-                <input type="color" value={b} onChange={(e) => setB(e.target.value)} className="size-9 cursor-pointer rounded-[0.5rem] border border-line bg-surface p-0.5" />
-                {t.colorB}
-              </label>
-            )}
+          <div className="flex flex-wrap gap-x-4 gap-y-3">
+            <Swatch label={t.colorA} value={a} onChange={setA} />
+            {mode === "two" && <Swatch label={t.colorB} value={b} onChange={setB} />}
           </div>
         )}
 
-        <div className="rounded-[0.75rem] bg-warn-soft px-4 py-3 text-sm text-warn">
+        <Notice tone="warn">
           <p className="flex items-center gap-1.5 font-semibold">
             <TriangleAlert className="size-4 shrink-0" aria-hidden />
             {t.warnTitle}
           </p>
           <p className="mt-1">{t.warn}</p>
           <Checkbox className="mt-2 text-sm text-warn" label={t.ack} checked={ack} onChange={(e) => setAck(e.target.checked)} />
-        </div>
-
+        </Notice>
+      </Panel>
+      <div className="flex min-w-0 flex-col gap-4 lg:col-start-1 lg:row-start-1">
+        <div ref={previewRef} aria-hidden className={cn("order-last aspect-[16/9] w-full rounded-[1.25rem] bg-black shadow-[var(--shadow-card)] transition-opacity lg:order-first", !running && "opacity-60")} />
         <div className="flex flex-wrap gap-2">
-          <Button variant="primary" size="lg" onClick={go}>
+          <Button variant="filled" size="xl" onClick={go}>
             <Maximize aria-hidden />
             {t.start}
           </Button>
-          <Button variant="secondary" size="lg" onClick={() => setRunning((r) => !r)} aria-pressed={running && !stage.open}>
-            {running && !stage.open ? <Pause aria-hidden /> : <Play aria-hidden />}
-            {running && !stage.open ? t.stop : t.preview}
+          <Button variant="tonal" size="xl" onClick={() => setRunning((r) => !r)} aria-pressed={running0}>
+            {running0 ? <Pause aria-hidden /> : <Play aria-hidden />}
+            {running0 ? t.stop : t.preview}
           </Button>
         </div>
         <p className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-sm text-fg-3 pointer-coarse:hidden">
@@ -185,8 +186,6 @@ export default function FlashingLight({ locale, mode: initial = "blink" }: { loc
           </span>
         </p>
       </div>
-
-      <div ref={previewRef} aria-hidden className={cn("aspect-[16/9] w-full rounded-[1rem] border border-line-strong bg-black sm:aspect-[3/1]", !running && "opacity-60")} />
 
       <StageLayer
         stage={stage}
@@ -210,18 +209,12 @@ export default function FlashingLight({ locale, mode: initial = "blink" }: { loc
             <span className="font-semibold">{t.modes[mode]}</span>
             {mode !== "sos" && (
               <>
-                <button type="button" className={iconBtn} onClick={() => faster(-0.5)} aria-label={t.slower} title={t.slower}>
-                  <Minus className="size-5" aria-hidden />
-                </button>
+                <BarButton label={t.slower} icon={<Minus aria-hidden />} onClick={() => faster(-0.5)} />
                 <span className={cn("min-w-10 text-center tabular-nums", fast && "text-amber-300")}>{speed.toLocaleString(locale)} Hz</span>
-                <button type="button" className={iconBtn} onClick={() => faster(0.5)} aria-label={t.faster} title={t.faster}>
-                  <Plus className="size-5" aria-hidden />
-                </button>
+                <BarButton label={t.faster} icon={<Plus aria-hidden />} onClick={() => faster(0.5)} />
               </>
             )}
-            <button type="button" className={iconBtn} onClick={() => setPaused((p) => !p)} aria-label={paused ? t.resume : t.pause} title={paused ? t.resume : t.pause}>
-              {paused ? <Play className="size-5" aria-hidden /> : <Pause className="size-5" aria-hidden />}
-            </button>
+            <BarButton label={paused ? t.resume : t.pause} icon={paused ? <Play aria-hidden /> : <Pause aria-hidden />} onClick={() => setPaused((p) => !p)} />
           </>
         }
       />

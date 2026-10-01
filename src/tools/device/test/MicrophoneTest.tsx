@@ -5,7 +5,7 @@ import { useEffect, useId, useRef, useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { formatNumber } from "@/i18n/format";
 import { downloadBlob } from "@/lib/clipboard";
-import { Button } from "@/ui/button";
+import { Button, IconButton } from "@/ui/button";
 import { Field, Select, Switch } from "@/ui/field";
 import { Badge, Notice, Panel } from "@/ui/panel";
 import { isClipping, meterFraction, noiseFloor, noiseRating, rmsPeak, toDbfs, type NoiseRating } from "./lib/audio-level";
@@ -380,140 +380,115 @@ export default function MicrophoneTest({ locale }: { locale: Locale }) {
     [16000, "16k"],
   ];
 
+  if (!live)
+    return (
+      <div className="flex flex-col gap-4">
+        <Panel className="flex flex-col items-center gap-4 px-4 py-10 text-center sm:py-14">
+          <span className="flex size-20 items-center justify-center rounded-full bg-accent-soft text-accent" aria-hidden>
+            <Mic className="size-10" />
+          </span>
+          <Button variant="filled" size="xl" onClick={() => start(deviceId, proc)} disabled={!supported} loading={status === "requesting"}>
+            {status !== "requesting" && <Mic aria-hidden />}
+            {status === "requesting" ? t.starting : status === "idle" ? t.start : t.retry}
+          </Button>
+          <p className="max-w-md text-sm text-fg-3">{t.intro}</p>
+          <MediaStatusNotice locale={locale} kind="microphone" status={supported ? status : "unsupported"} />
+        </Panel>
+        <PermissionHelp locale={locale} kind="microphone" open={status === "denied"} />
+      </div>
+    );
+
   return (
-    <div className="flex flex-col gap-4">
-      <Panel className="flex flex-col gap-4 p-4 sm:p-5">
-        {!live ? (
-          <div className="flex flex-col items-center gap-4 px-2 py-8 text-center sm:py-10">
-            <span className="flex size-16 items-center justify-center rounded-full bg-accent-soft text-accent" aria-hidden>
-              <Mic className="size-8" />
-            </span>
-            <Button variant="primary" size="lg" onClick={() => start(deviceId, proc)} disabled={status === "requesting" || !supported}>
-              {status === "requesting" ? t.starting : status === "idle" ? t.start : t.retry}
-            </Button>
-            <p className="max-w-md text-sm text-fg-3">{t.intro}</p>
-            <MediaStatusNotice locale={locale} kind="microphone" status={supported ? status : "unsupported"} />
-          </div>
-        ) : (
-          <div className="flex flex-wrap items-end gap-3">
-            <Field label={t.device} htmlFor={`${id}-dev`} className="min-w-0 flex-1 basis-60">
-              <Select
-                id={`${id}-dev`}
-                value={deviceId}
-                onChange={(e) => {
-                  setDeviceId(e.target.value);
-                  start(e.target.value, proc);
-                }}
-              >
-                {devices.length === 0 && <option value={deviceId}>{label || t.deviceN(1)}</option>}
-                {devices.map((d) => (
-                  <option key={d.id} value={d.id}>
-                    {d.label}
-                  </option>
-                ))}
-              </Select>
-            </Field>
-            <Button variant="outline" onClick={stop}>
-              <MicOff aria-hidden />
-              {t.stop}
-            </Button>
-          </div>
-        )}
-
-        {live && (
-          <>
-            <div className="flex flex-col gap-2 pt-2">
-              <div className="flex flex-wrap items-end justify-between gap-x-4 gap-y-1">
-                <div>
-                  <div className="tabular text-5xl font-bold tracking-tight text-fg sm:text-6xl">
-                    {levels ? fmtDb(levels.rms) : "—"} <span className="text-2xl font-semibold text-fg-3">dBFS</span>
-                  </div>
-                  <div className="text-sm text-fg-2">{t.rms}</div>
-                </div>
-                {levels?.clip ? <Badge tone="err">{t.clip}</Badge> : levels && levels.peak < -70 ? <span className="text-sm text-fg-3">{t.silent}</span> : null}
-              </div>
-              <div
-                className="relative mt-1 h-6 overflow-hidden rounded-full bg-[linear-gradient(to_right,var(--ok)_0%,var(--ok)_70%,var(--warn)_80%,var(--err)_95%)]"
-                role="img"
-                aria-label={t.level}
-              >
-                <div ref={coverRef} className="absolute inset-y-0 right-0 w-full bg-surface-2" />
-                <div ref={peakRef} className="absolute inset-y-0 left-0 w-0.5 bg-fg" />
-              </div>
-              <div className="relative h-4 text-[0.6875rem] text-fg-3 tabular" aria-hidden>
-                {TICKS.map((d) => (
-                  <span key={d} className="absolute -translate-x-1/2 first:translate-x-0 last:-translate-x-full" style={{ left: `${meterFraction(d) * 100}%` }}>
-                    {d === 0 ? "0" : `−${-d}`}
-                  </span>
-                ))}
-              </div>
-              <p className="flex flex-wrap gap-x-5 gap-y-1 text-sm text-fg-2">
-                <span>
-                  {t.peak}: <span className="tabular font-semibold text-fg">{levels ? `${fmtDb(levels.peak)} dBFS` : "—"}</span>
-                </span>
-                <span>
-                  {t.floor}:{" "}
-                  {levels?.floor != null ? (
-                    <>
-                      <span className="tabular font-semibold text-fg">{fmtDb(levels.floor)} dBFS</span> — {t.rating[noiseRating(levels.floor)]}
-                    </>
-                  ) : (
-                    <span className="text-fg-3">{t.floorWait}</span>
-                  )}
-                </span>
-              </p>
-            </div>
-
+    <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] lg:gap-6">
+      <Panel className="flex min-w-0 flex-col gap-5 p-4 sm:p-6">
+        <div className="flex flex-wrap items-end gap-3">
+          <Field label={t.device} htmlFor={`${id}-dev`} className="min-w-0 flex-1 basis-60">
+            <Select
+              id={`${id}-dev`}
+              value={deviceId}
+              onChange={(e) => {
+                setDeviceId(e.target.value);
+                start(e.target.value, proc);
+              }}
+            >
+              {devices.length === 0 && <option value={deviceId}>{label || t.deviceN(1)}</option>}
+              {devices.map((d) => (
+                <option key={d.id} value={d.id}>
+                  {d.label}
+                </option>
+              ))}
+            </Select>
+          </Field>
+          <Button variant="tonal" onClick={stop}>
+            <MicOff aria-hidden />
+            {t.stop}
+          </Button>
+        </div>
+        <div className="flex flex-col gap-2">
+          <div className="flex flex-wrap items-end justify-between gap-x-4 gap-y-1">
             <div>
-              <canvas ref={canvasRef} className="block h-20 w-full rounded-[0.625rem] bg-surface-2" role="img" aria-label={t.spectrum} />
-              <div className="relative mt-1 h-4 text-[0.6875rem] text-fg-3 tabular" aria-hidden>
-                {specTicks.map(([f, l]) => (
-                  <span key={f} className="absolute -translate-x-1/2 first:translate-x-0 last:-translate-x-full" style={{ left: `${(Math.log(f / 40) / Math.log(16000 / 40)) * 100}%` }}>
-                    {l}
-                  </span>
-                ))}
+              <div className="tabular text-5xl font-bold tracking-tight text-fg sm:text-6xl">
+                {levels ? fmtDb(levels.rms) : "—"} <span className="text-2xl font-semibold text-fg-3">dBFS</span>
               </div>
+              <div className="text-sm text-fg-2">{t.rms}</div>
             </div>
+            {levels?.clip ? <Badge tone="err">{t.clip}</Badge> : levels && levels.peak < -70 ? <span className="text-sm text-fg-3">{t.silent}</span> : null}
+          </div>
+          <div className="relative mt-1 h-6 overflow-hidden rounded-full bg-[linear-gradient(to_right,var(--ok)_0%,var(--ok)_70%,var(--warn)_80%,var(--err)_95%)]" role="img" aria-label={t.level}>
+            <div ref={coverRef} className="absolute inset-y-0 right-0 w-full bg-surface-2" />
+            <div ref={peakRef} className="absolute inset-y-0 left-0 w-0.5 bg-fg" />
+          </div>
+          <div className="relative h-4 text-[0.6875rem] text-fg-3 tabular" aria-hidden>
+            {TICKS.map((d) => (
+              <span key={d} className="absolute -translate-x-1/2 first:translate-x-0 last:-translate-x-full" style={{ left: `${meterFraction(d) * 100}%` }}>
+                {d === 0 ? "0" : `−${-d}`}
+              </span>
+            ))}
+          </div>
+          <p className="flex flex-wrap gap-x-5 gap-y-1 text-sm text-fg-2">
+            <span>
+              {t.peak}: <span className="tabular font-semibold text-fg">{levels ? `${fmtDb(levels.peak)} dBFS` : "—"}</span>
+            </span>
+            <span>
+              {t.floor}:{" "}
+              {levels?.floor != null ? (
+                <>
+                  <span className="tabular font-semibold text-fg">{fmtDb(levels.floor)} dBFS</span> — {t.rating[noiseRating(levels.floor)]}
+                </>
+              ) : (
+                <span className="text-fg-3">{t.floorWait}</span>
+              )}
+            </span>
+          </p>
+        </div>
 
-          </>
-        )}
+        <div>
+          <canvas ref={canvasRef} className="block h-20 w-full rounded-[1rem] bg-surface-2" role="img" aria-label={t.spectrum} />
+          <div className="relative mt-1 h-4 text-[0.6875rem] text-fg-3 tabular" aria-hidden>
+            {specTicks.map(([f, l]) => (
+              <span key={f} className="absolute -translate-x-1/2 first:translate-x-0 last:-translate-x-full" style={{ left: `${(Math.log(f / 40) / Math.log(16000 / 40)) * 100}%` }}>
+                {l}
+              </span>
+            ))}
+          </div>
+        </div>
       </Panel>
 
-      {live && PROC_KEYS.some((k) => procSupported[k]) && (
-        <fieldset className="flex flex-wrap items-center gap-x-6 gap-y-2 px-1">
-          <legend className="sr-only">{t.processing}</legend>
-          {PROC_KEYS.filter((k) => procSupported[k]).map((k) => (
-            <Switch
-              key={k}
-              label={k === "echoCancellation" ? t.ec : k === "noiseSuppression" ? t.ns : t.agc}
-              checked={proc[k]}
-              className="text-sm!"
-              onChange={(e) => {
-                const next = { ...proc, [k]: e.target.checked };
-                setProc(next);
-                start(deviceId, next);
-              }}
-            />
-          ))}
-          <p className="w-full text-[0.8125rem] text-fg-3">{t.procHint}</p>
-        </fieldset>
-      )}
-
-      {live && (
-        <Panel className="flex flex-col gap-3 p-4 sm:p-5">
+      <div className="flex min-w-0 flex-col gap-4">
+        <Panel className="flex flex-col gap-3 p-4 sm:p-6">
           {!canRecord ? (
             <Notice>{t.recUnsupported}</Notice>
           ) : recElapsed === null ? (
-            <div className="flex flex-wrap items-center gap-3">
-              <Button variant="secondary" onClick={record}>
+            <>
+              <Button variant="filled" size="lg" onClick={record} className="w-fit">
                 <Circle aria-hidden className="fill-current" />
                 {t.record}
               </Button>
-              <p className="min-w-0 flex-1 basis-64 text-sm text-fg-3">{t.recHint}</p>
-            </div>
+              <p className="text-sm text-fg-3">{t.recHint}</p>
+            </>
           ) : (
             <div className="flex flex-wrap items-center gap-3">
-              <Button variant="danger" onClick={stopRecording}>
+              <Button variant="danger" size="lg" onClick={stopRecording}>
                 <Square aria-hidden className="fill-current" />
                 {t.stopRec}
               </Button>
@@ -526,48 +501,61 @@ export default function MicrophoneTest({ locale }: { locale: Locale }) {
               </span>
             </div>
           )}
+          {rec && (
+            <div className="mt-1 flex flex-col gap-2 rounded-[1rem] bg-surface-2 p-3 motion-safe:animate-[menu-in_200ms_ease-out]">
+              <div className="flex items-center justify-between gap-3">
+                <h2 className="text-sm font-semibold text-fg">
+                  {t.yourRec} · {formatNumber(locale, rec.seconds, { maximumFractionDigits: 1 })} {t.sec}
+                </h2>
+                <IconButton variant="tonal" size="sm" label={t.download} icon={<Download aria-hidden />} onClick={() => downloadBlob(rec.blob, `microphone-test.${extFromMime(rec.blob.type)}`)} />
+              </div>
+              <audio controls src={rec.url} className="w-full" aria-label={t.yourRec} />
+            </div>
+          )}
         </Panel>
-      )}
 
-      {rec && (
-        <Panel className="flex flex-col gap-3 p-4 sm:p-5">
-          <div className="flex items-center justify-between gap-3">
-            <h2 className="text-sm font-semibold text-fg">
-              {t.yourRec} · {formatNumber(locale, rec.seconds, { maximumFractionDigits: 1 })} {t.sec}
-            </h2>
-            <Button size="sm" variant="ghost" onClick={() => downloadBlob(rec.blob, `microphone-test.${extFromMime(rec.blob.type)}`)}>
-              <Download aria-hidden />
-              {t.download}
-            </Button>
-          </div>
-          <audio controls src={rec.url} className="w-full" aria-label={t.yourRec} />
-        </Panel>
-      )}
+        {PROC_KEYS.some((k) => procSupported[k]) && (
+          <Panel className="p-4 sm:p-6">
+            <fieldset className="flex flex-col">
+              <legend className="mb-1 text-sm font-semibold text-fg">{t.processing}</legend>
+              {PROC_KEYS.filter((k) => procSupported[k]).map((k) => (
+                <Switch
+                  key={k}
+                  label={k === "echoCancellation" ? t.ec : k === "noiseSuppression" ? t.ns : t.agc}
+                  checked={proc[k]}
+                  onChange={(e) => {
+                    const next = { ...proc, [k]: e.target.checked };
+                    setProc(next);
+                    start(deviceId, next);
+                  }}
+                />
+              ))}
+              <p className="mt-1 text-[0.8125rem] text-fg-3">{t.procHint}</p>
+            </fieldset>
+          </Panel>
+        )}
 
-      {live && settings && (
-        <dl className="facts">
-          <div>
-            <dt>{t.device}</dt>
-            <dd>{label || "—"}</dd>
-          </div>
-          <div>
-            <dt>{t.sampleRate}</dt>
-            <dd>{settings.sampleRate ? `${formatNumber(locale, settings.sampleRate)} ${t.hz}` : "—"}</dd>
-          </div>
-          <div>
-            <dt>{t.channels}</dt>
-            <dd>{settings.channelCount ?? "—"}</dd>
-          </div>
-          <div>
-            <dt>{t.processing}</dt>
-            <dd>
-              {PROC_KEYS.map((k) => `${k === "echoCancellation" ? t.ec : k === "noiseSuppression" ? t.ns : t.agc}: ${settings[k] === undefined ? "—" : settings[k] ? t.on : t.off}`).join(" · ")}
-            </dd>
-          </div>
-        </dl>
-      )}
-
-      <PermissionHelp locale={locale} kind="microphone" open={status === "denied"} />
+        {settings && (
+          <dl className="facts">
+            <div>
+              <dt>{t.device}</dt>
+              <dd>{label || "—"}</dd>
+            </div>
+            <div>
+              <dt>{t.sampleRate}</dt>
+              <dd>{settings.sampleRate ? `${formatNumber(locale, settings.sampleRate)} ${t.hz}` : "—"}</dd>
+            </div>
+            <div>
+              <dt>{t.channels}</dt>
+              <dd>{settings.channelCount ?? "—"}</dd>
+            </div>
+            <div>
+              <dt>{t.processing}</dt>
+              <dd>{PROC_KEYS.map((k) => `${k === "echoCancellation" ? t.ec : k === "noiseSuppression" ? t.ns : t.agc}: ${settings[k] === undefined ? "—" : settings[k] ? t.on : t.off}`).join(" · ")}</dd>
+            </div>
+          </dl>
+        )}
+      </div>
     </div>
   );
 }

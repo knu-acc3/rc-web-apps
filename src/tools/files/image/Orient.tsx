@@ -4,7 +4,7 @@ import { FlipHorizontal2, FlipVertical2, RotateCcw, RotateCw } from "lucide-reac
 import { useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { formatNumber } from "@/i18n/format";
-import { Button } from "@/ui/button";
+import { Button, IconButton } from "@/ui/button";
 import { Field } from "@/ui/field";
 import { Segmented } from "@/ui/segmented";
 import { jpegDisplaySize, readExifOrientation, transformJpegLossless } from "./lib/jpeg";
@@ -23,6 +23,7 @@ const T = {
     right: "Повернуть на 90° вправо",
     r180: "180°",
     angle: "Точный угол",
+    quarter: "Поворот",
     corners: "Углы после поворота",
     crop: "Обрезать пустые углы",
     expand: "Расширить холст",
@@ -32,8 +33,7 @@ const T = {
     jpg: "JPG",
     lossless: "Без потерь (EXIF)",
     pixels: "Повернуть пиксели",
-    losslessHint:
-      "Пиксели не перекодируются, меняется только ориентация. Некоторые старые программы и сайты игнорируют флаг — для них выберите «Повернуть пиксели».",
+    losslessHint: "«Без потерь» меняет только флаг поворота — старые программы могут его не учесть",
     losslessNote: (o: number) => `Без потерь: изменён только флаг ориентации EXIF (теперь ${o}), данные изображения не перекодированы`,
     flipMode: "Отражение",
     h: "По горизонтали",
@@ -46,6 +46,7 @@ const T = {
     right: "Rotate 90° right",
     r180: "180°",
     angle: "Exact angle",
+    quarter: "Rotate",
     corners: "Corners after rotation",
     crop: "Crop empty corners",
     expand: "Expand canvas",
@@ -55,7 +56,7 @@ const T = {
     jpg: "JPG",
     lossless: "Lossless (EXIF)",
     pixels: "Rotate pixels",
-    losslessHint: "Pixels aren't re-encoded; only the orientation flag changes. Some old programs and websites ignore it — for them choose “Rotate pixels”.",
+    losslessHint: "“Lossless” only changes the rotation flag — some old apps ignore it",
     losslessNote: (o: number) => `Lossless: only the EXIF orientation flag changed (now ${o}); image data wasn't re-encoded`,
     flipMode: "Flip",
     h: "Horizontal",
@@ -121,58 +122,37 @@ export default function Orient({ locale, mode = "rotate" }: OrientProps) {
   const options =
     mode === "rotate" ? (
       <>
-        <div className="flex gap-1.5">
-          <Button variant="outline" size="icon" aria-label={t.left} title={t.left} onClick={() => setQuarter((x) => x - 1)}>
-            <RotateCcw aria-hidden />
-          </Button>
-          <Button variant="outline" size="icon" aria-label={t.right} title={t.right} onClick={() => setQuarter((x) => x + 1)}>
-            <RotateCw aria-hidden />
-          </Button>
-          <Button variant="outline" onClick={() => setQuarter((x) => x + 2)}>
-            {t.r180}
-          </Button>
-        </div>
-        <div className="min-w-52 flex-1">
-          <RangeField
-            label={t.angle}
-            value={angle}
-            onChange={setAngle}
-            min={-45}
-            max={45}
-            step={0.1}
-            locale={locale}
-            format={(v) =>
-              `${v > 0 ? "+" : v < 0 ? "−" : ""}${formatNumber(locale, Math.abs(v), { maximumFractionDigits: 1 })}° · ${formatNumber(locale, (((k * 90 + angle) % 360) + 360) % 360, { maximumFractionDigits: 1 })}°`
-            }
-          />
-        </div>
+        <Field label={t.quarter}>
+          <div className="flex flex-wrap items-center gap-2">
+            <IconButton variant="tonal" size="lg" label={t.left} icon={<RotateCcw aria-hidden />} onClick={() => setQuarter((x) => x - 1)} />
+            <IconButton variant="tonal" size="lg" label={t.right} icon={<RotateCw aria-hidden />} onClick={() => setQuarter((x) => x + 1)} />
+            <Button variant="tonal" size="lg" onClick={() => setQuarter((x) => x + 2)}>
+              {t.r180}
+            </Button>
+          </div>
+        </Field>
+        <RangeField
+          label={t.angle}
+          value={angle}
+          onChange={setAngle}
+          min={-45}
+          max={45}
+          step={0.1}
+          locale={locale}
+          format={(v) =>
+            `${v > 0 ? "+" : v < 0 ? "−" : ""}${formatNumber(locale, Math.abs(v), { maximumFractionDigits: 1 })}° · ${formatNumber(locale, (((k * 90 + angle) % 360) + 360) % 360, { maximumFractionDigits: 1 })}°`
+          }
+        />
       </>
     ) : (
       <Field label={t.flipMode}>
         <Segmented
-          wrap
           label={t.flipMode}
           value={flip}
           onChange={setFlip}
           options={[
-            {
-              value: "h",
-              label: (
-                <span className="inline-flex items-center gap-1.5">
-                  <FlipHorizontal2 className="size-4" aria-hidden />
-                  {t.h}
-                </span>
-              ),
-            },
-            {
-              value: "v",
-              label: (
-                <span className="inline-flex items-center gap-1.5">
-                  <FlipVertical2 className="size-4" aria-hidden />
-                  {t.v}
-                </span>
-              ),
-            },
+            { value: "h", label: t.h, icon: <FlipHorizontal2 className="size-4 shrink-0" aria-hidden /> },
+            { value: "v", label: t.v, icon: <FlipVertical2 className="size-4 shrink-0" aria-hidden /> },
             { value: "both", label: t.both },
           ]}
         />
@@ -183,7 +163,6 @@ export default function Orient({ locale, mode = "rotate" }: OrientProps) {
     <>
       <Field label={t.jpg} hint={t.losslessHint}>
         <Segmented
-          wrap
           label={t.jpg}
           value={lossless ? "lossless" : "pixels"}
           onChange={(v) => setLossless(v === "lossless")}
@@ -197,7 +176,6 @@ export default function Orient({ locale, mode = "rotate" }: OrientProps) {
         <>
           <Field label={t.corners}>
             <Segmented
-              wrap
               label={t.corners}
               value={corners}
               onChange={setCorners}
@@ -210,7 +188,6 @@ export default function Orient({ locale, mode = "rotate" }: OrientProps) {
           {corners === "expand" && (
             <Field label={t.fill}>
               <Segmented
-                wrap
                 label={t.fill}
                 value={fillKind}
                 onChange={setFillKind}
@@ -229,6 +206,7 @@ export default function Orient({ locale, mode = "rotate" }: OrientProps) {
 
   return (
     <BatchWorkspace
+      self={mode === "rotate" ? "rotate" : undefined}
       locale={locale}
       batch={batch}
       options={options}

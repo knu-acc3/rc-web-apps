@@ -5,7 +5,7 @@ import type { Locale } from "@/i18n/config";
 import { Field, Textarea } from "@/ui/field";
 import { Segmented } from "@/ui/segmented";
 import { hreflangHeader, hreflangHtml, hreflangIssues, hreflangSitemap, normalizeCode, type HreflangIssue, type HreflangRow } from "./lib/hreflang";
-import { Issues, Output } from "./ui/kit";
+import { Issues, Output, Split } from "./ui/kit";
 
 type Format = "html" | "header" | "sitemap";
 
@@ -82,20 +82,23 @@ export default function HreflangGenerator({ locale }: { locale: Locale }) {
     lineOf.push(i + 1);
   });
   const issues = hreflangIssues(rows);
-  const messages = [
-    ...bad.map(t.bad),
-    ...issues.map((x) => (x.issue === "noDefault" ? t.noDefault : `${t.line(lineOf[x.row])} (${normalizeCode(rows[x.row].code)}): ${t.issue[x.issue]}`)),
-  ];
+  const messages = [...bad.map(t.bad), ...issues.map((x) => (x.issue === "noDefault" ? t.noDefault : `${t.line(lineOf[x.row])} (${normalizeCode(rows[x.row].code)}): ${t.issue[x.issue]}`))];
   const out = format === "html" ? hreflangHtml(rows) : format === "header" ? hreflangHeader(rows) : hreflangSitemap(rows);
 
   return (
-    <div className="flex flex-col gap-5">
-      <Field label={t.input} htmlFor={`${id}-i`} hint={t.hint}>
-        <Textarea id={`${id}-i`} value={text} onChange={(e) => setText(e.target.value)} rows={6} className="font-mono text-sm" spellCheck={false} />
-      </Field>
-      <div aria-live="polite">
-        <Issues items={messages} />
-      </div>
+    <Split
+      input={
+        <>
+          <Field label={t.input} htmlFor={`${id}-i`} hint={t.hint}>
+            <Textarea id={`${id}-i`} value={text} onChange={(e) => setText(e.target.value)} rows={8} className="font-mono text-sm" spellCheck={false} />
+          </Field>
+          <div aria-live="polite">
+            <Issues items={messages} />
+          </div>
+          <p className="text-sm text-fg-3">{t.note}</p>
+        </>
+      }
+    >
       <Segmented<Format>
         label={t.format}
         value={format}
@@ -106,8 +109,7 @@ export default function HreflangGenerator({ locale }: { locale: Locale }) {
           { value: "sitemap", label: t.sitemap },
         ]}
       />
-      <Output locale={locale} value={out} title={format === "html" ? t.html : format === "header" ? t.header : t.sitemap} filename={format === "sitemap" ? "sitemap.xml" : undefined} mime="application/xml" rows={8} />
-      <p className="text-sm text-fg-3">{t.note}</p>
-    </div>
+      <Output locale={locale} value={out} title={format === "html" ? t.html : format === "header" ? t.header : t.sitemap} filename={format === "sitemap" ? "sitemap.xml" : undefined} mime="application/xml" rows={10} />
+    </Split>
   );
 }

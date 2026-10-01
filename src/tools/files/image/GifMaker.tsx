@@ -12,11 +12,13 @@ import { Field, Select } from "@/ui/field";
 import { Notice, Panel } from "@/ui/panel";
 import { Segmented } from "@/ui/segmented";
 import { IMAGE_ACCEPT } from "./lib/detect";
-import { checker, ColorField, NumberField } from "./ui/controls";
+import { checker, ChipGroup, ColorField, NumberField } from "./ui/controls";
 import { useEngine, useObjectUrls } from "./ui/hooks";
 import { FrameStrip } from "./ui/FrameStrip";
+import { OptionsBar, ToolColumns } from "./ui/OptionsBar";
 import { errorText, S } from "./ui/strings";
 import { useImageList } from "./ui/useImageList";
+import { RestoringPlaceholder, WorkspaceBar } from "./ui/Workspace";
 
 const T = {
   ru: {
@@ -177,126 +179,141 @@ export default function GifMaker({ locale }: { locale: Locale }) {
   if (!items.length) {
     return (
       <div className="flex flex-col gap-3">
-        <Dropzone onFiles={list.add} accept={IMAGE_ACCEPT} multiple title={s.dropMany} hint={t.need} />
-        {list.loading && <Loader2 className="size-5 animate-spin text-accent" aria-label={s.reading} />}
+        {list.ws.restoring || list.loading ? (
+          <RestoringPlaceholder locale={locale} text={list.ws.restoring ? undefined : s.reading} />
+        ) : (
+          <Dropzone onFiles={list.add} accept={IMAGE_ACCEPT} multiple title={s.dropMany} hint={t.need} locale={locale} />
+        )}
       </div>
     );
   }
 
   const total = delays.reduce((a, b) => a + b, 0);
+  const side = (
+    <OptionsBar locale={locale}>
+      <NumberField label={t.delay} value={delay} onChange={setDelay} min={20} max={10000} step={50} suffix={t.ms} stepper locale={locale} />
+      <Field label={t.loop} htmlFor={`${id}-loop`}>
+        <Select id={`${id}-loop`} value={loop} onChange={(e) => setLoop(e.target.value as typeof loop)}>
+          <option value="0">{t.forever}</option>
+          <option value="-1">{t.once}</option>
+          <option value="2">{t.times(2)}</option>
+          <option value="3">{t.times(3)}</option>
+          <option value="5">{t.times(5)}</option>
+        </Select>
+      </Field>
+      <Field label={t.width}>
+        <ChipGroup label={t.width} value={width} onChange={setWidth} options={WIDTHS.map((w) => ({ value: w, label: `${w} px` }))} />
+      </Field>
+      <Field label={t.fit}>
+        <Segmented
+          label={t.fit}
+          value={fit}
+          onChange={setFit}
+          options={[
+            { value: "contain", label: t.contain },
+            { value: "cover", label: t.cover },
+          ]}
+        />
+      </Field>
+      <Field label={t.bg}>
+        <Segmented
+          label={t.bg}
+          value={bgKind}
+          onChange={setBgKind}
+          options={[
+            { value: "color", label: t.color },
+            { value: "transparent", label: t.transparent },
+          ]}
+        />
+      </Field>
+      {bgKind === "color" && <ColorField label={t.bgColor} value={bg} onChange={setBg} locale={locale} />}
+    </OptionsBar>
+  );
+
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex flex-wrap items-end gap-x-4 gap-y-3 rounded-[0.75rem] border border-line bg-surface px-4 py-3">
-        <NumberField label={t.delay} value={delay} onChange={setDelay} min={20} max={10000} suffix={t.ms} className="w-36" />
-        <Field label={t.loop} htmlFor={`${id}-loop`} className="w-40">
-          <Select id={`${id}-loop`} value={loop} onChange={(e) => setLoop(e.target.value as typeof loop)}>
-            <option value="0">{t.forever}</option>
-            <option value="-1">{t.once}</option>
-            <option value="2">{t.times(2)}</option>
-            <option value="3">{t.times(3)}</option>
-            <option value="5">{t.times(5)}</option>
-          </Select>
-        </Field>
-        <Field label={t.width} htmlFor={`${id}-w`} className="w-32">
-          <Select id={`${id}-w`} value={width} onChange={(e) => setWidth(Number(e.target.value))}>
-            {WIDTHS.map((w) => (
-              <option key={w} value={w}>
-                {w} px
-              </option>
-            ))}
-          </Select>
-        </Field>
-        <Field label={t.fit}>
-          <Segmented
-            wrap
-            label={t.fit}
-            value={fit}
-            onChange={setFit}
-            options={[
-              { value: "contain", label: t.contain },
-              { value: "cover", label: t.cover },
-            ]}
-          />
-        </Field>
-        <Field label={t.bg}>
-          <Segmented
-            wrap
-            label={t.bg}
-            value={bgKind}
-            onChange={setBgKind}
-            options={[
-              { value: "color", label: t.color },
-              { value: "transparent", label: t.transparent },
-            ]}
-          />
-        </Field>
-        {bgKind === "color" && <ColorField label={t.bgColor} value={bg} onChange={setBg} locale={locale} className="w-44" />}
-      </div>
-
-      <Panel className="overflow-hidden">
-        <div className={`flex justify-center p-3 sm:p-4 ${checker}`}>
-          {result && !stale ? (
-            <img src={result.url} alt={t.result} className="block h-auto max-h-[60vh] max-w-full" />
-          ) : (
-            <canvas ref={canvasRef} role="img" aria-label={t.frameList} className="block h-auto max-h-[60vh] max-w-full" />
-          )}
-        </div>
-        <div className="flex flex-col gap-3 border-t border-line px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
-          <div aria-live="polite">
-            <p className="tabular text-2xl font-semibold tracking-tight text-fg">
-              {result && !stale ? formatBytes(locale, result.blob.size) : `${items.length} ${plural(locale, items.length, t.frames)}`}
-            </p>
-            <p className="tabular text-sm text-fg-3">
-              {width}×{height} px · {t.duration} {formatNumber(locale, total / 1000, { maximumFractionDigits: 2 })} {locale === "ru" ? "с" : "s"} ·{" "}
-              {formatNumber(locale, 1000 / d, { maximumFractionDigits: 1 })} {t.fps}
-            </p>
-          </div>
-          {result && !stale ? (
-            <Button variant="primary" size="lg" onClick={() => downloadBlob(result.blob, `animation-${width}x${height}.gif`)}>
-              <Download aria-hidden />
-              {t.download}
-            </Button>
-          ) : (
-            <Button variant="primary" size="lg" onClick={make} disabled={busy || items.length < 2}>
-              {busy ? <Loader2 className="animate-spin" aria-hidden /> : <Play aria-hidden />}
-              {busy ? `${t.making} ${Math.round(progress * 100)} %` : t.make}
-            </Button>
-          )}
-        </div>
-        <p className="border-t border-line px-4 py-2.5 text-[0.8125rem] text-fg-3">{items.length < 2 ? t.need : t.note}</p>
-      </Panel>
-
-      <FrameStrip
-        items={items}
-        onMove={list.move}
-        onRemove={list.remove}
-        onAdd={list.add}
+      <WorkspaceBar
         locale={locale}
-        label={t.frameList}
-        selected={cur}
-        onSelect={setFrame}
+        count={list.ws.restored}
+        onStartOver={() => {
+          list.ws.startOver();
+          list.clear();
+        }}
       />
-      {items[cur] && (
-        <NumberField
-          label={t.ownDelay(cur + 1)}
-          value={own[items[cur].key] ?? null}
-          onChange={(v) =>
-            setOwn((o) => {
-              const next = { ...o };
-              if (v === null) delete next[items[cur].key];
-              else next[items[cur].key] = v;
-              return next;
-            })
-          }
-          min={20}
-          max={10000}
-          suffix={t.ms}
-          placeholder={String(d)}
-          className="w-64"
-        />
-      )}
-      {error ? <Notice tone="err">{errorText(locale, error)}</Notice> : null}
-      {list.errors.length > 0 && <Notice tone="warn">{errorText(locale, list.errors[list.errors.length - 1])}</Notice>}
+      <ToolColumns
+        side={side}
+        rest={
+          <>
+            <FrameStrip
+              items={items}
+              onMove={list.move}
+              onRemove={list.remove}
+              onAdd={list.add}
+              locale={locale}
+              label={t.frameList}
+              selected={cur}
+              onSelect={setFrame}
+            />
+            {items[cur] && (
+              <NumberField
+                label={t.ownDelay(cur + 1)}
+                value={own[items[cur].key] ?? null}
+                onChange={(v) =>
+                  setOwn((o) => {
+                    const next = { ...o };
+                    if (v === null) delete next[items[cur].key];
+                    else next[items[cur].key] = v;
+                    return next;
+                  })
+                }
+                min={20}
+                max={10000}
+                step={50}
+                suffix={t.ms}
+                placeholder={String(d)}
+                stepper
+                locale={locale}
+                className="max-w-xs"
+              />
+            )}
+            {error ? <Notice tone="err">{errorText(locale, error)}</Notice> : null}
+            {list.errors.length > 0 && <Notice tone="warn">{errorText(locale, list.errors[list.errors.length - 1])}</Notice>}
+          </>
+        }
+      >
+        <Panel className="flex min-w-0 flex-col gap-3 p-3 sm:gap-4 sm:p-4">
+          <div className={`flex justify-center rounded-[1rem] p-3 sm:p-4 ${checker}`}>
+            {result && !stale ? (
+              <img src={result.url} alt={t.result} className="block h-auto max-h-[60vh] max-w-full" />
+            ) : (
+              <canvas ref={canvasRef} role="img" aria-label={t.frameList} className="block h-auto max-h-[60vh] max-w-full" />
+            )}
+          </div>
+          <div className="flex flex-col gap-3 px-1 sm:flex-row sm:items-center sm:justify-between">
+            <div aria-live="polite">
+              <p className="tabular text-2xl font-semibold tracking-tight text-fg sm:text-3xl">
+                {result && !stale ? formatBytes(locale, result.blob.size) : `${items.length} ${plural(locale, items.length, t.frames)}`}
+              </p>
+              <p className="tabular text-sm text-fg-3">
+                {width}×{height} px · {t.duration} {formatNumber(locale, total / 1000, { maximumFractionDigits: 2 })} {locale === "ru" ? "с" : "s"} ·{" "}
+                {formatNumber(locale, 1000 / d, { maximumFractionDigits: 1 })} {t.fps}
+              </p>
+            </div>
+            {result && !stale ? (
+              <Button variant="filled" size="lg" onClick={() => downloadBlob(result.blob, `animation-${width}x${height}.gif`)}>
+                <Download aria-hidden />
+                {t.download}
+              </Button>
+            ) : (
+              <Button variant="filled" size="lg" onClick={make} disabled={busy || items.length < 2}>
+                {busy ? <Loader2 className="animate-spin" aria-hidden /> : <Play aria-hidden />}
+                {busy ? `${t.making} ${Math.round(progress * 100)} %` : t.make}
+              </Button>
+            )}
+          </div>
+          <p className="px-1 text-[0.8125rem] text-fg-3">{items.length < 2 ? t.need : t.note}</p>
+        </Panel>
+      </ToolColumns>
     </div>
   );
 }

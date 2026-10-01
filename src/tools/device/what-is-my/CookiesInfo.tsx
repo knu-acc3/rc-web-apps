@@ -27,8 +27,7 @@ const T = {
     persistedYes: "да (браузер не удалит данные сам)",
     persistedNo: "нет (при нехватке места данные могут быть удалены)",
     again: "Проверить снова",
-    blockedHint:
-      "Cookie отключены. Во многих сайтах перестанут работать вход, корзина и настройки. Как включить их в вашем браузере — в инструкции ниже.",
+    blockedHint: "Cookie отключены. Во многих сайтах перестанут работать вход, корзина и настройки. Как включить их в вашем браузере — в инструкции ниже.",
     storageHint: "Cookie работают, но локальное хранилище недоступно — так бывает в приватном режиме некоторых браузеров или при запрете «данных сайтов».",
   },
   en: {
@@ -135,13 +134,8 @@ export default function CookiesInfo({ locale }: ToolProps) {
   const status = d ? (d.cookie ? t.enabled : d.flag ? t.blockedSite : t.blocked) : null;
   return (
     <Stack>
-      <Hero
-        locale={locale}
-        label={t.label}
-        value={status ? <span className={d?.cookie ? "text-ok" : "text-err"}>{status}</span> : null}
-        sub={d ? (d.cookie ? t.sub : t.subBlocked) : undefined}
-      >
-        <Button variant="outline" size="sm" className="mt-3" onClick={() => setNonce((x) => x + 1)} disabled={!d}>
+      <Hero locale={locale} label={t.label} value={status ? <span className={d?.cookie ? "text-ok" : "text-err"}>{status}</span> : null} sub={d ? (d.cookie ? t.sub : t.subBlocked) : undefined}>
+        <Button variant="elevated" className="mt-3 ml-2" onClick={() => setNonce((x) => x + 1)} disabled={!d}>
           <RefreshCw aria-hidden />
           {t.again}
         </Button>
@@ -154,7 +148,7 @@ export default function CookiesInfo({ locale }: ToolProps) {
           { k: t.test, v: d ? <YesNo locale={locale} value={d.cookie} /> : null },
           { k: t.local, v: d ? <YesNo locale={locale} value={d.local} /> : null },
           { k: t.session, v: d ? <YesNo locale={locale} value={d.session} /> : null },
-          { k: t.idb, v: d ? (d.idb === null ? c.unknown : <YesNo locale={locale} value={d.idb} />) : null },
+          { k: t.idb, v: d ? d.idb === null ? c.unknown : <YesNo locale={locale} value={d.idb} /> : null },
           { k: t.quota, v: d ? (d.quota ? t.quotaValue(formatBytes(locale, d.usage ?? 0), formatBytes(locale, d.quota)) : c.notAvailable) : null },
           { k: t.persisted, v: d ? (d.persisted === null ? c.notAvailable : d.persisted ? t.persistedYes : t.persistedNo) : null },
         ]}

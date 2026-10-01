@@ -1,6 +1,6 @@
 "use client";
 
-import { RotateCcw, Trophy } from "lucide-react";
+import { MousePointerClick, RotateCcw, Trophy } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { formatNumber, plural } from "@/i18n/format";
@@ -143,12 +143,7 @@ export default function ClickSpeedTest({ locale, seconds = DEFAULT_CPS_DURATION 
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <Segmented
-          label={t.duration}
-          value={String(duration)}
-          onChange={(v) => reset(Number(v) as CpsDuration)}
-          options={CPS_DURATIONS.map((d) => ({ value: String(d), label: `${d} ${t.secShort}`, title: t.sec(d) }))}
-        />
+        <Segmented label={t.duration} value={String(duration)} onChange={(v) => reset(Number(v) as CpsDuration)} options={CPS_DURATIONS.map((d) => ({ value: String(d), label: `${d} ${t.secShort}`, title: t.sec(d) }))} />
         <span className="inline-flex items-center gap-1.5 text-sm text-fg-2">
           <Trophy className="size-4 text-warn" aria-hidden />
           {t.best} ({duration} {t.secShort}): <span className="tabular font-semibold text-fg">{best !== null ? `${fmt(best)} CPS` : "—"}</span>
@@ -169,8 +164,8 @@ export default function ClickSpeedTest({ locale, seconds = DEFAULT_CPS_DURATION 
           }
         }}
         className={cn(
-          "relative flex min-h-72 w-full touch-manipulation select-none flex-col items-center justify-center gap-2 rounded-[1rem] border-2 px-4 py-8 text-center transition-colors duration-100 sm:min-h-80",
-          running ? "border-accent bg-accent-soft" : showResult ? "border-line bg-surface-2" : "border-dashed border-line-strong bg-surface hover:border-accent",
+          "relative flex min-h-72 w-full touch-manipulation select-none flex-col items-center justify-center gap-2 overflow-hidden rounded-[1.25rem] px-4 py-8 text-center transition-[background-color,box-shadow,transform] duration-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent active:scale-[0.99] sm:min-h-80 lg:min-h-96",
+          running ? "bg-accent-soft shadow-[var(--elev-2)]" : showResult ? "bg-surface-2" : "bg-accent-soft shadow-[var(--elev-1)] hover:shadow-[var(--elev-2)]",
         )}
       >
         {running ? (
@@ -186,12 +181,15 @@ export default function ClickSpeedTest({ locale, seconds = DEFAULT_CPS_DURATION 
           </>
         ) : (
           <>
+            <span className="flex size-20 items-center justify-center rounded-full bg-accent text-accent-fg shadow-[var(--elev-2)]" aria-hidden>
+              <MousePointerClick className="size-10" />
+            </span>
             <span className="text-2xl font-semibold text-fg sm:text-3xl">{t.start}</span>
             <span className="text-[0.9375rem] text-fg-3">{t.startSub}</span>
           </>
         )}
         {running && (
-          <span className="absolute inset-x-0 bottom-0 h-1.5 overflow-hidden rounded-b-[0.875rem] bg-line" aria-hidden>
+          <span className="absolute inset-x-0 bottom-0 h-2 overflow-hidden bg-line" aria-hidden>
             <span className="block h-full bg-accent" style={{ width: `${(leftS / duration) * 100}%` }} />
           </span>
         )}
@@ -199,13 +197,13 @@ export default function ClickSpeedTest({ locale, seconds = DEFAULT_CPS_DURATION 
 
       <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-1 text-[0.9375rem] text-fg-2 tabular">
         <span>
-          <span className="font-semibold text-fg">{fmt(leftS, 1)}</span> {t.secShort} {t.timeLeft}
+          <span className="text-xl font-bold text-fg">{fmt(leftS, 1)}</span> {t.secShort} {t.timeLeft}
         </span>
         <span>
-          <span className="font-semibold text-fg">{running ? fmt(liveCps, 1) : result ? fmt(result.cps, 1) : "0"}</span> CPS
+          <span className="text-xl font-bold text-fg">{running ? fmt(liveCps, 1) : result ? fmt(result.cps, 1) : "0"}</span> CPS
         </span>
         <span>
-          <span className="font-semibold text-fg">{result && !running ? result.clicks : clicks}</span> {t.clicks(result && !running ? result.clicks : clicks)}
+          <span className="text-xl font-bold text-fg">{result && !running ? result.clicks : clicks}</span> {t.clicks(result && !running ? result.clicks : clicks)}
         </span>
       </div>
 
@@ -216,7 +214,7 @@ export default function ClickSpeedTest({ locale, seconds = DEFAULT_CPS_DURATION 
             <Badge tone="accent">{CPS_RANK_LABELS[locale][cpsRank(result.cps)]}</Badge>
             {result.record && <Badge tone="ok">{t.newBest}</Badge>}
             {phase === "done" && (
-              <Button variant="outline" size="sm" onClick={() => reset()}>
+              <Button variant="filled" size="lg" onClick={() => reset()}>
                 <RotateCcw aria-hidden />
                 {t.again}
               </Button>

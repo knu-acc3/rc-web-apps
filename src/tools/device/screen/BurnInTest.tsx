@@ -1,13 +1,14 @@
 "use client";
 
 import { ChevronLeft, ChevronRight, Maximize, Play } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { Button } from "@/ui/button";
-import { Select } from "@/ui/field";
-import { Kbd } from "@/ui/panel";
+import { Field, Select } from "@/ui/field";
+import { Kbd, Panel } from "@/ui/panel";
 import { Segmented } from "@/ui/segmented";
 import { StageLayer, useStage } from "@/ui/stage";
+import { BarButton } from "./ui/BarButton";
 
 /** Fills where retained images show best: mid gray first (burn-in shows as darker shapes), then pure colours. */
 const CHECK = [
@@ -61,6 +62,7 @@ const T = {
 
 export default function BurnInTest({ locale, mode: initial = "check" }: { locale: Locale; mode?: "check" | "wash" }) {
   const t = T[locale];
+  const id = useId();
   const [mode, setMode] = useState<"check" | "wash">(initial);
   const [i, setI] = useState(0);
   const [minutes, setMinutes] = useState(10);
@@ -100,35 +102,42 @@ export default function BurnInTest({ locale, mode: initial = "check" }: { locale
 
   const step = (d: number) => setI((x) => (x + d + CHECK.length) % CHECK.length);
   const mm = `${Math.floor(left / 60)}:${String(left % 60).padStart(2, "0")}`;
-  const iconBtn = "flex size-9 items-center justify-center rounded-full hover:bg-white/15";
 
   return (
     <div className="flex flex-col gap-5">
-      <div className="flex flex-col gap-4 rounded-[1rem] border border-line bg-surface p-4 sm:p-5">
-        <Segmented label={t.mode} value={mode} onChange={setMode} options={[{ value: "check", label: t.check }, { value: "wash", label: t.wash }]} />
+      <Panel className="flex flex-col gap-5 p-4 sm:p-6">
+        <Segmented
+          size="lg"
+          label={t.mode}
+          value={mode}
+          onChange={setMode}
+          options={[
+            { value: "check", label: t.check },
+            { value: "wash", label: t.wash },
+          ]}
+        />
         <p className="text-[0.9375rem] text-fg-2">{mode === "check" ? t.checkHint : t.washHint}</p>
         {mode === "check" ? (
-          <div className="flex h-16 overflow-hidden rounded-[0.5rem] border border-line-strong" aria-hidden>
+          <div className="flex h-20 overflow-hidden rounded-[1rem] shadow-[inset_0_0_0_1px_rgb(0_0_0/0.12)] sm:h-28" aria-hidden>
             {CHECK.map((c) => (
               <span key={c.hex} className="flex-1" style={{ background: c.hex }} />
             ))}
           </div>
         ) : (
-          <label className="flex max-w-xs flex-col gap-2 text-sm font-medium text-fg-2">
-            {t.duration}
-            <Select value={minutes} onChange={(e) => setMinutes(Number(e.target.value))}>
+          <Field label={t.duration} htmlFor={`${id}-min`}>
+            <Select id={`${id}-min`} value={minutes} onChange={(e) => setMinutes(Number(e.target.value))} className="w-fit">
               {[5, 10, 20, 30, 60].map((m) => (
                 <option key={m} value={m}>
                   {t.min(m)}
                 </option>
               ))}
             </Select>
-          </label>
+          </Field>
         )}
         <div>
           <Button
-            variant="primary"
-            size="lg"
+            variant="filled"
+            size="xl"
             onClick={() => {
               setI(0);
               setLeft(minutes * 60);
@@ -149,7 +158,7 @@ export default function BurnInTest({ locale, mode: initial = "check" }: { locale
             </span>
           </p>
         )}
-      </div>
+      </Panel>
 
       <StageLayer
         stage={stage}
@@ -171,13 +180,9 @@ export default function BurnInTest({ locale, mode: initial = "check" }: { locale
         bar={
           mode === "check" ? (
             <>
-              <button type="button" className={iconBtn} onClick={() => step(-1)} aria-label={t.prev} title={t.prev}>
-                <ChevronLeft className="size-5" aria-hidden />
-              </button>
+              <BarButton label={t.prev} icon={<ChevronLeft aria-hidden />} onClick={() => step(-1)} />
               <span className="font-semibold">{CHECK[i][locale]}</span>
-              <button type="button" className={iconBtn} onClick={() => step(1)} aria-label={t.next} title={t.next}>
-                <ChevronRight className="size-5" aria-hidden />
-              </button>
+              <BarButton label={t.next} icon={<ChevronRight aria-hidden />} onClick={() => step(1)} />
             </>
           ) : (
             <span className="tabular-nums font-semibold">

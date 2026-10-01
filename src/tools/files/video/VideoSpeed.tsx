@@ -4,13 +4,13 @@ import { Gauge } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { formatNumber } from "@/i18n/format";
-import { Checkbox } from "@/ui/field";
-import { Segmented } from "@/ui/segmented";
+import { Switch } from "@/ui/field";
 import { runJob } from "../shared/client";
 import { outputName, type JobResult, type VideoTarget } from "../shared/spec";
 import { formatTime } from "../shared/time";
 import { VIDEO_ACCEPT } from "./ui/FilePicker";
 import { useJob, useProbe } from "./ui/hooks";
+import { ChoiceChips, Setting } from "./ui/options";
 import { JobProgress } from "./ui/Progress";
 import { ResultCard } from "./ui/ResultCard";
 import { UI } from "./ui/strings";
@@ -22,7 +22,7 @@ const SPEEDS = ["0.25", "0.5", "0.75", "1.25", "1.5", "2", "3", "4"] as const;
 const T = {
   ru: {
     speed: "Скорость",
-    keepPitch: "Сохранить высоту голоса (без эффекта «бурундука»)",
+    keepPitch: "Сохранить высоту голоса",
     length: "Длительность",
     run: "Изменить скорость",
     preview: "Предпросмотр видео (скорость применяется сразу)",
@@ -31,7 +31,7 @@ const T = {
   },
   en: {
     speed: "Speed",
-    keepPitch: "Keep voice pitch (no chipmunk effect)",
+    keepPitch: "Keep voice pitch",
     length: "Duration",
     run: "Change speed",
     preview: "Video preview (speed applies live)",
@@ -86,31 +86,34 @@ function VideoSpeedInner({ locale, speed: speed0 = 2 }: { locale: Locale; speed?
           <div className="flex flex-col gap-3">
             <VideoPreview ref={player} file={file} label={t.preview} />
             {d ? (
-              <p className="text-fg-2" aria-live="polite">
-                {t.length}:{" "}
-                <span className="tabular text-2xl font-semibold text-fg">
+              <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1" aria-live="polite">
+                <span className="text-sm text-fg-3">{t.length}</span>
+                <span className="tabular text-2xl font-bold tracking-tight text-fg">
                   {formatTime(d, 1)} → {formatTime(d / factor, 1)}
-                </span>{" "}
-                <span className="text-sm text-fg-3">({factor < 1 ? t.slow : t.fast} ×{formatNumber(locale, factor)})</span>
-              </p>
+                </span>
+                <span className="text-sm text-fg-3">
+                  {factor < 1 ? t.slow : t.fast} ×{formatNumber(locale, factor)}
+                </span>
+              </div>
             ) : null}
           </div>
         )
       }
       options={
-        <div className="flex flex-col gap-3">
-          <Segmented
-            label={t.speed}
-            value={speed as (typeof SPEEDS)[number]}
-            onChange={(x) => {
-              setSpeed(x);
-              touch();
-            }}
-            options={SPEEDS.map((s) => ({ value: s, label: `×${formatNumber(locale, Number(s))}` }))}
-            wrap
-          />
+        <>
+          <Setting label={t.speed}>
+            <ChoiceChips
+              label={t.speed}
+              value={speed}
+              onChange={(x) => {
+                setSpeed(x);
+                touch();
+              }}
+              options={SPEEDS.map((s) => ({ value: s, label: `×${formatNumber(locale, Number(s))}` }))}
+            />
+          </Setting>
           {probe.info?.audio !== null && (
-            <Checkbox
+            <Switch
               label={t.keepPitch}
               checked={keepPitch}
               onChange={(e) => {
@@ -119,7 +122,7 @@ function VideoSpeedInner({ locale, speed: speed0 = 2 }: { locale: Locale; speed?
               }}
             />
           )}
-        </div>
+        </>
       }
       action={{ label: t.run, onClick: run, icon: <Gauge aria-hidden /> }}
       status={<JobProgress job={job} locale={locale} onCancel={job.cancel} onRetry={run} />}

@@ -2,10 +2,10 @@
 
 import { useId, useState } from "react";
 import type { Locale } from "@/i18n/config";
-import { Field, Select } from "@/ui/field";
 import { buildSchema, missing, SCHEMA_TYPES, scriptTag, type SchemaType } from "./lib/jsonld";
 import { SCHEMA_FIELDS, SCHEMA_NAME } from "./content/schema-fields";
-import { FieldGrid, Issues, More, Output, type Fields } from "./ui/kit";
+import { FieldGrid, Issues, More, Output, Split, type Fields } from "./ui/kit";
+import { ChipChoice } from "../shared/ChipChoice";
 
 const T = {
   ru: {
@@ -49,27 +49,23 @@ export default function SchemaGenerator({ locale, type: initial = "article" }: {
   const code = touched ? scriptTag(buildSchema(type, f, typeof window === "undefined" ? "+00:00" : localOffset())) : "";
 
   return (
-    <div className="flex flex-col gap-5">
-      <Field label={t.type} htmlFor={`${id}-t`} className="sm:max-w-sm">
-        <Select id={`${id}-t`} value={type} onChange={(e) => setType(e.target.value as SchemaType)}>
-          {SCHEMA_TYPES.map((s) => (
-            <option key={s} value={s}>
-              {SCHEMA_NAME[s][locale]}
-            </option>
-          ))}
-        </Select>
-      </Field>
-
-      <FieldGrid specs={specs.filter((s) => !s.more)} f={f} set={set} locale={locale} id={`${id}-${type}`} />
-      {specs.some((s) => s.more) && (
-        <More label={t.more}>
-          <FieldGrid specs={specs.filter((s) => s.more)} f={f} set={set} locale={locale} id={`${id}-${type}-m`} />
-        </More>
-      )}
-
-      <div aria-live="polite">{touched && (miss.length ? <Issues items={[t.missing(miss.map((alts) => alts.map(labelOf).join(t.or)).join(", "))]} /> : <Issues tone="ok" items={[t.ok]} />)}</div>
-
-      <Output locale={locale} value={code} title={t.out} rows={14} />
+    <div className="flex flex-col gap-4">
+      <ChipChoice label={t.type} value={type} onChange={setType} options={SCHEMA_TYPES.map((s) => ({ value: s, label: SCHEMA_NAME[s][locale] }))} />
+      <Split
+        input={
+          <>
+            <FieldGrid specs={specs.filter((s) => !s.more)} f={f} set={set} locale={locale} id={`${id}-${type}`} />
+            {specs.some((s) => s.more) && (
+              <More label={t.more}>
+                <FieldGrid specs={specs.filter((s) => s.more)} f={f} set={set} locale={locale} id={`${id}-${type}-m`} />
+              </More>
+            )}
+          </>
+        }
+      >
+        <div aria-live="polite">{touched && (miss.length ? <Issues items={[t.missing(miss.map((alts) => alts.map(labelOf).join(t.or)).join(", "))]} /> : <Issues tone="ok" items={[t.ok]} />)}</div>
+        <Output locale={locale} value={code} title={t.out} rows={18} />
+      </Split>
     </div>
   );
 }

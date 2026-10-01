@@ -1,5 +1,6 @@
 "use client";
 
+import { Barcode } from "lucide-react";
 import { useId, useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { href } from "@/i18n/config";
@@ -7,7 +8,9 @@ import { cn } from "@/lib/cn";
 import { ButtonLink } from "@/ui/button";
 import { CopyButton } from "@/ui/copy-button";
 import { Field, Input } from "@/ui/field";
-import { Segmented } from "@/ui/segmented";
+import { Fold } from "@/ui/fold";
+import { Panel } from "@/ui/panel";
+import { ChipChoice } from "../shared/ChipChoice";
 import { gs1Steps, isbn10Steps, upcEToA, type CheckStep } from "./lib/checkdigits";
 
 export type CheckKind = "ean13" | "ean8" | "upca" | "upce" | "gtin14" | "sscc" | "isbn10";
@@ -38,10 +41,7 @@ const T = {
     digitsOnly: "Допустимы только цифры",
     upceNs: "Код UPC-E начинается с системной цифры 0 или 1",
     steps: "Как посчитана",
-    pos: "Позиция",
-    d: "Цифра",
-    w: "Вес",
-    p: "Произведение",
+    legend: "Позиция, цифра, вес и произведение",
     sum: "Сумма произведений",
     gs1: (s: number, c: number) => (s % 10 === 0 ? `${s} делится на 10 без остатка → контрольная цифра 0` : `${s} mod 10 = ${s % 10} → 10 − ${s % 10} = ${c}`),
     isbn: (s: number, c: string) => `${s} mod 11 = ${s % 11} → 11 − ${s % 11} = ${(11 - (s % 11)) % 11 === 0 ? "11 → 0" : 11 - (s % 11)}${c === "X" ? " → 10 записывается как X" : ""}`,
@@ -63,10 +63,7 @@ const T = {
     digitsOnly: "Digits only",
     upceNs: "UPC-E starts with number system 0 or 1",
     steps: "How it's calculated",
-    pos: "Position",
-    d: "Digit",
-    w: "Weight",
-    p: "Product",
+    legend: "Position, digit, weight and product",
     sum: "Sum of products",
     gs1: (s: number, c: number) => (s % 10 === 0 ? `${s} is divisible by 10 → the check digit is 0` : `${s} mod 10 = ${s % 10} → 10 − ${s % 10} = ${c}`),
     isbn: (s: number, c: string) => `${s} mod 11 = ${s % 11} → 11 − ${s % 11} = ${(11 - (s % 11)) % 11 === 0 ? "11 → 0" : 11 - (s % 11)}${c === "X" ? " → 10 is written as X" : ""}`,
@@ -118,84 +115,80 @@ export default function CheckDigitCalculator({ locale, kind: initial = "ean13" }
   const verdict = calc?.given ? (calc.given === calc.check ? "ok" : "bad") : null;
 
   return (
-    <div className="flex flex-col gap-5">
-      <Segmented<CheckKind>
+    <div className="flex flex-col gap-4">
+      <ChipChoice
         label={t.kind}
         value={kind}
-        wrap
         onChange={(v) => {
           setKind(v);
           setValue(SAMPLE[v]);
         }}
         options={KINDS.map((x) => ({ value: x.kind, label: x.label }))}
       />
-      <Field label={kind === "upce" ? t.inputUpce : t.input(k.body)} htmlFor={`${id}-v`}>
-        <Input id={`${id}-v`} value={value} onChange={(e) => setValue(e.target.value)} size="lg" className="font-mono tracking-wider" inputMode="numeric" autoComplete="off" spellCheck={false} aria-invalid={!!r && !calc} />
-      </Field>
+      <div className="grid items-start gap-4 lg:grid-cols-2 lg:gap-6">
+        <Panel className="flex min-w-0 flex-col gap-4 p-4 sm:p-6">
+          <Field label={kind === "upce" ? t.inputUpce : t.input(k.body)} htmlFor={`${id}-v`}>
+            <Input
+              id={`${id}-v`}
+              value={value}
+              onChange={(e) => setValue(e.target.value)}
+              size="lg"
+              className="font-mono tracking-wider"
+              inputMode="numeric"
+              autoComplete="off"
+              spellCheck={false}
+              aria-invalid={!!r && !calc}
+            />
+          </Field>
+          {calc && k.barcode && (
+            <ButtonLink variant="outlined" href={`${href(locale, ["barcode-generator", k.barcode])}`} className="w-fit">
+              <Barcode aria-hidden className="size-4" />
+              {t.barcode}
+            </ButtonLink>
+          )}
+        </Panel>
 
-      <div aria-live="polite" className={cn("rounded-[0.75rem] px-4 py-4 sm:px-5", verdict === "bad" || (r && !calc) ? "bg-err-soft" : verdict === "ok" ? "bg-ok-soft" : "bg-surface-2")}>
-        {calc ? (
-          <>
-            <div className="text-sm text-fg-2">{verdict === "ok" ? t.ok : verdict === "bad" ? t.bad(calc.check) : t.result}</div>
-            <div className="mt-1 flex flex-wrap items-center gap-3">
-              <span className="font-mono text-3xl font-semibold tracking-wider break-words [overflow-wrap:anywhere] text-fg sm:text-4xl">
-                {calc.body}
-                <span className="text-accent">{calc.check}</span>
-              </span>
-              <CopyButton value={full} label={t.copy} copiedLabel={t.copied} variant="ghost" />
-            </div>
-          </>
-        ) : r && "error" in r ? (
-          <div className="text-[0.9375rem] text-err">{r.error === "digits" ? t.digitsOnly : r.error === "upceNs" ? t.upceNs : t.count(k.body, digits.length)}</div>
-        ) : (
-          <div className="text-[0.9375rem] text-fg-3">{t.need(k.body)}</div>
-        )}
-      </div>
-
-      {calc && (
-        <details className="rounded-[0.75rem] border border-line">
-          <summary className="cursor-pointer px-4 py-2.5 text-sm font-medium text-fg-2 select-none hover:text-fg">{t.steps}</summary>
-          <div className="flex flex-col gap-3 px-4 pt-1 pb-4 text-sm text-fg-2">
-            {calc.expanded && <p>{t.expand(calc.expanded)}</p>}
-            <div className="overflow-x-auto">
-              <table className="w-full min-w-max border-collapse text-center font-mono text-[0.8125rem]">
-                <tbody>
-                  {(
-                    [
-                      [t.pos, (s: CheckStep, i: number) => i + 1],
-                      [t.d, (s: CheckStep) => s.digit],
-                      [t.w, (s: CheckStep) => `×${s.weight}`],
-                      [t.p, (s: CheckStep) => s.product],
-                    ] as const
-                  ).map(([label, cell]) => (
-                    <tr key={label} className="border-b border-line last:border-0">
-                      <th scope="row" className="py-1.5 pr-3 text-left font-sans font-medium text-fg-3">
-                        {label}
-                      </th>
-                      {calc.steps.map((s, i) => (
-                        <td key={i} className="px-1.5 py-1.5 text-fg">
-                          {cell(s, i)}
-                        </td>
-                      ))}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            <p>
-              {t.sum}: <span className="font-mono text-fg">{calc.sum}</span>. {kind === "isbn10" ? t.isbn(calc.sum, calc.check) : t.gs1(calc.sum, Number(calc.check))}
-            </p>
+        <div className="flex min-w-0 flex-col gap-4">
+          <div aria-live="polite" className={cn("min-w-0 rounded-[1.25rem] p-5 sm:p-6", verdict === "bad" || (r && !calc) ? "bg-err-soft" : verdict === "ok" ? "bg-ok-soft" : "bg-accent-soft")}>
+            {calc ? (
+              <>
+                <div className="text-sm font-medium text-fg-2">{verdict === "ok" ? t.ok : verdict === "bad" ? t.bad(calc.check) : t.result}</div>
+                <div className="mt-1 font-mono text-3xl font-bold tracking-wider break-words text-fg [overflow-wrap:anywhere] sm:text-4xl">
+                  {calc.body}
+                  <span className="text-accent">{calc.check}</span>
+                </div>
+                <CopyButton value={full} label={t.copy} copiedLabel={t.copied} variant="primary" size="md" className="mt-4" />
+              </>
+            ) : r && "error" in r ? (
+              <div className="text-[0.9375rem] text-err">{r.error === "digits" ? t.digitsOnly : r.error === "upceNs" ? t.upceNs : t.count(k.body, digits.length)}</div>
+            ) : (
+              <div className="text-[0.9375rem] text-fg-3">{t.need(k.body)}</div>
+            )}
           </div>
-        </details>
-      )}
 
-      {calc && k.barcode && (
-        <div>
-          <ButtonLink variant="outline" href={`${href(locale, ["barcode-generator", k.barcode])}`}>
-            {t.barcode}
-          </ButtonLink>
+          {calc && (
+            <Fold title={t.steps}>
+              <div className="flex flex-col gap-3 text-sm text-fg-2">
+                {calc.expanded && <p>{t.expand(calc.expanded)}</p>}
+                <p className="text-[0.8125rem] text-fg-3">{t.legend}</p>
+                <ol className="flex flex-wrap gap-1.5">
+                  {calc.steps.map((s, i) => (
+                    <li key={i} className="flex min-w-[2.75rem] flex-col items-center rounded-[0.75rem] bg-surface-2 px-1.5 py-1.5 font-mono text-[0.8125rem] leading-tight">
+                      <span className="text-[0.6875rem] text-fg-3">{i + 1}</span>
+                      <span className="text-lg font-semibold text-fg">{s.digit}</span>
+                      <span className="text-fg-3">×{s.weight}</span>
+                      <span className="font-semibold text-fg">{s.product}</span>
+                    </li>
+                  ))}
+                </ol>
+                <p>
+                  {t.sum}: <span className="font-mono text-fg">{calc.sum}</span>. {kind === "isbn10" ? t.isbn(calc.sum, calc.check) : t.gs1(calc.sum, Number(calc.check))}
+                </p>
+              </div>
+            </Fold>
+          )}
         </div>
-      )}
+      </div>
     </div>
   );
 }

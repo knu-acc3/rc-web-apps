@@ -101,49 +101,50 @@ export default function Base64ToImage({ locale }: { locale: Locale }) {
   const declaredMismatch = meta && result?.declared && result.declared.toLowerCase() !== meta.mime && !(meta.ext === "jpg" && /jpe?g/i.test(result.declared));
 
   return (
-    <div className="flex flex-col gap-4">
-      <Field
-        label={t.input}
-        htmlFor={`${id}-in`}
-        aside={
-          <Button variant="ghost" size="sm" onClick={() => fileRef.current?.click()}>
-            <FileText aria-hidden />
-            {t.fromFile}
-          </Button>
-        }
-      >
-        <textarea
-          ref={taRef}
-          id={`${id}-in`}
-          defaultValue=""
-          onInput={(e) => setText(e.currentTarget.value)}
-          placeholder={t.placeholder}
-          rows={6}
-          spellCheck={false}
-          className="control min-h-40 resize-y py-2.5 font-mono text-xs leading-relaxed"
-          aria-invalid={!!error}
-        />
-        <input
-          ref={fileRef}
-          type="file"
-          accept=".txt,text/plain"
-          hidden
-          onChange={async (e) => {
-            const f = e.target.files?.[0];
-            e.target.value = "";
-            if (!f) return;
-            const v = await f.text();
-            if (taRef.current) taRef.current.value = v.length > 200_000 ? `${v.slice(0, 200_000)}…` : v;
-            setText(v);
-          }}
-        />
-      </Field>
-
-      {error && <Notice tone="err">{error}</Notice>}
+    <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-6">
+      <Panel className="flex min-w-0 flex-col gap-3 p-4 sm:p-5">
+        <Field
+          label={t.input}
+          htmlFor={`${id}-in`}
+          aside={
+            <Button variant="text" size="sm" onClick={() => fileRef.current?.click()}>
+              <FileText aria-hidden />
+              {t.fromFile}
+            </Button>
+          }
+        >
+          <textarea
+            ref={taRef}
+            id={`${id}-in`}
+            defaultValue=""
+            onInput={(e) => setText(e.currentTarget.value)}
+            placeholder={t.placeholder}
+            rows={8}
+            spellCheck={false}
+            className="control min-h-48 resize-y py-2.5 font-mono text-xs leading-relaxed lg:min-h-80"
+            aria-invalid={!!error}
+          />
+          <input
+            ref={fileRef}
+            type="file"
+            accept=".txt,text/plain"
+            hidden
+            onChange={async (e) => {
+              const f = e.target.files?.[0];
+              e.target.value = "";
+              if (!f) return;
+              const v = await f.text();
+              if (taRef.current) taRef.current.value = v.length > 200_000 ? `${v.slice(0, 200_000)}…` : v;
+              setText(v);
+            }}
+          />
+        </Field>
+        {error && <Notice tone="err">{error}</Notice>}
+      </Panel>
 
       {result?.format && meta ? (
-        <Panel className="overflow-hidden">
-          <div className={`flex min-h-40 items-center justify-center p-3 ${checker}`}>
+        <Panel className="flex min-w-0 flex-col gap-3 p-3 sm:gap-4 sm:p-4 lg:sticky lg:top-20">
+          <div className={`flex min-h-40 items-center justify-center rounded-[1rem] p-3 ${checker}`}>
             {url ? (
               <img
                 src={url}
@@ -155,9 +156,9 @@ export default function Base64ToImage({ locale }: { locale: Locale }) {
               <p className="px-4 text-center text-sm text-fg-2">{t.noPreview}</p>
             )}
           </div>
-          <div className="flex flex-col gap-3 border-t border-line px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
-            <div aria-live="polite">
-              <p className="tabular text-2xl font-semibold tracking-tight text-fg">
+          <div className="flex flex-col gap-3 px-1 sm:flex-row sm:items-center sm:justify-between">
+            <div aria-live="polite" className="min-w-0">
+              <p className="tabular text-2xl font-semibold tracking-tight text-fg sm:text-3xl">
                 {meta.label}
                 {dims ? ` · ${formatNumber(locale, dims.w)} × ${formatNumber(locale, dims.h)} px` : ""}
               </p>
@@ -166,14 +167,18 @@ export default function Base64ToImage({ locale }: { locale: Locale }) {
                 {declaredMismatch ? ` · ${t.declared(result.declared!)}` : ""}
               </p>
             </div>
-            <Button variant="primary" size="lg" onClick={() => downloadBlob(new Blob([result.bytes as BlobPart], { type: meta.mime }), `image.${meta.ext}`)}>
+            <Button variant="filled" size="lg" onClick={() => downloadBlob(new Blob([result.bytes as BlobPart], { type: meta.mime }), `image.${meta.ext}`)}>
               <Download aria-hidden />
               {t.download} .{meta.ext}
             </Button>
           </div>
         </Panel>
       ) : (
-        !error && <p className="text-sm text-fg-3">{t.empty}</p>
+        !error && (
+          <div className={`flex min-h-40 items-center justify-center rounded-[1.25rem] p-6 text-center text-sm text-fg-3 lg:min-h-80 ${checker}`}>
+            {t.empty}
+          </div>
+        )
       )}
     </div>
   );
