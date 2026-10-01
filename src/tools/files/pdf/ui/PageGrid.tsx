@@ -106,7 +106,8 @@ export function PageGrid({ locale, pages, thumbsOf, renderThumb, label, describe
   return (
     <div className="flex flex-col gap-3">
       {toolbar}
-      <ul className="grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6" aria-describedby={interactive ? helpId : undefined}>
+      {interactive && <p className="text-sm text-fg-3">{onMove ? t.gridTip : mark === "delete" ? t.gridTipDelete : t.gridTipSelect}</p>}
+      <ul className="grid grid-cols-[repeat(auto-fill,minmax(6.25rem,1fr))] gap-2 sm:grid-cols-[repeat(auto-fill,minmax(8.5rem,1fr))] 2xl:grid-cols-[repeat(auto-fill,minmax(10rem,1fr))]" aria-describedby={interactive ? helpId : undefined}>
         {pages.map((p, i) => {
           const isSel = selected?.has(p.key) ?? false;
           const del = isSel && mark === "delete";
@@ -150,8 +151,8 @@ export function PageGrid({ locale, pages, thumbsOf, renderThumb, label, describe
                 onClick={(e) => onToggle?.(p.key, e.shiftKey)}
                 onKeyDown={(e) => onKey(e, p, i)}
                 className={cn(
-                  "group relative block w-full rounded-[0.625rem] border-2 p-1 transition-colors",
-                  over === i ? "border-accent bg-accent-soft" : del ? "border-err/60" : isSel ? "border-accent" : "border-transparent hover:border-line-strong",
+                  "group relative block w-full rounded-[0.875rem] border-2 p-1.5 transition-[border-color,background-color,transform] duration-150 motion-safe:active:scale-[0.97]",
+                  over === i ? "border-accent bg-accent-soft" : del ? "border-err/60 bg-err-soft/40" : isSel ? "border-accent bg-accent-soft/60" : "border-transparent hover:bg-surface-2",
                   !onToggle && "cursor-default",
                 )}
               >
@@ -175,35 +176,10 @@ export function PageGrid({ locale, pages, thumbsOf, renderThumb, label, describe
         })}
       </ul>
       {interactive && (
-        <p id={helpId} className="text-xs text-fg-3">
+        <p id={helpId} className="sr-only">
           {onMove ? (onRotate ? t.gridHelp : t.gridHelpMove) : mark === "delete" ? t.gridHelpDelete : t.gridHelpSelect}
         </p>
       )}
     </div>
   );
-}
-
-/** Move an item in an array (returns a new array). */
-export function moveItem<T>(list: readonly T[], from: number, to: number): T[] {
-  const next = list.slice();
-  const [item] = next.splice(from, 1);
-  next.splice(to, 0, item);
-  return next;
-}
-
-/** Selection with Shift+click ranges over an ordered list of keys. */
-export function toggleSelection(prev: ReadonlySet<string>, keys: readonly string[], key: string, extend: boolean, anchor: { current: string | null }): Set<string> {
-  const next = new Set(prev);
-  if (extend && anchor.current && keys.includes(anchor.current)) {
-    const a = keys.indexOf(anchor.current);
-    const b = keys.indexOf(key);
-    const [lo, hi] = a < b ? [a, b] : [b, a];
-    for (let i = lo; i <= hi; i++) next.add(keys[i]);
-  } else if (next.has(key)) {
-    next.delete(key);
-  } else {
-    next.add(key);
-  }
-  anchor.current = key;
-  return next;
 }

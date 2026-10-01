@@ -95,10 +95,16 @@ export function Segmented<T extends string>({
             disabled={disabled || o.disabled}
             className={cn("seg disabled:pointer-events-none disabled:opacity-45", h)}
           >
-            <span aria-hidden className="seg-check">
-              <Check className="size-4 shrink-0" strokeWidth={2.75} />
-            </span>
-            {o.icon}
+            {/* Material: the chosen option shows a check — in place of its icon when it has one. */}
+            {o.icon ? (
+              <span aria-hidden className="flex shrink-0 [&_svg]:size-4">
+                {active ? <Check strokeWidth={2.75} /> : o.icon}
+              </span>
+            ) : (
+              <span aria-hidden className="seg-check">
+                <Check className="size-4 shrink-0" strokeWidth={2.75} />
+              </span>
+            )}
             <span className="min-w-0 truncate">{o.label}</span>
           </button>
         );

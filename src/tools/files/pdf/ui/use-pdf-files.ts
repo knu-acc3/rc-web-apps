@@ -12,6 +12,8 @@ export interface PdfFile {
   name: string;
   size: number;
   status: "loading" | "password" | "ready" | "error";
+  /** Why it failed: a damaged file, or pdf.js didn't start (worth a retry). */
+  error?: "invalid" | "engine";
   wrongPassword?: boolean;
   password?: string;
   bytes: ArrayBuffer | null;
@@ -31,8 +33,8 @@ const pdfjsModule = () => (modPromise ??= import("../lib/pdfjs"));
  * thumbnailer; results of a load that finishes after the file was removed or
  * replaced are discarded, and everything is destroyed on removal/unmount.
  */
-export function usePdfFiles(opts: { multiple?: boolean; thumbnails?: boolean; thumbWidth?: number } = {}) {
-  const { multiple = false, thumbnails = true, thumbWidth = 160 } = opts;
+export function usePdfFiles(opts: { multiple?: boolean; thumbnails?: boolean; thumbWidth?: number; jobWorker?: boolean } = {}) {
+  const { multiple = false, thumbnails = true, thumbWidth = 160, jobWorker = true } = opts;
   const [files, setFiles] = useState<PdfFile[]>([]);
   const alive = useRef(new Set<string>());
   const resources = useRef(new Map<string, { doc: PDFDocumentProxy; thumbs: Thumbnailer | null }>());
@@ -49,9 +51,13 @@ export function usePdfFiles(opts: { multiple?: boolean; thumbnails?: boolean; th
 
   useEffect(() => {
     let released = false;
-    void pdfjsModule().then((m) => {
-      if (!released) m.acquirePdfjs();
-    });
+    void pdfjsModule()
+      .then((m) => {
+        if (!released) m.acquirePdfjs();
+      })
+      .catch(() => {
+        modPromise = null;
+      });
     const res = resources.current;
     const ids = alive.current;
     return () => {
@@ -63,7 +69,9 @@ export function usePdfFiles(opts: { multiple?: boolean; thumbnails?: boolean; th
         void r?.doc.loadingTask.destroy().catch(() => {});
       }
       res.clear();
-      void pdfjsModule().then((m) => m.releasePdfjs());
+      void pdfjsModule()
+        .then((m) => m.releasePdfjs())
+        .catch(() => {});
     };
   }, []);
 
@@ -77,11 +85,18 @@ export function usePdfFiles(opts: { multiple?: boolean; thumbnails?: boolean; th
       try {
         bytes ??= await file.arrayBuffer();
       } catch {
-        if (alive.current.has(id)) update(id, { status: "error" });
+        if (alive.current.has(id)) update(id, { status: "error", error: "invalid" });
         return;
       }
       if (!alive.current.has(id)) return;
-      const m = await pdfjsModule();
+      let m: PdfjsModule;
+      try {
+        m = await pdfjsModule();
+      } catch {
+        modPromise = null;
+        if (alive.current.has(id)) update(id, { status: "error", error: "engine", bytes });
+        return;
+      }
       try {
         const doc = await m.openDocument(bytes, password);
         if (!alive.current.has(id)) {
@@ -90,11 +105,12 @@ export function usePdfFiles(opts: { multiple?: boolean; thumbnails?: boolean; th
         }
         const thumbs = thumbnails ? new m.Thumbnailer(doc, thumbWidth) : null;
         resources.current.set(id, { doc, thumbs });
-        update(id, { status: "ready", doc, thumbs, pages: doc.numPages, bytes, password, wrongPassword: false });
+        update(id, { status: "ready", error: undefined, doc, thumbs, pages: doc.numPages, bytes, password, wrongPassword: false });
       } catch (e) {
         if (!alive.current.has(id)) return;
+        if (process.env.NODE_ENV !== "production") console.error(e);
         if (e instanceof m.PasswordNeeded) update(id, { status: "password", wrongPassword: e.incorrect, bytes });
-        else update(id, { status: "error", bytes });
+        else update(id, { status: "error", error: e instanceof m.PdfOpenError ? e.kind : "invalid", bytes });
       }
     },
     [thumbnails, thumbWidth, update],
@@ -132,6 +148,33 @@ export function usePdfFiles(opts: { multiple?: boolean; thumbnails?: boolean; th
     [files, load, update],
   );
 
+  /** Try a file again after pdf.js failed to start. */
+  const retry = useCallback(
+    (id: string) => {
+      const f = files.find((x) => x.id === id);
+      if (!f) return;
+      update(id, { status: "loading", error: undefined });
+      void load(id, f.file, f.bytes, f.password);
+    },
+    [files, load, update],
+  );
+
+  /**
+   * Start fetching pdf.js (and the pdf-lib worker most tools end with) before a
+   * file is chosen: the file picker takes a few seconds anyway.
+   */
+  const warm = useCallback(() => {
+    void pdfjsModule()
+      .then((m) => m.warmUp())
+      .catch(() => {
+        modPromise = null;
+      });
+    if (jobWorker)
+      void import("../lib/client")
+        .then((c) => c.warmPdfWorker())
+        .catch(() => {});
+  }, [jobWorker]);
+
   const remove = useCallback(
     (id: string) => {
       dispose(id);
@@ -157,7 +200,7 @@ export function usePdfFiles(opts: { multiple?: boolean; thumbnails?: boolean; th
   }, [dispose]);
 
   const ready = files.filter((f) => f.status === "ready");
-  return { files, ready, add, unlock, remove, move, clear, allReady: files.length > 0 && ready.length === files.length };
+  return { files, ready, add, unlock, retry, warm, remove, move, clear, allReady: files.length > 0 && ready.length === files.length };
 }
 
 export type PdfFiles = ReturnType<typeof usePdfFiles>;

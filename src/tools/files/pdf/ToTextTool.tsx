@@ -7,7 +7,8 @@ import { count, formatNumber } from "@/i18n/format";
 import { downloadBlob, downloadText } from "@/lib/clipboard";
 import { Button } from "@/ui/button";
 import { CopyButton } from "@/ui/copy-button";
-import { Notice } from "@/ui/panel";
+import { Field } from "@/ui/field";
+import { Notice, Panel } from "@/ui/panel";
 import { Segmented } from "@/ui/segmented";
 import { buildDocx, pageParagraphs, toMarkdown, toPlainText, type PageText, type TextItemLike } from "./lib/text";
 import { FilePanel } from "./ui/FilePanel";
@@ -15,6 +16,7 @@ import { JobStatus, baseName } from "./ui/Result";
 import { pagesCount } from "./ui/strings";
 import { useJob } from "./ui/use-job";
 import { usePdfFiles } from "./ui/use-pdf-files";
+import { Controls, Workspace } from "./ui/Workspace";
 
 export type TextFormat = "txt" | "md" | "docx";
 
@@ -49,7 +51,7 @@ const T = {
 
 export default function ToTextTool({ locale, format: format0 = "txt" }: { locale: Locale; format?: TextFormat }) {
   const t = T[locale];
-  const pdf = usePdfFiles({ thumbnails: false });
+  const pdf = usePdfFiles({ thumbnails: false, jobWorker: false });
   const job = useJob(locale);
   const [format, setFormat] = useState<TextFormat>(format0);
   const [pages, setPages] = useState<{ file: string; pages: PageText[] } | null>(null);
@@ -97,32 +99,50 @@ export default function ToTextTool({ locale, format: format0 = "txt" }: { locale
     }
   }
 
+  const files = <FilePanel locale={locale} pdf={pdf} />;
+  if (!current || !plain) {
+    return (
+      <div className="flex flex-col gap-4">
+        {files}
+        <JobStatus locale={locale} state={job.state} onCancel={job.cancel} />
+        {current && !plain && <Notice tone="warn">{t.noText}</Notice>}
+      </div>
+    );
+  }
   return (
-    <div className="flex flex-col gap-4">
-      <FilePanel locale={locale} pdf={pdf} />
-      <JobStatus locale={locale} state={job.state} onCancel={job.cancel} />
-      {current && !plain && <Notice tone="warn">{t.noText}</Notice>}
-      {current && plain && (
-        <>
-          <div className="flex flex-wrap items-center justify-between gap-3">
+    <Workspace
+      files={files}
+      previewFirst={false}
+      controls={
+        <Controls>
+          <Field label={t.format}>
             <Segmented label={t.format} value={format} onChange={setFormat} options={(["txt", "md", "docx"] as const).map((f) => ({ value: f, label: t.formats[f] }))} />
-            <div className="flex gap-2">
-              <CopyButton value={shown} label={t.copy} copiedLabel={t.copied} size="md" variant="outline" />
-              <Button variant="primary" onClick={download}>
-                <Download aria-hidden />
-                {t.download(format.toUpperCase())}
-              </Button>
-            </div>
+          </Field>
+          <div className="flex flex-wrap gap-2">
+            <Button variant="filled" size="lg" className="min-w-48 flex-1" onClick={download}>
+              <Download aria-hidden />
+              {t.download(format.toUpperCase())}
+            </Button>
+            <CopyButton value={shown} label={t.copy} copiedLabel={t.copied} size="md" variant="outline" className="h-12!" />
           </div>
-          <div className="overflow-hidden rounded-[0.75rem] border border-line bg-surface">
-            <p className="tabular border-b border-line px-4 py-2 text-sm text-fg-2" aria-live="polite">
-              {t.stats(current.length, plain.length, words)}
-            </p>
-            <textarea readOnly value={shown} aria-label={t.label} rows={16} spellCheck={false} className="block min-h-72 w-full resize-y bg-transparent px-4 py-3 text-[0.9375rem] leading-relaxed text-fg focus:outline-none" />
-          </div>
-          <p className="text-sm text-fg-3">{t.honest}</p>
-        </>
-      )}
-    </div>
+        </Controls>
+      }
+      preview={
+        <Panel className="flex min-w-0 flex-col overflow-hidden">
+          <p className="tabular px-4 pt-3 pb-1 text-sm text-fg-2" aria-live="polite">
+            {t.stats(current.length, plain.length, words)}
+          </p>
+          <textarea
+            readOnly
+            value={shown}
+            aria-label={t.label}
+            rows={16}
+            spellCheck={false}
+            className="block min-h-72 w-full resize-y bg-transparent px-4 pt-1 pb-3 text-[0.9375rem] leading-relaxed text-fg focus:outline-none lg:h-[calc(100dvh-10rem)]"
+          />
+        </Panel>
+      }
+      action={<p className="text-sm text-fg-3">{t.honest}</p>}
+    />
   );
 }

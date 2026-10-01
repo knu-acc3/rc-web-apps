@@ -4,14 +4,17 @@ import { Images } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { formatNumber } from "@/i18n/format";
+import { Field } from "@/ui/field";
 import { Segmented } from "@/ui/segmented";
-import { Caption, OptionsRow, PrimaryButton } from "./ui/bits";
+import { PrimaryButton } from "./ui/bits";
 import { FilePanel } from "./ui/FilePanel";
+import { PdfPreview } from "./ui/PdfPreview";
 import { RangeField, resolveRange } from "./ui/RangeField";
 import { JobStatus, ResultCard, baseName, type OutputItem } from "./ui/Result";
 import { UserFacingError, pagesCount } from "./ui/strings";
 import { useJob } from "./ui/use-job";
 import { usePdfFiles } from "./ui/use-pdf-files";
+import { Controls, Summary, Workspace } from "./ui/Workspace";
 
 export type ImageFormat = "jpg" | "png" | "webp";
 
@@ -30,6 +33,7 @@ const T = {
     format: "Формат",
     dpi: "Качество",
     dpis: { "72": "72 DPI · экран", "150": "150 DPI · стандарт", "300": "300 DPI · печать" },
+    preview: "Первая страница",
     pagesAll: "все",
     info: (n: number, w: number, h: number) => `${pagesCount("ru", n)} → картинки примерно ${formatNumber("ru", w)} × ${formatNumber("ru", h)} px`,
     go: (f: string) => `Сохранить как ${f}`,
@@ -42,6 +46,7 @@ const T = {
     format: "Format",
     dpi: "Quality",
     dpis: { "72": "72 DPI · screen", "150": "150 DPI · standard", "300": "300 DPI · print" },
+    preview: "First page",
     pagesAll: "all",
     info: (n: number, w: number, h: number) => `${pagesCount("en", n)} → images of about ${formatNumber("en", w)} × ${formatNumber("en", h)} px`,
     go: (f: string) => `Save as ${f}`,
@@ -54,7 +59,7 @@ const T = {
 
 export default function PdfToImagesTool({ locale, format: format0 = "jpg", choose = false }: { locale: Locale; format?: ImageFormat; choose?: boolean }) {
   const t = T[locale];
-  const pdf = usePdfFiles({ thumbnails: false });
+  const pdf = usePdfFiles({ thumbnails: false, jobWorker: false });
   const job = useJob(locale);
   const [format, setFormat] = useState<ImageFormat>(format0);
   const [dpi, setDpi] = useState<(typeof DPIS)[number]>("150");
@@ -129,76 +134,83 @@ export default function PdfToImagesTool({ locale, format: format0 = "jpg", choos
     }
   }
 
+  const files = <FilePanel locale={locale} pdf={pdf} disabled={job.running} />;
+  if (!file) return <div className="flex flex-col gap-4">{files}</div>;
+  const firstPage = pages.ok ? (pages.pages[0] ?? 1) - 1 : 0;
   return (
-    <div className="flex flex-col gap-4">
-      <FilePanel locale={locale} pdf={pdf} disabled={job.running} />
-      {file && (
-        <>
-          <OptionsRow className="items-start!">
-            {choose && (
-              <div>
-                <Caption>{t.format}</Caption>
-                <Segmented
-                  label={t.format}
-                  value={format}
-                  onChange={(v) => {
-                    setFormat(v);
-                    setResult(null);
-                  }}
-                  options={[
-                    { value: "jpg", label: "JPG" },
-                    { value: "png", label: "PNG" },
-                    { value: "webp", label: "WebP" },
-                  ]}
-                />
-              </div>
-            )}
-            <div>
-              <Caption>{t.dpi}</Caption>
+    <Workspace
+      files={files}
+      preview={<PdfPreview locale={locale} preview={null} original={{ doc: file.doc, index: firstPage }} label={t.preview} />}
+      controls={
+        <Controls>
+          {choose && (
+            <Field label={t.format}>
               <Segmented
-                label={t.dpi}
-                value={dpi}
+                fill
+                label={t.format}
+                value={format}
                 onChange={(v) => {
-                  setDpi(v);
+                  setFormat(v);
                   setResult(null);
                 }}
-                options={DPIS.map((d) => ({ value: d, label: t.dpis[d] }))}
+                options={[
+                  { value: "jpg", label: "JPG" },
+                  { value: "png", label: "PNG" },
+                  { value: "webp", label: "WebP" },
+                ]}
               />
-            </div>
-            <RangeField locale={locale} value={range} onChange={setRange} result={pages} pageCount={count} placeholder={`${t.pagesAll} (1-${count})`} size="sm" className="w-full sm:w-64" />
-          </OptionsRow>
-          {pages.ok && size && <p className="tabular text-lg font-semibold text-fg">{t.info(pages.pages.length, size.w, size.h)}</p>}
-          <PrimaryButton disabled={!pages.ok || job.running} onClick={convert}>
+            </Field>
+          )}
+          <Field label={t.dpi}>
+            <Segmented
+              label={t.dpi}
+              value={dpi}
+              onChange={(v) => {
+                setDpi(v);
+                setResult(null);
+              }}
+              options={DPIS.map((d) => ({ value: d, label: t.dpis[d] }))}
+            />
+          </Field>
+          {count > 1 && <RangeField locale={locale} value={range} onChange={setRange} result={pages} pageCount={count} placeholder={`${t.pagesAll} (1-${count})`} />}
+        </Controls>
+      }
+      action={
+        <>
+          {pages.ok && size && <Summary>{t.info(pages.pages.length, size.w, size.h)}</Summary>}
+          <PrimaryButton disabled={!pages.ok || job.running} done={!!result} onClick={convert}>
             <Images aria-hidden />
             {t.go(format.toUpperCase())}
           </PrimaryButton>
           <JobStatus locale={locale} state={job.state} onCancel={job.cancel} />
-          {result && (
-            <ResultCard
-              locale={locale}
-              items={result}
-              zipName={`${baseName(file.name)}-${format}.zip`}
-              onReset={() => {
-                setResult(null);
-                setPreviews([]);
-                pdf.clear();
-                job.reset();
-              }}
-            >
-              {previews.length > 1 && (
-                <ul className="grid grid-cols-4 gap-2 border-t border-line p-3 sm:grid-cols-6 lg:grid-cols-8">
-                  {previews.map((u, i) => (
-                    <li key={u} className="flex aspect-square items-center justify-center overflow-hidden rounded-[0.375rem] bg-surface-2">
-                      {/* eslint-disable-next-line @next/next/no-img-element -- local blob preview */}
-                      <img src={u} alt={result[i]?.name ?? ""} className="max-h-full max-w-full object-contain" />
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </ResultCard>
-          )}
         </>
-      )}
-    </div>
+      }
+      result={
+        result && (
+          <ResultCard
+            locale={locale}
+            items={result}
+            zipName={`${baseName(file.name)}-${format}.zip`}
+            onReset={() => {
+              setResult(null);
+              setPreviews([]);
+              pdf.clear();
+              job.reset();
+            }}
+          >
+            {previews.length > 1 && (
+              <ul className="grid grid-cols-[repeat(auto-fill,minmax(4.5rem,1fr))] gap-2">
+                {previews.map((u, i) => (
+                  <li key={u} className="flex aspect-square items-center justify-center overflow-hidden rounded-[0.75rem] bg-surface-2">
+                    {/* eslint-disable-next-line @next/next/no-img-element -- local blob preview */}
+                    <img src={u} alt={result[i]?.name ?? ""} className="max-h-full max-w-full object-contain" />
+                  </li>
+                ))}
+              </ul>
+            )}
+          </ResultCard>
+        )
+      }
+    />
   );
 }
