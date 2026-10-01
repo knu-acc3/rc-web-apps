@@ -8,7 +8,9 @@ import { downloadText } from "@/lib/clipboard";
 import { Button } from "@/ui/button";
 import { CopyButton } from "@/ui/copy-button";
 import { Kbd } from "@/ui/panel";
+import { usePersistentState } from "@/lib/persist";
 import { useFullscreen } from "@/ui/fullscreen";
+import { ToolTitle } from "@/ui/tool-title";
 import { clock } from "./lib/format";
 import { useKeys } from "./lib/keys";
 import { nowMs } from "./lib/now";
@@ -67,6 +69,8 @@ interface Lap {
 
 const fmt = (ms: number) => clock(ms, { up: true, hundredths: true });
 
+const isTitle = (v: unknown): v is string => typeof v === "string" && v.length <= 60;
+
 export default function Stopwatch({ locale }: { locale: Locale }) {
   const t = T[locale];
   const [running, setRunning] = useState(false);
@@ -75,6 +79,7 @@ export default function Stopwatch({ locale }: { locale: Locale }) {
   const [elapsed, setElapsed] = useState(0);
   const [laps, setLaps] = useState<Lap[]>([]);
   const { ref, active: full, toggle } = useFullscreen<HTMLDivElement>();
+  const [title, setTitle] = usePersistentState("timer:stopwatch:title:v1", "", isTitle);
 
   const now = () => base.current + (running ? nowMs() - startedAt.current : 0);
 
@@ -119,6 +124,7 @@ export default function Stopwatch({ locale }: { locale: Locale }) {
         ref={ref}
         className={cn("flex flex-col items-center justify-center gap-6 rounded-[0.75rem] border border-line bg-surface px-3 py-8 sm:py-10", full && "min-h-screen rounded-none border-0")}
       >
+        <ToolTitle value={title} onChange={setTitle} locale={locale} full={full} />
         <div className={cn("tabular font-semibold leading-none tracking-tight text-fg", full ? "text-[min(16vw,34vh)]" : "text-[min(15vw,7rem)]")}>
           {clock(elapsed, { up: true })}
           <span className="text-[0.55em] text-fg-3">.{String(Math.floor((elapsed % 1000) / 10)).padStart(2, "0")}</span>

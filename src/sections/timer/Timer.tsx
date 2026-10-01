@@ -8,6 +8,7 @@ import { linkHere, useQueryParam } from "@/lib/share-link";
 import { Button } from "@/ui/button";
 import { useFullscreen } from "@/ui/fullscreen";
 import { ShareLink } from "@/ui/share-link";
+import { ToolTitle } from "@/ui/tool-title";
 import { useWakeLock } from "@/ui/stage";
 import { TimerOptions, useAlertOptions } from "./ui/TimerOptions";
 import { hasPlayed, schedule, unlockAudio, type Scheduled } from "./lib/audio";
@@ -38,7 +39,6 @@ const T = {
     presets: "Быстрый выбор",
     full: "На весь экран",
     title: "Таймер",
-    name: "Название таймера",
     namePh: "Например, пицца в духовке",
   },
   en: {
@@ -56,7 +56,6 @@ const T = {
     presets: "Quick picks",
     full: "Full screen",
     title: "Timer",
-    name: "Timer name",
     namePh: "E.g. pizza in the oven",
   },
 } as const;
@@ -230,18 +229,7 @@ export default function Timer({ locale, seconds = 300 }: TimerProps) {
           status === "done" && "border-accent",
         )}
       >
-        <input
-          aria-label={t.name}
-          placeholder={t.namePh}
-          value={name}
-          maxLength={60}
-          onChange={(e) => setName(e.target.value)}
-          className={cn(
-            "w-full max-w-xl truncate rounded-[0.5rem] border border-transparent bg-transparent px-2 text-center font-semibold text-fg-2 outline-none placeholder:font-normal placeholder:text-fg-3 hover:border-line focus:border-accent",
-            full ? "text-[min(6vw,3rem)]" : "text-lg",
-            full && !name && "hidden",
-          )}
-        />
+        <ToolTitle value={name} onChange={setName} locale={locale} placeholder={t.namePh} full={full} />
         {editable ? (
           <div className={cn("flex items-baseline leading-none tracking-tight", big)}>
             {field("h", t.h)}

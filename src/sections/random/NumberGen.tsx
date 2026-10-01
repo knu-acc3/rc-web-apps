@@ -3,7 +3,9 @@
 import { ArrowUpDown } from "lucide-react";
 import { useId, useRef, useState, type KeyboardEvent } from "react";
 import type { Locale } from "@/i18n/config";
+import { usePersistentState } from "@/lib/persist";
 import { Presentable } from "@/ui/fullscreen";
+import { ToolTitle } from "@/ui/tool-title";
 import { count as countOf, formatNumber, parseNumber } from "@/i18n/format";
 import { Button } from "@/ui/button";
 import { CopyButton } from "@/ui/copy-button";
@@ -79,8 +81,11 @@ const T = {
   },
 } as const;
 
+const isTitle = (v: unknown): v is string => typeof v === "string" && v.length <= 60;
+
 export default function NumberGen({ locale, min = 1, max = 100, count = 1, decimals: dec0 = 0, unique: uniq0 = false, sorted: sort0 = false }: NumberGenProps) {
   const t = T[locale];
+  const [title, setTitle] = usePersistentState("random:number:title:v1", "", isTitle);
   const id = useId();
   const fmtIn = (n: number) => formatNumber(locale, n, { useGrouping: false, maximumFractionDigits: MAX_DECIMALS });
   const [minText, setMinText] = useState(fmtIn(min));
@@ -128,7 +133,17 @@ export default function NumberGen({ locale, min = 1, max = 100, count = 1, decim
       <Panel className="flex flex-col gap-4 p-4 sm:p-5">
         <div className="grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-end gap-2">
           <Field label={t.min} htmlFor={`${id}-min`}>
-            <Input id={`${id}-min`} inputMode="decimal" autoComplete="off" value={minText} onChange={(e) => setMinText(e.target.value)} onKeyDown={onEnter} aria-invalid={lo === null} size="lg" className="tabular" />
+            <Input
+              id={`${id}-min`}
+              inputMode="decimal"
+              autoComplete="off"
+              value={minText}
+              onChange={(e) => setMinText(e.target.value)}
+              onKeyDown={onEnter}
+              aria-invalid={lo === null}
+              size="lg"
+              className="tabular"
+            />
           </Field>
           <Button
             variant="ghost"
@@ -144,12 +159,32 @@ export default function NumberGen({ locale, min = 1, max = 100, count = 1, decim
             <ArrowUpDown className="rotate-90" />
           </Button>
           <Field label={t.max} htmlFor={`${id}-max`}>
-            <Input id={`${id}-max`} inputMode="decimal" autoComplete="off" value={maxText} onChange={(e) => setMaxText(e.target.value)} onKeyDown={onEnter} aria-invalid={hi === null} size="lg" className="tabular" />
+            <Input
+              id={`${id}-max`}
+              inputMode="decimal"
+              autoComplete="off"
+              value={maxText}
+              onChange={(e) => setMaxText(e.target.value)}
+              onKeyDown={onEnter}
+              aria-invalid={hi === null}
+              size="lg"
+              className="tabular"
+            />
           </Field>
         </div>
         <div className="grid grid-cols-2 gap-3">
           <Field label={t.count} htmlFor={`${id}-n`}>
-            <Input id={`${id}-n`} inputMode="numeric" autoComplete="off" value={countText} onChange={(e) => setCountText(e.target.value)} onKeyDown={onEnter} aria-invalid={n === null} size="sm" className="tabular" />
+            <Input
+              id={`${id}-n`}
+              inputMode="numeric"
+              autoComplete="off"
+              value={countText}
+              onChange={(e) => setCountText(e.target.value)}
+              onKeyDown={onEnter}
+              aria-invalid={n === null}
+              size="sm"
+              className="tabular"
+            />
           </Field>
           <Field label={t.decimals} htmlFor={`${id}-d`}>
             <Select id={`${id}-d`} value={decimals} onChange={(e) => setDecimals(Number(e.target.value))} size="sm">
@@ -172,21 +207,34 @@ export default function NumberGen({ locale, min = 1, max = 100, count = 1, decim
       </Panel>
 
       <Presentable locale={locale} className="rounded-[0.75rem] border border-line bg-surface">
-        <PanelHeader
-          title={values && values.length > 1 ? `${t.results} · ${countOf(locale, values.length, t.values)}` : t.result}
-          actions={values && <CopyButton value={text} label={t.copy} copiedLabel={t.copied} variant="ghost" />}
-        />
-        <div className="px-4 py-4">
-          <div aria-live="polite" className={values && values.length === 1 ? "fs-big tabular text-center text-5xl font-bold tracking-tight break-all text-fg sm:text-6xl" : "tabular max-h-80 overflow-y-auto text-lg leading-relaxed break-words text-fg scrollbar-thin"}>
-            {error ? "" : text}
-          </div>
-          {error && (
-            <p className="text-sm text-err" role="alert">
-              {error}
-            </p>
-          )}
-          {!values && !error && <p className="text-center text-sm text-fg-3">{t.idle}</p>}
-        </div>
+        {(full) => (
+          <>
+            {full ? <ToolTitle value={title} onChange={setTitle} locale={locale} full /> : null}
+            <PanelHeader
+              title={values && values.length > 1 ? `${t.results} · ${countOf(locale, values.length, t.values)}` : t.result}
+              actions={values && <CopyButton value={text} label={t.copy} copiedLabel={t.copied} variant="ghost" />}
+            />
+            <div className="px-4 py-4">
+              <div
+                aria-live="polite"
+                className={
+                  values && values.length === 1
+                    ? "fs-big tabular text-center text-5xl font-bold tracking-tight break-all text-fg sm:text-6xl"
+                    : "tabular max-h-80 overflow-y-auto text-lg leading-relaxed break-words text-fg scrollbar-thin"
+                }
+              >
+                {error ? "" : text}
+              </div>
+              {error && (
+                <p className="text-sm text-err" role="alert">
+                  {error}
+                </p>
+              )}
+              {!values && !error && <p className="text-center text-sm text-fg-3">{t.idle}</p>}
+            </div>
+            {!full && <ToolTitle value={title} onChange={setTitle} locale={locale} className="mx-auto mb-3 block text-base" />}
+          </>
+        )}
       </Presentable>
 
       <HistoryPanel title={t.history} items={history} onClear={() => setHistory([])} clearLabel={t.clear} emptyLabel={t.empty} />

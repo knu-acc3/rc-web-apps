@@ -5,12 +5,14 @@ import { useEffect, useId, useMemo, useRef, useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { count } from "@/i18n/format";
 import { cn } from "@/lib/cn";
-import { linkHere, listHash, readListHash } from "@/lib/share-link";
+import { usePersistentState } from "@/lib/persist";
+import { linkHere, listHash, readListHash, useQueryParam } from "@/lib/share-link";
 import { Button } from "@/ui/button";
 import { Field, Switch, Textarea } from "@/ui/field";
 import { useFullscreen } from "@/ui/fullscreen";
 import { Panel } from "@/ui/panel";
 import { ShareLink } from "@/ui/share-link";
+import { ToolTitle } from "@/ui/tool-title";
 import { typingTarget, useWakeLock } from "@/ui/stage";
 import { pickWeighted, randomFloat, randomInt, shuffle } from "./lib/rng";
 import { prefersReducedMotion, readStored, removeStored, writeStored } from "./lib/storage";
@@ -102,11 +104,21 @@ function fromLabels(labels: readonly string[], colors?: (string | null)[]): Whee
   return labels.slice(0, MAX_ENTRIES).map((label, i) => ({ id: i, label: label.slice(0, MAX_LABEL), weight: 1, color: colors?.[i] ?? undefined }));
 }
 
+const isTitle = (v: unknown): v is string => typeof v === "string" && v.length <= 60;
+
 export default function Wheel({ locale, preset, entries: presetEntries, colors }: WheelProps) {
   const t = T[locale];
   const id = useId();
   const initial = useMemo(() => fromLabels(presetEntries[locale] ?? [], colors), [presetEntries, locale, colors]);
   const storageKey = `random:wheel:v1:${preset ?? "main"}:${locale}`;
+  const [title, setTitle] = usePersistentState(`${storageKey}:title`, "", isTitle);
+  // A shared link may carry the wheel's title (?n=…).
+  const urlTitle = useQueryParam("n");
+  const [seenTitle, setSeenTitle] = useState<string | null>(null);
+  if (urlTitle !== seenTitle) {
+    setSeenTitle(urlTitle);
+    if (urlTitle) setTitle(urlTitle.slice(0, 60));
+  }
 
   const [entries, setEntries] = useState<WheelEntry[]>(initial);
   const [text, setText] = useState(() => initial.map((e) => e.label).join("\n"));
@@ -293,7 +305,8 @@ export default function Wheel({ locale, preset, entries: presetEntries, colors }
         >
           {full ? <Minimize aria-hidden /> : <Maximize aria-hidden />}
         </Button>
-        <div className={cn("relative mt-3 aspect-square w-full", full ? "max-w-[min(70vh,92vw)]" : "max-w-[27.5rem]")}>
+        <ToolTitle value={title} onChange={setTitle} locale={locale} full={full} className="mt-1 pr-8 pl-8" />
+        <div className={cn("relative aspect-square w-full", full ? "max-w-[min(70vh,92vw)]" : "max-w-[27.5rem]")}>
           <WheelPointer />
           {/* The wheel surface is a mouse shortcut; the button below is the accessible control. */}
           {/* Clip the rotating square so its corners never create page overflow. */}
@@ -353,7 +366,7 @@ export default function Wheel({ locale, preset, entries: presetEntries, colors }
               <RotateCcw aria-hidden />
               {preset ? t.resetPreset : t.reset}
             </Button>
-            <ShareLink locale={locale} url={() => linkHere({ hash: listHash("w", entries.map((e) => e.label)) })} />
+            <ShareLink locale={locale} url={() => linkHere({ query: title.trim() ? { n: title.trim() } : {}, hash: listHash("w", entries.map((e) => e.label)) })} />
             {removed.length > 0 && (
               <Button size="sm" variant="ghost" onClick={restoreRemoved} disabled={spinning}>
                 <Undo2 aria-hidden />

@@ -61,6 +61,9 @@ title (the complete `<title>`; no brand suffix is appended), h1, description (me
 The tool itself is rendered by `ToolClient` from the generated `next/dynamic` map: every tool is its own chunk, preloaded
 from the HTML of the pages that use it, so shared JS stays at the framework floor.
 Sitemaps (`/sitemap.xml` → `/sitemaps/<section>.xml`) and the search index (`/<locale>/search.json`) are generated from `SectionDef.paths()` / `search()`.
+Each section's `lastmod` is the date of the last commit that touched `src/sections/<id>` (the build date when git history
+is missing, e.g. a shallow CI checkout). After a deploy, `npm run indexnow -- --since=<previous deploy commit>` sends the
+changed sections' URLs to IndexNow (Yandex, Bing); the key lives in `src/config/brand.ts` and `public/<key>.txt`.
 
 ## Two ways to write a section
 1. **Declarative tools** — `defineToolSection({...tools: ToolDef[]})` from `src/registry/tool-section.ts`.

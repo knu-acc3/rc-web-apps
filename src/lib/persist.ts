@@ -9,7 +9,6 @@ import { useCallback, useEffect, useRef, useState } from "react";
  */
 export function usePersistentState<T>(key: string, initial: T, valid: (v: unknown) => v is T): [T, (v: T | ((prev: T) => T)) => void, () => void] {
   const [value, setValue] = useState<T>(initial);
-  const loaded = useRef(false);
   const initialRef = useRef(initial);
 
   useEffect(() => {
@@ -23,19 +22,25 @@ export function usePersistentState<T>(key: string, initial: T, valid: (v: unknow
     } catch {
       // storage unavailable
     }
-    loaded.current = true;
     // `valid` is a stable type guard; re-reading on every render is not wanted.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [key]);
 
-  useEffect(() => {
-    if (!loaded.current) return;
-    try {
-      localStorage.setItem(key, JSON.stringify(value));
-    } catch {
-      // storage unavailable
-    }
-  }, [key, value]);
+  // Saved when the user changes the value, never on mount: a mount-time write could overwrite the saved value
+  // before it is read back (React runs effects twice in development).
+  const set = useCallback(
+    (v: T | ((prev: T) => T)) =>
+      setValue((prev) => {
+        const next = typeof v === "function" ? (v as (prev: T) => T)(prev) : v;
+        try {
+          localStorage.setItem(key, JSON.stringify(next));
+        } catch {
+          // storage unavailable
+        }
+        return next;
+      }),
+    [key],
+  );
 
   const clear = useCallback(() => {
     try {
@@ -46,5 +51,5 @@ export function usePersistentState<T>(key: string, initial: T, valid: (v: unknow
     setValue(initialRef.current);
   }, [key]);
 
-  return [value, setValue, clear];
+  return [value, set, clear];
 }
