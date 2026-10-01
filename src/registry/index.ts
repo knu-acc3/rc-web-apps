@@ -1,5 +1,5 @@
 import { tr, type Locale } from "@/i18n/config";
-import { SECTIONS } from "@/sections";
+import { SECTIONS } from "@/tools";
 import { CATEGORIES } from "./categories";
 import { setRelatedResolver } from "./tool-section";
 import type { LinkItem, PageModel, SearchEntry, SectionDef } from "./types";

@@ -2,8 +2,8 @@
 // Sources: emojibase-data 17 (order, groups, versions, shortcodes, skin tones) +
 // Unicode CLDR 48 annotations (ru/en names and keywords, the authoritative translations).
 // Output:
-//   src/sections/emoji/data/emoji.json        – compact server-side data (never shipped to the client)
-//   src/sections/emoji/data/client/index-{ru,en}.json – search index lazily loaded by the /emoji hub (-> public/vendor/emoji)
+//   src/tools/symbols/emoji/data/emoji.json        – compact server-side data (never shipped to the client)
+//   src/tools/symbols/emoji/data/client/index-{ru,en}.json – search index lazily loaded by the /emoji hub (-> public/vendor/emoji)
 //
 // Run: node scripts/data/gen-emoji.mjs
 // Packages are resolved from scripts/data/node_modules (npm --prefix scripts/data install) or from the
@@ -201,12 +201,12 @@ for (const [glyph, sub] of [["🍦", "food-sweet"], ["🇰🇿", "country-flag"]
   if (data.subgroups[row[2]][0] !== sub) throw new Error(`${glyph} expected in ${sub}, got ${data.subgroups[row[2]][0]}`);
 }
 
-const dataDir = join(root, "src", "sections", "emoji", "data");
+const dataDir = join(root, "src", "tools", "symbols", "emoji", "data");
 mkdirSync(dataDir, { recursive: true });
 writeFileSync(join(dataDir, "emoji.json"), JSON.stringify(data));
 
 /* ── client search index: [glyph, slug, name, search text, group index] ──
-   Committed in src/sections/emoji/data/client/ and copied to public/vendor/emoji/ by scripts/vendor-emoji.mjs. */
+   Committed in src/tools/symbols/emoji/data/client/ and copied to public/vendor/emoji/ by scripts/vendor-emoji.mjs. */
 const clientDir = join(dataDir, "client");
 const vendor = join(root, "public", "vendor", "emoji");
 mkdirSync(clientDir, { recursive: true });

@@ -1,7 +1,7 @@
 // Builds the MIME reference data from mime-db (https://github.com/jshttp/mime-db).
 // Output (committed, deterministic):
-//   src/sections/mime/data/db.json     { ext: [[type, source, compressible, charset], …] } — server-side only
-//   src/sections/mime/data/index.json  [[ext, "type1|type2"], …] — lazily loaded by the hub search
+//   src/tools/dev/mime/data/db.json     { ext: [[type, source, compressible, charset], …] } — server-side only
+//   src/tools/dev/mime/data/index.json  [[ext, "type1|type2"], …] — lazily loaded by the hub search
 // mime-db is looked up in scripts/data/node_modules (npm --prefix scripts/data install),
 // then in $MIME_DB_DIR, then in parent checkouts (useful inside git worktrees).
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
@@ -43,7 +43,7 @@ const out = { _source: `mime-db ${version}` };
 for (const e of exts) out[e] = byExt.get(e);
 const index = exts.map((e) => [e, byExt.get(e).map((t) => t[0]).join("|")]);
 
-const dataDir = join(root, "src/sections/mime/data");
+const dataDir = join(root, "src/tools/dev/mime/data");
 writeFileSync(join(dataDir, "db.json"), JSON.stringify(out) + "\n");
 writeFileSync(join(dataDir, "index.json"), JSON.stringify(index) + "\n");
 console.log(`gen-mime: ${exts.length} extensions from mime-db ${version} (${dbDir})`);

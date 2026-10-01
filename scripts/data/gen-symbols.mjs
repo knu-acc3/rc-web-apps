@@ -3,8 +3,8 @@
 // annotations (ru/en short names and keywords), the WHATWG HTML named character references (html-entities),
 // Windows-1251/1252 code pages (Alt codes) and the hand-curated collections and Russian names next to this file.
 // Output:
-//   src/sections/symbols/data/symbols.json     – collections and per-character data (server only)
-//   src/sections/symbols/data/client/unicode*.json – name index for the /unicode-table lookup tool (-> public/vendor/symbols)
+//   src/tools/symbols/symbols/data/symbols.json     – collections and per-character data (server only)
+//   src/tools/symbols/symbols/data/client/unicode*.json – name index for the /unicode-table lookup tool (-> public/vendor/symbols)
 //
 // Run: node scripts/data/gen-symbols.mjs  (needs gen-emoji.mjs output for links to emoji pages)
 // Packages are resolved from scripts/data/node_modules, the project node_modules, or DATA_PACKAGES_DIRS.
@@ -93,7 +93,7 @@ const CP1252 = codePage("windows-1252");
 const CP1251 = codePage("windows-1251");
 
 /* ── emoji pages (from gen-emoji.mjs output) ── */
-const emojiData = JSON.parse(readFileSync(join(root, "src", "sections", "emoji", "data", "emoji.json"), "utf8"));
+const emojiData = JSON.parse(readFileSync(join(root, "src", "tools", "symbols", "emoji", "data", "emoji.json"), "utf8"));
 const emojiSlug = new Map(emojiData.emoji.map((r) => [r[0].replace(/\u{FE0F}/gu, ""), r[1]]));
 
 /* ── names ── */
@@ -197,7 +197,7 @@ const data = {
   collections,
   chars,
 };
-const dataDir = join(root, "src", "sections", "symbols", "data");
+const dataDir = join(root, "src", "tools", "symbols", "symbols", "data");
 mkdirSync(dataDir, { recursive: true });
 writeFileSync(join(dataDir, "symbols.json"), JSON.stringify(data));
 
@@ -234,7 +234,7 @@ for (const [k, v] of Object.entries(chars)) if (v[1]) ruIndex[parseInt(k, 16).to
 for (const [ch, a] of Object.entries(CLDR.ru)) if ([...ch].length === 1 && a.tts && !EP.test(ch)) ruIndex[ch.codePointAt(0).toString(36)] ??= a.tts[0];
 const ruBlocks = {};
 for (const [a, , n] of lookupBlocks) if (BLOCKS_RU[n]) ruBlocks[a.toString(36)] = BLOCKS_RU[n];
-// Committed in src/sections/symbols/data/client/ and copied to public/vendor/symbols/ by scripts/vendor-symbols.mjs.
+// Committed in src/tools/symbols/symbols/data/client/ and copied to public/vendor/symbols/ by scripts/vendor-symbols.mjs.
 const files = {
   "unicode.json": JSON.stringify({ v: "16.0", b: lookupBlocks.map(([a, b, n]) => [a, b, n]), n: lines.join("\n"), p: pagePaths, em: emojiPaths, e: ents }),
   "unicode-ru.json": JSON.stringify({ n: ruIndex, b: ruBlocks }),

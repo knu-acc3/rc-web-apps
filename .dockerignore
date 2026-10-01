@@ -1,7 +1,0 @@
-node_modules
-.next
-.git
-legacy
-tests
-.claude
-scripts/data/node_modules

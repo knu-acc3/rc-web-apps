@@ -6,4 +6,4 @@ import { fileURLToPath } from "node:url";
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const dest = join(root, "public", "vendor", "symbols");
 mkdirSync(dest, { recursive: true });
-cpSync(join(root, "src", "sections", "symbols", "data", "client"), dest, { recursive: true });
+cpSync(join(root, "src", "tools", "symbols", "symbols", "data", "client"), dest, { recursive: true });

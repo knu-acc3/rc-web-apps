@@ -30,11 +30,15 @@ const locs = (xml) => [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1].
 
 let files = locs(await text(`${site}/sitemap.xml`)).map((f) => f.replace(`https://${domain}`, site));
 if (args.since) {
-  const changed = execFileSync("git", ["diff", "--name-only", `${args.since}..HEAD`, "--", "src/sections"], { encoding: "utf8" })
-    .split("\n")
-    .map((f) => f.split("/")[2])
-    .filter(Boolean);
-  const ids = new Set(changed);
+  // src/tools/<category>/<section>/… → that section; src/tools/<category>/shared/… → every section of the category.
+  const changed = execFileSync("git", ["diff", "--name-only", `${args.since}..HEAD`, "--", "src/tools"], { encoding: "utf8" }).split("\n");
+  const ids = new Set();
+  for (const f of changed) {
+    const [, , cat, id] = f.split("/");
+    if (!cat || !id || id.includes(".")) continue;
+    if (id !== "shared") ids.add(id);
+    else for (const d of fs.readdirSync(new URL(`../src/tools/${cat}/`, import.meta.url))) if (d !== "shared" && !d.includes(".")) ids.add(d);
+  }
   files = files.filter((f) => ids.has(f.replace(/^.*\/sitemaps\//, "").replace(/\.xml$/, "")));
   console.log(`changed sections: ${[...ids].join(", ") || "none"}`);
 }

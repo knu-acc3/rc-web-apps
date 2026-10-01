@@ -3,7 +3,7 @@
   "version": "2.0.0",
   "private": true,
   "engines": {
-    "node": ">=22.12.0"
+    "node": "24.x"
   },
   "scripts": {
     "dev": "next dev -p 3000",
@@ -19,7 +19,8 @@
     "vendor": "node scripts/vendor.mjs",
     "verify": "npm run lint && npm run typecheck && npm run knip && npm test && npm run build",
     "knip": "knip",
-    "indexnow": "node scripts/indexnow.mjs"
+    "indexnow": "node scripts/indexnow.mjs",
+    "docs": "UPDATE_DOCS=1 vitest run tests/unit/site/readme.test.ts"
   },
   "dependencies": {
     "@cantoo/pdf-lib": "^2.11.1",
@@ -93,5 +94,20 @@
     "firefox >= 78",
     "safari >= 14",
     "ios_saf >= 14"
-  ]
+  ],
+  "knip": {
+    "entry": [
+      "scripts/*.mjs",
+      "scripts/data/*.mjs"
+    ],
+    "project": [
+      "src/**/*.{ts,tsx}",
+      "scripts/**/*.mjs",
+      "*.ts"
+    ],
+    "ignoreDependencies": [
+      "@ffmpeg/core",
+      "html-entities"
+    ]
+  }
 }

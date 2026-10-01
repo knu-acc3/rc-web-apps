@@ -7,14 +7,14 @@ const BUILD_DATE = new Date().toISOString().slice(0, 10);
 
 const lastmods = new Map<string, string>();
 /**
- * Honest lastmod for a section: the date of the last commit that touched its folder (src/sections/{id}), so a
- * deploy does not mark 16 000 untouched pages as changed. Falls back to the build date without git history.
+ * Honest lastmod for a section: the date of the last commit that touched its folder (src/tools/<category>/<id>), so
+ * a deploy does not mark 16 000 untouched pages as changed. Falls back to the build date without git history.
  */
 export function sectionLastmod(id: string): string {
   let d = lastmods.get(id);
   if (d) return d;
   try {
-    d = execFileSync("git", ["log", "-1", "--format=%cs", "--", `src/sections/${id}`], { encoding: "utf8", stdio: ["ignore", "pipe", "ignore"], timeout: 5000 }).trim();
+    d = execFileSync("git", ["log", "-1", "--format=%cs", "--", `:(glob)src/tools/*/${id}/**`, `:(glob)src/site/${id}/**`], { encoding: "utf8", stdio: ["ignore", "pipe", "ignore"], timeout: 5000 }).trim();
   } catch {
     d = "";
   }
