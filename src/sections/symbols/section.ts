@@ -362,8 +362,10 @@ function collectionPage(c: Collection, locale: Locale): PageModel {
   const ru = locale === "ru";
   const meta = colMeta(c.id);
   const h1 = tr(meta.h1, locale);
-  const hasGlyphs = /[^\p{L}\p{N}\s:,()—–-]/u.test(h1);
   const sample = sampleOf(c, 5);
+  // The H1 already shows the symbols ("★ ☆ ✦", or letters "Ё, Ї, Ґ") — don't repeat them in the title.
+  const visible = sample.replace(/[\s\u200B-\u200D\u2060\uFEFF]/g, "");
+  const hasGlyphs = !visible || /[^\p{L}\p{N}\s:,()—–-]/u.test(h1) || [...visible].some((ch) => h1.includes(ch));
   const blocksUsed = [...new Map(c.chars.map((s) => [s.block[2], s])).values()].map((s) => `«${blockName(s, locale)}»`);
   const rows = c.chars.map((s) => [s.ext.d ?? s.ch, nameOf(s, locale), u(s), entity(s) ?? htmlDec(s.ch)]);
   const group = HUB_GROUPS.find((g) => g.ids.includes(c.id))?.ids ?? [];

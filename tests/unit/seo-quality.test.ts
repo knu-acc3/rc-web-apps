@@ -63,6 +63,11 @@ describe.each(LOCALES)("SEO quality (%s)", (locale: Locale) => {
       if (parts.length > 2 || parts.some((x) => x.trim().length < 3) || (parts.length === 1 && p.title.length < 45)) bad.push(`${p.path.join("/")}: "${p.title}" is not "A | B"`);
       if (BANNED.test(p.title) || p.title.includes(BRAND.name)) bad.push(`${p.path.join("/")}: boilerplate "${p.title}"`);
       if (p.title.length > 90) bad.push(`${p.path.join("/")}: title too long (${p.title.length})`);
+      if (/\s{2}|^\s|\s$/.test(p.title)) bad.push(`${p.path.join("/")}: stray spaces in "${p.title}"`);
+      // The same set of characters must not be listed twice ("Буквы: Ё, Ї, Ґ … Ё ё Ї ї Ґ").
+      const singles = p.title.split(/[\s,;|]+/).filter((x) => [...x].length === 1 && !/\d/.test(x));
+      const twice = new Set(singles.filter((x, i) => singles.indexOf(x) !== i));
+      if (twice.size >= 3) bad.push(`${p.path.join("/")}: repeated symbols in "${p.title}"`);
       // The first half is the H1 query (word forms may differ: "курсив" / "курсивный").
       const stem = (w: string) => w.slice(0, w.length <= 5 ? 4 : 5);
       const STOP = new Set(["онлайн", "online", "на", "в", "и", "с", "по", "для", "из", "the", "a", "an", "of", "to", "in", "for", "and", "with"]);
