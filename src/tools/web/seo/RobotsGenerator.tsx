@@ -7,7 +7,7 @@ import { buildRobots, type Preset } from "./lib/presets";
 import { parseRobots } from "./lib/robots";
 import { lintText } from "./content/robots-text";
 import { Issues, Output, Split } from "./ui/kit";
-import { ChipChoice } from "../shared/ChipChoice";
+import { ChipChoice } from "@/ui/chip-choice";
 
 const NAMES: Record<Preset, Record<Locale, string>> = {
   basic: { ru: "Открыть весь сайт", en: "Allow everything" },
@@ -59,7 +59,7 @@ export default function RobotsGenerator({ locale, preset: initial = "basic", blo
             <span id={`${id}-p`} className="text-sm font-medium text-fg-2">
               {t.preset}
             </span>
-            <ChipChoice wrap label={t.preset} value={preset} onChange={setPreset} options={(Object.keys(NAMES) as Preset[]).map((p) => ({ value: p, label: NAMES[p][locale] }))} />
+            <ChipChoice layout="wrap" label={t.preset} value={preset} onChange={setPreset} options={(Object.keys(NAMES) as Preset[]).map((p) => ({ value: p, label: NAMES[p][locale] }))} />
           </div>
           <Field label={t.sitemap} htmlFor={`${id}-s`}>
             <Input id={`${id}-s`} value={sitemap} onChange={(e) => setSitemap(e.target.value)} placeholder="https://example.com/sitemap.xml" inputMode="url" className="font-mono" spellCheck={false} autoComplete="off" />

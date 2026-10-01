@@ -28,6 +28,7 @@ export function SliderField({
   ends,
   inputMode = "decimal",
   placeholder,
+  disabled,
   className,
 }: {
   id: string;
@@ -50,13 +51,14 @@ export function SliderField({
   inputMode?: "decimal" | "numeric";
   /** Shown while the value is empty (the handle then waits at the start, dimmed). */
   placeholder?: string;
+  disabled?: boolean;
   className?: string;
 }) {
   const n = parse(value);
   const pos = toPos(n ?? min, min, max, scale);
   const width = `${Math.max(2, (value || placeholder || "").length) + 0.75}ch`;
   return (
-    <div className={cn("flex min-w-0 flex-col", className)}>
+    <div className={cn("flex min-w-0 flex-col", disabled && "opacity-60", className)}>
       <div className="flex min-w-0 items-end justify-between gap-3">
         <label htmlFor={id} className="min-w-0 pb-1 text-sm font-medium text-fg-2">
           {label}
@@ -68,6 +70,7 @@ export function SliderField({
             onChange={(e) => onChange(e.target.value)}
             onFocus={(e) => e.target.select()}
             placeholder={placeholder}
+            disabled={disabled}
             inputMode={inputMode}
             autoComplete="off"
             spellCheck={false}
@@ -85,6 +88,7 @@ export function SliderField({
         max={STEPS}
         step={1}
         value={pos}
+        disabled={disabled}
         format={() => format(niceValue(fromPos(pos, min, max, scale), step, scale))}
         onChange={(e) => onChange(format(niceValue(fromPos(Number(e.target.value), min, max, scale), step, scale)))}
         className={cn("mt-1", n === null && "opacity-50")}

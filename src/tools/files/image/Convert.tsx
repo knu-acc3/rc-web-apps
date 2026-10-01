@@ -8,7 +8,8 @@ import { processFile, toBlob } from "./lib/run";
 import { baseName } from "./lib/source";
 import type { OutFormat } from "./lib/types";
 import { BatchWorkspace } from "./ui/BatchWorkspace";
-import { ChipGroup, ColorField, NumberField, RangeField } from "./ui/controls";
+import { ColorField, NumberField, RangeField } from "./ui/controls";
+import { ChipChoice } from "@/ui/chip-choice";
 import { DEFAULT_QUALITY, LOSSY, OUT_LABEL } from "./ui/format";
 import { S } from "./ui/strings";
 import { useBatch, type Runner } from "./ui/useBatch";
@@ -76,7 +77,7 @@ export default function Convert({ locale, from, to: to0 = "jpg" }: ConvertProps)
   const options = (
     <>
       <Field label={t.to}>
-        <ChipGroup label={t.to} value={to} onChange={setTo} options={TARGETS.map((f) => ({ value: f, label: OUT_LABEL[f] }))} />
+        <ChipChoice layout="wrap" label={t.to} value={to} onChange={setTo} options={TARGETS.map((f) => ({ value: f, label: OUT_LABEL[f] }))} />
       </Field>
       {LOSSY.has(to) && <RangeField label={s.quality} value={q} onChange={setQuality} min={1} max={100} locale={locale} />}
       {to === "ico" && (

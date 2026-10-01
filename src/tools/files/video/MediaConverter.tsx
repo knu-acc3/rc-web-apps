@@ -15,7 +15,8 @@ import { probeMedia, runGifToVideo, runJob, type Hooks } from "../shared/client"
 import { isAbort } from "../shared/ffmpeg";
 import { even, FFMPEG_ENCODED, isAudioTarget, isVideoTarget, outputName, planFor, type AudioSpec, type GifSpec, type JobResult, type JobSpec, type MediaInfo, type Plan, type Target, type VideoTarget } from "../shared/spec";
 import { useWebCodecs } from "./ui/hooks";
-import { AudioOptions, ChoiceChips, FORMAT_LABEL, GIF_DEFAULT, GifOptions, Setting } from "./ui/options";
+import { AudioOptions, FORMAT_LABEL, GIF_DEFAULT, GifOptions, Setting } from "./ui/options";
+import { ChipChoice } from "@/ui/chip-choice";
 import { MEDIA_ACCEPT, VIDEO_ACCEPT } from "./ui/FilePicker";
 import { ProgressBar } from "./ui/Progress";
 import { sizeChange } from "./ui/ResultCard";
@@ -305,7 +306,7 @@ function MediaConverterInner({ locale, kind, to, targets }: MediaConverterProps)
 
       <Panel className="flex min-w-0 flex-col gap-5 p-4 sm:p-5">
         <Setting label={t.format}>
-          <ChoiceChips label={t.format} value={target} onChange={setTarget} size="lg" options={targets.map((x) => ({ value: x, label: SHORT[x], title: FORMAT_LABEL[x] }))} />
+          <ChipChoice label={t.format} value={target} onChange={setTarget} size="lg" options={targets.map((x) => ({ value: x, label: SHORT[x], title: FORMAT_LABEL[x] }))} />
         </Setting>
         <Fold variant="inline" title={`${t.settings}: ${settingsSummary}`} className="text-sm">
           {target === "gif" ? (

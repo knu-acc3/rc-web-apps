@@ -5,7 +5,7 @@ import type { Locale } from "@/i18n/config";
 import { buildSchema, missing, SCHEMA_TYPES, scriptTag, type SchemaType } from "./lib/jsonld";
 import { SCHEMA_FIELDS, SCHEMA_NAME } from "./content/schema-fields";
 import { FieldGrid, Issues, More, Output, Split, type Fields } from "./ui/kit";
-import { ChipChoice } from "../shared/ChipChoice";
+import { ChipChoice } from "@/ui/chip-choice";
 
 const T = {
   ru: {

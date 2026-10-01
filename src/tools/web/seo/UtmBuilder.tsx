@@ -6,7 +6,7 @@ import { CopyButton } from "@/ui/copy-button";
 import { Field, Input } from "@/ui/field";
 import { buildUtm, parseUtm, utmWarnings, UTM_KEYS, type UtmKey, type UtmParams } from "./lib/utm";
 import { Issues, Split } from "./ui/kit";
-import { ChipChoice } from "../shared/ChipChoice";
+import { ChipChoice } from "@/ui/chip-choice";
 
 export type UtmPreset = "" | "yandex" | "google" | "vk" | "telegram" | "email";
 
@@ -90,7 +90,7 @@ export default function UtmBuilder({ locale, preset: initial = "" }: { locale: L
               {t.preset}
             </span>
             <ChipChoice
-              wrap
+              layout="wrap"
               label={t.preset}
               value={preset}
               onChange={(v) => {

@@ -7,7 +7,8 @@ import { formatNumber } from "@/i18n/format";
 import { cn } from "@/lib/cn";
 import { Notice, Panel } from "@/ui/panel";
 import { Fab } from "@/tools/files/video/ui/Fab";
-import { ChoiceChips, Setting, StepSlider } from "@/tools/files/video/ui/options";
+import { Setting, StepSlider } from "@/tools/files/video/ui/options";
+import { ChipChoice } from "@/ui/chip-choice";
 import { INSTRUMENTS, type InstrumentId } from "../data/instruments";
 import { mediaErrorKind, openMicrophone, resumeAudio, stopStream } from "../lib/audio";
 import { centsBetween, detectPitch, median, midiToFreq, NOTE_NAMES_RU, noteOf, parseNote } from "../lib/pitch";
@@ -207,7 +208,7 @@ function TunerInner({ locale, instrument: inst0 = "chromatic" }: { locale: Local
         </Panel>
         <Panel className="flex min-w-0 flex-col gap-5 p-4 sm:p-5">
           <Setting label={t.instrument}>
-            <ChoiceChips label={t.instrument} value={instrument} onChange={setInstrument} options={(Object.keys(INSTRUMENTS) as InstrumentId[]).map((k) => ({ value: k, label: t.names[k] }))} />
+            <ChipChoice label={t.instrument} value={instrument} onChange={setInstrument} options={(Object.keys(INSTRUMENTS) as InstrumentId[]).map((k) => ({ value: k, label: t.names[k] }))} />
           </Setting>
           {strings.length > 0 && (
             <Setting label={t.ref}>

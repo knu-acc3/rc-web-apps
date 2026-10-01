@@ -10,7 +10,8 @@ import { Slider, Switch } from "@/ui/field";
 import { Notice, Panel } from "@/ui/panel";
 import { Segmented } from "@/ui/segmented";
 import { Fab } from "@/tools/files/video/ui/Fab";
-import { ChoiceChips, Setting } from "@/tools/files/video/ui/options";
+import { Setting } from "@/tools/files/video/ui/options";
+import { ChipChoice } from "@/ui/chip-choice";
 import { resumeAudio } from "../lib/audio";
 import { addTap, tempoFromTaps, tempoMarking } from "../lib/bpm";
 
@@ -204,7 +205,7 @@ function MetronomeInner({ locale, bpm: bpm0 = 120 }: { locale: Locale; bpm?: num
         </Panel>
         <Panel className="flex min-w-0 flex-col gap-5 p-4 sm:p-5">
           <Setting label={t.meter}>
-            <ChoiceChips label={t.meter} value={meter} onChange={setMeter} options={METERS.map((m) => ({ value: m, label: m }))} />
+            <ChipChoice label={t.meter} value={meter} onChange={setMeter} options={METERS.map((m) => ({ value: m, label: m }))} />
           </Setting>
           <Setting label={t.sub}>
             <Segmented label={t.sub} value={String(sub) as "1" | "2" | "3" | "4"} onChange={(x) => setSub(Number(x))} options={(["1", "2", "3", "4"] as const).map((v, i) => ({ value: v, label: SUB_LABELS[i] ?? t.triplets, title: t.subs[i] }))} />

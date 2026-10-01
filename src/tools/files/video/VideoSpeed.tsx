@@ -10,7 +10,8 @@ import { outputName, type JobResult, type VideoTarget } from "../shared/spec";
 import { formatTime } from "../shared/time";
 import { VIDEO_ACCEPT } from "./ui/FilePicker";
 import { useJob, useProbe } from "./ui/hooks";
-import { ChoiceChips, Setting } from "./ui/options";
+import { Setting } from "./ui/options";
+import { ChipChoice } from "@/ui/chip-choice";
 import { JobProgress } from "./ui/Progress";
 import { ResultCard } from "./ui/ResultCard";
 import { UI } from "./ui/strings";
@@ -102,7 +103,7 @@ function VideoSpeedInner({ locale, speed: speed0 = 2 }: { locale: Locale; speed?
       options={
         <>
           <Setting label={t.speed}>
-            <ChoiceChips
+            <ChipChoice
               label={t.speed}
               value={speed}
               onChange={(x) => {

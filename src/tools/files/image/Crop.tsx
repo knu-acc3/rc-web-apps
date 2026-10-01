@@ -7,7 +7,8 @@ import { applyAspect, centeredAspectRect, roundRect, type Rect } from "./lib/geo
 import { processFile, toBlob } from "./lib/run";
 import { baseName } from "./lib/source";
 import type { Op, OutFormat } from "./lib/types";
-import { ChipGroup, ColorField, NumberField } from "./ui/controls";
+import { ColorField, NumberField } from "./ui/controls";
+import { ChipChoice } from "@/ui/chip-choice";
 import { DEFAULT_QUALITY, LOSSY, OUT_LABEL, sameFormat } from "./ui/format";
 import { useEngine } from "./ui/hooks";
 import { ImageStage } from "./ui/ImageStage";
@@ -140,7 +141,7 @@ export default function Crop({ locale, ratio: presetRatio, shape = "rect" }: Cro
     <>
       {!circle && (
         <Field label={t.ratio}>
-          <ChipGroup label={t.ratio} value={ratioKey} onChange={chooseRatio} options={ratios.map(([k]) => ({ value: k, label: k === "free" ? t.free : k }))} />
+          <ChipChoice layout="wrap" label={t.ratio} value={ratioKey} onChange={chooseRatio} options={ratios.map(([k]) => ({ value: k, label: k === "free" ? t.free : k }))} />
         </Field>
       )}
       <Field label={t.output} htmlFor={`${id}-out`}>

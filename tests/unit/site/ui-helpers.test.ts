@@ -69,3 +69,12 @@ describe("logo", () => {
     expect(svg).toContain(LOGO.color);
   });
 });
+
+describe("exp slider scale", () => {
+  it("gives every octave the same length", () => {
+    const a = toPos(40, 20, 20480, "exp");
+    const b = toPos(80, 20, 20480, "exp");
+    expect(b - a).toBe(a - toPos(20, 20, 20480, "exp"));
+    expect(fromPos(STEPS, 20, 20480, "exp")).toBeCloseTo(20480, 6);
+  });
+});

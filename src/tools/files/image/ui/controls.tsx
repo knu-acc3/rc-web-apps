@@ -158,39 +158,6 @@ export function ProgressBar({ value, className }: { value: number; className?: s
 export const checker =
   "bg-[length:16px_16px] bg-[position:0_0,8px_8px] [background-image:linear-gradient(45deg,var(--surface-2)_25%,transparent_25%,transparent_75%,var(--surface-2)_75%),linear-gradient(45deg,var(--surface-2)_25%,transparent_25%,transparent_75%,var(--surface-2)_75%)] bg-surface";
 
-/** A wrapping group of chips with one chosen (radiogroup): for 6+ short options (ratios, formats, sizes). */
-export function ChipGroup<T extends string | number>({
-  label,
-  value,
-  onChange,
-  options,
-  className,
-}: {
-  label: string;
-  value: T;
-  onChange: (v: T) => void;
-  options: readonly { value: T; label: ReactNode; title?: string }[];
-  className?: string;
-}) {
-  return (
-    <div role="radiogroup" aria-label={label} className={cn("flex flex-wrap gap-2", className)}>
-      {options.map((o) => (
-        <button
-          key={String(o.value)}
-          type="button"
-          role="radio"
-          aria-checked={o.value === value}
-          title={o.title}
-          onClick={() => onChange(o.value)}
-          className="chip tabular"
-        >
-          {o.label}
-        </button>
-      ))}
-    </div>
-  );
-}
-
 /**
  * A drop zone that replaces the current file: the full zone's "Choose file" button (the compact zone says "Add more"),
  * squeezed to the height of a compact one.

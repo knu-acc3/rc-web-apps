@@ -21,8 +21,8 @@ export function CopyButton({
   label?: string;
   copiedLabel?: string;
   showLabel?: boolean;
-  variant?: "primary" | "secondary" | "ghost" | "outline";
-  size?: "sm" | "md" | "icon" | "icon-sm";
+  variant?: "filled" | "tonal" | "outlined" | "text" | "neutral" | "elevated" | "primary" | "secondary" | "ghost" | "outline";
+  size?: "sm" | "md" | "lg" | "xl" | "icon" | "icon-sm" | "icon-lg";
   className?: string;
   onCopied?: () => void;
   /** Icon only on phones (the label stays for screen readers), icon + label from 640px. */
@@ -45,7 +45,7 @@ export function CopyButton({
     }
   }
 
-  const iconOnly = !showLabel || size === "icon" || size === "icon-sm";
+  const iconOnly = !showLabel || size === "icon" || size === "icon-sm" || size === "icon-lg";
   return (
     <button
       type="button"

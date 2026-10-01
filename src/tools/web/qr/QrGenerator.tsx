@@ -15,7 +15,7 @@ import { SliderField } from "@/ui/slider-field";
 import { buildPayload, DEFAULTS, FIELDS, QR_TYPES, TYPE_NAME, type FieldSpec, type Fields, type QrType } from "./lib/build";
 import { CAPACITY, contrastCheck, detectMode, encodeQr, fileSlug, logoBox, modulesPath, payloadUnits, qrPng, qrSvg, QUIET, type Ecc } from "./lib/qr";
 import QrBatch from "./ui/QrBatch";
-import { ChipChoice } from "../shared/ChipChoice";
+import { ChipChoice } from "@/ui/chip-choice";
 import { LookRow, type LookState } from "./ui/kit";
 
 const T = {

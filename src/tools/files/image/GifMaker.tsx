@@ -12,7 +12,8 @@ import { Field, Select } from "@/ui/field";
 import { Notice, Panel } from "@/ui/panel";
 import { Segmented } from "@/ui/segmented";
 import { IMAGE_ACCEPT } from "./lib/detect";
-import { checker, ChipGroup, ColorField, NumberField } from "./ui/controls";
+import { checker, ColorField, NumberField } from "./ui/controls";
+import { ChipChoice } from "@/ui/chip-choice";
 import { useEngine, useObjectUrls } from "./ui/hooks";
 import { FrameStrip } from "./ui/FrameStrip";
 import { OptionsBar, ToolColumns } from "./ui/OptionsBar";
@@ -202,7 +203,7 @@ export default function GifMaker({ locale }: { locale: Locale }) {
         </Select>
       </Field>
       <Field label={t.width}>
-        <ChipGroup label={t.width} value={width} onChange={setWidth} options={WIDTHS.map((w) => ({ value: w, label: `${w} px` }))} />
+        <ChipChoice layout="wrap" label={t.width} value={width} onChange={setWidth} options={WIDTHS.map((w) => ({ value: w, label: `${w} px` }))} />
       </Field>
       <Field label={t.fit}>
         <Segmented

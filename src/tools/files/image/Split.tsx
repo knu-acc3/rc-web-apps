@@ -9,7 +9,8 @@ import { gridRects } from "./lib/collage";
 import { centeredAspectRect, type Rect } from "./lib/geometry";
 import { baseName, materialize } from "./lib/source";
 import type { OutFormat, TileResult } from "./lib/types";
-import { ChipGroup, NumberField } from "./ui/controls";
+import { NumberField } from "./ui/controls";
+import { ChipChoice } from "@/ui/chip-choice";
 import { DEFAULT_QUALITY, LOSSY, sameFormat } from "./ui/format";
 import { useEngine } from "./ui/hooks";
 import { ImageStage } from "./ui/ImageStage";
@@ -138,7 +139,8 @@ export default function Split({
       {mode === "grid" ? (
         <>
           <Field label={t.presets}>
-            <ChipGroup
+            <ChipChoice
+            layout="wrap"
               label={t.presets}
               value={`${rows}x${cols}`}
               onChange={(v) => {

@@ -10,7 +10,7 @@ import { CopyButton } from "@/ui/copy-button";
 import { Field, Input } from "@/ui/field";
 import { Fold } from "@/ui/fold";
 import { Panel } from "@/ui/panel";
-import { ChipChoice } from "../shared/ChipChoice";
+import { ChipChoice } from "@/ui/chip-choice";
 import { gs1Steps, isbn10Steps, upcEToA, type CheckStep } from "./lib/checkdigits";
 
 export type CheckKind = "ean13" | "ean8" | "upca" | "upce" | "gtin14" | "sscc" | "isbn10";

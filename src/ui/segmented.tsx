@@ -9,6 +9,7 @@ interface SegmentedOption<T extends string> {
   label: ReactNode;
   title?: string;
   icon?: ReactNode;
+  disabled?: boolean;
 }
 
 const useIsoLayoutEffect = typeof window === "undefined" ? () => {} : useLayoutEffect;
@@ -28,6 +29,7 @@ export function Segmented<T extends string>({
   size = "md",
   className,
   fill = false,
+  disabled = false,
 }: {
   value: T;
   onChange: (value: T) => void;
@@ -37,6 +39,7 @@ export function Segmented<T extends string>({
   className?: string;
   fill?: boolean;
   wrap?: boolean;
+  disabled?: boolean;
 }) {
   const ref = useRef<HTMLDivElement>(null);
 
@@ -89,7 +92,8 @@ export function Segmented<T extends string>({
               (e.currentTarget.parentElement?.children[options.indexOf(next)] as HTMLElement | undefined)?.focus();
             }}
             tabIndex={active ? 0 : -1}
-            className={cn("seg", h)}
+            disabled={disabled || o.disabled}
+            className={cn("seg disabled:pointer-events-none disabled:opacity-45", h)}
           >
             <span aria-hidden className="seg-check">
               <Check className="size-4 shrink-0" strokeWidth={2.75} />

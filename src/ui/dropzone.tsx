@@ -35,6 +35,7 @@ export function Dropzone({
   disabled = false,
   children,
   locale,
+  action,
 }: {
   onFiles: (files: File[]) => void;
   accept?: string;
@@ -47,6 +48,8 @@ export function Dropzone({
   children?: ReactNode;
   /** Language of the button inside the zone (guessed from the title when omitted). */
   locale?: "ru" | "en";
+  /** Text of the button inside the zone instead of "Выбрать файл(ы)" / "Добавить ещё" (e.g. "Другой файл"). */
+  action?: string;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const rootRef = useRef<HTMLDivElement>(null);
@@ -127,7 +130,7 @@ export function Dropzone({
         )}
       >
         <Upload aria-hidden />
-        {CHOOSE[locale ?? lang(title)][compact ? "more" : multiple ? "many" : "one"]}
+        {action ?? CHOOSE[locale ?? lang(title)][compact ? "more" : multiple ? "many" : "one"]}
       </span>
       <span id={`${id}-title`} className={cn("font-semibold text-fg", compact ? "text-[0.9375rem]" : "text-base")}>
         {typeof title === "string" && touchTitle(title) ? (

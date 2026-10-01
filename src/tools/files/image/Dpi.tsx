@@ -8,7 +8,8 @@ import { readPngDpi, readPngHeader, setPngDpi } from "./lib/container";
 import { jpegDisplaySize, readJfifDensity, setJpegDpi } from "./lib/jpeg";
 import { baseName, type Prepared } from "./lib/source";
 import { BatchWorkspace } from "./ui/BatchWorkspace";
-import { ChipGroup, NumberField } from "./ui/controls";
+import { NumberField } from "./ui/controls";
+import { ChipChoice } from "@/ui/chip-choice";
 import { useBatch, type Runner } from "./ui/useBatch";
 
 const T = {
@@ -82,7 +83,7 @@ export default function Dpi({ locale }: { locale: Locale }) {
     <>
       <NumberField label={t.dpi} value={dpi} onChange={setDpi} min={1} max={2400} step={1} suffix="dpi" stepper locale={locale} />
       <Field label={t.presets}>
-        <ChipGroup label={t.presets} value={value} onChange={setDpi} options={PRESETS.map((d) => ({ value: d as number, label: String(d) }))} />
+        <ChipChoice layout="wrap" label={t.presets} value={value} onChange={setDpi} options={PRESETS.map((d) => ({ value: d as number, label: String(d) }))} />
       </Field>
     </>
   );

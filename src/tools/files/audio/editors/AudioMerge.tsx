@@ -13,7 +13,8 @@ import { MEDIA_ACCEPT } from "@/tools/files/video/ui/FilePicker";
 import { useJob } from "@/tools/files/video/ui/hooks";
 import { JobProgress } from "@/tools/files/video/ui/Progress";
 import { ResultCard } from "@/tools/files/video/ui/ResultCard";
-import { ChoiceChips, Setting, StepSlider } from "@/tools/files/video/ui/options";
+import { Setting, StepSlider } from "@/tools/files/video/ui/options";
+import { ChipChoice } from "@/ui/chip-choice";
 import { UI } from "@/tools/files/video/ui/strings";
 
 const T = {
@@ -148,7 +149,7 @@ export default function AudioMerge({ locale }: { locale: Locale }) {
           </div>
           <StepSlider label={t.crossfade} value={crossfade} steps={CROSSFADES} format={(x) => (x ? `${formatNumber(locale, x)} ${t.sec}` : t.none)} onChange={(x) => (setCrossfade(x), touch())} />
           <Setting label={t.format}>
-            <ChoiceChips label={t.format} value={target} onChange={(x) => (setTarget(x), touch())} options={TARGETS.map((x) => ({ value: x, label: LABEL[x] }))} />
+            <ChipChoice label={t.format} value={target} onChange={(x) => (setTarget(x), touch())} options={TARGETS.map((x) => ({ value: x, label: LABEL[x] }))} />
           </Setting>
           {target !== "wav" && target !== "flac" && (
             <StepSlider label={t.bitrate} value={bitrate} steps={BITRATES.filter((k) => target !== "opus" || k <= 256000)} format={(k) => `${k / 1000} ${t.kbps}`} onChange={(x) => (setBitrate(x), touch())} />

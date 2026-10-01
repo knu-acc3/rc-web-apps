@@ -9,7 +9,7 @@ import { Button } from "@/ui/button";
 import { Field, Input, Switch } from "@/ui/field";
 import { Panel } from "@/ui/panel";
 import { Segmented } from "@/ui/segmented";
-import { ChipChoice } from "../shared/ChipChoice";
+import { ChipChoice } from "@/ui/chip-choice";
 import { OptionGroup } from "./ui/kit";
 import { JS_FORMAT, LABEL, prepareBarcode, SAMPLE, SYMBOLOGIES, type BarcodeError, type Symbology } from "./lib/barcode";
 

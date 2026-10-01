@@ -18,7 +18,8 @@ import { JobProgress, ProgressBar } from "@/tools/files/video/ui/Progress";
 import { RangeSelector, TimeInput } from "@/tools/files/video/ui/RangeSelector";
 import { ResultCard } from "@/tools/files/video/ui/ResultCard";
 import { UI } from "@/tools/files/video/ui/strings";
-import { ChoiceChips, Setting, StepSlider } from "@/tools/files/video/ui/options";
+import { Setting, StepSlider } from "@/tools/files/video/ui/options";
+import { ChipChoice } from "@/ui/chip-choice";
 import { Waveform } from "@/tools/files/video/ui/Waveform";
 import { Workbench } from "@/tools/files/video/ui/Workbench";
 import { fromDb, getAudioContext, toDb } from "../lib/audio";
@@ -326,7 +327,7 @@ function AudioEditorInner({ locale, mode }: { locale: Locale; mode: EditorMode }
         return (
           <>
             <Setting label={t.speed}>
-              <ChoiceChips label={t.speed} value={speed} onChange={(x) => (setSpeed(x), touch())} options={SPEEDS.map((x) => ({ value: x, label: `×${formatNumber(locale, Number(x))}` }))} />
+              <ChipChoice label={t.speed} value={speed} onChange={(x) => (setSpeed(x), touch())} options={SPEEDS.map((x) => ({ value: x, label: `×${formatNumber(locale, Number(x))}` }))} />
             </Setting>
             <StepSlider label={t.pitch} value={semis} steps={SEMIS} format={(x) => `${x > 0 ? "+" : x < 0 ? "−" : ""}${Math.abs(x)} ${t.semis}`} onChange={(x) => (setSemis(x), touch())} />
             <Switch label={t.keepPitch} checked={keepPitch} onChange={(e) => (setKeepPitch(e.target.checked), touch())} />
@@ -425,7 +426,7 @@ function AudioEditorInner({ locale, mode }: { locale: Locale; mode: EditorMode }
           <>
             {controls}
             <Setting label={t.format}>
-              <ChoiceChips label={t.format} value={out} onChange={(x) => (setTarget(x), touch())} options={TARGETS.map((x) => ({ value: x, label: LABEL[x] }))} />
+              <ChipChoice label={t.format} value={out} onChange={(x) => (setTarget(x), touch())} options={TARGETS.map((x) => ({ value: x, label: LABEL[x] }))} />
             </Setting>
             {lossy && !copyTrim && <StepSlider label={t.bitrate} value={bitrate} steps={BITRATES.filter((k) => out !== "opus" || k <= 256000)} format={(k) => `${k / 1000} ${t.kbps}`} onChange={(x) => (setBitrate(x), touch())} />}
             {copyTrim && <p className="-mt-2 text-[0.8125rem] text-ok">{t.lossless}</p>}

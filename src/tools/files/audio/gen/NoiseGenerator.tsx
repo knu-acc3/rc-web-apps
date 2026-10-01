@@ -8,7 +8,8 @@ import { Slider } from "@/ui/field";
 import { Notice, Panel } from "@/ui/panel";
 import { Segmented } from "@/ui/segmented";
 import { Fab } from "@/tools/files/video/ui/Fab";
-import { ChoiceChips, Setting } from "@/tools/files/video/ui/options";
+import { Setting } from "@/tools/files/video/ui/options";
+import { ChipChoice } from "@/ui/chip-choice";
 import { formatTime } from "@/tools/files/shared/time";
 import { createNoise, NOISE_COLORS, NOISE_WORKLET_SRC, type NoiseColor } from "../lib/noise";
 import { fadeGain, resumeAudio, smoothSet } from "../lib/audio";
@@ -203,7 +204,7 @@ function NoiseGeneratorInner({ locale, color: color0 = "white" }: { locale: Loca
             <Slider id={`${id}-v`} min={0} max={1} step={0.01} value={volume} format={pct} aria-valuetext={pct(volume)} onChange={(e) => setVolume(Number(e.target.value))} />
           </div>
           <Setting label={t.timer}>
-            <ChoiceChips label={t.timer} value={String(timer)} onChange={(x) => setTimer(Number(x))} options={TIMERS.map((m) => ({ value: String(m), label: m === 0 ? t.never : m < 60 ? `${m} ${t.min}` : `${formatNumber(locale, m / 60)} ${t.h}` }))} />
+            <ChipChoice label={t.timer} value={String(timer)} onChange={(x) => setTimer(Number(x))} options={TIMERS.map((m) => ({ value: String(m), label: m === 0 ? t.never : m < 60 ? `${m} ${t.min}` : `${formatNumber(locale, m / 60)} ${t.h}` }))} />
           </Setting>
         </Panel>
       </div>

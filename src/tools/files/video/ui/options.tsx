@@ -1,12 +1,10 @@
 "use client";
 
-import { Check } from "lucide-react";
 import { useId, type ReactNode } from "react";
 import type { Locale } from "@/i18n/config";
 import { formatNumber } from "@/i18n/format";
 import { cn } from "@/lib/cn";
 import { Field, Select, Slider, Switch } from "@/ui/field";
-import { ScrollRow } from "@/ui/scroll-row";
 import { Segmented } from "@/ui/segmented";
 import type { AudioSpec, GifSpec, Target } from "../../shared/spec";
 
@@ -119,57 +117,6 @@ export function StepSlider<V extends number>({
       </div>
       <Slider id={id} min={0} max={steps.length - 1} step={1} value={i} disabled={disabled} aria-valuetext={format(steps[i])} format={(x) => format(steps[x])} onChange={(e) => onChange(steps[Number(e.target.value)])} />
     </div>
-  );
-}
-
-/**
- * One choice out of many (6+ speeds, formats, time signatures) as radio chips in a row that scrolls sideways when
- * it doesn't fit (never a wrapping wall). ←/→ move the choice.
- */
-export function ChoiceChips<V extends string>({
-  label,
-  value,
-  onChange,
-  options,
-  size = "md",
-  className,
-}: {
-  label: string;
-  value: V;
-  onChange: (v: V) => void;
-  options: readonly { value: V; label: ReactNode; title?: string }[];
-  size?: "md" | "lg";
-  className?: string;
-}) {
-  return (
-    <ScrollRow role="radiogroup" label={label} className={className}>
-      {options.map((o, i) => {
-        const on = o.value === value;
-        return (
-          <button
-            key={o.value}
-            type="button"
-            role="radio"
-            aria-checked={on}
-            tabIndex={on ? 0 : -1}
-            title={o.title}
-            onClick={() => onChange(o.value)}
-            onKeyDown={(e) => {
-              const dir = e.key === "ArrowRight" || e.key === "ArrowDown" ? 1 : e.key === "ArrowLeft" || e.key === "ArrowUp" ? -1 : 0;
-              if (!dir) return;
-              e.preventDefault();
-              const j = (i + dir + options.length) % options.length;
-              onChange(options[j].value);
-              (e.currentTarget.parentElement?.children[j] as HTMLElement | undefined)?.focus();
-            }}
-            className={cn("chip tabular shrink-0 font-semibold!", size === "lg" ? "min-h-11! px-4! text-[0.9375rem]!" : "min-h-10! px-3.5!")}
-          >
-            {on && <Check className="size-4" strokeWidth={2.75} aria-hidden />}
-            {o.label}
-          </button>
-        );
-      })}
-    </ScrollRow>
   );
 }
 
