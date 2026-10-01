@@ -1,7 +1,8 @@
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { ImageResponse } from "next/og";
-import { BRAND, BRAND_MARK } from "@/config/brand";
+import { BRAND } from "@/config/brand";
+import { LOGO } from "@/site/logo-mark";
 import { isLocale, LOCALES, tr } from "@/i18n/config";
 import { getSection, liveSections } from "@/registry";
 
@@ -37,9 +38,10 @@ export async function GET(_req: Request, { params }: { params: Promise<{ locale:
     (
       <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", justifyContent: "space-between", background: "#F6F6F3", padding: "72px 80px", fontFamily: "Onest, OnestCyr" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
-          <div style={{ width: 72, height: 72, borderRadius: 18, background: BRAND.color, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 30, fontWeight: 700 }}>
-            {BRAND_MARK}
-          </div>
+          <svg width="76" height="76" viewBox={LOGO.viewBox}>
+            <path d={LOGO.cookie} fill={LOGO.color} />
+            <path d={LOGO.spark} fill="#fff" />
+          </svg>
           <div style={{ fontSize: 34, fontWeight: 700, color: "#15161A" }}>{BRAND.name}</div>
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>

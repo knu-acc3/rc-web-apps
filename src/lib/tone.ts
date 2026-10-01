@@ -71,11 +71,15 @@ export function toneVars(hue: number | undefined): Record<string, string> {
     "--t-soft": oklchHex(0.96, 0.035, h),
     "--t-stage": oklchHex(0.976, 0.014, h),
     "--t-line": oklchHex(0.915, 0.03, h),
+    "--t-cont": oklchHex(0.905, 0.06, h),
+    "--t-on-cont": oklchHex(0.33, 0.11, h),
     "--t-acc-d": oklchHex(0.76, 0.13, h),
     "--t-acc-hd": oklchHex(0.82, 0.12, h),
     "--t-soft-d": oklchHex(0.28, 0.05, h),
     "--t-stage-d": oklchHex(0.195, 0.016, h),
     "--t-line-d": oklchHex(0.285, 0.03, h),
+    "--t-cont-d": oklchHex(0.33, 0.07, h),
+    "--t-on-cont-d": oklchHex(0.91, 0.05, h),
   };
   cache.set(key, vars);
   return vars;

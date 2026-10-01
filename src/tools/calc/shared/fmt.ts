@@ -6,6 +6,13 @@ import { formatNumber, formatSmart } from "@/i18n/format";
 export type Currency = "KZT" | "RUB" | "USD" | "EUR";
 export const CURRENCIES: readonly Currency[] = ["KZT", "RUB", "USD", "EUR"];
 export const CURRENCY_SYMBOL: Record<Currency, string> = { KZT: "₸", RUB: "₽", USD: "$", EUR: "€" };
+
+/** Slider ends for money in another currency: a tenge amount scaled roughly to the currency and rounded nicely. */
+export function moneyMax(cur: Currency, kzt: number): number {
+  const v = kzt * { KZT: 1, RUB: 0.2, USD: 0.002, EUR: 0.002 }[cur];
+  const mag = 10 ** Math.floor(Math.log10(v));
+  return Math.ceil(v / mag) * mag;
+}
 /** Name of the minor unit, for texts like «округление до тиынов». */
 export const MINOR_UNIT: Record<Locale, Record<Currency, string>> = {
   ru: { KZT: "тиын", RUB: "копейка", USD: "цент", EUR: "цент" },

@@ -1,5 +1,5 @@
 import { LayoutGrid, Menu, X } from "lucide-react";
-import { href, LOCALES, LOCALE_LABEL, type Locale } from "@/i18n/config";
+import { href, type Locale } from "@/i18n/config";
 import { ui } from "@/i18n/ui";
 import { sectionsByCategory } from "@/registry";
 import { CATEGORY_LOOK } from "@/registry/categories";
@@ -25,7 +25,7 @@ export function Header({ locale }: { locale: Locale }) {
         <Logo locale={locale} />
         <div className="flex min-w-0 flex-1 items-center justify-end gap-1 sm:gap-2">
           <SearchBox locale={locale} labels={searchLabels} />
-          <a href={href(locale, ["all"])} className={buttonClass("ghost", "md", "hidden! gap-2 px-3 text-fg sm:inline-flex!")}>
+          <a href={href(locale, ["all"])} className={buttonClass("tonal", "md", "hidden! gap-2 px-4 sm:inline-flex!")}>
             <LayoutGrid aria-hidden />
             <span className="hidden lg:inline">{t.catalog}</span>
             <span className="lg:hidden">{t.catalogShort}</span>
@@ -77,13 +77,7 @@ function SiteMenu({ locale }: { locale: Locale }) {
         <div className="flex flex-col gap-4 border-t border-line pt-5">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <span className="text-sm font-medium text-fg-2">{t.language}</span>
-            <div className="flex gap-1">
-              {LOCALES.map((l) => (
-                <a key={l} href={href(l)} hrefLang={l} lang={l} aria-current={l === locale ? "true" : undefined} className={buttonClass(l === locale ? "secondary" : "ghost", "sm")}>
-                  {LOCALE_LABEL[l]}
-                </a>
-              ))}
-            </div>
+            <LangSwitch locale={locale} full />
           </div>
           <div className="flex flex-wrap items-center justify-between gap-3">
             <span className="text-sm font-medium text-fg-2">{t.theme}</span>

@@ -6,7 +6,8 @@
  *
  *   <CalcGrid
  *     inputs={<>
- *       <NumField size="lg" …/>             primary inputs (1–3)
+ *       <NumSlider …/>                       numbers with a sensible range: value on the line + a slider
+ *       <NumField size="lg" …/>             free numbers (1–3)
  *       <OptionsRow>…</OptionsRow>           at most one quiet row of secondary options
  *       <Advanced title=…>…</Advanced>       rarely used inputs, collapsed
  *     </>}
@@ -18,7 +19,7 @@
  * output formatted with ./fmt, state in the URL via `useQueryState`, `aria-live` only on ResultMain.
  */
 
-import { Info, RotateCcw } from "lucide-react";
+import { ChevronDown, Info, RotateCcw } from "lucide-react";
 import type { ReactNode } from "react";
 import type { Locale } from "@/i18n/config";
 import { cn } from "@/lib/cn";
@@ -27,6 +28,9 @@ import { CopyButton } from "@/ui/copy-button";
 import { Field, Input, Select } from "@/ui/field";
 import { Notice, Panel } from "@/ui/panel";
 import { Segmented } from "@/ui/segmented";
+import { SliderField } from "@/ui/slider-field";
+import type { Scale } from "@/lib/slider-scale";
+import { parseLocaleNumber, toInput } from "./num";
 
 const K = {
   ru: {
@@ -103,6 +107,65 @@ export function NumField({
         )}
       </div>
     </Field>
+  );
+}
+
+/**
+ * A number with a sensible range — age, sum, rate, term: the value is written on the line (tap to type) and a slider
+ * under it changes it by dragging. Same text state as NumField. Money ranges use `scale="log"`.
+ */
+export function NumSlider({
+  id,
+  locale,
+  label,
+  value,
+  onChange,
+  min,
+  max,
+  step,
+  scale,
+  suffix,
+  hint,
+  error,
+  decimals = 0,
+  inputMode,
+  className,
+}: {
+  id: string;
+  locale: Locale;
+  label: ReactNode;
+  value: string;
+  onChange: (v: string) => void;
+  min: number;
+  max: number;
+  step?: number;
+  scale?: Scale;
+  suffix?: string;
+  hint?: ReactNode;
+  error?: ReactNode;
+  /** Decimals kept when dragging (rates: 1). */
+  decimals?: number;
+  inputMode?: "decimal" | "numeric";
+  className?: string;
+}) {
+  return (
+    <SliderField
+      id={id}
+      label={label}
+      value={value}
+      onChange={onChange}
+      parse={(t) => parseLocaleNumber(locale, t)}
+      format={(n) => toInput(locale, n, decimals)}
+      min={min}
+      max={max}
+      step={step ?? (decimals > 0 ? 10 ** -decimals : undefined)}
+      scale={scale}
+      suffix={suffix}
+      hint={hint}
+      error={error}
+      inputMode={inputMode ?? (decimals > 0 ? "decimal" : "numeric")}
+      className={className}
+    />
   );
 }
 
@@ -205,17 +268,17 @@ export function InlineToggle<T extends string>({
   );
 }
 
-/** Rarely used inputs, collapsed by default. */
+/** Rarely used inputs, collapsed by default: a text button with a chevron. */
 export function Advanced({ title, children, open }: { title: ReactNode; children: ReactNode; open?: boolean }) {
   return (
-    <details className="group border-t border-line pt-3" open={open || undefined}>
-      <summary className="flex cursor-pointer items-center gap-1.5 text-sm font-medium text-fg-2 hover:text-fg">
-        <span aria-hidden className="inline-block transition-transform duration-150 group-open:rotate-90">
-          ›
+    <details className="fold fold-inline group -ml-2" open={open || undefined}>
+      <summary>
+        <span className="fold-i" aria-hidden>
+          <ChevronDown className="size-4" />
         </span>
         {title}
       </summary>
-      <div className="mt-3 flex flex-col gap-3">{children}</div>
+      <div className="mt-2 flex flex-col gap-4 pl-2">{children}</div>
     </details>
   );
 }
@@ -226,7 +289,7 @@ export function Advanced({ title, children, open }: { title: ReactNode; children
 export function CalcGrid({ inputs, result, className }: { inputs: ReactNode; result: ReactNode; className?: string }) {
   return (
     <div className={cn("grid items-start gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-6", className)}>
-      <Panel className="flex min-w-0 flex-col gap-4 p-4 sm:p-5">{inputs}</Panel>
+      <Panel className="flex min-w-0 flex-col gap-5 p-4 sm:p-6">{inputs}</Panel>
       <div className="flex min-w-0 flex-col gap-4 lg:sticky lg:top-20">{result}</div>
     </div>
   );
@@ -269,7 +332,7 @@ export function ResultMain({
   size?: "md" | "lg";
 }) {
   return (
-    <div className={cn("min-w-0 rounded-[0.75rem] bg-accent-soft p-5 sm:p-6", className)}>
+    <div className={cn("min-w-0 rounded-[1.25rem] bg-accent-soft p-5 sm:p-6", className)}>
       <div className="text-sm font-medium text-fg-2">{label}</div>
       <div
         aria-live="polite"
@@ -307,7 +370,7 @@ export function ResultRows({ rows, title, className }: { rows: ResultRow[]; titl
   return (
     <section className={cn("min-w-0", className)}>
       {title && <h2 className="mb-2 text-base font-semibold text-fg">{title}</h2>}
-      <dl className="divide-y divide-line overflow-hidden rounded-[0.75rem] border border-line bg-surface">
+      <dl className="panel divide-y divide-line overflow-hidden">
         {rows.map((r, i) => (
           <div key={i} className="flex items-baseline justify-between gap-4 px-4 py-2.5">
             <dt className="min-w-0 text-[0.9375rem] text-fg-2">
@@ -344,9 +407,10 @@ export function Explain({
     <section className={cn("min-w-0", className)}>
       <h2 className="text-base font-semibold text-fg">{title ?? K[locale].how}</h2>
       {formula && formula.length > 0 && (
-        <div className="mt-3 overflow-x-auto rounded-[0.625rem] border border-line bg-surface px-4 py-3 font-mono text-[0.8125rem] leading-relaxed text-fg sm:text-sm">
+        <div className="mt-3 flex flex-col gap-2 rounded-[1rem] bg-surface-2 px-4 py-3 font-mono text-[0.8125rem] leading-relaxed text-fg sm:text-sm">
           {formula.map((l, i) => (
-            <div key={i} className="whitespace-pre">
+            // Long formulas wrap (with a hanging indent) instead of running off a phone screen.
+            <div key={i} className="whitespace-pre-wrap pl-4 -indent-4 [overflow-wrap:anywhere]">
               {l}
             </div>
           ))}

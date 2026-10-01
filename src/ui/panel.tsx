@@ -1,9 +1,13 @@
 import type { ComponentProps, ReactNode } from "react";
 import { cn } from "@/lib/cn";
 
-/** Bordered surface. The main building block of tool UIs. */
-export function Panel({ className, ...props }: ComponentProps<"div">) {
-  return <div className={cn("rounded-[0.75rem] border border-line bg-surface", className)} {...props} />;
+/**
+ * Material 3 card — the main building block of tool UIs. "elevated" (default): white with a soft shadow, no border;
+ * "filled"/"inset": a tonal block; "outlined": a hairline. A card inside a card automatically becomes a tonal inset
+ * (`.panel .panel` in globals.css), so borders never nest.
+ */
+export function Panel({ className, variant = "elevated", ...props }: ComponentProps<"div"> & { variant?: "elevated" | "filled" | "outlined" | "inset" }) {
+  return <div className={cn("panel", variant !== "elevated" && `panel-${variant}`, className)} {...props} />;
 }
 
 export function PanelHeader({
@@ -16,7 +20,7 @@ export function PanelHeader({
   className?: string;
 }) {
   return (
-    <div className={cn("flex min-h-12 items-center justify-between gap-3 border-b border-line px-4 py-2", className)}>
+    <div className={cn("flex min-h-12 items-center justify-between gap-3 border-b border-line px-4 py-2 sm:px-5", className)}>
       <div className="min-w-0 truncate text-sm font-semibold text-fg">{title}</div>
       {actions && <div className="flex shrink-0 items-center gap-1.5">{actions}</div>}
     </div>
@@ -40,7 +44,7 @@ export function Stat({
   action?: ReactNode;
 }) {
   return (
-    <div className={cn("min-w-0 rounded-[0.625rem] bg-surface-2 px-4 py-3", className)}>
+    <div className={cn("min-w-0 rounded-[1rem] bg-surface-2 px-4 py-3", className)}>
       <div className="flex items-start justify-between gap-2">
         <div className="text-[0.8125rem] font-medium text-fg-2">{label}</div>
         {action}
@@ -101,5 +105,5 @@ export function Notice({
     warn: "bg-warn-soft text-warn",
     err: "bg-err-soft text-err",
   } as const;
-  return <div role={tone === "err" ? "alert" : undefined} className={cn("rounded-[0.625rem] px-4 py-3 text-sm", tones[tone], className)} {...props} />;
+  return <div role={tone === "err" ? "alert" : undefined} className={cn("rounded-[1rem] px-4 py-3 text-sm", tones[tone], className)} {...props} />;
 }

@@ -1,8 +1,9 @@
 import Link from "@/ui/link";
 import { BRAND } from "@/config/brand";
-import { href, LOCALES, LOCALE_LABEL, type Locale } from "@/i18n/config";
+import { href, type Locale } from "@/i18n/config";
 import { ui } from "@/i18n/ui";
 import { navigation } from "@/registry";
+import { LangSwitch } from "./lang-switch";
 import { LogoMark } from "./logo";
 import { ThemeSwitch } from "./theme";
 
@@ -35,7 +36,13 @@ export function Footer({ locale }: { locale: Locale }) {
           <div className="flex items-start gap-2.5">
             <LogoMark className="size-7" />
             <span>
-              © {new Date().getFullYear()} {BRAND.name}. {t.privacyNote}
+              © {new Date().getFullYear()} {BRAND.name}. {t.privacyNote}{" "}
+              <span className="whitespace-nowrap">
+                {t.author}{" "}
+                <a href={BRAND.author.url} rel="author" className="font-semibold text-fg-2 underline-offset-2 hover:text-accent hover:underline">
+                  {BRAND.author.name}
+                </a>
+              </span>
             </span>
           </div>
           <div className="flex flex-wrap items-center gap-x-4 gap-y-3">
@@ -52,12 +59,8 @@ export function Footer({ locale }: { locale: Locale }) {
               <Link href={href(locale, ["about", "terms"])} className="hover:text-accent">
                 {t.terms}
               </Link>
-              {LOCALES.map((l) => (
-                <Link key={l} href={href(l)} hrefLang={l} lang={l} className={l === locale ? "text-fg-2" : "hover:text-accent"}>
-                  {LOCALE_LABEL[l]}
-                </Link>
-              ))}
             </nav>
+            <LangSwitch locale={locale} full />
             <ThemeSwitch labels={{ theme: t.theme, system: t.themeSystem, light: t.themeLight, dark: t.themeDark }} />
           </div>
         </div>

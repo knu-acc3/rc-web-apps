@@ -4,9 +4,9 @@ import { useId } from "react";
 import { plural } from "@/i18n/format";
 import type { ToolProps } from "../../../types";
 import { LineChart } from "../../shared/charts";
-import { CURRENCIES, CURRENCY_SYMBOL, fmtCompact, fmtMoney, fmtN, isCurrency, type Currency } from "../../shared/fmt";
+import { CURRENCIES, CURRENCY_SYMBOL, fmtCompact, fmtMoney, fmtN, isCurrency, moneyMax, type Currency } from "../../shared/fmt";
 import { field, toInput } from "../../shared/num";
-import { Advanced, CalcGrid, Disclaimer, Explain, FieldRow, NumField, OptionsRow, ResultMain, Stack, SubHeading, ToolActions } from "../../shared/ui";
+import { Advanced, CalcGrid, Disclaimer, Explain, FieldRow, NumField, NumSlider, OptionsRow, ResultMain, Stack, SubHeading, ToolActions } from "../../shared/ui";
 import { useQueryState } from "../../shared/url-state";
 import { retirement } from "../lib/growth";
 import { CurrencySelect } from "../loan/parts";
@@ -19,9 +19,9 @@ const T = {
     monthly: "Откладываю в месяц",
     income: "Желаемый доход на пенсии в месяц",
     incomeHint: "В сегодняшних деньгах",
-    returnPre: "Доходность до пенсии, %",
-    returnPost: "Доходность на пенсии, %",
-    inflation: "Инфляция, %",
+    returnPre: "Доходность до пенсии",
+    returnPost: "Доходность на пенсии",
+    inflation: "Инфляция",
     more: "Горизонт и рост взносов",
     endAge: "Планировать до возраста",
     increase: "Рост взносов, % в год",
@@ -47,9 +47,9 @@ const T = {
     monthly: "Monthly saving",
     income: "Desired monthly income in retirement",
     incomeHint: "In today's money",
-    returnPre: "Return before retirement, %",
-    returnPost: "Return in retirement, %",
-    inflation: "Inflation, %",
+    returnPre: "Return before retirement",
+    returnPost: "Return in retirement",
+    inflation: "Inflation",
     more: "Horizon and contribution growth",
     endAge: "Plan until age",
     increase: "Contribution growth, % per year",
@@ -125,26 +125,24 @@ export default function Retirement({ locale }: ToolProps) {
 
   const inputs = (
     <>
-      <FieldRow>
-        <NumField id={`${id}-a`} label={t.age} value={q.v.a} onChange={(a) => q.set({ a })} error={A.message} inputMode="numeric" size="lg" />
-        <NumField id={`${id}-ra`} label={t.retireAge} value={q.v.ra} onChange={(ra) => q.set({ ra })} error={RA.message ?? ageErr} inputMode="numeric" size="lg" />
+      <FieldRow className="gap-x-6 gap-y-5">
+        <NumSlider id={`${id}-a`} locale={locale} label={t.age} value={q.v.a} onChange={(a) => q.set({ a })} error={A.message} min={14} max={80} />
+        <NumSlider id={`${id}-ra`} locale={locale} label={t.retireAge} value={q.v.ra} onChange={(ra) => q.set({ ra })} error={RA.message ?? ageErr} min={40} max={80} />
       </FieldRow>
-      <FieldRow>
-        <NumField id={`${id}-s`} label={t.savings} value={q.v.s} onChange={(s) => q.set({ s })} suffix={sym} error={S.message} />
-        <NumField id={`${id}-m`} label={t.monthly} value={q.v.m} onChange={(m) => q.set({ m })} suffix={sym} error={M.message} />
-      </FieldRow>
-      <NumField id={`${id}-inc`} label={t.income} hint={t.incomeHint} value={q.v.inc} onChange={(inc) => q.set({ inc })} suffix={sym} error={INC.message} />
-      <div className="grid gap-3 min-[480px]:grid-cols-3">
-        <NumField id={`${id}-rp`} label={t.returnPre} value={q.v.rp} onChange={(rp) => q.set({ rp })} error={RP.message} size="sm" />
-        <NumField id={`${id}-rq`} label={t.returnPost} value={q.v.rq} onChange={(rq) => q.set({ rq })} error={RQ.message} size="sm" />
-        <NumField id={`${id}-n`} label={t.inflation} value={q.v.n} onChange={(n) => q.set({ n })} error={N.message} size="sm" />
+      <NumSlider id={`${id}-s`} locale={locale} label={t.savings} value={q.v.s} onChange={(s) => q.set({ s })} suffix={sym} error={S.message} min={0} max={moneyMax(cur, 50_000_000)} scale="log" />
+      <NumSlider id={`${id}-m`} locale={locale} label={t.monthly} value={q.v.m} onChange={(m) => q.set({ m })} suffix={sym} error={M.message} min={0} max={moneyMax(cur, 1_000_000)} scale="log" />
+      <NumSlider id={`${id}-inc`} locale={locale} label={t.income} hint={t.incomeHint} value={q.v.inc} onChange={(inc) => q.set({ inc })} suffix={sym} error={INC.message} min={0} max={moneyMax(cur, 3_000_000)} scale="log" />
+      <div className="grid gap-x-6 gap-y-5 min-[480px]:grid-cols-3">
+        <NumSlider id={`${id}-rp`} locale={locale} label={t.returnPre} value={q.v.rp} onChange={(rp) => q.set({ rp })} error={RP.message} min={0} max={25} decimals={1} suffix="%" />
+        <NumSlider id={`${id}-rq`} locale={locale} label={t.returnPost} value={q.v.rq} onChange={(rq) => q.set({ rq })} error={RQ.message} min={0} max={25} decimals={1} suffix="%" />
+        <NumSlider id={`${id}-n`} locale={locale} label={t.inflation} value={q.v.n} onChange={(n) => q.set({ n })} error={N.message} min={0} max={30} decimals={1} suffix="%" />
       </div>
       <OptionsRow>
         <CurrencySelect id={`${id}-c`} locale={locale} value={cur} onChange={(c) => q.set({ c })} />
       </OptionsRow>
       <Advanced title={t.more}>
-        <FieldRow>
-          <NumField id={`${id}-ea`} label={t.endAge} value={q.v.ea} onChange={(ea) => q.set({ ea })} error={EA.message ?? endErr} inputMode="numeric" />
+        <FieldRow className="gap-x-6 gap-y-5">
+          <NumSlider id={`${id}-ea`} locale={locale} label={t.endAge} value={q.v.ea} onChange={(ea) => q.set({ ea })} error={EA.message ?? endErr} min={60} max={110} />
           <NumField id={`${id}-g`} label={t.increase} value={q.v.g} onChange={(g) => q.set({ g })} suffix="%" error={G.message} placeholder="0" />
         </FieldRow>
       </Advanced>

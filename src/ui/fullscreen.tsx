@@ -105,7 +105,7 @@ export function Presentable({
         onClick={() => void toggle()}
         aria-label={active ? t.exit : t.full}
         title={active ? t.exit : t.full}
-        className="absolute right-2 top-2 z-10 flex size-9 items-center justify-center rounded-full text-fg-3 transition-colors hover:bg-surface-2 hover:text-fg pointer-coarse:size-10"
+        className="btn btn-tonal btn-round absolute right-2 top-2 z-10 size-10 pointer-coarse:size-11"
       >
         {active ? <Minimize className="size-[1.125rem]" aria-hidden /> : <Maximize className="size-[1.125rem]" aria-hidden />}
       </button>

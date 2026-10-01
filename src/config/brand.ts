@@ -11,8 +11,10 @@ export const BRAND = {
     ru: "Онлайн-инструменты, которые работают прямо в браузере",
     en: "Online tools that work right in your browser",
   },
-  /** Brand accent used in OG images, manifest and theme-color. */
-  color: "#2952FF",
+  /** Logo colour (src/site/logo-mark.ts), used by OG images and the web app manifest. */
+  color: "#FF6B00",
+  /** Who made the site: credited in the footer of every page. */
+  author: { name: "rc-web.kz", url: "https://rc-web.kz" },
   /** Search engine verification codes (empty = not rendered). */
   verification: {
     google: "MAC5dCagquZqUeHrwagiZKVNfEExuqSaXBkTL12Tpgo",
@@ -28,6 +30,3 @@ export const BRAND = {
 } as const;
 
 export const SITE_URL = `https://${BRAND.domain}`;
-
-/** Monogram used by the logo mark and favicons: first letter of the brand. */
-export const BRAND_MARK = BRAND.shortName.slice(0, 2).toUpperCase();
