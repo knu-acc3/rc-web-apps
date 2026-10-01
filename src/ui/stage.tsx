@@ -180,7 +180,7 @@ export function StageLayer({
       <div
         onClick={(e) => e.stopPropagation()}
         className={cn(
-          "absolute left-1/2 top-3 flex max-w-[calc(100%-1.5rem)] -translate-x-1/2 items-center gap-2 rounded-full py-1.5 pl-4 pr-1.5 text-sm shadow-[var(--shadow-overlay)] transition-opacity duration-500 [padding-top:max(0.375rem,env(safe-area-inset-top))]",
+          "absolute inset-x-3 top-3 mx-auto flex w-fit max-w-full items-center gap-2 rounded-full py-1.5 pl-4 pr-1.5 text-sm shadow-[var(--shadow-overlay)] transition-opacity duration-500 [padding-top:max(0.375rem,env(safe-area-inset-top))]",
           dark ? "bg-white/90 text-black" : "bg-black/75 text-white",
           awake ? "opacity-100" : "pointer-events-none opacity-0",
         )}

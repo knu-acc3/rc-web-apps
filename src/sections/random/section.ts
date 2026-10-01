@@ -3,6 +3,7 @@ import { defineToolSection } from "@/registry/tool-section";
 import type { Block } from "@/registry/types";
 import { diceTool } from "./defs/dice";
 import { letterTool } from "./defs/letters";
+import { lotsTool } from "./defs/lots";
 import { lotteryTool } from "./defs/lottery";
 import { nameTool } from "./defs/names";
 import { numberTool } from "./defs/number";
@@ -62,6 +63,6 @@ export const randomSection = defineToolSection({
   hue: 300,
   category: "random",
   order: 1,
-  tools: [wheelTool, numberTool, coinTool, diceTool, pickerTool, teamsTool, yesNoTool, lotteryTool, nameTool, letterTool, cardTool, rpsTool, santaTool, dateTool],
+  tools: [wheelTool, numberTool, coinTool, diceTool, pickerTool, lotsTool, teamsTool, yesNoTool, lotteryTool, nameTool, letterTool, cardTool, rpsTool, santaTool, dateTool],
   hubBlocks,
 });

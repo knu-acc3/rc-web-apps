@@ -18,6 +18,7 @@ const BY_SECTION: Record<string, PageLayout> = {
   time: "screen",
   test: "screen",
   screen: "screen",
+  score: "screen",
   "actual-size": "screen",
   emoji: "reference",
   symbols: "reference",

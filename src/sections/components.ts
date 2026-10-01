@@ -23,6 +23,7 @@ import { components as numbers } from "./numbers/components";
 import { components as sizes } from "./sizes/components";
 import { components as actualSize } from "./actual-size/components";
 import { components as random } from "./random/components";
+import { components as score } from "./score/components";
 import { components as color } from "./color/components";
 import { components as css } from "./css/components";
 import { components as code } from "./code/components";
@@ -71,6 +72,7 @@ export const COMPONENTS: ComponentMap = {
   ...sizes,
   ...actualSize,
   ...random,
+  ...score,
   ...color,
   ...css,
   ...code,

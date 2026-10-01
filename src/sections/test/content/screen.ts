@@ -2,7 +2,7 @@ import type { ToolDef } from "@/registry/types";
 
 export const deadPixelTool: ToolDef = {
   slug: "dead-pixel-test",
-  related: ["screen-resolution", "screen-dpi"],
+  related: ["stuck-pixel-fix", "monitor-test", "black-screen", "screen-resolution"],
   component: "test/dead-pixel",
   icon: "Monitor",
   popular: true,
@@ -39,12 +39,12 @@ export const deadPixelTool: ToolDef = {
     ru: [
       "Битый (мёртвый) пиксель не светится совсем и заметен как чёрная точка на белом и цветных фонах. Застрявший, наоборот, всегда горит одним цветом — красным, зелёным или синим — и лучше всего виден на чёрном фоне.",
       "На чёрной заливке ищите светящиеся точки, на белой — тёмные, на красной, зелёной и синей — точки, где не работает один из субпикселей. Серый фон помогает заметить неравномерность подсветки и «грязный экран» — пятна и полосы.",
-      "Сайт не «лечит» пиксели. Застрявшие иногда восстанавливаются сами после нескольких часов работы, мёртвые — нет: это аппаратный дефект. Условия замены по гарантии зависят от производителя и магазина.",
+      "Застрявшие пиксели иногда восстанавливаются сами после нескольких часов работы или после мерцания цветов (инструмент «Исправить застрявший пиксель»), мёртвые — нет: это аппаратный дефект. Условия замены по гарантии зависят от производителя и магазина.",
     ],
     en: [
       "A dead pixel doesn't light up at all and shows as a black dot on white and coloured backgrounds. A stuck pixel is the opposite: it's always lit in one colour — red, green or blue — and is easiest to spot on black.",
       "On black look for lit dots, on white for dark ones, and on red, green and blue for dots where one subpixel isn't working. Gray helps reveal uneven backlight and the “dirty screen effect” — blotches and bands.",
-      "This site doesn't “fix” pixels. Stuck pixels sometimes recover on their own after hours of use; dead ones don't — it's a hardware defect. Warranty replacement terms depend on the manufacturer and the shop.",
+      "Stuck pixels sometimes recover on their own after hours of use or after colour flicker (see the Stuck pixel fixer); dead ones don't — it's a hardware defect. Warranty replacement terms depend on the manufacturer and the shop.",
     ],
   },
   faq: {
@@ -59,7 +59,7 @@ export const deadPixelTool: ToolDef = {
       },
       {
         q: "Можно ли вылечить пиксель программой?",
-        a: "Мёртвый — нет. Застрявший иногда «оживает» после быстрого мерцания цветов или лёгкого массажа через мягкую ткань, но гарантии нет, а быстрое мерцание опасно для людей с фоточувствительной эпилепсией. Поэтому такой функции здесь нет.",
+        a: "Мёртвый — нет. Застрявший иногда «оживает» после быстрого мерцания цветов или лёгкого массажа через мягкую ткань, но гарантии нет. Для мерцания есть отдельный инструмент «Исправить застрявший пиксель» — он запускается только после предупреждения: быстрое мерцание опасно для людей со светочувствительной эпилепсией.",
       },
       {
         q: "Почему на iPhone не открывается полноэкранный режим?",
@@ -77,7 +77,7 @@ export const deadPixelTool: ToolDef = {
       },
       {
         q: "Can software fix a pixel?",
-        a: "Not a dead one. A stuck pixel sometimes comes back after rapid colour flashing or gentle pressure through a soft cloth, but there's no guarantee, and rapid flashing is dangerous for people with photosensitive epilepsy — so this test doesn't offer it.",
+        a: "Not a dead one. A stuck pixel sometimes comes back after rapid colour flashing or gentle pressure through a soft cloth, but there's no guarantee. The separate Stuck pixel fixer does the flashing — only after a warning, because rapid flicker is dangerous for people with photosensitive epilepsy.",
       },
       {
         q: "Why doesn't full screen work on iPhone?",

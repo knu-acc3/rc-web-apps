@@ -22,10 +22,10 @@ function linksOf(page: PageModel): string[][] {
 }
 
 describe("random section: SEO bar", () => {
-  it("publishes the landing page, 14 tools and their variants", () => {
+  it("publishes the landing page, 15 tools and their variants", () => {
     const tools = paths.filter((p) => p.length === 1 && p[0] !== "random");
     expect(paths.some((p) => p.join("/") === "random")).toBe(true);
-    expect(tools).toHaveLength(14);
+    expect(tools).toHaveLength(15);
     expect(paths.filter((p) => p[0] === "spin-the-wheel" && p.length === 2)).toHaveLength(WHEEL_PRESETS.length);
     expect(WHEEL_PRESETS.length).toBeGreaterThanOrEqual(25);
   });

@@ -15,4 +15,5 @@ export const components: ComponentMap = {
   "random/rps": () => import("./Rps"),
   "random/secret-santa": () => import("./SecretSanta"),
   "random/date": () => import("./DateGen"),
+  "random/lots": () => import("./DrawLots"),
 };

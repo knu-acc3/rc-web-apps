@@ -24,6 +24,7 @@ import { numbersSection } from "./numbers/section";
 import { sizesSection } from "./sizes/section";
 import { actualSizeSection } from "./actual-size/section";
 import { randomSection } from "./random/section";
+import { scoreSection } from "./score/section";
 import { colorSection } from "./color/section";
 import { cssSection } from "./css/section";
 import { codeSection } from "./code/section";
@@ -72,6 +73,7 @@ export const SECTIONS: SectionDef[] = [
   sizesSection,
   actualSizeSection,
   randomSection,
+  scoreSection,
   colorSection,
   cssSection,
   codeSection,
