@@ -99,7 +99,7 @@ export function Select({
 }
 
 /** Material 3 checkbox: a 18px box with a drawn check. */
-export function Checkbox({ label, className, ...props }: Omit<ComponentProps<"input">, "type"> & { label: ReactNode }) {
+export function Checkbox({ label, hideLabel = false, className, ...props }: Omit<ComponentProps<"input">, "type"> & { label: ReactNode; hideLabel?: boolean }) {
   return (
     <label className={cn("group inline-flex min-h-10 cursor-pointer items-center gap-3 text-[0.9375rem] text-fg select-none", className)}>
       <span className="relative isolate inline-flex size-[1.125rem] shrink-0">
@@ -111,7 +111,7 @@ export function Checkbox({ label, className, ...props }: Omit<ComponentProps<"in
         <Check aria-hidden strokeWidth={3.5} className="pointer-events-none absolute left-[0.1875rem] top-[0.1875rem] size-3 scale-50 text-accent-fg opacity-0 transition-[opacity,transform] duration-150 peer-checked:scale-100 peer-checked:opacity-100" />
         <span aria-hidden className="pointer-events-none absolute -inset-2.5 -z-10 rounded-full bg-fg opacity-0 transition-opacity group-hover:opacity-[0.08]" />
       </span>
-      <span>{label}</span>
+      <span className={hideLabel ? "sr-only" : undefined}>{label}</span>
     </label>
   );
 }

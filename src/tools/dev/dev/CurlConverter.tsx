@@ -51,7 +51,6 @@ export default function CurlConverter({ locale, target: target0 = "fetch" }: { l
 
   return (
     <div className="flex flex-col gap-4">
-      <CodeEditor id={`${id}-in`} locale={locale} label={t.input} value={cmd} onChange={setCmd} rows={7} sample={SAMPLE} invalid={"error" in res} />
       <Segmented
         label={t.target}
         value={target}
@@ -62,11 +61,16 @@ export default function CurlConverter({ locale, target: target0 = "fetch" }: { l
           { value: "python", label: "Python requests" },
         ]}
       />
-      {"error" in res ? (
-        <Notice tone="err">{t.error[res.error ?? ""] ?? res.error}</Notice>
-      ) : (
-        <CodeOutput value={res.code} title={target === "python" ? "Python" : "JavaScript"} filename={target === "python" ? "request.py" : "request.js"} labels={outputLabels(locale)} minRows={12} />
-      )}
+      <div className="grid gap-4 lg:grid-cols-2">
+        <CodeEditor id={`${id}-in`} locale={locale} label={t.input} value={cmd} onChange={setCmd} rows={14} sample={SAMPLE} invalid={"error" in res} />
+        {"error" in res ? (
+          <Notice tone="err" className="self-start">
+            {t.error[res.error ?? ""] ?? res.error}
+          </Notice>
+        ) : (
+          <CodeOutput value={res.code} title={target === "python" ? "Python" : "JavaScript"} filename={target === "python" ? "request.py" : "request.js"} labels={outputLabels(locale)} minRows={14} />
+        )}
+      </div>
       {"r" in res && res.r?.insecure && <Notice tone="warn">{t.warn.insecure}</Notice>}
       {other.map((w) => (
         <Notice key={w} tone="warn">

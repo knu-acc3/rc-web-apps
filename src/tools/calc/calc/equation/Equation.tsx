@@ -2,6 +2,7 @@
 
 import { Fragment, type ReactNode } from "react";
 import type { Locale } from "@/i18n/config";
+import { Panel } from "@/ui/panel";
 import { Tabs } from "@/ui/tabs";
 import type { ToolProps } from "../../../types";
 import {
@@ -463,10 +464,10 @@ export default function Equation({
           items={EQ_MODES.map((x) => ({ value: x, label: t.modes[x] }))}
         />
         <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-6">
-          <section className="flex min-w-0 flex-col gap-3 rounded-[0.75rem] border border-line bg-surface p-4 sm:p-5">
+          <Panel className="flex min-w-0 flex-col gap-3 p-4 sm:p-6">
             {inputs}
             {anyBad && <p className="text-sm text-err">{t.bad}</p>}
-          </section>
+          </Panel>
           <ResultMain
             label={label}
             value={value}

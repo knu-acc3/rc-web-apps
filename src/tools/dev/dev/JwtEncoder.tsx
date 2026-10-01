@@ -1,14 +1,17 @@
 "use client";
 
-import { KeyRound } from "lucide-react";
+import { Clock, KeyRound, TimerReset } from "lucide-react";
 import { useEffect, useId, useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { base64ToBytes, utf8Encode } from "@/tools/dev/shared/bytes";
+import { CodeEditor } from "@/tools/dev/shared/CodeEditor";
 import { useHydrated } from "@/tools/dev/shared/hooks";
+import { Pane } from "@/tools/dev/shared/Pane";
 import { Button } from "@/ui/button";
 import { CopyButton } from "@/ui/copy-button";
 import { Field, Input, Select, Textarea } from "@/ui/field";
 import { Notice, Panel } from "@/ui/panel";
+import { Segmented } from "@/ui/segmented";
 import { ASYM_ALGS, generateKeyPair, hasSubtle, HMAC_ALGS, parseKey, signJwt, type Alg } from "./lib/jwt";
 
 const T = {
@@ -110,27 +113,42 @@ export default function JwtEncoder({ locale }: { locale: Locale }) {
     setPub(kp.publicPem);
   }
 
-  return (
-    <Panel className="p-4 sm:p-6">
-      <div className="text-sm font-medium text-fg-2">{t.token}</div>
-      <output className="mt-1 block min-h-16 font-mono text-[0.9375rem] break-all text-fg" aria-live="polite">
-        {current?.token ? (
-          <>
-            <span className="text-err">{current.token.split(".")[0]}</span>.<span className="text-accent">{current.token.split(".")[1]}</span>.<span className="text-ok">{current.token.split(".")[2]}</span>
-          </>
-        ) : (
-          <span className="text-fg-3">{current?.error ?? "—"}</span>
-        )}
-      </output>
-      <div className="mt-3">
-        <CopyButton value={current?.token ?? ""} size="md" variant="outline" />
-      </div>
+  const parts = current?.token ? current.token.split(".") : null;
 
-      <div className="mt-5 grid gap-4 md:grid-cols-2">
-        <Field label={t.payload} htmlFor={`${id}-p`} error={!jsonOk ? t.badJson : undefined}>
-          <Textarea id={`${id}-p`} value={payload} onChange={(e) => setPayload(e.target.value)} rows={8} aria-invalid={!jsonOk} />
-        </Field>
-        <div className="flex flex-col gap-3">
+  return (
+    <Panel className="flex flex-col gap-5 p-4 sm:p-6">
+      <Pane title={t.token} actions={<CopyButton value={current?.token ?? ""} variant="secondary" compact />}>
+        <output className="block min-h-20 px-4 py-3 font-mono text-[0.9375rem] leading-relaxed break-all text-fg sm:text-base" aria-live="polite">
+          {parts ? (
+            <>
+              <span className="text-err">{parts[0]}</span>.<span className="text-accent">{parts[1]}</span>.<span className="text-ok">{parts[2]}</span>
+            </>
+          ) : (
+            <span className="text-fg-3">{current?.error ?? "—"}</span>
+          )}
+        </output>
+      </Pane>
+
+      <div className="grid gap-5 lg:grid-cols-2">
+        <div className="flex min-w-0 flex-col gap-2">
+          <CodeEditor id={`${id}-p`} locale={locale} label={t.payload} value={payload} onChange={setPayload} rows={9} invalid={!jsonOk} describedBy={!jsonOk ? `${id}-pe` : undefined} />
+          {!jsonOk && (
+            <p id={`${id}-pe`} role="alert" className="text-sm text-err">
+              {t.badJson}
+            </p>
+          )}
+          <div className="flex flex-wrap gap-2">
+            <Button size="sm" variant="outlined" onClick={() => setClaim("iat", Math.floor(Date.now() / 1000))}>
+              <Clock aria-hidden />
+              {t.iat}
+            </Button>
+            <Button size="sm" variant="outlined" onClick={() => setClaim("exp", Math.floor(Date.now() / 1000) + 3600)}>
+              <TimerReset aria-hidden />
+              {t.exp}
+            </Button>
+          </div>
+        </div>
+        <div className="flex min-w-0 flex-col gap-4">
           <Field label={t.alg} htmlFor={`${id}-a`}>
             <Select id={`${id}-a`} value={alg} onChange={(e) => setAlg(e.target.value as Alg)}>
               {ALGS.map((a) => (
@@ -141,15 +159,25 @@ export default function JwtEncoder({ locale }: { locale: Locale }) {
             </Select>
           </Field>
           {isHmac && (
-            <div className="grid gap-2 sm:grid-cols-[1fr_8rem] sm:items-end">
-              <Field label={t.secret} htmlFor={`${id}-s`} hint={secretEnc === "text" && utf8Encode(secret).length < 32 ? t.weak : undefined}>
-                <Input id={`${id}-s`} value={secret} onChange={(e) => setSecret(e.target.value)} className="font-mono" autoComplete="off" spellCheck={false} />
-              </Field>
-              <Select aria-label={t.secretEnc} value={secretEnc} onChange={(e) => setSecretEnc(e.target.value as "text" | "b64")}>
-                <option value="text">{t.text}</option>
-                <option value="b64">{t.b64}</option>
-              </Select>
-            </div>
+            <Field
+              label={t.secret}
+              htmlFor={`${id}-s`}
+              hint={secretEnc === "text" && utf8Encode(secret).length < 32 ? t.weak : undefined}
+              aside={
+                <Segmented
+                  size="sm"
+                  label={t.secretEnc}
+                  value={secretEnc}
+                  onChange={setSecretEnc}
+                  options={[
+                    { value: "text", label: t.text },
+                    { value: "b64", label: t.b64 },
+                  ]}
+                />
+              }
+            >
+              <Input id={`${id}-s`} value={secret} onChange={(e) => setSecret(e.target.value)} className="font-mono" autoComplete="off" spellCheck={false} />
+            </Field>
           )}
           {isAsym &&
             (hydrated && !hasSubtle() ? (
@@ -159,28 +187,20 @@ export default function JwtEncoder({ locale }: { locale: Locale }) {
                 <Field label={t.privKey} htmlFor={`${id}-k`}>
                   <Textarea id={`${id}-k`} value={priv} onChange={(e) => setPriv(e.target.value)} rows={4} placeholder="-----BEGIN PRIVATE KEY-----" />
                 </Field>
-                <Button variant="outline" size="sm" onClick={gen} className="self-start">
+                <Button variant="tonal" onClick={gen} className="self-start">
                   <KeyRound aria-hidden />
                   {t.gen}
                 </Button>
               </>
             ))}
           {alg === "none" && <Notice tone="warn">{t.none}</Notice>}
-          <div className="flex flex-wrap gap-2">
-            <Button size="sm" variant="ghost" onClick={() => setClaim("iat", Math.floor(Date.now() / 1000))}>
-              {t.iat}
-            </Button>
-            <Button size="sm" variant="ghost" onClick={() => setClaim("exp", Math.floor(Date.now() / 1000) + 3600)}>
-              {t.exp}
-            </Button>
-          </div>
+          {pub && isAsym && (
+            <Field label={t.pub} htmlFor={`${id}-pub`}>
+              <Textarea id={`${id}-pub`} value={pub} readOnly rows={4} />
+            </Field>
+          )}
         </div>
       </div>
-      {pub && isAsym && (
-        <Field className="mt-4" label={t.pub} htmlFor={`${id}-pub`}>
-          <Textarea id={`${id}-pub`} value={pub} readOnly rows={4} />
-        </Field>
-      )}
     </Panel>
   );
 }

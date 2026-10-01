@@ -1,7 +1,7 @@
 "use client";
 
 import { useId } from "react";
-import { Checkbox } from "@/ui/field";
+import { Switch } from "@/ui/field";
 import type { ToolProps } from "../../../types";
 import { ScaleBar } from "../../shared/charts";
 import { fmtRound } from "../../shared/fmt";
@@ -74,8 +74,8 @@ export default function Bmi({ locale, height = 170, weight = 70 }: ToolProps<{ h
       <BodyFields id={id} locale={locale} v={q.v} set={q.set} errors={body.errors} />
       <OptionsRow>
         <UnitToggle locale={locale} value={q.v.u as "m" | "i"} onChange={(u) => q.set(switchUnits(locale, q.v, u))} />
-        <Checkbox label={<span className="text-sm text-fg-2">{t.asian}</span>} checked={asian} onChange={(e) => q.set({ a: e.target.checked ? "1" : "0" })} />
       </OptionsRow>
+      <Switch label={<span className="text-sm text-fg-2">{t.asian}</span>} checked={asian} onChange={(e) => q.set({ a: e.target.checked ? "1" : "0" })} />
     </>
   );
 
@@ -151,7 +151,7 @@ export default function Bmi({ locale, height = 170, weight = 70 }: ToolProps<{ h
           formula={["BMI = weight (kg) / height (m)²", "BMI = 703 × weight (lb) / height (in)²"]}
           notes={[
             "WHO classes: below 18.5 underweight, 18.5–24.9 normal, 25–29.9 overweight, 30–34.9 obesity class I, 35–39.9 class II, 40 and above class III.",
-            "For Asian populations the WHO (2004) suggested lower action points of 23 and 27.5 — tick the box to use them.",
+            "For Asian populations the WHO (2004) suggested lower action points of 23 and 27.5 — turn on the switch to use them.",
             "BMI does not distinguish muscle from fat: it can overestimate fatness in athletes and underestimate it in older people. Use body-fat percentage and waist size too.",
           ]}
         />

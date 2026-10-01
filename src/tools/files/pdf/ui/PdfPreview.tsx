@@ -11,7 +11,7 @@ import type { Job } from "../lib/jobs";
 import { PageView } from "./PageView";
 import { S, errorText } from "./strings";
 
-export interface PagePreview {
+interface PagePreview {
   /** File the preview belongs to. */
   scope: string;
   bytes: Uint8Array | null;

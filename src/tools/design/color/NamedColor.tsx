@@ -1,7 +1,7 @@
 "use client";
 
 import type { Locale } from "@/i18n/config";
-import { Panel, PanelHeader } from "@/ui/panel";
+import { Panel } from "@/ui/panel";
 import { BLACK, WHITE, contrastRatio, formatRatio, harmony, hex as parseHex, type Harmony } from "./lib/color";
 import { VARIATION_STEPS, shades, tints } from "./lib/variations";
 import { FormatList } from "./ui/FormatList";
@@ -53,7 +53,7 @@ export default function NamedColor({ locale, hex, name }: { locale: Locale; hex:
       <div className="flex min-w-0 flex-col gap-4">
         <Panel className="overflow-hidden">
           <div role="img" aria-label={`${name} ${hex}`} className="h-44 sm:h-56" style={{ background: hex }} />
-          <div className="grid grid-cols-2 border-t border-line">
+          <div className="grid grid-cols-2">
             {[
               { bg: hex, fg: "#FFFFFF", other: WHITE },
               { bg: hex, fg: "#000000", other: BLACK },
@@ -67,13 +67,13 @@ export default function NamedColor({ locale, hex, name }: { locale: Locale; hex:
             ))}
           </div>
         </Panel>
-        <Panel className="p-4">
+        <Panel className="p-4 sm:p-5">
           <h2 className="mb-2 text-sm font-semibold text-fg">{t.tints}</h2>
           <SwatchStrip items={tints(c).map((x, i) => ({ color: x, caption: `${VARIATION_STEPS[i]}%` }))} {...labels} />
           <h2 className="mt-4 mb-2 text-sm font-semibold text-fg">{t.shades}</h2>
           <SwatchStrip items={shades(c).map((x, i) => ({ color: x, caption: `${VARIATION_STEPS[i]}%` }))} {...labels} />
         </Panel>
-        <Panel className="p-4">
+        <Panel className="p-4 sm:p-5">
           <h2 className="mb-2 text-sm font-semibold text-fg">{t.harmonies}</h2>
           <div className="grid gap-3 sm:grid-cols-2">
             {HARMONIES.map((k) => (
@@ -85,8 +85,8 @@ export default function NamedColor({ locale, hex, name }: { locale: Locale; hex:
           </div>
         </Panel>
       </div>
-      <Panel className="h-fit">
-        <PanelHeader title={t.formats} />
+      <Panel className="h-fit p-2 sm:p-3">
+        <h2 className="px-3 pt-1 pb-2 text-sm font-semibold text-fg-2">{t.formats}</h2>
         <FormatList color={c} locale={locale} />
       </Panel>
     </div>

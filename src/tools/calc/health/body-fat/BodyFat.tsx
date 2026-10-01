@@ -1,11 +1,12 @@
 "use client";
 
 import { useId } from "react";
+import { plural } from "@/i18n/format";
 import type { ToolProps } from "../../../types";
 import { ScaleBar } from "../../shared/charts";
 import { fmtRound } from "../../shared/fmt";
 import { field, toInput } from "../../shared/num";
-import { CalcGrid, DataTable, Disclaimer, Explain, FieldRow, NumField, OptionsRow, ResultMain, Stack, SubHeading, ToolActions } from "../../shared/ui";
+import { CalcGrid, DataTable, Disclaimer, Explain, NumSlider, OptionsRow, ResultMain, SliderRow, Stack, SubHeading, ToolActions } from "../../shared/ui";
 import { useQueryState } from "../../shared/url-state";
 import { bmi, bmiBodyFat, CM_PER_IN, FAT_BOUNDS, fatCategory, kgToLb, navyBodyFat, type Sex } from "../lib/body";
 import { FAT_LABEL } from "../lib/labels";
@@ -20,6 +21,7 @@ const T = {
     hip: "Бёдра",
     hipHint: "По самой широкой части",
     age: "Возраст",
+    years: ["год", "года", "лет"],
     label: "Процент жира (метод ВМС США)",
     fatMass: "Жировая масса",
     lean: "Безжировая масса",
@@ -41,6 +43,7 @@ const T = {
     hip: "Hips",
     hipHint: "At the widest point",
     age: "Age",
+    years: ["year", "years"],
     label: "Body fat (US Navy method)",
     fatMass: "Fat mass",
     lean: "Lean mass",
@@ -82,15 +85,13 @@ export default function BodyFat({ locale }: ToolProps) {
 
   const inputs = (
     <>
-      <BodyFields id={id} locale={locale} v={q.v} set={q.set} errors={body.errors} size="md" />
-      <FieldRow>
-        <NumField id={`${id}-wa`} label={t.waist} hint={t.waistHint} value={q.v.wa} onChange={(wa) => q.set({ wa })} suffix={lenUnit} error={WA.message} size="lg" />
-        <NumField id={`${id}-ne`} label={t.neck} hint={t.neckHint} value={q.v.ne} onChange={(ne) => q.set({ ne })} suffix={lenUnit} error={NE.message} size="lg" />
-      </FieldRow>
-      <FieldRow>
-        {sex === "female" && <NumField id={`${id}-hi`} label={t.hip} hint={t.hipHint} value={q.v.hi} onChange={(v) => q.set({ hi: v })} suffix={lenUnit} error={HI.message} />}
-        <NumField id={`${id}-a`} label={t.age} value={q.v.a} onChange={(a) => q.set({ a })} error={A.message} inputMode="numeric" />
-      </FieldRow>
+      <BodyFields id={id} locale={locale} v={q.v} set={q.set} errors={body.errors} />
+      <SliderRow>
+        <NumSlider id={`${id}-wa`} locale={locale} label={t.waist} hint={t.waistHint} value={q.v.wa} onChange={(wa) => q.set({ wa })} suffix={lenUnit} error={WA.message} min={imperial ? 20 : 50} max={imperial ? 60 : 150} />
+        <NumSlider id={`${id}-ne`} locale={locale} label={t.neck} hint={t.neckHint} value={q.v.ne} onChange={(ne) => q.set({ ne })} suffix={lenUnit} error={NE.message} min={imperial ? 10 : 25} max={imperial ? 24 : 60} />
+        {sex === "female" && <NumSlider id={`${id}-hi`} locale={locale} label={t.hip} hint={t.hipHint} value={q.v.hi} onChange={(v) => q.set({ hi: v })} suffix={lenUnit} error={HI.message} min={imperial ? 28 : 70} max={imperial ? 64 : 160} />}
+        <NumSlider id={`${id}-a`} locale={locale} label={t.age} value={q.v.a} onChange={(a) => q.set({ a })} suffix={plural(locale, A.value ?? 30, t.years)} error={A.message} min={15} max={90} />
+      </SliderRow>
       <OptionsRow>
         <SexToggle locale={locale} value={sex} onChange={(s) => q.set({ s })} />
         <UnitToggle

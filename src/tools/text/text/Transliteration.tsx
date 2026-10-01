@@ -2,7 +2,7 @@
 
 import { useId, useMemo, useState } from "react";
 import type { Locale } from "@/i18n/config";
-import { Checkbox } from "@/ui/field";
+import { Switch } from "@/ui/field";
 import { Segmented } from "@/ui/segmented";
 import { detectLang, isReversible, reverseTransliterate, slugify, STANDARD_IDS, transliterate, type LangOption, type StandardId } from "./lib/translit";
 import { InlineSelect, InputPanel, OptionsBar, OutputPanel, TwoPane } from "./ui/shared";
@@ -128,16 +128,19 @@ export default function Transliteration({ locale, standard: std0 = "icao", mode 
         )}
         {mode === "slug" && (
           <>
-            <InlineSelect
-              id={`${id}-sep`}
-              label={t.sep}
-              value={sep}
-              onChange={setSep}
-              options={[
-                { value: "-", label: "-" },
-                { value: "_", label: "_" },
-              ]}
-            />
+            <span className="flex items-center gap-2">
+              <span className="text-fg-2">{t.sep}</span>
+              <Segmented
+                label={t.sep}
+                value={sep}
+                onChange={setSep}
+                size="sm"
+                options={[
+                  { value: "-", label: <code className="font-mono text-base">-</code> },
+                  { value: "_", label: <code className="font-mono text-base">_</code> },
+                ]}
+              />
+            </span>
             <InlineSelect
               id={`${id}-max`}
               label={t.maxLen}
@@ -150,7 +153,7 @@ export default function Transliteration({ locale, standard: std0 = "icao", mode 
                 { value: "80", label: "80" },
               ]}
             />
-            <Checkbox label={t.lower} checked={lower} onChange={(e) => setLower(e.target.checked)} />
+            <Switch label={t.lower} checked={lower} onChange={(e) => setLower(e.target.checked)} />
           </>
         )}
       </OptionsBar>

@@ -2,29 +2,24 @@
 
 import { useId } from "react";
 import { Field, Input } from "@/ui/field";
-import { Segmented } from "@/ui/segmented";
 import type { ToolProps } from "../../../types";
 import { LineChart } from "../../shared/charts";
 import { useToday } from "../../shared/clock";
 import { fmtDay, parseIso } from "../../shared/dates";
-import { CURRENCIES, CURRENCY_SYMBOL, fmtCompact, fmtMoney, fmtPct, isCurrency, type Currency } from "../../shared/fmt";
-import { roundTo } from "../../shared/math";
+import { CURRENCIES, CURRENCY_SYMBOL, fmtCompact, fmtMoney, fmtPct, isCurrency, moneyMax, type Currency } from "../../shared/fmt";
 import { field, toInput } from "../../shared/num";
-import { Advanced, CalcGrid, DataTable, Disclaimer, Explain, FieldRow, InlineSelect, NumField, OptionsRow, ResultMain, Stack, SubHeading, ToolActions } from "../../shared/ui";
+import { Advanced, CalcGrid, DataTable, Disclaimer, Explain, NumSlider, OptionsRow, ResultMain, Stack, SubHeading, ToggleField, ToolActions, SliderRow } from "../../shared/ui";
 import { useQueryState } from "../../shared/url-state";
 import { depositSchedule, type Capitalization } from "../lib/deposit";
-import { CurrencySelect, termText } from "../loan/parts";
+import { CurrencySelect, TERM_UNITS, TermSlider, termText, type TermUnit } from "../loan/parts";
 
 const T = {
   ru: {
     amount: "Сумма вклада",
-    rate: "Ставка, % годовых",
-    term: "Срок",
-    years: "лет",
+    rate: "Ставка в год",
     monthsShort: "мес.",
-    unit: "Единица срока",
     cap: "Капитализация",
-    caps: { monthly: "ежемесячно", quarterly: "ежеквартально", end: "нет, в конце срока" } satisfies Record<Capitalization, string>,
+    caps: { monthly: "каждый месяц", quarterly: "раз в квартал", end: "нет, в конце" } satisfies Record<Capitalization, string>,
     more: "Дата открытия, пополнения и снятия",
     start: "Дата открытия",
     startHint: "По умолчанию — сегодня",
@@ -51,13 +46,10 @@ const T = {
   },
   en: {
     amount: "Deposit amount",
-    rate: "Interest rate, % per year",
-    term: "Term",
-    years: "years",
+    rate: "Interest rate per year",
     monthsShort: "mo",
-    unit: "Term unit",
     cap: "Capitalization",
-    caps: { monthly: "monthly", quarterly: "quarterly", end: "none, paid at maturity" } satisfies Record<Capitalization, string>,
+    caps: { monthly: "monthly", quarterly: "quarterly", end: "none, at maturity" } satisfies Record<Capitalization, string>,
     more: "Start date, top-ups and withdrawals",
     start: "Start date",
     startHint: "Defaults to today",
@@ -85,7 +77,6 @@ const T = {
 } as const;
 
 const CAPS = ["monthly", "quarterly", "end"] as const;
-const UNITS = ["y", "m"] as const;
 
 export default function Deposit({ locale, amount = locale === "ru" ? 1_000_000 : 10_000, rate = locale === "ru" ? 14 : 4.5, months = 12 }: ToolProps<{ amount?: number; rate?: number; months?: number }>) {
   const t = T[locale];
@@ -94,12 +85,12 @@ export default function Deposit({ locale, amount = locale === "ru" ? 1_000_000 :
   const defCur: Currency = locale === "ru" ? "KZT" : "USD";
   const q = useQueryState(
     { s: toInput(locale, amount), r: toInput(locale, rate), t: toInput(locale, months), u: "m", k: "monthly", c: defCur, d: "", tu: "", wd: "" },
-    { enums: { k: CAPS, u: UNITS, c: CURRENCIES } },
+    { enums: { k: CAPS, u: TERM_UNITS, c: CURRENCIES } },
   );
   const cur = isCurrency(q.v.c) ? q.v.c : defCur;
   const sym = CURRENCY_SYMBOL[cur];
   const money = (v: number) => fmtMoney(locale, v, cur);
-  const unit = q.v.u as (typeof UNITS)[number];
+  const unit = q.v.u as TermUnit;
   const cap = q.v.k as Capitalization;
   const S = field(locale, q.v.s, { gt: 0, max: 1e12 });
   const R = field(locale, q.v.r, { min: 0, max: 100 });
@@ -116,46 +107,21 @@ export default function Deposit({ locale, amount = locale === "ru" ? 1_000_000 :
 
   const inputs = (
     <>
-      <NumField id={`${id}-s`} label={t.amount} value={q.v.s} onChange={(s) => q.set({ s })} suffix={sym} error={S.message} size="lg" />
-      <FieldRow>
-        <NumField id={`${id}-r`} label={t.rate} value={q.v.r} onChange={(r) => q.set({ r })} suffix="%" error={R.message} size="lg" />
-        <NumField
-          id={`${id}-t`}
-          label={t.term}
-          value={q.v.t}
-          onChange={(v) => q.set({ t: v })}
-          suffix={unit === "y" ? t.years : t.monthsShort}
-          error={N.message}
-          size="lg"
-          aside={
-            <Segmented
-              size="sm"
-              label={t.unit}
-              value={unit}
-              onChange={(u) => {
-                const nv = N.value;
-                q.set({ u, t: nv === null ? q.v.t : toInput(locale, u === "m" ? Math.round(nv * 12) : roundTo(nv / 12, 2)) });
-              }}
-              options={[
-                { value: "y", label: t.years },
-                { value: "m", label: t.monthsShort },
-              ]}
-            />
-          }
-        />
-      </FieldRow>
+      <NumSlider id={`${id}-s`} locale={locale} label={t.amount} value={q.v.s} onChange={(s) => q.set({ s })} suffix={sym} error={S.message} min={0} max={moneyMax(cur, 100_000_000)} scale="log" />
+      <NumSlider id={`${id}-r`} locale={locale} label={t.rate} value={q.v.r} onChange={(r) => q.set({ r })} suffix="%" error={R.message} min={0} max={30} decimals={1} />
+      <TermSlider id={`${id}-t`} locale={locale} value={q.v.t} unit={unit} onChange={(v, u) => q.set({ t: v, u })} error={N.message} maxYears={5} />
+      <ToggleField label={t.cap} value={cap} onChange={(k) => q.set({ k })} options={CAPS.map((c) => ({ value: c, label: t.caps[c] }))} />
       <OptionsRow>
-        <InlineSelect id={`${id}-k`} label={t.cap} value={cap} onChange={(k) => q.set({ k })} options={CAPS.map((c) => ({ value: c, label: t.caps[c] }))} />
-        <CurrencySelect id={`${id}-c`} locale={locale} value={cur} onChange={(c) => q.set({ c })} />
+        <CurrencySelect locale={locale} value={cur} onChange={(c) => q.set({ c })} />
       </OptionsRow>
       <Advanced title={t.more} open={!!(q.v.d || q.v.tu || q.v.wd)}>
         <Field label={t.start} htmlFor={`${id}-d`} hint={t.startHint}>
-          <Input id={`${id}-d`} type="date" value={startIso ?? ""} onChange={(e) => q.set({ d: e.target.value })} />
+          <Input id={`${id}-d`} type="date" value={startIso ?? ""} onChange={(e) => q.set({ d: e.target.value })} className="max-w-[16rem]" />
         </Field>
-        <FieldRow>
-          <NumField id={`${id}-tu`} label={t.topUp} value={q.v.tu} onChange={(tu) => q.set({ tu })} suffix={sym} error={TU.message} placeholder="0" />
-          <NumField id={`${id}-wd`} label={t.withdrawal} value={q.v.wd} onChange={(wd) => q.set({ wd })} suffix={sym} error={WD.message} placeholder="0" />
-        </FieldRow>
+        <SliderRow>
+          <NumSlider id={`${id}-tu`} locale={locale} label={t.topUp} value={q.v.tu} onChange={(tu) => q.set({ tu })} suffix={sym} error={TU.message} min={0} max={moneyMax(cur, 5_000_000)} scale="log" />
+          <NumSlider id={`${id}-wd`} locale={locale} label={t.withdrawal} value={q.v.wd} onChange={(wd) => q.set({ wd })} suffix={sym} error={WD.message} min={0} max={moneyMax(cur, 5_000_000)} scale="log" />
+        </SliderRow>
       </Advanced>
     </>
   );

@@ -5,7 +5,7 @@ import { plural } from "@/i18n/format";
 import type { ToolProps } from "../../../types";
 import { fmtRound } from "../../shared/fmt";
 import { field, toInput } from "../../shared/num";
-import { CalcGrid, Disclaimer, Explain, FieldRow, InlineToggle, NumField, OptionsRow, ResultMain, Stack, ToolActions } from "../../shared/ui";
+import { CalcGrid, Disclaimer, Explain, InlineToggle, NumSlider, OptionsRow, ResultMain, Stack, ToolActions } from "../../shared/ui";
 import { useQueryState } from "../../shared/url-state";
 import { kgToLb, lbToKg, ML_PER_FLOZ, waterIntake, type Climate } from "../lib/body";
 
@@ -61,10 +61,8 @@ export default function Water({ locale }: ToolProps) {
 
   const inputs = (
     <>
-      <FieldRow>
-        <NumField id={`${id}-w`} label={t.weight} value={q.v.w} onChange={(w) => q.set({ w })} suffix={lb ? "lb" : locale === "ru" ? "кг" : "kg"} error={W.message} size="lg" />
-        <NumField id={`${id}-e`} label={t.exercise} value={q.v.e} onChange={(e) => q.set({ e })} suffix={t.min} error={E.message} size="lg" />
-      </FieldRow>
+      <NumSlider id={`${id}-w`} locale={locale} label={t.weight} value={q.v.w} onChange={(w) => q.set({ w })} suffix={lb ? "lb" : locale === "ru" ? "кг" : "kg"} error={W.message} min={lb ? 60 : 30} max={lb ? 440 : 200} />
+      <NumSlider id={`${id}-e`} locale={locale} label={t.exercise} value={q.v.e} onChange={(e) => q.set({ e })} suffix={t.min} error={E.message} min={0} max={180} step={5} />
       <OptionsRow>
         <InlineToggle
           label={t.climate}

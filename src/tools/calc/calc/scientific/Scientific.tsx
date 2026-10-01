@@ -5,6 +5,7 @@ import { useId, useRef } from "react";
 import { cn } from "@/lib/cn";
 import { Button } from "@/ui/button";
 import { CopyButton } from "@/ui/copy-button";
+import { Panel } from "@/ui/panel";
 import { Segmented } from "@/ui/segmented";
 import type { ToolProps } from "../../../types";
 import { calculate, errorText, type Angle } from "../expr/parser";
@@ -187,8 +188,8 @@ export default function Scientific({ locale }: ToolProps) {
   return (
     <Stack>
       <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] lg:gap-6">
-        <section
-          className="flex min-w-0 flex-col gap-3 rounded-[0.75rem] border border-line bg-surface p-4 sm:p-5"
+        <Panel
+          className="flex min-w-0 flex-col gap-3 p-4 sm:p-6"
           onKeyDown={(e) => {
             if (e.key === "Enter") {
               e.preventDefault();
@@ -227,10 +228,10 @@ export default function Scientific({ locale }: ToolProps) {
             aria-describedby={`${id}-err`}
             className="control h-12 font-mono text-lg"
           />
-          <div className="min-h-[4.75rem] rounded-[0.625rem] bg-accent-soft px-4 py-3">
+          <div className="min-h-[4.75rem] min-w-0 rounded-[1rem] bg-accent-soft px-4 py-3">
             <div className="text-[0.8125rem] text-fg-2">{t.result}</div>
             <div className="flex items-center justify-between gap-2">
-              <output aria-live="polite" className={cn("tabular min-w-0 break-words [overflow-wrap:anywhere] font-bold tracking-tight text-fg", (shown?.length ?? 0) > 16 ? "text-xl sm:text-2xl" : (shown?.length ?? 0) > 10 ? "text-2xl sm:text-3xl" : "text-3xl")}>
+              <output aria-live="polite" className={cn("tabular min-w-0 break-words [overflow-wrap:anywhere] font-bold tracking-tight text-fg", (shown?.length ?? 0) > 16 ? "text-xl sm:text-2xl" : (shown?.length ?? 0) > 10 ? "text-2xl sm:text-4xl" : "text-3xl sm:text-5xl")}>
                 {shown ?? "—"}
               </output>
               {shown && <CopyButton value={shown.replace(/[  ]/g, " ")} label={t.copy} copiedLabel={t.copied} variant="ghost" size="icon-sm" />}
@@ -239,7 +240,7 @@ export default function Scientific({ locale }: ToolProps) {
               {error}
             </p>
           </div>
-          <div role="group" aria-label={t.keys} className="grid grid-cols-5 gap-1.5">
+          <div role="group" aria-label={t.keys} className="grid grid-cols-5 gap-2">
             {K.flat().map((k) => (
               <button
                 key={k.label}
@@ -247,25 +248,25 @@ export default function Scientific({ locale }: ToolProps) {
                 onClick={() => press(k)}
                 aria-label={k.aria}
                 className={cn(
-                  "h-11 rounded-[0.5rem] text-[0.9375rem] font-medium transition-colors duration-100 active:scale-[0.97] sm:h-12",
-                  k.tone === "num" && "bg-surface-2 text-fg hover:bg-line",
-                  k.tone === "op" && "bg-surface-2 text-fg-2 hover:bg-line hover:text-fg",
-                  k.tone === "fn" && "border border-line bg-surface text-fg-2 hover:border-line-strong hover:text-fg",
-                  k.tone === "eq" && "bg-accent text-accent-fg hover:bg-accent-hover",
+                  "btn h-12 min-w-0 px-0 text-base [--btn-r-press:0.5rem] [--btn-r:0.875rem] sm:h-14 sm:text-lg",
+                  k.tone === "num" && "btn-elevated text-fg!",
+                  k.tone === "op" && "btn-tonal",
+                  k.tone === "fn" && "btn-neutral bg-surface-2 text-[0.9375rem] font-medium text-fg-2 sm:text-base",
+                  k.tone === "eq" && "btn-filled text-xl",
                 )}
               >
-                {k.action === "back" ? <Delete className="mx-auto size-[1.125rem]" aria-hidden /> : k.label}
+                {k.action === "back" ? <Delete className="size-5" aria-hidden /> : k.label}
               </button>
             ))}
           </div>
           <p className="text-[0.8125rem] text-fg-3">{t.hint}</p>
           <ToolActions locale={locale} onReset={q.reset} shareUrl={q.shareUrl} />
-        </section>
+        </Panel>
         <section className="min-w-0">
           <SubHeading
             aside={
               history.length > 0 && (
-                <Button variant="ghost" size="sm" onClick={() => setHistory(null)}>
+                <Button variant="text" size="sm" onClick={() => setHistory(null)}>
                   <Trash2 aria-hidden />
                   {t.clearHistory}
                 </Button>
@@ -277,10 +278,10 @@ export default function Scientific({ locale }: ToolProps) {
           {history.length === 0 ? (
             <p className="text-sm text-fg-3">{t.empty}</p>
           ) : (
-            <ul className="divide-y divide-line overflow-hidden rounded-[0.75rem] border border-line bg-surface">
+            <ul className="panel divide-y divide-line overflow-hidden">
               {history.map((h, i) => (
                 <li key={i}>
-                  <button type="button" className="block w-full px-4 py-2.5 text-left hover:bg-surface-2" onClick={() => q.set({ e: h.e })}>
+                  <button type="button" className="block w-full px-4 py-2.5 text-left transition-colors hover:bg-surface-2 active:bg-surface-3" onClick={() => q.set({ e: h.e })}>
                     <span className="block truncate font-mono text-[0.8125rem] text-fg-3">{h.e}</span>
                     <span className="tabular block font-semibold text-fg">= {h.r}</span>
                   </button>

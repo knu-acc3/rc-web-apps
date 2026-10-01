@@ -5,27 +5,29 @@ import { useId, useRef, useState, type KeyboardEvent, type PointerEvent } from "
 import type { Locale } from "@/i18n/config";
 import { Button } from "@/ui/button";
 import { CopyButton } from "@/ui/copy-button";
-import { Field, Input, Select } from "@/ui/field";
+import { Field, Input } from "@/ui/field";
+import { NumberInput } from "@/ui/number-input";
 import { Notice, Panel } from "@/ui/panel";
+import { ScrollRow } from "@/ui/scroll-row";
 import { useReducedMotion } from "@/tools/design/color/ui/hooks";
 import { BEZIER_PRESETS, bezierCss, parseBezier, type Bezier } from "./lib/bezier";
 import { round } from "./lib/tokens";
-import { CodePanel } from "./ui/kit";
+import { CodePanel, NumberSlider } from "./ui/kit";
 
 const T = {
   ru: {
     graph: "График кривой: перетащите точки или выберите их клавишей Tab и двигайте стрелками",
     p1: "Первая контрольная точка",
     p2: "Вторая контрольная точка",
-    preset: "Готовая кривая",
-    choose: "— выбрать —",
+    preset: "Готовые кривые",
     paste: "Или вставьте значение",
     invalid: "Нужно cubic-bezier(x1, y1, x2, y2), где x от 0 до 1",
     copy: "Копировать",
     copied: "Скопировано",
     linear: "linear",
     yours: "ваша кривая",
-    duration: "Длительность, с",
+    duration: "Длительность",
+    sec: "с",
     reduced: "В системе включено «Уменьшить движение», поэтому превью не запускается само.",
     play: "Воспроизвести",
   },
@@ -33,15 +35,15 @@ const T = {
     graph: "Curve graph: drag the points, or Tab to them and move with the arrow keys",
     p1: "First control point",
     p2: "Second control point",
-    preset: "Preset curve",
-    choose: "— choose —",
+    preset: "Presets",
     paste: "Or paste a value",
     invalid: "Expected cubic-bezier(x1, y1, x2, y2) with x between 0 and 1",
     copy: "Copy",
     copied: "Copied",
     linear: "linear",
     yours: "your curve",
-    duration: "Duration, s",
+    duration: "Duration",
+    sec: "s",
     reduced: "Your system asks for reduced motion, so the preview doesn't start on its own.",
     play: "Play",
   },
@@ -128,7 +130,7 @@ export default function CubicBezierEditor({ locale, value = [0.25, 0.1, 0.25, 1]
   return (
     <div className="flex flex-col gap-4">
       <div className="grid gap-4 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
-        <Panel className="p-3">
+        <Panel className="p-3 sm:p-4">
           <svg
             ref={svgRef}
             viewBox={`0 0 ${W + PAD_X * 2} ${W + PAD_Y * 2}`}
@@ -160,24 +162,23 @@ export default function CubicBezierEditor({ locale, value = [0.25, 0.1, 0.25, 1]
         </Panel>
 
         <div className="flex min-w-0 flex-col gap-4">
-          <Panel className="flex flex-col gap-3 p-4 sm:p-5">
-            <div className="flex items-center justify-between gap-2 rounded-[0.625rem] bg-surface-2 px-4 py-3">
+          <Panel className="flex flex-col gap-4 p-4 sm:p-5">
+            <div className="flex items-center justify-between gap-2 rounded-[1rem] bg-surface-2 py-2 pr-2 pl-4">
               <code className="min-w-0 font-mono text-lg font-semibold break-words [overflow-wrap:anywhere] text-fg sm:text-xl">{css}</code>
-              <CopyButton value={css} label={t.copy} copiedLabel={t.copied} size="sm" variant="ghost" />
+              <CopyButton value={css} label={t.copy} copiedLabel={t.copied} size="md" variant="primary" compact />
             </div>
-            <div className="grid grid-cols-4 gap-2">
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
               {(["x1", "y1", "x2", "y2"] as const).map((k, i) => (
                 <Field key={k} label={k} htmlFor={`${id}-${k}`}>
-                  <Input
+                  <NumberInput
                     id={`${id}-${k}`}
-                    type="number"
                     step={0.01}
-                    min={i % 2 === 0 ? 0 : undefined}
-                    max={i % 2 === 0 ? 1 : undefined}
+                    decimals={2}
+                    min={i % 2 === 0 ? 0 : -1}
+                    max={i % 2 === 0 ? 1 : 2}
                     value={b[i]}
-                    onChange={(e) => {
-                      const v = Number(e.target.value);
-                      if (!Number.isFinite(v)) return;
+                    onChange={(v) => {
+                      if (v === null) return;
                       const next = [...b] as Bezier;
                       next[i] = i % 2 === 0 ? clamp(v, 0, 1) : v;
                       setB(next);
@@ -187,44 +188,34 @@ export default function CubicBezierEditor({ locale, value = [0.25, 0.1, 0.25, 1]
                 </Field>
               ))}
             </div>
-            <div className="grid gap-3 sm:grid-cols-2">
-              <Field label={t.preset} htmlFor={`${id}-pr`}>
-                <Select
-                  id={`${id}-pr`}
-                  value=""
-                  onChange={(e) => {
-                    const p = BEZIER_PRESETS.find((x) => x.name === e.target.value);
-                    if (p) setB(p.value);
-                  }}
-                  size="sm"
-                >
-                  <option value="">{t.choose}</option>
-                  {BEZIER_PRESETS.map((p) => (
-                    <option key={p.name} value={p.name}>
-                      {p.name}
-                    </option>
-                  ))}
-                </Select>
-              </Field>
-              <Field label={t.paste} htmlFor={`${id}-ps`} error={text.trim() && !parsed ? t.invalid : undefined}>
-                <Input
-                  id={`${id}-ps`}
-                  value={text}
-                  placeholder="cubic-bezier(0.4, 0, 0.2, 1)"
-                  className="font-mono"
-                  size="sm"
-                  autoComplete="off"
-                  onChange={(e) => {
-                    setText(e.target.value);
-                    const p = parseBezier(e.target.value);
-                    if (p) setB(p);
-                  }}
-                />
-              </Field>
+            <div className="flex flex-col gap-1.5">
+              <span className="text-sm font-medium text-fg-2">{t.preset}</span>
+              <ScrollRow label={t.preset} rowClassName="gap-1.5">
+                {BEZIER_PRESETS.map((p) => (
+                  <button key={p.name} type="button" aria-pressed={p.value.every((x, k) => x === b[k])} onClick={() => setB(p.value)} className="chip shrink-0 font-mono text-[0.8125rem]!">
+                    {p.name}
+                  </button>
+                ))}
+              </ScrollRow>
             </div>
+            <Field label={t.paste} htmlFor={`${id}-ps`} error={text.trim() && !parsed ? t.invalid : undefined}>
+              <Input
+                id={`${id}-ps`}
+                value={text}
+                placeholder="cubic-bezier(0.4, 0, 0.2, 1)"
+                className="font-mono"
+                size="sm"
+                autoComplete="off"
+                onChange={(e) => {
+                  setText(e.target.value);
+                  const p = parseBezier(e.target.value);
+                  if (p) setB(p);
+                }}
+              />
+            </Field>
           </Panel>
 
-          <Panel className="flex flex-col gap-3 p-4">
+          <Panel className="flex flex-col gap-4 p-4 sm:p-5">
             <style>{style}</style>
             {[
               { cls: `${anim}-a`, label: t.linear },
@@ -237,25 +228,20 @@ export default function CubicBezierEditor({ locale, value = [0.25, 0.1, 0.25, 1]
                 </div>
               </div>
             ))}
-            <div className="flex flex-wrap items-center gap-3">
-              <label htmlFor={`${id}-dur`} className="text-sm text-fg-2">
-                {t.duration}
-              </label>
-              <Input id={`${id}-dur`} type="number" min={0.2} max={10} step={0.1} value={duration} onChange={(e) => setDuration(clamp(Number(e.target.value) || 1, 0.2, 10))} size="sm" className="w-24" />
-              {reduced && !force && (
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => {
-                    setForce(true);
-                    setRun((r) => r + 1);
-                  }}
-                >
-                  <Play aria-hidden />
-                  {t.play}
-                </Button>
-              )}
-            </div>
+            <NumberSlider label={t.duration} value={duration} min={0.2} max={10} step={0.1} unit={t.sec} onChange={(v) => setDuration(clamp(v, 0.2, 10))} />
+            {reduced && !force && (
+              <Button
+                variant="outlined"
+                className="self-start"
+                onClick={() => {
+                  setForce(true);
+                  setRun((r) => r + 1);
+                }}
+              >
+                <Play aria-hidden />
+                {t.play}
+              </Button>
+            )}
             {reduced && !force && <Notice>{t.reduced}</Notice>}
           </Panel>
         </div>

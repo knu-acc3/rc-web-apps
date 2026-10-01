@@ -10,7 +10,8 @@ import { ScrollRow } from "./scroll-row";
  * (arrow keys move the choice); the chosen chip is tinted with a check. Use it from about six options up — fewer
  * fit a Segmented.
  *  - layout "scroll" (default): one row that scrolls sideways with ‹ › on phones and wraps from `lg`;
- *  - layout "wrap": wraps at every width (inside a card).
+ *  - layout "wrap": wraps at every width (inside a card);
+ *  - `grid` (e.g. "grid-cols-2 sm:grid-cols-4"): an even grid of equal chips — the main mode of a tool with long labels.
  */
 export function ChipChoice<V extends string | number>({
   label,
@@ -18,6 +19,7 @@ export function ChipChoice<V extends string | number>({
   options,
   onChange,
   layout = "scroll",
+  grid,
   size = "md",
   className,
 }: {
@@ -26,6 +28,8 @@ export function ChipChoice<V extends string | number>({
   options: readonly { value: V; label: ReactNode; title?: string; disabled?: boolean }[];
   onChange: (v: V) => void;
   layout?: "scroll" | "wrap";
+  /** Grid column classes: equal chips in an even grid (overrides `layout`). */
+  grid?: string;
   size?: "md" | "lg";
   className?: string;
 }) {
@@ -50,13 +54,19 @@ export function ChipChoice<V extends string | number>({
           onChange(options[next].value);
           (e.currentTarget.parentElement?.children[next] as HTMLElement | undefined)?.focus();
         }}
-        className={cn("chip tabular shrink-0 font-semibold", size === "lg" && "min-h-11 px-4 text-[0.9375rem]")}
+        className={cn("chip tabular shrink-0 font-semibold", size === "lg" && "min-h-11 px-4 text-[0.9375rem]", grid && "w-full justify-center text-center whitespace-normal")}
       >
         {on && <Check className="size-4" strokeWidth={2.75} aria-hidden />}
         {o.label}
       </button>
     );
   });
+  if (grid)
+    return (
+      <div role="radiogroup" aria-label={label} className={cn("grid gap-2", grid, className)}>
+        {chips}
+      </div>
+    );
   if (layout === "wrap")
     return (
       <div role="radiogroup" aria-label={label} className={cn("flex flex-wrap gap-2", className)}>

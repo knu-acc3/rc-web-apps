@@ -216,7 +216,7 @@ export function tallyGroups(n: number): number[] {
   return out;
 }
 
-export const TALLY_MAX = 500;
+const TALLY_MAX = 500;
 
 /**
  * How a value is drawn as tally marks: up to 500 — only marks; above that the number plus the strokes of the

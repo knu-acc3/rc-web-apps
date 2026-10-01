@@ -3,11 +3,13 @@
 import { Plus, X } from "lucide-react";
 import { useId, useState } from "react";
 import type { Locale } from "@/i18n/config";
-import { Button } from "@/ui/button";
+import { Button, IconButton } from "@/ui/button";
 import { CodeOutput } from "@/ui/code-output";
-import { Checkbox, Input, Select } from "@/ui/field";
+import { Field, Select, Switch } from "@/ui/field";
 import { Panel } from "@/ui/panel";
 import { Segmented } from "@/ui/segmented";
+import { SliderField } from "@/ui/slider-field";
+import { NumberSlider } from "@/tools/design/css/ui/kit";
 import { ColorField, CHECKER_STYLE } from "../ui/ColorField";
 import { DEFAULT_GRADIENT, DIRECTIONS, GRADIENT_PRESETS, gradientCss, gradientValue, type GradientState, type GradientStop, type GradientType, type InterpolationSpace } from "./lib/gradient";
 
@@ -23,11 +25,12 @@ const T = {
     shape: "Форма",
     circle: "Круг",
     ellipse: "Эллипс",
-    center: "Центр X / Y, %",
+    centerX: "Центр по X",
+    centerY: "Центр по Y",
     from: "Начальный угол",
     stops: "Цвета",
     color: (n: number) => `Цвет ${n}`,
-    pos: (n: number) => `Позиция цвета ${n}, %`,
+    position: "Позиция",
     remove: (n: number) => `Удалить цвет ${n}`,
     add: "Добавить цвет",
     space: "Интерполяция",
@@ -50,11 +53,12 @@ const T = {
     shape: "Shape",
     circle: "Circle",
     ellipse: "Ellipse",
-    center: "Center X / Y, %",
+    centerX: "Center X",
+    centerY: "Center Y",
     from: "Start angle",
     stops: "Colors",
     color: (n: number) => `Color ${n}`,
-    pos: (n: number) => `Color ${n} position, %`,
+    position: "Position",
     remove: (n: number) => `Remove color ${n}`,
     add: "Add color",
     space: "Interpolation",
@@ -68,9 +72,12 @@ const T = {
   },
 } as const;
 
-const num = (v: string, lo: number, hi: number, fallback: number) => {
-  const n = Number(v.replace(",", "."));
-  return Number.isFinite(n) ? Math.min(hi, Math.max(lo, n)) : fallback;
+/** A typed stop position: "" means "auto" (null). */
+const parsePos = (v: string): number | null => {
+  const s = v.trim().replace(",", ".");
+  if (!s) return null;
+  const n = Number(s);
+  return Number.isFinite(n) ? n : null;
 };
 
 export default function GradientGenerator({ locale, preset }: { locale: Locale; preset?: number }) {
@@ -88,15 +95,16 @@ export default function GradientGenerator({ locale, preset }: { locale: Locale; 
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="overflow-hidden rounded-[0.75rem] border border-line" style={CHECKER_STYLE}>
-        <div className="h-56 sm:h-72" style={{ background: gradientValue(g) }} role="img" aria-label={gradientValue(g)} />
+      <div className="overflow-hidden rounded-[1.25rem] shadow-card" style={CHECKER_STYLE}>
+        <div className="h-56 sm:h-72 lg:h-80" style={{ background: gradientValue(g) }} role="img" aria-label={gradientValue(g)} />
       </div>
 
-      <Panel className="flex flex-col gap-4 p-4 sm:p-5">
-        <div className="flex flex-wrap items-end gap-3">
+      <div className="grid items-start gap-4 lg:grid-cols-2">
+        <Panel className="flex flex-col gap-4 p-4 sm:p-5">
           <Segmented
             label={t.type}
             value={g.type}
+            fill
             onChange={(v: GradientType) => set({ type: v })}
             options={[
               { value: "linear", label: t.linear },
@@ -106,11 +114,8 @@ export default function GradientGenerator({ locale, preset }: { locale: Locale; 
           />
           {g.type === "linear" && (
             <>
-              <div className="flex flex-col gap-1">
-                <label htmlFor={`${id}-dir`} className="text-xs text-fg-3">
-                  {t.direction}
-                </label>
-                <Select id={`${id}-dir`} value={g.direction} onChange={(e) => set({ direction: e.target.value })} size="sm" className="w-44">
+              <Field label={t.direction} htmlFor={`${id}-dir`}>
+                <Select id={`${id}-dir`} value={g.direction} onChange={(e) => set({ direction: e.target.value })}>
                   <option value="">{t.byAngle}</option>
                   {DIRECTIONS.map((d) => (
                     <option key={d} value={d}>
@@ -118,101 +123,98 @@ export default function GradientGenerator({ locale, preset }: { locale: Locale; 
                     </option>
                   ))}
                 </Select>
-              </div>
-              {!g.direction && (
-                <div className="flex flex-col gap-1">
-                  <label htmlFor={`${id}-ang`} className="text-xs text-fg-3">
-                    {t.angle}, °
-                  </label>
-                  <Input id={`${id}-ang`} type="number" min={0} max={360} value={g.angle} onChange={(e) => set({ angle: num(e.target.value, -360, 720, g.angle) })} size="sm" className="w-24" />
-                </div>
-              )}
+              </Field>
+              {!g.direction && <NumberSlider label={t.angle} value={g.angle} min={0} max={360} unit="°" onChange={(v) => set({ angle: Math.min(720, Math.max(-360, v)) })} />}
             </>
           )}
           {g.type === "radial" && (
-            <div className="flex flex-col gap-1">
-              <label htmlFor={`${id}-shape`} className="text-xs text-fg-3">
-                {t.shape}
-              </label>
-              <Select id={`${id}-shape`} value={g.shape} onChange={(e) => set({ shape: e.target.value as GradientState["shape"] })} size="sm" className="w-32">
-                <option value="circle">{t.circle}</option>
-                <option value="ellipse">{t.ellipse}</option>
-              </Select>
-            </div>
+            <Segmented
+              label={t.shape}
+              value={g.shape}
+              size="sm"
+              onChange={(v: GradientState["shape"]) => set({ shape: v })}
+              options={[
+                { value: "circle", label: t.circle },
+                { value: "ellipse", label: t.ellipse },
+              ]}
+            />
           )}
-          {g.type === "conic" && (
-            <div className="flex flex-col gap-1">
-              <label htmlFor={`${id}-from`} className="text-xs text-fg-3">
-                {t.from}, °
-              </label>
-              <Input id={`${id}-from`} type="number" min={0} max={360} value={g.from} onChange={(e) => set({ from: num(e.target.value, -360, 720, g.from) })} size="sm" className="w-24" />
-            </div>
-          )}
+          {g.type === "conic" && <NumberSlider label={t.from} value={g.from} min={0} max={360} unit="°" onChange={(v) => set({ from: Math.min(720, Math.max(-360, v)) })} />}
           {g.type !== "linear" && (
-            <fieldset className="flex flex-col gap-1">
-              <legend className="mb-1 text-xs text-fg-3">{t.center}</legend>
-              <div className="flex gap-1.5">
-                <Input aria-label="X, %" type="number" min={0} max={100} value={g.x} onChange={(e) => set({ x: num(e.target.value, 0, 100, g.x) })} size="sm" className="w-20" />
-                <Input aria-label="Y, %" type="number" min={0} max={100} value={g.y} onChange={(e) => set({ y: num(e.target.value, 0, 100, g.y) })} size="sm" className="w-20" />
-              </div>
-            </fieldset>
+            <div className="grid gap-x-6 gap-y-4 sm:grid-cols-2">
+              <NumberSlider label={t.centerX} value={g.x} min={0} max={100} unit="%" onChange={(v) => set({ x: Math.min(100, Math.max(0, v)) })} />
+              <NumberSlider label={t.centerY} value={g.y} min={0} max={100} unit="%" onChange={(v) => set({ y: Math.min(100, Math.max(0, v)) })} />
+            </div>
           )}
-        </div>
+          <div className="flex flex-wrap items-center gap-x-5 gap-y-3">
+            <Field label={t.space} htmlFor={`${id}-sp`}>
+              <Select id={`${id}-sp`} value={g.space} onChange={(e) => set({ space: e.target.value as InterpolationSpace })} size="sm" variant="tonal">
+                <option value="">{t.spaceDefault}</option>
+                <option value="oklab">in oklab</option>
+                <option value="oklch">in oklch</option>
+                <option value="srgb-linear">in srgb-linear</option>
+              </Select>
+            </Field>
+            <Switch label={t.repeating} checked={g.repeating} onChange={(e) => set({ repeating: e.target.checked })} className="self-end" />
+          </div>
+        </Panel>
 
-        <fieldset>
-          <legend className="mb-2 text-sm font-medium text-fg-2">{t.stops}</legend>
-          <ol className="flex flex-col gap-2">
-            {g.stops.map((s, i) => (
-              <li key={s.id} className="grid grid-cols-[minmax(0,1fr)_5.5rem_2rem] items-end gap-2">
-                <ColorField label={t.color(i + 1)} value={s.color} onChange={(v) => setStop(s.id, { color: v })} locale={locale} size="sm" hideLabel />
-                <Input
-                  aria-label={t.pos(i + 1)}
-                  type="number"
-                  min={0}
-                  max={100}
-                  step={1}
-                  value={s.pos ?? ""}
-                  onChange={(e) => setStop(s.id, { pos: e.target.value === "" ? null : num(e.target.value, 0, 100, 0) })}
-                  size="sm"
-                />
-                <Button variant="ghost" size="icon-sm" aria-label={t.remove(i + 1)} title={t.remove(i + 1)} disabled={g.stops.length <= 2} onClick={() => set({ stops: g.stops.filter((x) => x.id !== s.id) })}>
-                  <X />
-                </Button>
-              </li>
-            ))}
-          </ol>
-          <Button variant="outline" size="sm" className="mt-2" onClick={addStop}>
-            <Plus aria-hidden />
-            {t.add}
-          </Button>
-        </fieldset>
-
-        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-line pt-3">
-          <label htmlFor={`${id}-sp`} className="text-sm text-fg-3">
-            {t.space}
-          </label>
-          <Select id={`${id}-sp`} value={g.space} onChange={(e) => set({ space: e.target.value as InterpolationSpace })} size="sm" className="w-44">
-            <option value="">{t.spaceDefault}</option>
-            <option value="oklab">in oklab</option>
-            <option value="oklch">in oklch</option>
-            <option value="srgb-linear">in srgb-linear</option>
-          </Select>
-          <Checkbox label={t.repeating} checked={g.repeating} onChange={(e) => set({ repeating: e.target.checked })} />
-        </div>
-      </Panel>
+        <Panel className="p-4 sm:p-5">
+          <fieldset>
+            <legend className="mb-3 text-sm font-medium text-fg-2">{t.stops}</legend>
+            <ol className="flex flex-col gap-3">
+              {g.stops.map((s, i) => (
+                <li key={s.id} className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-x-2 gap-y-2 rounded-[1rem] bg-surface-2 p-3 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto]">
+                  <ColorField label={t.color(i + 1)} value={s.color} onChange={(v) => setStop(s.id, { color: v })} locale={locale} size="sm" hideLabel className="self-center" />
+                  <SliderField
+                    id={`${id}-pos-${s.id}`}
+                    label={t.position}
+                    value={s.pos === null || s.pos === undefined ? "" : String(s.pos)}
+                    onChange={(v) => {
+                      const n = parsePos(v);
+                      setStop(s.id, { pos: n === null ? null : Math.min(100, Math.max(0, n)) });
+                    }}
+                    parse={parsePos}
+                    format={String}
+                    min={0}
+                    max={100}
+                    suffix="%"
+                    className="col-span-2 row-start-2 sm:col-span-1 sm:row-start-auto"
+                  />
+                  <IconButton
+                    label={t.remove(i + 1)}
+                    icon={<X aria-hidden />}
+                    disabled={g.stops.length <= 2}
+                    onClick={() => set({ stops: g.stops.filter((x) => x.id !== s.id) })}
+                    className="col-start-2 row-start-1 self-center sm:col-start-3"
+                  />
+                </li>
+              ))}
+            </ol>
+            <Button variant="tonal" className="mt-3" onClick={addStop}>
+              <Plus aria-hidden />
+              {t.add}
+            </Button>
+          </fieldset>
+        </Panel>
+      </div>
 
       <CodeOutput value={gradientCss(g)} title={t.code} filename="gradient.css" labels={{ copy: t.copy, copied: t.copied, download: t.download }} minRows={3} />
 
       <section>
         <h2 className="mb-2 text-sm font-semibold text-fg-2">{t.presets}</h2>
-        <ul className="grid grid-cols-[repeat(auto-fill,minmax(6.875rem,1fr))] gap-2">
+        <ul className="grid grid-cols-[repeat(auto-fill,minmax(7.5rem,1fr))] gap-2.5">
           {GRADIENT_PRESETS.map((p, i) => {
             const state = { ...DEFAULT_GRADIENT, ...p.state };
             return (
               <li key={i}>
-                <button type="button" className="w-full overflow-hidden rounded-[0.625rem] border border-line text-left hover:border-line-strong" onClick={() => setG(state)}>
-                  <span className="block h-12" style={{ background: gradientValue(state) }} />
-                  <span className="block px-2 py-1 text-xs text-fg-2">{p.name[locale]}</span>
+                <button
+                  type="button"
+                  className="block w-full overflow-hidden rounded-[1rem] bg-surface text-left shadow-card transition-[box-shadow,transform] duration-150 hover:-translate-y-0.5 hover:shadow-elev-2 active:translate-y-0 active:shadow-card"
+                  onClick={() => setG(state)}
+                >
+                  <span className="block h-14" style={{ background: gradientValue(state) }} />
+                  <span className="block truncate px-2.5 py-1.5 text-xs font-medium text-fg-2">{p.name[locale]}</span>
                 </button>
               </li>
             );

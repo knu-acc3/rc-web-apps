@@ -4,7 +4,7 @@ import { Pipette } from "lucide-react";
 import Link from "@/ui/link";
 import { useRef, useState, type PointerEvent } from "react";
 import { href, type Locale } from "@/i18n/config";
-import { Button } from "@/ui/button";
+import { IconButton } from "@/ui/button";
 import { CopyButton } from "@/ui/copy-button";
 import { Panel } from "@/ui/panel";
 import { contrastRatio, formatRatio, nearestNamed, parseColor, readableTextColor, toHex, WHITE } from "./lib/color";
@@ -120,26 +120,22 @@ export default function ColorPicker({ locale, initial = "#3B82F6" }: PickerProps
       <div className="flex min-w-0 flex-col gap-4">
         <Panel className="overflow-hidden">
           <div style={CHECKER_STYLE}>
-            <div className="flex min-h-36 flex-col justify-between gap-3 p-4 sm:min-h-44 sm:p-5" style={{ background: hex, color: fg }}>
-              <span className="font-mono text-3xl font-bold tracking-tight sm:text-4xl">{hex}</span>
+            <div className="flex min-h-40 flex-col justify-between gap-3 p-4 transition-colors duration-150 sm:min-h-52 sm:p-5" style={{ background: hex, color: fg }}>
+              <span className="font-mono text-4xl font-bold tracking-tight sm:text-5xl">{hex}</span>
               <div className="flex items-end justify-between gap-2">
                 <span className="text-sm">
                   {formatRatio(contrastRatio(opaque, WHITE))}:1 {t.onWhite}
                 </span>
-                <CopyButton value={hex} label={t.copyHex} copiedLabel={t.copied} variant="secondary" size="sm" />
+                <CopyButton value={hex} label={t.copyHex} copiedLabel={t.copied} variant="primary" size="md" />
               </div>
             </div>
           </div>
-          <div className="flex items-end gap-2 border-t border-line p-4">
+          <div className="flex items-end gap-2 p-4 sm:px-5">
             <ColorField label={t.input} value={text} onChange={onText} locale={locale} className="flex-1" />
-            {canEyedrop && (
-              <Button variant="outline" size="icon" onClick={eyedrop} aria-label={t.eyedropperTitle} title={t.eyedropperTitle}>
-                <Pipette />
-              </Button>
-            )}
+            {canEyedrop && <IconButton variant="tonal" onClick={eyedrop} label={t.eyedropperTitle} icon={<Pipette aria-hidden />} />}
           </div>
         </Panel>
-        <Panel className="p-2">
+        <Panel className="p-2 sm:p-3">
           <FormatList color={color} locale={locale} formats={["rgb", "hsl", "oklch", "hwb", "hsv", "cmyk", "lab", "lch", "oklab", "p3"]} />
           <p className="px-3 pt-1 pb-1.5 text-xs text-fg-3">
             {t.nearest}:{" "}
@@ -170,7 +166,7 @@ function SVArea({ hsva, onChange, label, valueText }: { hsva: Hsva; onChange: (x
   return (
     <div
       ref={boxRef}
-      className="relative aspect-[4/3] w-full touch-none overflow-hidden rounded-[0.625rem] border border-line select-none"
+      className="relative aspect-[4/3] w-full cursor-crosshair touch-none overflow-hidden rounded-[1rem] select-none"
       style={{ background: `linear-gradient(to top, #000, transparent), linear-gradient(to right, #fff, hsl(${hsva.h} 100% 50%))` }}
       onPointerDown={(e) => {
         if (e.button !== 0) return;

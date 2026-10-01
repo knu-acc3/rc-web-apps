@@ -17,17 +17,20 @@ export function Tabs<T extends string>({
   items,
   label,
   className,
+  bare = false,
 }: {
   value: T;
   onChange: (v: T) => void;
   items: readonly TabItem<T>[];
   label: string;
   className?: string;
+  /** No line under the tabs (when the card around them already draws one). */
+  bare?: boolean;
 }) {
   const id = useId();
   const refs = useRef<(HTMLButtonElement | null)[]>([]);
   return (
-    <ScrollRow role="tablist" label={label} className={cn("border-b border-line", className)} rowClassName="gap-1 py-0">
+    <ScrollRow role="tablist" label={label} className={cn(!bare && "border-b border-line", className)} rowClassName="gap-1 py-0">
       {items.map((it, i) => {
         const active = it.value === value;
         return (

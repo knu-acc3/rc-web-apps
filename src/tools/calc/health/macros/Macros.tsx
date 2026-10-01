@@ -5,7 +5,7 @@ import type { ToolProps } from "../../../types";
 import { Donut } from "../../shared/charts";
 import { fmtRound } from "../../shared/fmt";
 import { field, toInput } from "../../shared/num";
-import { Advanced, CalcGrid, Disclaimer, Explain, FieldRow, InlineSelect, NumField, OptionsRow, ResultMain, Stack, SubHeading, ToolActions } from "../../shared/ui";
+import { Advanced, CalcGrid, Disclaimer, Explain, NumSlider, ResultMain, SliderRow, Stack, SubHeading, ToggleField, ToolActions } from "../../shared/ui";
 import { useQueryState } from "../../shared/url-state";
 import { KCAL_PER_G, MACRO_PRESETS, macroGrams, type MacroPreset } from "../lib/body";
 
@@ -17,11 +17,11 @@ const T = {
     kcalHint: "Возьмите из калькулятора калорий",
     preset: "Распределение",
     presets: { balanced: "сбалансированное 25/30/45", lowcarb: "меньше углеводов 30/45/25", highprotein: "больше белка 35/30/35", custom: "своё" } satisfies Record<(typeof PRESETS)[number], string>,
-    custom: "Своё распределение, % калорий",
-    p: "Белки, %",
-    f: "Жиры, %",
-    c: "Углеводы, %",
-    weight: "Вес, кг (для белка на кг)",
+    p: "Белки",
+    f: "Жиры",
+    c: "Углеводы",
+    weightTitle: "Белок на кг веса",
+    weight: "Вес",
     label: "Белки · Жиры · Углеводы",
     g: "г",
     sub: (k: string) => `на ${k} в день`,
@@ -38,11 +38,11 @@ const T = {
     kcalHint: "Take it from the calorie calculator",
     preset: "Split",
     presets: { balanced: "balanced 25/30/45", lowcarb: "lower carb 30/45/25", highprotein: "higher protein 35/30/35", custom: "custom" } satisfies Record<(typeof PRESETS)[number], string>,
-    custom: "Custom split, % of calories",
-    p: "Protein, %",
-    f: "Fat, %",
-    c: "Carbs, %",
-    weight: "Body weight, kg (for protein per kg)",
+    p: "Protein",
+    f: "Fat",
+    c: "Carbs",
+    weightTitle: "Protein per kg of body weight",
+    weight: "Body weight",
     label: "Protein · Fat · Carbs",
     g: "g",
     sub: (k: string) => `for ${k} a day`,
@@ -75,22 +75,18 @@ export default function Macros({ locale }: ToolProps) {
 
   const inputs = (
     <>
-      <NumField id={`${id}-k`} label={t.kcal} hint={t.kcalHint} value={q.v.k} onChange={(k) => q.set({ k })} suffix={locale === "ru" ? "ккал" : "kcal"} error={K.message} size="lg" />
-      <OptionsRow>
-        <InlineSelect id={`${id}-s`} label={t.preset} value={preset} onChange={(s) => q.set({ s })} options={PRESETS.map((p) => ({ value: p, label: t.presets[p] }))} />
-      </OptionsRow>
+      <NumSlider id={`${id}-k`} locale={locale} label={t.kcal} hint={t.kcalHint} value={q.v.k} onChange={(k) => q.set({ k })} suffix={locale === "ru" ? "ккал" : "kcal"} error={K.message} min={1000} max={5000} step={50} />
+      <ToggleField label={t.preset} value={preset} onChange={(s) => q.set({ s })} options={PRESETS.map((p) => ({ value: p, label: t.presets[p] }))} />
       {preset === "custom" && (
-        <div className="grid grid-cols-3 gap-2">
-          <NumField id={`${id}-p`} label={t.p} value={q.v.p} onChange={(p) => q.set({ p })} error={P.message} size="sm" />
-          <NumField id={`${id}-f`} label={t.f} value={q.v.f} onChange={(f) => q.set({ f })} error={F.message} size="sm" />
-          <NumField id={`${id}-c`} label={t.c} value={q.v.c} onChange={(c) => q.set({ c })} error={C.message} size="sm" />
-        </div>
+        <SliderRow cols={3}>
+          <NumSlider id={`${id}-p`} locale={locale} label={t.p} value={q.v.p} onChange={(p) => q.set({ p })} error={P.message} suffix="%" min={0} max={100} />
+          <NumSlider id={`${id}-f`} locale={locale} label={t.f} value={q.v.f} onChange={(f) => q.set({ f })} error={F.message} suffix="%" min={0} max={100} />
+          <NumSlider id={`${id}-c`} locale={locale} label={t.c} value={q.v.c} onChange={(c) => q.set({ c })} error={C.message} suffix="%" min={0} max={100} />
+        </SliderRow>
       )}
       {split && !sumOk && <p className="text-sm text-err">{t.sum(`${fmtRound(locale, total, 1)} %`)}</p>}
-      <Advanced title={t.weight} open={!!q.v.w}>
-        <FieldRow>
-          <NumField id={`${id}-w`} label={t.weight} value={q.v.w} onChange={(w) => q.set({ w })} error={W.message} suffix={locale === "ru" ? "кг" : "kg"} placeholder="70" />
-        </FieldRow>
+      <Advanced title={t.weightTitle} open={!!q.v.w}>
+        <NumSlider id={`${id}-w`} locale={locale} label={t.weight} value={q.v.w} onChange={(w) => q.set({ w })} error={W.message} suffix={locale === "ru" ? "кг" : "kg"} min={30} max={200} />
       </Advanced>
     </>
   );
@@ -120,6 +116,7 @@ export default function Macros({ locale }: ToolProps) {
         <section>
           <SubHeading>{t.chart}</SubHeading>
           <Donut
+            className="panel p-4 sm:p-6"
             ariaLabel={t.chart}
             format={(v) => kc(v)}
             size={132}

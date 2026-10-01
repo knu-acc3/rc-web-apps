@@ -2,24 +2,18 @@
 
 import { useId } from "react";
 import type { Locale } from "@/i18n/config";
-import { Segmented } from "@/ui/segmented";
 import type { ToolProps } from "../../../types";
-import { CURRENCIES, CURRENCY_SYMBOL, fmtMoney, fmtPct, isCurrency, MINOR_UNIT, type Currency } from "../../shared/fmt";
-import { roundTo } from "../../shared/math";
+import { CURRENCIES, CURRENCY_SYMBOL, fmtMoney, fmtPct, isCurrency, MINOR_UNIT, moneyMax, type Currency } from "../../shared/fmt";
 import { field, toInput } from "../../shared/num";
-import { Advanced, CalcGrid, Disclaimer, Explain, FieldRow, InlineToggle, NumField, OptionsRow, ResultMain, Stack, ToolActions } from "../../shared/ui";
+import { Advanced, CalcGrid, Disclaimer, Explain, InlineToggle, NumSlider, OptionsRow, ResultMain, Stack, ToolActions, SliderRow } from "../../shared/ui";
 import { useQueryState } from "../../shared/url-state";
 import { loanSchedule, type ExtraMode, type LoanType } from "../lib/loan";
-import { CurrencySelect, ScheduleView, termText } from "./parts";
+import { CurrencySelect, ScheduleView, TERM_UNITS, TermSlider, termText, type TermUnit } from "./parts";
 
 const T = {
   ru: {
     amount: "Сумма кредита",
-    rate: "Ставка, % годовых",
-    term: "Срок",
-    years: "лет",
-    monthsShort: "мес.",
-    unit: "Единица срока",
+    rate: "Ставка в год",
     type: "Тип платежа",
     annuity: "Аннуитетный",
     diff: "Дифференцированный",
@@ -41,11 +35,7 @@ const T = {
   },
   en: {
     amount: "Loan amount",
-    rate: "Interest rate, % per year",
-    term: "Term",
-    years: "years",
-    monthsShort: "mo",
-    unit: "Term unit",
+    rate: "Interest rate per year",
     type: "Payment type",
     annuity: "Annuity",
     diff: "Differentiated",
@@ -68,7 +58,6 @@ const T = {
 } as const;
 
 const TYPES = ["annuity", "diff"] as const;
-const UNITS = ["y", "m"] as const;
 const MODES = ["term", "payment"] as const;
 
 export default function Loan({
@@ -83,11 +72,11 @@ export default function Loan({
   const defCur: Currency = locale === "ru" ? "KZT" : "USD";
   const q = useQueryState(
     { s: toInput(locale, amount), r: toInput(locale, rate), t: toInput(locale, years), u: "y", k: type, c: defCur, x: "", xm: "12", mx: "", em: "term" },
-    { enums: { u: UNITS, k: TYPES, c: CURRENCIES, em: MODES } },
+    { enums: { u: TERM_UNITS, k: TYPES, c: CURRENCIES, em: MODES } },
   );
   const cur = isCurrency(q.v.c) ? q.v.c : defCur;
   const sym = CURRENCY_SYMBOL[cur];
-  const unit = q.v.u as (typeof UNITS)[number];
+  const unit = q.v.u as TermUnit;
   const S = field(locale, q.v.s, { gt: 0, max: 1e12 });
   const R = field(locale, q.v.r, { min: 0, max: 200 });
   const N = field(locale, q.v.t, unit === "y" ? { gt: 0, max: 50 } : { gt: 0, max: 600, int: true });
@@ -129,34 +118,9 @@ export default function Loan({
 
   const inputs = (
     <>
-      <NumField id={`${id}-s`} label={t.amount} value={q.v.s} onChange={(s) => q.set({ s })} suffix={sym} error={S.message} size="lg" />
-      <FieldRow>
-        <NumField id={`${id}-r`} label={t.rate} value={q.v.r} onChange={(r) => q.set({ r })} suffix="%" error={R.message} size="lg" />
-        <NumField
-          id={`${id}-t`}
-          label={t.term}
-          value={q.v.t}
-          onChange={(v) => q.set({ t: v })}
-          suffix={unit === "y" ? t.years : t.monthsShort}
-          error={N.message}
-          size="lg"
-          aside={
-            <Segmented
-              size="sm"
-              label={t.unit}
-              value={unit}
-              onChange={(u) => {
-                const nv = N.value;
-                q.set({ u, t: nv === null ? q.v.t : toInput(locale, u === "m" ? Math.round(nv * 12) : roundTo(nv / 12, 2)) });
-              }}
-              options={[
-                { value: "y", label: t.years },
-                { value: "m", label: t.monthsShort },
-              ]}
-            />
-          }
-        />
-      </FieldRow>
+      <NumSlider id={`${id}-s`} locale={locale} label={t.amount} value={q.v.s} onChange={(s) => q.set({ s })} suffix={sym} error={S.message} min={0} max={moneyMax(cur, 100_000_000)} scale="log" />
+      <NumSlider id={`${id}-r`} locale={locale} label={t.rate} value={q.v.r} onChange={(r) => q.set({ r })} suffix="%" error={R.message} min={0} max={40} decimals={1} />
+      <TermSlider id={`${id}-t`} locale={locale} value={q.v.t} unit={unit} onChange={(v, u) => q.set({ t: v, u })} error={N.message} />
       <OptionsRow>
         <InlineToggle
           label={t.type}
@@ -167,14 +131,14 @@ export default function Loan({
             { value: "diff", label: t.diff },
           ]}
         />
-        <CurrencySelect id={`${id}-c`} locale={locale} value={cur} onChange={(c) => q.set({ c })} />
+        <CurrencySelect locale={locale} value={cur} onChange={(c) => q.set({ c })} />
       </OptionsRow>
       <Advanced title={t.early} open={hasExtra}>
-        <FieldRow>
-          <NumField id={`${id}-x`} label={t.oneOff} value={q.v.x} onChange={(x) => q.set({ x })} suffix={sym} error={X.message} placeholder="0" />
-          <NumField id={`${id}-xm`} label={t.inMonth} value={q.v.xm} onChange={(xm) => q.set({ xm })} error={XM.message} inputMode="numeric" />
-        </FieldRow>
-        <NumField id={`${id}-mx`} label={t.monthly} value={q.v.mx} onChange={(mx) => q.set({ mx })} suffix={sym} error={MX.message} placeholder="0" />
+        <SliderRow>
+          <NumSlider id={`${id}-x`} locale={locale} label={t.oneOff} value={q.v.x} onChange={(x) => q.set({ x })} suffix={sym} error={X.message} min={0} max={S.value ?? moneyMax(cur, 100_000_000)} scale="log" />
+          <NumSlider id={`${id}-xm`} locale={locale} label={t.inMonth} value={q.v.xm} onChange={(xm) => q.set({ xm })} error={XM.message} min={1} max={Math.max(2, months ?? 60)} />
+        </SliderRow>
+        <NumSlider id={`${id}-mx`} locale={locale} label={t.monthly} value={q.v.mx} onChange={(mx) => q.set({ mx })} suffix={sym} error={MX.message} min={0} max={moneyMax(cur, 5_000_000)} scale="log" />
         <InlineToggle
           label={t.reduce}
           showLabel

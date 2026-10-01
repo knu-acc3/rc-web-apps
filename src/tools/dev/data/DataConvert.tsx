@@ -7,11 +7,13 @@ import { href, type Locale } from "@/i18n/config";
 import { CodeEditor } from "@/tools/dev/shared/CodeEditor";
 import { useLiveTask, useWorkerClient } from "@/tools/dev/shared/hooks";
 import { outputLabels, positionLabel } from "@/tools/dev/shared/labels";
+import { Opt, OptionsRow } from "@/tools/dev/shared/Pane";
 import { JobError } from "@/tools/dev/shared/worker-client";
 import { buttonClass } from "@/ui/button";
 import { CodeOutput } from "@/ui/code-output";
-import { Input, Select, Switch } from "@/ui/field";
+import { Input, Switch } from "@/ui/field";
 import { Notice } from "@/ui/panel";
+import { Segmented } from "@/ui/segmented";
 import type { ConvertOptions, Fmt, Warn } from "./lib/convert";
 import { FORMAT_META, SAMPLES } from "./content/samples";
 
@@ -160,17 +162,10 @@ export default function DataConvert({ locale, from, to, options = {}, reverse }:
 
   const tabularIn = from === "csv" || from === "tsv";
   const tabularOut = to === "csv" || to === "tsv" || to === "markdown" || to === "html";
-  const sel = (label: string, value: string, onChange: (v: string) => void, items: [string, string][], w = "w-36") => (
-    <label className="flex items-center gap-2">
-      {label}
-      <Select value={value} size="sm" className={w} onChange={(e) => onChange(e.target.value)}>
-        {items.map(([v, l]) => (
-          <option key={v} value={v}>
-            {l}
-          </option>
-        ))}
-      </Select>
-    </label>
+  const sel = (label: string, value: string, onChange: (v: string) => void, items: [string, string][]) => (
+    <Opt label={label} group>
+      <Segmented label={label} size="sm" value={value} onChange={onChange} options={items.map(([v, l]) => ({ value: v, label: l }))} />
+    </Opt>
   );
   const delims: [string, string][] = [
     ["auto", t.auto],
@@ -200,15 +195,15 @@ export default function DataConvert({ locale, from, to, options = {}, reverse }:
         </Notice>
       )}
 
-      <div className="flex flex-wrap items-center gap-x-5 gap-y-3 text-sm text-fg-2">
-        {from === "csv" && sel(t.delimiter, opts.delimiter ?? "auto", (v) => set("delimiter", v), delims, "w-32")}
+      <OptionsRow>
+        {from === "csv" && sel(t.delimiter, opts.delimiter ?? "auto", (v) => set("delimiter", v), delims)}
         {tabularIn && <Switch label={t.header} checked={opts.header !== false} onChange={(e) => set("header", e.target.checked)} />}
         {tabularIn && !tabularOut && <Switch label={t.typed} checked={!!opts.typed} onChange={(e) => set("typed", e.target.checked)} />}
         {tabularIn && !tabularOut && <Switch label={t.nested} checked={!!opts.nested} onChange={(e) => set("nested", e.target.checked)} />}
-        {to === "csv" && !tabularIn && sel(t.delimiter, opts.delimiter && opts.delimiter !== "auto" ? opts.delimiter : ",", (v) => set("delimiter", v), delims.slice(1), "w-32")}
+        {to === "csv" && !tabularIn && sel(t.delimiter, opts.delimiter && opts.delimiter !== "auto" ? opts.delimiter : ",", (v) => set("delimiter", v), delims.slice(1))}
         {(to === "csv" || to === "tsv") && <Switch label={t.bom} checked={!!opts.bom} onChange={(e) => set("bom", e.target.checked)} />}
         {(to === "csv" || to === "tsv") && <Switch label={t.guard} checked={!!opts.injectionGuard} onChange={(e) => set("injectionGuard", e.target.checked)} />}
-        {tabularOut && !tabularIn && sel(t.arrays, opts.arrays ?? "index", (v) => set("arrays", v as ConvertOptions["arrays"]), Object.entries(t.arrayModes), "w-48")}
+        {tabularOut && !tabularIn && sel(t.arrays, opts.arrays ?? "index", (v) => set("arrays", v as ConvertOptions["arrays"]), Object.entries(t.arrayModes))}
         {(to === "json" || to === "yaml" || to === "xml") &&
           sel(
             t.indent,
@@ -219,19 +214,16 @@ export default function DataConvert({ locale, from, to, options = {}, reverse }:
               ["4", "4"],
               ...(to === "json" ? ([["0", t.minified]] as [string, string][]) : []),
             ],
-            "w-36",
           )}
         {to === "xml" && (
-          <label className="flex items-center gap-2" htmlFor={`${id}-root`}>
-            {t.root}
-            <Input id={`${id}-root`} size="sm" className="w-32 font-mono" value={opts.root ?? ""} placeholder="root" onChange={(e) => set("root", e.target.value.trim())} />
-          </label>
+          <Opt label={t.root} htmlFor={`${id}-root`}>
+            <Input id={`${id}-root`} size="sm" className="w-40 font-mono" value={opts.root ?? ""} placeholder="root" onChange={(e) => set("root", e.target.value.trim())} />
+          </Opt>
         )}
         {(to === "typescript" || to === "zod") && (
-          <label className="flex items-center gap-2" htmlFor={`${id}-root`}>
-            {t.rootType}
-            <Input id={`${id}-root`} size="sm" className="w-32 font-mono" value={opts.root ?? ""} placeholder="Root" onChange={(e) => set("root", e.target.value.trim())} />
-          </label>
+          <Opt label={t.rootType} htmlFor={`${id}-root`}>
+            <Input id={`${id}-root`} size="sm" className="w-40 font-mono" value={opts.root ?? ""} placeholder="Root" onChange={(e) => set("root", e.target.value.trim())} />
+          </Opt>
         )}
         {to === "typescript" &&
           sel(t.style, opts.tsStyle ?? "interface", (v) => set("tsStyle", v as "interface" | "type"), [
@@ -240,12 +232,12 @@ export default function DataConvert({ locale, from, to, options = {}, reverse }:
           ])}
         {to === "env" && <Switch label={t.upper} checked={opts.envUpper !== false} onChange={(e) => set("envUpper", e.target.checked)} />}
         {reverse && (
-          <Link href={href(locale, [reverse])} className={buttonClass("ghost", "sm", "ml-auto")}>
+          <Link href={href(locale, [reverse])} className={buttonClass("tonal", "sm", "ml-auto")}>
             <ArrowLeftRight aria-hidden />
             {t.reverse}
           </Link>
         )}
-      </div>
+      </OptionsRow>
     </div>
   );
 }

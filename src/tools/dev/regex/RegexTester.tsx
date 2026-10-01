@@ -5,12 +5,13 @@ import type { Locale } from "@/i18n/config";
 import { formatNumber, plural } from "@/i18n/format";
 import { CodeEditor } from "@/tools/dev/shared/CodeEditor";
 import { useHydrated, useLiveTask, useWorkerClient } from "@/tools/dev/shared/hooks";
-import { outputLabels } from "@/tools/dev/shared/labels";
+import { KIT_T, outputLabels } from "@/tools/dev/shared/labels";
+import { Pane } from "@/tools/dev/shared/Pane";
 import { JobTimeout } from "@/tools/dev/shared/worker-client";
 import { cn } from "@/lib/cn";
 import { CodeOutput } from "@/ui/code-output";
 import { CopyButton } from "@/ui/copy-button";
-import { Input } from "@/ui/field";
+import { Field, Input } from "@/ui/field";
 import { Notice, Panel } from "@/ui/panel";
 import { Segmented } from "@/ui/segmented";
 import { Tabs } from "@/ui/tabs";
@@ -25,6 +26,7 @@ const T = {
     pattern: "Регулярное выражение",
     flagsLabel: "Флаги",
     flag: { g: "g — все совпадения", i: "i — без учёта регистра", m: "m — ^ и $ для каждой строки", s: "s — точка захватывает перевод строки", u: "u — Unicode (\\p{…}, эмодзи)", v: "v — Unicode-множества (новее u)", y: "y — «липкий» поиск с lastIndex", d: "d — позиции групп (indices)" },
+    flagShort: { g: "все", i: "регистр", m: "строки", s: "точка", u: "Unicode", v: "множества", y: "липкий", d: "индексы" },
     unsupported: "не поддерживается этим браузером",
     uv: "Флаги u и v нельзя включить вместе",
     text: "Тестовая строка",
@@ -60,6 +62,7 @@ const T = {
     pattern: "Regular expression",
     flagsLabel: "Flags",
     flag: { g: "g — all matches", i: "i — case-insensitive", m: "m — ^ and $ per line", s: "s — dot matches newlines", u: "u — Unicode (\\p{…}, emoji)", v: "v — Unicode sets (newer u)", y: "y — sticky search from lastIndex", d: "d — group indices" },
+    flagShort: { g: "global", i: "ignore case", m: "multiline", s: "dotAll", u: "Unicode", v: "sets", y: "sticky", d: "indices" },
     unsupported: "not supported by this browser",
     uv: "The u and v flags can't be combined",
     text: "Test string",
@@ -157,104 +160,95 @@ export default function RegexTester({ locale, pattern: p0 = "(?<user>[\\w.+-]+)@
   }, [syntax, tab, lang, pattern, flags, replacement]);
   const count = res?.matches.length ?? 0;
 
+  const summary = syntax || timedOut ? "" : count ? `${formatNumber(locale, count)} ${plural(locale, count, t.found)}${res?.capped ? ` · ${t.capped(formatNumber(locale, CAP))}` : ""}` : res ? t.none : "";
+
   return (
     <div className="flex flex-col gap-4">
-      <Panel className="p-4 sm:p-6">
+      <Panel className="flex flex-col gap-3 p-4 sm:p-6">
         <label htmlFor={`${id}-p`} className="text-sm font-medium text-fg-2">
           {t.pattern}
         </label>
-        <div className="mt-1.5 flex items-center gap-2">
-          <span className="font-mono text-2xl text-fg-3" aria-hidden>
+        <div className="flex items-center gap-2">
+          <span className="font-mono text-2xl text-fg-3 max-sm:hidden" aria-hidden>
             /
           </span>
           <Input id={`${id}-p`} size="lg" value={pattern} onChange={(e) => setPattern(e.target.value)} className="font-mono text-lg!" spellCheck={false} autoComplete="off" autoCapitalize="off" aria-invalid={!!syntax} />
-          <span className="font-mono text-2xl text-fg-3" aria-hidden>
+          <span className="shrink-0 font-mono text-2xl text-fg-3 max-sm:hidden" aria-hidden>
             /{flags}
           </span>
-          <CopyButton value={`/${pattern}/${flags}`} size="icon" variant="outline" className="h-12! w-12! shrink-0" />
+          <CopyButton value={`/${pattern}/${flags}`} label={KIT_T[locale].copy} copiedLabel={KIT_T[locale].copied} size="icon" variant="secondary" className="shrink-0" />
         </div>
-        <div className="mt-3 flex flex-wrap gap-1.5" role="group" aria-label={t.flagsLabel}>
+        <div className="flex flex-wrap gap-2" role="group" aria-label={t.flagsLabel}>
           {FLAGS.map((f) => {
             const ok = !hydrated || supports(f);
             const on = flags.includes(f);
             return (
-              <button
-                key={f}
-                type="button"
-                aria-pressed={on}
-                disabled={!ok}
-                title={ok ? t.flag[f] : `${t.flag[f]} — ${t.unsupported}`}
-                onClick={() => toggle(f)}
-                className={cn("h-8 min-w-9 rounded-[0.4375rem] border px-2.5 font-mono text-sm transition-colors duration-150 disabled:opacity-40", on ? "border-accent bg-accent-soft text-accent" : "border-line text-fg-2 hover:border-line-strong hover:text-fg")}
-              >
-                {f}
+              <button key={f} type="button" aria-pressed={on} disabled={!ok} title={ok ? t.flag[f] : `${t.flag[f]} — ${t.unsupported}`} onClick={() => toggle(f)} className="chip">
+                <span className="font-mono text-[0.9375rem] font-bold">{f}</span>
+                <span className="max-sm:hidden">{t.flagShort[f]}</span>
               </button>
             );
           })}
         </div>
         {syntax && (
-          <Notice tone="err" className="mt-3">
+          <Notice tone="err">
             {t.error}: {syntax}
           </Notice>
         )}
-        {timedOut && (
-          <Notice tone="warn" className="mt-3">
-            {t.timeout}
-          </Notice>
-        )}
+        {timedOut && <Notice tone="warn">{t.timeout}</Notice>}
       </Panel>
 
-      <CodeEditor id={`${id}-t`} locale={locale} label={t.text} value={text} onChange={setText} rows={6} wrap fileAccept=".txt,.log,.csv,.json,text/*" />
+      <div className="grid items-start gap-4 lg:grid-cols-2">
+        <CodeEditor id={`${id}-t`} locale={locale} label={t.text} value={text} onChange={setText} rows={8} wrap fileAccept=".txt,.log,.csv,.json,text/*" />
 
-      <Tabs label={t.tabsLabel} value={tab} onChange={setTab} items={(["matches", "replace", "code"] as const).map((v) => ({ value: v, label: t.tabs[v] }))} />
+        <div className="flex min-w-0 flex-col gap-3">
+          <Tabs label={t.tabsLabel} value={tab} onChange={setTab} items={(["matches", "replace", "code"] as const).map((v) => ({ value: v, label: t.tabs[v] }))} />
 
-      {tab === "matches" && (
-        <>
-          <p className="text-sm font-medium text-fg-2" aria-live="polite">
-            {syntax || timedOut ? "" : count ? `${formatNumber(locale, count)} ${plural(locale, count, t.found)}${res?.capped ? ` · ${t.capped(formatNumber(locale, CAP))}` : ""}` : res ? t.none : ""}
-          </p>
-          {!syntax && res && <Highlight text={text} matches={res.matches} empty={t.empty} cut={t.previewCut} dim={live.pending} />}
-          {!syntax && res && res.matches.length > 0 && <MatchTable locale={locale} matches={res.matches} />}
-        </>
-      )}
+          {tab === "matches" && !syntax && res && (
+            <Pane title={<span aria-live="polite">{summary}</span>}>
+              <Highlight text={text} matches={res.matches} empty={t.empty} cut={t.previewCut} dim={live.pending} />
+            </Pane>
+          )}
+          {tab === "matches" && (syntax || !res) && summary && <p className="text-sm font-medium text-fg-2">{summary}</p>}
 
-      {tab === "replace" && (
-        <>
-          <div className="flex flex-col gap-1.5">
-            <label htmlFor={`${id}-r`} className="text-sm font-medium text-fg-2">
-              {t.replacement}
-            </label>
-            <Input id={`${id}-r`} value={replacement} onChange={(e) => setReplacement(e.target.value)} className="font-mono" spellCheck={false} autoComplete="off" />
-            <p className="text-[0.8125rem] text-fg-3">{t.replaceHint}</p>
-          </div>
-          <CodeOutput value={rep.value ?? rep.stale ?? ""} title={t.result} labels={outputLabels(locale)} minRows={6} />
-        </>
-      )}
+          {tab === "replace" && (
+            <>
+              <Field label={t.replacement} htmlFor={`${id}-r`} hint={t.replaceHint}>
+                <Input id={`${id}-r`} value={replacement} onChange={(e) => setReplacement(e.target.value)} className="font-mono" spellCheck={false} autoComplete="off" />
+              </Field>
+              <CodeOutput value={rep.value ?? rep.stale ?? ""} title={t.result} labels={outputLabels(locale)} minRows={6} />
+            </>
+          )}
 
-      {tab === "code" && exported && (
-        <>
-          <Segmented
-            label={t.lang}
-            value={lang}
-            onChange={setLang}
-            options={[
-              { value: "js", label: "JavaScript" },
-              { value: "python", label: "Python" },
-              { value: "php", label: "PHP" },
-              { value: "java", label: "Java" },
-              { value: "go", label: "Go" },
-              { value: "csharp", label: "C#" },
-            ]}
-          />
-          <CodeOutput value={exported.find.code} title={t.tabs.matches} labels={outputLabels(locale)} minRows={7} />
-          {exported.repl && <CodeOutput value={exported.repl.code} title={t.tabs.replace} labels={outputLabels(locale)} minRows={5} />}
-          {exported.warnings.map((w) => (
-            <Notice key={w} tone="warn">
-              {t.warn[w]}
-            </Notice>
-          ))}
-        </>
-      )}
+          {tab === "code" && exported && (
+            <>
+              <Segmented
+                label={t.lang}
+                value={lang}
+                onChange={setLang}
+                size="sm"
+                options={[
+                  { value: "js", label: "JavaScript" },
+                  { value: "python", label: "Python" },
+                  { value: "php", label: "PHP" },
+                  { value: "java", label: "Java" },
+                  { value: "go", label: "Go" },
+                  { value: "csharp", label: "C#" },
+                ]}
+              />
+              <CodeOutput value={exported.find.code} title={t.tabs.matches} labels={outputLabels(locale)} minRows={7} />
+              {exported.repl && <CodeOutput value={exported.repl.code} title={t.tabs.replace} labels={outputLabels(locale)} minRows={5} />}
+              {exported.warnings.map((w) => (
+                <Notice key={w} tone="warn">
+                  {t.warn[w]}
+                </Notice>
+              ))}
+            </>
+          )}
+        </div>
+      </div>
+
+      {tab === "matches" && !syntax && res && res.matches.length > 0 && <MatchTable locale={locale} matches={res.matches} />}
     </div>
   );
 }
@@ -270,14 +264,19 @@ function Highlight({ text, matches, empty, cut, dim }: { text: string; matches: 
     if (m.index > pos) nodes.push(shown.slice(pos, m.index));
     if (m.index < pos) continue;
     if (m.end === m.index) nodes.push(<mark key={k++} className="mx-px inline-block h-[1.1em] w-0.5 translate-y-0.5 rounded-sm bg-accent" aria-label="∅" />);
-    else nodes.push(<mark key={k++} className={cn("rounded-[0.1875rem] px-px text-fg", i % 2 ? "bg-warn-soft" : "bg-accent-soft")}>{shown.slice(m.index, Math.min(m.end, shown.length))}</mark>);
+    else
+      nodes.push(
+        <mark key={k++} className={cn("rounded-[0.25rem] border-b-2 px-0.5 font-semibold [box-decoration-break:clone] [-webkit-box-decoration-break:clone]", i % 2 ? "border-warn bg-warn-soft text-fg" : "border-accent bg-accent-container text-on-accent-container")}>
+          {shown.slice(m.index, Math.min(m.end, shown.length))}
+        </mark>,
+      );
     pos = Math.min(m.end, shown.length);
   }
   if (pos < shown.length) nodes.push(shown.slice(pos));
   return (
-    <div className={cn("rounded-[0.75rem] border border-line bg-surface", dim && "opacity-70")}>
-      <div className="max-h-[50vh] overflow-auto px-3 py-2.5 font-mono text-sm leading-relaxed break-words whitespace-pre-wrap text-fg">{text ? nodes : <span className="text-fg-3">{empty}</span>}</div>
-      {text.length > PREVIEW_CHARS && <p className="border-t border-line px-3 py-1.5 text-[0.8125rem] text-fg-3">{cut}</p>}
+    <div className={cn("motion-safe:transition-opacity", dim && "opacity-70")}>
+      <div className="max-h-[50vh] min-h-32 overflow-auto px-4 py-3 font-mono text-sm leading-[1.9] break-words whitespace-pre-wrap text-fg">{text ? nodes : <span className="text-fg-3">{empty}</span>}</div>
+      {text.length > PREVIEW_CHARS && <p className="px-4 pb-2.5 text-[0.8125rem] text-fg-3">{cut}</p>}
     </div>
   );
 }
@@ -310,18 +309,18 @@ function MatchTable({ locale, matches }: { locale: Locale; matches: Match[] }) {
           {matches.slice(0, 200).map((m, i) => (
             <tr key={i}>
               <td className="text-fg-3">{i + 1}</td>
-              <td className="text-fg-2">
+              <td className="whitespace-nowrap text-fg-2">
                 {m.index}–{m.end}
               </td>
-              <td className="max-w-[16rem] break-all">{m.text || "∅"}</td>
+              <td className="min-w-36 max-w-[16rem] break-all">{m.text || "∅"}</td>
               {Array.from({ length: Math.min(groupCount, 9) }, (_, g) => (
-                <td key={g} className="max-w-[12rem] break-all">
+                <td key={g} className="min-w-28 max-w-[12rem] break-all">
                   {m.groups[g] ?? <span className="text-fg-3">—</span>}
                   {m.spans?.[g] && <span className="block text-fg-3">{m.spans[g]!.join("–")}</span>}
                 </td>
               ))}
               {names.map((n) => (
-                <td key={n} className="max-w-[12rem] break-all">
+                <td key={n} className="min-w-28 max-w-[12rem] break-all">
                   {m.named?.[n] ?? <span className="text-fg-3">—</span>}
                 </td>
               ))}

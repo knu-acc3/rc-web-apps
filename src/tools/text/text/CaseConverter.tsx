@@ -2,10 +2,10 @@
 
 import { useId, useMemo, useState } from "react";
 import type { Locale } from "@/i18n/config";
-import { Checkbox } from "@/ui/field";
-import { Segmented } from "@/ui/segmented";
+import { Switch } from "@/ui/field";
 import { CASE_IDS, convertCase, type CaseId } from "./lib/case";
 import { InputPanel, OptionsBar, OutputPanel, TwoPane } from "./ui/shared";
+import { ChipChoice } from "@/ui/chip-choice";
 
 const CASE_LABELS: Record<CaseId, { ru: string; en: string }> = {
   upper: { ru: "ВСЕ ЗАГЛАВНЫЕ", en: "UPPER CASE" },
@@ -56,11 +56,17 @@ export default function CaseConverter({ locale, caseId = "upper" }: CaseConverte
 
   return (
     <div className="flex flex-col gap-4">
-      <Segmented label={t.caseLabel} value={mode} onChange={setMode} options={CASE_IDS.map((c) => ({ value: c, label: CASE_LABELS[c][locale] }))} className="self-start" />
+      <ChipChoice
+        label={t.caseLabel}
+        value={mode}
+        onChange={setMode}
+        grid="grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6"
+        options={CASE_IDS.map((c) => ({ value: c, label: CASE_LABELS[c][locale] }))}
+      />
       {(mode === "title" || mode === "sentence") && (
         <OptionsBar>
-          <Checkbox label={t.acronyms} checked={acronyms} onChange={(e) => setAcronyms(e.target.checked)} />
-          {mode === "title" && <Checkbox label={t.small} checked={smallWords} onChange={(e) => setSmallWords(e.target.checked)} />}
+          <Switch label={t.acronyms} checked={acronyms} onChange={(e) => setAcronyms(e.target.checked)} />
+          {mode === "title" && <Switch label={t.small} checked={smallWords} onChange={(e) => setSmallWords(e.target.checked)} />}
         </OptionsBar>
       )}
       <TwoPane>

@@ -29,7 +29,7 @@ export function CodeOutput({
 }) {
   return (
     <div className={cn("panel flex min-w-0 flex-col overflow-hidden", className)}>
-      <div className="flex min-h-12 items-center justify-between gap-2 border-b border-line py-1.5 pl-4 pr-2">
+      <div className="flex min-h-[3.25rem] items-center justify-between gap-2 border-b border-line py-1.5 pl-4 pr-2">
         <div className="min-w-0 truncate text-sm font-semibold text-fg">{title}</div>
         <div className="flex items-center gap-1">
           {extraActions}

@@ -5,9 +5,11 @@ import { useId, useRef, useState } from "react";
 import { cn } from "@/lib/cn";
 import { Button } from "@/ui/button";
 import { Input } from "@/ui/field";
+import { Panel } from "@/ui/panel";
+import { ScrollRow } from "@/ui/scroll-row";
 import { Tabs } from "@/ui/tabs";
 import type { ToolProps } from "../../../types";
-import { Explain, InlineSelect, InlineToggle, OptionsRow, Stack } from "../../shared/ui";
+import { Explain, InlineToggle, OptionsRow, Stack } from "../../shared/ui";
 import { useQueryState } from "../../shared/url-state";
 import { tableTip } from "./tips";
 
@@ -146,9 +148,17 @@ export default function MultiplicationTable({ locale, n = 7 }: ToolProps<{ n?: n
     <Stack>
       <div className="flex flex-col gap-4">
         <Tabs label={t.viewLabel} value={view} onChange={(v) => q.set({ v })} items={VIEWS.map((v) => ({ value: v, label: t.views[v] }))} />
+        {view === "one" && (
+          <ScrollRow label={t.number} rowClassName="gap-2">
+            {NUMS.map((x) => (
+              <button key={x} type="button" className="chip tabular min-w-11 shrink-0 justify-center text-base" aria-pressed={q.v.n === x} onClick={() => q.set({ n: x })}>
+                × {x}
+              </button>
+            ))}
+          </ScrollRow>
+        )}
         {view !== "practice" && (
           <OptionsRow>
-            {view === "one" && <InlineSelect id={`${id}-n`} label={t.number} value={q.v.n} onChange={(v) => q.set({ n: v })} options={NUMS.map((x) => ({ value: x, label: x }))} />}
             <InlineToggle
               label={t.upTo}
               showLabel
@@ -159,7 +169,7 @@ export default function MultiplicationTable({ locale, n = 7 }: ToolProps<{ n?: n
                 { value: "20", label: "20" },
               ]}
             />
-            <Button variant="outline" size="sm" onClick={print}>
+            <Button variant="tonal" size="sm" onClick={print}>
               <Printer aria-hidden />
               {t.print}
             </Button>
@@ -168,7 +178,7 @@ export default function MultiplicationTable({ locale, n = 7 }: ToolProps<{ n?: n
 
         {view === "one" && (
           <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
-            <section aria-label={t.title(q.v.n)} className={cn("grid gap-x-8 rounded-[0.75rem] bg-accent-soft p-5 sm:p-6", max === 20 && "sm:grid-cols-2")}>
+            <section aria-label={t.title(q.v.n)} className={cn("grid gap-x-8 rounded-[1.25rem] bg-accent-soft p-5 sm:p-6", max === 20 && "sm:grid-cols-2")}>
               {oneRows.map((i) => (
                 <p key={i} className="tabular py-1 text-2xl font-semibold text-fg sm:text-[1.75rem]">
                   <span className="text-fg-2">
@@ -178,10 +188,10 @@ export default function MultiplicationTable({ locale, n = 7 }: ToolProps<{ n?: n
                 </p>
               ))}
             </section>
-            <section className="rounded-[0.75rem] border border-line bg-surface p-5">
+            <Panel className="p-5 sm:p-6">
               <h2 className="text-base font-semibold text-fg">{t.tip}</h2>
               <p className="mt-2 text-[0.9375rem] leading-relaxed text-fg-2">{tableTip(locale, num)}</p>
-            </section>
+            </Panel>
           </div>
         )}
 
@@ -224,10 +234,17 @@ export default function MultiplicationTable({ locale, n = 7 }: ToolProps<{ n?: n
         )}
 
         {view === "practice" && (
-          <section className="flex flex-col items-center gap-4 rounded-[0.75rem] bg-accent-soft p-6 text-center sm:p-8">
-            <OptionsRow className="justify-center">
-              <InlineSelect id={`${id}-p`} label={t.practiceOn} value={q.v.p} onChange={(p) => q.set({ p })} options={[{ value: "all", label: t.all }, ...NUMS.map((x) => ({ value: x, label: `× ${x}` }))]} />
-            </OptionsRow>
+          <section className="flex min-w-0 flex-col items-center gap-4 rounded-[1.25rem] bg-accent-soft p-6 text-center sm:p-8">
+            <div className="flex w-full min-w-0 flex-col items-center gap-2">
+              <span className="text-sm font-medium text-fg-2">{t.practiceOn}</span>
+              <ScrollRow label={t.practiceOn} className="max-w-full" rowClassName="gap-2">
+                {["all", ...NUMS].map((x) => (
+                  <button key={x} type="button" className="chip tabular min-w-11 shrink-0 justify-center" aria-pressed={q.v.p === x} onClick={() => q.set({ p: x })}>
+                    {x === "all" ? t.all : `× ${x}`}
+                  </button>
+                ))}
+              </ScrollRow>
+            </div>
             {quiz ? (
               <>
                 <p className="tabular text-5xl font-bold tracking-tight text-fg">

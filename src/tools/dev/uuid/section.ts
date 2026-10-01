@@ -63,13 +63,13 @@ const tools: ToolDef[] = [
       ru: [
         { q: "Может ли UUID v4 повториться?", a: "Теоретически да, практически нет: в UUID v4 122 случайных бита. Чтобы вероятность хотя бы одного совпадения достигла 50 %, нужно сгенерировать около 2,7×10¹⁸ идентификаторов." },
         { q: "Насколько случайны эти UUID?", a: "Байты берутся из crypto.getRandomValues — криптографически стойкого генератора браузера. Затем выставляются 4 бита версии и 2 бита варианта, как требует RFC 9562." },
-        { q: "Чем UUID отличается от GUID?", a: "Это одно и то же: GUID — название UUID в мире Microsoft. В .NET GUID обычно пишут заглавными буквами и иногда в фигурных скобках — эти форматы включаются галочками." },
+        { q: "Чем UUID отличается от GUID?", a: "Это одно и то же: GUID — название UUID в мире Microsoft. В .NET GUID обычно пишут заглавными буквами и иногда в фигурных скобках — эти форматы выбираются в списке «Формат»." },
         { q: "Какую версию UUID выбрать для базы данных?", a: "Для первичных ключей в PostgreSQL и MySQL лучше UUID v7: он растёт со временем, и индекс B-дерева не фрагментируется. UUID v4 подходит, когда порядок не важен или время создания нужно скрыть." },
       ],
       en: [
         { q: "Can a UUID v4 repeat?", a: "In theory yes, in practice no: a v4 UUID has 122 random bits. You would need about 2.7×10¹⁸ IDs before the chance of a single collision reaches 50%." },
         { q: "How random are these UUIDs?", a: "The bytes come from crypto.getRandomValues, the browser's cryptographically secure generator. Then 4 version bits and 2 variant bits are set as RFC 9562 requires." },
-        { q: "What is the difference between UUID and GUID?", a: "None: GUID is Microsoft's name for a UUID. In .NET GUIDs are usually written in uppercase and sometimes in braces — enable those formats with the checkboxes." },
+        { q: "What is the difference between UUID and GUID?", a: "None: GUID is Microsoft's name for a UUID. In .NET GUIDs are usually written in uppercase and sometimes in braces — pick those formats in the Format list." },
         { q: "Which UUID version is best for a database key?", a: "For primary keys in PostgreSQL or MySQL prefer UUID v7: it grows with time, so B-tree indexes don't fragment. UUID v4 is fine when order doesn't matter or the creation time must stay hidden." },
       ],
     },
@@ -264,8 +264,8 @@ const tools: ToolDef[] = [
     lead: { ru: "Список до 10 000 идентификаторов любого типа за одно нажатие — с выбором формата и скачиванием файлом.", en: "A list of up to 10,000 IDs of any type in one click — with format options and file download." },
     keywords: { ru: ["массовая генерация uuid", "список uuid", "много uuid"], en: ["bulk uuid", "uuid list", "multiple uuids"] },
     howTo: {
-      ru: ["Выберите тип идентификатора: UUID v4, v7, v1, v6, ULID или ObjectId.", "Укажите количество от 1 до 10 000 и нажмите Enter.", "Настройте формат и скачайте список в TXT или JSON либо скопируйте его."],
-      en: ["Pick the ID type: UUID v4, v7, v1, v6, ULID or ObjectId.", "Enter a count from 1 to 10,000 and press Enter.", "Adjust the format, then download the list as TXT or JSON or copy it."],
+      ru: ["Выберите тип идентификатора: UUID v4, v7, v1, v6, ULID или ObjectId.", "Задайте количество от 1 до 10 000 ползунком или числом — список обновится сам.", "Настройте формат и скачайте список в TXT или JSON либо скопируйте его."],
+      en: ["Pick the ID type: UUID v4, v7, v1, v6, ULID or ObjectId.", "Set a count from 1 to 10,000 with the slider or a number — the list updates by itself.", "Adjust the format, then download the list as TXT or JSON or copy it."],
     },
     faq: {
       ru: [
@@ -299,8 +299,8 @@ const tools: ToolDef[] = [
     lead: { ru: "GUID — это UUID v4 в записи Microsoft: {XXXXXXXX-XXXX-4XXX-YXXX-XXXXXXXXXXXX}.", en: "A GUID is a UUID v4 written the Microsoft way: {XXXXXXXX-XXXX-4XXX-YXXX-XXXXXXXXXXXX}." },
     keywords: { ru: ["guid", "генератор guid", "guid c#", "guid .net"], en: ["guid", "guid generator", "c# guid", "new guid"] },
     howTo: {
-      ru: ["Скопируйте готовый GUID — он уже в заглавных буквах и фигурных скобках.", "Снимите галочки, если нужен формат без скобок, как у Guid.ToString().", "Укажите количество, чтобы получить список GUID."],
-      en: ["Copy the ready GUID — it is already uppercase and in braces.", "Clear the checkboxes for the brace-less format of Guid.ToString().", "Set a count to get a list of GUIDs."],
+      ru: ["Скопируйте готовый GUID — он уже в заглавных буквах и фигурных скобках.", "Выберите в списке «Формат» вариант без скобок, если нужен формат Guid.ToString().", "Укажите количество, чтобы получить список GUID."],
+      en: ["Copy the ready GUID — it is already uppercase and in braces.", "Pick a brace-less option in the Format list for the Guid.ToString() format.", "Set a count to get a list of GUIDs."],
     },
     faq: {
       ru: [

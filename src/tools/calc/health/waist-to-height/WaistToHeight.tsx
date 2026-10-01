@@ -5,7 +5,7 @@ import type { ToolProps } from "../../../types";
 import { ScaleBar } from "../../shared/charts";
 import { fmtRound } from "../../shared/fmt";
 import { field, toInput } from "../../shared/num";
-import { CalcGrid, Disclaimer, Explain, FieldRow, InlineToggle, NumField, OptionsRow, ResultMain, Stack, ToolActions } from "../../shared/ui";
+import { CalcGrid, Disclaimer, Explain, InlineToggle, NumSlider, OptionsRow, ResultMain, Stack, ToolActions } from "../../shared/ui";
 import { useQueryState } from "../../shared/url-state";
 import { whtrCategory } from "../lib/body";
 import { WHTR_LABEL } from "../lib/labels";
@@ -13,7 +13,7 @@ import { WHTR_LABEL } from "../lib/labels";
 const T = {
   ru: {
     waist: "Окружность талии",
-    waistHint: "Посередине между нижним ребром и тазовой костью, на выдохе",
+    waistHint: "Между нижним ребром и тазовой костью, на выдохе",
     height: "Рост",
     units: "Единицы",
     label: "Отношение талии к росту",
@@ -37,7 +37,8 @@ export default function WaistToHeight({ locale }: ToolProps) {
   const t = T[locale];
   const id = useId();
   const q = useQueryState({ w: "80", h: "170", u: "cm" }, { enums: { u: ["cm", "in"] } });
-  const unit = q.v.u === "in" ? "in" : locale === "ru" ? "см" : "cm";
+  const inch = q.v.u === "in";
+  const unit = inch ? "in" : locale === "ru" ? "см" : "cm";
   const W = field(locale, q.v.w, { gt: 0, max: 400 });
   const H = field(locale, q.v.h, { gt: 0, max: 300 });
   const ratio = W.value !== null && H.value !== null ? W.value / H.value : null;
@@ -45,11 +46,8 @@ export default function WaistToHeight({ locale }: ToolProps) {
 
   const inputs = (
     <>
-      <FieldRow>
-        <NumField id={`${id}-w`} label={t.waist} value={q.v.w} onChange={(w) => q.set({ w })} suffix={unit} error={W.message} size="lg" />
-        <NumField id={`${id}-h`} label={t.height} value={q.v.h} onChange={(h) => q.set({ h })} suffix={unit} error={H.message} size="lg" />
-      </FieldRow>
-      <p className="text-[0.8125rem] text-fg-3">{t.waistHint}</p>
+      <NumSlider id={`${id}-w`} locale={locale} label={t.waist} hint={t.waistHint} value={q.v.w} onChange={(w) => q.set({ w })} suffix={unit} error={W.message} min={inch ? 20 : 50} max={inch ? 60 : 150} />
+      <NumSlider id={`${id}-h`} locale={locale} label={t.height} value={q.v.h} onChange={(h) => q.set({ h })} suffix={unit} error={H.message} min={inch ? 48 : 120} max={inch ? 87 : 220} />
       <OptionsRow>
         <InlineToggle
           label={t.units}

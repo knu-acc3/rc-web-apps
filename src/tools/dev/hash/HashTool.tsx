@@ -4,13 +4,15 @@ import { CircleCheck, CircleX, X } from "lucide-react";
 import { useId, useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { formatBytes } from "@/i18n/format";
+import { cn } from "@/lib/cn";
 import { CodeEditor } from "@/tools/dev/shared/CodeEditor";
 import { useLiveTask, useWorkerClient } from "@/tools/dev/shared/hooks";
+import { Opt, OptionsRow, Pane } from "@/tools/dev/shared/Pane";
 import { isCancelled } from "@/tools/dev/shared/worker-client";
 import { Button } from "@/ui/button";
 import { CopyButton } from "@/ui/copy-button";
 import { Dropzone } from "@/ui/dropzone";
-import { Field, Input, Select } from "@/ui/field";
+import { Field, Input } from "@/ui/field";
 import { Notice, Panel } from "@/ui/panel";
 import { Segmented } from "@/ui/segmented";
 import { ALGO_BY_ID, type AlgoId } from "./lib/algorithms";
@@ -112,94 +114,72 @@ export default function HashTool({ locale, algo, hmac = false, sample = "" }: Ha
   const verdict = mode === "text" && expected.trim() && hex ? digestMatches(hex, expected) : null;
   const title = hmac ? `HMAC-${def.name.replace(/ \(.*\)$/, "")}` : def.name;
 
-  const encOptions = (Object.keys(INPUT_ENC_LABEL[locale]) as InputEncoding[]).map((v) => (
-    <option key={v} value={v}>
-      {INPUT_ENC_LABEL[locale][v]}
-    </option>
-  ));
+  const encOpts = (Object.keys(INPUT_ENC_LABEL[locale]) as InputEncoding[]).map((v) => ({ value: v, label: INPUT_ENC_LABEL[locale][v] }));
+  const digest = inputError ? "" : formatDigest(hex, fmt);
 
   return (
-    <Panel className="p-4 sm:p-6">
-      <Segmented label={t.mode} value={mode} onChange={setMode} options={[{ value: "text", label: t.modes.text }, { value: "files", label: t.modes.files }]} size="sm" className="mb-4" />
+    <Panel className="flex flex-col gap-4 p-4 sm:p-6">
+      <Segmented label={t.mode} value={mode} onChange={setMode} options={[{ value: "text", label: t.modes.text }, { value: "files", label: t.modes.files }]} className="self-start" />
 
       {hmac && (
-        <div className="mb-3 grid gap-2 sm:grid-cols-[1fr_9rem] sm:items-end">
-          <Field label={t.key} htmlFor={`${id}-key`} error={keyError ?? undefined}>
-            <Input id={`${id}-key`} value={key} onChange={(e) => setKey(e.target.value)} className="font-mono" spellCheck={false} autoComplete="off" aria-invalid={!!keyError} />
-          </Field>
-          <Select aria-label={t.keyEnc} value={keyEnc} onChange={(e) => setKeyEnc(e.target.value as InputEncoding)}>
-            {encOptions}
-          </Select>
-        </div>
+        <Field label={t.key} htmlFor={`${id}-key`} error={keyError ?? undefined} aside={<Segmented size="sm" label={t.keyEnc} value={keyEnc} onChange={setKeyEnc} options={encOpts} />}>
+          <Input id={`${id}-key`} value={key} onChange={(e) => setKey(e.target.value)} className="font-mono" spellCheck={false} autoComplete="off" aria-invalid={!!keyError} />
+        </Field>
       )}
 
       {mode === "text" ? (
-        <>
-          <CodeEditor id={`${id}-in`} locale={locale} label={t.input} value={text} onChange={setText} placeholder={t.placeholder} rows={5} wrap invalid={"error" in data} />
-          {"error" in data && (
-            <Notice tone="err" className="mt-2">
-              {data.error}
-            </Notice>
-          )}
-          <div className="mt-5 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-            <div className="min-w-0">
-              <div className="text-sm font-medium text-fg-2">
-                {title}
-                {text === "" && !inputError ? <span className="text-fg-3"> · {t.empty}</span> : null}
-              </div>
-              <output className={`mt-1 block min-h-8 font-mono text-lg font-semibold break-all sm:text-xl ${live.pending ? "text-fg-3" : "text-fg"}`} aria-live="polite">
-                {inputError ? "—" : shown}
-              </output>
-            </div>
-            <CopyButton value={inputError ? "" : formatDigest(hex, fmt)} label={t.copy} copiedLabel={t.copied} size="md" variant="outline" className="self-start sm:self-auto" />
+        <div className="grid gap-4 lg:grid-cols-2">
+          <div className="flex min-w-0 flex-col gap-2">
+            <CodeEditor id={`${id}-in`} locale={locale} label={t.input} value={text} onChange={setText} placeholder={t.placeholder} rows={6} wrap invalid={"error" in data} />
+            {"error" in data && <Notice tone="err">{data.error}</Notice>}
           </div>
-        </>
+          <Pane
+            title={
+              <>
+                {title}
+                {text === "" && !inputError ? <span className="font-normal text-fg-3"> · {t.empty}</span> : null}
+              </>
+            }
+            actions={<CopyButton value={digest} label={t.copy} copiedLabel={t.copied} variant="secondary" compact />}
+            footer={
+              verdict !== null ? (
+                <span className={cn("flex items-center gap-1.5 text-sm font-semibold", verdict ? "text-ok" : "text-err")} aria-live="polite">
+                  {verdict ? <CircleCheck className="size-4" aria-hidden /> : <CircleX className="size-4" aria-hidden />}
+                  {verdict ? t.match : t.mismatch}
+                </span>
+              ) : undefined
+            }
+          >
+            <output className={cn("block flex-1 px-4 py-4 font-mono text-xl font-semibold break-all sm:text-2xl", live.pending ? "text-fg-3" : verdict === true ? "text-ok" : verdict === false ? "text-err" : "text-fg")} aria-live="polite">
+              {inputError ? "—" : shown}
+            </output>
+          </Pane>
+        </div>
       ) : (
         <FileHasher locale={locale} algo={algo} bits={bitsOpt} hmacKey={keyArg} fmt={fmt} expected={expected} />
       )}
 
-      <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-3 border-t border-line pt-4 text-sm text-fg-2">
+      <OptionsRow>
         {mode === "text" && (
-          <label className="flex items-center gap-2">
-            {t.inputEnc}
-            <Select value={enc} size="sm" className="w-36" onChange={(e) => setEnc(e.target.value as InputEncoding)}>
-              {encOptions}
-            </Select>
-          </label>
+          <Opt label={t.inputEnc} group>
+            <Segmented size="sm" label={t.inputEnc} value={enc} onChange={setEnc} options={encOpts} />
+          </Opt>
         )}
-        <label className="flex items-center gap-2">
-          {t.out}
-          <Select value={fmt} size="sm" className="w-32" onChange={(e) => setFmt(e.target.value as OutFormat)}>
-            {(Object.keys(t.fmt) as OutFormat[]).map((v) => (
-              <option key={v} value={v}>
-                {t.fmt[v]}
-              </option>
-            ))}
-          </Select>
-        </label>
+        <Opt label={t.out} group>
+          <Segmented size="sm" label={t.out} value={fmt} onChange={setFmt} options={(Object.keys(t.fmt) as OutFormat[]).map((v) => ({ value: v, label: t.fmt[v] }))} />
+        </Opt>
         {def.bitsOptions && (
-          <label className="flex items-center gap-2">
-            {t.bits}
-            <Select value={String(bits)} size="sm" className="w-28" onChange={(e) => setBits(Number(e.target.value))}>
-              {def.bitsOptions.map((b) => (
-                <option key={b} value={b}>
-                  {b} {t.bitsUnit}
-                </option>
-              ))}
-            </Select>
+          <Opt label={t.bits} group>
+            <Segmented size="sm" label={t.bits} value={String(bits)} onChange={(v) => setBits(Number(v))} options={def.bitsOptions.map((b) => ({ value: String(b), label: `${b} ${t.bitsUnit}` }))} />
+          </Opt>
+        )}
+        <div className="flex min-w-0 flex-1 basis-72 items-center gap-2">
+          <label htmlFor={`${id}-exp`} className="shrink-0">
+            {t.expected}
           </label>
-        )}
-        <label className="flex min-w-0 flex-1 basis-64 items-center gap-2" htmlFor={`${id}-exp`}>
-          <span className="shrink-0">{t.expected}</span>
           <Input id={`${id}-exp`} size="sm" value={expected} onChange={(e) => setExpected(e.target.value)} placeholder={t.expectedPh} className="min-w-0 flex-1 font-mono" spellCheck={false} autoComplete="off" />
-        </label>
-        {verdict !== null && (
-          <span className={`flex items-center gap-1 font-semibold ${verdict ? "text-ok" : "text-err"}`} aria-live="polite">
-            {verdict ? <CircleCheck className="size-4" aria-hidden /> : <CircleX className="size-4" aria-hidden />}
-            {verdict ? t.match : t.mismatch}
-          </span>
-        )}
-      </div>
+        </div>
+      </OptionsRow>
     </Panel>
   );
 }
@@ -245,15 +225,15 @@ function FileHasher({ locale, algo, bits, hmacKey, fmt, expected }: { locale: Lo
 
   return (
     <div className="flex flex-col gap-3">
-      <Dropzone multiple onFiles={start} title={t.drop} hint={t.dropHint} compact={rows.length > 0} />
+      <Dropzone multiple onFiles={start} title={t.drop} hint={t.dropHint} locale={locale} compact={rows.length > 0} />
       {rows.length > 0 && (
-        <div className="overflow-hidden rounded-[0.625rem] border border-line">
-          <ul className="divide-y divide-line" aria-live="polite">
+        <div className="flex flex-col gap-2">
+          <ul className="flex flex-col gap-1.5" aria-live="polite">
             {rows.map((r, i) => {
               const ok = expected.trim() && r.digest ? digestMatches(r.digest, expected) : null;
               const pct = r.file.size ? Math.round((r.done / r.file.size) * 100) : 100;
               return (
-                <li key={i} className="flex flex-col gap-1 px-3 py-2.5">
+                <li key={i} className="flex flex-col gap-1 rounded-[1rem] bg-surface-2 px-4 py-3">
                   <div className="flex items-center justify-between gap-2 text-sm">
                     <span className="min-w-0 truncate text-fg-2">{r.file.name}</span>
                     <span className="shrink-0 text-[0.8125rem] text-fg-3">{formatBytes(locale, r.file.size)}</span>
@@ -264,7 +244,7 @@ function FileHasher({ locale, algo, bits, hmacKey, fmt, expected }: { locale: Lo
                       {formatDigest(r.digest, fmt)}
                     </code>
                   ) : r.state === "run" ? (
-                    <progress className="h-1.5 w-full accent-[var(--accent)]" max={100} value={pct} aria-label={r.file.name} />
+                    <progress className="h-1.5 w-full overflow-hidden rounded-full accent-[var(--accent)]" max={100} value={pct} aria-label={r.file.name} />
                   ) : (
                     <span className={`text-[0.8125rem] ${r.state === "error" ? "text-err" : "text-fg-3"}`}>{r.state === "wait" ? t.waiting : r.state === "cancel" ? t.cancelled : r.error}</span>
                   )}
@@ -272,14 +252,14 @@ function FileHasher({ locale, algo, bits, hmacKey, fmt, expected }: { locale: Lo
               );
             })}
           </ul>
-          <div className="flex justify-end gap-1 border-t border-line bg-surface-2 px-2 py-1.5">
+          <div className="flex justify-end gap-2">
             {busy ? (
-              <Button size="sm" variant="ghost" onClick={() => client.cancel()}>
+              <Button size="sm" variant="outlined" onClick={() => client.cancel()}>
                 <X aria-hidden />
                 {t.cancel}
               </Button>
             ) : (
-              <CopyButton value={list} label={t.copyAll} copiedLabel={t.copied} variant="ghost" />
+              <CopyButton value={list} label={t.copyAll} copiedLabel={t.copied} variant="secondary" />
             )}
           </div>
         </div>

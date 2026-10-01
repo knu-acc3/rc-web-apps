@@ -23,6 +23,7 @@ const onWorkerFailure = new Set<() => void>();
 /**
  * Why a PDF couldn't be opened: "invalid" — the file is damaged or not a PDF;
  * "engine" — the viewer itself didn't start (network, old browser, a stuck worker): worth a retry.
+ * @public — read through a dynamic import() in use-pdf-files.ts
  */
 export class PdfOpenError extends Error {
   constructor(
@@ -62,7 +63,10 @@ async function lib(): Promise<PdfjsLib> {
   return pdfjs;
 }
 
-/** Start loading pdf.js and its worker ahead of time (e.g. when the user reaches for the file picker). */
+/**
+ * Start loading pdf.js and its worker ahead of time (e.g. when the user reaches for the file picker).
+ * @public — read through a dynamic import() in use-pdf-files.ts
+ */
 export function warmUp(): void {
   void lib().catch(() => {});
 }

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import type { Locale } from "@/i18n/config";
+import { Pane } from "@/tools/dev/shared/Pane";
 import { CopyButton } from "@/ui/copy-button";
 import { Tabs } from "@/ui/tabs";
 
@@ -74,15 +75,15 @@ export default function MimeServe(props: MimeServeProps) {
   const code = snippet(server, props);
   return (
     <div className="flex flex-col gap-4">
-      <div className="rounded-[0.75rem] bg-surface-2 px-4 py-4 sm:px-5">
+      <div className="panel px-4 py-4 sm:px-5">
         <div className="text-sm text-fg-2">
           {t.label} <span className="font-mono font-semibold text-fg">.{ext}</span>
         </div>
         <div className="mt-1 flex items-start justify-between gap-3">
-          <div aria-live="polite" className="min-w-0 font-mono text-xl font-semibold break-words [overflow-wrap:anywhere] text-fg sm:text-2xl">
+          <div aria-live="polite" className="min-w-0 font-mono text-2xl font-bold tracking-tight break-words [overflow-wrap:anywhere] text-fg sm:text-3xl">
             {type}
           </div>
-          <CopyButton value={type} label={t.copy} copiedLabel={t.copied} />
+          <CopyButton value={type} label={t.copy} copiedLabel={t.copied} size="md" />
         </div>
         {alts.length > 0 && (
           <div className="mt-2 text-sm text-fg-3">
@@ -90,11 +91,7 @@ export default function MimeServe(props: MimeServeProps) {
           </div>
         )}
       </div>
-      <section className="flex min-w-0 flex-col overflow-hidden rounded-[0.75rem] border border-line bg-surface">
-        <div className="flex items-center justify-between gap-2 px-4 pt-2">
-          <h2 className="text-sm font-semibold text-fg-2">{t.how}</h2>
-          <CopyButton value={code.split("\n").filter((l) => !/^\s*(#|\/\/|<!--)/.test(l)).join("\n").trim()} label={t.copy} copiedLabel={t.copied} variant="ghost" />
-        </div>
+      <Pane as="section" title={<h2>{t.how}</h2>} actions={<CopyButton value={code.split("\n").filter((l) => !/^\s*(#|\/\/|<!--)/.test(l)).join("\n").trim()} label={t.copy} copiedLabel={t.copied} variant="secondary" compact />}>
         <Tabs
           label={t.how}
           value={server}
@@ -108,10 +105,10 @@ export default function MimeServe(props: MimeServeProps) {
             { value: "s3", label: "S3" },
           ]}
         />
-        <pre className="overflow-x-auto px-4 py-3 font-mono text-[0.8125rem] leading-relaxed text-fg">
+        <pre className="max-w-full overflow-x-auto px-4 py-3 font-mono text-[0.8125rem] leading-relaxed text-fg">
           <code>{code}</code>
         </pre>
-      </section>
+      </Pane>
     </div>
   );
 }

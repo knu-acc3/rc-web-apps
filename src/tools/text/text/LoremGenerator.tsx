@@ -3,15 +3,18 @@
 import { Download, RefreshCw } from "lucide-react";
 import { useId, useMemo, useState } from "react";
 import type { Locale } from "@/i18n/config";
+import { formatNumber } from "@/i18n/format";
 import { downloadText } from "@/lib/clipboard";
-import { Button, buttonClass } from "@/ui/button";
+import { Button, IconButton } from "@/ui/button";
 import { CopyButton } from "@/ui/copy-button";
-import { Checkbox, Input } from "@/ui/field";
+import { Switch } from "@/ui/field";
 import { Panel, PanelHeader } from "@/ui/panel";
 import { Segmented } from "@/ui/segmented";
+import { SliderField } from "@/ui/slider-field";
 import { textStats } from "./lib/textOps";
 import { generateLorem, loremToHtml, loremToText, randomSeed, type LoremLang, type LoremUnit } from "./lib/lorem";
-import { countLabel, OptionsBar, TX } from "./ui/shared";
+import { countLabel, TX } from "./ui/shared";
+import { ChipChoice } from "@/ui/chip-choice";
 
 const T = {
   ru: {
@@ -75,7 +78,11 @@ export default function LoremGenerator({ locale, lang: lang0 = "latin", unit: un
   const [numbered, setNumbered] = useState(false);
   const [seed, setSeed] = useState(SSR_SEED);
 
-  const parsed = Math.floor(Number(countText.replace(/\s/g, "")));
+  const parseCount = (v: string) => {
+    const n = Math.floor(Number(v.replace(/\s/g, "")));
+    return v.trim() && Number.isFinite(n) ? n : null;
+  };
+  const parsed = parseCount(countText) ?? NaN;
   const count = Number.isFinite(parsed) && parsed > 0 ? Math.min(parsed, MAX[unit]) : 1;
   const blocks = useMemo(() => generateLorem({ lang, unit, count, seed, classicStart: classic }), [lang, unit, count, seed, classic]);
   const listStyle = numbered ? "numbers" : "bullets";
@@ -83,55 +90,48 @@ export default function LoremGenerator({ locale, lang: lang0 = "latin", unit: un
   const stats = useMemo(() => textStats(loremToText(blocks, unit, listStyle), lang === "english" || lang === "latin" ? "en" : "ru"), [blocks, unit, listStyle, lang]);
 
   return (
-    <div className="flex flex-col gap-4">
-      <Segmented
-        label={t.lang}
-        value={lang}
-        onChange={setLang}
-        wrap
-        options={(["latin", "russian", "cyrillic", "english"] as const).map((v) => ({ value: v, label: t[v] }))}
-      />
-      <OptionsBar>
+    <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,22rem)_minmax(0,1fr)] xl:grid-cols-[minmax(0,26rem)_minmax(0,1fr)]">
+      <Panel className="flex flex-col gap-5 p-4 sm:p-5">
+        <ChipChoice label={t.lang} value={lang} onChange={setLang} grid="grid-cols-2" options={(["latin", "russian", "cyrillic", "english"] as const).map((v) => ({ value: v, label: t[v] }))} />
         <Segmented
           label={t.unit}
           value={unit}
+          fill
           onChange={(u) => {
             setUnit(u);
             setCountText(String(u === "words" ? 100 : u === "sentences" ? 5 : u === "list" ? 7 : 3));
           }}
-          size="sm"
-          wrap
           options={(["paragraphs", "sentences", "words", "list"] as const).map((v) => ({ value: v, label: t[v] }))}
         />
-        <label className="flex items-center gap-2">
-          <span className="text-fg-2">{t.count}</span>
-          <Input id={`${id}-n`} inputMode="numeric" value={countText} onChange={(e) => setCountText(e.target.value)} size="sm" autoComplete="off" className="w-20" />
-        </label>
-        <Checkbox label={t.html} checked={html} onChange={(e) => setHtml(e.target.checked)} />
-        {(lang === "latin" || lang === "cyrillic") && unit !== "list" && <Checkbox label={t.classic} checked={classic} onChange={(e) => setClassic(e.target.checked)} />}
-        {unit === "list" && <Checkbox label={t.numbered} checked={numbered} onChange={(e) => setNumbered(e.target.checked)} />}
-        <Button variant="ghost" size="sm" onClick={() => setSeed(randomSeed())}>
+        <SliderField id={`${id}-n`} label={t.count} value={countText} onChange={setCountText} parse={parseCount} format={(x) => formatNumber(locale, x)} min={1} max={MAX[unit]} scale="exp" inputMode="numeric" />
+        <div className="flex flex-col items-start gap-1">
+          <Switch label={t.html} checked={html} onChange={(e) => setHtml(e.target.checked)} />
+          {(lang === "latin" || lang === "cyrillic") && unit !== "list" && <Switch label={t.classic} checked={classic} onChange={(e) => setClassic(e.target.checked)} />}
+          {unit === "list" && <Switch label={t.numbered} checked={numbered} onChange={(e) => setNumbered(e.target.checked)} />}
+        </div>
+        <Button variant="tonal" size="lg" onClick={() => setSeed(randomSeed())}>
           <RefreshCw aria-hidden />
           {t.again}
         </Button>
-      </OptionsBar>
-      <Panel>
+      </Panel>
+      <Panel className="min-w-0 overflow-hidden">
         <PanelHeader
-          title={`${t.result} · ${countLabel(locale, stats.words, TX[locale].words)}, ${countLabel(locale, stats.chars, TX[locale].chars)}`}
+          title={
+            <span title={t.result}>
+              {countLabel(locale, stats.words, TX[locale].words)} · {countLabel(locale, stats.chars, TX[locale].chars)}
+            </span>
+          }
           actions={
             <>
-              <button type="button" className={buttonClass("ghost", "sm")} onClick={() => downloadText(text, html ? "lorem.html" : "lorem.txt")}>
-                <Download aria-hidden />
-                <span className="max-sm:sr-only">{TX[locale].download}</span>
-              </button>
-              <CopyButton value={text} label={TX[locale].copy} copiedLabel={TX[locale].copied} variant="primary" />
+              <IconButton label={TX[locale].download} icon={<Download aria-hidden />} onClick={() => downloadText(text, html ? "lorem.html" : "lorem.txt")} />
+              <CopyButton value={text} label={TX[locale].copy} copiedLabel={TX[locale].copied} variant="primary" size="md" compact />
             </>
           }
         />
         {html ? (
-          <pre className="max-h-[32rem] overflow-auto px-4 py-3 font-mono text-sm leading-relaxed whitespace-pre-wrap text-fg">{text}</pre>
+          <pre className="max-h-[36rem] overflow-auto px-4 py-3 font-mono text-sm leading-relaxed whitespace-pre-wrap text-fg">{text}</pre>
         ) : (
-          <div className="max-h-[32rem] overflow-auto px-4 py-3 text-[0.9375rem] leading-relaxed text-fg" lang={lang === "english" || lang === "latin" ? (lang === "latin" ? "la" : "en") : "ru"}>
+          <div className="max-h-[36rem] overflow-auto px-4 py-3 sm:px-5 text-[0.9375rem] leading-relaxed text-fg" lang={lang === "english" || lang === "latin" ? (lang === "latin" ? "la" : "en") : "ru"}>
             {unit === "list" ? (
               numbered ? (
                 <ol className="list-decimal pl-6">{blocks.map((b, i) => <li key={i}>{b}</li>)}</ol>

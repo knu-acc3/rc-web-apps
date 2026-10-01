@@ -3,9 +3,10 @@
 import { useEffect, useId, useMemo, useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { formatNumber } from "@/i18n/format";
-import { Checkbox } from "@/ui/field";
+import { Switch } from "@/ui/field";
 import { EXTRACT_KINDS, extractPhones, extractSync, uniqueList, type ExtractKind, type PhoneFormat } from "./lib/extract";
 import { InlineSelect, InputPanel, MoreOptions, OptionsBar, OutputPanel, TwoPane } from "./ui/shared";
+import { ChipChoice } from "@/ui/chip-choice";
 
 const T = {
   ru: {
@@ -106,10 +107,10 @@ export default function Extractor({ locale, kind: kind0 = "emails" }: { locale: 
   const waiting = kind === "phones" && !lib;
   return (
     <div className="flex flex-col gap-4">
+      <ChipChoice label={t.kind} value={kind} onChange={setKind} grid="grid-cols-2 sm:grid-cols-4 xl:grid-cols-7" options={EXTRACT_KINDS.map((k) => ({ value: k, label: t[k] }))} />
       <OptionsBar>
-        <InlineSelect id={`${id}-kind`} label={t.kind} value={kind} onChange={setKind} options={EXTRACT_KINDS.map((k) => ({ value: k, label: t[k] }))} />
-        <Checkbox label={t.unique} checked={unique} onChange={(e) => setUnique(e.target.checked)} />
-        <Checkbox label={t.sort} checked={sort} onChange={(e) => setSort(e.target.checked)} />
+        <Switch label={t.unique} checked={unique} onChange={(e) => setUnique(e.target.checked)} />
+        <Switch label={t.sort} checked={sort} onChange={(e) => setSort(e.target.checked)} />
       </OptionsBar>
       <TwoPane>
         <InputPanel id={`${id}-in`} locale={locale} value={text} onChange={setText} />
@@ -133,7 +134,7 @@ export default function Extractor({ locale, kind: kind0 = "emails" }: { locale: 
             { value: "space", label: t.sepSpace },
           ]}
         />
-        {kind === "urls" && <Checkbox label={t.bare} checked={bare} onChange={(e) => setBare(e.target.checked)} />}
+        {kind === "urls" && <Switch label={t.bare} checked={bare} onChange={(e) => setBare(e.target.checked)} />}
         {kind === "phones" && (
           <>
             <InlineSelect id={`${id}-cc`} label={t.country} value={country} onChange={setCountry} options={COUNTRIES.map((c) => ({ value: c, label: c }))} />

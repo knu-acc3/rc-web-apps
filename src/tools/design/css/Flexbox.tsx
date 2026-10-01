@@ -4,8 +4,9 @@ import { Plus, Trash2 } from "lucide-react";
 import { useId, useState, type CSSProperties } from "react";
 import type { Locale } from "@/i18n/config";
 import { cn } from "@/lib/cn";
-import { Button } from "@/ui/button";
-import { Checkbox, Field, Input, Select } from "@/ui/field";
+import { IconButton } from "@/ui/button";
+import { Field, Input, Select, Switch } from "@/ui/field";
+import { NumberInput } from "@/ui/number-input";
 import { Panel } from "@/ui/panel";
 import { DEFAULT_FLEX, flexCss, flexHtml, flexItem, type FlexItem, type FlexState } from "./lib/layout";
 import { CodePanel, NumberSlider, Stage } from "./ui/kit";
@@ -18,7 +19,7 @@ const T = {
     justify: "justify-content",
     alignItems: "align-items",
     alignContent: "align-content",
-    gap: "Отступ gap, px",
+    gap: "Отступ gap",
     items: "Элементы",
     item: (n: number) => `Элемент ${n}`,
     add: "Добавить элемент",
@@ -29,7 +30,7 @@ const T = {
     basis: "flex-basis",
     order: "order",
     alignSelf: "align-self",
-    push: "Прижать вправо (margin-inline-start: auto)",
+    push: "Прижать к концу (margin-inline-start: auto)",
     label: "Текст",
   },
   en: {
@@ -39,7 +40,7 @@ const T = {
     justify: "justify-content",
     alignItems: "align-items",
     alignContent: "align-content",
-    gap: "Gap, px",
+    gap: "Gap",
     items: "Items",
     item: (n: number) => `Item ${n}`,
     add: "Add item",
@@ -105,7 +106,7 @@ export default function FlexboxGenerator({ locale, recipe }: { locale: Locale; r
               onClick={() => setSel(it.id)}
               aria-pressed={it.id === sel}
               aria-label={t.item(i + 1)}
-              className={cn("min-h-12 min-w-12 rounded-[0.5rem] px-3 py-2 text-left text-sm font-medium text-white", it.id === sel && "ring-3 ring-zinc-900 ring-offset-2")}
+              className={cn("min-h-12 min-w-12 rounded-[0.5rem] px-3 py-2 text-left text-sm font-medium text-white transition-[filter,transform] hover:brightness-110 active:scale-[0.97]", it.id === sel && "ring-3 ring-zinc-900 ring-offset-2")}
               style={{
                 background: COLORS[i % COLORS.length],
                 flexGrow: it.grow,
@@ -123,7 +124,7 @@ export default function FlexboxGenerator({ locale, recipe }: { locale: Locale; r
       </Stage>
 
       <div className="grid gap-4 lg:grid-cols-2">
-        <Panel className="flex flex-col gap-3 p-4">
+        <Panel className="flex flex-col gap-4 p-4 sm:p-5">
           <h2 className="text-sm font-semibold text-fg">{t.container}</h2>
           <div className="grid grid-cols-2 gap-3">
             <Choice id={`${id}-d`} label={t.direction} value={s.direction} options={["row", "row-reverse", "column", "column-reverse"] as const} onChange={(v) => set({ direction: v })} />
@@ -137,37 +138,30 @@ export default function FlexboxGenerator({ locale, recipe }: { locale: Locale; r
           <NumberSlider label={t.gap} value={s.gap} min={0} max={64} onChange={(v) => set({ gap: Math.max(0, v) })} unit="px" />
         </Panel>
 
-        <Panel className="flex flex-col gap-3 p-4">
+        <Panel className="flex flex-col gap-4 p-4 sm:p-5">
           <div className="flex items-center justify-between gap-2">
             <h2 className="text-sm font-semibold text-fg">{item ? t.selected(index + 1) : t.items}</h2>
             <div className="flex gap-1">
-              <Button
-                variant="ghost"
-                size="icon-sm"
-                aria-label={t.add}
-                title={t.add}
+              <IconButton
+                variant="tonal"
+                label={t.add}
+                icon={<Plus aria-hidden />}
                 disabled={s.items.length >= 12}
                 onClick={() => {
                   setS((x) => ({ ...x, items: [...x.items, flexItem(nextId, String(x.items.length + 1))] }));
                   setSel(nextId);
                 }}
-              >
-                <Plus />
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon-sm"
-                aria-label={t.remove}
-                title={t.remove}
+              />
+              <IconButton
+                label={t.remove}
+                icon={<Trash2 aria-hidden />}
                 disabled={!item || s.items.length <= 1}
                 onClick={() => {
                   const rest = s.items.filter((x) => x.id !== sel);
                   set({ items: rest });
                   setSel(rest[Math.max(0, index - 1)]?.id ?? 0);
                 }}
-              >
-                <Trash2 />
-              </Button>
+              />
             </div>
           </div>
           {item && (
@@ -175,15 +169,15 @@ export default function FlexboxGenerator({ locale, recipe }: { locale: Locale; r
               <Field label={t.label} htmlFor={`${id}-l`}>
                 <Input id={`${id}-l`} value={item.label} onChange={(e) => setItem({ label: e.target.value })} size="sm" />
               </Field>
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 gap-3 min-[26rem]:grid-cols-3">
                 <Field label={<code className="text-[0.8125rem]">{t.grow}</code>} htmlFor={`${id}-g`}>
-                  <Input id={`${id}-g`} type="number" min={0} value={item.grow} onChange={(e) => setItem({ grow: Math.max(0, Number(e.target.value) || 0) })} size="sm" />
+                  <NumberInput id={`${id}-g`} value={item.grow} min={0} max={99} onChange={(v) => setItem({ grow: Math.max(0, v ?? 0) })} size="sm" />
                 </Field>
                 <Field label={<code className="text-[0.8125rem]">{t.shrink}</code>} htmlFor={`${id}-s`}>
-                  <Input id={`${id}-s`} type="number" min={0} value={item.shrink} onChange={(e) => setItem({ shrink: Math.max(0, Number(e.target.value) || 0) })} size="sm" />
+                  <NumberInput id={`${id}-s`} value={item.shrink} min={0} max={99} onChange={(v) => setItem({ shrink: Math.max(0, v ?? 0) })} size="sm" />
                 </Field>
                 <Field label={<code className="text-[0.8125rem]">{t.order}</code>} htmlFor={`${id}-o`}>
-                  <Input id={`${id}-o`} type="number" value={item.order} onChange={(e) => setItem({ order: Number(e.target.value) || 0 })} size="sm" />
+                  <NumberInput id={`${id}-o`} value={item.order} min={-99} max={99} onChange={(v) => setItem({ order: v ?? 0 })} size="sm" />
                 </Field>
               </div>
               <div className="grid grid-cols-2 gap-3">
@@ -192,7 +186,7 @@ export default function FlexboxGenerator({ locale, recipe }: { locale: Locale; r
                 </Field>
                 <Choice id={`${id}-as`} label={t.alignSelf} value={item.alignSelf} options={["auto", "flex-start", "flex-end", "center", "stretch", "baseline"] as const} onChange={(v) => setItem({ alignSelf: v })} />
               </div>
-              <Checkbox label={t.push} checked={item.push} onChange={(e) => setItem({ push: e.target.checked })} />
+              <Switch label={t.push} checked={item.push} onChange={(e) => setItem({ push: e.target.checked })} />
             </>
           )}
         </Panel>

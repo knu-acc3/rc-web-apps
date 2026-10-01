@@ -4,9 +4,10 @@ import { Plus, Trash2 } from "lucide-react";
 import { useId, useState, type CSSProperties } from "react";
 import type { Locale } from "@/i18n/config";
 import { cn } from "@/lib/cn";
-import { Button } from "@/ui/button";
+import { IconButton } from "@/ui/button";
 import { Field, Input, Select, Textarea } from "@/ui/field";
 import { Panel } from "@/ui/panel";
+import { ScrollRow } from "@/ui/scroll-row";
 import { areaNames, DEFAULT_GRID, gridCss, gridHtml, gridItem, gridItemDecls, validateAreas, type GridItem, type GridState } from "./lib/layout";
 import { CodePanel, NumberSlider, Stage } from "./ui/kit";
 
@@ -21,7 +22,7 @@ const T = {
       shape: (n: string) => `Область «${n}» должна быть прямоугольником`,
       name: (n: string) => `Недопустимое имя области «${n}»`,
     },
-    gap: "Отступ gap, px",
+    gap: "Отступ gap",
     justify: "justify-items",
     align: "align-items",
     add: "Добавить элемент",
@@ -45,7 +46,7 @@ const T = {
       shape: (n: string) => `Area “${n}” must be a rectangle`,
       name: (n: string) => `Invalid area name “${n}”`,
     },
-    gap: "Gap, px",
+    gap: "Gap",
     justify: "justify-items",
     align: "align-items",
     add: "Add item",
@@ -122,7 +123,7 @@ export default function GridGenerator({ locale, recipe }: { locale: Locale; reci
               onClick={() => setSel(it.id)}
               aria-pressed={it.id === sel}
               aria-label={t.item(i + 1)}
-              className={cn("min-h-12 min-w-0 rounded-[0.5rem] px-3 py-2 text-left text-sm font-medium break-words text-white", it.id === sel && "ring-3 ring-zinc-900 ring-offset-2")}
+              className={cn("min-h-12 min-w-0 rounded-[0.5rem] px-3 py-2 text-left text-sm font-medium break-words text-white transition-[filter,transform] hover:brightness-110 active:scale-[0.97]", it.id === sel && "ring-3 ring-zinc-900 ring-offset-2")}
               style={{ background: COLORS[i % COLORS.length], ...itemStyle(it) }}
             >
               {it.label}
@@ -132,15 +133,17 @@ export default function GridGenerator({ locale, recipe }: { locale: Locale; reci
       </Stage>
 
       <div className="grid gap-4 lg:grid-cols-2">
-        <Panel className="flex flex-col gap-3 p-4">
+        <Panel className="flex flex-col gap-4 p-4 sm:p-5">
           <h2 className="text-sm font-semibold text-fg">{t.container}</h2>
           <Field label={<code className="text-[0.8125rem]">{t.columns}</code>} htmlFor={`${id}-c`}>
-            <Input id={`${id}-c`} value={s.columns} onChange={(e) => set({ columns: e.target.value })} list={`${id}-cl`} className="font-mono" size="sm" autoComplete="off" />
-            <datalist id={`${id}-cl`}>
+            <Input id={`${id}-c`} value={s.columns} onChange={(e) => set({ columns: e.target.value })} className="font-mono" size="sm" autoComplete="off" />
+            <ScrollRow label={t.columns} rowClassName="gap-1.5">
               {COLUMN_PRESETS.map((p) => (
-                <option key={p} value={p} />
+                <button key={p} type="button" aria-pressed={s.columns === p} onClick={() => set({ columns: p })} className="chip shrink-0 font-mono text-[0.8125rem]!">
+                  {p}
+                </button>
               ))}
-            </datalist>
+            </ScrollRow>
           </Field>
           <Field label={<code className="text-[0.8125rem]">{t.rows}</code>} htmlFor={`${id}-r`}>
             <Input id={`${id}-r`} value={s.rows} onChange={(e) => set({ rows: e.target.value })} className="font-mono" size="sm" placeholder="auto 1fr auto" autoComplete="off" />
@@ -149,7 +152,7 @@ export default function GridGenerator({ locale, recipe }: { locale: Locale; reci
             <Textarea
               id={`${id}-ar`}
               rows={3}
-              className="min-h-20!"
+              className="min-h-20! max-sm:text-base"
               value={areasText}
               placeholder={"header header\nsidebar main"}
               onChange={(e) => {
@@ -178,37 +181,30 @@ export default function GridGenerator({ locale, recipe }: { locale: Locale; reci
           </div>
         </Panel>
 
-        <Panel className="flex flex-col gap-3 p-4">
+        <Panel className="flex flex-col gap-4 p-4 sm:p-5">
           <div className="flex items-center justify-between gap-2">
             <h2 className="text-sm font-semibold text-fg">{item ? t.selected(index + 1) : t.items}</h2>
             <div className="flex gap-1">
-              <Button
-                variant="ghost"
-                size="icon-sm"
-                aria-label={t.add}
-                title={t.add}
+              <IconButton
+                variant="tonal"
+                label={t.add}
+                icon={<Plus aria-hidden />}
                 disabled={s.items.length >= 24}
                 onClick={() => {
                   setS((x) => ({ ...x, items: [...x.items, gridItem(nextId, String(x.items.length + 1))] }));
                   setSel(nextId);
                 }}
-              >
-                <Plus />
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon-sm"
-                aria-label={t.remove}
-                title={t.remove}
+              />
+              <IconButton
+                label={t.remove}
+                icon={<Trash2 aria-hidden />}
                 disabled={!item || s.items.length <= 1}
                 onClick={() => {
                   const rest = s.items.filter((x) => x.id !== sel);
                   set({ items: rest });
                   setSel(rest[Math.max(0, index - 1)]?.id ?? 0);
                 }}
-              >
-                <Trash2 />
-              </Button>
+              />
             </div>
           </div>
           {item && (

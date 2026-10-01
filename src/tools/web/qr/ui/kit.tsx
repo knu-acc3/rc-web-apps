@@ -53,7 +53,7 @@ export function OptionGroup({ label, id, children, aside }: { label: ReactNode; 
 }
 
 /** A colour field: a round swatch and the hex code on a tonal pill; the whole pill opens the colour picker. */
-export function ColorField({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) {
+function ColorField({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) {
   return (
     <label className="flex min-w-0 flex-col gap-2">
       <span className="text-sm font-medium text-fg-2">{label}</span>

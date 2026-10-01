@@ -1,10 +1,11 @@
 "use client";
 
 import { useId } from "react";
+import { plural } from "@/i18n/format";
 import type { ToolProps } from "../../../types";
 import { fmtRound } from "../../shared/fmt";
 import { field } from "../../shared/num";
-import { CalcGrid, DataTable, Disclaimer, Explain, FieldRow, NumField, OptionsRow, ResultMain, SelectField, Stack, SubHeading, ToolActions } from "../../shared/ui";
+import { CalcGrid, DataTable, Disclaimer, Explain, NumSlider, OptionsRow, ResultMain, SelectField, Stack, SubHeading, ToolActions } from "../../shared/ui";
 import { useQueryState } from "../../shared/url-state";
 import { ACTIVITIES, ACTIVITY_FACTOR, harrisBenedict, mifflin, weeklyChange, type Activity, type Sex } from "../lib/body";
 import { BodyFields, bodyDefaults, parseBody, SEXES, SexToggle, switchUnits, UNIT_SYSTEMS, UnitToggle } from "../ui/parts";
@@ -13,7 +14,8 @@ const GOALS = ["-500", "-250", "0", "250", "500"] as const;
 
 const T = {
   ru: {
-    age: "Возраст, лет",
+    age: "Возраст",
+    years: ["год", "года", "лет"],
     activity: "Активность",
     acts: {
       sedentary: "Сидячий образ жизни (×1,2)",
@@ -22,6 +24,7 @@ const T = {
       active: "Интенсивные тренировки 6–7 раз в неделю (×1,725)",
       very: "Тяжёлый физический труд или 2 тренировки в день (×1,9)",
     } satisfies Record<Activity, string>,
+    actsShort: { sedentary: "Сидячий образ жизни", light: "1–3 тренировки в неделю", moderate: "3–5 тренировок в неделю", active: "6–7 тренировок в неделю", very: "Тяжёлый труд или 2 тренировки в день" } satisfies Record<Activity, string>,
     goal: "Цель",
     goals: { "-500": "похудеть быстрее (−500)", "-250": "похудеть (−250)", "0": "поддерживать вес", "250": "набрать (+250)", "500": "набрать быстрее (+500)" } satisfies Record<(typeof GOALS)[number], string>,
     label: "Калорий в день",
@@ -41,7 +44,8 @@ const T = {
     kg: "кг",
   },
   en: {
-    age: "Age, years",
+    age: "Age",
+    years: ["year", "years"],
     activity: "Activity",
     acts: {
       sedentary: "Sedentary (×1.2)",
@@ -50,6 +54,7 @@ const T = {
       active: "Hard exercise 6–7 times a week (×1.725)",
       very: "Physical job or training twice a day (×1.9)",
     } satisfies Record<Activity, string>,
+    actsShort: { sedentary: "Sedentary", light: "Exercise 1–3 times a week", moderate: "Exercise 3–5 times a week", active: "Exercise 6–7 times a week", very: "Physical job or 2 sessions a day" } satisfies Record<Activity, string>,
     goal: "Goal",
     goals: { "-500": "lose faster (−500)", "-250": "lose (−250)", "0": "maintain weight", "250": "gain (+250)", "500": "gain faster (+500)" } satisfies Record<(typeof GOALS)[number], string>,
     label: "Calories per day",
@@ -90,11 +95,9 @@ export default function Calories({ locale }: ToolProps) {
   const inputs = (
     <>
       <BodyFields id={id} locale={locale} v={q.v} set={q.set} errors={body.errors} />
-      <FieldRow>
-        <NumField id={`${id}-a`} label={t.age} value={q.v.a} onChange={(a) => q.set({ a })} error={A.message} inputMode="numeric" />
-        <SelectField id={`${id}-g`} label={t.goal} value={q.v.g as (typeof GOALS)[number]} onChange={(g) => q.set({ g })} options={GOALS.map((g) => ({ value: g, label: t.goals[g] }))} />
-      </FieldRow>
-      <SelectField id={`${id}-act`} label={t.activity} value={act} onChange={(v) => q.set({ act: v })} options={ACTIVITIES.map((a) => ({ value: a, label: t.acts[a] }))} />
+      <NumSlider id={`${id}-a`} locale={locale} label={t.age} value={q.v.a} onChange={(a) => q.set({ a })} suffix={plural(locale, A.value ?? 30, t.years)} error={A.message} min={15} max={90} />
+      <SelectField id={`${id}-act`} label={t.activity} value={act} onChange={(v) => q.set({ act: v })} options={ACTIVITIES.map((a) => ({ value: a, label: t.actsShort[a] }))} />
+      <SelectField id={`${id}-g`} label={t.goal} value={q.v.g as (typeof GOALS)[number]} onChange={(g) => q.set({ g })} options={GOALS.map((g) => ({ value: g, label: t.goals[g] }))} />
       <OptionsRow>
         <SexToggle locale={locale} value={sex} onChange={(s) => q.set({ s })} />
         <UnitToggle locale={locale} value={q.v.u as "m" | "i"} onChange={(u) => q.set(switchUnits(locale, q.v, u))} />

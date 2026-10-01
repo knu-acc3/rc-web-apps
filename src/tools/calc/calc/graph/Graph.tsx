@@ -2,7 +2,8 @@
 
 import { Maximize, Plus, X, ZoomIn, ZoomOut } from "lucide-react";
 import { useEffect, useId, useRef, useState } from "react";
-import { Button } from "@/ui/button";
+import { Button, IconButton } from "@/ui/button";
+import { Panel } from "@/ui/panel";
 import type { ToolProps } from "../../../types";
 import { compile, errorText } from "../expr/parser";
 import { fmtN } from "../../shared/fmt";
@@ -313,7 +314,7 @@ export default function Graph({ locale }: ToolProps) {
   return (
     <Stack>
       <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,2.2fr)] lg:gap-6">
-        <section className="flex min-w-0 flex-col gap-3 rounded-[0.75rem] border border-line bg-surface p-4">
+        <Panel className="flex min-w-0 flex-col gap-3 p-4 sm:p-5">
           {active.map((k) => {
             const i = KEYS.indexOf(k);
             const cf = compiled[i];
@@ -349,17 +350,15 @@ export default function Graph({ locale }: ToolProps) {
                     className="control h-10 min-w-0 flex-1 font-mono text-[0.9375rem]"
                   />
                   {k !== "f1" && (
-                    <Button
-                      variant="ghost"
-                      size="icon-sm"
+                    <IconButton
+                      size="sm"
+                      icon={<X aria-hidden />}
                       onClick={() =>
                         q.set({ [k]: "" } as Partial<Record<FKey, string>>)
                       }
-                      aria-label={`${t.remove} ${i + 1}`}
+                      label={`${t.remove} ${i + 1}`}
                       title={t.remove}
-                    >
-                      <X aria-hidden />
-                    </Button>
+                    />
                   )}
                 </div>
                 {cf.err && (
@@ -370,7 +369,7 @@ export default function Graph({ locale }: ToolProps) {
           })}
           {active.length < KEYS.length && (
             <Button
-              variant="outline"
+              variant="tonal"
               size="sm"
               className="self-start"
               onClick={() => {
@@ -384,11 +383,11 @@ export default function Graph({ locale }: ToolProps) {
             </Button>
           )}
           <p className="text-[0.8125rem] text-fg-3">{t.logHint}</p>
-        </section>
+        </Panel>
         <section className="min-w-0">
           <div
             ref={wrapRef}
-            className="relative overflow-hidden rounded-[0.75rem] border border-line"
+            className="panel relative overflow-hidden"
           >
             <canvas
               ref={canvasRef}
@@ -479,10 +478,10 @@ export default function Graph({ locale }: ToolProps) {
               }}
               onPointerLeave={() => setHoverX(null)}
             />
-            <div className="absolute right-2 top-2 flex flex-col gap-1">
+            <div className="absolute right-2 top-2 flex flex-col gap-1.5">
               <Button
-                variant="outline"
-                size="icon-sm"
+                variant="elevated"
+                size="icon"
                 onClick={() => zoomBy(0.7)}
                 aria-label={t.zoomIn}
                 title={t.zoomIn}
@@ -490,8 +489,8 @@ export default function Graph({ locale }: ToolProps) {
                 <ZoomIn aria-hidden />
               </Button>
               <Button
-                variant="outline"
-                size="icon-sm"
+                variant="elevated"
+                size="icon"
                 onClick={() => zoomBy(1 / 0.7)}
                 aria-label={t.zoomOut}
                 title={t.zoomOut}
@@ -499,8 +498,8 @@ export default function Graph({ locale }: ToolProps) {
                 <ZoomOut aria-hidden />
               </Button>
               <Button
-                variant="outline"
-                size="icon-sm"
+                variant="elevated"
+                size="icon"
                 onClick={() => setViewEdit(DEFAULT_VIEW)}
                 aria-label={t.reset}
                 title={t.reset}

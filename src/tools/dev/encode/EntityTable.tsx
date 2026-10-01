@@ -48,12 +48,12 @@ export default function EntityTable({ locale }: { locale: Locale }) {
         {rows ? `${t.found}: ${formatNumber(locale, found.length)} · ${t.hint}` : t.loading}
       </p>
       {rows && (
-        <ul className="mt-3 grid gap-px overflow-hidden rounded-[0.625rem] border border-line bg-line sm:grid-cols-2">
+        <ul className="mt-3 grid gap-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
           {found.slice(0, LIMIT).map(([n, c]) => (
-            <li key={n} className="bg-surface">
+            <li key={n} className="min-w-0">
               <button
                 type="button"
-                className="flex w-full items-center gap-3 px-3 py-2 text-left hover:bg-surface-2"
+                className="flex w-full items-center gap-3 rounded-[0.75rem] px-3 py-2 text-left transition-[background-color,transform] duration-150 hover:bg-surface-2 active:bg-accent-container motion-safe:active:scale-[0.98]"
                 onClick={async () => {
                   if (await copyText(`&${n};`)) setCopied(n);
                 }}

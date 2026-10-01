@@ -4,9 +4,12 @@ import { useId, useMemo, useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { INTL_LOCALE } from "@/i18n/config";
 import { useHydrated, useNow } from "@/tools/dev/shared/hooks";
+import { KIT_T } from "@/tools/dev/shared/labels";
+import { Opt, OptionsRow } from "@/tools/dev/shared/Pane";
 import { CopyButton } from "@/ui/copy-button";
 import { Input, Select } from "@/ui/field";
 import { Notice, Panel } from "@/ui/panel";
+import { Segmented } from "@/ui/segmented";
 import { describe, fieldRows } from "./lib/describe";
 import { CronError, MACROS, nextRuns, parseCron, type CronExpr, type Dialect } from "./lib/engine";
 import { CronBuilder } from "./ui/CronBuilder";
@@ -158,68 +161,57 @@ export default function CronTool({ locale, expr: expr0 = "*/5 * * * *", dialect:
 
   return (
     <div className="flex flex-col gap-4">
-      <Panel className="p-4 sm:p-6">
-        <label htmlFor={`${id}-e`} className="text-sm font-medium text-fg-2">
-          {t.expr}
-        </label>
-        <div className="mt-1.5 flex gap-2">
-          <Input id={`${id}-e`} size="lg" value={text} onChange={(e) => setText(e.target.value)} className="font-mono text-2xl! tracking-wide" spellCheck={false} autoComplete="off" autoCapitalize="off" aria-invalid={"err" in parsed} />
-          <CopyButton value={text} size="icon" variant="outline" className="h-12! w-12!" />
-        </div>
-        <p className="mt-4 min-h-8 text-xl font-semibold text-fg sm:text-2xl" aria-live="polite">
-          {"e" in parsed ? describe(parsed.e, locale) : <span className="text-base font-medium text-err">{errText}</span>}
-        </p>
-
-        <div className="mt-5 border-t border-line pt-4">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <h2 className="text-sm font-semibold text-fg">{t.next}</h2>
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-fg-2">
-              <label className="flex items-center gap-2">
-                {t.tz}
-                <Select value={tz} size="sm" className="w-48" onChange={(e) => setTzSel(e.target.value)}>
-                  {zones.map((z) => (
-                    <option key={z} value={z}>
-                      {z}
-                    </option>
-                  ))}
-                </Select>
-              </label>
-              <label className="flex items-center gap-2">
-                {t.count}
-                <Select value={String(count)} size="sm" className="w-20" onChange={(e) => setCount(Number(e.target.value))}>
-                  {[5, 10, 20, 50].map((n) => (
-                    <option key={n} value={n}>
-                      {n}
-                    </option>
-                  ))}
-                </Select>
-              </label>
-              <label className="flex items-center gap-2">
-                {t.dialect}
-                <Select value={dialect} size="sm" className="w-40" onChange={(e) => setDialect(e.target.value as DialectSel)}>
-                  {(Object.keys(t.dialects) as DialectSel[]).map((k) => (
-                    <option key={k} value={k}>
-                      {t.dialects[k]}
-                    </option>
-                  ))}
-                </Select>
-              </label>
+      <Panel className="grid gap-6 p-4 sm:p-6 lg:grid-cols-2">
+        <div className="flex min-w-0 flex-col gap-4">
+          <div className="flex flex-col gap-1.5">
+            <label htmlFor={`${id}-e`} className="text-sm font-medium text-fg-2">
+              {t.expr}
+            </label>
+            <div className="flex gap-2">
+              <Input id={`${id}-e`} size="lg" value={text} onChange={(e) => setText(e.target.value)} className="font-mono text-2xl! tracking-wide" spellCheck={false} autoComplete="off" autoCapitalize="off" aria-invalid={"err" in parsed} />
+              <CopyButton value={text} label={KIT_T[locale].copy} copiedLabel={KIT_T[locale].copied} size="icon" variant="secondary" className="size-12! shrink-0" />
             </div>
           </div>
+          <p className="min-h-8 text-2xl font-bold tracking-tight text-fg sm:text-3xl" aria-live="polite">
+            {"e" in parsed ? describe(parsed.e, locale) : <span className="text-base font-medium text-err">{errText}</span>}
+          </p>
+          <OptionsRow>
+            <Opt label={t.dialect} group>
+              <Segmented size="sm" label={t.dialect} value={dialect} onChange={setDialect} options={(Object.keys(t.dialects) as DialectSel[]).map((k) => ({ value: k, label: t.dialects[k] }))} />
+            </Opt>
+          </OptionsRow>
+        </div>
+
+        <section className="flex min-w-0 flex-col gap-3 rounded-[1rem] bg-surface-2 p-4" aria-labelledby={`${id}-next`}>
+          <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
+            <h2 id={`${id}-next`} className="text-base font-semibold text-fg">
+              {t.next}
+            </h2>
+            <Segmented size="sm" label={t.count} value={String(count)} onChange={(v) => setCount(Number(v))} options={[5, 10, 20, 50].map((n) => ({ value: String(n), label: String(n) }))} />
+          </div>
+          <OptionsRow>
+            <Opt label={t.tz}>
+              <Select value={tz} size="sm" onChange={(e) => setTzSel(e.target.value)}>
+                {zones.map((z) => (
+                  <option key={z} value={z}>
+                    {z}
+                  </option>
+                ))}
+              </Select>
+            </Opt>
+          </OptionsRow>
           {"e" in parsed && parsed.e.reboot ? (
-            <p className="mt-3 text-sm text-fg-2">{t.reboot}</p>
+            <p className="text-sm text-fg-2">{t.reboot}</p>
           ) : runs === null ? (
-            <p className="mt-3 text-sm text-fg-3">{"e" in parsed ? t.loading : ""}</p>
+            <p className="text-sm text-fg-3">{"e" in parsed ? t.loading : ""}</p>
           ) : runs.length === 0 ? (
-            <Notice tone="warn" className="mt-3">
-              {t.none}
-            </Notice>
+            <Notice tone="warn">{t.none}</Notice>
           ) : (
-            <ol className="mt-3 grid gap-x-6 gap-y-1 font-mono text-[0.875rem] sm:grid-cols-2">
+            <ol className="grid grid-cols-[repeat(auto-fill,minmax(min(100%,18rem),1fr))] gap-x-6 gap-y-1 font-mono text-[0.875rem]">
               {runs.map((r, i) => (
-                <li key={r.ms} className="flex gap-3">
+                <li key={r.ms} className="flex min-w-0 gap-3">
                   <span className="w-6 shrink-0 text-right text-fg-3">{i + 1}</span>
-                  <span className="text-fg">
+                  <span className="min-w-0 text-fg">
                     {dateFmt.format(r.ms)}
                     {(r.gap || r.overlap) && <span className="ml-2 font-sans text-[0.75rem] text-warn">{r.gap ? t.gap : t.overlap}</span>}
                   </span>
@@ -227,7 +219,7 @@ export default function CronTool({ locale, expr: expr0 = "*/5 * * * *", dialect:
               ))}
             </ol>
           )}
-        </div>
+        </section>
       </Panel>
 
       {"e" in parsed && (

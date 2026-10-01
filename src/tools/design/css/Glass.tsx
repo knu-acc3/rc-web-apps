@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import type { Locale } from "@/i18n/config";
-import { Checkbox } from "@/ui/field";
+import { Switch } from "@/ui/field";
 import { Panel } from "@/ui/panel";
 import { parseColor, toHex } from "@/tools/design/color/lib/color";
 import { ColorField } from "@/tools/design/color/ui/ColorField";
@@ -50,7 +50,7 @@ export default function GlassGenerator({ locale }: { locale: Locale }) {
     <div className="flex flex-col gap-4">
       <div className="grid gap-4 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
         <div
-          className="relative flex min-h-80 items-center justify-center overflow-hidden rounded-[0.75rem] border border-line p-6"
+          className="relative flex min-h-80 items-center justify-center overflow-hidden rounded-[1.25rem] p-6 shadow-card lg:min-h-96"
           style={{ background: "radial-gradient(circle at 20% 30%, #f472b6 0 18%, transparent 19%), radial-gradient(circle at 80% 70%, #38bdf8 0 22%, transparent 23%), radial-gradient(circle at 70% 20%, #facc15 0 12%, transparent 13%), linear-gradient(135deg, #6366f1, #a855f7)" }}
         >
           <div
@@ -68,14 +68,14 @@ export default function GlassGenerator({ locale }: { locale: Locale }) {
             <p className="mt-1 text-sm opacity-90">{t.text}</p>
           </div>
         </div>
-        <Panel className="flex flex-col gap-3 p-4">
+        <Panel className="flex flex-col gap-4 p-4 sm:p-5">
           <NumberSlider label={t.blur} value={g.blur} min={0} max={40} unit="px" onChange={(v) => set({ blur: Math.max(0, v) })} />
           <NumberSlider label={t.opacity} value={Math.round(g.opacity * 100)} min={0} max={100} unit="%" onChange={(v) => set({ opacity: Math.min(1, Math.max(0, v / 100)) })} />
           <NumberSlider label={t.saturate} value={g.saturate} min={50} max={250} unit="%" onChange={(v) => set({ saturate: Math.max(0, v) })} />
           <NumberSlider label={t.border} value={Math.round(g.border * 100)} min={0} max={100} unit="%" onChange={(v) => set({ border: Math.min(1, Math.max(0, v / 100)) })} />
           <NumberSlider label={t.radius} value={g.radius} min={0} max={48} unit="px" onChange={(v) => set({ radius: Math.max(0, v) })} />
           <ColorField label={t.tint} value={tint} onChange={setTint} locale={locale} size="sm" />
-          <Checkbox label={t.shadow} checked={g.shadow} onChange={(e) => set({ shadow: e.target.checked })} />
+          <Switch label={t.shadow} checked={g.shadow} onChange={(e) => set({ shadow: e.target.checked })} />
         </Panel>
       </div>
       <CodePanel locale={locale} tabs={[{ id: "css", label: "CSS", code: glassCss(settings), filename: "glass.css" }]} />

@@ -2,13 +2,14 @@
 
 import { Plus, X } from "lucide-react";
 import { useId } from "react";
-import { Button } from "@/ui/button";
-import { Input, Select } from "@/ui/field";
+import { IconButton } from "@/ui/button";
+import { Input } from "@/ui/field";
 import { Notice } from "@/ui/panel";
+import { ScrollRow } from "@/ui/scroll-row";
 import type { ToolProps } from "../../../types";
 import { fmtRound } from "../../shared/fmt";
 import { field, readNum } from "../../shared/num";
-import { CalcGrid, Disclaimer, Explain, FieldRow, NumField, OptionsRow, ResultMain, Stack, ToolActions } from "../../shared/ui";
+import { CalcGrid, Disclaimer, Explain, NumSlider, OptionsRow, ResultMain, Stack, ToolActions } from "../../shared/ui";
 import { useQueryState } from "../../shared/url-state";
 import { alcoholGrams, ELIMINATION, widmark, WIDMARK_R, type Sex } from "../lib/body";
 import { SEXES, SexToggle } from "../ui/parts";
@@ -24,8 +25,10 @@ const PRESETS = [
 
 const T = {
   ru: {
-    weight: "Вес, кг",
-    hours: "Прошло часов с начала",
+    weight: "Вес",
+    kg: "кг",
+    hShort: "ч",
+    hours: "Прошло с начала",
     drinks: "Что выпито",
     ml: "Объём, мл",
     abv: "Крепость, %",
@@ -44,8 +47,10 @@ const T = {
     enter: "Введите вес и напитки",
   },
   en: {
-    weight: "Weight, kg",
-    hours: "Hours since the first drink",
+    weight: "Weight",
+    kg: "kg",
+    hShort: "h",
+    hours: "Time since the first drink",
     drinks: "Drinks",
     ml: "Volume, ml",
     abv: "ABV, %",
@@ -101,18 +106,21 @@ export default function Bac({ locale }: ToolProps) {
 
   const inputs = (
     <>
-      <FieldRow>
-        <NumField id={`${id}-w`} label={t.weight} value={q.v.w} onChange={(w) => q.set({ w })} error={W.message} size="lg" />
-        <NumField id={`${id}-h`} label={t.hours} value={q.v.h} onChange={(h) => q.set({ h })} error={H.message} size="lg" />
-      </FieldRow>
+      <NumSlider id={`${id}-w`} locale={locale} label={t.weight} value={q.v.w} onChange={(w) => q.set({ w })} suffix={t.kg} error={W.message} min={40} max={150} />
+      <NumSlider id={`${id}-h`} locale={locale} label={t.hours} value={q.v.h} onChange={(h) => q.set({ h })} suffix={t.hShort} error={H.message} min={0} max={24} decimals={1} step={0.5} />
       <OptionsRow>
         <SexToggle locale={locale} value={sex} onChange={(s) => q.set({ s })} />
       </OptionsRow>
-      <div>
-        <h2 className="mb-2 text-sm font-semibold text-fg-2">{t.drinks}</h2>
+      <div className="flex flex-col gap-2">
+        <h2 className="text-sm font-semibold text-fg-2">{t.drinks}</h2>
+        <div aria-hidden className="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,0.8fr)_2.5rem] gap-2 px-1 text-[0.75rem] text-fg-3">
+          <span>{t.ml}</span>
+          <span>{t.abv}</span>
+          <span>{t.count}</span>
+        </div>
         <ul className="flex flex-col gap-2">
           {drinks.map((d, i) => (
-            <li key={i} className="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,0.8fr)_auto] items-center gap-2">
+            <li key={i} className="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,0.8fr)_2.5rem] items-center gap-2">
               <label className="min-w-0">
                 <span className="sr-only">{`${t.ml} ${i + 1}`}</span>
                 <Input value={d.ml} onChange={(e) => setDrink(i, { ml: e.target.value })} inputMode="decimal" placeholder={t.ml} className="tabular" autoComplete="off" />
@@ -125,37 +133,19 @@ export default function Bac({ locale }: ToolProps) {
                 <span className="sr-only">{`${t.count} ${i + 1}`}</span>
                 <Input value={d.n} onChange={(e) => setDrink(i, { n: e.target.value })} inputMode="decimal" placeholder={t.count} className="tabular" autoComplete="off" />
               </label>
-              <Button variant="ghost" size="icon-sm" onClick={() => q.set({ d: encode(drinks.filter((_, j) => j !== i)) })} aria-label={t.remove} title={t.remove}>
-                <X aria-hidden />
-              </Button>
+              <IconButton label={`${t.remove} ${i + 1}`} title={t.remove} icon={<X aria-hidden />} size="sm" onClick={() => q.set({ d: encode(drinks.filter((_, j) => j !== i)) })} />
             </li>
           ))}
         </ul>
-        <p className="mt-1 text-[0.75rem] text-fg-3">
-          {t.ml} · {t.abv} · {t.count}
-        </p>
-        <div className="mt-2 flex items-center gap-2">
-          <Plus className="size-4 text-fg-3" aria-hidden />
-          <label htmlFor={`${id}-add`} className="sr-only">
-            {t.add}
-          </label>
-          <Select
-            id={`${id}-add`}
-            size="sm"
-            value=""
-            onChange={(e) => {
-              const p = PRESETS.find((x) => x.id === e.target.value);
-              if (p) q.set({ d: encode([...drinks, { ml: String(p.ml), abv: String(p.abv), n: "1" }]) });
-            }}
-          >
-            <option value="">{t.add}</option>
-            {PRESETS.map((p) => (
-              <option key={p.id} value={p.id}>
-                {t.presets[p.id]}
-              </option>
-            ))}
-          </Select>
-        </div>
+        <span className="mt-1 text-[0.8125rem] font-medium text-fg-2">{t.add}</span>
+        <ScrollRow label={t.add} rowClassName="gap-2">
+          {PRESETS.map((p) => (
+            <button key={p.id} type="button" className="chip shrink-0" disabled={drinks.length >= 20} onClick={() => q.set({ d: encode([...drinks, { ml: String(p.ml), abv: String(p.abv), n: "1" }]) })}>
+              <Plus className="size-4" aria-hidden />
+              {t.presets[p.id]}
+            </button>
+          ))}
+        </ScrollRow>
       </div>
     </>
   );

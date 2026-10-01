@@ -33,6 +33,19 @@ const config = [
       "@typescript-eslint/no-unused-vars": ["error", { argsIgnorePattern: "^_", varsIgnorePattern: "^_" }],
     },
   },
+  // Tools and pages use the shared controls: Select (a native list in a Material field), NumberInput (− / +
+  // instead of spinner arrows) and Slider / SliderField. A plain <select multiple> is the one exception.
+  {
+    files: ["src/tools/**/*.tsx", "src/site/**/*.tsx", "src/app/**/*.tsx"],
+    rules: {
+      "no-restricted-syntax": [
+        "error",
+        { selector: "JSXOpeningElement[name.name='select']:not(:has(JSXAttribute[name.name='multiple']))", message: "Use Select from @/ui/field." },
+        { selector: "JSXOpeningElement JSXAttribute[name.name='type'][value.value='number']", message: "Use NumberInput from @/ui/number-input (or SliderField)." },
+        { selector: "JSXOpeningElement[name.name='input'] JSXAttribute[name.name='type'][value.value='range']", message: "Use Slider from @/ui/field (or SliderField)." },
+      ],
+    },
+  },
 ];
 
 export default config;

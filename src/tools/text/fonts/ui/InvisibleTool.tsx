@@ -37,7 +37,7 @@ export function InvisibleTool({ locale, t }: { locale: Locale; t: Strings }) {
         <div className="text-[0.8125rem] font-medium text-fg-2">
           {cur.label[locale]} · {codePoint(curCh)}
         </div>
-        <div className="mt-3 flex min-h-24 items-center justify-center rounded-[0.625rem] bg-surface-2 font-mono text-4xl text-fg-3" title={t.width}>
+        <div className="mt-3 flex min-h-24 items-center justify-center rounded-[1rem] bg-surface-2 font-mono text-4xl text-fg-3" title={t.width}>
           <span aria-hidden>[</span>
           <span className="inline-block h-10 bg-accent-soft whitespace-pre">{curCh.repeat(n)}</span>
           <span aria-hidden>]</span>
@@ -49,7 +49,7 @@ export function InvisibleTool({ locale, t }: { locale: Locale; t: Strings }) {
         </div>
       </Panel>
 
-      <ul className="divide-y divide-line overflow-hidden rounded-[0.75rem] border border-line bg-surface">
+      <ul className="panel divide-y divide-line overflow-hidden">
         {INVISIBLE.map((c, i) => {
           const ch = String.fromCodePoint(c.cp);
           return (
@@ -63,7 +63,7 @@ export function InvisibleTool({ locale, t }: { locale: Locale; t: Strings }) {
                   void copy(i, ch.repeat(n));
                 }}
                 className={cn(
-                  "flex w-full items-center gap-3 px-4 py-3 text-left transition-colors duration-150 hover:bg-surface-2 focus-visible:bg-surface-2",
+                  "flex w-full items-center gap-3 px-4 py-3 text-left transition-colors duration-150 hover:bg-surface-2 focus-visible:bg-surface-2 active:bg-surface-3 sm:px-5",
                   sel === i && "bg-accent-soft hover:bg-accent-soft",
                 )}
               >
@@ -77,7 +77,7 @@ export function InvisibleTool({ locale, t }: { locale: Locale; t: Strings }) {
                     {codePoint(ch)} · {cls[charFacts(c.cp).cls]}
                   </span>
                 </span>
-                <span aria-hidden className={cn("shrink-0 [&_svg]:size-4", copied === i ? "text-ok" : "text-fg-3 opacity-60")}>
+                <span aria-hidden className={cn("flex size-9 shrink-0 items-center justify-center rounded-full transition-colors [&_svg]:size-4", copied === i ? "bg-ok-soft text-ok" : "text-fg-3")}>
                   {copied === i ? <Check /> : <Copy />}
                 </span>
               </button>

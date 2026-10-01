@@ -8,7 +8,7 @@ import { Segmented } from "@/ui/segmented";
 import type { ToolProps } from "../../../types";
 import { useMinuteClock } from "../../shared/clock";
 import { field } from "../../shared/num";
-import { Advanced, CalcGrid, Disclaimer, Explain, FieldRow, NumField, ResultMain, Stack, ToolActions } from "../../shared/ui";
+import { Advanced, CalcGrid, Disclaimer, Explain, NumSlider, ResultMain, SliderRow, Stack, ToolActions } from "../../shared/ui";
 import { useQueryState } from "../../shared/url-state";
 import { bedtimesFor, hm, hm12, parseHm, wakeTimesFor, type SleepOption } from "../lib/sleep";
 
@@ -24,8 +24,8 @@ const T = {
     wakeAt: "Во сколько нужно встать",
     bedAt: "Во сколько ложитесь",
     settings: "Длина цикла и время засыпания",
-    cycle: "Длина цикла, мин",
-    fall: "Время на засыпание, мин",
+    cycle: "Длина цикла",
+    fall: "Время на засыпание",
     labelWake: "Ложитесь спать в",
     labelBed: "Просыпайтесь в",
     labelNow: "Если лечь сейчас, вставайте в",
@@ -45,8 +45,8 @@ const T = {
     wakeAt: "Time to wake up",
     bedAt: "Bedtime",
     settings: "Cycle length and time to fall asleep",
-    cycle: "Cycle length, min",
-    fall: "Time to fall asleep, min",
+    cycle: "Cycle length",
+    fall: "Time to fall asleep",
     labelWake: "Go to bed at",
     labelBed: "Wake up at",
     labelNow: "If you go to bed now, wake up at",
@@ -96,6 +96,7 @@ export default function Sleep({ locale, mode = "wake", time = "07:00" }: ToolPro
     <>
       <Segmented
         label={t.mode}
+        fill
         value={m}
         onChange={(v) => q.set({ m: v })}
         options={[
@@ -110,10 +111,10 @@ export default function Sleep({ locale, mode = "wake", time = "07:00" }: ToolPro
         </Field>
       )}
       <Advanced title={t.settings} open={q.v.c !== "90" || q.v.f !== "15"}>
-        <FieldRow>
-          <NumField id={`${id}-c`} label={t.cycle} value={q.v.c} onChange={(c) => q.set({ c })} error={C.message} inputMode="numeric" />
-          <NumField id={`${id}-f`} label={t.fall} value={q.v.f} onChange={(f) => q.set({ f })} error={F.message} inputMode="numeric" />
-        </FieldRow>
+        <SliderRow>
+          <NumSlider id={`${id}-c`} locale={locale} label={t.cycle} value={q.v.c} onChange={(c) => q.set({ c })} suffix={t.m} error={C.message} min={60} max={120} step={5} />
+          <NumSlider id={`${id}-f`} locale={locale} label={t.fall} value={q.v.f} onChange={(f) => q.set({ f })} suffix={t.m} error={F.message} min={0} max={60} />
+        </SliderRow>
       </Advanced>
     </>
   );

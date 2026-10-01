@@ -2,7 +2,7 @@
 
 import type { Locale } from "@/i18n/config";
 import { field, toInput, type NumResult } from "../../shared/num";
-import { FieldRow, InlineToggle, NumField } from "../../shared/ui";
+import { InlineToggle, NumSlider, SliderRow } from "../../shared/ui";
 import { cmToFtIn, ftInToCm, kgToLb, lbToKg, type Sex } from "../lib/body";
 
 const T = {
@@ -15,8 +15,8 @@ const T = {
     imperial: "фут, фунт",
     height: "Рост",
     weight: "Вес",
-    ft: "Рост, футы",
-    inch: "дюймы",
+    ft: "Рост",
+    inch: "и дюймы",
     cm: "см",
     kg: "кг",
     lb: "фунты",
@@ -30,8 +30,8 @@ const T = {
     imperial: "ft, lb",
     height: "Height",
     weight: "Weight",
-    ft: "Height, ft",
-    inch: "in",
+    ft: "Height",
+    inch: "and inches",
     cm: "cm",
     kg: "kg",
     lb: "lb",
@@ -121,7 +121,7 @@ export function UnitToggle({ locale, value, onChange }: { locale: Locale; value:
   );
 }
 
-/** Height and weight inputs in the chosen unit system. */
+/** Height and weight sliders in the chosen unit system (the value is written on the line — tap to type). */
 export function BodyFields({
   id,
   locale,
@@ -129,7 +129,6 @@ export function BodyFields({
   set,
   errors,
   weight = true,
-  size = "lg",
 }: {
   id: string;
   locale: Locale;
@@ -137,26 +136,27 @@ export function BodyFields({
   set: (patch: Partial<BodyValues>) => void;
   errors: BodyParsed["errors"];
   weight?: boolean;
+  /** Kept for old callers; sliders have one size. */
   size?: "md" | "lg";
 }) {
   const t = T[locale];
   if (v.u === "i") {
     return (
       <>
-        <FieldRow>
-          <NumField id={`${id}-ft`} label={t.ft} value={v.ft} onChange={(ft) => set({ ft })} suffix="ft" error={errors.ft} inputMode="numeric" size={size} />
-          <NumField id={`${id}-in`} label={t.inch} value={v.in} onChange={(x) => set({ in: x })} suffix="in" error={errors.in} size={size} />
-        </FieldRow>
-        {weight && <NumField id={`${id}-lb`} label={`${t.weight}, ${t.lb}`} value={v.lb} onChange={(lb) => set({ lb })} suffix="lb" error={errors.lb} size={size} />}
+        <SliderRow>
+          <NumSlider id={`${id}-ft`} locale={locale} label={t.ft} value={v.ft} onChange={(ft) => set({ ft })} suffix="ft" error={errors.ft} min={3} max={7} />
+          <NumSlider id={`${id}-in`} locale={locale} label={t.inch} value={v.in} onChange={(x) => set({ in: x })} suffix="in" error={errors.in} min={0} max={11} />
+        </SliderRow>
+        {weight && <NumSlider id={`${id}-lb`} locale={locale} label={t.weight} value={v.lb} onChange={(lb) => set({ lb })} suffix="lb" error={errors.lb} min={60} max={440} />}
       </>
     );
   }
-  const heightField = <NumField id={`${id}-h`} label={t.height} value={v.h} onChange={(h) => set({ h })} suffix={t.cm} error={errors.h} size={size} />;
+  const heightField = <NumSlider id={`${id}-h`} locale={locale} label={t.height} value={v.h} onChange={(h) => set({ h })} suffix={t.cm} error={errors.h} min={120} max={220} />;
   if (!weight) return heightField;
   return (
-    <FieldRow>
+    <>
       {heightField}
-      <NumField id={`${id}-w`} label={t.weight} value={v.w} onChange={(w) => set({ w })} suffix={t.kg} error={errors.w} size={size} />
-    </FieldRow>
+      <NumSlider id={`${id}-w`} locale={locale} label={t.weight} value={v.w} onChange={(w) => set({ w })} suffix={t.kg} error={errors.w} min={30} max={200} />
+    </>
   );
 }

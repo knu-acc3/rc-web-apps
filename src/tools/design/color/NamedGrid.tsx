@@ -37,12 +37,12 @@ export default function NamedGrid({ locale }: { locale: Locale }) {
       {groups.map(({ g, items }) => (
         <section key={g}>
           <h2 className="mb-2 text-base font-semibold text-fg">{GROUP_LABEL[g][locale]}</h2>
-          <ul className="grid grid-cols-[repeat(auto-fill,minmax(8.25rem,1fr))] gap-2">
+          <ul className="grid grid-cols-[repeat(auto-fill,minmax(8.25rem,1fr))] gap-2.5">
             {items.map(([n, h]) => (
               <li key={n}>
-                <Link href={href(locale, ["color", n])} className="group block overflow-hidden rounded-[0.625rem] border border-line bg-surface hover:border-line-strong">
-                  <span className="block h-14" style={{ background: h }} />
-                  <span className="block px-2.5 py-1.5">
+                <Link href={href(locale, ["color", n])} className="group block overflow-hidden rounded-[1rem] bg-surface shadow-card transition-[box-shadow,transform] duration-150 hover:-translate-y-0.5 hover:shadow-elev-2 active:translate-y-0 active:shadow-card">
+                  <span className="block h-16" style={{ background: h }} />
+                  <span className="block px-3 py-2">
                     <span className="block truncate text-sm font-medium text-fg group-hover:text-accent">{NAMED_INFO[n].camel}</span>
                     <span className="block font-mono text-xs text-fg-3">{h.toUpperCase()}</span>
                   </span>

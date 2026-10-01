@@ -3,7 +3,6 @@
 import { ArrowDown, ArrowDownLeft, ArrowDownRight, ArrowLeft, ArrowRight, ArrowUp, ArrowUpLeft, ArrowUpRight } from "lucide-react";
 import { useState } from "react";
 import type { Locale } from "@/i18n/config";
-import { cn } from "@/lib/cn";
 import { Panel } from "@/ui/panel";
 import { parseColor, toHex } from "@/tools/design/color/lib/color";
 import { ColorField } from "@/tools/design/color/ui/ColorField";
@@ -78,12 +77,12 @@ export default function TriangleGenerator({ locale }: { locale: Locale }) {
         <Stage locale={locale} minHeight={300}>
           <div role="img" aria-label={`${t.preview}: ${t.dirs[dir]}`} style={{ width: w, height: h, background: hex, clipPath: trianglePolygon(dir) }} />
         </Stage>
-        <Panel className="flex flex-col gap-4 p-4">
+        <Panel className="flex flex-col gap-4 p-4 sm:p-5">
           <div>
             <div className="mb-1.5 text-sm font-medium text-fg-2" id="tri-dir">
               {t.direction}
             </div>
-            <div role="radiogroup" aria-labelledby="tri-dir" className="grid w-fit grid-cols-3 gap-1">
+            <div role="radiogroup" aria-labelledby="tri-dir" className="grid w-fit grid-cols-3 gap-1.5">
               {GRID.map((d, i) =>
                 d ? (
                   <button
@@ -94,11 +93,11 @@ export default function TriangleGenerator({ locale }: { locale: Locale }) {
                     aria-label={t.dirs[d]}
                     title={t.dirs[d]}
                     onClick={() => setDir(d)}
-                    className={cn("flex size-10 items-center justify-center rounded-[0.5rem] border", dir === d ? "border-accent bg-accent-soft text-accent" : "border-line text-fg-2 hover:bg-surface-2")}
+                    className="chip size-11 justify-center p-0!"
                   >
                     {(() => {
                       const Icon = ICON[d];
-                      return <Icon className="size-4" aria-hidden />;
+                      return <Icon className="size-5" aria-hidden />;
                     })()}
                   </button>
                 ) : (

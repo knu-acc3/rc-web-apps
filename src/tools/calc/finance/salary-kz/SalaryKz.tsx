@@ -1,12 +1,12 @@
 "use client";
 
 import { useId } from "react";
-import { Checkbox } from "@/ui/field";
+import { Switch } from "@/ui/field";
 import { Segmented } from "@/ui/segmented";
 import type { ToolProps } from "../../../types";
 import { fmtPct } from "../../shared/fmt";
 import { field, toInput } from "../../shared/num";
-import { CalcGrid, DataTable, Disclaimer, Explain, InlineSelect, NumField, OptionsRow, ResultMain, Stack, SubHeading, ToolActions } from "../../shared/ui";
+import { CalcGrid, DataTable, Disclaimer, Explain, InlineToggle, NumSlider, OptionsRow, ResultMain, Stack, SubHeading, ToolActions } from "../../shared/ui";
 import { useQueryState } from "../../shared/url-state";
 import { grossFromNet, salaryKz, SALARY_YEARS, type SalaryYear } from "../lib/salary-kz";
 import { constantRows, employeeLines, employerLines, tg } from "./content";
@@ -89,6 +89,7 @@ export default function SalaryKz({ locale, gross = 500_000, year = 2026 }: ToolP
     <>
       <Segmented
         label={t.dir}
+        fill
         value={dir}
         onChange={(d) => {
           // keep the same salary when switching direction: show the other side of the current result
@@ -99,11 +100,11 @@ export default function SalaryKz({ locale, gross = 500_000, year = 2026 }: ToolP
           { value: "n", label: t.n2g },
         ]}
       />
-      <NumField id={`${id}-a`} label={dir === "g" ? t.gross : t.net} value={q.v.a} onChange={(a) => q.set({ a })} suffix="₸" error={A.message} size="lg" />
+      <NumSlider id={`${id}-a`} locale={locale} label={dir === "g" ? t.gross : t.net} value={q.v.a} onChange={(a) => q.set({ a })} suffix="₸" error={A.message} min={0} max={5_000_000} scale="log" />
       <OptionsRow>
-        <InlineSelect id={`${id}-y`} label={t.year} value={q.v.y} onChange={(v) => q.set({ y: v })} options={YEARS.map((x) => ({ value: x, label: x }))} />
-        <Checkbox label={<span className="text-sm text-fg-2">{t.deduction}</span>} checked={deduction} onChange={(e) => q.set({ v: e.target.checked ? "1" : "0" })} />
+        <InlineToggle label={t.year} showLabel value={q.v.y} onChange={(v) => q.set({ y: v })} options={YEARS.map((x) => ({ value: x, label: x }))} />
       </OptionsRow>
+      <Switch label={<span className="text-sm text-fg-2">{t.deduction}</span>} checked={deduction} onChange={(e) => q.set({ v: e.target.checked ? "1" : "0" })} />
     </>
   );
 

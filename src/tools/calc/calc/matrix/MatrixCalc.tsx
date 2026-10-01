@@ -3,7 +3,8 @@
 import { useId, type ReactNode } from "react";
 import type { Locale } from "@/i18n/config";
 import { cn } from "@/lib/cn";
-import { Textarea } from "@/ui/field";
+import { Field, Input, Textarea } from "@/ui/field";
+import { Panel } from "@/ui/panel";
 import type { ToolProps } from "../../../types";
 import { det, eigenvalues, inverse, madd, mmul, rank, rref, scale, transpose, type M } from "../algebra/matrix";
 import { complexText, num } from "../algebra/poly";
@@ -225,7 +226,7 @@ export default function MatrixCalc({ locale, op = "det" }: ToolProps<{ op?: Matr
   return (
     <Stack>
       <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] lg:gap-6">
-        <section className="flex min-w-0 flex-col gap-4 rounded-[0.75rem] border border-line bg-surface p-4 sm:p-5">
+        <Panel className="flex min-w-0 flex-col gap-5 p-4 sm:p-6">
           <SelectField id={`${id}-o`} label={t.op} value={o} onChange={(v) => q.set({ o: v })} options={MATRIX_OPS.map((x) => ({ value: x, label: t.ops[x] }))} />
           <div className="flex flex-col gap-2">
             <OptionsRow>
@@ -260,10 +261,9 @@ export default function MatrixCalc({ locale, op = "det" }: ToolProps<{ op?: Matr
             </div>
           )}
           {o === "scalar" && (
-            <label className="flex max-w-40 flex-col gap-1.5 text-sm font-medium text-fg-2">
-              {t.k}
-              <input value={q.v.k} onChange={(e) => q.set({ k: e.target.value })} className="control tabular h-10" inputMode="text" aria-invalid={!K} />
-            </label>
+            <Field label={t.k} htmlFor={`${id}-k`} className="max-w-[12rem]">
+              <Input id={`${id}-k`} value={q.v.k} onChange={(e) => q.set({ k: e.target.value })} className="tabular" inputMode="text" autoComplete="off" aria-invalid={!K} />
+            </Field>
           )}
           <OptionsRow>
             <InlineToggle
@@ -282,8 +282,8 @@ export default function MatrixCalc({ locale, op = "det" }: ToolProps<{ op?: Matr
             {pasteArea("a", "A")}
             {TWO.has(o) && pasteArea("b", "B")}
           </Advanced>
-        </section>
-        <ResultMain label={t.ops[o]} value={<div tabIndex={0} className={cn("overflow-x-auto", typeof value === "string" && "whitespace-normal")}>{value}</div>} sub={sub} rows={rows} size="md" actions={<ToolActions locale={locale} onReset={q.reset} shareUrl={q.shareUrl} />} />
+        </Panel>
+        <ResultMain label={t.ops[o]} value={<div tabIndex={0} className={cn("max-w-full overflow-x-auto", typeof value === "string" && "whitespace-normal")}>{value}</div>} sub={sub} rows={rows} size="md" actions={<ToolActions locale={locale} onReset={q.reset} shareUrl={q.shareUrl} />} />
       </div>
       {steps.length > 0 && <Explain locale={locale} title={t.steps} formula={steps.slice(0, 60)} />}
       <MatrixTheory locale={locale} op={o} />

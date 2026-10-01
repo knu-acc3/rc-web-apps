@@ -78,7 +78,7 @@ export default function MimeSearch({ locale, items, cats, only }: { locale: Loca
 
   return (
     <div className="flex flex-col gap-3">
-      <div className="grid gap-3 sm:grid-cols-[1fr_16rem] sm:items-end">
+      <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end">
         <div className="flex min-w-0 flex-col gap-1.5">
           <label htmlFor={`${id}-q`} className="text-sm font-medium text-fg-2">
             {t.search}

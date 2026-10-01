@@ -114,6 +114,7 @@ export default function Proportion({ locale, mode = "direct" }: ToolProps<{ mode
     <>
       <Segmented
         label={t.mode}
+        fill
         value={m}
         onChange={(v) => q.set({ m: v })}
         options={[

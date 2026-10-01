@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import type { Locale } from "@/i18n/config";
+import { Pane } from "@/tools/dev/shared/Pane";
 import { CopyButton } from "@/ui/copy-button";
 import { Badge } from "@/ui/panel";
 import { Tabs } from "@/ui/tabs";
@@ -80,9 +81,9 @@ export default function PortCheck({ locale, port, protos, service, status, offic
   const [os, setOs] = useState<Os>("linux");
   const text = commands(os, port, protos, locale);
   return (
-    <div className="grid gap-4 md:grid-cols-[minmax(0,14rem)_minmax(0,1fr)]">
-      <div className="flex flex-col justify-center rounded-[0.75rem] bg-surface-2 px-5 py-5">
-        <div className="font-mono text-6xl font-bold tracking-tight text-accent">{port}</div>
+    <div className="grid gap-4 md:grid-cols-[minmax(0,14rem)_minmax(0,1fr)] xl:grid-cols-[minmax(0,18rem)_minmax(0,1fr)]">
+      <div className="panel flex min-w-0 flex-col justify-center px-5 py-5">
+        <div className="font-mono text-6xl font-bold tracking-tight break-all text-accent sm:text-7xl">{port}</div>
         <div className="mt-2 text-lg font-semibold text-fg">{service}</div>
         <div className="mt-3 flex flex-wrap gap-1.5">
           {protos.map((p) => (
@@ -93,11 +94,7 @@ export default function PortCheck({ locale, port, protos, service, status, offic
           <Badge tone={official ? "ok" : "neutral"}>{status}</Badge>
         </div>
       </div>
-      <section className="flex min-w-0 flex-col overflow-hidden rounded-[0.75rem] border border-line bg-surface">
-        <div className="flex items-center justify-between gap-2 px-4 pt-2">
-          <h2 className="text-sm font-semibold text-fg-2">{t.title}</h2>
-          <CopyButton value={text.split("\n").filter((l) => l && !l.startsWith("#")).join("\n")} label={t.copy} copiedLabel={t.copied} variant="ghost" />
-        </div>
+      <Pane as="section" title={<h2>{t.title}</h2>} actions={<CopyButton value={text.split("\n").filter((l) => l && !l.startsWith("#")).join("\n")} label={t.copy} copiedLabel={t.copied} variant="secondary" compact />}>
         <Tabs
           label={t.title}
           value={os}
@@ -105,11 +102,11 @@ export default function PortCheck({ locale, port, protos, service, status, offic
           className="px-2"
           items={(["linux", "macos", "windows", "remote"] as Os[]).map((v) => ({ value: v, label: t.tabs[v] }))}
         />
-        <pre className="overflow-x-auto px-4 py-3 font-mono text-[0.8125rem] leading-relaxed text-fg">
+        <pre className="max-w-full overflow-x-auto px-4 py-3 font-mono text-[0.8125rem] leading-relaxed text-fg">
           <code>{text}</code>
         </pre>
-        {protos.includes("udp") && <p className="border-t border-line px-4 py-2.5 text-[0.8125rem] text-fg-3">{t.udpNote}</p>}
-      </section>
+        {protos.includes("udp") && <p className="px-4 pb-3 text-[0.8125rem] text-fg-3">{t.udpNote}</p>}
+      </Pane>
     </div>
   );
 }

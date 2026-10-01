@@ -84,12 +84,12 @@ function FracView({ v, mixed = false }: { v: Q; mixed?: boolean }) {
   const m = toMixed(v);
   const num = mixed ? m.num : m.whole * m.den + m.num;
   return (
-    <span className="inline-flex items-center gap-1.5 align-middle">
+    <span className="inline-flex max-w-full items-center gap-1.5 align-middle">
       {m.negative && <span>−</span>}
-      {mixed && m.whole > 0n && <span>{m.whole.toString()}</span>}
-      <span className="inline-flex flex-col items-center leading-none">
-        <span className="px-1 pb-1">{num.toString()}</span>
-        <span className="w-full border-t-2 border-current px-1 pt-1">{m.den.toString()}</span>
+      {mixed && m.whole > 0n && <span className="min-w-0 break-all">{m.whole.toString()}</span>}
+      <span className="inline-flex min-w-0 max-w-full flex-col items-center leading-none">
+        <span className="max-w-full break-all px-1 pb-1 text-center">{num.toString()}</span>
+        <span className="w-full break-all border-t-2 border-current px-1 pt-1 text-center">{m.den.toString()}</span>
       </span>
     </span>
   );
@@ -164,6 +164,7 @@ export default function Fractions({ locale, mode = "calc" }: ToolProps<{ mode?: 
           <span className="text-sm font-medium text-fg-2">{t.op}</span>
           <Segmented
             label={t.op}
+            size="lg"
             value={op}
             onChange={(o) => q.set({ o })}
             options={[

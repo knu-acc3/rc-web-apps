@@ -6,7 +6,7 @@ import { type Locale } from "@/i18n/config";
 import { href } from "@/i18n/config";
 import { ButtonLink } from "@/ui/button";
 import { CopyButton } from "@/ui/copy-button";
-import { Panel, PanelHeader } from "@/ui/panel";
+import { Panel } from "@/ui/panel";
 import { readableTextColor, toHex } from "./lib/color";
 import { CONV_LABEL, bareHint, formatAs, parseAs, type ConvFormat } from "./lib/convert";
 import { ColorField, CHECKER_STYLE } from "./ui/ColorField";
@@ -15,7 +15,7 @@ import { FormatList } from "./ui/FormatList";
 const T = {
   ru: {
     input: (f: string) => `Цвет в формате ${f}`,
-    hint: "Можно вставить и другой формат: #hex, rgb(), hsl(), oklch() или название цвета",
+    hint: "Подойдёт и #hex, rgb(), hsl(), oklch() или название",
     result: (f: string) => `Результат в ${f}`,
     empty: "Введите цвет",
     reverse: "Обратный перевод",
@@ -25,7 +25,7 @@ const T = {
   },
   en: {
     input: (f: string) => `Color in ${f}`,
-    hint: "Other formats work too: #hex, rgb(), hsl(), oklch() or a color name",
+    hint: "#hex, rgb(), hsl(), oklch() or a name work too",
     result: (f: string) => `Result in ${f}`,
     empty: "Enter a color",
     reverse: "Reverse conversion",
@@ -56,7 +56,7 @@ export default function ColorConverter({ locale, from, to, sample, reverse }: Co
         <div className="grid items-end gap-4 md:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)]">
           <ColorField label={t.input(CONV_LABEL[from])} value={text} onChange={setText} locale={locale} bare={bareHint(from)} size="lg" hint={t.hint} />
           {reverse ? (
-            <ButtonLink href={href(locale, [reverse])} variant="outline" size="icon" aria-label={t.reverse} title={t.reverse} className="mx-auto max-md:rotate-90 md:mb-7">
+            <ButtonLink href={href(locale, [reverse])} variant="tonal" size="icon" aria-label={t.reverse} title={t.reverse} className="mx-auto max-md:rotate-90 md:mb-7">
               <ArrowLeftRight />
             </ButtonLink>
           ) : (
@@ -64,11 +64,11 @@ export default function ColorConverter({ locale, from, to, sample, reverse }: Co
           )}
           <div className="flex min-w-0 flex-col gap-1.5 md:mb-7">
             <div className="text-sm font-medium text-fg-2">{t.result(CONV_LABEL[to])}</div>
-            <div className="flex min-h-12 items-center gap-2 rounded-[0.5rem] bg-surface-2 px-3">
-              <output className="min-w-0 flex-1 font-mono text-lg font-semibold break-words text-fg [overflow-wrap:anywhere]" aria-live="polite">
+            <div className="flex min-h-12 items-center gap-2 rounded-[1rem] bg-surface-2 py-1 pr-1.5 pl-4">
+              <output className="min-w-0 flex-1 font-mono text-lg font-semibold break-words text-fg [overflow-wrap:anywhere] sm:text-xl" aria-live="polite">
                 {out || <span className="text-base font-normal text-fg-3">{t.empty}</span>}
               </output>
-              <CopyButton value={out} label={t.copy} copiedLabel={t.copied} size="sm" variant="ghost" compact />
+              <CopyButton value={out} label={t.copy} copiedLabel={t.copied} size="md" variant="primary" compact />
             </div>
           </div>
         </div>
@@ -85,8 +85,8 @@ export default function ColorConverter({ locale, from, to, sample, reverse }: Co
               </div>
             </div>
           </Panel>
-          <Panel>
-            <PanelHeader title={t.all} />
+          <Panel className="p-2 sm:p-3">
+            <h2 className="px-3 pt-1 pb-2 text-sm font-semibold text-fg-2">{t.all}</h2>
             <FormatList color={color} locale={locale} />
           </Panel>
         </div>

@@ -45,7 +45,7 @@ export function StyleList({
         <h2 className="text-sm font-semibold text-fg-2">{title}</h2>
         {aside}
       </div>
-      <ul className="divide-y divide-line overflow-hidden rounded-[0.75rem] border border-line bg-surface">
+      <ul className="panel divide-y divide-line overflow-hidden">
         {ids.map((id) => {
           const info = STYLES[id];
           const text = outputs[id];
@@ -60,7 +60,7 @@ export function StyleList({
                 aria-pressed={selected === id}
                 title={t.clickToCopy}
                 className={cn(
-                  "flex w-full items-center gap-3 px-4 text-left transition-colors duration-150 hover:bg-surface-2 focus-visible:bg-surface-2",
+                  "flex w-full items-center gap-3 px-4 text-left transition-colors duration-150 hover:bg-surface-2 focus-visible:bg-surface-2 active:bg-surface-3 sm:px-5",
                   info.random ? "overflow-hidden py-4" : "py-3",
                   selected === id && "bg-accent-soft hover:bg-accent-soft",
                 )}
@@ -74,7 +74,7 @@ export function StyleList({
                   </span>
                   <span className="mt-0.5 block text-lg leading-relaxed whitespace-pre-wrap text-fg [overflow-wrap:anywhere]">{text}</span>
                 </span>
-                <span aria-hidden className={cn("shrink-0 [&_svg]:size-4", isCopied ? "text-ok" : "text-fg-3 opacity-60")}>
+                <span aria-hidden className={cn("flex size-9 shrink-0 items-center justify-center rounded-full transition-colors [&_svg]:size-4", isCopied ? "bg-ok-soft text-ok" : "text-fg-3")}>
                   {isCopied ? <Check /> : <Copy />}
                 </span>
               </button>

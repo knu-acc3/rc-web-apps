@@ -29,6 +29,7 @@ export function SliderField({
   inputMode = "decimal",
   placeholder,
   disabled,
+  aside,
   className,
 }: {
   id: string;
@@ -52,6 +53,8 @@ export function SliderField({
   /** Shown while the value is empty (the handle then waits at the start, dimmed). */
   placeholder?: string;
   disabled?: boolean;
+  /** A small control next to the label (a unit switch "лет / мес.", "% / ₸"). */
+  aside?: ReactNode;
   className?: string;
 }) {
   const n = parse(value);
@@ -60,9 +63,12 @@ export function SliderField({
   return (
     <div className={cn("flex min-w-0 flex-col", disabled && "opacity-60", className)}>
       <div className="flex min-w-0 items-end justify-between gap-3">
-        <label htmlFor={id} className="min-w-0 pb-1 text-sm font-medium text-fg-2">
-          {label}
-        </label>
+        <div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1 pb-1">
+          <label htmlFor={id} className="min-w-0 text-sm font-medium text-fg-2">
+            {label}
+          </label>
+          {aside}
+        </div>
         <div className={cn("flex min-w-0 shrink-0 items-baseline gap-1 border-b-2 border-dashed pb-0.5 transition-colors focus-within:border-solid focus-within:border-accent", error ? "border-err" : "border-line-strong hover:border-outline")}>
           <input
             id={id}

@@ -1,35 +1,32 @@
 "use client";
 
 import { useId } from "react";
+import { ScrollRow } from "@/ui/scroll-row";
 import { Segmented } from "@/ui/segmented";
 import type { ToolProps } from "../../../types";
-import { CURRENCIES, CURRENCY_SYMBOL, fmtMoney, fmtPct, isCurrency, type Currency } from "../../shared/fmt";
+import { CURRENCIES, CURRENCY_SYMBOL, fmtMoney, fmtPct, isCurrency, moneyMax, type Currency } from "../../shared/fmt";
 import { roundTo } from "../../shared/math";
 import { field, toInput } from "../../shared/num";
-import { Advanced, CalcGrid, Disclaimer, Explain, FieldRow, InlineToggle, NumField, OptionsRow, ResultMain, Stack, ToolActions } from "../../shared/ui";
+import { Advanced, CalcGrid, Disclaimer, Explain, InlineToggle, NumSlider, OptionsRow, ResultMain, Stack, ToolActions, SliderRow } from "../../shared/ui";
 import { useQueryState } from "../../shared/url-state";
 import { loanSchedule, type LoanType } from "../lib/loan";
-import { CurrencySelect, ScheduleView, termText } from "../loan/parts";
+import { CurrencySelect, ScheduleView, TERM_UNITS, TermSlider, termText, type TermUnit } from "../loan/parts";
 
 const T = {
   ru: {
     price: "Стоимость жилья",
     down: "Первоначальный взнос",
     downMode: "Взнос в процентах или суммой",
-    rate: "Ставка, % годовых",
-    term: "Срок",
-    years: "лет",
-    monthsShort: "мес.",
-    unit: "Единица срока",
+    rate: "Ставка в год",
     type: "Тип платежа",
     annuity: "Аннуитетный",
     diff: "Дифференцированный",
     currency: "Валюта (только подпись)",
     extras: "Страховка и налог на имущество",
-    ins: "Страхование, % от остатка в год",
+    ins: "Страхование от остатка в год",
     tax: "Налог на имущество в год",
-    presets: "Примеры параметров программ",
-    presetsNote: "Ставки и условия программ меняются — уточняйте в банке. Примеры можно менять.",
+    presets: "Примеры программ",
+    presetsNote: "Ставка · взнос · срок. Условия программ меняются — уточняйте в банке.",
     monthly: "Ежемесячный платёж",
     firstLast: "Первый → последний платёж",
     withExtras: (v: string) => `с учётом страховки и налога в первый месяц — ${v}`,
@@ -45,31 +42,24 @@ const T = {
     downTooBig: "Взнос не может быть больше стоимости",
     insurance: "Страховка",
     taxCol: "Налог",
-    p7: "7 % · взнос 20 % · 25 лет",
-    p7h: "параметры программы «7-20-25»",
-    pMarket: "18 % · взнос 30 % · 15 лет",
-    pMarketH: "пример рыночной ставки",
-    pFamily: "6 % · взнос 20 % · 30 лет",
-    pFamilyH: "как «Семейная ипотека» в России",
+    p7: "«7-20-25»: 7 % · 20 % · 25 лет",
+    pMarket: "Рыночная: 18 % · 30 % · 15 лет",
+    pFamily: "Семейная (РФ): 6 % · 20 % · 30 лет",
   },
   en: {
     price: "Property price",
     down: "Down payment",
     downMode: "Down payment as percent or amount",
-    rate: "Interest rate, % per year",
-    term: "Term",
-    years: "years",
-    monthsShort: "mo",
-    unit: "Term unit",
+    rate: "Interest rate per year",
     type: "Payment type",
     annuity: "Annuity (fixed)",
     diff: "Differentiated",
     currency: "Currency (label only)",
     extras: "Insurance and property tax",
-    ins: "Insurance, % of balance per year",
+    ins: "Insurance on the balance per year",
     tax: "Property tax per year",
-    presets: "Example programme parameters",
-    presetsNote: "Programme rates and terms change — check with the bank. The examples are editable.",
+    presets: "Example programmes",
+    presetsNote: "Rate · down payment · term. Programme terms change — check with the bank.",
     monthly: "Monthly payment",
     firstLast: "First → last payment",
     withExtras: (v: string) => `with insurance and tax in the first month — ${v}`,
@@ -85,17 +75,13 @@ const T = {
     downTooBig: "The down payment cannot exceed the price",
     insurance: "Insurance",
     taxCol: "Tax",
-    p7: "7% · 20% down · 25 years",
-    p7h: "Kazakhstan's 7-20-25 programme parameters",
-    pMarket: "18% · 30% down · 15 years",
-    pMarketH: "example market rate",
-    pFamily: "6% · 20% down · 30 years",
-    pFamilyH: "like Russia's family mortgage",
+    p7: "7-20-25 (KZ): 7% · 20% · 25 yrs",
+    pMarket: "Market: 18% · 30% · 15 yrs",
+    pFamily: "Family (RU): 6% · 20% · 30 yrs",
   },
 } as const;
 
 const TYPES = ["annuity", "diff"] as const;
-const UNITS = ["y", "m"] as const;
 const DMODES = ["pct", "amt"] as const;
 
 export default function Mortgage({
@@ -110,12 +96,12 @@ export default function Mortgage({
   const defCur: Currency = locale === "ru" ? "KZT" : "USD";
   const q = useQueryState(
     { p: toInput(locale, price), d: toInput(locale, down), dm: "pct", r: toInput(locale, rate), t: toInput(locale, years), u: "y", k: "annuity", c: defCur, i: "", tx: "" },
-    { enums: { dm: DMODES, u: UNITS, k: TYPES, c: CURRENCIES } },
+    { enums: { dm: DMODES, u: TERM_UNITS, k: TYPES, c: CURRENCIES } },
   );
   const cur = isCurrency(q.v.c) ? q.v.c : defCur;
   const sym = CURRENCY_SYMBOL[cur];
   const money = (v: number, digits = 2) => fmtMoney(locale, v, cur, digits);
-  const unit = q.v.u as (typeof UNITS)[number];
+  const unit = q.v.u as TermUnit;
   const dm = q.v.dm as (typeof DMODES)[number];
 
   const P = field(locale, q.v.p, { gt: 0, max: 1e13 });
@@ -156,16 +142,19 @@ export default function Mortgage({
 
   const inputs = (
     <>
-      <NumField id={`${id}-p`} label={t.price} value={q.v.p} onChange={(p) => q.set({ p })} suffix={sym} error={P.message} size="lg" />
-      <NumField
+      <NumSlider id={`${id}-p`} locale={locale} label={t.price} value={q.v.p} onChange={(p) => q.set({ p })} suffix={sym} error={P.message} min={0} max={moneyMax(cur, 300_000_000)} scale="log" />
+      <NumSlider
         id={`${id}-d`}
+        locale={locale}
         label={t.down}
         value={q.v.d}
         onChange={(d) => q.set({ d })}
         suffix={dm === "pct" ? "%" : sym}
         error={D.message ?? downErr}
         hint={downHint}
-        size="lg"
+        min={0}
+        max={dm === "pct" ? 90 : Math.max(1, Math.round((P.value ?? moneyMax(cur, 300_000_000)) * 0.9))}
+        scale={dm === "pct" ? "linear" : "log"}
         aside={
           <Segmented
             size="sm"
@@ -188,32 +177,8 @@ export default function Mortgage({
           />
         }
       />
-      <FieldRow>
-        <NumField id={`${id}-r`} label={t.rate} value={q.v.r} onChange={(r) => q.set({ r })} suffix="%" error={R.message} />
-        <NumField
-          id={`${id}-t`}
-          label={t.term}
-          value={q.v.t}
-          onChange={(v) => q.set({ t: v })}
-          suffix={unit === "y" ? t.years : t.monthsShort}
-          error={N.message}
-          aside={
-            <Segmented
-              size="sm"
-              label={t.unit}
-              value={unit}
-              onChange={(u) => {
-                const nv = N.value;
-                q.set({ u, t: nv === null ? q.v.t : toInput(locale, u === "m" ? Math.round(nv * 12) : roundTo(nv / 12, 2)) });
-              }}
-              options={[
-                { value: "y", label: t.years },
-                { value: "m", label: t.monthsShort },
-              ]}
-            />
-          }
-        />
-      </FieldRow>
+      <NumSlider id={`${id}-r`} locale={locale} label={t.rate} value={q.v.r} onChange={(r) => q.set({ r })} suffix="%" error={R.message} min={0} max={30} decimals={1} />
+      <TermSlider id={`${id}-t`} locale={locale} value={q.v.t} unit={unit} onChange={(v, u) => q.set({ t: v, u })} error={N.message} maxYears={35} />
       <OptionsRow>
         <InlineToggle
           label={t.type}
@@ -224,32 +189,30 @@ export default function Mortgage({
             { value: "diff", label: t.diff },
           ]}
         />
-        <CurrencySelect id={`${id}-c`} locale={locale} value={cur} onChange={(c) => q.set({ c })} />
+        <CurrencySelect locale={locale} value={cur} onChange={(c) => q.set({ c })} />
       </OptionsRow>
-      <Advanced title={t.extras} open={insRate > 0 || taxYear > 0}>
-        <FieldRow>
-          <NumField id={`${id}-i`} label={t.ins} value={q.v.i} onChange={(i) => q.set({ i })} suffix="%" error={I.message} placeholder="0" />
-          <NumField id={`${id}-tx`} label={t.tax} value={q.v.tx} onChange={(tx) => q.set({ tx })} suffix={sym} error={TX.message} placeholder="0" />
-        </FieldRow>
-      </Advanced>
-      <Advanced title={t.presets}>
-        <ul className="flex flex-col gap-1">
+      <div className="flex flex-col gap-2">
+        <span className="text-sm font-medium text-fg-2">{t.presets}</span>
+        <ScrollRow label={t.presets} rowClassName="gap-2">
           {(
             [
-              [t.p7, t.p7h, 7, 20, 25],
-              [t.pMarket, t.pMarketH, 18, 30, 15],
-              [t.pFamily, t.pFamilyH, 6, 20, 30],
+              [t.p7, 7, 20, 25],
+              [t.pMarket, 18, 30, 15],
+              [t.pFamily, 6, 20, 30],
             ] as const
-          ).map(([label, hint, r, d, y]) => (
-            <li key={label}>
-              <button type="button" className="text-left text-sm text-accent hover:underline" onClick={() => applyPreset(r, d, y)}>
-                {label}
-              </button>
-              <span className="text-[0.8125rem] text-fg-3"> — {hint}</span>
-            </li>
+          ).map(([label, r, d, y]) => (
+            <button key={label} type="button" className="chip shrink-0" aria-pressed={R.value === r && dm === "pct" && D.value === d && unit === "y" && N.value === y} onClick={() => applyPreset(r, d, y)}>
+              {label}
+            </button>
           ))}
-        </ul>
+        </ScrollRow>
         <p className="text-[0.8125rem] text-fg-3">{t.presetsNote}</p>
+      </div>
+      <Advanced title={t.extras} open={insRate > 0 || taxYear > 0}>
+        <SliderRow>
+          <NumSlider id={`${id}-i`} locale={locale} label={t.ins} value={q.v.i} onChange={(i) => q.set({ i })} suffix="%" error={I.message} min={0} max={2} decimals={2} />
+          <NumSlider id={`${id}-tx`} locale={locale} label={t.tax} value={q.v.tx} onChange={(tx) => q.set({ tx })} suffix={sym} error={TX.message} min={0} max={moneyMax(cur, 1_000_000)} scale="log" />
+        </SliderRow>
       </Advanced>
     </>
   );

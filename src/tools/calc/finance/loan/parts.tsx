@@ -5,10 +5,13 @@ import type { Locale } from "@/i18n/config";
 import { plural } from "@/i18n/format";
 import { downloadText } from "@/lib/clipboard";
 import { Button } from "@/ui/button";
+import { Segmented } from "@/ui/segmented";
 import { BarChart } from "../../shared/charts";
 import { toCsv } from "../../shared/csv";
 import { CURRENCIES, CURRENCY_SYMBOL, fmtCompact, fmtMoney, type Currency } from "../../shared/fmt";
-import { DataTable, InlineSelect, SubHeading } from "../../shared/ui";
+import { roundTo } from "../../shared/math";
+import { parseLocaleNumber, toInput } from "../../shared/num";
+import { DataTable, InlineToggle, NumSlider, SubHeading } from "../../shared/ui";
 import { yearlyTotals, type LoanResult, type LoanRow } from "../lib/loan";
 
 const T = {
@@ -26,6 +29,10 @@ const T = {
     byYear: "Погашение по годам",
     byMonth: "Погашение по месяцам",
     currency: "Валюта",
+    term: "Срок",
+    unit: "Единица срока",
+    yearsUnit: "лет",
+    monthsShort: "мес.",
     years: ["год", "года", "лет"],
     months: ["месяц", "месяца", "месяцев"],
   },
@@ -43,6 +50,10 @@ const T = {
     byYear: "Repayment by year",
     byMonth: "Repayment by month",
     currency: "Currency",
+    term: "Term",
+    unit: "Term unit",
+    yearsUnit: "years",
+    monthsShort: "mo",
     years: ["year", "years"],
     months: ["month", "months"],
   },
@@ -59,9 +70,68 @@ export function termText(locale: Locale, months: number): string {
   return parts.join(" ");
 }
 
-/** Currency label picker (label only — no exchange rates). */
-export function CurrencySelect({ id, locale, value, onChange }: { id: string; locale: Locale; value: Currency; onChange: (c: Currency) => void }) {
-  return <InlineSelect id={id} label={T[locale].currency} value={value} onChange={onChange} options={CURRENCIES.map((c) => ({ value: c, label: CURRENCY_SYMBOL[c] }))} />;
+/** Currency label picker (label only — no exchange rates): ₸ ₽ $ € as segmented buttons. `id` is kept for old callers. */
+export function CurrencySelect({ locale, value, onChange }: { id?: string; locale: Locale; value: Currency; onChange: (c: Currency) => void }) {
+  return <InlineToggle label={T[locale].currency} showLabel value={value} onChange={onChange} options={CURRENCIES.map((c) => ({ value: c, label: CURRENCY_SYMBOL[c], title: c }))} />;
+}
+
+export const TERM_UNITS = ["y", "m"] as const;
+export type TermUnit = (typeof TERM_UNITS)[number];
+
+/** Term as a slider with a years / months switch; switching converts the value. */
+export function TermSlider({
+  id,
+  locale,
+  label,
+  value,
+  unit,
+  onChange,
+  error,
+  maxYears = 30,
+  hint,
+}: {
+  id: string;
+  locale: Locale;
+  label?: string;
+  value: string;
+  unit: TermUnit;
+  onChange: (text: string, unit: TermUnit) => void;
+  error?: string;
+  /** Right end of the track in years (months: × 12). */
+  maxYears?: number;
+  hint?: string;
+}) {
+  const t = T[locale];
+  const n = parseLocaleNumber(locale, value);
+  return (
+    <NumSlider
+      id={id}
+      locale={locale}
+      label={label ?? t.term}
+      value={value}
+      onChange={(v) => onChange(v, unit)}
+      error={error}
+      hint={hint}
+      min={1}
+      max={unit === "y" ? maxYears : maxYears * 12}
+      suffix={unit === "y" ? plural(locale, n ?? 5, t.years) : t.monthsShort}
+      aside={
+        <Segmented
+          size="sm"
+          label={t.unit}
+          value={unit}
+          onChange={(u) => {
+            if (u === unit) return;
+            onChange(n === null ? value : toInput(locale, u === "m" ? Math.round(n * 12) : roundTo(n / 12, 2)), u);
+          }}
+          options={[
+            { value: "y", label: t.yearsUnit },
+            { value: "m", label: t.monthsShort },
+          ]}
+        />
+      }
+    />
+  );
 }
 
 interface ExtraColumn {
@@ -139,7 +209,7 @@ export function ScheduleView({
       <section>
         <SubHeading
           aside={
-            <Button variant="ghost" size="sm" onClick={exportCsv} title={t.csvLong} aria-label={t.csvLong}>
+            <Button variant="tonal" size="sm" onClick={exportCsv} title={t.csvLong} aria-label={t.csvLong}>
               <Download aria-hidden />
               {t.csv}
             </Button>

@@ -2,7 +2,7 @@
 
 import { useCallback, useRef } from "react";
 
-export type Sound = "tick" | "goal" | "end";
+type Sound = "tick" | "goal" | "end";
 
 /** Tones of each sound: frequency (Hz), length (s), wave, volume. */
 const TONES: Record<Sound, { f: number[]; len: number; gap: number; type: OscillatorType; vol: number }> = {

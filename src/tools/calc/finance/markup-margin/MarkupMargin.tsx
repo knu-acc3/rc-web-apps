@@ -3,9 +3,9 @@
 import { useId } from "react";
 import { Segmented } from "@/ui/segmented";
 import type { ToolProps } from "../../../types";
-import { CURRENCIES, CURRENCY_SYMBOL, fmtMoney, fmtPct, isCurrency, type Currency } from "../../shared/fmt";
+import { CURRENCIES, CURRENCY_SYMBOL, fmtMoney, fmtPct, isCurrency, moneyMax, type Currency } from "../../shared/fmt";
 import { field, toInput } from "../../shared/num";
-import { CalcGrid, DataTable, Explain, FieldRow, NumField, OptionsRow, ResultMain, Stack, SubHeading, ToolActions } from "../../shared/ui";
+import { CalcGrid, DataTable, Explain, NumSlider, OptionsRow, ResultMain, Stack, SubHeading, ToolActions } from "../../shared/ui";
 import { useQueryState } from "../../shared/url-state";
 import { fromCostPrice, markupToMargin, priceFromMargin, priceFromMarkup, type MarginResult } from "../lib/money";
 import { CurrencySelect } from "../loan/parts";
@@ -18,8 +18,8 @@ const T = {
     mMargin: "Маржа",
     cost: "Себестоимость (закупка)",
     price: "Цена продажи",
-    markupPct: "Наценка, %",
-    marginPct: "Маржа, %",
+    markupPct: "Наценка",
+    marginPct: "Маржа",
     markup: "Наценка",
     margin: "Маржа",
     profit: "Прибыль с единицы",
@@ -37,8 +37,8 @@ const T = {
     mMargin: "Margin",
     cost: "Cost",
     price: "Selling price",
-    markupPct: "Markup, %",
-    marginPct: "Margin, %",
+    markupPct: "Markup",
+    marginPct: "Margin",
     markup: "Markup",
     margin: "Margin",
     profit: "Profit per unit",
@@ -84,6 +84,7 @@ export default function MarkupMargin({ locale }: ToolProps) {
     <>
       <Segmented
         label={t.mode}
+        fill
         value={m}
         onChange={(v) => q.set({ m: v })}
         options={[
@@ -92,16 +93,14 @@ export default function MarkupMargin({ locale }: ToolProps) {
           { value: "margin", label: t.mMargin },
         ]}
       />
-      <FieldRow>
-        <NumField id={`${id}-c1`} label={t.cost} value={q.v.c1} onChange={(c1) => q.set({ c1 })} suffix={sym} error={C.message} size="lg" />
-        {m === "price" ? (
-          <NumField id={`${id}-p`} label={t.price} value={q.v.p} onChange={(p) => q.set({ p })} suffix={sym} error={P.message} size="lg" />
-        ) : (
-          <NumField id={`${id}-x`} label={m === "markup" ? t.markupPct : t.marginPct} value={q.v.x} onChange={(x) => q.set({ x })} suffix="%" error={X.message ?? err} size="lg" />
-        )}
-      </FieldRow>
+      <NumSlider id={`${id}-c1`} locale={locale} label={t.cost} value={q.v.c1} onChange={(c1) => q.set({ c1 })} suffix={sym} error={C.message} min={0} max={moneyMax(cur, 1_000_000)} scale="log" />
+      {m === "price" ? (
+        <NumSlider id={`${id}-p`} locale={locale} label={t.price} value={q.v.p} onChange={(p) => q.set({ p })} suffix={sym} error={P.message} min={0} max={moneyMax(cur, 1_000_000)} scale="log" />
+      ) : (
+        <NumSlider id={`${id}-x`} locale={locale} label={m === "markup" ? t.markupPct : t.marginPct} value={q.v.x} onChange={(x) => q.set({ x })} suffix="%" error={X.message ?? err} min={0} max={m === "markup" ? 200 : 90} />
+      )}
       <OptionsRow>
-        <CurrencySelect id={`${id}-c`} locale={locale} value={cur} onChange={(c) => q.set({ c })} />
+        <CurrencySelect locale={locale} value={cur} onChange={(c) => q.set({ c })} />
       </OptionsRow>
     </>
   );

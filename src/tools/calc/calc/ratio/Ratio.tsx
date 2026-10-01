@@ -97,6 +97,7 @@ export default function Ratio({ locale }: ToolProps) {
           <>
             <Segmented
               label={t.mode}
+              fill
               value={m}
               onChange={(v) => q.set({ m: v })}
               options={[

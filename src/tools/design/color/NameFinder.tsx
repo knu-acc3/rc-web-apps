@@ -3,7 +3,7 @@
 import Link from "@/ui/link";
 import { useState } from "react";
 import { href, type Locale } from "@/i18n/config";
-import { Notice, Panel, PanelHeader } from "@/ui/panel";
+import { Notice, Panel } from "@/ui/panel";
 import { nearestNamed, parseColor, toHex } from "./lib/color";
 import { ColorField, Swatch } from "./ui/ColorField";
 
@@ -39,19 +39,19 @@ export default function NameFinder({ locale, initial = "#3B82F6" }: { locale: Lo
         <ColorField label={t.input} value={text} onChange={setText} locale={locale} size="lg" />
         {c && (
           <div className="flex items-center gap-3">
-            <Swatch color={toHex(c)} className="h-20 w-full" label={`${t.yours} ${toHex(c)}`} />
+            <Swatch color={toHex(c)} className="h-28 w-full rounded-[1rem]! lg:h-40" label={`${t.yours} ${toHex(c)}`} />
           </div>
         )}
       </Panel>
-      <Panel>
-        <PanelHeader title={t.title} />
+      <Panel className="p-2 sm:p-3">
+        <h2 className="px-3 pt-1 pb-2 text-sm font-semibold text-fg-2">{t.title}</h2>
         {c ? (
-          <ol className="divide-y divide-line" aria-live="polite">
+          <ol className="flex flex-col gap-0.5" aria-live="polite">
             {list.map((n, i) => (
-              <li key={n.name} className="flex items-center gap-3 px-4 py-2.5">
+              <li key={n.name} className="relative flex items-center gap-3 rounded-[0.75rem] px-2 py-2 transition-colors hover:bg-surface-2">
                 <Swatch color={n.hex} className="size-10 shrink-0" />
                 <span className="min-w-0 flex-1">
-                  <Link href={href(locale, ["color", n.name])} className={i === 0 ? "font-semibold text-accent hover:underline" : "font-medium text-fg hover:text-accent"}>
+                  <Link href={href(locale, ["color", n.name])} className={`after:absolute after:inset-0 after:rounded-[0.75rem] ${i === 0 ? "font-semibold text-accent" : "font-medium text-fg hover:text-accent"}`}>
                     {n.name}
                   </Link>
                   <span className="block text-sm text-fg-3">

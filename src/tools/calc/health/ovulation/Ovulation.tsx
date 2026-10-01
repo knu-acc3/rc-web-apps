@@ -2,22 +2,24 @@
 
 import { useId } from "react";
 import type { Locale } from "@/i18n/config";
+import { plural } from "@/i18n/format";
 import { cn } from "@/lib/cn";
 import { Field, Input } from "@/ui/field";
 import type { ToolProps } from "../../../types";
 import { useToday } from "../../shared/clock";
 import { daysInMonth, fmtDay, parseIso, partsOf } from "../../shared/dates";
 import { field } from "../../shared/num";
-import { Advanced, CalcGrid, Disclaimer, Explain, FieldRow, NumField, ResultMain, Stack, SubHeading, ToolActions } from "../../shared/ui";
+import { Advanced, CalcGrid, Disclaimer, Explain, NumSlider, ResultMain, Stack, SubHeading, ToolActions } from "../../shared/ui";
 import { useQueryState } from "../../shared/url-state";
 import { cycles, type CycleDays } from "../lib/cycle";
 
 const T = {
   ru: {
     lmp: "Первый день последних месячных",
-    cycle: "Длина цикла, дней",
+    cycle: "Длина цикла",
+    days: ["день", "дня", "дней"],
     more: "Длина лютеиновой фазы",
-    luteal: "Лютеиновая фаза, дней",
+    luteal: "Лютеиновая фаза",
     lutealHint: "Обычно 12–16 дней; если не знаете — оставьте 14",
     label: "Ближайшая овуляция",
     sub: (a: string, b: string) => `фертильное окно: ${a} — ${b}`,
@@ -35,9 +37,10 @@ const T = {
   },
   en: {
     lmp: "First day of your last period",
-    cycle: "Cycle length, days",
+    cycle: "Cycle length",
+    days: ["day", "days"],
     more: "Luteal phase length",
-    luteal: "Luteal phase, days",
+    luteal: "Luteal phase",
     lutealHint: "Usually 12–16 days; leave 14 if unsure",
     label: "Next ovulation",
     sub: (a: string, b: string) => `fertile window: ${a} — ${b}`,
@@ -148,11 +151,9 @@ export default function Ovulation({ locale }: ToolProps) {
       <Field label={t.lmp} htmlFor={`${id}-d`} error={future ? t.future : undefined}>
         <Input id={`${id}-d`} type="date" size="lg" value={q.v.d} onChange={(e) => q.set({ d: e.target.value })} max={today ?? undefined} aria-invalid={future} />
       </Field>
-      <NumField id={`${id}-c`} label={t.cycle} value={q.v.c} onChange={(c) => q.set({ c })} error={C.message} inputMode="numeric" size="lg" />
+      <NumSlider id={`${id}-c`} locale={locale} label={t.cycle} value={q.v.c} onChange={(c) => q.set({ c })} suffix={plural(locale, C.value ?? 28, t.days)} error={C.message} min={21} max={45} />
       <Advanced title={t.more} open={q.v.l !== "14"}>
-        <FieldRow>
-          <NumField id={`${id}-l`} label={t.luteal} hint={t.lutealHint} value={q.v.l} onChange={(l) => q.set({ l })} error={L.message} inputMode="numeric" />
-        </FieldRow>
+        <NumSlider id={`${id}-l`} locale={locale} label={t.luteal} hint={t.lutealHint} value={q.v.l} onChange={(l) => q.set({ l })} suffix={plural(locale, L.value ?? 14, t.days)} error={L.message} min={10} max={16} />
       </Advanced>
     </>
   );
@@ -190,7 +191,7 @@ export default function Ovulation({ locale }: ToolProps) {
           </ul>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {months.slice(0, 6).map(({ y, m }) => (
-              <div key={`${y}-${m}`} className="rounded-[0.75rem] border border-line bg-surface p-3">
+              <div key={`${y}-${m}`} className="panel min-w-0 p-3">
                 <MonthGrid locale={locale} year={y} month={m} cs={cs} today={todayDay} />
               </div>
             ))}

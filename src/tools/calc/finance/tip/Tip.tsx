@@ -3,9 +3,9 @@
 import { useId } from "react";
 import { plural } from "@/i18n/format";
 import type { ToolProps } from "../../../types";
-import { CURRENCIES, CURRENCY_SYMBOL, fmtMoney, fmtPct, isCurrency, type Currency } from "../../shared/fmt";
+import { CURRENCIES, CURRENCY_SYMBOL, fmtMoney, fmtPct, isCurrency, moneyMax, type Currency } from "../../shared/fmt";
 import { field, toInput } from "../../shared/num";
-import { CalcGrid, Explain, FieldRow, InlineSelect, NumField, OptionsRow, ResultMain, Stack, ToolActions } from "../../shared/ui";
+import { CalcGrid, Explain, InlineSelect, NumSlider, OptionsRow, ResultMain, SliderRow, Stack, ToolActions } from "../../shared/ui";
 import { useQueryState } from "../../shared/url-state";
 import { splitTip } from "../lib/money";
 import { CurrencySelect } from "../loan/parts";
@@ -13,7 +13,7 @@ import { CurrencySelect } from "../loan/parts";
 const T = {
   ru: {
     bill: "Сумма счёта",
-    tip: "Чаевые, %",
+    tip: "Чаевые",
     people: "Сколько человек",
     round: "Округлять долю вверх",
     exact: "не округлять",
@@ -28,7 +28,7 @@ const T = {
   },
   en: {
     bill: "Bill amount",
-    tip: "Tip, %",
+    tip: "Tip",
     people: "Number of people",
     round: "Round each share up",
     exact: "exact",
@@ -72,11 +72,11 @@ export default function Tip({ locale }: ToolProps) {
 
   const inputs = (
     <>
-      <NumField id={`${id}-b`} label={t.bill} value={q.v.b} onChange={(b) => q.set({ b })} suffix={sym} error={B.message} size="lg" />
-      <FieldRow>
-        <NumField id={`${id}-p`} label={t.tip} value={q.v.p} onChange={(p) => q.set({ p })} suffix="%" error={P.message} size="lg" />
-        <NumField id={`${id}-n`} label={t.people} value={q.v.n} onChange={(n) => q.set({ n })} error={N.message} inputMode="numeric" size="lg" />
-      </FieldRow>
+      <NumSlider id={`${id}-b`} locale={locale} label={t.bill} value={q.v.b} onChange={(b) => q.set({ b })} suffix={sym} error={B.message} min={0} max={moneyMax(cur, 500_000)} scale="log" />
+      <SliderRow>
+        <NumSlider id={`${id}-p`} locale={locale} label={t.tip} value={q.v.p} onChange={(p) => q.set({ p })} suffix="%" error={P.message} min={0} max={30} />
+        <NumSlider id={`${id}-n`} locale={locale} label={t.people} value={q.v.n} onChange={(n) => q.set({ n })} error={N.message} min={1} max={20} />
+      </SliderRow>
       <OptionsRow>
         <InlineSelect
           id={`${id}-s`}
@@ -85,7 +85,7 @@ export default function Tip({ locale }: ToolProps) {
           onChange={(s) => q.set({ s })}
           options={STEPS.map((s) => ({ value: s, label: s === "0.01" ? t.exact : `${ru ? "до" : "to"} ${Number(s).toLocaleString(ru ? "ru-RU" : "en-US")} ${sym}` }))}
         />
-        <CurrencySelect id={`${id}-c`} locale={locale} value={cur} onChange={(c) => q.set({ c })} />
+        <CurrencySelect locale={locale} value={cur} onChange={(c) => q.set({ c })} />
       </OptionsRow>
     </>
   );

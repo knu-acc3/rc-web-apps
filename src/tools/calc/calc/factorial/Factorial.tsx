@@ -128,9 +128,9 @@ export default function Factorial({ locale, n = 20 }: ToolProps<{ n?: number }>)
       />
       {v !== null && (v > EXACT_MAX || exact) && (
         <section>
-          <SubHeading aside={exact ? <CopyButton value={exact} label={t.copy} copiedLabel={t.copied} variant="ghost" /> : undefined}>{t.exact}</SubHeading>
+          <SubHeading aside={exact ? <CopyButton value={exact} label={t.copy} copiedLabel={t.copied} variant="secondary" /> : undefined}>{t.exact}</SubHeading>
           {exact ? (
-            <p className="tabular max-h-72 overflow-y-auto rounded-[0.75rem] border border-line bg-surface p-4 font-mono text-sm leading-relaxed break-all text-fg-2">{exact}</p>
+            <p className="tabular max-h-72 overflow-y-auto panel p-4 font-mono text-sm leading-relaxed break-all text-fg-2">{exact}</p>
           ) : (
             <p className="text-sm text-fg-3">{v > EXACT_MAX ? t.tooBig : t.computing}</p>
           )}

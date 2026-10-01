@@ -4,9 +4,9 @@ import { useId } from "react";
 import { plural } from "@/i18n/format";
 import type { ToolProps } from "../../../types";
 import { LineChart } from "../../shared/charts";
-import { CURRENCIES, CURRENCY_SYMBOL, fmtCompact, fmtMoney, fmtN, fmtPct, isCurrency, type Currency } from "../../shared/fmt";
+import { CURRENCIES, CURRENCY_SYMBOL, fmtCompact, fmtMoney, fmtN, fmtPct, isCurrency, moneyMax, type Currency } from "../../shared/fmt";
 import { field, toInput } from "../../shared/num";
-import { Advanced, CalcGrid, Explain, FieldRow, NumField, OptionsRow, ResultMain, Stack, SubHeading, ToolActions } from "../../shared/ui";
+import { Advanced, CalcGrid, Explain, NumSlider, OptionsRow, ResultMain, Stack, SubHeading, ToolActions } from "../../shared/ui";
 import { useQueryState } from "../../shared/url-state";
 import { breakEven } from "../lib/money";
 import { CurrencySelect } from "../loan/parts";
@@ -14,7 +14,7 @@ import { CurrencySelect } from "../loan/parts";
 const T = {
   ru: {
     fixed: "Постоянные расходы в месяц",
-    fixedHint: "Аренда, зарплаты, связь — не зависят от объёма",
+    fixedHint: "Аренда, зарплаты, связь",
     price: "Цена за единицу",
     variable: "Переменные расходы на единицу",
     plan: "Плановый объём продаж",
@@ -35,7 +35,7 @@ const T = {
   },
   en: {
     fixed: "Fixed costs per month",
-    fixedHint: "Rent, salaries, software — independent of volume",
+    fixedHint: "Rent, salaries, software",
     price: "Price per unit",
     variable: "Variable cost per unit",
     plan: "Planned sales volume",
@@ -91,16 +91,14 @@ export default function BreakEven({ locale }: ToolProps) {
 
   const inputs = (
     <>
-      <NumField id={`${id}-f`} label={t.fixed} hint={t.fixedHint} value={q.v.f} onChange={(f) => q.set({ f })} suffix={sym} error={F.message} size="lg" />
-      <FieldRow>
-        <NumField id={`${id}-p`} label={t.price} value={q.v.p} onChange={(p) => q.set({ p })} suffix={sym} error={P.message} size="lg" />
-        <NumField id={`${id}-v`} label={t.variable} value={q.v.v} onChange={(v) => q.set({ v })} suffix={sym} error={V.message} size="lg" />
-      </FieldRow>
+      <NumSlider id={`${id}-f`} locale={locale} label={t.fixed} hint={t.fixedHint} value={q.v.f} onChange={(f) => q.set({ f })} suffix={sym} error={F.message} min={0} max={moneyMax(cur, 50_000_000)} scale="log" />
+      <NumSlider id={`${id}-p`} locale={locale} label={t.price} value={q.v.p} onChange={(p) => q.set({ p })} suffix={sym} error={P.message} min={0} max={moneyMax(cur, 1_000_000)} scale="log" />
+      <NumSlider id={`${id}-v`} locale={locale} label={t.variable} value={q.v.v} onChange={(v) => q.set({ v })} suffix={sym} error={V.message} min={0} max={moneyMax(cur, 1_000_000)} scale="log" />
       <OptionsRow>
-        <CurrencySelect id={`${id}-c`} locale={locale} value={cur} onChange={(c) => q.set({ c })} />
+        <CurrencySelect locale={locale} value={cur} onChange={(c) => q.set({ c })} />
       </OptionsRow>
       <Advanced title={t.planTitle} open={!!q.v.n}>
-        <NumField id={`${id}-n`} label={t.plan} value={q.v.n} onChange={(n) => q.set({ n })} error={N.message} suffix={t.qty} placeholder="0" />
+        <NumSlider id={`${id}-n`} locale={locale} label={t.plan} value={q.v.n} onChange={(n) => q.set({ n })} error={N.message} suffix={t.qty} min={0} max={10_000} scale="log" />
       </Advanced>
     </>
   );

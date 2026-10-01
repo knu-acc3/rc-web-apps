@@ -172,11 +172,11 @@ const tools: ToolDef[] = [
       ru: "Калькулятор прав chmod: перевод 755 ↔ rwxr-xr-x в обе стороны, биты SUID, SGID и sticky, выражения u+x и g-w, расчёт umask и понятные предупреждения.",
       en: "Chmod calculator: convert 755 ↔ rwxr-xr-x both ways, SUID, SGID and sticky bits, symbolic expressions like u+x and g-w, a umask calculator and clear warnings.",
     },
-    lead: { ru: "Отметьте права галочками или введите 755 / rwxr-xr-x — получите обе записи и готовые команды chmod.", en: "Tick the permissions or type 755 / rwxr-xr-x to get both notations and ready chmod commands." },
+    lead: { ru: "Включите права кнопками r, w, x или введите 755 / rwxr-xr-x — получите обе записи и готовые команды chmod.", en: "Toggle r, w, x or type 755 / rwxr-xr-x to get both notations and ready chmod commands." },
     keywords: { ru: ["chmod", "калькулятор chmod", "права доступа linux", "rwxr-xr-x", "umask"], en: ["chmod calculator", "chmod", "unix permissions", "rwxr-xr-x", "umask calculator"] },
     howTo: {
-      ru: ["Введите права числом (755) или символами (rwxr-xr-x) либо отметьте галочки в таблице.", "Проверьте предупреждения: например, 777 даёт всем право менять и удалять файлы.", "Скопируйте команду chmod в числовой или символьной записи.", "Чтобы изменить права выражением, введите его в поле «Применить» — например, g+w или o-rwx."],
-      en: ["Type the mode as a number (755) or symbols (rwxr-xr-x), or tick the boxes.", "Read the notes: 777, for instance, lets anyone modify and delete files.", "Copy the chmod command in numeric or symbolic form.", "To change the mode with an expression, type it into Apply — e.g. g+w or o-rwx."],
+      ru: ["Введите права числом (755) или символами (rwxr-xr-x) либо нажимайте r, w, x в таблице.", "Проверьте предупреждения: например, 777 даёт всем право менять и удалять файлы.", "Скопируйте команду chmod в числовой или символьной записи.", "Чтобы изменить права выражением, введите его в поле «Применить» — например, g+w или o-rwx."],
+      en: ["Type the mode as a number (755) or symbols (rwxr-xr-x), or toggle r, w, x in the grid.", "Read the notes: 777, for instance, lets anyone modify and delete files.", "Copy the chmod command in numeric or symbolic form.", "To change the mode with an expression, type it into Apply — e.g. g+w or o-rwx."],
     },
     faq: {
       ru: [
@@ -321,8 +321,8 @@ const tools: ToolDef[] = [
     lead: { ru: "Вставьте строку User-Agent — увидите браузер, систему и устройство, а если это бот — какой именно.", en: "Paste a User-Agent string to see the browser, system and device — and which bot it is, if any." },
     keywords: { ru: ["user agent", "разбор user agent", "определить бота", "юзер агент"], en: ["user agent parser", "user agent", "detect bot", "ua string"] },
     howTo: {
-      ru: ["Вставьте строку User-Agent из логов сервера или выберите пример.", "Посмотрите браузер, движок, ОС и тип устройства, а также отметку о боте.", "Ниже показан ваш собственный браузер вместе с Client Hints — он не смешивается со вставленной строкой."],
-      en: ["Paste a User-Agent from server logs or pick an example.", "See the browser, engine, OS and device type, plus the bot flag.", "Your own browser with its Client Hints is shown below — never mixed with the pasted string."],
+      ru: ["Вставьте строку User-Agent из логов сервера или выберите пример.", "Посмотрите браузер, движок, ОС и тип устройства, а также отметку о боте.", "Отдельно показан ваш собственный браузер вместе с Client Hints — он не смешивается со вставленной строкой."],
+      en: ["Paste a User-Agent from server logs or pick an example.", "See the browser, engine, OS and device type, plus the bot flag.", "Your own browser with its Client Hints is shown separately — never mixed with the pasted string."],
     },
     faq: {
       ru: [
