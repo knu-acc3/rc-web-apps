@@ -1,5 +1,5 @@
 /** Messages exchanged with the pdf-lib worker. Types only — safe to import anywhere. */
-import type { TransformOp } from "./transform";
+import type { EditItem, TransformOp } from "./transform";
 import type { ImagesLayout, MetaFields, NupOptions, PageNumberOptions, PageRef, Placement, ProtectOptions, TextWatermark, ImageStamp, DocInfo, FormFieldInfo, PdfErrorCode } from "./pdf-ops";
 
 export interface SourceFile {
@@ -33,7 +33,9 @@ export type Job =
   | { type: "protect"; source: SourceFile; options: ProtectOptions }
   | { type: "unlock"; source: SourceFile }
   /** In-place page transforms (mirror, grayscale, crop, paper size); `pages` = 0-based indices, all when omitted. */
-  | { type: "transform"; source: SourceFile; op: TransformOp; pages?: number[]; preview?: number };
+  | { type: "transform"; source: SourceFile; op: TransformOp; pages?: number[]; preview?: number }
+  /** Text and white-out boxes from the editor; `font` = Noto Sans bytes (the editor shows the same font). */
+  | { type: "edit"; source: SourceFile; items: EditItem[]; font: ArrayBuffer };
 
 export interface OutputFile {
   name: string;

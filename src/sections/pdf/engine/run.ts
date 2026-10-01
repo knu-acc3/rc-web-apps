@@ -6,12 +6,13 @@
 import type { PDFDocument } from "@cantoo/pdf-lib";
 import { readJpegInfo, readPngInfo, sniffImage } from "./image-info";
 import type { ImageInput, Job, JobResult, OutputFile, SourceFile } from "./jobs";
-import { transformPages } from "./transform";
+import { drawEdits, transformPages } from "./transform";
 import { collectGarbage, optimizeLossless, recompressImages, type Bitmap, type ImageCodec } from "./optimize";
 import {
   PdfError,
   addPageNumbers,
   assemble,
+  embedTtf,
   fillForm,
   imagesToPdf,
   isEncrypted,
@@ -73,6 +74,13 @@ export async function prepareImage(input: ImageInput, env: RunEnv): Promise<Prep
 
 export async function runJob(job: Job, env: RunEnv = {}, progress: (p: number) => void = () => {}): Promise<JobResult> {
   switch (job.type) {
+    case "edit": {
+      const doc = await open(job.source);
+      const font = await embedTtf(doc, u8(job.font));
+      drawEdits(doc, job.items, font);
+      return { files: [{ name: "edited.pdf", bytes: await saveLoaded(doc) }] };
+    }
+
     case "transform": {
       const src = await open(job.source);
       if (job.preview !== undefined) {

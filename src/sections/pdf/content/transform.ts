@@ -454,3 +454,85 @@ export const blankPagesTool: ToolDef = {
     },
   ],
 };
+
+/* ───────────── add text ───────────── */
+
+export const addTextTool: ToolDef = {
+  slug: "add-text-to-pdf",
+  component: "pdf/edit",
+  icon: "Type",
+  popular: true,
+  name: { ru: "Добавить текст в PDF", en: "Add text to PDF" },
+  title: { ru: "Добавить текст в PDF онлайн | вписать текст в PDF-файл", en: "Add Text to PDF Online — Type on a PDF" },
+  h1: { ru: "Добавить текст в PDF онлайн", en: "Add text to a PDF online" },
+  description: {
+    ru: "Впишите текст в PDF: нажмите на место на странице и печатайте. Кириллица, размер и цвет, перенос мышью, закрашивание лишнего. Без регистрации.",
+    en: "Type on a PDF: tap a spot on the page and start typing. Any language, size and colour, drag to move, white-out for mistakes. No sign-up.",
+  },
+  lead: { ru: "Нажмите на страницу там, где нужен текст, и печатайте — как в обычном редакторе.", en: "Tap the page where you want text and type — just like in a normal editor." },
+  keywords: { ru: ["добавить текст в pdf", "вписать текст в pdf", "редактировать pdf", "написать в pdf", "заполнить pdf"], en: ["add text to pdf", "type on pdf", "write on pdf", "pdf editor"] },
+  props: { tool: "text" },
+  howTo: {
+    ru: ["Откройте PDF-файл.", "Нажмите на страницу в нужном месте и введите текст; размер и цвет — над страницей.", "Передвиньте надпись за значок ⋮, затем нажмите «Сохранить PDF»."],
+    en: ["Open a PDF file.", "Tap the page where you need text and type; size and colour are above the page.", "Drag the text by its ⋮ handle, then press Save PDF."],
+  },
+  about: {
+    ru: [
+      "Текст встраивается в страницу шрифтом Noto Sans — тем же, что вы видите при наборе, поэтому результат совпадает с экраном. Поддерживаются кириллица, казахские буквы, латиница и большинство других алфавитов.",
+      "Так удобно вписать данные в бланк без полей формы, подписать фото в документе или поставить дату. Если в PDF есть настоящие поля, быстрее заполнить их в «Заполнить PDF-форму».",
+      PRIVACY.ru,
+    ],
+    en: [
+      "Text is embedded with Noto Sans — the same font you see while typing — so the result matches the screen. Cyrillic, Latin and most other scripts are supported.",
+      "It's handy for filling in a form that has no fields, labelling a picture or adding a date. If the PDF has real form fields, Fill in a PDF form is quicker.",
+      PRIVACY.en,
+    ],
+  },
+  faq: faq(
+    [
+      { q: "Можно ли изменить существующий текст в PDF?", a: "Исправить буквы в готовом тексте нельзя: PDF хранит текст как набор знаков на позициях. Закрасьте старое слово белым прямоугольником и впишите новое поверх." },
+      { q: "Сохранится ли кириллица?", a: "Да. В файл встраивается шрифт Noto Sans с нужными буквами, поэтому текст правильно отображается на любом устройстве." },
+      { q: "Как добавить подпись?", a: "Для рукописной подписи откройте «Подписать PDF»: там можно нарисовать подпись или загрузить её фото." },
+      PRIVACY_QA.ru,
+    ],
+    [
+      { q: "Can I change existing text in a PDF?", a: "Not letter by letter: a PDF stores text as glyphs at fixed positions. Cover the old word with a white box and type the new one on top." },
+      { q: "Will non-Latin text work?", a: "Yes. Noto Sans with the needed glyphs is embedded, so the text shows correctly on any device." },
+      { q: "How do I add a signature?", a: "For a handwritten signature open Sign PDF: draw it or upload a photo of it." },
+      PRIVACY_QA.en,
+    ],
+  ),
+  related: ["sign-pdf", "fill-pdf-form", "watermark-pdf"],
+  variants: {
+    title: { ru: "Ещё", en: "More" },
+    list: (): VariantDef[] => [
+      {
+        slug: "white-out",
+        name: { ru: "Замазать текст", en: "White-out" },
+        title: { ru: "Замазать текст в PDF онлайн | закрасить белым", en: "White-Out PDF Online — Cover Text with White" },
+        h1: { ru: "Замазать текст в PDF", en: "White-out text in a PDF" },
+        description: {
+          ru: "Закрасьте лишнее в PDF белым или цветным прямоугольником и при необходимости впишите новый текст поверх. Работает в браузере, файл не загружается.",
+          en: "Cover parts of a PDF with a white or coloured box and type new text on top if needed. Runs in your browser; the file isn't uploaded.",
+        },
+        lead: { ru: "Проведите по странице — выделенное место закрасится белым прямоугольником.", en: "Drag across the page to cover that spot with a white rectangle." },
+        props: { tool: "box" },
+        blocks: (l) => [
+          {
+            type: "facts",
+            title: tt(l, "Закрасить или удалить", "Cover or remove"),
+            rows: [
+              [tt(l, "Закрашивание", "White-out"), tt(l, "скрывает визуально, текст под ним остаётся в файле", "hides visually; the text stays in the file underneath")],
+              [tt(l, "Перевод в картинку", "Convert to image"), tt(l, "убирает скрытый текст: PDF → JPG → PDF", "removes hidden text: PDF → JPG → PDF")],
+              [tt(l, "Удаление страницы", "Delete the page"), tt(l, "если лишнее занимает всю страницу", "if the whole page must go")],
+            ],
+          },
+        ],
+        faq: faq(
+          [{ q: "Можно ли так скрыть паспортные данные?", a: "Нет: текст под прямоугольником можно скопировать. Чтобы убрать его совсем, после закрашивания переведите PDF в JPG и обратно в PDF." }],
+          [{ q: "Can I hide passport details this way?", a: "No: text under the box can still be copied. To remove it for good, convert the PDF to JPG and back to PDF after covering it." }],
+        ),
+      },
+    ],
+  },
+};

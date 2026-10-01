@@ -1,4 +1,5 @@
 import { PDFDict, PDFDocument, PDFName, StandardFonts, degrees } from "@cantoo/pdf-lib";
+import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { getDocument } from "pdfjs-dist/legacy/build/pdf.mjs";
 import { describe, expect, it } from "vitest";
@@ -31,6 +32,31 @@ async function inspect(bytes: Uint8Array) {
   }
   return out;
 }
+
+describe("pdf edit", () => {
+  it("adds Cyrillic text where the editor placed it and white-out boxes under it", async () => {
+    const src = await makePdf([{ size: [400, 600] }]);
+    const font = readFileSync(join(process.cwd(), "src/sections/pdf/assets/NotoSans-Regular.ttf"));
+    const r = await runJob({
+      type: "edit",
+      source: { bytes: src },
+      font: font.buffer.slice(font.byteOffset, font.byteOffset + font.byteLength),
+      items: [
+        { kind: "box", page: 0, x: 0.1, y: 0.1, w: 0.5, h: 0.1, color: [1, 1, 1] },
+        { kind: "text", page: 0, x: 0.25, y: 0.5, text: "Привет\nмир", size: 20, color: [0, 0, 1] },
+      ],
+    });
+    const doc = await getDocument({ data: r.files[0].bytes.slice(), standardFontDataUrl: STD_FONTS }).promise;
+    const tc = await (await doc.getPage(1)).getTextContent();
+    const items = tc.items.filter((x) => "str" in x && x.str.trim()) as { str: string; transform: number[] }[];
+    const hello = items.find((x) => x.str === "Привет")!;
+    const world = items.find((x) => x.str === "мир")!;
+    expect(hello.transform[4]).toBeCloseTo(100, 0);
+    expect(hello.transform[5]).toBeLessThan(300);
+    expect(hello.transform[5]).toBeGreaterThan(270);
+    expect(hello.transform[5] - world.transform[5]).toBeCloseTo(25, 0);
+  });
+});
 
 describe("pdf transforms", () => {
   it("mirrors the page horizontally and keeps the text", async () => {

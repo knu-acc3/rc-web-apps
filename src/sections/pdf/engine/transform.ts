@@ -3,9 +3,9 @@
  * mirror, grayscale / inverted colours (a blend-mode overlay), crop and change the paper size.
  * Runs in the worker and in Node unit tests — no DOM.
  */
-import { PDFArray, PDFDict, PDFName, PDFNumber, concatTransformationMatrix, degrees, fill, popGraphicsState, pushGraphicsState, rectangle, setFillingGrayscaleColor, setGraphicsState, type PDFDocument, type PDFPage } from "@cantoo/pdf-lib";
+import { PDFArray, PDFDict, PDFName, PDFNumber, concatTransformationMatrix, degrees, fill, popGraphicsState, pushGraphicsState, rectangle, rgb, setFillingGrayscaleColor, setGraphicsState, type PDFDocument, type PDFPage } from "@cantoo/pdf-lib";
 import { PAPER, apply, clean, compose, invert, scaleM, translate, type Box, type Matrix, type PaperId } from "./geometry";
-import { pageGeometry } from "./pdf-ops";
+import { inVisualSpace, pageGeometry } from "./pdf-ops";
 
 /** Crop in visual space as fractions of the page: left, top, right, bottom edges (0–1, from the top-left). */
 export type FracBox = [number, number, number, number];
@@ -129,5 +129,41 @@ export function transformPages(doc: PDFDocument, op: TransformOp, indices?: read
         break;
       }
     }
+  }
+}
+
+/* ───────────── add text / white-out ───────────── */
+
+/** Something placed on a page in the editor. Coordinates are fractions of the page as displayed, origin top-left. */
+export type EditItem =
+  | { kind: "text"; page: number; x: number; y: number; text: string; size: number; color: [number, number, number] }
+  | { kind: "box"; page: number; x: number; y: number; w: number; h: number; color: [number, number, number] };
+
+/** Line height used both by the editor's text boxes and in the PDF. */
+export const EDIT_LINE_HEIGHT = 1.25;
+
+/** Draw editor items: boxes first (to cover old content), then text on top. */
+export function drawEdits(doc: PDFDocument, items: readonly EditItem[], font: import("@cantoo/pdf-lib").PDFFont) {
+  const pages = doc.getPages();
+  const ordered = [...items.filter((i) => i.kind === "box"), ...items.filter((i) => i.kind === "text")];
+  for (const it of ordered) {
+    const page = pages[it.page];
+    if (!page) continue;
+    const geo = pageGeometry(page);
+    const W = geo.width;
+    const H = geo.height;
+    const color = rgb(...it.color);
+    inVisualSpace(page, geo, () => {
+      if (it.kind === "box") {
+        page.drawRectangle({ x: it.x * W, y: H - (it.y + it.h) * H, width: it.w * W, height: it.h * H, color });
+        return;
+      }
+      const lh = it.size * EDIT_LINE_HEIGHT;
+      // The editor puts the first line's box at the top; the baseline sits where the browser would put it.
+      const first = H - it.y * H - (lh - it.size) / 2 - font.heightAtSize(it.size, { descender: false });
+      it.text.split(/\r?\n/).forEach((line, k) => {
+        if (line) page.drawText(line, { x: it.x * W, y: first - k * lh, size: it.size, font, color });
+      });
+    });
   }
 }

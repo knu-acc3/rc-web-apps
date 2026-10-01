@@ -2,7 +2,7 @@ import { defineToolSection } from "@/registry/tool-section";
 import { heicToPdfTool, imageToPdfTool, jpgToPdfTool, pdfToImageTool, pdfToJpgTool, pdfToPngTool, pdfToWebpTool, pngToPdfTool, toTextTool, webpToPdfTool } from "./content/convert";
 import { compressTool, formTool, metadataTool, nupTool, pageNumbersTool, protectTool, signTool, unlockTool, watermarkTool } from "./content/edit";
 import { deleteTool, extractTool, mergeTool, organizeTool, rotateTool, splitTool } from "./content/pages";
-import { blankPagesTool, cropTool, flipTool, grayscaleTool, invertTool, resizeTool, reverseTool } from "./content/transform";
+import { addTextTool, blankPagesTool, cropTool, flipTool, grayscaleTool, invertTool, resizeTool, reverseTool } from "./content/transform";
 
 export const pdfSection = defineToolSection({
   id: "pdf",
@@ -47,6 +47,7 @@ export const pdfSection = defineToolSection({
     pdfToPngTool,
     pdfToWebpTool,
     toTextTool,
+    addTextTool,
     watermarkTool,
     pageNumbersTool,
     signTool,

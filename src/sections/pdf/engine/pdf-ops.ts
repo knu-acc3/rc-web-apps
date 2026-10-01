@@ -112,7 +112,7 @@ export function pageGeometry(page: PDFPage): PageGeometry {
 }
 
 /** Run drawing callbacks in visual coordinates (respects /Rotate and CropBox). */
-function inVisualSpace(page: PDFPage, geo: PageGeometry, draw: () => void) {
+export function inVisualSpace(page: PDFPage, geo: PageGeometry, draw: () => void) {
   page.pushOperators(pushGraphicsState(), concatTransformationMatrix(...geo.toPage));
   draw();
   page.pushOperators(popGraphicsState());
@@ -223,6 +223,12 @@ function loadFontkit(): Promise<Fontkit> {
     } as unknown as Fontkit;
   });
   return fontkitPromise;
+}
+
+/** Embed a TrueType font (subset) — e.g. Noto Sans, so the PDF matches what the editor showed. */
+export async function embedTtf(doc: PDFDocument, fontBytes: Uint8Array | ArrayBuffer): Promise<PDFFont> {
+  doc.registerFontkit(await loadFontkit());
+  return doc.embedFont(fontBytes, { subset: true });
 }
 
 export async function textFont(doc: PDFDocument, text: string, fontBytes?: Uint8Array | ArrayBuffer | null): Promise<PDFFont> {
