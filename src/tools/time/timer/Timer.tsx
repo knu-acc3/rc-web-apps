@@ -1,0 +1,291 @@
+"use client";
+
+import { Maximize2, Minimize2, Pause, Play, Plus, RotateCcw, Square } from "lucide-react";
+import { useEffect, useId, useRef, useState } from "react";
+import type { Locale } from "@/i18n/config";
+import { cn } from "@/lib/cn";
+import { linkHere, useQueryParam } from "@/lib/share-link";
+import { Button } from "@/ui/button";
+import { useFullscreen } from "@/ui/fullscreen";
+import { ShareLink } from "@/ui/share-link";
+import { ToolTitle } from "@/ui/tool-title";
+import { useWakeLock } from "@/ui/stage";
+import { TimerOptions, useAlertOptions } from "./ui/TimerOptions";
+import { hasPlayed, schedule, unlockAudio, type Scheduled } from "./lib/audio";
+import { clampInt, clock, durationParam, durationShort, durationText, hms, parseDurationParam } from "./lib/format";
+import { useKeys } from "./lib/keys";
+import { nowMs } from "./lib/now";
+import { notify, useTicker, useTitle } from "./lib/notify";
+
+export interface TimerProps {
+  locale: Locale;
+  /** Preset duration in seconds. */
+  seconds?: number;
+}
+
+const T = {
+  ru: {
+    start: "Старт",
+    pause: "Пауза",
+    resume: "Продолжить",
+    reset: "Сброс",
+    stop: "Стоп",
+    add: "+1 мин",
+    h: "Часы",
+    m: "Минуты",
+    s: "Секунды",
+    done: "Время вышло!",
+    doneFor: (d: string) => `Таймер на ${d} завершён`,
+    presets: "Быстрый выбор",
+    full: "На весь экран",
+    title: "Таймер",
+    namePh: "Например, пицца в духовке",
+  },
+  en: {
+    start: "Start",
+    pause: "Pause",
+    resume: "Resume",
+    reset: "Reset",
+    stop: "Stop",
+    add: "+1 min",
+    h: "Hours",
+    m: "Minutes",
+    s: "Seconds",
+    done: "Time's up!",
+    doneFor: (d: string) => `${d} timer finished`,
+    presets: "Quick picks",
+    full: "Full screen",
+    title: "Timer",
+    namePh: "E.g. pizza in the oven",
+  },
+} as const;
+
+const PRESETS = [60, 180, 300, 600, 900, 1800, 3600];
+type Status = "idle" | "running" | "paused" | "done";
+
+export default function Timer({ locale, seconds = 300 }: TimerProps) {
+  const t = T[locale];
+  const id = useId();
+  const [dur, setDur] = useState(seconds);
+  const [fields, setFields] = useState(() => {
+    const x = hms(seconds);
+    return { h: String(x.h).padStart(2, "0"), m: String(x.m).padStart(2, "0"), s: String(x.s).padStart(2, "0") };
+  });
+  const [status, setStatus] = useState<Status>("idle");
+  const [left, setLeft] = useState(seconds * 1000);
+  const [over, setOver] = useState(0);
+  const endAt = useRef(0);
+  const sound = useRef<Scheduled | null>(null);
+  const [opts, setOpts] = useAlertOptions();
+  const { ref, active: full, toggle: toggleFull } = useFullscreen<HTMLDivElement>();
+  useWakeLock(status === "running");
+
+  const running = status === "running";
+
+  // A shared link (?t=10m) sets the length once the page is live; the server renders the page's own default.
+  const urlT = useQueryParam("t");
+  const urlName = useQueryParam("n");
+  const [name, setName] = useState("");
+  const urlKey = urlT === null && urlName === null ? null : `${urlT}|${urlName}`;
+  const [seenUrl, setSeenUrl] = useState<string | null>(null);
+  if (urlKey !== seenUrl) {
+    setSeenUrl(urlKey);
+    if (urlName) setName(urlName.slice(0, 60));
+    const sec = urlT ? parseDurationParam(urlT) : null;
+    if (sec && status === "idle") {
+      const x = hms(sec);
+      setDur(sec);
+      setFields({ h: String(x.h).padStart(2, "0"), m: String(x.m).padStart(2, "0"), s: String(x.s).padStart(2, "0") });
+      setLeft(sec * 1000);
+    }
+  }
+
+  function cancelSound() {
+    sound.current?.stop();
+    sound.current = null;
+  }
+
+  function arm(ms: number) {
+    cancelSound();
+    if (opts.sound !== "off") sound.current = schedule(opts.sound, ms / 1000, 4);
+  }
+
+  function start() {
+    if (status === "running") return;
+    unlockAudio();
+    const ms = status === "paused" ? left : dur * 1000;
+    if (ms <= 0) return;
+    endAt.current = nowMs() + ms;
+    setLeft(ms);
+    setOver(0);
+    arm(ms);
+    setStatus("running");
+  }
+
+  function pause() {
+    if (!running) return;
+    const ms = Math.max(0, endAt.current - nowMs());
+    cancelSound();
+    setLeft(ms);
+    setStatus("paused");
+  }
+
+  function reset() {
+    cancelSound();
+    setLeft(dur * 1000);
+    setOver(0);
+    setStatus("idle");
+  }
+
+  function addMinute() {
+    if (running) {
+      endAt.current += 60000;
+      const ms = endAt.current - nowMs();
+      setLeft(ms);
+      arm(ms);
+    } else if (status === "paused") setLeft((l) => l + 60000);
+    else setDuration(dur + 60);
+  }
+
+  function finish() {
+    setStatus("done");
+    setLeft(0);
+    if (opts.sound !== "off" && !hasPlayed(sound.current)) {
+      cancelSound();
+      sound.current = schedule(opts.sound, 0, 4);
+    }
+    if (opts.notify) notify(name || t.done, t.doneFor(durationText(dur, locale)));
+  }
+
+  // Drift-free: remaining time is always endAt − now.
+  useTicker(running || status === "done", () => {
+    if (status === "running") {
+      const ms = endAt.current - nowMs();
+      if (ms <= 0) finish();
+      else setLeft(ms);
+    } else if (status === "done") {
+      setOver(nowMs() - endAt.current);
+    }
+  });
+
+  // Changing the sound while running re-schedules (or cancels) the finish sound.
+  const soundRef = useRef(opts.sound);
+  useEffect(() => {
+    if (soundRef.current === opts.sound) return;
+    soundRef.current = opts.sound;
+    if (status === "running") {
+      cancelSound();
+      if (opts.sound !== "off") sound.current = schedule(opts.sound, Math.max(0, endAt.current - nowMs()) / 1000, 4);
+    }
+  });
+
+  useEffect(() => () => sound.current?.stop(), []);
+
+  useTitle(running || status === "paused" ? `${clock(left)}${name ? ` · ${name}` : ""}` : status === "done" ? (name ? `${t.done} ${name}` : t.done) : null);
+  useKeys({ " ": () => (running ? pause() : status === "done" ? reset() : start()), r: reset });
+
+  function setDuration(sec: number) {
+    const v = Math.max(0, Math.min(99 * 3600 + 59 * 60 + 59, sec));
+    setDur(v);
+    const x = hms(v);
+    setFields({ h: String(x.h).padStart(2, "0"), m: String(x.m).padStart(2, "0"), s: String(x.s).padStart(2, "0") });
+    setLeft(v * 1000);
+    if (status === "done") setStatus("idle");
+  }
+
+  function onField(k: "h" | "m" | "s", text: string) {
+    const clean = text.replace(/\D/g, "").slice(0, 2);
+    const next = { ...fields, [k]: clean };
+    setFields(next);
+    const sec = clampInt(next.h, 99) * 3600 + clampInt(next.m, 59) * 60 + clampInt(next.s, 59);
+    setDur(sec);
+    setLeft(sec * 1000);
+  }
+
+  const editable = status === "idle" || status === "done";
+  const shown = clock(status === "done" ? 0 : left, { forceHours: true, padHours: true });
+  const big = full ? "text-[min(22vw,40vh)]" : "text-[min(19vw,8rem)]";
+  const field = (k: "h" | "m" | "s", label: string) => (
+    <input
+      id={`${id}-${k}`}
+      aria-label={label}
+      inputMode="numeric"
+      autoComplete="off"
+      value={fields[k]}
+      onChange={(e) => onField(k, e.target.value)}
+      onFocus={(e) => e.target.select()}
+      onBlur={() => setFields((f) => ({ ...f, [k]: String(clampInt(f[k], k === "h" ? 99 : 59)).padStart(2, "0") }))}
+      className="tabular w-[2.1ch] rounded-[0.12em] bg-transparent text-center font-semibold text-fg outline-none hover:bg-surface-2 focus:bg-accent-soft"
+    />
+  );
+
+  return (
+    <div className="flex flex-col gap-4">
+      <div
+        ref={ref}
+        className={cn(
+          "flex flex-col items-center justify-center gap-6 rounded-[0.75rem] border border-line bg-surface px-3 py-8 sm:py-10",
+          full && "min-h-screen rounded-none border-0",
+          status === "done" && "border-accent",
+        )}
+      >
+        <ToolTitle value={name} onChange={setName} locale={locale} placeholder={t.namePh} full={full} />
+        {editable ? (
+          <div className={cn("flex items-baseline leading-none tracking-tight", big)}>
+            {field("h", t.h)}
+            <span className="text-fg-3">:</span>
+            {field("m", t.m)}
+            <span className="text-fg-3">:</span>
+            {field("s", t.s)}
+          </div>
+        ) : (
+          <div className={cn("tabular font-semibold leading-none tracking-tight text-fg", big, status === "paused" && "text-fg-2")}>{shown}</div>
+        )}
+
+        <p className="min-h-7 text-lg font-semibold text-accent" aria-live="polite">
+          {status === "done" ? `${t.done} +${clock(over, { up: true })}` : ""}
+        </p>
+
+        <div className="flex w-full max-w-md items-center justify-center gap-2">
+          {status === "done" ? (
+            <Button variant="primary" size="lg" onClick={reset} className="min-w-0 flex-1 sm:max-w-52">
+              <Square aria-hidden />
+              {t.stop}
+            </Button>
+          ) : running ? (
+            <Button variant="primary" size="lg" onClick={pause} className="min-w-0 flex-1 sm:max-w-52">
+              <Pause aria-hidden />
+              {t.pause}
+            </Button>
+          ) : (
+            <Button variant="primary" size="lg" onClick={start} disabled={dur === 0 && status === "idle"} className="min-w-0 flex-1 sm:max-w-52">
+              <Play aria-hidden />
+              {status === "paused" ? t.resume : t.start}
+            </Button>
+          )}
+          <Button variant="secondary" size="lg" onClick={addMinute} aria-label={t.add} title={t.add} className="w-12 px-0 sm:w-auto sm:px-5">
+            <Plus aria-hidden />
+            <span className="max-sm:sr-only">1</span>
+          </Button>
+          <Button variant="ghost" size="lg" onClick={reset} disabled={status === "idle"} aria-label={t.reset} title={`${t.reset} (R)`} className="w-12 px-0">
+            <RotateCcw aria-hidden />
+          </Button>
+          <Button variant="ghost" size="lg" onClick={toggleFull} aria-label={t.full} title={`${t.full} (F)`} className="w-12 px-0">
+            {full ? <Minimize2 aria-hidden /> : <Maximize2 aria-hidden />}
+          </Button>
+        </div>
+      </div>
+
+      <div className="flex flex-wrap items-center gap-2" role="group" aria-label={t.presets}>
+        {PRESETS.map((p) => (
+          <button key={p} type="button" className={cn("chip h-8! px-3! text-[0.8125rem]!", dur === p && editable && "border-accent! text-accent!")} onClick={() => (editable ? setDuration(p) : undefined)} disabled={!editable}>
+            {durationShort(p, locale)}
+          </button>
+        ))}
+        <ShareLink locale={locale} url={() => linkHere({ query: { ...(dur > 0 ? { t: durationParam(dur) } : {}), ...(name.trim() ? { n: name.trim() } : {}) } })} className="ml-auto" />
+      </div>
+
+      <TimerOptions locale={locale} options={opts} onChange={setOpts} />
+    </div>
+  );
+}

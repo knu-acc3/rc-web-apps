@@ -1,4 +1,4 @@
-// Generates src/sections/encode/data/entities.json — the full WHATWG HTML5 named character
+// Generates src/tools/dev/encode/data/entities.json — the full WHATWG HTML5 named character
 // reference list (2 231 names incl. the legacy ones that may omit the semicolon), taken offline
 // from the html-entities package already present in node_modules.
 // Output: { "names": [[name, chars, legacy01], …] } sorted by name.
@@ -16,7 +16,7 @@ for (const [key, chars] of Object.entries(all)) {
   rows.push([name, chars, legacy]);
 }
 rows.sort((a, b) => (a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0));
-const dir = new URL("../../src/sections/encode/data/", import.meta.url);
+const dir = new URL("../../src/tools/dev/encode/data/", import.meta.url);
 mkdirSync(dir, { recursive: true });
 writeFileSync(new URL("entities.json", dir), JSON.stringify({ names: rows }) + "\n");
 console.log(`${rows.length} entities, ${rows.filter((r) => r[2]).length} legacy`);

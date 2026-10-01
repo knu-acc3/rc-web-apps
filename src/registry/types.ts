@@ -38,7 +38,7 @@ export interface QA {
 
 /** Server-rendered content blocks that sit under the tool. */
 export type Block =
-  | { type: "text"; title?: string; paragraphs: string[] }
+  | { type: "text"; title?: string; paragraphs: string[]; /** Collapsed under its title (long explanations). */ fold?: boolean }
   | { type: "list"; title?: string; ordered?: boolean; items: string[] }
   | { type: "facts"; title?: string; rows: [string, string][] }
   | { type: "table"; title?: string; head: string[]; rows: string[][]; caption?: string; mono?: boolean; /** Two half-tables side by side on wide screens. */ split?: boolean }
@@ -51,6 +51,9 @@ export interface ToolMount {
   /** Serializable preset props passed to the tool component. */
   props?: Record<string, unknown>;
 }
+
+/** Page layout by task type (see src/registry/layouts.ts). */
+export type PageLayout = "file" | "compute" | "screen" | "reference";
 
 export interface PageModel {
   path: string[];
@@ -80,6 +83,8 @@ export interface PageModel {
   compactHeader?: boolean;
   /** Wide layout for tools that need the full container width. */
   wide?: boolean;
+  /** Overrides the layout derived from the section. */
+  layout?: PageLayout;
   icon?: string;
   hue?: number;
 }
@@ -162,6 +167,11 @@ export interface ToolDef {
   icon: string;
   name: L10n;
   title: L10n;
+  /**
+   * Second half of titles that don't have one ("<query> | <seoAlt>"): another way people search for this tool,
+   * e.g. "калькулятор сна по циклам"; a list gives shorter fallbacks for long titles. Defaults to the tool name.
+   */
+  seoAlt?: L10n | L10nList;
   h1?: L10n;
   description: L10n;
   lead?: L10n;

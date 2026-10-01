@@ -4,8 +4,8 @@
  * Source: the hand-curated lists below (one city / country per line). The script
  * validates everything (unique slugs, valid IANA zones, coordinates, Russian
  * locative forms, country coverage) and writes:
- *   src/sections/time/data/cities.json
- *   src/sections/time/data/countries.json
+ *   src/tools/time/time/data/cities.json
+ *   src/tools/time/time/data/countries.json
  * Russian country names are cross-checked against CLDR when it is installed
  * (npm --prefix scripts/data install) — mismatches are only reported, the
  * curated names win (CLDR uses long/official forms such as «Соединенные Штаты»).
@@ -18,7 +18,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..", "..");
-const OUT = join(ROOT, "src", "sections", "time", "data");
+const OUT = join(ROOT, "src", "tools", "time", "time", "data");
 
 const CITIES = `
 # ───── Kazakhstan

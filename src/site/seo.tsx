@@ -3,7 +3,7 @@ import { BRAND, SITE_URL } from "@/config/brand";
 import { href, LOCALES, OG_LOCALE, X_DEFAULT_LOCALE, type Locale } from "@/i18n/config";
 import type { PageModel } from "@/registry/types";
 
-export function absoluteUrl(locale: Locale, path: string[]): string {
+function absoluteUrl(locale: Locale, path: string[]): string {
   return SITE_URL + href(locale, path);
 }
 
@@ -15,7 +15,7 @@ export function alternates(path: string[], locale: Locale): Metadata["alternates
 }
 
 /** Clamp a meta description to ~160 chars on a word boundary. */
-export function clampDescription(text: string, max = 160): string {
+function clampDescription(text: string, max = 160): string {
   const s = text.replace(/\s+/g, " ").trim();
   if (s.length <= max) return s;
   const cut = s.slice(0, max - 1);
@@ -50,7 +50,7 @@ export function pageMetadata(page: PageModel, locale: Locale): Metadata {
   };
 }
 
-export function breadcrumbJsonLd(page: PageModel, locale: Locale) {
+function breadcrumbJsonLd(page: PageModel, locale: Locale) {
   const items = [...page.breadcrumbs, { name: page.h1, path: page.path }];
   return {
     "@context": "https://schema.org",

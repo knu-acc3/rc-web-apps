@@ -1,5 +1,5 @@
 /** Recently opened tools, stored per browser (no server). */
-export interface RecentItem {
+interface RecentItem {
   path: string[];
   title: string;
   locale?: string;

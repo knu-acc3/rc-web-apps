@@ -6,7 +6,7 @@ const ru = {
   home: "Главная",
   allTools: "Все инструменты",
   search: "Поиск",
-  searchPlaceholder: "Найти инструмент, символ, город…",
+  searchPlaceholder: "Например, сжать фото",
   searchHint: "Введите запрос",
   searchEmpty: "Ничего не найдено",
   searchLoading: "Загрузка…",
@@ -62,6 +62,19 @@ const ru = {
   inYourBrowser: "Работает в браузере",
   free: "Бесплатно",
   noSignup: "Без регистрации",
+  catalog: "Все инструменты",
+  catalogShort: "Инструменты",
+  showAllCount: "Показать все",
+  localOnly: "Работает прямо в браузере: данные и файлы не отправляются в интернет.",
+  localOnlyHow: "Как это проверить",
+  oldBrowser: "Этот инструмент не работает в вашем браузере: он слишком старый. Обновите iOS или браузер либо откройте страницу в свежем Chrome или Firefox.",
+  maybeLookingFor: "Возможно, вы искали",
+  searchTools: "Поиск",
+  menuOpen: "Открыть меню",
+  footerTheme: "Оформление",
+  favorites: "Избранное",
+  nextSteps: "Дальше",
+  family: "Похожие инструменты рядом",
 } as const;
 
 type UiDict = { [K in keyof typeof ru]: (typeof ru)[K] extends readonly string[] ? readonly string[] : string };
@@ -71,7 +84,7 @@ const en: UiDict = {
   home: "Home",
   allTools: "All tools",
   search: "Search",
-  searchPlaceholder: "Find a tool, symbol, city…",
+  searchPlaceholder: "E.g. compress a photo",
   searchHint: "Type to search",
   searchEmpty: "Nothing found",
   searchLoading: "Loading…",
@@ -127,6 +140,19 @@ const en: UiDict = {
   inYourBrowser: "Runs in your browser",
   free: "Free",
   noSignup: "No sign-up",
+  catalog: "All tools",
+  catalogShort: "Tools",
+  showAllCount: "Show all",
+  localOnly: "Runs right in your browser: your data and files are never sent over the internet.",
+  localOnlyHow: "How to check",
+  oldBrowser: "This tool doesn't work in your browser because it is too old. Update iOS or your browser, or open the page in a recent Chrome or Firefox.",
+  maybeLookingFor: "Maybe you were looking for",
+  searchTools: "Search",
+  menuOpen: "Open menu",
+  footerTheme: "Theme",
+  favorites: "Favourites",
+  nextSteps: "Next",
+  family: "Neighbouring tools",
 };
 
 const DICTS: Record<Locale, UiDict> = { ru, en };
@@ -135,4 +161,3 @@ export function ui(locale: Locale): UiDict {
   return DICTS[locale];
 }
 
-export type { UiDict };

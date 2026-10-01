@@ -1,5 +1,5 @@
-/** Compact search entry: [title, path, hint, keywords, glyph, weight] */
-export type PackedEntry = [string, string, string, string, string, number];
+/** Compact search entry: [title, path, hint, keywords, glyph, weight, section hue] */
+export type PackedEntry = [string, string, string, string, string, number, number?];
 
 const RU = "йцукенгшщзхъфывапролджэячсмитьбю";
 const EN = "qwertyuiop[]asdfghjkl;'zxcvbnm,.";
@@ -16,7 +16,7 @@ const TRANSLIT: Record<string, string> = {
   ъ: "", ы: "y", ь: "", э: "e", ю: "yu", я: "ya",
 };
 
-export function normalize(s: string): string {
+function normalize(s: string): string {
   return s
     .toLowerCase()
     .replace(/ё/g, "е")
@@ -41,14 +41,15 @@ export interface IndexedEntry {
   hint: string;
   glyph: string;
   weight: number;
+  hue: number;
   hay: string;
   titleN: string;
 }
 
 export function prepare(entries: PackedEntry[]): IndexedEntry[] {
-  return entries.map(([title, path, hint, keywords, glyph, weight]) => {
+  return entries.map(([title, path, hint, keywords, glyph, weight, hue]) => {
     const titleN = normalize(title);
-    return { title, path, hint, glyph, weight, titleN, hay: `${titleN} ${normalize(keywords)} ${translit(titleN)} ${normalize(hint)}` };
+    return { title, path, hint, glyph, weight, hue: hue ?? 225, titleN, hay: `${titleN} ${normalize(keywords)} ${translit(titleN)} ${normalize(hint)}` };
   });
 }
 

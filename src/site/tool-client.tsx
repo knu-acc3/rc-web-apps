@@ -1,7 +1,7 @@
 "use client";
 
 import type { Locale } from "@/i18n/config";
-import { TOOL_COMPONENTS } from "@/sections/tool-components";
+import { TOOL_COMPONENTS } from "@/tools/tool-components";
 
 /**
  * Client boundary for tool components. Each tool is its own next/dynamic chunk: a page loads only

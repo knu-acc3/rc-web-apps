@@ -19,6 +19,8 @@ export const BRAND = {
     yandex: "d33fa0c3c4e6cdd4",
     bing: "",
   },
+  /** IndexNow key (Yandex, Bing): public/{key}.txt must contain it. Submit changed pages with `npm run indexnow`. */
+  indexNowKey: "62f5dd069e5b09dede0cd1c809e96580",
   /** Analytics ids (empty = disabled, nothing is loaded). */
   analytics: {
     yandexMetrika: "",

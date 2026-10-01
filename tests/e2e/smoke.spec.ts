@@ -7,13 +7,13 @@ const SAMPLE = [
   "create-zip", "word-counter", "font-generator", "notes", "emoji", "emoji/red-heart", "symbols", "symbols/hearts", "kaomoji",
   "time/almaty", "world-clock", "timer/5-minutes", "stopwatch", "countdown/new-year", "calendar", "age-calculator",
   "percentage-calculator", "finance", "mortgage-calculator", "bmi-calculator", "roman-numerals", "number-to-words",
-  "convert", "convert/length", "convert/kilometers-to-miles", "paper-sizes/a4", "actual-size", "random", "spin-the-wheel",
+  "unit-converter", "length-converter", "kilometers-to-miles", "all", "paper-sizes/a4", "actual-size", "random", "spin-the-wheel",
   "color", "color-picker", "css", "box-shadow-generator", "json-formatter", "json-to-csv", "regex", "cron", "base64-encode",
   "hash-generator", "uuid-generator", "jwt-decoder", "http-status", "http-status/404", "mime", "port", "password-generator",
   "qr-code-generator", "iban-validator", "subnet-calculator", "meta-tag-generator", "microphone-test", "keyboard-test",
   "what-is-my-browser", "about/privacy",
 ];
-const PAGES = ["/ru", "/en", ...SAMPLE.map((p) => `/ru/${p}`), "/en/convert/celsius-to-fahrenheit", "/en/merge-pdf", "/en/emoji"];
+const PAGES = ["/ru", "/en", ...SAMPLE.map((p) => `/ru/${p}`), "/en/celsius-to-fahrenheit", "/en/merge-pdf", "/en/emoji"];
 
 for (const path of PAGES) {
   test(`renders ${path}`, async ({ page }) => {
@@ -30,21 +30,25 @@ for (const path of PAGES) {
 }
 
 test("unit converter computes live", async ({ page }) => {
-  await page.goto("/ru/convert/kilometers-to-miles");
+  await page.goto("/ru/kilometers-to-miles");
   const input = page.getByLabel("Значение", { exact: true });
   await input.fill("10");
   await expect(page.getByLabel("Результат", { exact: true })).toHaveValue("6,213712");
 });
 
-test("search palette finds a page", async ({ page, isMobile }) => {
-  test.skip(isMobile, "desktop shortcut");
+test("live search finds a page", async ({ page }) => {
   await page.goto("/ru");
-  await page.keyboard.press("Control+k");
-  await page.getByRole("combobox").fill("мили");
+  await page.getByRole("combobox").first().fill("мили");
   await expect(page.getByRole("option").first()).toBeVisible();
 });
 
-const AXE_PAGES = ["/ru", "/ru/merge-pdf", "/ru/word-counter", "/ru/emoji", "/ru/timer/5-minutes", "/ru/percentage-calculator", "/ru/color-picker", "/ru/json-formatter", "/ru/password-generator", "/ru/microphone-test", "/ru/convert/kilometers-to-miles", "/ru/spin-the-wheel"];
+test("unknown pages get the site's 404 page", async ({ page }) => {
+  const res = await page.goto("/ru/no-such-tool");
+  expect(res?.status()).toBe(404);
+  await expect(page.locator("h1")).toHaveText("Страница не найдена");
+});
+
+const AXE_PAGES = ["/ru", "/ru/merge-pdf", "/ru/word-counter", "/ru/emoji", "/ru/timer/5-minutes", "/ru/percentage-calculator", "/ru/color-picker", "/ru/json-formatter", "/ru/password-generator", "/ru/microphone-test", "/ru/kilometers-to-miles", "/ru/spin-the-wheel"];
 for (const path of AXE_PAGES) {
   test(`no serious accessibility violations on ${path}`, async ({ page }) => {
     await page.goto(path);
@@ -62,6 +66,9 @@ test("legacy URLs redirect permanently", async ({ request }) => {
     ["/ru/timer/countdown-5m", "/ru/timer/5-minutes"],
     ["/tools/word-counter", "/ru/word-counter"],
     ["/ru/privacy", "/ru/about/privacy"],
+    ["/ru/convert/length", "/ru/length-converter"],
+    ["/ru/km-to-miles", "/ru/kilometers-to-miles"],
+    ["/merge-pdf", "/ru/merge-pdf"],
   ]) {
     const res = await request.get(from, { maxRedirects: 0 });
     expect(res.status(), from).toBe(301);

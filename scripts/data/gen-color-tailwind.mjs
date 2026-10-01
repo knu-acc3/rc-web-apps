@@ -1,4 +1,4 @@
-// Tailwind CSS v4 default palette (OKLCH) → src/sections/color/design/data/tailwind-v4.ts
+// Tailwind CSS v4 default palette (OKLCH) → src/tools/design/color/design/data/tailwind-v4.ts
 // Source: node_modules/tailwindcss/theme.css of the installed Tailwind version.
 import { readFileSync, writeFileSync } from "node:fs";
 import { createRequire } from "node:module";
@@ -30,5 +30,5 @@ export const TAILWIND_V4: Readonly<Record<string, readonly string[]>> = {
 ${lines.join("\n")}
 };
 `;
-writeFileSync(join(root, "src/sections/color/design/data/tailwind-v4.ts"), out);
+writeFileSync(join(root, "src/tools/design/color/design/data/tailwind-v4.ts"), out);
 console.log(`tailwind v4 ${version}: ${families.size} families`);

@@ -1,5 +1,5 @@
 import { tr, type Locale } from "@/i18n/config";
-import { SECTIONS } from "@/sections";
+import { SECTIONS } from "@/tools";
 import { CATEGORIES } from "./categories";
 import { setRelatedResolver } from "./tool-section";
 import type { LinkItem, PageModel, SearchEntry, SectionDef } from "./types";
@@ -41,7 +41,22 @@ export function resolvePage(locale: Locale, segments: string[]): PageModel | nul
   if (segments.some((s) => s !== s.toLowerCase())) return null;
   const section = owners.get(segments[0]);
   if (!section) return null;
-  return section.absolute ? section.resolve(locale, segments) : section.resolve(locale, segments.slice(1));
+  const page = section.absolute ? section.resolve(locale, segments) : section.resolve(locale, segments.slice(1));
+  return page ? { ...page, title: seoTitle(page.title) } : null;
+}
+
+/**
+ * Title format of every page: "<exact query> | <second way people search for it>"
+ * ("Килограммы в унции | кг в унции конвертер"). Sections write "A — B" or "A: B"; the first separator
+ * becomes " | ".
+ */
+function seoTitle(title: string): string {
+  if (title.includes(" | ")) return title;
+  const dash = title.indexOf(" — ");
+  if (dash > 0) return `${title.slice(0, dash)} | ${title.slice(dash + 3)}`;
+  const colon = title.indexOf(": ");
+  if (colon > 0) return `${title.slice(0, colon)} | ${title.slice(colon + 2)}`;
+  return title;
 }
 
 /** Every path of the site (without locale). */
@@ -54,8 +69,8 @@ export function prebuildPaths(): string[][] {
   return SECTIONS.flatMap((s) => sectionPaths(s, true));
 }
 
-export function searchEntries(locale: Locale): SearchEntry[] {
-  return SECTIONS.flatMap((s) => s.search(locale));
+export function searchEntries(locale: Locale): (SearchEntry & { hue: number })[] {
+  return SECTIONS.flatMap((s) => s.search(locale).map((e) => ({ ...e, hue: s.hue })));
 }
 
 export function sectionsByCategory(locale: Locale) {
@@ -67,11 +82,11 @@ export function sectionsByCategory(locale: Locale) {
 }
 
 /** Landing page of a section: its hub, or null for navigation-only groups. */
-export function sectionHub(s: SectionDef): string[] | null {
+function sectionHub(s: SectionDef): string[] | null {
   return s.hubPath === undefined ? [s.id] : s.hubPath;
 }
 
-export function sectionTools(s: SectionDef, locale: Locale): LinkItem[] {
+function sectionTools(s: SectionDef, locale: Locale): LinkItem[] {
   return withSectionLook(s, s.tools ? s.tools(locale) : s.featured(locale));
 }
 
@@ -113,4 +128,43 @@ function resolveRelated(key: string, locale: Locale): LinkItem | null {
   if (!page) return null;
   const s = byId.get(page.sectionId);
   return { path: page.path, label: page.h1, hint: page.lead ?? page.description, icon: page.icon ?? s?.icon, hue: s?.hue };
+}
+
+/** Link card data for one page path (home page picks, 404 suggestions). */
+export function linkFor(locale: Locale, path: string[]): LinkItem | null {
+  const page = resolvePage(locale, path);
+  if (!page) return null;
+  const s = byId.get(page.sectionId);
+  return { path: page.path, label: page.h1, hint: page.lead ?? page.description, icon: page.icon ?? s?.icon, hue: s?.hue };
+}
+
+interface CatalogGroup {
+  id: string;
+  label: string;
+  icon: string;
+  hue: number;
+  blurb: string;
+  count: number;
+  sections: { id: string; name: string; icon: string; hue: number; hub: string[] | null; tools: LinkItem[] }[];
+}
+
+/** Every tool by category and section (catalogue page, home tiles). */
+export function catalog(locale: Locale): CatalogGroup[] {
+  return sectionsByCategory(locale).map((g) => {
+    const sections = g.sections.map((s) => {
+      const name = tr(s.name, locale);
+      // A one-tool section named like its tool ("Каомодзи → Каомодзи") is listed as the tool alone.
+      const tools = sectionTools(s, locale);
+      return { id: s.id, name, icon: s.icon, hue: s.hue, hub: sectionHub(s), tools };
+    });
+    return {
+      id: g.id,
+      label: g.label,
+      icon: g.icon,
+      hue: g.hue,
+      blurb: tr(g.blurb, locale),
+      count: sections.reduce((n, s) => n + s.tools.length, 0),
+      sections,
+    };
+  });
 }

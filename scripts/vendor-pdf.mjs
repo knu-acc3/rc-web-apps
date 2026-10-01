@@ -7,9 +7,9 @@
  *   public/vendor/pdf/wasm/            JPEG 2000 / JBIG2 / colour-management decoders (pdfjs-dist)
  *   public/vendor/pdf/iccs/            default CMYK profile (pdfjs-dist)
  *   public/vendor/pdf/fonts/           Noto Sans (SIL OFL) for Cyrillic text stamping,
- *                                      from src/sections/pdf/assets/
+ *                                      from src/tools/files/pdf/data/
  *
- * The pdf.js worker itself is bundled by Next (src/sections/pdf/engine/pdfjs.worker.ts),
+ * The pdf.js worker itself is bundled by Next (src/tools/files/pdf/lib/pdfjs.worker.ts),
  * so it always matches the installed pdfjs-dist version.
  */
 import { cpSync, existsSync, mkdirSync, readdirSync, rmSync } from "node:fs";
@@ -43,7 +43,7 @@ copyDir("iccs");
 // Scripting (quickjs) is never enabled.
 copyDir("wasm", (f) => !f.startsWith("quickjs"));
 
-const fontSrc = join(root, "src", "sections", "pdf", "assets");
+const fontSrc = join(root, "src", "tools", "files", "pdf", "data");
 const fontDst = join(out, "fonts");
 mkdirSync(fontDst, { recursive: true });
 for (const f of ["NotoSans-Regular.ttf", "OFL-NotoSans.txt"]) cpSync(join(fontSrc, f), join(fontDst, f));

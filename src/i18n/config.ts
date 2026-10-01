@@ -1,6 +1,5 @@
 export const LOCALES = ["ru", "en"] as const;
 export type Locale = (typeof LOCALES)[number];
-export const DEFAULT_LOCALE: Locale = "ru";
 /** Locale used for hreflang x-default. */
 export const X_DEFAULT_LOCALE: Locale = "en";
 

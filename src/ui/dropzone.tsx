@@ -4,6 +4,21 @@ import { Upload } from "lucide-react";
 import { useCallback, useEffect, useId, useRef, useState, type ReactNode } from "react";
 import { cn } from "@/lib/cn";
 
+/** Phones can't drag files: "Перетащите файлы сюда или нажмите, чтобы выбрать" → "Нажмите, чтобы выбрать файлы". */
+export function touchTitle(title: string): string | null {
+  const ru = title.match(/^Перетащите (.+?)(?: сюда| в поле)?(?:, вставьте Ctrl\+V)? или нажмите(?:, чтобы (?:выбрать|добавить))?(.*)$/);
+  if (ru) return `Нажмите, чтобы выбрать ${ru[1]}${ru[2]}`;
+  const en = title.match(/^Drop (.+?)(?: here)?(?:, paste [^,]+?)?,? or click to (?:choose|select|browse|add)(.*)$/);
+  if (en) return `Tap to choose ${en[1]}${en[2]}`;
+  return null;
+}
+
+/** Phones have no Ctrl+V: drop the sentences about pasting. */
+export function touchHint(hint: string): string | null {
+  if (!/(Ctrl|Cmd|⌘)\s*\+\s*V/i.test(hint)) return null;
+  return hint.replace(/[^.]*(Ctrl|Cmd|⌘)\s*\+\s*V[^.]*\.?\s*/gi, "").trim();
+}
+
 /**
  * File drop area. Accepts drag & drop, click-to-browse and Ctrl+V paste
  * (paste is handled only by the dropzone that currently has focus or, if none
@@ -92,20 +107,35 @@ export function Dropzone({
         emit(e.dataTransfer.files);
       }}
       className={cn(
-        "flex w-full cursor-pointer flex-col items-center justify-center gap-2 rounded-[12px] border-2 border-dashed text-center transition-colors duration-150",
-        compact ? "min-h-24 px-4 py-4" : "min-h-44 px-6 py-8",
-        over ? "border-accent bg-accent-soft" : "border-line-strong bg-surface hover:border-accent hover:bg-surface-2",
+        "flex w-full cursor-pointer flex-col items-center justify-center gap-2.5 rounded-[0.875rem] border-2 border-dashed text-center transition-colors duration-150",
+        compact ? "min-h-24 px-4 py-4" : "min-h-40 px-5 py-7",
+        over ? "border-accent bg-accent-soft" : "border-line-strong bg-surface hover:border-accent",
         disabled && "pointer-events-none opacity-60",
         className,
       )}
     >
-      <span className="flex size-11 items-center justify-center rounded-full bg-accent-soft text-accent">
-        <Upload className="size-5" aria-hidden />
+      <span className={cn("flex items-center justify-center rounded-full bg-accent text-accent-fg", compact ? "size-9" : "size-12")}>
+        <Upload className={compact ? "size-4" : "size-5"} aria-hidden />
       </span>
-      <span id={`${id}-title`} className="text-[15px] font-medium text-fg">
-        {title}
+      <span id={`${id}-title`} className={cn("font-semibold text-fg", compact ? "text-[0.9375rem]" : "text-base")}>
+        {typeof title === "string" && touchTitle(title) ? (
+          <>
+            <span className="pointer-coarse:hidden">{title}</span>
+            <span className="hidden pointer-coarse:inline">{touchTitle(title)}</span>
+          </>
+        ) : (
+          title
+        )}
       </span>
-      {hint && <span className="text-sm text-fg-3">{hint}</span>}
+      {hint &&
+        (typeof hint === "string" && touchHint(hint) !== null ? (
+          <>
+            <span className="max-w-md text-sm text-fg-3 pointer-coarse:hidden">{hint}</span>
+            {touchHint(hint) && <span className="hidden max-w-md text-sm text-fg-3 pointer-coarse:inline">{touchHint(hint)}</span>}
+          </>
+        ) : (
+          <span className="max-w-md text-sm text-fg-3">{hint}</span>
+        ))}
       {children}
       {/* Hidden (not sr-only): the zone itself is the control; .click() still opens the picker. */}
       <input

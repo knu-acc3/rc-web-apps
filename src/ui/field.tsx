@@ -1,10 +1,8 @@
 import type { ComponentProps, ReactNode } from "react";
 import { cn } from "@/lib/cn";
 
-/** Base look of text inputs/selects (see .control in globals.css). */
-export const controlClass = "control";
 type CtlSize = "sm" | "md" | "lg";
-const ctlSize: Record<CtlSize, string> = { sm: "h-9 text-sm", md: "h-10 text-[15px]", lg: "h-12 text-lg font-semibold" };
+const ctlSize: Record<CtlSize, string> = { sm: "h-9 text-sm pointer-coarse:h-10", md: "h-10 text-[0.9375rem] pointer-coarse:h-11", lg: "h-12 text-lg font-semibold" };
 
 export function Field({
   label,
@@ -84,8 +82,8 @@ export function Select({ className, children, size = "md", ...props }: Omit<Comp
 
 export function Checkbox({ label, className, ...props }: Omit<ComponentProps<"input">, "type"> & { label: ReactNode }) {
   return (
-    <label className={cn("inline-flex cursor-pointer items-center gap-2.5 text-[15px] text-fg select-none", className)}>
-      <input type="checkbox" className="size-[18px] shrink-0 cursor-pointer rounded accent-[var(--accent)]" {...props} />
+    <label className={cn("inline-flex cursor-pointer items-center gap-2.5 text-[0.9375rem] text-fg select-none", className)}>
+      <input type="checkbox" className="size-[1.125rem] shrink-0 cursor-pointer rounded accent-[var(--accent)]" {...props} />
       <span>{label}</span>
     </label>
   );
@@ -94,7 +92,7 @@ export function Checkbox({ label, className, ...props }: Omit<ComponentProps<"in
 /** Toggle switch built on a checkbox (keyboard + screen reader friendly). */
 export function Switch({ label, className, ...props }: Omit<ComponentProps<"input">, "type"> & { label: ReactNode }) {
   return (
-    <label className={cn("inline-flex cursor-pointer items-center gap-2.5 text-[15px] text-fg select-none", className)}>
+    <label className={cn("inline-flex cursor-pointer items-center gap-2.5 text-[0.9375rem] text-fg select-none", className)}>
       <span className="relative inline-flex">
         <input type="checkbox" role="switch" className="peer sr-only" {...props} />
         <span className="h-6 w-10 rounded-full bg-line-strong transition-colors duration-150 peer-checked:bg-accent peer-focus-visible:ring-3 peer-focus-visible:ring-accent/30" />

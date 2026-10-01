@@ -3,12 +3,13 @@
   "version": "2.0.0",
   "private": true,
   "engines": {
-    "node": ">=22.12.0"
+    "node": "24.x"
   },
   "scripts": {
     "dev": "next dev -p 3000",
     "prebuild": "node scripts/gen-tool-components.mjs && node scripts/vendor.mjs",
     "build": "next build",
+    "postbuild": "node scripts/postbuild.mjs",
     "start": "next start -p 3000",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
@@ -16,13 +17,15 @@
     "test:e2e": "playwright test",
     "data": "node scripts/data/build.mjs",
     "vendor": "node scripts/vendor.mjs",
-    "verify": "npm run lint && npm run typecheck && npm test && npm run build"
+    "verify": "npm run lint && npm run typecheck && npm run knip && npm test && npm run build",
+    "knip": "knip",
+    "indexnow": "node scripts/indexnow.mjs",
+    "docs": "UPDATE_DOCS=1 vitest run tests/unit/site/readme.test.ts"
   },
   "dependencies": {
     "@cantoo/pdf-lib": "^2.11.1",
     "@ffmpeg/core": "^0.12.10",
     "@ffmpeg/ffmpeg": "^0.12.15",
-    "@ffmpeg/util": "^0.12.2",
     "@jsquash/avif": "^2.1.1",
     "@jsquash/jpeg": "^1.6.0",
     "@jsquash/oxipng": "^2.3.0",
@@ -47,7 +50,7 @@
     "lucide-react": "^1.49.0",
     "marked": "^18.0.14",
     "mediabunny": "^1.61.0",
-    "next": "^16.3.7",
+    "next": "^16.3.8",
     "pdfjs-dist": "^6.3.289",
     "pica": "^10.0.3",
     "prettier": "^3.9.9",
@@ -63,24 +66,48 @@
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.13.0",
-    "@fontsource-variable/onest": "^5.3.1",
-    "@fontsource/onest": "^5.3.1",
+    "@csstools/postcss-cascade-layers": "^6.0.1",
     "@playwright/test": "^1.63.0",
     "@tailwindcss/postcss": "^4.3.3",
-    "@types/diff": "^7.0.2",
-    "@types/js-yaml": "^4.0.9",
     "@types/node": "^24.13.6",
-    "@types/pica": "^9.0.5",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "@types/ua-parser-js": "^0.7.39",
+    "acorn": "^8.18.0",
     "eslint": "^9.39.5",
-    "eslint-config-next": "^16.3.7",
+    "eslint-config-next": "^16.3.8",
+    "knip": "^5.88.1",
+    "lightningcss": "^1.33.0",
+    "postcss": "^8.5.28",
+    "postcss-custom-properties": "^15.0.3",
+    "postcss-selector-parser": "^7.1.6",
     "tailwindcss": "^4.3.3",
     "typescript": "^5.9.3",
     "vitest": "^5.0.3"
   },
   "allowScripts": {
     "unrs-resolver": true
+  },
+  "browserslist": [
+    "chrome >= 87",
+    "edge >= 88",
+    "firefox >= 78",
+    "safari >= 14",
+    "ios_saf >= 14"
+  ],
+  "knip": {
+    "entry": [
+      "scripts/*.mjs",
+      "scripts/data/*.mjs"
+    ],
+    "project": [
+      "src/**/*.{ts,tsx}",
+      "scripts/**/*.mjs",
+      "*.ts"
+    ],
+    "ignoreDependencies": [
+      "@ffmpeg/core",
+      "html-entities"
+    ]
   }
 }

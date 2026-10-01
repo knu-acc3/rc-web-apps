@@ -28,7 +28,7 @@ export function CodeOutput({
   extraActions?: ReactNode;
 }) {
   return (
-    <div className={cn("flex min-w-0 flex-col overflow-hidden rounded-[12px] border border-line bg-surface", className)}>
+    <div className={cn("flex min-w-0 flex-col overflow-hidden rounded-[0.75rem] border border-line bg-surface", className)}>
       <div className="flex min-h-11 items-center justify-between gap-2 border-b border-line px-3 py-1.5">
         <div className="min-w-0 truncate text-sm font-semibold text-fg">{title}</div>
         <div className="flex items-center gap-1">
@@ -39,12 +39,13 @@ export function CodeOutput({
               className={buttonClass("ghost", "sm")}
               onClick={() => downloadText(value, filename, mime)}
               disabled={!value}
+              title={labels.download}
             >
               <Download aria-hidden />
               <span className="max-sm:sr-only">{labels.download}</span>
             </button>
           )}
-          <CopyButton value={value} label={labels.copy} copiedLabel={labels.copied} variant="ghost" />
+          <CopyButton value={value} label={labels.copy} copiedLabel={labels.copied} variant="ghost" compact />
         </div>
       </div>
       <textarea
