@@ -4,12 +4,17 @@ import { RefreshCw } from "lucide-react";
 import { useEffect, useId, useMemo, useRef, useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { formatNumber, formatSmart, plural } from "@/i18n/format";
+import { cn } from "@/lib/cn";
 import { outputLabels } from "@/tools/dev/shared/labels";
+import { Opt } from "@/tools/dev/shared/Pane";
 import { Button } from "@/ui/button";
 import { CodeOutput } from "@/ui/code-output";
 import { CopyButton } from "@/ui/copy-button";
-import { Field, Input, Select } from "@/ui/field";
+import { Field, Input } from "@/ui/field";
+import { NumberInput } from "@/ui/number-input";
 import { Panel } from "@/ui/panel";
+import { ScrollRow } from "@/ui/scroll-row";
+import { SliderField } from "@/ui/slider-field";
 import { entropyBits, log10IdsForCollision, NANOID_ALPHABETS, nanoid } from "./lib/engine";
 
 type Preset = keyof typeof NANOID_ALPHABETS | "custom";
@@ -23,7 +28,7 @@ const T = {
     length: "Длина",
     count: "Количество",
     rate: "ID в час",
-    generate: "Новый",
+    generate: "Сгенерировать",
     badAlphabet: "Нужно от 2 до 256 разных символов",
     bits: ["бит", "бита", "бит"],
     risk: (n: string, ids: string) => `Риск коллизии 1 % — после ${n} ${ids}`,
@@ -40,7 +45,7 @@ const T = {
     length: "Length",
     count: "Count",
     rate: "IDs per hour",
-    generate: "New",
+    generate: "Generate",
     badAlphabet: "Use 2 to 256 distinct characters",
     bits: ["bit", "bits"],
     risk: (n: string, ids: string) => `1% collision risk after ${n} ${ids}`,
@@ -88,6 +93,20 @@ export default function NanoIdTool({ locale, preset: preset0 = "default", size: 
     return () => clearTimeout(timer);
   }, []);
 
+  // A new alphabet, length or count (typed or dragged) regenerates once the value settles.
+  const settled = useRef(`${alphabet}|${size0}|1`);
+  useEffect(() => {
+    const key = `${alphabet}|${size}|${count}`;
+    if (key === settled.current) return;
+    const timer = setTimeout(() => {
+      settled.current = key;
+      const cs = [...alphabet];
+      if (cs.length < 2 || cs.length > 256 || new Set(cs).size !== cs.length) return;
+      setIds(Array.from({ length: count }, () => nanoid(alphabet, size)));
+    }, 150);
+    return () => clearTimeout(timer);
+  }, [alphabet, size, count]);
+
   const stats = useMemo(() => {
     if (!valid) return null;
     const lg = log10IdsForCollision(chars.length, size, 0.01);
@@ -107,74 +126,65 @@ export default function NanoIdTool({ locale, preset: preset0 = "default", size: 
     duration = stats.value >= 1e15 ? `${bigNumber(locale, Math.log10(stats.value))} ${plural(locale, 5, t.units[stats.unit])}` : `${formatSmart(locale, v)} ${plural(locale, v, t.units[stats.unit])}`;
   }
 
-  const commit = () => gen();
+  const parseInt10 = (v: string) => {
+    const n = Number(v.replace(/\s/g, ""));
+    return v.trim() && Number.isFinite(n) ? n : null;
+  };
 
   return (
-    <div className="flex flex-col gap-4">
-      <Panel className="p-4 sm:p-6">
-        <div className="text-sm font-medium text-fg-2">NanoID</div>
-        <output className="mt-1 block min-h-9 font-mono text-xl font-semibold tracking-tight break-all text-fg sm:text-[1.625rem]" aria-live="polite">
-          {ids?.[0] ?? "…"}
-        </output>
-        <div className="mt-4 flex flex-wrap items-center gap-2">
-          <Button variant="primary" onClick={() => gen()} disabled={!valid}>
-            <RefreshCw aria-hidden />
-            {t.generate}
-          </Button>
-          <CopyButton value={ids?.[0] ?? ""} label={t.copy} copiedLabel={t.copied} size="md" variant="outline" />
-        </div>
+    <div className={cn("grid items-start gap-4", ids && ids.length > 1 && "xl:grid-cols-2")}>
+      <div className="flex min-w-0 flex-col gap-4">
+        <Panel className="flex flex-col gap-5 p-4 sm:p-6">
+          <div className="min-w-0">
+            <div className="text-sm font-medium text-fg-2">NanoID</div>
+            <output key={ids?.[0]} className="mt-1 block min-h-10 font-mono text-2xl font-semibold tracking-tight break-all text-fg motion-safe:animate-[menu-in_0.25s_ease-out] sm:text-3xl" aria-live="polite">
+              {ids?.[0] ?? "…"}
+            </output>
+          </div>
+          <div className="flex flex-wrap items-center gap-3">
+            <Button variant="filled" size="lg" onClick={() => gen()} disabled={!valid}>
+              <RefreshCw aria-hidden />
+              {t.generate}
+            </Button>
+            <CopyButton value={ids?.[0] ?? ""} label={t.copy} copiedLabel={t.copied} size="md" variant="secondary" className="h-12! px-6!" />
+          </div>
 
-        <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-3 border-t border-line pt-4 text-sm text-fg-2">
-          <label className="flex items-center gap-2">
-            {t.alphabet}
-            <Select
-              value={preset}
-              size="sm"
-              className="w-48"
-              onChange={(e) => {
-                const p = e.target.value as Preset;
-                setPreset(p);
-                gen(p === "custom" ? custom : NANOID_ALPHABETS[p]);
-              }}
-            >
+          <div className="flex min-w-0 flex-col gap-2">
+            <span className="text-sm font-medium text-fg-2">{t.alphabet}</span>
+            <ScrollRow label={t.alphabet} role="radiogroup" rowClassName="gap-2">
               {(Object.keys(t.presets) as Preset[]).map((p) => (
-                <option key={p} value={p}>
+                <button key={p} type="button" role="radio" aria-checked={p === preset} className="chip shrink-0 font-mono" onClick={() => setPreset(p)}>
                   {t.presets[p]}
-                </option>
+                </button>
               ))}
-            </Select>
-          </label>
-          <label className="flex items-center gap-2" htmlFor={`${id}-l`}>
-            {t.length}
-            <Input id={`${id}-l`} size="sm" inputMode="numeric" className="w-16" value={sizeText} onChange={(e) => setSizeText(e.target.value)} onBlur={commit} onKeyDown={(e) => e.key === "Enter" && commit()} />
-          </label>
-          <label className="flex items-center gap-2" htmlFor={`${id}-n`}>
-            {t.count}
-            <Input id={`${id}-n`} size="sm" inputMode="numeric" className="w-20" value={countText} onChange={(e) => setCountText(e.target.value)} onBlur={commit} onKeyDown={(e) => e.key === "Enter" && commit()} />
-          </label>
-        </div>
-        {preset === "custom" && (
-          <Field className="mt-3" label={t.customLabel} htmlFor={`${id}-c`} error={!valid ? t.badAlphabet : undefined}>
-            <Input id={`${id}-c`} value={custom} onChange={(e) => setCustom(e.target.value)} onBlur={commit} className="font-mono" spellCheck={false} aria-invalid={!valid} />
-          </Field>
+            </ScrollRow>
+          </div>
+          {preset === "custom" && (
+            <Field label={t.customLabel} htmlFor={`${id}-c`} error={!valid ? t.badAlphabet : undefined}>
+              <Input id={`${id}-c`} value={custom} onChange={(e) => setCustom(e.target.value)} className="font-mono" spellCheck={false} aria-invalid={!valid} />
+            </Field>
+          )}
+          <div className="grid gap-x-6 gap-y-4 sm:grid-cols-2">
+            <SliderField id={`${id}-l`} label={t.length} value={sizeText} onChange={setSizeText} parse={parseInt10} format={(n) => String(Math.round(n))} min={2} max={64} inputMode="numeric" />
+            <SliderField id={`${id}-n`} label={t.count} value={countText} onChange={setCountText} parse={parseInt10} format={(n) => String(Math.round(n))} min={1} max={10000} scale="log" inputMode="numeric" />
+          </div>
+        </Panel>
+
+        {stats && (
+          <div className="flex flex-wrap items-center gap-x-2 gap-y-2 px-1 text-sm text-fg-2">
+            <span>
+              {formatNumber(locale, stats.bits, { maximumFractionDigits: 1 })} {plural(locale, Math.round(stats.bits), t.bits)} ·{" "}
+              {t.risk(bigNumber(locale, stats.lg), plural(locale, stats.lg < 15 ? Math.round(10 ** stats.lg) : 5, t.ids))},
+            </span>
+            <span>{t.time(formatNumber(locale, rate), duration)}</span>
+            <Opt label={t.rate} htmlFor={`${id}-r`} className="text-fg-3">
+              <NumberInput id={`${id}-r`} size="sm" locale={locale} stepper={false} min={1} max={1e12} value={rate} onChange={(v) => setRateText(v === null ? "" : String(v))} className="w-36" />
+            </Opt>
+          </div>
         )}
-      </Panel>
+      </div>
 
-      {stats && (
-        <div className="flex flex-wrap items-center gap-x-2 gap-y-2 px-1 text-sm text-fg-2">
-          <span>
-            {formatNumber(locale, stats.bits, { maximumFractionDigits: 1 })} {plural(locale, Math.round(stats.bits), t.bits)} ·{" "}
-            {t.risk(bigNumber(locale, stats.lg), plural(locale, stats.lg < 15 ? Math.round(10 ** stats.lg) : 5, t.ids))},
-          </span>
-          <span>{t.time(formatNumber(locale, rate), duration)}</span>
-          <label className="flex items-center gap-2 text-fg-3" htmlFor={`${id}-r`}>
-            ({t.rate}
-            <Input id={`${id}-r`} size="sm" inputMode="numeric" className="w-24" value={rateText} onChange={(e) => setRateText(e.target.value)} />)
-          </label>
-        </div>
-      )}
-
-      {ids && ids.length > 1 && <CodeOutput value={ids.join("\n")} title="NanoID" filename={`nanoid-${ids.length}.txt`} labels={outputLabels(locale)} />}
+      {ids && ids.length > 1 && <CodeOutput value={ids.join("\n")} title="NanoID" filename={`nanoid-${ids.length}.txt`} labels={outputLabels(locale)} minRows={Math.min(14, ids.length)} />}
     </div>
   );
 }

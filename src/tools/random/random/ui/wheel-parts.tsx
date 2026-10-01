@@ -1,9 +1,9 @@
 "use client";
 
-import { memo, useId, useState } from "react";
-import { formatNumber, parseNumber } from "@/i18n/format";
+import { memo } from "react";
+import { formatNumber } from "@/i18n/format";
 import type { Locale } from "@/i18n/config";
-import { Input } from "@/ui/field";
+import { NumberInput } from "@/ui/number-input";
 import { paletteColor, readableTextColor, type Sector } from "../lib/wheel";
 
 export interface WheelEntry {
@@ -139,7 +139,7 @@ export function EntryTable({
                   disabled={disabled}
                   onChange={(ev) => onColor(e.id, ev.target.value)}
                   aria-label={`${t.color} ${t.of} «${e.label}»`}
-                  className="h-8 w-10 cursor-pointer rounded-[0.375rem] border border-line bg-surface p-0.5"
+                  className="h-9 w-11 cursor-pointer rounded-[0.5rem] border border-line bg-surface p-0.5"
                 />
               </td>
               <td className="max-w-40 truncate sm:max-w-none">{e.label}</td>
@@ -158,29 +158,19 @@ export function EntryTable({
 }
 
 function WeightInput({ locale, value, onCommit, label, disabled }: { locale: Locale; value: number; onCommit: (w: number) => void; label: string; disabled: boolean }) {
-  const id = useId();
-  const [text, setText] = useState<string | null>(null);
-  const parsed = text === null ? value : parseNumber(text);
-  const valid = parsed !== null && Math.round(parsed * 100) > 0 && parsed <= 1000;
   return (
-    <Input
-      id={id}
+    <NumberInput
       size="sm"
-      inputMode="decimal"
-      autoComplete="off"
+      locale={locale}
+      min={0.01}
+      max={1000}
+      step={1}
+      decimals={2}
       aria-label={label}
-      aria-invalid={!valid}
       disabled={disabled}
-      className="tabular w-20"
-      value={text ?? formatNumber(locale, value, { useGrouping: false })}
-      onChange={(ev) => {
-        const v = ev.target.value;
-        setText(v);
-        const n = parseNumber(v);
-        const w = n === null ? 0 : Math.round(n * 100) / 100;
-        if (w > 0 && w <= 1000) onCommit(w);
-      }}
-      onBlur={() => setText(null)}
+      className="w-32"
+      value={value}
+      onChange={(w) => w !== null && w > 0 && onCommit(w)}
     />
   );
 }

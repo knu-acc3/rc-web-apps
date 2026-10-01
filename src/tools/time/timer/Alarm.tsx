@@ -7,7 +7,7 @@ import { useBrowser12h } from "@/lib/clock-format";
 import { cn } from "@/lib/cn";
 import { Button } from "@/ui/button";
 import { Switch } from "@/ui/field";
-import { Notice } from "@/ui/panel";
+import { Notice, Panel } from "@/ui/panel";
 import { useStoredJson } from "@/tools/time/time/lib/storage";
 import { useNow } from "@/tools/time/time/lib/use-now";
 import { useWakeLock } from "@/ui/stage";
@@ -131,7 +131,7 @@ export default function Alarm({ locale, time = "07:00" }: AlarmProps) {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className={cn("flex flex-col items-center gap-5 rounded-[0.75rem] border border-line bg-surface px-3 py-8 sm:py-10", status === "ringing" && "border-accent bg-accent-soft")}>
+      <Panel className={cn("flex flex-col items-center gap-5 px-3 py-8 transition-colors sm:py-10", status === "ringing" && "bg-accent-soft ring-2 ring-accent")}>
         <p className="tabular text-sm text-fg-3">
           {t.now}: {nowD ? `${p2(nowD.getHours())}:${p2(nowD.getMinutes())}:${p2(nowD.getSeconds())}` : "--:--:--"}
         </p>
@@ -146,37 +146,40 @@ export default function Alarm({ locale, time = "07:00" }: AlarmProps) {
             setValue(e.target.value);
             if (status === "armed" && /^\d{2}:\d{2}$/.test(e.target.value)) arm(nextOccurrence(e.target.value, nowMs()));
           }}
-          className={cn(h12 ? "text-[min(12vw,5rem)]" : "text-[min(18vw,7rem)]", "tabular w-full min-w-0 max-w-[26rem] rounded-[0.75rem] border border-transparent bg-transparent px-2 text-center leading-none font-semibold tracking-tight text-fg hover:border-line focus:border-accent focus:outline-none")}
+          className={cn(
+            h12 ? "text-[min(12vw,5rem)]" : "text-[min(17vw,7rem)]",
+            "tabular w-full min-w-0 max-w-[28rem] cursor-text rounded-[1.25rem] bg-surface-2 px-3 py-2 text-center leading-none font-semibold tracking-tight text-fg transition-colors outline-none hover:bg-accent-container hover:text-on-accent-container focus:bg-accent-container focus:text-on-accent-container focus:ring-2 focus:ring-accent",
+          )}
         />
         <p className="min-h-7 text-lg text-fg-2" aria-live="polite">
           {status === "ringing" ? <span className="font-semibold text-accent">{t.ringing}</span> : info}
         </p>
         <div className="flex flex-wrap items-center justify-center gap-2">
           {status === "idle" && (
-            <Button variant="primary" size="lg" onClick={() => arm(nextOccurrence(value, nowMs()))} disabled={!valid} className="min-w-44">
+            <Button variant="filled" size="xl" onClick={() => arm(nextOccurrence(value, nowMs()))} disabled={!valid} className="min-w-52">
               <AlarmClock aria-hidden />
               {t.set}
             </Button>
           )}
           {status === "armed" && (
-            <Button variant="secondary" size="lg" onClick={off} className="min-w-44">
+            <Button variant="tonal" size="xl" onClick={off} className="min-w-52">
               <AlarmClockOff aria-hidden />
               {t.cancel}
             </Button>
           )}
           {status === "ringing" && (
             <>
-              <Button variant="primary" size="lg" onClick={off} className="min-w-40">
+              <Button variant="filled" size="xl" onClick={off} className="min-w-44 motion-safe:animate-pulse">
                 <BellRing aria-hidden />
                 {t.off}
               </Button>
-              <Button variant="secondary" size="lg" onClick={() => arm(nowMs() + 5 * 60000)}>
+              <Button variant="tonal" size="xl" onClick={() => arm(nowMs() + 5 * 60000)}>
                 {t.snooze}
               </Button>
             </>
           )}
         </div>
-      </div>
+      </Panel>
       <Switch label={t.wake} checked={wake} onChange={(e) => setWake(e.target.checked)} />
       <TimerOptions locale={locale} options={opts} onChange={setOpts} />
       <Notice>{t.honest}</Notice>

@@ -124,8 +124,13 @@ export default function NightClock({ locale }: { locale: Locale }) {
   );
 
   return (
-    <div className="flex flex-col gap-5">
-      <button type="button" onClick={stage.enter} aria-label={t.full} className="group relative flex min-h-[15rem] w-full items-center justify-center overflow-hidden rounded-[1rem] bg-black px-3 py-10 sm:min-h-[20rem]">
+    <div className="grid gap-5 lg:grid-cols-[minmax(0,2fr)_minmax(18rem,1fr)] lg:items-start">
+      <button
+        type="button"
+        onClick={stage.enter}
+        aria-label={t.full}
+        className="group relative flex min-h-[15rem] w-full items-center justify-center overflow-hidden rounded-[1.25rem] bg-black px-3 py-10 shadow-elev-1 transition-shadow hover:shadow-elev-2 active:scale-[0.995] sm:min-h-[20rem] lg:min-h-[26rem]"
+      >
         {face(false)}
         <span className="absolute bottom-3 right-3 flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1.5 text-sm text-white/80 transition-colors group-hover:bg-white/20">
           <Maximize className="size-4" aria-hidden />
@@ -133,7 +138,7 @@ export default function NightClock({ locale }: { locale: Locale }) {
         </span>
       </button>
 
-      <div className="flex flex-col gap-4">
+      <div className="flex min-w-0 flex-col gap-4">
         <div role="radiogroup" aria-label={t.color} className="flex flex-wrap items-center gap-2">
           {COLORS.map((c) => (
             <button
@@ -144,7 +149,7 @@ export default function NightClock({ locale }: { locale: Locale }) {
               aria-label={c[locale]}
               title={c[locale]}
               onClick={() => setO({ ...o, color: c.id })}
-              className={cn("flex size-10 items-center justify-center rounded-full bg-black text-lg font-bold pointer-coarse:size-11", o.color === c.id && "ring-3 ring-accent ring-offset-2 ring-offset-bg")}
+              className={cn("flex size-10 items-center justify-center rounded-full bg-black text-lg font-bold transition-transform hover:scale-110 active:scale-95 pointer-coarse:size-11", o.color === c.id && "ring-3 ring-accent ring-offset-2 ring-offset-bg")}
               style={{ color: c.hex }}
             >
               8

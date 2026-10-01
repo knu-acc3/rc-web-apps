@@ -1,0 +1,11 @@
+/**
+ * The logo mark: an orange Material "cookie" (a ten-bump rounded shape) with a white four-point spark.
+ * One source for the header/footer logo, the OG images and public/favicon.svg (a test keeps them identical).
+ */
+export const LOGO = {
+  viewBox: "0 0 32 32",
+  color: "#FF6B00",
+  cookie:
+    "M16 3.4Q21.13 .21 23.41 5.81Q29.43 6.24 27.98 12.11Q32.6 16 27.98 19.89Q29.43 25.76 23.41 26.19Q21.13 31.79 16 28.6Q10.87 31.79 8.59 26.19Q2.57 25.76 4.02 19.89Q-.6 16 4.02 12.11Q2.57 6.24 8.59 5.81Q10.87 .21 16 3.4Z",
+  spark: "M16 7.5C17.2 13.2 18.8 14.8 24.5 16C18.8 17.2 17.2 18.8 16 24.5C14.8 18.8 13.2 17.2 7.5 16C13.2 14.8 14.8 13.2 16 7.5Z",
+} as const;

@@ -1,15 +1,18 @@
 "use client";
 
-import { CircleCheck, CircleX, Loader2, X } from "lucide-react";
+import { CircleCheck, CircleX, X } from "lucide-react";
 import { useId, useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { formatNumber } from "@/i18n/format";
+import { cn } from "@/lib/cn";
 import { useWorkerClient } from "@/tools/dev/shared/hooks";
+import { Opt, OptionsRow, Pane } from "@/tools/dev/shared/Pane";
 import { cryptoRng } from "@/tools/dev/shared/random";
 import { isCancelled } from "@/tools/dev/shared/worker-client";
 import { Button } from "@/ui/button";
 import { CopyButton } from "@/ui/copy-button";
-import { Field, Input, Select, Textarea } from "@/ui/field";
+import { Field, Input, Textarea } from "@/ui/field";
+import { NumberInput } from "@/ui/number-input";
 import { Notice, Panel } from "@/ui/panel";
 import { Segmented } from "@/ui/segmented";
 import type { KdfId } from "./lib/algorithms";
@@ -120,16 +123,14 @@ export default function PasswordHash({ locale, kind }: { locale: Locale; kind: K
     }
   }
 
-  const num = (v: string, min: number, max: number) => Math.min(max, Math.max(min, Math.floor(Number(v) || min)));
-  const param = (label: string, value: number, set: (n: number) => void, min: number, max: number, w = "w-20") => (
-    <label className="flex items-center gap-2">
-      {label}
-      <Input size="sm" inputMode="numeric" className={w} value={String(value)} onChange={(e) => set(num(e.target.value, min, max))} />
-    </label>
+  const param = (key: string, label: string, value: number, set: (n: number) => void, min: number, max: number, step = 1, w = "w-36") => (
+    <Opt label={label} htmlFor={`${id}-${key}`}>
+      <NumberInput id={`${id}-${key}`} size="sm" locale={locale} value={value} onChange={(v) => v !== null && set(v)} min={min} max={max} step={step} className={w} />
+    </Opt>
   );
 
   return (
-    <Panel className="p-4 sm:p-6">
+    <Panel className="flex flex-col gap-4 p-4 sm:p-6">
       <Segmented
         label={t.mode}
         value={mode}
@@ -142,89 +143,92 @@ export default function PasswordHash({ locale, kind }: { locale: Locale; kind: K
           { value: "hash", label: t.modes.hash },
           { value: "verify", label: t.modes.verify },
         ]}
-        size="sm"
-        className="mb-4"
+        className="self-start"
       />
-      <Field label={t.password} htmlFor={`${id}-pw`}>
-        <Input id={`${id}-pw`} size="lg" value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="off" spellCheck={false} className="font-mono" />
-      </Field>
-      {mode === "verify" && (
-        <Field className="mt-3" label={t.hash} htmlFor={`${id}-h`}>
-          <Textarea id={`${id}-h`} value={encoded} onChange={(e) => setEncoded(e.target.value)} rows={2} placeholder={DEFAULT_HASH[kind] + "…"} className="min-h-0!" />
-        </Field>
-      )}
-
-      <div className="mt-4 flex flex-wrap items-center gap-2">
-        <Button variant="primary" onClick={run} disabled={busy || (mode === "verify" && !encoded.trim())}>
-          {busy ? <Loader2 className="animate-spin" aria-hidden /> : null}
-          {busy ? t.working : mode === "hash" ? t.run : t.check}
-        </Button>
-        {busy && (
-          <Button variant="ghost" onClick={() => client.cancel()}>
-            <X aria-hidden />
-            {t.cancel}
-          </Button>
-        )}
-      </div>
-
-      <div aria-live="polite">
-        {out?.hash && (
-          <div className="mt-5 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-            <div className="min-w-0">
-              <div className="text-sm font-medium text-fg-2">
-                {t.result} <span className="text-fg-3">· {t.time(formatNumber(locale, Math.round(out.ms)))}</span>
-              </div>
-              <output className="mt-1 block font-mono text-lg font-semibold break-all text-fg">{out.hash}</output>
-            </div>
-            <CopyButton value={out.hash} size="md" variant="outline" className="self-start sm:self-auto" />
+      <div className="grid gap-5 lg:grid-cols-2">
+        <div className="flex min-w-0 flex-col gap-4">
+          <Field label={t.password} htmlFor={`${id}-pw`}>
+            <Input id={`${id}-pw`} size="lg" value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="off" spellCheck={false} className="font-mono" />
+          </Field>
+          {mode === "verify" && (
+            <Field label={t.hash} htmlFor={`${id}-h`}>
+              <Textarea id={`${id}-h`} value={encoded} onChange={(e) => setEncoded(e.target.value)} rows={2} placeholder={DEFAULT_HASH[kind] + "…"} className="min-h-0!" />
+            </Field>
+          )}
+          <div className="flex flex-wrap items-center gap-2">
+            <Button variant="filled" size="lg" onClick={run} loading={busy} disabled={mode === "verify" && !encoded.trim()}>
+              {busy ? t.working : mode === "hash" ? t.run : t.check}
+            </Button>
+            {busy && (
+              <Button variant="outlined" size="lg" onClick={() => client.cancel()}>
+                <X aria-hidden />
+                {t.cancel}
+              </Button>
+            )}
           </div>
-        )}
-        {out?.ok !== undefined && (
-          <p className={`mt-5 flex items-center gap-2 text-xl font-semibold ${out.ok ? "text-ok" : "text-err"}`}>
-            {out.ok ? <CircleCheck className="size-6" aria-hidden /> : <CircleX className="size-6" aria-hidden />}
-            {out.ok ? t.ok : t.bad}
-          </p>
-        )}
-        {error && (
-          <Notice tone="err" className="mt-4">
-            {error}
-          </Notice>
-        )}
-      </div>
-
-      {mode === "hash" && (
-        <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-3 border-t border-line pt-4 text-sm text-fg-2">
-          {kind === "bcrypt" && param(t.cost, cost, setCost, 4, 15, "w-16")}
-          {kind === "argon2" && (
-            <>
-              {param(t.memory, memMiB, setMemMiB, 1, 1024)}
-              {param(t.iterations, iters, setIters, 1, 20, "w-16")}
-              {param(t.parallelism, lanes, setLanes, 1, 8, "w-16")}
-            </>
-          )}
-          {kind === "scrypt" && (
-            <>
-              {param(t.ln, ln, setLn, 1, 20, "w-16")}
-              {param(t.r, r, setR, 1, 32, "w-16")}
-              {param(t.p, p, setP, 1, 16, "w-16")}
-            </>
-          )}
-          {kind === "pbkdf2" && (
-            <>
-              <label className="flex items-center gap-2">
-                {t.hashFn}
-                <Select value={pbHash} size="sm" className="w-32" onChange={(e) => setPbHash(e.target.value as PbkdfHash)}>
-                  <option value="sha256">SHA-256</option>
-                  <option value="sha512">SHA-512</option>
-                  <option value="sha1">SHA-1</option>
-                </Select>
-              </label>
-              {param(t.iterations, iters, setIters, 1, 10_000_000, "w-28")}
-            </>
+          {mode === "hash" && (
+            <OptionsRow>
+              {kind === "bcrypt" && param("cost", t.cost, cost, setCost, 4, 15)}
+              {kind === "argon2" && (
+                <>
+                  {param("mem", t.memory, memMiB, setMemMiB, 1, 1024, 1, "w-40")}
+                  {param("it", t.iterations, iters, setIters, 1, 20)}
+                  {param("lanes", t.parallelism, lanes, setLanes, 1, 8)}
+                </>
+              )}
+              {kind === "scrypt" && (
+                <>
+                  {param("ln", t.ln, ln, setLn, 1, 20)}
+                  {param("r", t.r, r, setR, 1, 32)}
+                  {param("p", t.p, p, setP, 1, 16)}
+                </>
+              )}
+              {kind === "pbkdf2" && (
+                <>
+                  <Opt label={t.hashFn} group>
+                    <Segmented
+                      size="sm"
+                      label={t.hashFn}
+                      value={pbHash}
+                      onChange={setPbHash}
+                      options={[
+                        { value: "sha256", label: "SHA-256" },
+                        { value: "sha512", label: "SHA-512" },
+                        { value: "sha1", label: "SHA-1" },
+                      ]}
+                    />
+                  </Opt>
+                  {param("it", t.iterations, iters, setIters, 1, 10_000_000, 100_000, "w-48")}
+                </>
+              )}
+            </OptionsRow>
           )}
         </div>
-      )}
-      <p className="mt-4 text-[0.8125rem] text-fg-3">{t.note}</p>
+
+        <div className="flex min-w-0 flex-col gap-3" aria-live="polite">
+          {out?.hash && (
+            <Pane
+              className="motion-safe:animate-[menu-in_0.2s_ease-out]"
+              title={
+                <>
+                  {t.result} <span className="font-normal text-fg-3">· {t.time(formatNumber(locale, Math.round(out.ms)))}</span>
+                </>
+              }
+              actions={<CopyButton value={out.hash} variant="secondary" compact />}
+            >
+              <output className="block px-4 py-4 font-mono text-lg font-semibold break-all text-fg sm:text-xl">{out.hash}</output>
+            </Pane>
+          )}
+          {out?.ok !== undefined && (
+            <p className={cn("flex items-center gap-2.5 rounded-[1.25rem] px-5 py-5 text-2xl font-bold motion-safe:animate-[menu-in_0.2s_ease-out]", out.ok ? "bg-ok-soft text-ok" : "bg-err-soft text-err")}>
+              {out.ok ? <CircleCheck className="size-8 shrink-0" aria-hidden /> : <CircleX className="size-8 shrink-0" aria-hidden />}
+              {out.ok ? t.ok : t.bad}
+            </p>
+          )}
+          {error && <Notice tone="err">{error}</Notice>}
+        </div>
+      </div>
+      <p className="text-[0.8125rem] text-fg-3">{t.note}</p>
     </Panel>
   );
 }

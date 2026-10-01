@@ -88,7 +88,7 @@ export default function FamilyPalette({ locale, kind, families, single = false }
     <div className="flex flex-col gap-4">
       <Segmented label={t.format} value={fmt} onChange={setFmt} options={options} size="sm" className="self-start" />
       {single ? (
-        <ul className="overflow-hidden rounded-[0.75rem] border border-line">
+        <ul className="overflow-hidden rounded-[1.25rem] shadow-card">
           {families[0].rows.map((r) => {
             const v = valueOf(r, fmt, kind);
             const key = `${families[0].slug}-${r.step}`;
@@ -96,13 +96,13 @@ export default function FamilyPalette({ locale, kind, families, single = false }
               <li key={r.step}>
                 <button
                   type="button"
-                  className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left sm:py-4"
+                  className="relative flex min-h-12 w-full items-center justify-between gap-3 px-4 py-3 text-left after:pointer-events-none after:absolute after:inset-0 after:bg-current after:opacity-0 after:transition-opacity hover:after:opacity-10 focus-visible:outline-offset-[-3px] active:after:opacity-20 sm:px-5 sm:py-4"
                   style={{ background: r.hex, color: r.fg }}
                   onClick={() => copy(key, v)}
                   aria-label={`${t.copy} ${v}`}
                 >
                   <span className="text-lg font-semibold tabular">{r.step}</span>
-                  <span className="min-w-0 truncate font-mono text-sm">{copied === key ? t.copied : v}</span>
+                  <span className="min-w-0 truncate font-mono text-sm font-medium">{copied === key ? `✓ ${t.copied}` : v}</span>
                 </button>
               </li>
             );
@@ -126,7 +126,10 @@ export default function FamilyPalette({ locale, kind, families, single = false }
                         title={`${r.token} · ${v}`}
                         aria-label={`${t.copy} ${v}`}
                         onClick={() => copy(key, v)}
-                        className={cn("flex h-9 w-full items-center justify-center rounded-[0.25rem] text-[0.625rem] font-medium sm:h-11")}
+                        className={cn(
+                          "flex h-9 w-full items-center justify-center rounded-[0.375rem] text-[0.625rem] font-medium transition-[transform,box-shadow] duration-150 hover:relative hover:z-10 hover:scale-110 hover:shadow-elev-2 active:scale-100 sm:h-11",
+                          copied === key && "text-sm font-bold",
+                        )}
                         style={{ background: r.hex, color: r.fg }}
                       >
                         {copied === key ? "✓" : <span className="hidden md:inline">{r.step}</span>}

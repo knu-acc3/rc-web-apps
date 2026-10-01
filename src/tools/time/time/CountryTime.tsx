@@ -15,7 +15,7 @@ export default function CountryTime({ locale, groups }: CountryTimeProps) {
     const p = now !== null ? placeParts(g.places[0], now) : null;
     return (
       <Panel className="flex flex-col items-center gap-3 px-4 py-8 text-center sm:py-10">
-        <BigTime parts={p} className="text-[3.75rem] sm:text-[6.5rem]" />
+        <BigTime parts={p} className="text-[min(18vw,3.75rem)] sm:text-[6.5rem] 2xl:text-[8rem]" />
         <p className="min-h-7 text-lg text-fg-2 sm:text-xl">{p ? longDate(locale, p) : " "}</p>
         <p className="text-[0.9375rem] text-fg-3">
           {p ? fmtOffset(p.off) : g.label} · {g.places.map((x) => x.name).join(", ")}

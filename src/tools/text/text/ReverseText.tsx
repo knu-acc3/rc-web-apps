@@ -2,9 +2,9 @@
 
 import { useId, useMemo, useState } from "react";
 import type { Locale } from "@/i18n/config";
-import { Segmented } from "@/ui/segmented";
 import { reverseText, type ReverseMode } from "./lib/textOps";
 import { InputPanel, OutputPanel, TwoPane } from "./ui/shared";
+import { ChipChoice } from "@/ui/chip-choice";
 
 const T = {
   ru: {
@@ -37,7 +37,7 @@ export default function ReverseText({ locale, mode: mode0 = "text" }: { locale: 
   const out = useMemo(() => reverseText(text, mode, locale), [text, mode, locale]);
   return (
     <div className="flex flex-col gap-4">
-      <Segmented label={t.mode} value={mode} onChange={setMode} options={MODES.map((m) => ({ value: m, label: t[m] }))} wrap />
+      <ChipChoice label={t.mode} value={mode} onChange={setMode} grid="grid-cols-2 sm:grid-cols-3 lg:grid-cols-5" options={MODES.map((m) => ({ value: m, label: t[m] }))} />
       <TwoPane>
         <InputPanel id={`${id}-in`} locale={locale} value={text} onChange={setText} />
         <OutputPanel locale={locale} value={out} filename="reversed.txt" />

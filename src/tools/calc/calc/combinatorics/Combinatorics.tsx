@@ -122,7 +122,7 @@ export default function Combinatorics({ locale, kind = "ncr" }: ToolProps<{ kind
           }
         />
       </div>
-      {text && text.length > 60 && <p className="tabular max-h-60 overflow-y-auto rounded-[0.75rem] border border-line bg-surface p-4 font-mono text-sm break-all text-fg-2">{text}</p>}
+      {text && text.length > 60 && <p className="tabular max-h-60 overflow-y-auto panel p-4 font-mono text-sm break-all text-fg-2">{text}</p>}
       {locale === "ru" ? (
         <Explain
           locale={locale}

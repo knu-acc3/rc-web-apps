@@ -5,6 +5,7 @@ import type { Locale } from "@/i18n/config";
 import { formatNumber } from "@/i18n/format";
 import { Field, Input, Select } from "@/ui/field";
 import { Panel } from "@/ui/panel";
+import { SliderField } from "@/ui/slider-field";
 import { daysInMonth, fmtDate, isValidYmd, MONTHS, parseYmd, WEEKDAYS, ymdStr, type Ymd } from "@/tools/time/calendar/lib/dates";
 import { age, weekdayOf } from "./lib/engine";
 import { BigResult, qty, useToday, ymdText } from "./ui/kit";
@@ -102,13 +103,15 @@ export default function Age({ locale, birthYear }: AgeProps) {
       ]
     : [];
 
+  const thisYear = today?.y ?? 2026;
+
   return (
-    <div className="flex flex-col gap-4">
-      <Panel className="p-4 sm:p-5">
-        <fieldset>
+    <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:items-start">
+      <Panel className="flex min-w-0 flex-col gap-5 p-4 sm:p-6">
+        <fieldset className="min-w-0">
           <legend className="mb-2 text-sm font-medium text-fg-2">{t.birth}</legend>
-          <div className="grid grid-cols-[5rem_minmax(0,1fr)_6rem] gap-2 sm:max-w-md">
-            <Select aria-label={t.day} value={day} onChange={(e) => setDay(e.target.value)}>
+          <div className="flex flex-wrap gap-2">
+            <Select aria-label={t.day} value={day} onChange={(e) => setDay(e.target.value)} size="lg">
               <option value="">{t.day}</option>
               {Array.from({ length: maxDay }, (_, i) => i + 1).map((v) => (
                 <option key={v} value={v}>
@@ -116,7 +119,7 @@ export default function Age({ locale, birthYear }: AgeProps) {
                 </option>
               ))}
             </Select>
-            <Select aria-label={t.month} value={month} onChange={(e) => setMonth(e.target.value)}>
+            <Select aria-label={t.month} value={month} onChange={(e) => setMonth(e.target.value)} size="lg">
               <option value="">{t.month}</option>
               {(locale === "ru" ? MONTHS.ru : MONTHS.en).map((name, i) => (
                 <option key={i} value={i + 1}>
@@ -124,29 +127,40 @@ export default function Age({ locale, birthYear }: AgeProps) {
                 </option>
               ))}
             </Select>
-            <Input aria-label={t.year} inputMode="numeric" placeholder={t.year} maxLength={4} value={year} onChange={(e) => setYear(e.target.value.replace(/\D/g, "").slice(0, 4))} />
           </div>
         </fieldset>
-        <div className="mt-6 border-t border-line pt-6">
-          <BigResult value={main} sub={sub} />
-        </div>
-        {valid && valid.m === 2 && valid.d === 29 && <p className="mt-3 text-center text-[0.8125rem] text-fg-3">{t.feb29}</p>}
+        <SliderField
+          id={`${id}-y`}
+          label={t.year}
+          value={year}
+          onChange={(v) => setYear(v.replace(/\D/g, "").slice(0, 4))}
+          parse={(x) => (/^\d{4}$/.test(x) ? Number(x) : null)}
+          format={(n) => String(n)}
+          min={1920}
+          max={thisYear}
+          inputMode="numeric"
+        />
+        <Field label={t.on} htmlFor={`${id}-on`} hint={t.onHint} className="sm:max-w-xs">
+          <Input id={`${id}-on`} type="date" value={onText} onChange={(e) => setOnText(e.target.value)} placeholder={today ? ymdStr(today) : ""} />
+        </Field>
       </Panel>
 
-      {rows.length > 0 && (
-        <dl className="facts">
-          {rows.map(([k, v]) => (
-            <div key={k}>
-              <dt>{k}</dt>
-              <dd>{v}</dd>
-            </div>
-          ))}
-        </dl>
-      )}
-
-      <Field label={t.on} htmlFor={`${id}-on`} hint={t.onHint} className="sm:max-w-xs">
-        <Input id={`${id}-on`} type="date" value={onText} onChange={(e) => setOnText(e.target.value)} placeholder={today ? ymdStr(today) : ""} />
-      </Field>
+      <div className="flex min-w-0 flex-col gap-4">
+        <Panel className="flex min-h-40 flex-col justify-center p-5 sm:p-8">
+          <BigResult value={main} sub={sub} />
+          {valid && valid.m === 2 && valid.d === 29 && <p className="mt-3 text-center text-[0.8125rem] text-fg-3">{t.feb29}</p>}
+        </Panel>
+        {rows.length > 0 && (
+          <dl className="facts">
+            {rows.map(([k, v]) => (
+              <div key={k}>
+                <dt>{k}</dt>
+                <dd>{v}</dd>
+              </div>
+            ))}
+          </dl>
+        )}
+      </div>
     </div>
   );
 }

@@ -1,10 +1,12 @@
 "use client";
 
-import { useId, useState } from "react";
+import { UserRound } from "lucide-react";
+import { useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { Button } from "@/ui/button";
 import { CopyButton } from "@/ui/copy-button";
-import { Field, Select, Switch } from "@/ui/field";
+import { Field, Switch } from "@/ui/field";
+import { Segmented } from "@/ui/segmented";
 import { Panel, PanelHeader } from "@/ui/panel";
 import { formatName, randomName, toLatin, type Gender, type KkPatronymic, type NameFormat, type NameLang } from "./lib/names";
 import { randomInt } from "./lib/rng";
@@ -58,7 +60,6 @@ const COUNTS = [1, 5, 10, 20, 50];
 
 export default function NameGen({ locale, lang: lang0, gender: gender0 = "any", format: format0 = "full", count: count0 = 5 }: NameGenProps) {
   const t = T[locale];
-  const id = useId();
   const [lang, setLang] = useState<NameLang>(lang0 ?? (locale === "en" ? "en" : "ru"));
   const [gender, setGender] = useState<Gender | "any">(gender0);
   const [format, setFormat] = useState<NameFormat>(format0);
@@ -83,46 +84,27 @@ export default function NameGen({ locale, lang: lang0, gender: gender0 = "any", 
     setNames(out);
   }
 
-  const sel = <K extends string>(key: string, label: string, value: K, set: (v: K) => void, options: Record<K, string>) => (
-    <Field label={label} htmlFor={`${id}-${key}`}>
-      <Select id={`${id}-${key}`} value={value} onChange={(e) => set(e.target.value as K)} size="sm">
-        {(Object.keys(options) as K[]).map((k) => (
-          <option key={k} value={k}>
-            {options[k]}
-          </option>
-        ))}
-      </Select>
+  const seg = <K extends string>(label: string, value: K, set: (v: K) => void, options: Record<K, string>) => (
+    <Field label={label}>
+      <Segmented label={label} value={value} onChange={set} options={(Object.keys(options) as K[]).map((k) => ({ value: k, label: options[k] }))} />
     </Field>
   );
 
   const formats = lang === "en" ? { first: t.formats.first, full: t.formats.full } : t.formats;
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] lg:items-start">
       <Panel className="flex flex-col gap-4 p-4 sm:p-5">
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-          {sel("l", t.lang, lang, (v) => setLang(v as NameLang), t.langs)}
-          {sel("g", t.gender, gender, (v) => setGender(v as Gender | "any"), t.genders)}
-          {sel("f", t.format, fmt, (v) => setFormat(v as NameFormat), formats as Record<NameFormat, string>)}
-          <Field label={t.count} htmlFor={`${id}-n`}>
-            <Select id={`${id}-n`} value={n} onChange={(e) => setN(Number(e.target.value))} size="sm">
-              {COUNTS.map((c) => (
-                <option key={c} value={c}>
-                  {c}
-                </option>
-              ))}
-            </Select>
-          </Field>
-        </div>
-        {lang !== "en" && (
-          <div className="flex flex-wrap items-end gap-x-6 gap-y-3">
-            {lang === "kk" && fmt === "fio" && (
-              <div className="w-44">{sel("k", t.kkStyle, kkStyle, (v) => setKkStyle(v as KkPatronymic), t.kkStyles)}</div>
-            )}
-            <Switch label={t.latin} checked={latin} onChange={(e) => setLatin(e.target.checked)} className="pb-1.5" />
-          </div>
-        )}
-        <Button variant="primary" size="lg" onClick={generate} className="w-full sm:w-auto sm:self-start sm:min-w-56">
+        {seg(t.lang, lang, (v) => setLang(v as NameLang), t.langs)}
+        {seg(t.gender, gender, (v) => setGender(v as Gender | "any"), t.genders)}
+        {seg(t.format, fmt, (v) => setFormat(v as NameFormat), formats as Record<NameFormat, string>)}
+        {lang === "kk" && fmt === "fio" && seg(t.kkStyle, kkStyle, (v) => setKkStyle(v as KkPatronymic), t.kkStyles)}
+        <Field label={t.count}>
+          <Segmented label={t.count} value={String(n)} onChange={(v) => setN(Number(v))} options={COUNTS.map((c) => ({ value: String(c), label: String(c) }))} />
+        </Field>
+        {lang !== "en" && <Switch label={t.latin} checked={latin} onChange={(e) => setLatin(e.target.checked)} />}
+        <Button variant="filled" size="xl" onClick={generate} className="w-full">
+          <UserRound aria-hidden />
           {t.generate}
         </Button>
       </Panel>
@@ -130,13 +112,15 @@ export default function NameGen({ locale, lang: lang0, gender: gender0 = "any", 
       <Panel>
         <PanelHeader title={t.result} actions={names && <CopyButton value={names.join("\n")} label={t.copy} copiedLabel={t.copied} variant="ghost" />} />
         <div className="px-4 py-4">
-          {!names && <p className="text-sm text-fg-3">{t.idle}</p>}
+          {!names && <p className="py-6 text-center text-sm text-fg-3">{t.idle}</p>}
           <div aria-live="polite">
             {names &&
               (names.length === 1 ? (
-                <p className="text-center text-3xl font-semibold break-words text-fg">{names[0]}</p>
+                <p key={names[0]} className="py-6 text-center text-4xl font-bold break-words text-fg motion-safe:animate-[menu-in_0.3s_ease-out]">
+                  {names[0]}
+                </p>
               ) : (
-                <ol className="grid gap-x-6 gap-y-1.5 text-lg text-fg sm:grid-cols-2">
+                <ol key={names.join("|")} className="grid gap-x-6 gap-y-1.5 text-lg text-fg motion-safe:animate-[menu-in_0.3s_ease-out] sm:grid-cols-2">
                   {names.map((s, i) => (
                     <li key={s} className="flex gap-3 break-words">
                       <span className="tabular w-6 shrink-0 text-right text-sm leading-7 text-fg-3">{i + 1}.</span>

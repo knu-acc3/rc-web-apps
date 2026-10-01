@@ -3,7 +3,7 @@
 import { useId, useMemo, useState, type ReactNode } from "react";
 import type { Locale } from "@/i18n/config";
 import { formatNumber } from "@/i18n/format";
-import { Checkbox } from "@/ui/field";
+import { Switch } from "@/ui/field";
 import { cleanText, countInvisible, type CleanOptions } from "./lib/clean";
 import { InlineSelect, InputPanel, MoreOptions, OptionsBar, OutputPanel, TwoPane } from "./ui/shared";
 
@@ -127,7 +127,7 @@ export default function TextCleaner({ locale, preset = "default" }: { locale: Lo
   const invisible = useMemo(() => countInvisible(text), [text]);
   const primary = PRESETS[preset].primary;
 
-  const flag = (k: Key) => <Checkbox key={k} label={t[k as "yo"]} checked={!!o[k as "yo"]} onChange={(e) => setO((p) => ({ ...p, [k]: e.target.checked }))} />;
+  const flag = (k: Key) => <Switch key={k} label={t[k as "yo"]} checked={!!o[k as "yo"]} onChange={(e) => setO((p) => ({ ...p, [k]: e.target.checked }))} />;
   const select = <K extends "lineBreaks" | "emptyLines" | "quotes" | "tabs">(k: K, options: { value: NonNullable<CleanOptions[K]>; label: string }[]) => (
     <InlineSelect key={k} id={`${id}-${k}`} label={t[k]} value={(o[k] ?? "keep") as NonNullable<CleanOptions[K]>} onChange={(v) => setO((p) => ({ ...p, [k]: v }))} options={options} />
   );

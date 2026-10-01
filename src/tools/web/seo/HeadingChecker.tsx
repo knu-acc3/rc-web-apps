@@ -6,7 +6,8 @@ import { formatNumber, plural } from "@/i18n/format";
 import { cn } from "@/lib/cn";
 import { Field, Textarea } from "@/ui/field";
 import { extractHeadings, outlineIssues, type OutlineIssue } from "./lib/outline";
-import { Issues } from "./ui/kit";
+import { Panel } from "@/ui/panel";
+import { Issues, Split } from "./ui/kit";
 
 const T = {
   ru: {
@@ -61,34 +62,43 @@ export default function HeadingChecker({ locale }: { locale: Locale }) {
   const flagged = new Set(issues.filter((i) => i.index >= 0).map((i) => i.index));
 
   return (
-    <div className="flex flex-col gap-5">
-      <Field label={t.input} htmlFor={`${id}-h`} hint={t.hint}>
-        <Textarea id={`${id}-h`} value={html} onChange={(e) => setHtml(e.target.value)} rows={8} className="font-mono text-sm" spellCheck={false} placeholder={t.ph} />
-      </Field>
-
+    <Split
+      input={
+        <Field label={t.input} htmlFor={`${id}-h`} hint={t.hint}>
+          <Textarea id={`${id}-h`} value={html} onChange={(e) => setHtml(e.target.value)} rows={12} className="font-mono text-sm" spellCheck={false} placeholder={t.ph} />
+        </Field>
+      }
+    >
       {deferred.trim() && (
         <>
           <div aria-live="polite">{issues.length ? <Issues items={[...new Set(issues.map(t.issue))]} /> : hs.length ? <Issues tone="ok" items={[t.ok]} /> : null}</div>
-          <section className="rounded-[0.75rem] border border-line bg-surface">
-            <div className="flex min-h-11 items-center justify-between gap-2 border-b border-line px-4 py-1.5">
-              <h2 className="text-sm font-semibold text-fg-2">{t.outline}</h2>
+          <Panel className="p-4 sm:p-5">
+            <div className="flex items-center justify-between gap-2">
+              <h2 className="text-sm font-semibold text-fg">{t.outline}</h2>
               <span className="text-[0.8125rem] text-fg-3">{t.count(hs.length)}</span>
             </div>
             {hs.length ? (
-              <ol className="flex flex-col gap-1 px-4 py-3">
+              <ol className="mt-3 flex flex-col gap-1.5">
                 {hs.map((h, i) => (
-                  <li key={i} className="flex items-baseline gap-2" style={{ paddingLeft: `${(h.level - 1) * 18}px` }}>
-                    <span className={cn("shrink-0 rounded-[0.375rem] px-1.5 font-mono text-xs font-semibold", flagged.has(i) ? "bg-warn-soft text-warn" : h.level === 1 ? "bg-accent-soft text-accent" : "bg-surface-2 text-fg-2")}>H{h.level}</span>
+                  <li key={i} className="flex items-baseline gap-2" style={{ paddingLeft: `${Math.min(h.level - 1, 5) * 1.125}rem` }}>
+                    <span
+                      className={cn(
+                        "shrink-0 rounded-[0.375rem] px-1.5 font-mono text-xs font-semibold",
+                        flagged.has(i) ? "bg-warn-soft text-warn" : h.level === 1 ? "bg-accent-soft text-accent" : "bg-surface-2 text-fg-2",
+                      )}
+                    >
+                      H{h.level}
+                    </span>
                     <span className={cn("min-w-0 break-words", h.level === 1 ? "text-[1.0625rem] font-semibold text-fg" : "text-[0.9375rem] text-fg", !h.text && "text-fg-3 italic")}>{h.text || t.empty}</span>
                   </li>
                 ))}
               </ol>
             ) : (
-              <p className="px-4 py-3 text-[0.9375rem] text-fg-3">{t.none}</p>
+              <p className="mt-3 text-[0.9375rem] text-fg-3">{t.none}</p>
             )}
-          </section>
+          </Panel>
         </>
       )}
-    </div>
+    </Split>
   );
 }

@@ -79,15 +79,15 @@ export function PositionPicker({
           move(i, p === "tile" ? Math.sign(d) : d);
         }}
         className={cn(
-          "flex items-center justify-center rounded-[0.3125rem] border transition-colors",
-          p === "tile" ? "h-[4.75rem] w-9" : "size-6",
-          on ? "border-accent bg-accent text-accent-fg" : "border-line bg-surface text-fg-3 hover:border-line-strong",
+          "flex items-center justify-center rounded-[0.625rem] transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent",
+          p === "tile" ? "h-[8rem] w-10 pointer-coarse:h-[8.75rem] pointer-coarse:w-11" : "size-10 pointer-coarse:size-11",
+          on ? "bg-accent text-accent-fg shadow-elev-1" : "bg-surface-2 text-fg-3 hover:bg-surface-3 hover:text-fg",
         )}
       >
         {p === "tile" ? (
           <Grid3x3 className="size-4" aria-hidden />
         ) : (
-          <span className={cn("size-1.5 rounded-full", on ? "bg-accent-fg" : "bg-fg-3")} aria-hidden />
+          <span className={cn("size-2 rounded-full", on ? "bg-accent-fg" : "bg-fg-3")} aria-hidden />
         )}
       </button>
     );
@@ -95,7 +95,7 @@ export function PositionPicker({
   return (
     <div className="flex flex-col gap-1.5">
       <span className="text-sm font-medium text-fg-2">{label}</span>
-      <div role="radiogroup" aria-label={label} className="flex gap-1.5">
+      <div role="radiogroup" aria-label={label} className="flex gap-2">
         <div className="grid grid-cols-3 gap-1">{ORDER.map((p, i) => btn(p, i))}</div>
         {tile && btn("tile", 9)}
       </div>

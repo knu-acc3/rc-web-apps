@@ -1,15 +1,15 @@
 "use client";
 
-import { Download, FileText, FolderDown, FolderOpen } from "lucide-react";
+import { Download, File as FileIcon, FileImage, FileText, FolderDown, FolderInput, FolderOpen } from "lucide-react";
 import { useEffect, useId, useRef, useState, useSyncExternalStore } from "react";
 import type { Locale } from "@/i18n/config";
 import { count, formatBytes, formatDate } from "@/i18n/format";
 import { cn } from "@/lib/cn";
 import { downloadBlob } from "@/lib/clipboard";
-import { Button } from "@/ui/button";
+import { Button, buttonClass } from "@/ui/button";
 import { Dropzone } from "@/ui/dropzone";
 import { Field, Select } from "@/ui/field";
-import { Notice, Panel, PanelHeader } from "@/ui/panel";
+import { Notice, Panel } from "@/ui/panel";
 import { useJob } from "@/tools/files/video/ui/hooks";
 import { JobProgress } from "@/tools/files/video/ui/Progress";
 import { sniffFile } from "./lib/magic";
@@ -19,14 +19,14 @@ const T = {
   ru: {
     drop: "Перетащите ZIP-архив сюда или нажмите, чтобы выбрать",
     hint: "Также открываются DOCX, XLSX, EPUB, JAR, APK — это тоже ZIP",
-    change: "Открыть другой архив",
+    change: "Другой архив",
     encoding: "Кодировка имён",
     auto: "Автоматически",
     files: ["файл", "файла", "файлов"],
     packed: "в архиве",
     all: "Распаковать всё в папку",
     allFallback: "Скачать все файлы",
-    allNote: "Этот браузер не умеет сохранять в папку: файлы скачаются по одному (браузер может спросить разрешение на несколько загрузок).",
+    allNote: "Файлы скачаются по одному — разрешите браузеру несколько загрузок.",
     pick: "Выберите файл в списке, чтобы посмотреть и скачать его",
     download: "Скачать",
     preview: "Просмотр",
@@ -41,14 +41,14 @@ const T = {
   en: {
     drop: "Drop a ZIP archive here or click to choose",
     hint: "DOCX, XLSX, EPUB, JAR and APK open too — they are ZIP files",
-    change: "Open another archive",
+    change: "Another archive",
     encoding: "File name encoding",
     auto: "Automatic",
     files: ["file", "files"],
     packed: "packed",
     all: "Extract all to a folder",
     allFallback: "Download all files",
-    allNote: "This browser can't save into a folder: files will be downloaded one by one (the browser may ask to allow multiple downloads).",
+    allNote: "Files download one by one — allow multiple downloads if the browser asks.",
     pick: "Choose a file in the list to preview and download it",
     download: "Download",
     preview: "Preview",
@@ -132,6 +132,14 @@ export default function Unzip({ locale }: { locale: Locale }) {
     setSelected({ path, blob, text });
   }
 
+  // Phones: the preview sits under the list — bring it into view when a file is picked.
+  const previewRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = previewRef.current;
+    if (!selected || !el || window.innerWidth >= 1024) return;
+    el.scrollIntoView({ behavior: window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "nearest" });
+  }, [selected]);
+
   // Image preview object URL
   useEffect(() => {
     if (!selected || !IMAGE.test(selected.path) || !img.current) return;
@@ -178,36 +186,48 @@ export default function Unzip({ locale }: { locale: Locale }) {
     });
   }
 
-  if (!file)
-    return <Dropzone onFiles={(fs) => fs[0] && load(fs[0], encoding)} title={t.drop} hint={t.hint} />;
+  if (!file) return <Dropzone onFiles={(fs) => fs[0] && load(fs[0], encoding)} locale={locale} title={t.drop} hint={t.hint} />;
 
+  const selEntry = selected ? entries.find((x) => x.path === selected.path) : undefined;
   return (
     <div className="flex flex-col gap-4">
-      <Panel>
-        <PanelHeader
-          title={
-            <span className="flex items-center gap-2">
-              <FolderOpen className="size-4 text-accent" aria-hidden />
-              <span className="truncate">{file.name}</span>
-            </span>
-          }
-          actions={
-            <label className="cursor-pointer">
-              <span className="text-sm text-accent hover:underline">{t.change}</span>
-              <input type="file" className="sr-only" onChange={(e) => e.target.files?.[0] && load(e.target.files[0], encoding)} />
-            </label>
-          }
-        />
-        {entries.length > 0 && (
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 px-4 pt-3 text-sm text-fg-2" aria-live="polite">
-            <span className="text-lg font-semibold text-fg">{count(locale, entries.length, t.files)}</span>
-            <span className="tabular">
-              {formatBytes(locale, total)} · {formatBytes(locale, file.size)} {t.packed}
-            </span>
+      <Panel className="flex flex-col gap-4 p-4 sm:p-5">
+        <div className="flex items-center gap-3">
+          <span className="flex size-11 shrink-0 items-center justify-center rounded-[0.875rem] bg-accent-container text-on-accent-container">
+            <FolderOpen className="size-5" aria-hidden />
+          </span>
+          <div className="min-w-0 flex-1" aria-live="polite">
+            <div className="truncate font-semibold text-fg" title={file.name}>
+              {file.name}
+            </div>
+            <div className="tabular text-sm text-fg-3">
+              {entries.length > 0 ? (
+                <>
+                  {count(locale, entries.length, t.files)} · {formatBytes(locale, total)}
+                  <span className="max-sm:hidden">
+                    {" "}
+                    · {formatBytes(locale, file.size)} {t.packed}
+                  </span>
+                </>
+              ) : (
+                formatBytes(locale, file.size)
+              )}
+            </div>
           </div>
-        )}
-        <div className="flex flex-wrap items-end gap-3 px-4 py-3">
-          <Field label={t.encoding} htmlFor={`${id}-e`} className="w-52">
+          <label title={t.change} className={buttonClass("tonal", "sm", "cursor-pointer focus-within:outline-2 focus-within:outline-accent")}>
+            <FolderInput aria-hidden />
+            <span className="max-sm:sr-only">{t.change}</span>
+            <input type="file" className="sr-only" onChange={(e) => (e.target.files?.[0] && load(e.target.files[0], encoding), (e.target.value = ""))} />
+          </label>
+        </div>
+        <div className="flex flex-wrap items-end gap-3">
+          {entries.length > 0 && (
+            <Button variant="filled" size="xl" onClick={extractAll} disabled={all.running} className="max-sm:w-full">
+              <FolderDown aria-hidden />
+              <span className="truncate">{canDir ? t.all : t.allFallback}</span>
+            </Button>
+          )}
+          <Field label={t.encoding} htmlFor={`${id}-e`} className="sm:ml-auto">
             <Select
               id={`${id}-e`}
               size="sm"
@@ -223,66 +243,66 @@ export default function Unzip({ locale }: { locale: Locale }) {
               <option value="windows-1251">Windows-1251</option>
             </Select>
           </Field>
-          {entries.length > 0 && (
-            <Button variant="primary" onClick={extractAll} disabled={all.running}>
-              <FolderDown aria-hidden />
-              {canDir ? t.all : t.allFallback}
-            </Button>
-          )}
         </div>
+        {!canDir && entries.length > 0 && <p className="-mt-1 text-[0.8125rem] text-fg-3">{t.allNote}</p>}
+        <JobProgress job={all} locale={locale} onCancel={all.cancel} />
       </Panel>
       {problem && <Notice tone="err">{problem}</Notice>}
       {!problem && <JobProgress job={open} locale={locale} onCancel={open.cancel} />}
-      <JobProgress job={all} locale={locale} onCancel={all.cancel} />
       {all.status === "done" && canDir && <Notice tone="ok">{t.done}</Notice>}
-      {!canDir && entries.length > 0 && <p className="-mt-2 text-[0.8125rem] text-fg-3">{t.allNote}</p>}
 
       {entries.length > 0 && (
-        <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
-          <Panel className="max-h-[28rem] overflow-auto">
-            <ul className="divide-y divide-line">
-              {entries.map((e) => (
-                <li key={e.path}>
-                  <button
-                    type="button"
-                    onClick={() => pick(e.path)}
-                    className={cn("flex w-full items-center gap-3 px-4 py-2 text-left text-sm hover:bg-surface-2", selected?.path === e.path && "bg-accent-soft")}
-                  >
-                    <FileText className="size-4 shrink-0 text-fg-3" aria-hidden />
-                    <span className="min-w-0 flex-1 truncate text-fg" title={e.path}>
-                      {e.path}
-                    </span>
-                    <span className="tabular shrink-0 text-fg-3">{formatBytes(locale, e.size)}</span>
-                  </button>
-                </li>
-              ))}
+        <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-6">
+          <Panel className="max-h-[32rem] overflow-auto py-1.5">
+            <ul>
+              {entries.map((e) => {
+                const on = selected?.path === e.path;
+                const Icon = IMAGE.test(e.path) ? FileImage : TEXT.test(e.path) ? FileText : FileIcon;
+                return (
+                  <li key={e.path} className="px-1.5">
+                    <button
+                      type="button"
+                      onClick={() => pick(e.path)}
+                      aria-current={on || undefined}
+                      className={cn(
+                        "flex min-h-11 w-full items-center gap-3 rounded-[0.75rem] px-3 py-2 text-left text-sm transition-colors",
+                        on ? "bg-accent-container text-on-accent-container" : "text-fg hover:bg-surface-2 active:bg-surface-3",
+                      )}
+                    >
+                      <Icon className={cn("size-4 shrink-0", on ? "" : "text-fg-3")} aria-hidden />
+                      <span className="min-w-0 flex-1 truncate" title={e.path}>
+                        {e.path}
+                      </span>
+                      <span className={cn("tabular shrink-0", on ? "" : "text-fg-3")}>{formatBytes(locale, e.size)}</span>
+                    </button>
+                  </li>
+                );
+              })}
             </ul>
           </Panel>
-          <Panel className="flex min-h-40 flex-col gap-3 p-4">
+          <Panel ref={previewRef} className={cn("flex min-h-40 flex-col gap-4 p-4 sm:p-5 lg:sticky lg:top-20", !selected && "max-lg:hidden")}>
             {!selected ? (
               <p className="m-auto text-center text-sm text-fg-3">{t.pick}</p>
             ) : (
               <>
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <div className="min-w-0">
-                    <div className="truncate font-medium text-fg" title={selected.path}>
-                      {selected.path.split("/").pop()}
-                    </div>
-                    <div className="text-sm text-fg-3">
-                      {formatBytes(locale, selected.blob.size)}
-                      {entries.find((x) => x.path === selected.path)?.date ? ` · ${formatDate(locale, new Date(entries.find((x) => x.path === selected.path)!.date), { dateStyle: "medium", timeStyle: "short" })}` : ""}
-                    </div>
+                <div className="min-w-0">
+                  <div className="truncate text-lg font-semibold text-fg" title={selected.path}>
+                    {selected.path.split("/").pop()}
                   </div>
-                  <Button variant="primary" size="sm" onClick={() => downloadBlob(selected.blob, selected.path.split("/").pop() ?? "file")}>
-                    <Download aria-hidden />
-                    {t.download}
-                  </Button>
+                  <div className="tabular text-sm text-fg-3">
+                    {formatBytes(locale, selected.blob.size)}
+                    {selEntry?.date ? ` · ${formatDate(locale, new Date(selEntry.date), { dateStyle: "medium", timeStyle: "short" })}` : ""}
+                  </div>
                 </div>
+                <Button variant="filled" size="lg" fullWidth onClick={() => downloadBlob(selected.blob, selected.path.split("/").pop() ?? "file")}>
+                  <Download aria-hidden />
+                  {t.download}
+                </Button>
                 {IMAGE.test(selected.path) ? (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img ref={img} alt={selected.path} className="max-h-80 w-auto max-w-full self-center rounded-[0.5rem]" />
+                  <img ref={img} alt={selected.path} className="max-h-80 w-auto max-w-full self-center rounded-[0.75rem]" />
                 ) : selected.text !== null ? (
-                  <pre className="max-h-80 overflow-auto rounded-[0.5rem] bg-surface-2 p-3 font-mono text-[0.8125rem] whitespace-pre-wrap break-words text-fg">{selected.text}</pre>
+                  <pre className="max-h-80 overflow-auto rounded-[1rem] bg-surface-2 p-3 font-mono text-[0.8125rem] whitespace-pre-wrap break-words text-fg">{selected.text}</pre>
                 ) : (
                   <p className="text-sm text-fg-3">{t.noPreview}</p>
                 )}

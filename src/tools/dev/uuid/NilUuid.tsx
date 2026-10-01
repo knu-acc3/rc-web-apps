@@ -3,7 +3,7 @@
 import { useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { CopyButton } from "@/ui/copy-button";
-import { Checkbox } from "@/ui/field";
+import { Switch } from "@/ui/field";
 import { Panel } from "@/ui/panel";
 import { formatUuid, MAX_UUID, NIL_UUID } from "./lib/engine";
 
@@ -22,22 +22,22 @@ export default function NilUuid({ locale }: { locale: Locale }) {
     [t.max, formatUuid(MAX_UUID, { upper, braces, urn })],
   ];
   return (
-    <Panel className="p-4 sm:p-5">
+    <Panel className="p-4 sm:p-6">
       <div className="flex flex-col gap-3">
         {rows.map(([label, value]) => (
-          <div key={label} className="flex flex-col gap-2 rounded-[0.625rem] bg-surface-2 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+          <div key={label} className="flex flex-col gap-2 rounded-[1rem] bg-surface-2 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="min-w-0">
               <div className="text-[0.8125rem] font-medium text-fg-2">{label}</div>
-              <div className="font-mono text-lg font-semibold break-all text-fg">{value}</div>
+              <div className="font-mono text-xl font-semibold break-all text-fg sm:text-2xl">{value}</div>
             </div>
-            <CopyButton value={value} label={t.copy} copiedLabel={t.copied} />
+            <CopyButton value={value} label={t.copy} copiedLabel={t.copied} size="md" className="self-start sm:self-auto" />
           </div>
         ))}
       </div>
       <div className="mt-4 flex flex-wrap gap-x-6 gap-y-2">
-        <Checkbox label={t.upper} checked={upper} onChange={(e) => setUpper(e.target.checked)} />
-        <Checkbox label={t.braces} checked={braces} disabled={urn} onChange={(e) => setBraces(e.target.checked)} />
-        <Checkbox label={t.urn} checked={urn} onChange={(e) => setUrn(e.target.checked)} />
+        <Switch label={t.upper} checked={upper} onChange={(e) => setUpper(e.target.checked)} />
+        <Switch label={t.braces} checked={braces} disabled={urn} onChange={(e) => setBraces(e.target.checked)} />
+        <Switch label={t.urn} checked={urn} onChange={(e) => setUrn(e.target.checked)} />
       </div>
     </Panel>
   );

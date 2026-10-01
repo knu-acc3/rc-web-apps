@@ -1,15 +1,17 @@
 "use client";
 
-import { Eye, EyeOff, Lock } from "lucide-react";
+import { Check, Eye, EyeOff, Lock } from "lucide-react";
 import { useId, useState } from "react";
 import type { Locale } from "@/i18n/config";
-import { Button } from "@/ui/button";
-import { Checkbox, Field, Input } from "@/ui/field";
-import { OptionsRow, PrimaryButton, workerJob } from "./ui/bits";
+import { IconButton } from "@/ui/button";
+import { Field, Input } from "@/ui/field";
+import { Fold } from "@/ui/fold";
+import { Caption, PrimaryButton, workerJob } from "./ui/bits";
 import { FilePanel } from "./ui/FilePanel";
 import { JobStatus, ResultCard, baseName, pdfBlob, type OutputItem } from "./ui/Result";
 import { useJob } from "./ui/use-job";
 import { usePdfFiles } from "./ui/use-pdf-files";
+import { Controls, Workspace } from "./ui/Workspace";
 
 const T = {
   ru: {
@@ -19,13 +21,13 @@ const T = {
     hide: "Скрыть пароль",
     mismatch: "Пароли не совпадают",
     short: "Слишком короткий пароль — возьмите хотя бы 6 символов",
-    allow: "Разрешить тем, кто знает пароль:",
+    allow: "Разрешить тем, кто знает пароль",
     print: "печать",
     copy: "копирование текста",
     edit: "изменение и сборку страниц",
     annotate: "комментарии и заполнение форм",
-    owner: "Пароль владельца (снимает ограничения; необязательно)",
-    ownerHint: "Если оставить пустым, будет создан случайный — ограничения тогда не снять, но файл всегда откроется паролем выше.",
+    owner: "Пароль владельца (необязательно)",
+    ownerHint: "Снимает ограничения. Если оставить пустым, будет создан случайный.",
     go: "Защитить PDF",
     done: "Шифрование AES-256. Проверено: файл открывается только с паролем. Сохраните пароль — восстановить его нельзя.",
   },
@@ -36,13 +38,13 @@ const T = {
     hide: "Hide password",
     mismatch: "Passwords don't match",
     short: "Too short — use at least 6 characters",
-    allow: "Allow people who know the password to:",
+    allow: "Allow people who know the password to",
     print: "print",
     copy: "copy text",
     edit: "edit and assemble pages",
     annotate: "comment and fill forms",
-    owner: "Owner password (lifts restrictions; optional)",
-    ownerHint: "Leave empty to generate a random one — restrictions then can't be lifted, but the file always opens with the password above.",
+    owner: "Owner password (optional)",
+    ownerHint: "Lifts the restrictions. Left empty, a random one is generated.",
     go: "Protect PDF",
     done: "AES-256 encryption. Verified: the file opens only with the password. Keep the password safe — it can't be recovered.",
   },
@@ -93,18 +95,16 @@ export default function ProtectTool({ locale }: { locale: Locale }) {
     if (out) setResult([{ name: `${baseName(file.name)}-protected.pdf`, blob: pdfBlob(out.files[0].bytes) }]);
   }
 
-  const eye = (
-    <Button size="icon-sm" variant="ghost" onClick={() => setShow((s) => !s)} aria-label={show ? t.hide : t.show} title={show ? t.hide : t.show}>
-      {show ? <EyeOff /> : <Eye />}
-    </Button>
-  );
+  const eye = <IconButton size="sm" label={show ? t.hide : t.show} icon={show ? <EyeOff aria-hidden /> : <Eye aria-hidden />} onClick={() => setShow((s) => !s)} selected={show} />;
 
+  const files = <FilePanel locale={locale} pdf={pdf} disabled={job.running} />;
+  if (!file) return <div className="flex flex-col gap-4">{files}</div>;
   return (
-    <div className="flex flex-col gap-4">
-      <FilePanel locale={locale} pdf={pdf} disabled={job.running} />
-      {file && (
-        <>
-          <div className="grid max-w-2xl gap-4 sm:grid-cols-2">
+    <Workspace
+      files={files}
+      controls={
+        <Controls>
+          <div className="grid gap-4 sm:grid-cols-2">
             <Field label={t.password} htmlFor={`${id}-p`} aside={eye}>
               <Input id={`${id}-p`} size="lg" type={show ? "text" : "password"} autoComplete="new-password" value={pw} onChange={(e) => setPw(e.target.value)} aria-invalid={!!error && pw.length < 6} />
             </Field>
@@ -113,38 +113,49 @@ export default function ProtectTool({ locale }: { locale: Locale }) {
             </Field>
           </div>
           <div>
-            <p className="mb-2 text-sm font-medium text-fg-2">{t.allow}</p>
-            <OptionsRow className="gap-x-6!">
+            <Caption>{t.allow}</Caption>
+            <div role="group" aria-label={t.allow} className="flex flex-wrap gap-2">
               {(["print", "copy", "edit", "annotate"] as const).map((k) => (
-                <Checkbox key={k} label={t[k]} checked={perm[k]} onChange={(e) => setPerm((p) => ({ ...p, [k]: e.target.checked }))} />
+                <button key={k} type="button" className="chip" aria-pressed={perm[k]} onClick={() => setPerm((p) => ({ ...p, [k]: !p[k] }))}>
+                  {perm[k] && <Check className="size-4" aria-hidden />}
+                  {t[k]}
+                </button>
               ))}
-            </OptionsRow>
+            </div>
           </div>
-          <Field label={t.owner} htmlFor={`${id}-o`} hint={t.ownerHint} className="max-w-md">
-            <Input id={`${id}-o`} type={show ? "text" : "password"} autoComplete="new-password" value={owner} onChange={(e) => setOwner(e.target.value)} />
-          </Field>
-          <PrimaryButton disabled={!valid || job.running} onClick={protect}>
+          <Fold variant="inline" title={t.owner}>
+            <Field htmlFor={`${id}-o`} hint={t.ownerHint}>
+              <Input id={`${id}-o`} type={show ? "text" : "password"} autoComplete="new-password" value={owner} onChange={(e) => setOwner(e.target.value)} aria-label={t.owner} />
+            </Field>
+          </Fold>
+        </Controls>
+      }
+      action={
+        <>
+          <PrimaryButton disabled={!valid || job.running} done={!!result} onClick={protect}>
             <Lock aria-hidden />
             {t.go}
           </PrimaryButton>
           <JobStatus locale={locale} state={job.state} onCancel={job.cancel} />
-          {result && (
-            <ResultCard
-              locale={locale}
-              items={result}
-              notice={t.done}
-              onReset={() => {
-                setResult(null);
-                setPw("");
-                setPw2("");
-                setOwner("");
-                pdf.clear();
-                job.reset();
-              }}
-            />
-          )}
         </>
-      )}
-    </div>
+      }
+      result={
+        result && (
+          <ResultCard
+            locale={locale}
+            items={result}
+            notice={t.done}
+            onReset={() => {
+              setResult(null);
+              setPw("");
+              setPw2("");
+              setOwner("");
+              pdf.clear();
+              job.reset();
+            }}
+          />
+        )
+      }
+    />
   );
 }

@@ -3,13 +3,12 @@
 import { ChevronLeft, ChevronRight, Copy, PenLine, Plus, X } from "lucide-react";
 import { useEffect, useId, useRef, useState } from "react";
 import type { Locale } from "@/i18n/config";
+import { cn } from "@/lib/cn";
 import { formatNumber, plural } from "@/i18n/format";
-import { Button } from "@/ui/button";
-import { Checkbox, Field, Input, Select } from "@/ui/field";
+import { Button, IconButton } from "@/ui/button";
+import { Field, Input, Switch } from "@/ui/field";
 import { Dropzone } from "@/ui/dropzone";
-import { Notice } from "@/ui/panel";
 import { Segmented } from "@/ui/segmented";
-import { Tabs } from "@/ui/tabs";
 import { PrimaryButton, workerJob } from "./ui/bits";
 import { FilePanel } from "./ui/FilePanel";
 import { JobStatus, ResultCard, baseName, pdfBlob, type OutputItem } from "./ui/Result";
@@ -17,6 +16,7 @@ import { useJob } from "./ui/use-job";
 import { usePdfFiles } from "./ui/use-pdf-files";
 import { DrawPad } from "./ui/DrawPad";
 import { DraggableBox, PageStage, type Box } from "./ui/PageStage";
+import { Controls, Summary, Workspace } from "./ui/Workspace";
 import { imageCanvas, trimToPng, typedCanvas, type SignatureImage } from "./lib/signature";
 
 const FONTS = {
@@ -29,7 +29,7 @@ const INK = { black: "#111111", blue: "#1a3fb0" } as const;
 const T = {
   ru: {
     how: "Как создать подпись",
-    tabs: { draw: "Нарисовать", type: "Напечатать", upload: "Загрузить" },
+    tabs: { draw: "Рисовать", type: "Ввести", upload: "Загрузить" },
     pad: "Поле для подписи: рисуйте мышью, пальцем или стилусом",
     clear: "Очистить",
     name: "Ваше имя или инициалы",
@@ -39,7 +39,7 @@ const T = {
     inks: { black: "Чёрный", blue: "Синий" },
     upload: "Перетащите фото или скан подписи (PNG, JPG)",
     removeWhite: "Убрать белый фон",
-    place: "Перетащите подпись на нужное место, угол — изменить размер",
+    place: "Перетащите подпись на место; угол — размер",
     boxLabel: "Подпись на странице: стрелки — сдвинуть, плюс и минус — размер",
     prev: "Предыдущая страница",
     next: "Следующая страница",
@@ -50,8 +50,8 @@ const T = {
     count: (n: number) => `Подпись будет на ${formatNumber("ru", n)} ${plural("ru", n, ["странице", "страницах", "страницах"])}`,
     go: "Подписать PDF",
     pageLabel: "Страница документа",
-    notQes: "Это изображение подписи на странице, а не квалифицированная электронная подпись. Для госуслуг, торгов и налоговой нужна подпись с сертификатом: в Казахстане — ЭЦП НУЦ РК через NCALayer, в России — КЭП аккредитованного удостоверяющего центра.",
-    needSig: "Сначала создайте подпись выше",
+    notQes: "Это картинка подписи, а не ЭЦП или КЭП: для госуслуг, торгов и налоговой нужна подпись с сертификатом.",
+    needSig: "Создайте подпись — и её можно будет поставить на страницу",
   },
   en: {
     how: "How to create a signature",
@@ -65,7 +65,7 @@ const T = {
     inks: { black: "Black", blue: "Blue" },
     upload: "Drop a photo or scan of your signature (PNG, JPG)",
     removeWhite: "Remove white background",
-    place: "Drag the signature into place, use the corner to resize",
+    place: "Drag the signature into place; the corner resizes it",
     boxLabel: "Signature on the page: arrows move it, plus and minus resize",
     prev: "Previous page",
     next: "Next page",
@@ -76,12 +76,13 @@ const T = {
     count: (n: number) => `The signature will be on ${formatNumber("en", n)} ${n === 1 ? "page" : "pages"}`,
     go: "Sign PDF",
     pageLabel: "Document page",
-    notQes: "This is an image of your signature on the page, not a qualified electronic signature: legally binding e-signatures require a certificate-based signing key.",
-    needSig: "Create your signature above first",
+    notQes: "This is an image of your signature, not a certificate-based electronic signature.",
+    needSig: "Create a signature to place it on the page",
   },
 } as const;
 
 type Mode = "draw" | "type" | "upload";
+const DEFAULT_BOX: Box = { x: 0.55, y: 0.78, w: 0.3 };
 
 export default function SignTool({ locale }: { locale: Locale }) {
   const t = T[locale];
@@ -109,6 +110,20 @@ export default function SignTool({ locale }: { locale: Locale }) {
     setResult(null);
   };
 
+  // The first signature lands on the page in view right away (one step less); later ones keep the placement.
+  const fileId = useRef("");
+  useEffect(() => {
+    fileId.current = file?.id ?? "";
+  });
+  const gotSig = (img: SignatureImage | null) => {
+    setSig(img);
+    if (!img) return;
+    setPlacement((p) => {
+      const cur = p.file === fileId.current ? p : { file: fileId.current, page: 0, boxes: {} };
+      return Object.keys(cur.boxes).length ? cur : { ...cur, boxes: { [cur.page]: DEFAULT_BOX } };
+    });
+  };
+
   // Revoke the previous signature URL whenever it is replaced or on unmount.
   useEffect(() => () => {
     if (sig) URL.revokeObjectURL(sig.url);
@@ -125,7 +140,7 @@ export default function SignTool({ locale }: { locale: Locale }) {
       if (mode === "upload" && upload) canvas = await imageCanvas(upload, removeWhite).catch(() => null);
       const img = canvas ? await trimToPng(canvas) : null;
       if (canvas) canvas.width = canvas.height = 1;
-      if (my === token.current) setSig(img);
+      if (my === token.current) gotSig(img);
       else if (img) URL.revokeObjectURL(img.url);
     }, 200);
     return () => clearTimeout(timer);
@@ -134,7 +149,7 @@ export default function SignTool({ locale }: { locale: Locale }) {
   const aspect = sig ? sig.width / sig.height : 3;
   const current = boxes[page];
   const placed = Object.keys(boxes).length;
-  const defaultBox: Box = { x: 0.55, y: 0.78, w: 0.3 };
+  const defaultBox = DEFAULT_BOX;
 
   async function sign() {
     if (!file || !sig || !placed) return;
@@ -156,127 +171,138 @@ export default function SignTool({ locale }: { locale: Locale }) {
     setSig(null);
   };
 
-  return (
-    <div className="flex flex-col gap-5">
-      <FilePanel locale={locale} pdf={pdf} disabled={job.running} />
-      {file && (
+  const controls = (
+    <Controls>
+      <Segmented fill label={t.how} value={mode} onChange={changeMode} options={(["draw", "type", "upload"] as const).map((m) => ({ value: m, label: t.tabs[m] }))} />
+      {mode === "draw" && <DrawPad color={INK[ink]} label={t.pad} clearLabel={t.clear} onStroke={async (c) => gotSig(await trimToPng(c))} onClear={() => setSig(null)} />}
+      {mode === "type" && (
         <>
-          <section className="flex flex-col gap-3">
-            <Tabs label={t.how} value={mode} onChange={changeMode} items={(["draw", "type", "upload"] as const).map((m) => ({ value: m, label: t.tabs[m] }))} />
-            {mode === "draw" && <DrawPad color={INK[ink]} label={t.pad} clearLabel={t.clear} onStroke={async (c) => setSig(await trimToPng(c))} onClear={() => setSig(null)} />}
-            {mode === "type" && (
-              <div className="flex flex-col gap-3">
-                <Field label={t.name} htmlFor={`${id}-n`}>
-                  <Input id={`${id}-n`} size="lg" value={name} maxLength={60} onChange={(e) => setName(e.target.value)} autoComplete="name" />
-                </Field>
-                <Field label={t.font} htmlFor={`${id}-f`} className="w-48">
-                  <Select id={`${id}-f`} value={font} onChange={(e) => setFont(e.target.value as keyof typeof FONTS)}>
-                    {(Object.keys(FONTS) as (keyof typeof FONTS)[]).map((f) => (
-                      <option key={f} value={f}>
-                        {t.fonts[f]}
-                      </option>
-                    ))}
-                  </Select>
-                </Field>
-              </div>
-            )}
-            {mode === "upload" &&
-              (upload ? (
-                <div className="flex flex-wrap items-center gap-3">
-                  <span className="min-w-0 truncate text-sm text-fg">{upload.name}</span>
-                  <Checkbox label={t.removeWhite} checked={removeWhite} onChange={(e) => setRemoveWhite(e.target.checked)} />
-                  <Button size="sm" variant="ghost" onClick={() => setUpload(null)} aria-label={t.clear}>
-                    <X aria-hidden />
-                  </Button>
-                </div>
-              ) : (
-                <Dropzone compact accept="image/png,image/jpeg,.png,.jpg,.jpeg" title={t.upload} onFiles={([f]) => setUpload(f)} />
-              ))}
-            {mode !== "upload" && <Segmented label={t.ink} value={ink} onChange={setInk} options={(["black", "blue"] as const).map((k) => ({ value: k, label: t.inks[k] }))} size="sm" />}
-          </section>
-
-          {sig ? (
-            <section className="flex flex-col gap-3">
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <div className="flex items-center gap-1">
-                  <Button size="icon-sm" variant="ghost" aria-label={t.prev} disabled={page === 0} onClick={() => setPage((p) => p - 1)}>
-                    <ChevronLeft />
-                  </Button>
-                  <span className="tabular min-w-32 text-center text-sm font-medium text-fg">{t.pageOf(page + 1, pages)}</span>
-                  <Button size="icon-sm" variant="ghost" aria-label={t.next} disabled={page >= pages - 1} onClick={() => setPage((p) => p + 1)}>
-                    <ChevronRight />
-                  </Button>
-                </div>
-                <div className="flex flex-wrap gap-1">
-                  {current ? (
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={() =>
-                        setBoxes((b) => {
-                          const next = { ...b };
-                          delete next[page];
-                          return next;
-                        })
-                      }
-                    >
-                      <X aria-hidden />
-                      {t.removeHere}
-                    </Button>
-                  ) : (
-                    <Button size="sm" variant="outline" onClick={() => setBoxes((b) => ({ ...b, [page]: Object.values(b)[0] ?? defaultBox }))}>
-                      <Plus aria-hidden />
-                      {t.addHere}
-                    </Button>
-                  )}
-                  {pages > 1 && (
-                    <Button size="sm" variant="ghost" onClick={() => setBoxes(() => Object.fromEntries(Array.from({ length: pages }, (_, i) => [i, current ?? defaultBox])))}>
-                      <Copy aria-hidden />
-                      {t.allPages}
-                    </Button>
-                  )}
-                </div>
-              </div>
-              <PageStage doc={file.doc!} index={page} label={`${t.pageLabel}: ${t.pageOf(page + 1, pages)}`}>
-                {(stage) =>
-                  current ? (
-                    <DraggableBox
-                      box={current}
-                      aspect={aspect}
-                      stage={stage}
-                      url={sig.url}
-                      label={t.boxLabel}
-                      onChange={(b) => setBoxes((prev) => ({ ...prev, [page]: b }))}
-                    />
-                  ) : null
-                }
-              </PageStage>
-              <p className="text-center text-sm text-fg-3">{current ? t.place : ""}</p>
-            </section>
-          ) : (
-            <p className="text-sm text-fg-3">{t.needSig}</p>
-          )}
-
-          <Notice>{t.notQes}</Notice>
-          {sig && placed > 0 && <p className="text-lg font-semibold text-fg">{t.count(placed)}</p>}
-          <PrimaryButton disabled={!sig || !placed || job.running} onClick={sign}>
-            <PenLine aria-hidden />
-            {t.go}
-          </PrimaryButton>
-          <JobStatus locale={locale} state={job.state} onCancel={job.cancel} />
-          {result && (
-            <ResultCard
-              locale={locale}
-              items={result}
-              onReset={() => {
-                setResult(null);
-                setPlacement({ file: "", page: 0, boxes: {} });
-                pdf.clear();
-                job.reset();
-              }}
+          <Field label={t.name} htmlFor={`${id}-n`}>
+            <Input id={`${id}-n`} size="lg" value={name} maxLength={60} onChange={(e) => setName(e.target.value)} autoComplete="name" />
+          </Field>
+          <Field label={t.font}>
+            <Segmented
+              fill
+              label={t.font}
+              value={font}
+              onChange={setFont}
+              options={(Object.keys(FONTS) as (keyof typeof FONTS)[]).map((f) => ({
+                value: f,
+                label: (
+                  <span className="text-base" style={{ font: `${f === "italic" ? "italic " : ""}1rem ${f === "italic" ? 'Georgia, "Times New Roman", serif' : FONTS[f]}` }}>
+                    {t.fonts[f]}
+                  </span>
+                ),
+              }))}
             />
-          )}
+          </Field>
         </>
+      )}
+      {mode === "upload" &&
+        (upload ? (
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 rounded-[1rem] bg-surface-2 py-1 pr-1 pl-3">
+            <span className="min-w-0 flex-1 truncate text-sm font-medium text-fg">{upload.name}</span>
+            <Switch label={t.removeWhite} checked={removeWhite} onChange={(e) => setRemoveWhite(e.target.checked)} />
+            <IconButton label={t.clear} icon={<X aria-hidden />} onClick={() => setUpload(null)} />
+          </div>
+        ) : (
+          <Dropzone compact locale={locale} accept="image/png,image/jpeg,.png,.jpg,.jpeg" title={t.upload} onFiles={([f]) => setUpload(f)} />
+        ))}
+      {mode !== "draw" && sig && (
+        <div className="flex h-20 items-center justify-center rounded-[1rem] bg-white p-2 shadow-[inset_0_0_0_1px_var(--line)]">
+          {/* eslint-disable-next-line @next/next/no-img-element -- local blob of the signature */}
+          <img src={sig.url} alt="" className="max-h-full max-w-full object-contain" />
+        </div>
+      )}
+      {mode !== "upload" && (
+        <Field label={t.ink}>
+          <Segmented label={t.ink} value={ink} onChange={setInk} options={(["black", "blue"] as const).map((k) => ({ value: k, label: t.inks[k], icon: <span className="size-3.5 rounded-full" style={{ background: INK[k] }} aria-hidden /> }))} size="sm" />
+        </Field>
+      )}
+    </Controls>
+  );
+
+  const stage = file ? (
+    <section className="flex min-w-0 flex-col gap-3 rounded-[1.25rem] bg-surface-2 p-3 sm:p-4">
+      <div className={cn("flex flex-wrap items-center gap-2", sig ? "justify-between" : "justify-center")}>
+        <div className="flex items-center gap-1">
+          <IconButton label={t.prev} icon={<ChevronLeft aria-hidden />} disabled={page === 0} onClick={() => setPage((p) => p - 1)} />
+          <span className="tabular min-w-28 text-center text-sm font-medium text-fg">{t.pageOf(page + 1, pages)}</span>
+          <IconButton label={t.next} icon={<ChevronRight aria-hidden />} disabled={page >= pages - 1} onClick={() => setPage((p) => p + 1)} />
+        </div>
+        {sig && (
+          <div className="flex flex-wrap gap-1">
+            {current ? (
+              <Button
+                size="sm"
+                variant="text"
+                onClick={() =>
+                  setBoxes((b) => {
+                    const next = { ...b };
+                    delete next[page];
+                    return next;
+                  })
+                }
+              >
+                <X aria-hidden />
+                {t.removeHere}
+              </Button>
+            ) : (
+              <Button size="sm" variant="tonal" onClick={() => setBoxes((b) => ({ ...b, [page]: Object.values(b)[0] ?? defaultBox }))}>
+                <Plus aria-hidden />
+                {t.addHere}
+              </Button>
+            )}
+            {pages > 1 && (
+              <Button size="sm" variant="text" onClick={() => setBoxes(() => Object.fromEntries(Array.from({ length: pages }, (_, i) => [i, current ?? defaultBox])))}>
+                <Copy aria-hidden />
+                {t.allPages}
+              </Button>
+            )}
+          </div>
+        )}
+      </div>
+      <PageStage locale={locale} doc={file.doc!} index={page} label={`${t.pageLabel}: ${t.pageOf(page + 1, pages)}`}>
+        {(size) => (sig && current ? <DraggableBox box={current} aspect={aspect} stage={size} url={sig.url} label={t.boxLabel} onChange={(b) => setBoxes((prev) => ({ ...prev, [page]: b }))} /> : null)}
+      </PageStage>
+      <p className="text-center text-sm text-fg-3">{!sig ? t.needSig : current ? t.place : ""}</p>
+    </section>
+  ) : null;
+
+  return (
+    <div className="flex flex-col gap-4">
+      {!file ? (
+        <FilePanel locale={locale} pdf={pdf} disabled={job.running} />
+      ) : (
+        <Workspace
+          files={<FilePanel locale={locale} pdf={pdf} disabled={job.running} />}
+          controls={controls}
+          preview={stage}
+          previewFirst={false}
+          action={
+            <>
+              {sig && placed > 0 && <Summary>{t.count(placed)}</Summary>}
+              <PrimaryButton disabled={!sig || !placed || job.running} done={!!result} onClick={sign}>
+                <PenLine aria-hidden />
+                {t.go}
+              </PrimaryButton>
+              <p className="text-sm text-fg-3">{t.notQes}</p>
+              <JobStatus locale={locale} state={job.state} onCancel={job.cancel} />
+              {result && (
+                <ResultCard
+                  locale={locale}
+                  items={result}
+                  onReset={() => {
+                    setResult(null);
+                    setPlacement({ file: "", page: 0, boxes: {} });
+                    pdf.clear();
+                    job.reset();
+                  }}
+                />
+              )}
+            </>
+          }
+        />
       )}
     </div>
   );

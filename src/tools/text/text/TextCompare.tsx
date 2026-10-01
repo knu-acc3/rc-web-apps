@@ -5,8 +5,8 @@ import { useEffect, useId, useRef, useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { cn } from "@/lib/cn";
 import { downloadText } from "@/lib/clipboard";
-import { Button, buttonClass } from "@/ui/button";
-import { Checkbox } from "@/ui/field";
+import { buttonClass, IconButton } from "@/ui/button";
+import { Switch } from "@/ui/field";
 import { Panel, PanelHeader } from "@/ui/panel";
 import { Segmented } from "@/ui/segmented";
 import type { DiffMode, DiffOptions, DiffResult } from "./lib/diff";
@@ -147,21 +147,18 @@ export default function TextCompare({ locale }: { locale: Locale }) {
             ]}
           />
         )}
-        <Button
-          size="icon-sm"
-          variant="ghost"
-          aria-label={t.swap}
-          title={t.swap}
+        <IconButton
+          variant="tonal"
+          label={t.swap}
+          icon={<ArrowLeftRight aria-hidden />}
           onClick={() => {
             setA(b);
             setB(a);
           }}
-        >
-          <ArrowLeftRight aria-hidden />
-        </Button>
+        />
       </OptionsBar>
 
-      <Panel className={cn(stale && "opacity-70")}>
+      <Panel className={cn("min-w-0 overflow-hidden transition-opacity", stale && "opacity-70")}>
         <PanelHeader
           title={t.result}
           actions={
@@ -193,8 +190,8 @@ export default function TextCompare({ locale }: { locale: Locale }) {
         {res && !identical && <DiffView res={res} mode={mode} view={view} />}
       </Panel>
       <MoreOptions locale={locale}>
-        <Checkbox label={t.ignoreCase} checked={ignoreCase} onChange={(e) => setIgnoreCase(e.target.checked)} />
-        {mode === "lines" && <Checkbox label={t.ignoreWs} checked={ignoreWs} onChange={(e) => setIgnoreWs(e.target.checked)} />}
+        <Switch label={t.ignoreCase} checked={ignoreCase} onChange={(e) => setIgnoreCase(e.target.checked)} />
+        {mode === "lines" && <Switch label={t.ignoreWs} checked={ignoreWs} onChange={(e) => setIgnoreWs(e.target.checked)} />}
       </MoreOptions>
     </div>
   );
@@ -203,8 +200,8 @@ export default function TextCompare({ locale }: { locale: Locale }) {
 function DiffView({ res, mode, view }: { res: DiffResult; mode: DiffMode; view: "unified" | "split" }) {
   if (mode === "lines" && view === "split") {
     return (
-      <div className="overflow-x-auto">
-        <table className="w-full border-collapse font-mono text-[0.8125rem] leading-relaxed">
+      <div tabIndex={0} className="max-h-[70vh] overflow-auto">
+        <table className="w-full min-w-[36rem] border-collapse font-mono text-[0.8125rem] leading-relaxed">
           <tbody>
             {res.rows.map((r, i) => (
               <tr key={i} className="align-top">
@@ -223,7 +220,7 @@ function DiffView({ res, mode, view }: { res: DiffResult; mode: DiffMode; view: 
   }
   if (mode === "lines") {
     return (
-      <div className="overflow-x-auto px-2 py-2 font-mono text-[0.8125rem] leading-relaxed">
+      <div tabIndex={0} className="max-h-[70vh] overflow-auto px-2 py-2 font-mono text-[0.8125rem] leading-relaxed">
         {res.parts.flatMap((p, i) =>
           p.value.split("\n").map((line, k) => (
             <div key={`${i}-${k}`} className={cn("px-2 whitespace-pre-wrap [overflow-wrap:anywhere]", p.added && "bg-ok-soft text-ok", p.removed && "bg-err-soft text-err")}>
@@ -238,7 +235,7 @@ function DiffView({ res, mode, view }: { res: DiffResult; mode: DiffMode; view: 
     );
   }
   return (
-    <div className="px-4 py-3 text-[0.9375rem] leading-relaxed whitespace-pre-wrap break-words text-fg">
+    <div tabIndex={0} className="max-h-[70vh] overflow-auto px-4 py-3 text-[0.9375rem] leading-relaxed whitespace-pre-wrap break-words text-fg">
       {res.parts.map((p, i) =>
         p.added ? (
           <ins key={i} className="rounded-[0.1875rem] bg-ok-soft text-ok no-underline">

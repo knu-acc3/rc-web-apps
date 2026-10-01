@@ -1,11 +1,13 @@
 "use client";
 
-import { Maximize2, Pause, Play, RotateCcw } from "lucide-react";
+import { Maximize2, Minimize2, Pause, Play, RotateCcw } from "lucide-react";
 import { useEffect, useId, useMemo, useRef, useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { cn } from "@/lib/cn";
-import { Button } from "@/ui/button";
-import { Switch } from "@/ui/field";
+import { Button, IconButton } from "@/ui/button";
+import { Field, Switch } from "@/ui/field";
+import { NumberInput } from "@/ui/number-input";
+import { Panel } from "@/ui/panel";
 import { useStoredJson } from "@/tools/time/time/lib/storage";
 import { useFullscreen } from "@/ui/fullscreen";
 import { useWakeLock } from "@/ui/stage";
@@ -150,43 +152,51 @@ export default function Interval({ locale, work: w0 = 20, rest: r0 = 10, rounds:
   const color = !seg || status === "done" ? "text-accent" : seg.kind === "work" ? "text-err" : seg.kind === "rest" ? "text-ok" : "text-warn";
   const editable = status === "idle" || status === "done";
 
+  const LIMITS = { work: [1, 3600, 5], rest: [0, 3600, 5], rounds: [1, 99, 1], prepare: [0, 300, 5] } as const;
+
   return (
-    <div className="flex flex-col gap-4">
-      <div ref={ref} className={cn("flex flex-col items-center justify-center gap-4 rounded-[0.75rem] border border-line bg-surface px-3 py-8 sm:py-10", full && "min-h-screen rounded-none border-0")}>
+    <div className="grid gap-4 lg:grid-cols-[minmax(0,2fr)_minmax(18rem,1fr)] lg:items-start">
+      <Panel ref={ref} className={cn("flex flex-col items-center justify-center gap-4 px-3 py-8 sm:py-10", full && "min-h-screen rounded-none! shadow-none!")}>
         <p className={cn("text-2xl font-bold uppercase tracking-wide", color)}>{label}</p>
-        <div className={cn("tabular font-semibold leading-none tracking-tight", full ? "text-[min(26vw,42vh)]" : "text-[min(22vw,8.75rem)]", status === "paused" ? "text-fg-2" : "text-fg")}>{clock(segLeft)}</div>
-        <div className="h-1.5 w-full max-w-md overflow-hidden rounded-full bg-surface-2" aria-hidden>
+        <div className={cn("tabular font-semibold leading-none tracking-tight", full ? "text-[min(26vw,42vh)]" : "text-[min(22vw,8.75rem)] 2xl:text-[10rem]", status === "paused" ? "text-fg-2" : "text-fg")}>{clock(segLeft)}</div>
+        <div className="h-2 w-full max-w-md overflow-hidden rounded-full bg-surface-2" aria-hidden>
           <div className={cn("h-full rounded-full", seg?.kind === "rest" ? "bg-ok" : seg?.kind === "prepare" ? "bg-warn" : "bg-err")} style={{ width: `${Math.min(100, Math.max(0, progress * 100))}%` }} />
         </div>
         <p className="text-[0.9375rem] text-fg-2">
-          {seg && seg.round > 0 ? t.round(seg.round, cfg.rounds) : " "}
+          {seg && seg.round > 0 ? t.round(seg.round, cfg.rounds) : " "}
           <span className="text-fg-3">
             {" · "}
             {t.total} {clock(totalMs - elapsed)}
           </span>
         </p>
-        <div className="flex items-center gap-2">
+        <div className="flex w-full max-w-lg flex-wrap items-center justify-center gap-2 sm:gap-3">
           {status === "running" ? (
-            <Button variant="primary" size="lg" onClick={pause} className="min-w-36">
+            <Button variant="filled" size="xl" onClick={pause} className="min-w-40 flex-1 sm:max-w-60">
               <Pause aria-hidden />
               {t.pause}
             </Button>
           ) : (
-            <Button variant="primary" size="lg" onClick={() => {
+            <Button
+              variant="filled"
+              size="xl"
+              onClick={() => {
                 if (status === "done") reset();
                 start();
-              }} className="min-w-36">
+              }}
+              className="min-w-40 flex-1 sm:max-w-60"
+            >
               <Play aria-hidden />
               {status === "paused" ? t.resume : t.start}
             </Button>
           )}
-          <Button variant="ghost" size="lg" onClick={reset} disabled={status === "idle"} aria-label={t.reset} title={t.reset}>
-            <RotateCcw aria-hidden />
-          </Button>
+          <div className="flex items-center gap-2">
+            <IconButton label={t.reset} variant="tonal" size="lg" onClick={reset} disabled={status === "idle"} icon={<RotateCcw aria-hidden />} />
+            <IconButton label={t.full} size="lg" onClick={toggle} icon={full ? <Minimize2 aria-hidden /> : <Maximize2 aria-hidden />} />
+          </div>
         </div>
-      </div>
+      </Panel>
 
-      <div className="flex flex-wrap items-end gap-3">
+      <Panel className="grid grid-cols-2 gap-x-3 gap-y-4 p-4 sm:grid-cols-4 sm:p-5 lg:grid-cols-2">
         {(
           [
             ["work", t.workS],
@@ -195,28 +205,24 @@ export default function Interval({ locale, work: w0 = 20, rest: r0 = 10, rounds:
             ["prepare", t.prepS],
           ] as const
         ).map(([k, lbl]) => (
-          <label key={k} htmlFor={`${id}-${k}`} className="flex flex-col gap-1 text-[0.8125rem] text-fg-3">
-            {lbl}
-            <input
+          <Field key={k} label={lbl} htmlFor={`${id}-${k}`} className="justify-end">
+            <NumberInput
               id={`${id}-${k}`}
-              inputMode="numeric"
-              className="control h-9 w-20 text-sm"
-              value={txt[k]}
+              locale={locale}
+              value={cfg[k]}
+              min={LIMITS[k][0]}
+              max={LIMITS[k][1]}
+              step={LIMITS[k][2]}
               disabled={!editable}
-              onChange={(e) => {
-                const v = e.target.value.replace(/\D/g, "").slice(0, 4);
-                setTxt((x) => ({ ...x, [k]: v }));
+              onChange={(v) => {
+                setTxt((x) => ({ ...x, [k]: v === null ? "" : String(v) }));
                 if (status === "done") reset();
               }}
             />
-          </label>
+          </Field>
         ))}
-        <Switch label={t.beeps} checked={beeps} onChange={(e) => setBeeps(e.target.checked)} className="mb-1.5" />
-        <Button variant="ghost" size="sm" onClick={toggle} className="mb-0.5 ml-auto">
-          <Maximize2 aria-hidden />
-          {t.full}
-        </Button>
-      </div>
+        <Switch label={t.beeps} checked={beeps} onChange={(e) => setBeeps(e.target.checked)} className="col-span-full" />
+      </Panel>
     </div>
   );
 }

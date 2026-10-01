@@ -5,7 +5,7 @@ import type { Locale } from "@/i18n/config";
 import { Field, Textarea } from "@/ui/field";
 import { Segmented } from "@/ui/segmented";
 import { htaccess, nextjs, nginx, parsePairs, redirectIssues, type Code, type Server } from "./lib/redirects";
-import { Issues, Output } from "./ui/kit";
+import { Issues, Output, Split } from "./ui/kit";
 
 const SAMPLE = `/old-page /new-page
 /blog/2019/post.html /blog/post
@@ -19,7 +19,12 @@ const T = {
     code: "Код",
     codes: { 301: "301 — навсегда", 302: "302 — временно", 308: "308 — навсегда", 307: "307 — временно" } as Record<Code, string>,
     bad: (n: number) => `Строка ${n}: нужно ровно два адреса`,
-    issue: { chain: "цепочка редиректов — ведите сразу на конечный адрес", loop: "петля: адреса перенаправляют друг на друга", duplicate: "этот адрес уже перенаправляется выше", self: "адрес перенаправляет сам на себя" },
+    issue: {
+      chain: "цепочка редиректов — ведите сразу на конечный адрес",
+      loop: "петля: адреса перенаправляют друг на друга",
+      duplicate: "этот адрес уже перенаправляется выше",
+      self: "адрес перенаправляет сам на себя",
+    },
     line: (n: number) => `Строка ${n}: `,
     file: { htaccess: ".htaccess (Apache)", nginx: "nginx.conf", nextjs: "next.config.js" } as Record<Server, string>,
     where: {
@@ -58,33 +63,38 @@ export default function RedirectGenerator({ locale, server: initial = "htaccess"
   const problems = [...bad.map(t.bad), ...redirectIssues(pairs).map((i) => t.line(i.line) + t.issue[i.kind])];
 
   return (
-    <div className="flex flex-col gap-5">
-      <Field label={t.input} htmlFor={`${id}-i`} hint={t.hint}>
-        <Textarea id={`${id}-i`} value={text} onChange={(e) => setText(e.target.value)} rows={6} className="font-mono text-sm" spellCheck={false} />
-      </Field>
-      <div className="flex flex-wrap items-center gap-3">
-        <Segmented<Server>
-          label={t.server}
-          value={server}
-          onChange={setServer}
-          options={[
-            { value: "htaccess", label: ".htaccess" },
-            { value: "nginx", label: "nginx" },
-            { value: "nextjs", label: "Next.js" },
-          ]}
-        />
-        <Segmented<"301" | "302" | "308" | "307">
-          label={t.code}
-          value={String(code) as "301"}
-          onChange={(v) => setCode(Number(v) as Code)}
-          options={([301, 302, 308, 307] as const).map((c) => ({ value: String(c) as "301", label: String(c), title: t.codes[c] }))}
-        />
-      </div>
-      <div aria-live="polite">
-        <Issues items={problems} />
-      </div>
+    <Split
+      input={
+        <>
+          <Field label={t.input} htmlFor={`${id}-i`} hint={t.hint}>
+            <Textarea id={`${id}-i`} value={text} onChange={(e) => setText(e.target.value)} rows={8} className="font-mono text-sm" spellCheck={false} />
+          </Field>
+          <div className="flex flex-wrap items-center gap-3">
+            <Segmented<Server>
+              label={t.server}
+              value={server}
+              onChange={setServer}
+              options={[
+                { value: "htaccess", label: ".htaccess" },
+                { value: "nginx", label: "nginx" },
+                { value: "nextjs", label: "Next.js" },
+              ]}
+            />
+            <Segmented<"301" | "302" | "308" | "307">
+              label={t.code}
+              value={String(code) as "301"}
+              onChange={(v) => setCode(Number(v) as Code)}
+              options={([301, 302, 308, 307] as const).map((c) => ({ value: String(c) as "301", label: String(c), title: t.codes[c] }))}
+            />
+          </div>
+          <div aria-live="polite">
+            <Issues items={problems} />
+          </div>
+        </>
+      }
+    >
       <Output locale={locale} value={out} title={t.file[server]} rows={12} />
       <p className="text-sm text-fg-3">{t.where[server]}</p>
-    </div>
+    </Split>
   );
 }

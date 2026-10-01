@@ -1,13 +1,14 @@
 "use client";
 
-import { Crown } from "lucide-react";
+import { Crown, Users } from "lucide-react";
 import { useId, useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { count } from "@/i18n/format";
 import { Button } from "@/ui/button";
 import { CopyButton } from "@/ui/copy-button";
 import { linkHere, listHash, useSharedList } from "@/lib/share-link";
-import { Field, Select, Switch, Textarea } from "@/ui/field";
+import { Field, Switch, Textarea } from "@/ui/field";
+import { NumberInput } from "@/ui/number-input";
 import { ShareLink } from "@/ui/share-link";
 import { Panel, PanelHeader } from "@/ui/panel";
 import { shuffle } from "./lib/rng";
@@ -23,7 +24,7 @@ const MAX_PEOPLE = 500;
 
 const T = {
   ru: {
-    people: "Участники — по одному на строку",
+    people: "Имена — по одному на строку",
     personForms: ["участник", "участника", "участников"],
     teamForms: ["команда", "команды", "команд"],
     humanForms: ["человек", "человека", "человек"],
@@ -43,7 +44,7 @@ const T = {
     teamNames: ["Красные", "Синие", "Зелёные", "Жёлтые", "Оранжевые", "Фиолетовые", "Белые", "Чёрные", "Серебряные", "Золотые", "Молнии", "Кометы", "Тигры", "Волки", "Соколы", "Медведи", "Драконы", "Акулы", "Барсы", "Орлы"],
   },
   en: {
-    people: "Participants — one per line",
+    people: "Names — one per line",
     personForms: ["participant", "participants"],
     teamForms: ["team", "teams"],
     humanForms: ["person", "people"],
@@ -115,29 +116,22 @@ export default function Teams({ locale, teams: teams0 = 2 }: TeamsProps) {
     : "";
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)] lg:items-start">
       <Panel className="flex flex-col gap-4 p-4 sm:p-5">
-        <Field label={t.people} htmlFor={`${id}-p`} aside={<span className="tabular text-[0.8125rem] text-fg-3">{count(locale, people.length, t.personForms)}</span>}>
+        <Field label={t.people} htmlFor={`${id}-p`} aside={<span className="tabular shrink-0 whitespace-nowrap text-[0.8125rem] text-fg-3">{count(locale, people.length, t.personForms)}</span>}>
           <Textarea id={`${id}-p`} value={text} rows={8} onChange={(e) => setText(e.target.value)} className="font-sans! text-[0.9375rem]!" />
         </Field>
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
-          <Field label={t.teams} htmlFor={`${id}-k`} className="sm:w-48">
-            <Select id={`${id}-k`} value={teamCount} onChange={(e) => setTeamCount(Number(e.target.value))}>
-              {Array.from({ length: 19 }, (_, i) => (
-                <option key={i + 2} value={i + 2}>
-                  {count(locale, i + 2, t.teamForms)}
-                </option>
-              ))}
-            </Select>
-          </Field>
-          <div className="flex flex-wrap gap-x-6 gap-y-2 sm:mb-2">
-            <Switch label={t.captains} checked={captains} onChange={(e) => setCaptains(e.target.checked)} />
-            <Switch label={t.names} checked={named} onChange={(e) => setNamed(e.target.checked)} />
-          </div>
+        <Field label={t.teams} htmlFor={`${id}-k`} className="w-44">
+          <NumberInput id={`${id}-k`} locale={locale} min={2} max={20} value={teamCount} onChange={(v) => v !== null && setTeamCount(v)} />
+        </Field>
+        <div className="flex flex-wrap gap-x-6 gap-y-2">
+          <Switch label={t.captains} checked={captains} onChange={(e) => setCaptains(e.target.checked)} />
+          <Switch label={t.names} checked={named} onChange={(e) => setNamed(e.target.checked)} />
         </div>
         {summary && <p className="tabular text-sm text-fg-2">{summary}</p>}
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-          <Button variant="primary" size="lg" onClick={split} className="w-full sm:w-auto sm:min-w-56">
+          <Button variant="filled" size="xl" onClick={split} className="w-full sm:w-auto sm:min-w-64">
+            <Users aria-hidden />
             {t.split}
           </Button>
           <ShareLink locale={locale} url={() => linkHere({ hash: listHash("p", people) })} className="self-center sm:ml-auto" />
@@ -151,12 +145,12 @@ export default function Teams({ locale, teams: teams0 = 2 }: TeamsProps) {
 
       <Panel>
         <PanelHeader title={t.result} actions={result && <CopyButton value={asText} label={t.copy} copiedLabel={t.copied} variant="ghost" />} />
-        {!result && <p className="px-4 py-4 text-sm text-fg-3">{t.idle}</p>}
+        {!result && <p className="px-4 py-10 text-center text-sm text-fg-3">{t.idle}</p>}
         <div aria-live="polite">
           {result && (
-            <ul className="grid gap-3 p-4 sm:grid-cols-2 lg:grid-cols-3">
+            <ul key={result.names.join("|") + result.teams[0]?.members.join("|")} className="grid grid-cols-[repeat(auto-fill,minmax(min(100%,14rem),1fr))] gap-3 p-4 motion-safe:animate-[menu-in_0.25s_ease-out]">
               {result.teams.map((tm, i) => (
-                <li key={i} className="rounded-[0.625rem] border border-line bg-surface-2 p-3">
+                <li key={i} className="rounded-[1rem] bg-surface-2 p-3">
                   <h3 className="mb-2 flex items-baseline justify-between gap-2 font-semibold text-fg">
                     <span className="min-w-0 break-words">{title(i)}</span>
                     <span className="tabular shrink-0 text-[0.8125rem] font-normal text-fg-3">{count(locale, tm.members.length, t.humanForms)}</span>

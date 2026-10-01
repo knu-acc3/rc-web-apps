@@ -4,9 +4,9 @@ import { useId } from "react";
 import type { ToolProps } from "../../../types";
 import { LineChart } from "../../shared/charts";
 import { plural } from "@/i18n/format";
-import { CURRENCIES, CURRENCY_SYMBOL, fmtCompact, fmtMoney, fmtN, isCurrency, type Currency } from "../../shared/fmt";
+import { CURRENCIES, CURRENCY_SYMBOL, fmtCompact, fmtMoney, fmtN, isCurrency, moneyMax, type Currency } from "../../shared/fmt";
 import { field, toInput } from "../../shared/num";
-import { Advanced, CalcGrid, DataTable, Disclaimer, Explain, FieldRow, NumField, OptionsRow, ResultMain, Stack, SubHeading, ToolActions } from "../../shared/ui";
+import { Advanced, CalcGrid, DataTable, Disclaimer, Explain, NumSlider, OptionsRow, ResultMain, Stack, SubHeading, ToolActions, SliderRow } from "../../shared/ui";
 import { useQueryState } from "../../shared/url-state";
 import { invest } from "../lib/growth";
 import { CurrencySelect } from "../loan/parts";
@@ -15,13 +15,12 @@ const T = {
   ru: {
     initial: "Начальная сумма",
     monthly: "Взнос каждый месяц",
-    rate: "Доходность, % в год",
-    rateHint: "Может быть отрицательной",
-    years: "Срок, лет",
+    rate: "Доходность в год",
+    years: "Срок",
     more: "Комиссии, инфляция и рост взносов",
-    fee: "Комиссии, % в год",
-    inflation: "Инфляция, % в год",
-    increase: "Рост взноса, % в год",
+    fee: "Комиссии в год",
+    inflation: "Инфляция в год",
+    increase: "Рост взноса в год",
     final: "Капитал через",
     yearForms: ["год", "года", "лет"],
     subReal: (v: string) => `в сегодняшних деньгах — ${v}`,
@@ -40,13 +39,12 @@ const T = {
   en: {
     initial: "Initial investment",
     monthly: "Monthly contribution",
-    rate: "Return, % per year",
-    rateHint: "Can be negative",
-    years: "Term, years",
+    rate: "Return per year",
+    years: "Term",
     more: "Fees, inflation and contribution growth",
-    fee: "Fees, % per year",
-    inflation: "Inflation, % per year",
-    increase: "Contribution growth, % per year",
+    fee: "Fees per year",
+    inflation: "Inflation per year",
+    increase: "Contribution growth per year",
     final: "Portfolio after",
     yearForms: ["year", "years"],
     subReal: (v: string) => `in today's money — ${v}`,
@@ -98,23 +96,21 @@ export default function Investment({
 
   const inputs = (
     <>
-      <FieldRow>
-        <NumField id={`${id}-i`} label={t.initial} value={q.v.i} onChange={(i) => q.set({ i })} suffix={sym} error={I.message} size="lg" />
-        <NumField id={`${id}-m`} label={t.monthly} value={q.v.m} onChange={(m) => q.set({ m })} suffix={sym} error={M.message} size="lg" />
-      </FieldRow>
-      <FieldRow>
-        <NumField id={`${id}-r`} label={t.rate} value={q.v.r} onChange={(r) => q.set({ r })} suffix="%" error={R.message} hint={t.rateHint} />
-        <NumField id={`${id}-y`} label={t.years} value={q.v.y} onChange={(y) => q.set({ y })} error={Y.message} />
-      </FieldRow>
+      <NumSlider id={`${id}-i`} locale={locale} label={t.initial} value={q.v.i} onChange={(i) => q.set({ i })} suffix={sym} error={I.message} min={0} max={moneyMax(cur, 100_000_000)} scale="log" />
+      <NumSlider id={`${id}-m`} locale={locale} label={t.monthly} value={q.v.m} onChange={(m) => q.set({ m })} suffix={sym} error={M.message} min={0} max={moneyMax(cur, 2_000_000)} scale="log" />
+      <SliderRow>
+        <NumSlider id={`${id}-r`} locale={locale} label={t.rate} value={q.v.r} onChange={(r) => q.set({ r })} suffix="%" error={R.message} min={0} max={30} decimals={1} />
+        <NumSlider id={`${id}-y`} locale={locale} label={t.years} value={q.v.y} onChange={(y) => q.set({ y })} suffix={plural(locale, Y.value ?? 5, t.yearForms)} error={Y.message} min={1} max={50} />
+      </SliderRow>
       <OptionsRow>
-        <CurrencySelect id={`${id}-c`} locale={locale} value={cur} onChange={(c) => q.set({ c })} />
+        <CurrencySelect locale={locale} value={cur} onChange={(c) => q.set({ c })} />
       </OptionsRow>
       <Advanced title={t.more} open={!!(q.v.f || q.v.g)}>
-        <FieldRow>
-          <NumField id={`${id}-n`} label={t.inflation} value={q.v.n} onChange={(n) => q.set({ n })} suffix="%" error={N.message} placeholder="0" />
-          <NumField id={`${id}-f`} label={t.fee} value={q.v.f} onChange={(f) => q.set({ f })} suffix="%" error={F.message} placeholder="0" />
-        </FieldRow>
-        <NumField id={`${id}-g`} label={t.increase} value={q.v.g} onChange={(g) => q.set({ g })} suffix="%" error={G.message} placeholder="0" />
+        <SliderRow>
+          <NumSlider id={`${id}-n`} locale={locale} label={t.inflation} value={q.v.n} onChange={(n) => q.set({ n })} suffix="%" error={N.message} min={0} max={30} decimals={1} />
+          <NumSlider id={`${id}-f`} locale={locale} label={t.fee} value={q.v.f} onChange={(f) => q.set({ f })} suffix="%" error={F.message} min={0} max={5} decimals={2} />
+        </SliderRow>
+        <NumSlider id={`${id}-g`} locale={locale} label={t.increase} value={q.v.g} onChange={(g) => q.set({ g })} suffix="%" error={G.message} min={0} max={30} decimals={1} />
       </Advanced>
     </>
   );

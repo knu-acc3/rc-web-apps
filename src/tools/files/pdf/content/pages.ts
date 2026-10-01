@@ -27,13 +27,13 @@ export const mergeTool: ToolDef = {
     ru: [
       "Перетащите PDF-файлы в поле или выберите их — можно сразу несколько.",
       "Расставьте файлы стрелками; у каждого файла можно указать страницы, например «1-3, 5».",
-      "Чтобы переставить отдельные страницы, нажмите «Упорядочить страницы» и перетащите миниатюры.",
+      "Чтобы переставить отдельные страницы, переключитесь на «Страницы» и перетащите миниатюры.",
       "Нажмите «Объединить» и скачайте готовый PDF.",
     ],
     en: [
       "Drop PDF files into the box or choose them — several at once is fine.",
       "Order the files with the arrows; for each file you can list pages, e.g. “1-3, 5”.",
-      "To reorder individual pages, click “Arrange pages” and drag the thumbnails.",
+      "To reorder individual pages, switch to “Pages” and drag the thumbnails.",
       "Click “Merge” and download the combined PDF.",
     ],
   },
@@ -54,14 +54,14 @@ export const mergeTool: ToolDef = {
       { q: "Сколько файлов и какого размера можно объединить?", a: "Искусственных лимитов нет — всё зависит от памяти устройства. На компьютере спокойно объединяются сотни страниц и файлы по 100–200 МБ, на телефоне разумно держаться в пределах 50–100 МБ." },
       { q: "Сохранятся ли закладки и поля форм?", a: "Страницы, текст, картинки и ссылки внутри страниц сохраняются. Оглавление (закладки) исходных файлов и интерактивные поля форм при объединении не переносятся — формы лучше заполнить и «сплющить» заранее." },
       { q: "Можно ли объединить PDF, защищённый паролем?", a: "Да, если вы знаете пароль: введите его в строке файла. Без пароля страницы зашифрованы, и получить их содержимое нельзя." },
-      { q: "Как расставить страницы в нужном порядке?", a: "Укажите диапазон в поле «Страницы» (например, «3, 1-2») или включите «Упорядочить страницы» и перетащите миниатюры мышью; с клавиатуры — Alt и стрелки." },
+      { q: "Как расставить страницы в нужном порядке?", a: "Укажите диапазон в поле «Страницы» (например, «3, 1-2») или переключитесь на «Страницы» и перетащите миниатюры мышью; с клавиатуры — Alt и стрелки." },
       PRIVACY_QA.ru,
     ],
     [
       { q: "How many files, and how large, can I merge?", a: "There are no artificial limits — it depends on your device's memory. A computer handles hundreds of pages and 100–200 MB files; on a phone, stay around 50–100 MB." },
       { q: "Are bookmarks and form fields kept?", a: "Pages, text, images and in-page links are kept. The outlines (bookmarks) of the source files and interactive form fields are not carried over — fill and flatten forms beforehand." },
       { q: "Can I merge a password-protected PDF?", a: "Yes, if you know the password: enter it in the file's row. Without it the pages are encrypted and their content can't be read." },
-      { q: "How do I put pages in a specific order?", a: "Type a range in the “Pages” field (e.g. “3, 1-2”) or switch to “Arrange pages” and drag the thumbnails; on the keyboard use Alt plus the arrow keys." },
+      { q: "How do I put pages in a specific order?", a: "Type a range in the “Pages” field (e.g. “3, 1-2”) or switch to “Pages” and drag the thumbnails; on the keyboard use Alt plus the arrow keys." },
       PRIVACY_QA.en,
     ],
   ),
@@ -317,8 +317,8 @@ export const organizeTool: ToolDef = {
   lead: { ru: "Перетаскивайте миниатюры страниц — порядок в файле будет таким же.", en: "Drag page thumbnails — the file will follow the same order." },
   keywords: { ru: ["поменять страницы местами pdf", "переставить страницы pdf", "изменить порядок страниц pdf"], en: ["rearrange pdf pages", "reorder pdf", "sort pdf pages"] },
   howTo: {
-    ru: ["Откройте PDF — появятся миниатюры всех страниц.", "Перетащите страницы мышью или выберите их и двигайте Alt+стрелками.", "Поверните, удалите или продублируйте выбранные страницы кнопками над миниатюрами.", "Нажмите «Сохранить PDF»."],
-    en: ["Open a PDF — thumbnails of all pages appear.", "Drag pages with the mouse, or select them and move with Alt+arrow keys.", "Rotate, delete or duplicate the selected pages with the buttons above the thumbnails.", "Click “Save PDF”."],
+    ru: ["Откройте PDF — появятся миниатюры всех страниц.", "Перетащите страницы или выберите их и двигайте стрелками на панели (или Alt+стрелками).", "Поверните, удалите или продублируйте выбранные страницы кнопками на панели.", "Нажмите «Сохранить PDF»."],
+    en: ["Open a PDF — thumbnails of all pages appear.", "Drag pages, or select them and move them with the arrow buttons (or Alt+arrow keys).", "Rotate, delete or duplicate the selected pages with the buttons on the panel.", "Click “Save PDF”."],
   },
   about: {
     ru: [
@@ -335,13 +335,13 @@ export const organizeTool: ToolDef = {
   faq: faq(
     [
       { q: "Как поменять две страницы местами?", a: "Перетащите одну страницу на место другой или выделите её и нажимайте Alt+← / Alt+→." },
-      { q: "Как развернуть порядок страниц?", a: "Нажмите «Обратный порядок» над миниатюрами — последняя страница станет первой." },
+      { q: "Как развернуть порядок страниц?", a: "Нажмите «Обратный порядок» на панели — последняя страница станет первой." },
       { q: "Сохранятся ли закладки?", a: "Страницы, текст и ссылки внутри страниц сохраняются, название и автор — тоже. Оглавление (закладки) при перестановке не переносится, потому что ссылается на старый порядок." },
       PRIVACY_QA.ru,
     ],
     [
       { q: "How do I swap two pages?", a: "Drag one page onto the other's place, or select it and press Alt+← / Alt+→." },
-      { q: "How do I reverse the page order?", a: "Click “Reverse order” above the thumbnails — the last page becomes the first." },
+      { q: "How do I reverse the page order?", a: "Click “Reverse order” on the panel — the last page becomes the first." },
       { q: "Are bookmarks kept?", a: "Pages, text and in-page links are kept, and so are the title and author. The outline (bookmarks) is not carried over because it points to the old order." },
       PRIVACY_QA.en,
     ],

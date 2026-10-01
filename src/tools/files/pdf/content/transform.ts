@@ -215,11 +215,11 @@ export const cropTool: ToolDef = {
     ru: "Обрежьте поля страниц PDF: задайте отступы в миллиметрах или уберите белые поля автоматически. Удобно для чтения на телефоне и электронной книге.",
     en: "Crop the margins of PDF pages: set them in millimetres or trim white margins automatically. Handy for reading on a phone or e-reader.",
   },
-  lead: { ru: "Укажите, сколько отрезать с каждого края, или нажмите «Обрезать белые поля автоматически».", en: "Set how much to cut from each edge, or press Trim white margins automatically." },
+  lead: { ru: "Укажите, сколько отрезать с каждого края, или нажмите «Обрезать белые поля».", en: "Set how much to cut from each edge, or press Trim white margins." },
   keywords: { ru: ["обрезать pdf", "обрезать поля pdf", "убрать поля pdf", "кадрировать pdf"], en: ["crop pdf", "trim pdf margins", "remove white margins pdf"] },
   howTo: {
-    ru: ["Откройте PDF-файл.", "Задайте поля в миллиметрах или нажмите «Обрезать белые поля автоматически» — каждая страница обрежется по своему содержимому.", "Проверьте предпросмотр и нажмите «Обрезать PDF»."],
-    en: ["Open a PDF file.", "Set the margins in millimetres or press Trim white margins automatically — each page is trimmed to its own content.", "Check the preview and press Crop PDF."],
+    ru: ["Откройте PDF-файл.", "Задайте поля в миллиметрах или нажмите «Обрезать белые поля» — каждая страница обрежется по своему содержимому.", "Проверьте предпросмотр и нажмите «Обрезать PDF»."],
+    en: ["Open a PDF file.", "Set the margins in millimetres or press Trim white margins — each page is trimmed to its own content.", "Check the preview and press Crop PDF."],
   },
   about: {
     ru: [
@@ -237,13 +237,13 @@ export const cropTool: ToolDef = {
     [
       { q: "Уменьшится ли размер файла?", a: "Нет: обрезанная часть скрывается, но остаётся в файле. Чтобы уменьшить размер, сожмите PDF." },
       { q: "Можно ли обрезать только некоторые страницы?", a: "Да, укажите их в поле «Страницы», например «1, 3-5»." },
-      { q: "Как обрезать PDF для электронной книги?", a: "Нажмите «Обрезать белые поля автоматически»: текст займёт весь экран и станет крупнее." },
+      { q: "Как обрезать PDF для электронной книги?", a: "Нажмите «Обрезать белые поля»: текст займёт весь экран и станет крупнее." },
       PRIVACY_QA.ru,
     ],
     [
       { q: "Will the file get smaller?", a: "No: the cut-off part is hidden but stays in the file. Compress the PDF to reduce its size." },
       { q: "Can I crop only some pages?", a: "Yes, list them in the Pages field, e.g. “1, 3-5”." },
-      { q: "How do I crop a PDF for an e-reader?", a: "Press Trim white margins automatically: text fills the screen and looks bigger." },
+      { q: "How do I crop a PDF for an e-reader?", a: "Press Trim white margins: text fills the screen and looks bigger." },
       PRIVACY_QA.en,
     ],
   ),

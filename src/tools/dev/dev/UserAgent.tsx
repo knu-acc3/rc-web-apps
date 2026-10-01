@@ -2,8 +2,10 @@
 
 import { useEffect, useId, useState } from "react";
 import type { Locale } from "@/i18n/config";
-import { Field, Select, Textarea } from "@/ui/field";
+import { Button } from "@/ui/button";
+import { Field, Textarea } from "@/ui/field";
 import { Badge, Panel } from "@/ui/panel";
+import { ScrollRow } from "@/ui/scroll-row";
 import { detectBot, type BotKind } from "./data/bots";
 import { UA_EXAMPLES } from "./data/ua-examples";
 
@@ -11,7 +13,6 @@ const T = {
   ru: {
     ua: "Строка User-Agent",
     examples: "Примеры",
-    choose: "Выберите пример…",
     browser: "Браузер",
     engine: "Движок",
     os: "ОС",
@@ -32,7 +33,6 @@ const T = {
   en: {
     ua: "User-Agent string",
     examples: "Examples",
-    choose: "Choose an example…",
     browser: "Browser",
     engine: "Engine",
     os: "OS",
@@ -152,35 +152,22 @@ export default function UserAgent({ locale, sample }: { locale: Locale; sample: 
     );
 
   return (
-    <div className="flex flex-col gap-4">
-      <Panel className="p-4 sm:p-6">
+    <div className="grid items-start gap-4 lg:grid-cols-2">
+      <Panel className="min-w-0 p-4 sm:p-6">
         <Field label={t.ua} htmlFor={`${id}-ua`}>
           <Textarea id={`${id}-ua`} value={ua} onChange={(e) => setUa(e.target.value)} rows={3} className="min-h-0!" />
         </Field>
-        <div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-fg-2">
-          <label className="flex items-center gap-2">
-            {t.examples}
-            <Select
-              size="sm"
-              className="w-56"
-              value=""
-              onChange={(e) => {
-                if (e.target.value) setUa(e.target.value);
-              }}
-            >
-              <option value="">{t.choose}</option>
-              {UA_EXAMPLES.map(([n, v]) => (
-                <option key={n} value={v}>
-                  {n}
-                </option>
-              ))}
-            </Select>
-          </label>
-        </div>
+        <ScrollRow label={t.examples} className="mt-2" rowClassName="gap-2">
+          {UA_EXAMPLES.map(([n, v]) => (
+            <button key={n} type="button" aria-pressed={ua.trim() === v} className="chip shrink-0" onClick={() => setUa(v)}>
+              {n}
+            </button>
+          ))}
+        </ScrollRow>
         {ua.trim() && (
           <div className="mt-5 flex flex-col gap-4" aria-live="polite">
             <div className="flex flex-wrap items-center gap-2">
-              {bot ? <Badge tone="warn">{`${t.bot}: ${bot.name} — ${t.kinds[bot.kind]}`}</Badge> : <Badge tone="ok">{t.notBot}</Badge>}
+              {bot ? <Badge tone="warn" className="text-sm!">{`${t.bot}: ${bot.name} — ${t.kinds[bot.kind]}`}</Badge> : <Badge tone="ok" className="text-sm!">{t.notBot}</Badge>}
             </div>
             {res ? table(res) : <p className="text-sm text-fg-3">{t.loading}</p>}
             {bot && <p className="text-[0.8125rem] text-fg-3">{t.spoof}</p>}
@@ -188,12 +175,12 @@ export default function UserAgent({ locale, sample }: { locale: Locale; sample: 
         )}
       </Panel>
 
-      <Panel className="p-4 sm:p-6">
+      <Panel className="min-w-0 p-4 sm:p-6">
         <h2 className="text-base font-semibold text-fg">{t.yours}</h2>
         <p className="mt-1 text-[0.8125rem] text-fg-3">{t.yoursHint}</p>
         {mine && (
           <>
-            <code className="mt-3 block rounded-[0.5rem] bg-surface-2 px-3 py-2 font-mono text-[0.8125rem] break-all text-fg">{mine.ua}</code>
+            <code className="mt-3 block rounded-[1rem] bg-surface-2 px-4 py-3 font-mono text-[0.8125rem] break-all text-fg">{mine.ua}</code>
             <div className="mt-3">{parser && table(parser(mine.ua))}</div>
             <div className="mt-3 text-sm">
               <span className="text-fg-3">{t.hints}: </span>
@@ -207,9 +194,9 @@ export default function UserAgent({ locale, sample }: { locale: Locale; sample: 
                 <span className="text-fg-2">{t.notSupported}</span>
               )}
             </div>
-            <button type="button" className="mt-3 text-sm text-accent hover:underline" onClick={() => setUa(mine.ua)}>
+            <Button variant="tonal" size="sm" className="mt-4" onClick={() => setUa(mine.ua)}>
               {t.use}
-            </button>
+            </Button>
           </>
         )}
       </Panel>

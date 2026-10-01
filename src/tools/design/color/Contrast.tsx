@@ -4,7 +4,7 @@ import { ArrowUpDown, Check, X } from "lucide-react";
 import { useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { cn } from "@/lib/cn";
-import { Button } from "@/ui/button";
+import { Button, IconButton } from "@/ui/button";
 import { Badge, Notice, Panel, PanelHeader } from "@/ui/panel";
 import {
   adjustToContrast,
@@ -122,19 +122,16 @@ export default function ContrastChecker({ locale, fg: fg0 = "#6363F8", bg: bg0 =
       <Panel className="p-4 sm:p-5">
         <div className="grid items-end gap-3 md:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)]">
           <ColorField label={t.fg} value={fgText} onChange={setFg} locale={locale} size="lg" />
-          <Button
-            variant="outline"
-            size="icon"
+          <IconButton
+            variant="tonal"
             onClick={() => {
               setFg(bgText);
               setBg(fgText);
             }}
-            aria-label={t.swap}
-            title={t.swap}
+            label={t.swap}
+            icon={<ArrowUpDown aria-hidden />}
             className="mx-auto md:mb-1 md:rotate-90"
-          >
-            <ArrowUpDown />
-          </Button>
+          />
           <ColorField label={t.bg} value={bgText} onChange={setBg} locale={locale} size="lg" />
         </div>
       </Panel>
@@ -159,20 +156,20 @@ function Results({ fg, bg, t, onFg, onBg }: { fg: Color; bg: Color; t: Dict; onF
       <div className="flex min-w-0 flex-col gap-4">
         <Panel className="p-4 sm:p-5">
           <div className="text-sm font-medium text-fg-2">{t.ratio}</div>
-          <p className="tabular mt-1 text-4xl font-bold tracking-tight text-fg sm:text-5xl" aria-live="polite">
+          <p className="tabular mt-1 text-5xl font-bold tracking-tight text-fg sm:text-6xl" aria-live="polite">
             {formatRatio(ratio)}:1
             <span className="sr-only">
               {" "}
               — {t.checks.aaNormal}: {checks.aaNormal ? t.pass : t.fail}
             </span>
           </p>
-          <ul className="mt-4 divide-y divide-line rounded-[0.625rem] border border-line">
+          <ul className="mt-4 grid gap-1">
             {CHECKS.map((k) => (
-              <li key={k} className="flex items-center justify-between gap-3 px-3 py-2">
+              <li key={k} className="flex min-h-11 items-center justify-between gap-3 rounded-[0.75rem] bg-surface-2 px-3 py-1.5">
                 <span className="min-w-0 text-[0.9375rem] text-fg">
-                  {t.checks[k]} <span className="text-sm text-fg-3">· {t.need} {WCAG_THRESHOLDS[k]}:1</span>
+                  {t.checks[k]} <span className="block text-sm text-fg-3">{t.need} {WCAG_THRESHOLDS[k]}:1</span>
                 </span>
-                <Badge tone={checks[k] ? "ok" : "err"}>
+                <Badge tone={checks[k] ? "ok" : "err"} className="shrink-0 whitespace-nowrap">
                   {checks[k] ? <Check className="size-3.5" aria-hidden /> : <X className="size-3.5" aria-hidden />}
                   {checks[k] ? t.pass : t.fail}
                 </Badge>
@@ -196,7 +193,7 @@ function Results({ fg, bg, t, onFg, onBg }: { fg: Color; bg: Color; t: Dict; onF
               <p className="text-base">{t.normal}</p>
               <p className="text-2xl">{t.large}</p>
               <p className="text-[1.1663rem] font-bold">{t.bold}</p>
-              <span className="inline-flex w-fit items-center rounded-[0.5rem] border-2 px-4 py-1.5 font-medium" style={{ borderColor: toHex(fg) }}>
+              <span className="inline-flex w-fit items-center rounded-full border-2 px-5 py-2 font-medium" style={{ borderColor: toHex(fg) }}>
                 {t.button}
               </span>
             </div>
@@ -224,14 +221,14 @@ function Fixes({ fg, bg, t, onFg, onBg }: { fg: Color; bg: Color; t: Dict; onFg:
   return (
     <Panel>
       <PanelHeader title={t.fix} />
-      <ul className="divide-y divide-line">
+      <ul className="flex flex-col gap-1 p-2">
         {rows.map((r, i) => {
           const orig = r.apply === onFg ? flat.fg : flat.bg;
           return (
-            <li key={i} className="flex items-center gap-3 px-4 py-2.5">
+            <li key={i} className="flex items-center gap-3 rounded-[0.75rem] px-2 py-2 transition-colors hover:bg-surface-2">
               {r.color ? (
                 <>
-                  <Swatch color={toHex(r.color)} className="size-9 shrink-0" />
+                  <Swatch color={toHex(r.color)} className="size-10 shrink-0" />
                   <span className="min-w-0 flex-1 text-[0.9375rem]">
                     <span className="text-fg">
                       {r.label} {lighterOrDarker(orig, r.color)}: <code className="font-mono">{toHex(r.color)}</code>
@@ -240,7 +237,7 @@ function Fixes({ fg, bg, t, onFg, onBg }: { fg: Color; bg: Color; t: Dict; onFg:
                       {formatRatio(r.apply === onFg ? contrastRatio(r.color, flat.bg) : contrastRatio(flat.fg, r.color))}:1 · ≥ {r.target}:1
                     </span>
                   </span>
-                  <Button size="sm" variant="outline" onClick={() => r.apply(toHex(r.color!))}>
+                  <Button size="sm" variant="tonal" onClick={() => r.apply(toHex(r.color!))}>
                     {t.apply}
                   </Button>
                 </>

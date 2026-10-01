@@ -3,9 +3,10 @@
 import { useId, useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { formatNumber, parseNumber } from "@/i18n/format";
-import { Field, Input, Select } from "@/ui/field";
 import { Panel } from "@/ui/panel";
+import { ScrollRow } from "@/ui/scroll-row";
 import { Segmented } from "@/ui/segmented";
+import { SliderField } from "@/ui/slider-field";
 import { ResultTiles, plainSpaces, type Tile } from "../ui/kit";
 import { FOOT_RANGE, SHOE_SYSTEMS, footFrom, sizeIn, sizeOptions, type ShoeGroup, type ShoeSystem } from "./engine";
 import { GROUP_LABEL, SYSTEM_LABEL, shoeLabel } from "./format";
@@ -97,54 +98,52 @@ export default function ShoeSize({ locale, group: g0 = "men", system: s0 = "eu",
 
   return (
     <Panel className="p-4 sm:p-6">
-      <Segmented
-        size="sm"
-        label={t.group}
-        value={group}
-        onChange={changeGroup}
-        options={GROUPS.map((x) => ({ value: x, label: GROUP_LABEL[locale][x] }))}
-      />
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-3">
+        <Segmented label={t.group} value={group} onChange={changeGroup} options={GROUPS.map((x) => ({ value: x, label: GROUP_LABEL[locale][x] }))} />
+        <Segmented size="sm" label={t.system} value={system} onChange={changeSystem} options={SHOE_SYSTEMS.map((x) => ({ value: x, label: SYSTEM_LABEL[locale][x] }))} />
+      </div>
 
-      <div className="mt-4 grid grid-cols-2 gap-3 sm:max-w-md">
-        <Field label={t.system} htmlFor={`${id}-s`}>
-          <Select id={`${id}-s`} value={system} onChange={(e) => changeSystem(e.target.value as ShoeSystem)} size="lg">
-            {SHOE_SYSTEMS.map((s) => (
-              <option key={s} value={s}>
-                {SYSTEM_LABEL[locale][s]}
-              </option>
-            ))}
-          </Select>
-        </Field>
+      <div className="mt-5 grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:items-start lg:gap-8">
         {system === "cm" ? (
-          <Field label={t.foot} htmlFor={`${id}-v`} error={cmText.trim() && !cmOk ? t.range(n1(lo), n1(hi)) : undefined}>
-            <Input
-              id={`${id}-v`}
-              inputMode="decimal"
-              autoComplete="off"
-              value={cmText}
-              onChange={(e) => setCmText(e.target.value)}
-              aria-invalid={!!cmText.trim() && !cmOk}
-              size="lg"
-              className="tabular"
-            />
-          </Field>
+          <SliderField
+            id={`${id}-v`}
+            label={t.foot}
+            value={cmText}
+            onChange={setCmText}
+            parse={(x) => parseNumber(x)}
+            format={n1}
+            min={lo}
+            max={hi}
+            step={0.5}
+            error={cmText.trim() && !cmOk ? t.range(n1(lo), n1(hi)) : undefined}
+          />
         ) : (
-          <Field label={t.size} htmlFor={`${id}-v`}>
-            <Select id={`${id}-v`} value={String(current)} onChange={(e) => setFoot(footFrom(system, Number(e.target.value), group))} size="lg">
+          <div className="min-w-0">
+            <div className="mb-1 text-sm font-medium text-fg-2">
+              {t.size} {SYSTEM_LABEL[locale][system]}
+            </div>
+            <ScrollRow label={t.size} role="radiogroup" rowClassName="gap-1.5">
               {options.map((v) => (
-                <option key={v} value={String(v)}>
+                <button
+                  key={v}
+                  type="button"
+                  role="radio"
+                  aria-checked={v === current}
+                  onClick={() => setFoot(footFrom(system, v, group))}
+                  className="chip tabular min-w-12 justify-center text-base!"
+                >
                   {shoeLabel(locale, system, v, group)}
-                </option>
+                </button>
               ))}
-            </Select>
-          </Field>
+            </ScrollRow>
+          </div>
         )}
-      </div>
 
-      <div className="mt-5" aria-live="polite">
-        {tiles.length > 0 && <ResultTiles items={tiles} />}
+        <div className="min-w-0" aria-live="polite">
+          {tiles.length > 0 && <ResultTiles items={tiles} />}
+        </div>
       </div>
-      <p className="mt-4 text-sm text-fg-3">{group === "kids" ? t.noteKids : t.note}</p>
+      <p className="mt-5 text-sm text-fg-3">{group === "kids" ? t.noteKids : t.note}</p>
     </Panel>
   );
 }

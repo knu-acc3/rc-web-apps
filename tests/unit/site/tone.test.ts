@@ -23,6 +23,9 @@ describe("section tones", () => {
       expect(contrast("#0f1012", t["--t-acc-d"]), "dark text on dark accent").toBeGreaterThanOrEqual(4.5);
       expect(contrast(t["--t-acc-d"], t["--t-stage-d"]), "dark accent on dark stage").toBeGreaterThanOrEqual(4.5);
       expect(contrast(t["--t-acc-d"], t["--t-soft-d"]), "dark accent on dark soft").toBeGreaterThanOrEqual(4.5);
+      expect(contrast(t["--t-on-cont"], t["--t-cont"]), "text on tonal container").toBeGreaterThanOrEqual(4.5);
+      expect(contrast(t["--t-on-cont-d"], t["--t-cont-d"]), "dark text on dark tonal container").toBeGreaterThanOrEqual(4.5);
+      expect(contrast(t["--t-cont"], "#ffffff"), "tonal container visible on white").toBeGreaterThanOrEqual(1.2);
     });
   }
 });

@@ -4,19 +4,19 @@ import { useId, useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { parseNumber } from "@/i18n/format";
 import { CopyButton } from "@/ui/copy-button";
-import { Input, Slider } from "@/ui/field";
 import { Notice, Panel } from "@/ui/panel";
+import { SliderField } from "@/ui/slider-field";
 import { round } from "./lib/tokens";
 import { clampAt, fluidClamp, type ClampInput } from "./lib/units";
-import { CodePanel } from "./ui/kit";
+import { CodePanel, NumberSlider } from "./ui/kit";
 
 const T = {
   ru: {
-    minSize: "Размер на узком экране, px",
-    maxSize: "Размер на широком экране, px",
-    minVw: "Ширина узкого экрана, px",
-    maxVw: "Ширина широкого экрана, px",
-    root: "Базовый шрифт, px",
+    minSize: "Размер на узком экране",
+    maxSize: "Размер на широком экране",
+    minVw: "Ширина узкого экрана",
+    maxVw: "Ширина широкого экрана",
+    root: "Базовый шрифт",
     preview: "Предпросмотр на ширине",
     sample: "Заголовок меняет размер плавно",
     size: (px: string) => `${px} px`,
@@ -26,11 +26,11 @@ const T = {
     table: "Размер на разных экранах",
   },
   en: {
-    minSize: "Size on a narrow screen, px",
-    maxSize: "Size on a wide screen, px",
-    minVw: "Narrow screen width, px",
-    maxVw: "Wide screen width, px",
-    root: "Root font size, px",
+    minSize: "Size on a narrow screen",
+    maxSize: "Size on a wide screen",
+    minVw: "Narrow screen width",
+    maxVw: "Wide screen width",
+    root: "Root font size",
     preview: "Preview at width",
     sample: "This heading scales smoothly",
     size: (px: string) => `${px}px`,
@@ -43,6 +43,8 @@ const T = {
 
 const FIELDS = ["minSize", "maxSize", "minVw", "maxVw", "root"] as const;
 type Key = (typeof FIELDS)[number];
+/** Slider ranges; typed values may go past them. */
+const RANGE: Record<Key, [number, number]> = { minSize: [8, 96], maxSize: [8, 160], minVw: [320, 1280], maxVw: [768, 2560], root: [10, 24] };
 
 export default function ClampGenerator({ locale }: { locale: Locale }) {
   const t = T[locale];
@@ -57,35 +59,35 @@ export default function ClampGenerator({ locale }: { locale: Locale }) {
 
   return (
     <div className="flex flex-col gap-4">
-      <Panel className="p-4 sm:p-5">
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
+      <Panel className="flex flex-col gap-5 p-4 sm:p-5">
+        <div className="grid gap-x-8 gap-y-4 sm:grid-cols-2 xl:grid-cols-3">
           {FIELDS.map((k) => (
-            <div key={k} className="flex flex-col gap-1">
-              <label htmlFor={`${id}-${k}`} className="text-xs text-fg-2">
-                {t[k]}
-              </label>
-              <Input id={`${id}-${k}`} inputMode="decimal" value={v[k]} onChange={(e) => setV((x) => ({ ...x, [k]: e.target.value }))} className="tabular" autoComplete="off" />
-            </div>
+            <SliderField
+              key={k}
+              id={`${id}-${k}`}
+              label={t[k]}
+              value={v[k]}
+              onChange={(x) => setV((p) => ({ ...p, [k]: x }))}
+              parse={parseNumber}
+              format={String}
+              min={RANGE[k][0]}
+              max={RANGE[k][1]}
+              suffix="px"
+            />
           ))}
         </div>
-        <div className="mt-4 flex min-h-14 items-center justify-between gap-2 rounded-[0.625rem] bg-surface-2 px-4 py-2">
-          <output className="min-w-0 font-mono text-lg font-semibold break-words [overflow-wrap:anywhere] text-fg sm:text-xl" aria-live="polite">
+        <div className="flex min-h-14 items-center justify-between gap-2 rounded-[1rem] bg-surface-2 py-2 pr-2 pl-4">
+          <output className="min-w-0 font-mono text-lg font-semibold break-words [overflow-wrap:anywhere] text-fg sm:text-2xl" aria-live="polite">
             {result ? result.css : <span className="text-base font-normal text-fg-3">{t.invalid}</span>}
           </output>
-          <CopyButton value={result?.css ?? ""} label={t.copy} copiedLabel={t.copied} size="sm" variant="ghost" />
+          <CopyButton value={result?.css ?? ""} label={t.copy} copiedLabel={t.copied} size="md" variant="primary" compact />
         </div>
       </Panel>
 
       {input && result ? (
         <>
-          <Panel className="flex flex-col gap-3 p-4">
-            <div className="flex items-center gap-3">
-              <label htmlFor={`${id}-w`} className="shrink-0 text-sm text-fg-2">
-                {t.preview}
-              </label>
-              <Slider id={`${id}-w`} min={320} max={1920} step={10} value={width} onChange={(e) => setWidth(Number(e.target.value))} />
-              <span className="tabular w-16 shrink-0 text-right text-sm text-fg-2">{width}px</span>
-            </div>
+          <Panel className="flex flex-col gap-4 p-4 sm:p-5">
+            <NumberSlider label={t.preview} value={width} min={320} max={1920} step={10} unit="px" onChange={(n) => setWidth(Math.max(1, n))} />
             <p className="font-semibold break-words text-fg" style={{ fontSize: `${clampAt(input, width)}px`, lineHeight: 1.2 }}>
               {t.sample} <span className="text-sm font-normal text-fg-3">· {t.size(round(clampAt(input, width), 2))}</span>
             </p>

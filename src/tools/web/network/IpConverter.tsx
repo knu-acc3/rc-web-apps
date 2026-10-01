@@ -8,7 +8,7 @@ import { parseAnyV4, type ConvError, type Notation } from "./lib/convert";
 import { toBinary, toDotted, toHex } from "./lib/ipv4";
 import { compress, expand, mapV4, reverse4 } from "./lib/ipv6";
 import { special4 } from "./lib/special";
-import { DetailList, ResultCard } from "./ui/shared";
+import { DetailList, ResultCard, Split } from "./ui/shared";
 
 const T = {
   ru: {
@@ -68,10 +68,13 @@ export default function IpConverter({ locale, value = "192.168.1.10" }: { locale
   const r = parseAnyV4(text);
 
   return (
-    <div className="flex flex-col gap-4">
-      <Field label={t.input} htmlFor={`${id}-in`} hint={t.hint}>
-        <Input id={`${id}-in`} value={text} onChange={(e) => setText(e.target.value)} size="lg" className="font-mono" autoComplete="off" spellCheck={false} aria-invalid={!r.ok && text.trim() !== ""} />
-      </Field>
+    <Split
+      input={
+        <Field label={t.input} htmlFor={`${id}-in`} hint={t.hint}>
+          <Input id={`${id}-in`} value={text} onChange={(e) => setText(e.target.value)} size="lg" className="font-mono" autoComplete="off" spellCheck={false} aria-invalid={!r.ok && text.trim() !== ""} />
+        </Field>
+      }
+    >
       {r.ok ? (
         <>
           <ResultCard
@@ -91,7 +94,13 @@ export default function IpConverter({ locale, value = "192.168.1.10" }: { locale
               { label: t.dotted, value: toDotted(r.value) },
               { label: t.integer, value: String(r.value) },
               { label: t.hex, value: toHex(r.value) },
-              { label: t.octets, value: toDotted(r.value).split(".").map((o) => Number(o).toString(16).toUpperCase().padStart(2, "0")).join(".") },
+              {
+                label: t.octets,
+                value: toDotted(r.value)
+                  .split(".")
+                  .map((o) => Number(o).toString(16).toUpperCase().padStart(2, "0"))
+                  .join("."),
+              },
               { label: t.binary, value: toBinary(r.value) },
               { label: t.mapped, value: compress(mapV4(r.value)) },
               { label: t.mappedHex, value: compress(mapV4(r.value), false) },
@@ -104,6 +113,6 @@ export default function IpConverter({ locale, value = "192.168.1.10" }: { locale
       ) : (
         text.trim() !== "" && <Notice tone="err">{t.errors[r.error]}</Notice>
       )}
-    </div>
+    </Split>
   );
 }

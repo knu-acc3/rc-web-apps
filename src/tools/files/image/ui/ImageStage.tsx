@@ -4,7 +4,7 @@ import { ZoomIn, ZoomOut } from "lucide-react";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import type { Locale } from "@/i18n/config";
 import { cn } from "@/lib/cn";
-import { Button } from "@/ui/button";
+import { IconButton } from "@/ui/button";
 import { checker } from "./controls";
 import { S } from "./strings";
 
@@ -75,38 +75,22 @@ export function ImageStage({
 
   return (
     <div className={cn("flex flex-col", className)}>
-      <div
-        ref={boxRef}
-        className={cn("overflow-auto rounded-[0.625rem] border border-line p-3", checker)}
-        style={{ maxHeight: zoom > 1 ? `${maxHeightVh}vh` : undefined }}
-      >
+      <div ref={boxRef} className={cn("overflow-auto rounded-[1rem] p-3", checker)} style={{ maxHeight: zoom > 1 ? `${maxHeightVh}vh` : undefined }}>
         <div className="relative mx-auto" style={{ width: cssW || undefined, height: cssH || undefined }}>
           <canvas ref={canvasRef} role="img" aria-label={label ?? t.preview} className="block size-full" />
           {bitmap && factor > 0 && <div className="absolute inset-0">{children?.(factor)}</div>}
         </div>
       </div>
       {bitmap && (
-        <div className="mt-2 flex justify-end gap-1">
-          <Button
-            variant="ghost"
-            size="icon-sm"
-            aria-label={t.zoomOut}
-            title={t.zoomOut}
-            disabled={zi <= 0}
-            onClick={() => setZoom(ZOOMS[Math.max(0, zi - 1)])}
-          >
-            <ZoomOut aria-hidden />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon-sm"
-            aria-label={t.zoomIn}
-            title={t.zoomIn}
+        <div className="mt-1 flex justify-end gap-1">
+          <IconButton size="sm" label={t.zoomOut} icon={<ZoomOut aria-hidden />} disabled={zi <= 0} onClick={() => setZoom(ZOOMS[Math.max(0, zi - 1)])} />
+          <IconButton
+            size="sm"
+            label={t.zoomIn}
+            icon={<ZoomIn aria-hidden />}
             disabled={zi >= ZOOMS.length - 1}
             onClick={() => setZoom(ZOOMS[Math.min(ZOOMS.length - 1, zi + 1)])}
-          >
-            <ZoomIn aria-hidden />
-          </Button>
+          />
         </div>
       )}
     </div>

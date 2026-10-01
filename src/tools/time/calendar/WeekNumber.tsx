@@ -2,6 +2,7 @@
 
 import { useId, useState } from "react";
 import type { Locale } from "@/i18n/config";
+import { Input } from "@/ui/field";
 import { Panel } from "@/ui/panel";
 import { useNow } from "@/tools/time/time/lib/use-now";
 import { addDays, fmtDate, isoWeek, isoWeekMonday, isoWeeksInYear, localYmd, parseYmd, type Ymd } from "./lib/dates";
@@ -31,7 +32,7 @@ export default function WeekNumber({ locale }: { locale: Locale }) {
     <div className="flex flex-col gap-4">
       <Panel className="flex flex-col items-center gap-2 px-4 py-8 text-center sm:py-10">
         <p className="text-sm font-medium text-fg-3">{t.now}</p>
-        <p className="tabular text-[5.5rem] leading-none font-bold tracking-tight text-fg sm:text-[7.5rem]">{cur ? cur.week : "—"}</p>
+        <p className="tabular text-[5.5rem] leading-none font-bold tracking-tight text-fg sm:text-[7.5rem] 2xl:text-[9rem]">{cur ? cur.week : "—"}</p>
         <p className="min-h-7 text-lg text-fg-2">{cur ? range(locale, cur) : " "}</p>
         <p className="min-h-6 text-[0.9375rem] text-fg-3">{cur ? t.of(cur.year, isoWeeksInYear(cur.year)) : " "}</p>
       </Panel>
@@ -40,7 +41,7 @@ export default function WeekNumber({ locale }: { locale: Locale }) {
           <label htmlFor={`${id}-d`} className="text-[0.9375rem] font-medium text-fg-2">
             {t.date}
           </label>
-          <input id={`${id}-d`} type="date" className="control h-10 w-44 max-w-full" value={text} onChange={(e) => setText(e.target.value)} />
+          <Input id={`${id}-d`} type="date" className="w-44 max-w-full" value={text} onChange={(e) => setText(e.target.value)} />
         </div>
         <p className="min-h-7 text-lg text-fg" aria-live="polite">
           {pw && (

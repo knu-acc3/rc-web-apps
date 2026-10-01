@@ -4,15 +4,16 @@ import { Minimize2 } from "lucide-react";
 import { useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { formatBytes } from "@/i18n/format";
+import { Field } from "@/ui/field";
 import { Notice } from "@/ui/panel";
 import { Segmented } from "@/ui/segmented";
 import { IMAGE_LEVELS, RASTER_LEVELS, type CompressLevel, type CompressMode } from "./lib/presets";
-import { OptionsRow, PrimaryButton, workerJob } from "./ui/bits";
+import { PrimaryButton, workerJob } from "./ui/bits";
 import { FilePanel } from "./ui/FilePanel";
 import { JobStatus, ResultCard, baseName, pdfBlob, type OutputItem } from "./ui/Result";
 import { useJob } from "./ui/use-job";
 import { usePdfFiles } from "./ui/use-pdf-files";
-
+import { Controls, Workspace } from "./ui/Workspace";
 
 const T = {
   ru: {
@@ -27,7 +28,7 @@ const T = {
     },
     go: "Сжать PDF",
     rendering: (i: number, n: number) => `Страница ${i} из ${n}`,
-    notSmaller: (size: string) => `Сжатие не уменьшило файл (${size}) — он уже оптимизирован. Исходный файл остался без изменений, скачивать нечего. Попробуйте другой способ сжатия.`,
+    notSmaller: (size: string) => `Файл уже оптимизирован: сжатие не уменьшило его (${size}). Попробуйте другой способ.`,
     rasterNote: "Текст в этом файле больше нельзя выделить и найти поиском.",
   },
   en: {
@@ -42,7 +43,7 @@ const T = {
     },
     go: "Compress PDF",
     rendering: (i: number, n: number) => `Page ${i} of ${n}`,
-    notSmaller: (size: string) => `Compression didn't make the file smaller (${size}) — it is already optimized. Your original is unchanged and there is nothing to download. Try another method.`,
+    notSmaller: (size: string) => `The file is already optimized: compression didn't make it smaller (${size}). Try another method.`,
     rasterNote: "Text in this file can no longer be selected or searched.",
   },
 } as const;
@@ -100,12 +101,14 @@ export default function CompressTool({ locale, mode: mode0 = "images", level: le
     else setResult({ items: [{ name: `${baseName(file.name)}-compressed.pdf`, blob: pdfBlob(bytes) }], size: file.size, mode: usedMode });
   }
 
+  const files = <FilePanel locale={locale} pdf={pdf} disabled={job.running} />;
+  if (!file) return <div className="flex flex-col gap-4">{files}</div>;
   return (
-    <div className="flex flex-col gap-4">
-      <FilePanel locale={locale} pdf={pdf} disabled={job.running} />
-      {file && (
-        <>
-          <OptionsRow>
+    <Workspace
+      files={files}
+      controls={
+        <Controls>
+          <Field label={t.mode}>
             <Segmented
               label={t.mode}
               value={mode}
@@ -115,7 +118,9 @@ export default function CompressTool({ locale, mode: mode0 = "images", level: le
               }}
               options={(["lossless", "images", "raster"] as const).map((m) => ({ value: m, label: t.modes[m] }))}
             />
-            {mode !== "lossless" && (
+          </Field>
+          {mode !== "lossless" && (
+            <Field label={t.level}>
               <Segmented
                 label={t.level}
                 value={level}
@@ -125,14 +130,22 @@ export default function CompressTool({ locale, mode: mode0 = "images", level: le
                 }}
                 options={(["light", "medium", "strong"] as const).map((l) => ({ value: l, label: t.levels[l] }))}
               />
-            )}
-          </OptionsRow>
-          <p className="max-w-3xl text-sm text-fg-2">{explain}</p>
-          <PrimaryButton disabled={job.running} onClick={compress}>
+            </Field>
+          )}
+          <p className="text-sm text-fg-2">{explain}</p>
+        </Controls>
+      }
+      action={
+        <>
+          <PrimaryButton disabled={job.running} done={!!result && "items" in result} onClick={compress}>
             <Minimize2 aria-hidden />
             {t.go}
           </PrimaryButton>
           <JobStatus locale={locale} state={job.state} onCancel={job.cancel} />
+        </>
+      }
+      result={
+        <>
           {result && "notSmaller" in result && (
             <Notice tone="warn" role="status">
               {t.notSmaller(formatBytes(locale, result.notSmaller))}
@@ -153,7 +166,7 @@ export default function CompressTool({ locale, mode: mode0 = "images", level: le
             />
           )}
         </>
-      )}
-    </div>
+      }
+    />
   );
 }

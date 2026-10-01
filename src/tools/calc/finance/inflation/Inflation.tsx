@@ -6,9 +6,9 @@ import { Field, Input } from "@/ui/field";
 import { Segmented } from "@/ui/segmented";
 import type { ToolProps } from "../../../types";
 import { LineChart } from "../../shared/charts";
-import { CURRENCIES, CURRENCY_SYMBOL, fmtCompact, fmtMoney, fmtPct, isCurrency, type Currency } from "../../shared/fmt";
+import { CURRENCIES, CURRENCY_SYMBOL, fmtCompact, fmtMoney, fmtPct, isCurrency, moneyMax, type Currency } from "../../shared/fmt";
 import { field, parseLocaleNumber, toInput } from "../../shared/num";
-import { CalcGrid, Explain, FieldRow, NumField, OptionsRow, ResultMain, Stack, SubHeading, ToolActions } from "../../shared/ui";
+import { CalcGrid, Explain, NumSlider, OptionsRow, ResultMain, Stack, SubHeading, ToolActions, SliderRow } from "../../shared/ui";
 import { useQueryState } from "../../shared/url-state";
 import { averageRate, cumulative, futureCost, presentValue } from "../lib/growth";
 import { CurrencySelect } from "../loan/parts";
@@ -20,8 +20,8 @@ const T = {
     average: "Средняя инфляция",
     yearly: "По годам",
     amount: "Сумма сегодня",
-    rate: "Инфляция, % в год",
-    rateHint: "Введите свою оценку — калькулятор не подставляет официальную статистику",
+    rate: "Инфляция в год",
+    rateHint: "Ваша оценка — официальная статистика не подставляется",
     years: "Через сколько лет",
     p1: "Цена тогда",
     p2: "Цена сейчас",
@@ -48,8 +48,8 @@ const T = {
     average: "Average inflation",
     yearly: "Year by year",
     amount: "Amount today",
-    rate: "Inflation, % per year",
-    rateHint: "Enter your own estimate — no official statistics are filled in",
+    rate: "Inflation per year",
+    rateHint: "Your own estimate — no official data is filled in",
     years: "Years from now",
     p1: "Price then",
     p2: "Price now",
@@ -136,6 +136,7 @@ export default function Inflation({ locale }: ToolProps) {
     <>
       <Segmented
         label={t.mode}
+        fill
         value={mode}
         onChange={(k) => q.set({ k })}
         options={[
@@ -146,33 +147,32 @@ export default function Inflation({ locale }: ToolProps) {
       />
       {mode === "future" && (
         <>
-          <NumField id={`${id}-a`} label={t.amount} value={q.v.a} onChange={(a) => q.set({ a })} suffix={sym} error={A.message} size="lg" />
-          <FieldRow>
-            <NumField id={`${id}-r`} label={t.rate} value={q.v.r} onChange={(r) => q.set({ r })} suffix="%" error={R.message} size="lg" />
-            <NumField id={`${id}-y`} label={t.years} value={q.v.y} onChange={(y) => q.set({ y })} error={Y.message} size="lg" />
-          </FieldRow>
-          <p className="text-[0.8125rem] text-fg-3">{t.rateHint}</p>
+          <NumSlider id={`${id}-a`} locale={locale} label={t.amount} value={q.v.a} onChange={(a) => q.set({ a })} suffix={sym} error={A.message} min={0} max={moneyMax(cur, 10_000_000)} scale="log" />
+          <SliderRow>
+            <NumSlider id={`${id}-r`} locale={locale} label={t.rate} value={q.v.r} onChange={(r) => q.set({ r })} suffix="%" error={R.message} hint={t.rateHint} min={0} max={30} decimals={1} />
+            <NumSlider id={`${id}-y`} locale={locale} label={t.years} value={q.v.y} onChange={(y) => q.set({ y })} suffix={plural(locale, Y.value ?? 5, t.yearsForms)} error={Y.message} min={1} max={50} />
+          </SliderRow>
         </>
       )}
       {mode === "average" && (
         <>
-          <FieldRow>
-            <NumField id={`${id}-p1`} label={t.p1} value={q.v.p1} onChange={(p1) => q.set({ p1 })} suffix={sym} error={P1.message} size="lg" />
-            <NumField id={`${id}-p2`} label={t.p2} value={q.v.p2} onChange={(p2) => q.set({ p2 })} suffix={sym} error={P2.message} size="lg" />
-          </FieldRow>
-          <NumField id={`${id}-n`} label={t.period} value={q.v.n} onChange={(n) => q.set({ n })} error={NY.message} />
+          <SliderRow>
+            <NumSlider id={`${id}-p1`} locale={locale} label={t.p1} value={q.v.p1} onChange={(p1) => q.set({ p1 })} suffix={sym} error={P1.message} min={0} max={moneyMax(cur, 1_000_000)} scale="log" />
+            <NumSlider id={`${id}-p2`} locale={locale} label={t.p2} value={q.v.p2} onChange={(p2) => q.set({ p2 })} suffix={sym} error={P2.message} min={0} max={moneyMax(cur, 1_000_000)} scale="log" />
+          </SliderRow>
+          <NumSlider id={`${id}-n`} locale={locale} label={t.period} value={q.v.n} onChange={(n) => q.set({ n })} suffix={plural(locale, NY.value ?? 5, t.yearsForms)} error={NY.message} min={1} max={50} />
         </>
       )}
       {mode === "yearly" && (
         <>
-          <NumField id={`${id}-a2`} label={t.amount} value={q.v.a} onChange={(a) => q.set({ a })} suffix={sym} error={A.message} size="lg" />
+          <NumSlider id={`${id}-a2`} locale={locale} label={t.amount} value={q.v.a} onChange={(a) => q.set({ a })} suffix={sym} error={A.message} min={0} max={moneyMax(cur, 10_000_000)} scale="log" />
           <Field label={t.list} htmlFor={`${id}-l`} hint={t.listHint} error={!listOk && tokens.length ? t.invalidList : undefined}>
             <Input id={`${id}-l`} value={q.v.l} onChange={(e) => q.set({ l: e.target.value })} autoComplete="off" spellCheck={false} aria-invalid={!listOk} className="tabular" />
           </Field>
         </>
       )}
       <OptionsRow>
-        <CurrencySelect id={`${id}-c`} locale={locale} value={cur} onChange={(c) => q.set({ c })} />
+        <CurrencySelect locale={locale} value={cur} onChange={(c) => q.set({ c })} />
       </OptionsRow>
     </>
   );

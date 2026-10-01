@@ -19,7 +19,7 @@ export function Swatch({ color, className, label }: { color: string; className?:
       role={label ? "img" : undefined}
       aria-label={label}
       aria-hidden={label ? undefined : true}
-      className={cn("relative inline-block overflow-hidden rounded-[0.5rem] border border-line", className)}
+      className={cn("relative inline-block overflow-hidden rounded-[0.625rem] border border-line", className)}
       style={CHECKER_STYLE}
     >
       <span className="absolute inset-0" style={{ background: color }} />
@@ -72,9 +72,9 @@ export function ColorField({
   return (
     <Field label={hideLabel ? undefined : label} htmlFor={id} hint={invalid ? undefined : hint} error={invalid ? t.invalid : undefined} className={className}>
       <div className="flex items-stretch gap-2">
-        <label className="relative shrink-0 cursor-pointer" title={t.pick}>
+        <label className="relative shrink-0 cursor-pointer rounded-[0.625rem] transition-[box-shadow,transform] duration-150 hover:ring-2 hover:ring-outline focus-within:ring-2 focus-within:ring-accent active:scale-95" title={t.pick}>
           <span className="sr-only">{t.pick}</span>
-          <Swatch color={css} className={size === "lg" ? "size-12" : size === "sm" ? "size-9" : "size-10"} />
+          <Swatch color={css} className={cn("block", size === "lg" ? "size-12" : size === "sm" ? "size-9 pointer-coarse:size-10" : "size-10 pointer-coarse:size-11")} />
           <input
             type="color"
             value={hex6}

@@ -4,7 +4,8 @@ import { Search } from "lucide-react";
 import { useEffect, useId, useMemo, useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { plural } from "@/i18n/format";
-import { Field, Input, Select } from "@/ui/field";
+import { Field, Input } from "@/ui/field";
+import { ScrollRow } from "@/ui/scroll-row";
 import { Cells, usePicker, type BoardItem } from "../shared/GlyphBoard";
 
 /** Row of public/vendor/emoji/index-{locale}.json: [glyph, slug, name, search text, group index] */
@@ -126,7 +127,7 @@ export default function EmojiSearch({ locale, popular, groups }: EmojiSearchProp
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="grid gap-3 sm:grid-cols-[1fr_13.75rem]">
+      <div className="flex flex-col gap-2">
         <Field label={t.search} htmlFor={`${id}-q`}>
           <div className="relative">
             <Search className="pointer-events-none absolute left-3 top-1/2 size-5 -translate-y-1/2 text-fg-3" aria-hidden />
@@ -144,19 +145,16 @@ export default function EmojiSearch({ locale, popular, groups }: EmojiSearchProp
             />
           </div>
         </Field>
-        <Field label={t.group} htmlFor={`${id}-g`}>
-          <Select id={`${id}-g`} value={group} onChange={(e) => setGroup(e.target.value)} size="lg">
-            <option value="">{t.all}</option>
-            {groups.map(([k, n]) => (
-              <option key={k} value={k}>
-                {n}
-              </option>
-            ))}
-          </Select>
-        </Field>
+        <ScrollRow role="radiogroup" label={t.group}>
+          {[["", t.all] as const, ...groups].map(([k, n]) => (
+            <button key={k} type="button" role="radio" aria-checked={group === k} onClick={() => setGroup(k)} className="chip shrink-0">
+              {n}
+            </button>
+          ))}
+        </ScrollRow>
       </div>
 
-      <div className="rounded-[0.75rem] border border-line bg-surface p-3">{panel}</div>
+      <div className="panel z-10 p-3 sm:sticky sm:top-16 sm:p-4">{panel}</div>
 
       <div>
         <h2 className="mb-2 text-base font-semibold text-fg" aria-live="polite">

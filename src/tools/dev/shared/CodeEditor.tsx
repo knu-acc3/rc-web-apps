@@ -4,12 +4,13 @@ import { Eraser, FileText, FolderOpen } from "lucide-react";
 import { useMemo, useRef, type ReactNode } from "react";
 import type { Locale } from "@/i18n/config";
 import { cn } from "@/lib/cn";
-import { buttonClass } from "@/ui/button";
+import { Button, IconButton } from "@/ui/button";
 import { countsLabel, KIT_T, textStats } from "./labels";
 
 /**
- * Plain-textarea code editor with a labelled header, optional actions
- * (open file, sample, clear) and a footer with line / character counts.
+ * Plain-textarea code editor: the field is the card itself (no box inside a box). A title row with the label and
+ * quiet actions (sample, open file, clear) sits above the text, line / character counts below it. Inside a Panel it
+ * becomes a tonal block; focus draws an accent ring around the whole card.
  * No syntax highlighting on purpose: it stays fast on multi-megabyte input.
  */
 export function CodeEditor({
@@ -64,23 +65,26 @@ export function CodeEditor({
   return (
     <div
       className={cn(
-        "flex min-w-0 flex-col overflow-hidden rounded-[0.75rem] border bg-surface transition-colors duration-150 focus-within:border-accent",
-        invalid ? "border-err" : "border-line",
+        "panel flex min-w-0 flex-col overflow-hidden transition-shadow duration-150",
+        invalid ? "ring-2 ring-inset ring-err" : "focus-within:ring-2 focus-within:ring-inset focus-within:ring-accent",
         className,
       )}
     >
-      <div className="flex min-h-11 flex-wrap items-center justify-between gap-2 border-b border-line px-3 py-1.5">
+      <div className="flex min-h-[3.25rem] items-center justify-between gap-2 border-b border-line py-1.5 pl-4 pr-2">
         <label htmlFor={id} className="min-w-0 truncate text-sm font-semibold text-fg">
           {label}
         </label>
-        <div className="flex flex-wrap items-center gap-1">
+        <div className="flex shrink-0 items-center gap-0.5">
           {actions}
+          {editable && sample !== undefined && (
+            <Button variant="text" size="sm" className="px-3! max-sm:px-2.5!" title={t.sample} onClick={() => onChange?.(sample)}>
+              <FileText aria-hidden />
+              <span className="max-sm:sr-only">{t.sample}</span>
+            </Button>
+          )}
           {editable && fileAccept !== undefined && (
             <>
-              <button type="button" className={buttonClass("ghost", "sm")} onClick={() => fileRef.current?.click()}>
-                <FolderOpen aria-hidden />
-                <span className="max-sm:sr-only">{t.openFile}</span>
-              </button>
+              <IconButton label={t.openFile} icon={<FolderOpen aria-hidden />} onClick={() => fileRef.current?.click()} />
               <input
                 ref={fileRef}
                 type="file"
@@ -101,18 +105,7 @@ export function CodeEditor({
               />
             </>
           )}
-          {editable && sample !== undefined && (
-            <button type="button" className={buttonClass("ghost", "sm")} onClick={() => onChange?.(sample)}>
-              <FileText aria-hidden />
-              <span className="max-sm:sr-only">{t.sample}</span>
-            </button>
-          )}
-          {editable && (
-            <button type="button" className={buttonClass("ghost", "sm")} onClick={() => onChange?.("")} disabled={!value}>
-              <Eraser aria-hidden />
-              <span className="max-sm:sr-only">{t.clear}</span>
-            </button>
-          )}
+          {editable && <IconButton label={t.clear} icon={<Eraser aria-hidden />} onClick={() => onChange?.("")} disabled={!value} />}
         </div>
       </div>
       <textarea
@@ -129,9 +122,9 @@ export function CodeEditor({
         wrap={wrap ? "soft" : "off"}
         aria-invalid={invalid || undefined}
         aria-describedby={describedBy}
-        className="min-h-32 w-full resize-y bg-transparent px-3 py-2.5 font-mono text-sm leading-relaxed text-fg placeholder:text-fg-3 focus:outline-none"
+        className="min-h-32 w-full flex-1 resize-y bg-transparent px-4 py-3 font-mono text-sm leading-relaxed text-fg placeholder:text-fg-3 focus:outline-none max-sm:max-h-[60vh]"
       />
-      <div className="flex min-h-8 flex-wrap items-center justify-between gap-2 border-t border-line px-3 py-1 text-[0.8125rem] text-fg-3">
+      <div className="flex min-h-9 flex-wrap items-center justify-between gap-x-3 gap-y-1 px-4 pb-2 text-[0.8125rem] text-fg-3">
         <span className="tabular">{countsLabel(locale, stats.lines, stats.chars)}</span>
         {footer}
       </div>

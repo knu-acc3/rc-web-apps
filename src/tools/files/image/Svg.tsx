@@ -10,15 +10,16 @@ import { downloadBlob, downloadText } from "@/lib/clipboard";
 import { Button } from "@/ui/button";
 import { CopyButton } from "@/ui/copy-button";
 import { Dropzone } from "@/ui/dropzone";
-import { Field, Select } from "@/ui/field";
+import { Field } from "@/ui/field";
 import { Notice, Panel } from "@/ui/panel";
 import { Segmented } from "@/ui/segmented";
 import { rasterizeSvg, svgIntrinsicSize } from "./lib/source";
 import { optimizeSvg, type SvgReport } from "./lib/svg-optimize";
 import type { OutFormat } from "./lib/types";
-import { checker, NumberField } from "./ui/controls";
+import { checker, NumberField, replaceDrop } from "./ui/controls";
 import { encodeMainCanvas } from "./ui/encodeMain";
 import { useEngine } from "./ui/hooks";
+import { OptionsBar, ToolColumns } from "./ui/OptionsBar";
 import { errorText } from "./ui/strings";
 
 const T = {
@@ -30,7 +31,7 @@ const T = {
     optimized: "Оптимизированный",
     original: "Исходный",
     precision: "Округление координат",
-    off: "Не округлять",
+    off: "Нет",
     digits: (n: number) => `${n} зн. после запятой`,
     bg: "Фон",
     transparent: "Прозрачный",
@@ -47,7 +48,6 @@ const T = {
     size: "Размер",
     viewBox: "viewBox",
     none: "нет",
-    safe: "SVG показывается как изображение: скрипты не выполняются, стили не влияют на страницу",
     preview: "Предпросмотр SVG",
   },
   en: {
@@ -58,7 +58,7 @@ const T = {
     optimized: "Optimised",
     original: "Original",
     precision: "Coordinate rounding",
-    off: "Don't round",
+    off: "None",
     digits: (n: number) => `${n} decimal${n === 1 ? "" : "s"}`,
     bg: "Background",
     transparent: "Transparent",
@@ -75,7 +75,6 @@ const T = {
     size: "Size",
     viewBox: "viewBox",
     none: "none",
-    safe: "The SVG is shown as an image: scripts don't run and its styles can't affect the page",
     preview: "SVG preview",
   },
 } as const;
@@ -152,7 +151,7 @@ export default function Svg({ locale }: { locale: Locale }) {
   if (!src) {
     return (
       <div className="flex flex-col gap-3">
-        <Dropzone onFiles={loadFile} accept="image/svg+xml,.svg" title={t.drop} />
+        <Dropzone onFiles={loadFile} accept="image/svg+xml,.svg" title={t.drop} locale={locale} />
         <Field label={t.or} htmlFor={`${id}-paste`}>
           <textarea
             id={`${id}-paste`}
@@ -167,56 +166,112 @@ export default function Svg({ locale }: { locale: Locale }) {
     );
   }
 
-  return (
-    <div className="flex flex-col gap-4">
-      <div className="flex flex-wrap items-end gap-x-4 gap-y-3 rounded-[0.75rem] border border-line bg-surface px-4 py-3">
-        <Field label={t.view}>
-          <Segmented
-            wrap
-            label={t.view}
-            value={show}
-            onChange={setShow}
-            options={[
-              { value: "optimized", label: t.optimized },
-              { value: "original", label: t.original },
-            ]}
-          />
-        </Field>
-        <Field label={t.precision} htmlFor={`${id}-prec`} className="w-52">
-          <Select id={`${id}-prec`} value={precision} onChange={(e) => setPrecision(e.target.value)}>
-            <option value="off">{t.off}</option>
-            {[1, 2, 3].map((n) => (
-              <option key={n} value={n}>
-                {t.digits(n)}
-              </option>
-            ))}
-          </Select>
-        </Field>
-        <Field label={t.bg}>
-          <Segmented
-            wrap
-            label={t.bg}
-            value={bg}
-            onChange={setBg}
-            options={[
-              { value: "transparent", label: t.transparent },
-              { value: "light", label: t.light },
-              { value: "dark", label: t.dark },
-            ]}
-          />
-        </Field>
-      </div>
+  const dec = (n: number) => (locale === "ru" ? (0.1 ** n).toFixed(n).replace(".", ",") : (0.1 ** n).toFixed(n));
+  const side = (
+    <OptionsBar locale={locale}>
+      <Segmented
+        fill
+        label={t.view}
+        value={show}
+        onChange={setShow}
+        options={[
+          { value: "optimized", label: t.optimized },
+          { value: "original", label: t.original },
+        ]}
+      />
+      <Field label={t.precision}>
+        <Segmented
+          label={t.precision}
+          value={precision}
+          onChange={setPrecision}
+          options={[{ value: "off", label: t.off }, ...[1, 2, 3].map((n) => ({ value: String(n), label: dec(n), title: t.digits(n) }))]}
+        />
+      </Field>
+      <Field label={t.bg}>
+        <Segmented
+          label={t.bg}
+          value={bg}
+          onChange={setBg}
+          options={[
+            { value: "transparent", label: t.transparent },
+            { value: "light", label: t.light },
+            { value: "dark", label: t.dark },
+          ]}
+        />
+      </Field>
+      {ok && (
+        <section className="flex flex-col gap-3 border-t border-line pt-4" aria-labelledby={`${id}-exp`}>
+          <h3 id={`${id}-exp`} className="flex items-center gap-2 text-[0.9375rem] font-semibold text-fg">
+            <ImageDown className="size-4 text-accent" aria-hidden />
+            {t.export}
+          </h3>
+          <NumberField label={t.width} value={width} onChange={setWidth} min={8} max={16384} suffix="px" placeholder={String(outW)} locale={locale} />
+          <Field label={t.format}>
+            <Segmented
+              label={t.format}
+              value={fmt}
+              onChange={setFmt}
+              options={(["png", "jpg", "webp"] as const).map((f) => ({ value: f, label: f.toUpperCase() }))}
+            />
+          </Field>
+          <Button variant="tonal" onClick={exportImage} disabled={busy}>
+            {busy ? <Loader2 className="animate-spin" aria-hidden /> : <Download aria-hidden />}
+            {t.exportBtn} {fmt.toUpperCase()}
+          </Button>
+          {exportError ? <Notice tone="err">{errorText(locale, exportError)}</Notice> : null}
+        </section>
+      )}
+    </OptionsBar>
+  );
 
+  return (
+    <ToolColumns
+      side={side}
+      rest={
+        <>
+          {ok && (
+            <Panel className="flex min-w-0 flex-col gap-2 p-3 sm:p-4">
+              <div className="flex items-center justify-between gap-2 px-1">
+                <label htmlFor={`${id}-code`} className="flex items-center gap-2 text-sm font-semibold text-fg">
+                  <FileCode className="size-4" aria-hidden />
+                  {t.code}
+                </label>
+                <CopyButton
+                  value={ok.output}
+                  variant="ghost"
+                  label={locale === "ru" ? "Копировать" : "Copy"}
+                  copiedLabel={locale === "ru" ? "Скопировано" : "Copied"}
+                />
+              </div>
+              <textarea
+                id={`${id}-code`}
+                readOnly
+                value={ok.output.length > 200_000 ? `${ok.output.slice(0, 200_000)}…` : ok.output}
+                rows={8}
+                spellCheck={false}
+                className="block w-full resize-y rounded-[1rem] bg-surface-2 px-3.5 py-3 font-mono text-xs leading-relaxed text-fg-2 focus:outline-2 focus:outline-accent"
+              />
+            </Panel>
+          )}
+          <Dropzone onFiles={loadFile} accept="image/svg+xml,.svg" title={t.drop} locale={locale} className={replaceDrop} />
+        </>
+      }
+    >
       {result && "error" in result ? (
         <Notice tone="err">{errorText(locale, result.error)}</Notice>
       ) : ok ? (
-        <Panel className="overflow-hidden">
-          <div className={cn("flex min-h-56 items-center justify-center p-4", bg === "transparent" ? checker : bg === "light" ? "bg-white" : "bg-neutral-900")}>
+        <Panel className="flex min-w-0 flex-col gap-3 p-3 sm:gap-4 sm:p-4">
+          <div
+            className={cn(
+              "flex min-h-56 items-center justify-center rounded-[1rem] p-4",
+              bg === "transparent" ? checker : bg === "light" ? "bg-white" : "bg-neutral-900",
+            )}
+          >
             {url && <img src={url} alt={t.preview} className="block max-h-[55vh] max-w-full" style={{ width: Math.min(baseW || 300, 1200), height: "auto" }} />}
           </div>
-          <div className="flex flex-col gap-3 border-t border-line px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-col gap-3 px-1 sm:flex-row sm:items-center sm:justify-between">
             <div aria-live="polite" className="min-w-0">
-              <p className="tabular text-2xl font-semibold tracking-tight text-fg">
+              <p className="tabular text-2xl font-semibold tracking-tight text-fg sm:text-3xl">
                 {formatBytes(locale, after)}{" "}
                 <span className="text-lg text-ok">
                   −{formatNumber(locale, before ? Math.max(0, (1 - after / before) * 100) : 0, { maximumFractionDigits: 1 })} %
@@ -227,65 +282,14 @@ export default function Svg({ locale }: { locale: Locale }) {
                 {formatNumber(locale, ok.size.h, { maximumFractionDigits: 2 })} · {t.viewBox}: {ok.viewBox ?? t.none}
               </p>
             </div>
-            <Button variant="primary" size="lg" onClick={() => downloadText(ok.output, `${name}.min.svg`, "image/svg+xml")}>
+            <Button variant="filled" size="lg" onClick={() => downloadText(ok.output, `${name}.min.svg`, "image/svg+xml")}>
               <Download aria-hidden />
               {t.downloadSvg}
             </Button>
           </div>
-          <p className="border-t border-line px-4 py-2.5 text-[0.8125rem] text-fg-3">
-            {t.report(ok.report)}. {t.safe}.
-          </p>
+          <p className="px-1 text-[0.8125rem] text-fg-3">{t.report(ok.report)}</p>
         </Panel>
       ) : null}
-
-      {ok && (
-        <>
-          <div className="flex flex-wrap items-end gap-x-4 gap-y-3 rounded-[0.75rem] border border-line bg-surface px-4 py-3">
-            <span className="flex items-center gap-2 self-center text-sm font-semibold text-fg">
-              <ImageDown className="size-4 text-accent" aria-hidden />
-              {t.export}
-            </span>
-            <NumberField label={t.width} value={width} onChange={setWidth} min={8} max={16384} suffix="px" placeholder={String(outW)} className="w-36" />
-            <Field label={t.format}>
-              <Segmented
-                wrap
-                label={t.format}
-                value={fmt}
-                onChange={setFmt}
-                options={(["png", "jpg", "webp"] as const).map((f) => ({ value: f, label: f.toUpperCase() }))}
-              />
-            </Field>
-            <Button variant="secondary" onClick={exportImage} disabled={busy}>
-              {busy ? <Loader2 className="animate-spin" aria-hidden /> : <Download aria-hidden />}
-              {t.exportBtn} {fmt.toUpperCase()}
-            </Button>
-          </div>
-          {exportError ? <Notice tone="err">{errorText(locale, exportError)}</Notice> : null}
-          <div className="overflow-hidden rounded-[0.75rem] border border-line bg-surface">
-            <div className="flex items-center justify-between gap-2 border-b border-line px-3 py-1.5">
-              <label htmlFor={`${id}-code`} className="flex items-center gap-2 text-sm font-semibold text-fg">
-                <FileCode className="size-4" aria-hidden />
-                {t.code}
-              </label>
-              <CopyButton
-                value={ok.output}
-                variant="ghost"
-                label={locale === "ru" ? "Копировать" : "Copy"}
-                copiedLabel={locale === "ru" ? "Скопировано" : "Copied"}
-              />
-            </div>
-            <textarea
-              id={`${id}-code`}
-              readOnly
-              value={ok.output.length > 200_000 ? `${ok.output.slice(0, 200_000)}…` : ok.output}
-              rows={8}
-              spellCheck={false}
-              className="block w-full resize-y bg-transparent px-3 py-2.5 font-mono text-xs leading-relaxed text-fg-2 focus:outline-none"
-            />
-          </div>
-        </>
-      )}
-      <Dropzone onFiles={loadFile} accept="image/svg+xml,.svg" compact title={t.drop} />
-    </div>
+    </ToolColumns>
   );
 }

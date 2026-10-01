@@ -5,8 +5,9 @@ import { useEffect, useId, useRef, useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { formatNumber } from "@/i18n/format";
 import { cn } from "@/lib/cn";
-import { Button } from "@/ui/button";
+import { IconButton } from "@/ui/button";
 import { Field, Input } from "@/ui/field";
+import { Panel } from "@/ui/panel";
 import type { StrengthResult } from "./lib/strength-core";
 import { humanDuration } from "./lib/time";
 
@@ -89,73 +90,75 @@ export default function StrengthChecker({ locale }: { locale: Locale }) {
   const r = pw && res?.for === pw ? res.r : null;
 
   return (
-    <div className="flex flex-col gap-4">
-      <Field label={t.label} htmlFor={`${id}-pw`}>
-        <div className="flex gap-2">
-          <Input
-            id={`${id}-pw`}
-            type={show ? "text" : "password"}
-            value={pw}
-            onChange={(e) => setPw(e.target.value)}
-            size="lg"
-            className="font-mono"
-            autoComplete="off"
-            autoCapitalize="off"
-            autoCorrect="off"
-            spellCheck={false}
-          />
-          <Button variant="outline" size="icon" className="size-12!" onClick={() => setShow((s) => !s)} aria-label={show ? t.hide : t.show} aria-pressed={show}>
-            {show ? <EyeOff /> : <Eye />}
-          </Button>
-        </div>
-      </Field>
+    <div className="grid items-start gap-4 lg:grid-cols-2 lg:gap-6">
+      <Panel className="flex min-w-0 flex-col gap-3 p-4 sm:p-6">
+        <Field label={t.label} htmlFor={`${id}-pw`}>
+          <div className="flex items-center gap-2">
+            <Input
+              id={`${id}-pw`}
+              type={show ? "text" : "password"}
+              value={pw}
+              onChange={(e) => setPw(e.target.value)}
+              size="lg"
+              className="min-w-0 flex-1 font-mono"
+              autoComplete="off"
+              autoCapitalize="off"
+              autoCorrect="off"
+              spellCheck={false}
+            />
+            <IconButton variant="tonal" size="lg" onClick={() => setShow((s) => !s)} label={show ? t.hide : t.show} selected={show} icon={show ? <EyeOff aria-hidden /> : <Eye aria-hidden />} />
+          </div>
+        </Field>
+        <p className="text-sm text-fg-3">{t.local}</p>
+      </Panel>
 
-      <div className="rounded-[0.75rem] bg-surface-2 px-4 py-4 sm:px-5">
-        {!pw ? (
-          <p className="text-fg-2">{t.empty}</p>
-        ) : !r ? (
-          <p className="text-fg-2">{t.loading}</p>
-        ) : (
-          <>
-            <div aria-live="polite" className={cn("text-2xl font-semibold sm:text-3xl", TEXT[r.score])}>
-              {t.scores[r.score]}
-            </div>
-            <div className="mt-3 grid grid-cols-5 gap-1.5" aria-hidden>
-              {[0, 1, 2, 3, 4].map((i) => (
-                <div key={i} className={cn("h-1.5 rounded-full", i <= r.score ? TONE[r.score] : "bg-line")} />
-              ))}
-            </div>
-            <p className="mt-2 text-sm text-fg-2">{t.guesses(formatNumber(locale, Math.round(r.guessesLog10 * 10) / 10))}</p>
-            {(r.warning || r.suggestions.length > 0) && (
-              <div className="mt-3 text-[0.9375rem] text-fg-2">
-                {r.warning && <p className="font-medium text-fg">{r.warning}</p>}
-                {r.suggestions.length > 0 && (
-                  <ul className="mt-1 list-disc pl-5 marker:text-fg-3">
-                    {r.suggestions.map((s) => (
-                      <li key={s}>{s}</li>
-                    ))}
-                  </ul>
-                )}
+      <div className="flex min-w-0 flex-col gap-4">
+        <div className="min-w-0 rounded-[1.25rem] bg-accent-soft p-5 sm:p-6">
+          {!pw ? (
+            <p className="text-fg-2">{t.empty}</p>
+          ) : !r ? (
+            <p className="text-fg-2">{t.loading}</p>
+          ) : (
+            <div className="motion-safe:animate-[menu-in_200ms_ease-out]">
+              <div aria-live="polite" className={cn("text-3xl font-bold tracking-tight sm:text-4xl", TEXT[r.score])}>
+                {t.scores[r.score]}
               </div>
-            )}
-          </>
+              <div className="mt-3 grid grid-cols-5 gap-1.5" aria-hidden>
+                {[0, 1, 2, 3, 4].map((i) => (
+                  <div key={i} className={cn("h-2 rounded-full transition-colors duration-300", i <= r.score ? TONE[r.score] : "bg-[color-mix(in_oklab,var(--fg)_12%,transparent)]")} />
+                ))}
+              </div>
+              <p className="mt-2 text-sm text-fg-2">{t.guesses(formatNumber(locale, Math.round(r.guessesLog10 * 10) / 10))}</p>
+              {(r.warning || r.suggestions.length > 0) && (
+                <div className="mt-4 text-[0.9375rem] text-fg-2">
+                  {r.warning && <p className="font-medium text-fg">{r.warning}</p>}
+                  {r.suggestions.length > 0 && (
+                    <ul className="mt-1 list-disc pl-5 marker:text-fg-3">
+                      {r.suggestions.map((s) => (
+                        <li key={s}>{s}</li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
+        {r && (
+          <Panel className="p-4 sm:p-5">
+            <h2 className="mb-2 text-sm font-semibold text-fg">{t.crack}</h2>
+            <dl className="divide-y divide-line">
+              {(Object.keys(t.rows) as (keyof StrengthResult["seconds"])[]).map((k) => (
+                <div key={k} className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-0.5 py-2 text-sm">
+                  <dt className="min-w-0 text-fg-2">{t.rows[k]}</dt>
+                  <dd className="font-semibold text-fg">{humanDuration(r.seconds[k], locale)}</dd>
+                </div>
+              ))}
+            </dl>
+          </Panel>
         )}
       </div>
-
-      {r && (
-        <section className="rounded-[0.75rem] border border-line">
-          <h2 className="border-b border-line px-4 py-2.5 text-sm font-semibold text-fg-2">{t.crack}</h2>
-          <dl className="divide-y divide-line">
-            {(Object.keys(t.rows) as (keyof StrengthResult["seconds"])[]).map((k) => (
-              <div key={k} className="flex flex-wrap items-baseline justify-between gap-x-4 px-4 py-2 text-sm">
-                <dt className="text-fg-2">{t.rows[k]}</dt>
-                <dd className="font-medium text-fg">{humanDuration(r.seconds[k], locale)}</dd>
-              </div>
-            ))}
-          </dl>
-        </section>
-      )}
-      <p className="text-sm text-fg-3">{t.local}</p>
     </div>
   );
 }

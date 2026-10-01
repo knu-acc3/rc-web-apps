@@ -4,19 +4,21 @@ import { Contrast, Crop, FlipHorizontal2, FlipVertical2, Maximize2, ScanLine, Su
 import { useId, useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { Button } from "@/ui/button";
-import { Field, Input, Switch } from "@/ui/field";
+import { Field, Switch } from "@/ui/field";
+import { NumberInput } from "@/ui/number-input";
 import { Notice } from "@/ui/panel";
 import { Segmented } from "@/ui/segmented";
 import { mmToPt, type PaperId } from "./lib/geometry";
 import type { Job } from "./lib/jobs";
 import type { FracBox, TransformOp } from "./lib/transform";
-import { OptionsRow, PrimaryButton, workerJob } from "./ui/bits";
+import { PrimaryButton, workerJob } from "./ui/bits";
 import { FilePanel } from "./ui/FilePanel";
 import { PdfPreview, usePagePreview } from "./ui/PdfPreview";
 import { RangeField, resolveRange } from "./ui/RangeField";
 import { JobStatus, ResultCard, baseName, pdfBlob, type OutputItem } from "./ui/Result";
 import { useJob } from "./ui/use-job";
 import { usePdfFiles, type PdfFile } from "./ui/use-pdf-files";
+import { Controls, Workspace } from "./ui/Workspace";
 
 export type TransformKind = "flip" | "gray" | "invert" | "crop" | "resize";
 
@@ -29,13 +31,14 @@ const T = {
     axes: { h: "Слева направо", v: "Сверху вниз" },
     go: { flip: "Отразить PDF", gray: "Сделать чёрно-белым", invert: "Инвертировать цвета", crop: "Обрезать PDF", resize: "Изменить размер" },
     suffix: { flip: "mirrored", gray: "grayscale", invert: "inverted", crop: "cropped", resize: "resized" },
-    margins: "Отрезать с краёв, мм",
+    margins: "Отрезать с краёв",
+    all: "Со всех сторон",
     top: "Сверху",
     right: "Справа",
     bottom: "Снизу",
     left: "Слева",
     same: "Одинаково со всех сторон",
-    auto: "Обрезать белые поля автоматически",
+    auto: "Обрезать белые поля",
     autoBusy: "Ищем белые поля…",
     autoDone: (n: number) => `Белые поля найдены на страницах: ${n}. Можно сохранять.`,
     autoNone: "Белых полей не нашлось — страницы уже обрезаны по содержимому.",
@@ -43,10 +46,11 @@ const T = {
     paper: "Формат листа",
     orientation: "Ориентация",
     orientations: { auto: "Как у страницы", portrait: "Книжная", landscape: "Альбомная" },
-    margin: "Поля, мм",
+    margin: "Поля",
+    mm: "мм",
     scale: "Вписать содержимое в лист",
-    grayNote: "Текст останется текстом: его можно выделять и искать. Цвета убираются наложением, поэтому файл почти не вырастет.",
-    invertNote: "Белый фон станет чёрным, чёрный текст — белым. Удобно читать PDF ночью; для печати не подходит.",
+    grayNote: "Текст останется текстом: его можно выделять и искать, а файл почти не вырастет.",
+    invertNote: "Белый фон станет чёрным, текст — белым: удобно читать ночью, но не для печати.",
   },
   en: {
     pages: "Pages",
@@ -56,13 +60,14 @@ const T = {
     axes: { h: "Left to right", v: "Top to bottom" },
     go: { flip: "Mirror PDF", gray: "Make black and white", invert: "Invert colours", crop: "Crop PDF", resize: "Resize pages" },
     suffix: { flip: "mirrored", gray: "grayscale", invert: "inverted", crop: "cropped", resize: "resized" },
-    margins: "Cut from the edges, mm",
+    margins: "Cut from the edges",
+    all: "All sides",
     top: "Top",
     right: "Right",
     bottom: "Bottom",
     left: "Left",
     same: "Same on all sides",
-    auto: "Trim white margins automatically",
+    auto: "Trim white margins",
     autoBusy: "Looking for white margins…",
     autoDone: (n: number) => `White margins found on ${n} pages. Ready to save.`,
     autoNone: "No white margins found — the pages are already trimmed to their content.",
@@ -70,10 +75,11 @@ const T = {
     paper: "Paper size",
     orientation: "Orientation",
     orientations: { auto: "Same as page", portrait: "Portrait", landscape: "Landscape" },
-    margin: "Margins, mm",
+    margin: "Margins",
+    mm: "mm",
     scale: "Fit the content to the sheet",
-    grayNote: "Text stays text: you can still select and search it. Colour is removed with an overlay, so the file barely grows.",
-    invertNote: "White background turns black and black text white. Nice for reading at night; not for printing.",
+    grayNote: "Text stays text — still selectable and searchable — and the file barely grows.",
+    invertNote: "White background turns black, text turns white: nice for night reading, not for printing.",
   },
 } as const;
 
@@ -129,12 +135,12 @@ export default function TransformTool({ locale, kind, axis: axis0 = "h", paper: 
   const job = useJob(locale);
   const [rangeText, setRangeText] = useState("");
   const [axis, setAxis] = useState<"h" | "v">(axis0);
-  const [margins, setMargins] = useState<[string, string, string, string]>(["10", "10", "10", "10"]);
+  const [margins, setMargins] = useState<[number, number, number, number]>([10, 10, 10, 10]);
   const [same, setSame] = useState(true);
   const [boxes, setBoxes] = useState<{ file: string; boxes: (FracBox | null)[] } | null>(null);
   const [paper, setPaper] = useState<PaperId>(paper0);
   const [orientation, setOrientation] = useState<"auto" | "portrait" | "landscape">("auto");
-  const [margin, setMargin] = useState("0");
+  const [margin, setMargin] = useState(0);
   const [scale, setScale] = useState(true);
   const [result, setResult] = useState<OutputItem[] | null>(null);
   const file = pdf.ready[0] ?? null;
@@ -142,7 +148,7 @@ export default function TransformTool({ locale, kind, axis: axis0 = "h", paper: 
   const range = resolveRange(rangeText, Math.max(1, count));
   const indices = range.ok ? range.pages.map((p) => p - 1) : [];
   const auto = boxes && file && boxes.file === file.id ? boxes.boxes : null;
-  const mm = (v: string) => mmToPt(Math.max(0, Number(v.replace(",", ".")) || 0));
+  const mm = (v: number) => mmToPt(Math.max(0, v || 0));
 
   const op: TransformOp =
     kind === "flip"
@@ -156,7 +162,7 @@ export default function TransformTool({ locale, kind, axis: axis0 = "h", paper: 
   const previewIndex = indices[0] ?? 0;
   const buildJob = (preview?: number): Job | null =>
     file ? { type: "transform", source: { bytes: file.bytes!.slice(0), password: file.password }, op, pages: rangeText.trim() ? indices : undefined, preview } : null;
-  const preview = usePagePreview(file && range.ok ? async () => buildJob(previewIndex) : null, file?.id ?? "", JSON.stringify([op, previewIndex]));
+  const preview = usePagePreview(locale, file && range.ok ? async () => buildJob(previewIndex) : null, file?.id ?? "", JSON.stringify([op, previewIndex]));
 
   const reset = () => setResult(null);
   async function apply() {
@@ -177,171 +183,179 @@ export default function TransformTool({ locale, kind, axis: axis0 = "h", paper: 
     }
   }
 
-  const setMargin4 = (i: number, v: string) => {
+  const setMargin4 = (i: number, v: number | null) => {
     reset();
-    setMargins((m) => (same ? [v, v, v, v] : (m.map((x, k) => (k === i ? v : x)) as [string, string, string, string])));
+    const n = v ?? 0;
+    setMargins((m) => (same ? [n, n, n, n] : (m.map((x, k) => (k === i ? n : x)) as [number, number, number, number])));
   };
   const Icon = ICON[kind];
   const autoFound = auto ? auto.filter((b) => b && (b[0] > 0.02 || b[1] > 0.02 || b[2] < 0.98 || b[3] < 0.98)).length : 0;
 
-  return (
-    <div className="flex flex-col gap-4">
-      <FilePanel locale={locale} pdf={pdf} disabled={job.running} />
-      {file && (
-        <>
-          <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
-            <div className="flex min-w-0 flex-col gap-4">
-              {kind === "flip" && (
-                <Field label={t.axis}>
-                  <Segmented
-                    label={t.axis}
-                    value={axis}
-                    onChange={(v) => {
-                      setAxis(v);
-                      reset();
-                    }}
-                    options={[
-                      {
-                        value: "h",
-                        label: (
-                          <span className="inline-flex items-center gap-1.5">
-                            <FlipVertical2 className="size-4" aria-hidden />
-                            {t.axes.h}
-                          </span>
-                        ),
-                      },
-                      {
-                        value: "v",
-                        label: (
-                          <span className="inline-flex items-center gap-1.5">
-                            <FlipHorizontal2 className="size-4" aria-hidden />
-                            {t.axes.v}
-                          </span>
-                        ),
-                      },
-                    ]}
-                  />
-                </Field>
-              )}
+  const marginInput = (i: number, label: string, labelled = true) => {
+    const input = <NumberInput id={`${id}-m${i}`} locale={locale} value={margins[i]} onChange={(v) => setMargin4(i, v)} min={0} max={300} step={1} decimals={1} suffix={t.mm} aria-label={labelled ? undefined : label} />;
+    return labelled ? (
+      <Field key={i} label={label} htmlFor={`${id}-m${i}`}>
+        {input}
+      </Field>
+    ) : (
+      <div key={i}>{input}</div>
+    );
+  };
 
-              {kind === "crop" &&
-                (auto ? (
-                  <div className="flex flex-col gap-3">
-                    <Notice tone="ok">{autoFound ? t.autoDone(autoFound) : t.autoNone}</Notice>
-                    <Button variant="outline" className="self-start" onClick={() => setBoxes(null)}>
-                      {t.manual}
-                    </Button>
-                  </div>
-                ) : (
-                  <div className="flex flex-col gap-3">
-                    <span className="text-sm font-medium text-fg-2">{t.margins}</span>
-                    <OptionsRow>
-                      {([t.top, t.right, t.bottom, t.left] as const).map((label, i) => (
-                        <Field key={label} label={label} htmlFor={`${id}-m${i}`} className="w-20">
-                          <Input id={`${id}-m${i}`} type="number" inputMode="decimal" min={0} value={margins[i]} onChange={(e) => setMargin4(i, e.target.value)} />
-                        </Field>
-                      ))}
-                    </OptionsRow>
-                    <Switch label={t.same} checked={same} onChange={(e) => setSame(e.target.checked)} />
-                    <Button variant="outline" className="self-start" onClick={detect} disabled={job.running}>
-                      <ScanLine aria-hidden />
-                      {t.auto}
-                    </Button>
-                  </div>
-                ))}
+  const controls = (
+    <Controls>
+      {kind === "flip" && (
+        <Field label={t.axis}>
+          <Segmented
+            fill
+            label={t.axis}
+            value={axis}
+            onChange={(v) => {
+              setAxis(v);
+              reset();
+            }}
+            options={[
+              { value: "h", label: t.axes.h, icon: <FlipHorizontal2 className="size-4" aria-hidden /> },
+              { value: "v", label: t.axes.v, icon: <FlipVertical2 className="size-4" aria-hidden /> },
+            ]}
+          />
+        </Field>
+      )}
 
-              {kind === "resize" && (
-                <div className="flex flex-col gap-3">
-                  <Field label={t.paper}>
-                    <Segmented
-                      wrap
-                      label={t.paper}
-                      value={paper}
-                      onChange={(v) => {
-                        setPaper(v);
-                        reset();
-                      }}
-                      options={PAPERS.map((p) => ({ value: p.id, label: p.label }))}
-                    />
-                  </Field>
-                  <Field label={t.orientation}>
-                    <Segmented
-                      wrap
-                      label={t.orientation}
-                      value={orientation}
-                      onChange={(v) => {
-                        setOrientation(v);
-                        reset();
-                      }}
-                      options={(["auto", "portrait", "landscape"] as const).map((v) => ({ value: v, label: t.orientations[v] }))}
-                    />
-                  </Field>
-                  <OptionsRow>
-                    <Field label={t.margin} htmlFor={`${id}-mg`} className="w-24">
-                      <Input
-                        id={`${id}-mg`}
-                        type="number"
-                        inputMode="decimal"
-                        min={0}
-                        value={margin}
-                        onChange={(e) => {
-                          setMargin(e.target.value);
-                          reset();
-                        }}
-                      />
-                    </Field>
-                    <Switch
-                      label={t.scale}
-                      checked={scale}
-                      onChange={(e) => {
-                        setScale(e.target.checked);
-                        reset();
-                      }}
-                      className="pb-2"
-                    />
-                  </OptionsRow>
-                </div>
-              )}
-
-              {kind === "gray" && <p className="text-sm text-fg-3">{t.grayNote}</p>}
-              {kind === "invert" && <p className="text-sm text-fg-3">{t.invertNote}</p>}
-
-              {count > 1 && (
-                <RangeField
-                  locale={locale}
-                  label={t.pages}
-                  value={rangeText}
-                  onChange={(v) => {
-                    setRangeText(v);
-                    reset();
-                  }}
-                  result={range}
-                  pageCount={count}
-                  placeholder={t.pagesPh}
-                  className="max-w-xs"
-                />
-              )}
-            </div>
-            <PdfPreview bytes={preview.bytes} busy={preview.busy} label={t.preview} />
+      {kind === "crop" &&
+        (auto ? (
+          <div className="flex flex-col gap-3">
+            <Notice tone="ok">{autoFound ? t.autoDone(autoFound) : t.autoNone}</Notice>
+            <Button variant="outlined" className="self-start" onClick={() => setBoxes(null)}>
+              {t.manual}
+            </Button>
           </div>
-          <PrimaryButton disabled={job.running || !range.ok} onClick={apply}>
-            <Icon aria-hidden />
-            {t.go[kind]}
-          </PrimaryButton>
-          <JobStatus locale={locale} state={job.state} onCancel={job.cancel} />
-          {result && (
-            <ResultCard
-              locale={locale}
-              items={result}
-              onReset={() => {
-                setResult(null);
-                setBoxes(null);
-                pdf.clear();
-                job.reset();
+        ) : (
+          <div className="flex flex-col gap-3">
+            <span className="text-sm font-medium text-fg-2">{t.margins}</span>
+            {same ? (
+              marginInput(0, t.all, false)
+            ) : (
+              <div className="grid grid-cols-2 gap-3">{([t.top, t.right, t.bottom, t.left] as const).map((label, i) => marginInput(i, label))}</div>
+            )}
+            <Switch
+              label={t.same}
+              checked={same}
+              onChange={(e) => {
+                setSame(e.target.checked);
+                if (e.target.checked) setMargins((m) => [m[0], m[0], m[0], m[0]]);
               }}
             />
-          )}
+            <Button variant="tonal" className="self-start" onClick={detect} disabled={job.running}>
+              <ScanLine aria-hidden />
+              {t.auto}
+            </Button>
+          </div>
+        ))}
+
+      {kind === "resize" && (
+        <>
+          <Field label={t.paper}>
+            <Segmented
+              label={t.paper}
+              value={paper}
+              onChange={(v) => {
+                setPaper(v);
+                reset();
+              }}
+              options={PAPERS.map((p) => ({ value: p.id, label: p.label }))}
+            />
+          </Field>
+          <Field label={t.orientation}>
+            <Segmented
+              label={t.orientation}
+              value={orientation}
+              onChange={(v) => {
+                setOrientation(v);
+                reset();
+              }}
+              options={(["auto", "portrait", "landscape"] as const).map((v) => ({ value: v, label: t.orientations[v] }))}
+            />
+          </Field>
+          <Field label={t.margin} htmlFor={`${id}-mg`}>
+            <NumberInput
+              id={`${id}-mg`}
+              locale={locale}
+              value={margin}
+              onChange={(v) => {
+                setMargin(v ?? 0);
+                reset();
+              }}
+              min={0}
+              max={100}
+              step={5}
+              decimals={1}
+              suffix={t.mm}
+              className="max-w-48"
+            />
+          </Field>
+          <Switch
+            label={t.scale}
+            checked={scale}
+            onChange={(e) => {
+              setScale(e.target.checked);
+              reset();
+            }}
+          />
         </>
+      )}
+
+      {kind === "gray" && <p className="text-sm text-fg-2">{t.grayNote}</p>}
+      {kind === "invert" && <p className="text-sm text-fg-2">{t.invertNote}</p>}
+
+      {count > 1 && (
+        <RangeField
+          locale={locale}
+          label={t.pages}
+          value={rangeText}
+          onChange={(v) => {
+            setRangeText(v);
+            reset();
+          }}
+          result={range}
+          pageCount={count}
+          placeholder={t.pagesPh}
+        />
+      )}
+    </Controls>
+  );
+
+  return (
+    <div className="flex flex-col gap-4">
+      {!file ? (
+        <FilePanel locale={locale} pdf={pdf} disabled={job.running} />
+      ) : (
+        <Workspace
+          files={<FilePanel locale={locale} pdf={pdf} disabled={job.running} />}
+          preview={<PdfPreview locale={locale} preview={preview} original={{ doc: file.doc, index: previewIndex }} label={t.preview} />}
+          controls={controls}
+          action={
+            <>
+              <PrimaryButton disabled={job.running || !range.ok} done={!!result} onClick={apply}>
+                <Icon aria-hidden />
+                {t.go[kind]}
+              </PrimaryButton>
+              <JobStatus locale={locale} state={job.state} onCancel={job.cancel} />
+              {result && (
+                <ResultCard
+                  locale={locale}
+                  items={result}
+                  onReset={() => {
+                    setResult(null);
+                    setBoxes(null);
+                    pdf.clear();
+                    job.reset();
+                  }}
+                />
+              )}
+            </>
+          }
+        />
       )}
     </div>
   );

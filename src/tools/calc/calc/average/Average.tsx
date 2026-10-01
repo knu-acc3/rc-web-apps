@@ -102,7 +102,7 @@ export default function Average({ locale, kind = "arithmetic" }: ToolProps<{ kin
       <CalcGrid
         inputs={
           <>
-            <Segmented label={t.kind} value={k} onChange={(v) => q.set({ k: v })} options={KINDS.map((x) => ({ value: x, label: t.kinds[x] }))} />
+            <Segmented label={t.kind} fill value={k} onChange={(v) => q.set({ k: v })} options={KINDS.map((x) => ({ value: x, label: t.kinds[x] }))} />
             {k === "weighted" ? (
               <Field label={t.pairs} htmlFor={`${id}-w`} hint={t.pairsHint} error={bad.length ? t.invalid(bad.slice(0, 5).join(" | ")) : undefined}>
                 <Textarea id={`${id}-w`} value={q.v.w} onChange={(e) => q.set({ w: e.target.value })} rows={6} className="tabular text-base" />

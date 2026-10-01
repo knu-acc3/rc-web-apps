@@ -42,9 +42,7 @@ export default function FeaturesInfo({ locale }: ToolProps) {
   const d = useDetected(detect);
   const [filter, setFilter] = useState<Filter>("all");
   const ok = d ? FEATURES.filter((f) => d[f.id]).length : 0;
-  const report = d
-    ? [t.report, ...FEATURE_GROUPS.flatMap((g) => ["", tr(g.name, locale), ...FEATURES.filter((f) => f.group === g.id).map((f) => `${d[f.id] ? "✓" : "✗"} ${tr(f.name, locale)}`)])].join("\n")
-    : undefined;
+  const report = d ? [t.report, ...FEATURE_GROUPS.flatMap((g) => ["", tr(g.name, locale), ...FEATURES.filter((f) => f.group === g.id).map((f) => `${d[f.id] ? "✓" : "✗"} ${tr(f.name, locale)}`)])].join("\n") : undefined;
 
   return (
     <Stack>
@@ -62,18 +60,18 @@ export default function FeaturesInfo({ locale }: ToolProps) {
           ]}
         />
       </Hero>
-      <div className="gap-10 lg:columns-2">
+      <div className="gap-4 lg:columns-2 2xl:columns-3">
         {FEATURE_GROUPS.map((g) => {
           const total = FEATURES.filter((f) => f.group === g.id);
           const items = total.filter((f) => !d || filter === "all" || (filter === "yes") === d[f.id]);
           if (d && items.length === 0) return null;
           return (
-            <section key={g.id} className="mb-6 break-inside-avoid">
-              <h2 className="flex items-baseline justify-between gap-3 text-sm font-semibold text-fg-2">
+            <section key={g.id} className="panel mb-4 break-inside-avoid p-4 sm:p-5">
+              <h2 className="flex items-baseline justify-between gap-3 text-sm font-semibold text-fg">
                 {tr(g.name, locale)}
                 {d ? <span className="tabular font-normal text-fg-3">{`${total.filter((f) => d[f.id]).length}/${total.length}`}</span> : null}
               </h2>
-              <ul className="mt-1 divide-y divide-line border-y border-line">
+              <ul className="mt-2 divide-y divide-line">
                 {items.map((f) => (
                   <li key={f.id} className="flex items-center justify-between gap-3 py-2 text-[0.9375rem]">
                     <span className="min-w-0 text-fg">{tr(f.name, locale)}</span>
@@ -104,4 +102,3 @@ export default function FeaturesInfo({ locale }: ToolProps) {
     </Stack>
   );
 }
-

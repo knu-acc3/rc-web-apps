@@ -233,26 +233,20 @@ export default function MouseTest({ locale }: { locale: Locale }) {
   return (
     <div className="flex flex-col gap-4">
       <Panel className="overflow-hidden">
-        <div className="grid md:grid-cols-[minmax(0,1fr)_17rem]">
-          <div
-            ref={areaRef}
-            role="region"
-            aria-label={t.area}
-            className="flex min-h-72 cursor-crosshair select-none flex-col items-center justify-center gap-2 bg-surface-2/60 px-6 py-10 text-center"
-          >
-            <MousePointerClick className="size-8 text-accent" aria-hidden />
+        <div className="grid md:grid-cols-[minmax(0,1fr)_18rem]">
+          <div ref={areaRef} role="region" aria-label={t.area} className="flex min-h-80 cursor-crosshair select-none flex-col items-center justify-center gap-2 bg-surface-2 px-6 py-10 text-center lg:min-h-96">
+            <span className="flex size-16 items-center justify-center rounded-full bg-accent-soft text-accent" aria-hidden>
+              <MousePointerClick className="size-8" />
+            </span>
             <p className="max-w-sm text-[0.9375rem] font-medium text-fg">{t.areaHint}</p>
             <p className="max-w-sm text-[0.8125rem] text-fg-3">{t.areaNote}</p>
           </div>
-          <div className="flex flex-col items-center gap-3 border-t border-line p-4 md:border-l md:border-t-0">
+          <div className="flex flex-col items-center gap-3 p-4 sm:p-5">
             <MouseDiagram down={s.btn.map((b) => b.down)} tested={s.btn.map((b) => b.count > 0)} wheel={!!w} labels={t.buttons} />
             <ul className="w-full text-sm">
               {s.btn.map((b, i) => (
                 <li key={i} className="flex items-center gap-2 py-0.5">
-                  <span
-                    className={cn("size-2.5 shrink-0 rounded-full", b.down ? "bg-accent" : b.count > 0 ? "bg-ok" : "border border-line-strong")}
-                    aria-hidden
-                  />
+                  <span className={cn("size-2.5 shrink-0 rounded-full", b.down ? "bg-accent" : b.count > 0 ? "bg-ok" : "border border-line-strong")} aria-hidden />
                   <span className={cn("min-w-0 flex-1 truncate", b.count > 0 || b.down ? "text-fg" : "text-fg-3")}>
                     {i} · {t.buttons[i]}
                   </span>
@@ -316,7 +310,7 @@ export default function MouseTest({ locale }: { locale: Locale }) {
 
       <div className="flex flex-wrap items-center justify-between gap-3">
         <p className="min-w-0 flex-1 basis-64 text-[0.8125rem] text-fg-3">{!coalesced && t.pollNoCoalesced}</p>
-        <Button variant="ghost" size="sm" onClick={() => dispatch({ type: "reset" })}>
+        <Button variant="tonal" onClick={() => dispatch({ type: "reset" })}>
           <RotateCcw aria-hidden />
           {t.reset}
         </Button>

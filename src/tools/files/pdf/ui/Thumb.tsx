@@ -1,60 +1,70 @@
 "use client";
 
+import { ImageOff } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/cn";
 import type { Thumbnailer } from "../lib/pdfjs";
 
-/* One shared IntersectionObserver for all thumbnails on the page. */
-type Cb = (visible: boolean) => void;
-let observer: IntersectionObserver | null = null;
-const callbacks = new Map<Element, Cb>();
+/* Two shared IntersectionObservers for all thumbnails: "near" (start rendering) and "on screen" (render first). */
+type Seen = { near: boolean; visible: boolean };
+const listeners = new Map<Element, (patch: Partial<Seen>) => void>();
+let nearObs: IntersectionObserver | null = null;
+let seenObs: IntersectionObserver | null = null;
 
-function observe(el: Element, cb: Cb) {
+function observe(el: Element, cb: (patch: Partial<Seen>) => void) {
   if (typeof IntersectionObserver === "undefined") {
-    cb(true);
+    cb({ near: true, visible: true });
     return () => {};
   }
-  observer ??= new IntersectionObserver(
-    (entries) => {
-      for (const e of entries) callbacks.get(e.target)?.(e.isIntersecting);
-    },
-    { rootMargin: "300px 0px" },
-  );
-  callbacks.set(el, cb);
-  observer.observe(el);
+  nearObs ??= new IntersectionObserver((entries) => entries.forEach((e) => listeners.get(e.target)?.({ near: e.isIntersecting })), { rootMargin: "400px 0px" });
+  seenObs ??= new IntersectionObserver((entries) => entries.forEach((e) => listeners.get(e.target)?.({ visible: e.isIntersecting })));
+  listeners.set(el, cb);
+  nearObs.observe(el);
+  seenObs.observe(el);
   return () => {
-    callbacks.delete(el);
-    observer?.unobserve(el);
+    listeners.delete(el);
+    nearObs?.unobserve(el);
+    seenObs?.unobserve(el);
   };
 }
 
 /** Lazily rendered page thumbnail. `rotate` is an extra clockwise rotation shown with CSS. */
 export function Thumb({ thumbs, index, rotate = 0, className, dim }: { thumbs: Thumbnailer | null; index: number; rotate?: number; className?: string; dim?: boolean }) {
   const ref = useRef<HTMLDivElement>(null);
-  const [visible, setVisible] = useState(false);
+  const [seen, setSeen] = useState<Seen>({ near: false, visible: false });
   const [url, setUrl] = useState<string | null>(null);
+  const [failed, setFailed] = useState<{ thumbs: Thumbnailer; index: number } | null>(null);
 
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
-    return observe(el, setVisible);
+    return observe(el, (patch) => {
+      setSeen((s) => ({ ...s, ...patch }));
+      // A failed thumbnail is tried again the next time it scrolls into view.
+      if (patch.near === false) setFailed(null);
+    });
   }, []);
 
   const cached = thumbs?.peek(index) ?? null;
+  const isFailed = !!failed && failed.thumbs === thumbs && failed.index === index;
+  const want = seen.near || seen.visible;
   useEffect(() => {
-    if (!visible || !thumbs || cached) return;
+    if (!want || !thumbs || cached || isFailed) return;
     let live = true;
     thumbs
-      .get(index)
+      .get(index, seen.visible)
       .then((u) => {
         if (live) setUrl(u);
       })
-      .catch(() => {});
+      .catch((e: unknown) => {
+        const msg = e instanceof Error ? e.message : "";
+        if (live && msg !== "cancelled" && msg !== "disposed") setFailed({ thumbs, index });
+      });
     return () => {
       live = false;
       thumbs.cancel(index);
     };
-  }, [visible, thumbs, index, cached]);
+  }, [want, seen.visible, thumbs, index, cached, isFailed]);
 
   const src = cached ?? url;
   return (
@@ -65,11 +75,14 @@ export function Thumb({ thumbs, index, rotate = 0, className, dim }: { thumbs: T
           src={src}
           alt=""
           draggable={false}
-          className={cn("max-h-full max-w-full border border-line bg-white object-contain shadow-[0_1px_2px_rgb(0_0_0/0.08)] transition-transform duration-150", dim && "opacity-35 grayscale")}
+          decoding="async"
+          className={cn("max-h-full max-w-full bg-white object-contain shadow-[0_1px_3px_rgb(0_0_0/0.18)] transition-transform duration-150", dim && "opacity-35 grayscale")}
           style={rotate ? { transform: `rotate(${rotate}deg)` } : undefined}
         />
+      ) : isFailed ? (
+        <ImageOff className="size-5 text-fg-3" aria-hidden />
       ) : (
-        <span className="h-3/4 w-1/2 animate-pulse rounded-[0.25rem] bg-line" aria-hidden />
+        <span className="h-3/4 w-1/2 rounded-[0.25rem] bg-line motion-safe:animate-pulse" aria-hidden />
       )}
     </div>
   );

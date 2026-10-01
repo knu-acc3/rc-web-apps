@@ -73,8 +73,8 @@ export function MonthGrid({
                     key={i}
                     title={m?.title}
                     className={cn(
-                      "tabular rounded-[0.375rem]",
-                      lg ? "h-12 sm:h-14" : "h-7",
+                      "tabular",
+                      lg ? "h-12 rounded-[0.75rem] sm:h-14 2xl:h-20 2xl:text-xl" : "h-7 rounded-[0.375rem]",
                       m?.cls ?? (i >= 5 ? "text-err" : "text-fg"),
                       isToday && "font-bold ring-2 ring-accent ring-inset",
                     )}

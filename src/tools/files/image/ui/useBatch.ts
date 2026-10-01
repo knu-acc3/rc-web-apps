@@ -12,6 +12,9 @@ export interface BatchResult {
   name: string;
   width: number;
   height: number;
+  /** Size of the source photo (when the runner knows it). */
+  srcWidth?: number;
+  srcHeight?: number;
   keptOriginal?: boolean;
   missedTarget?: boolean;
   limited?: boolean;

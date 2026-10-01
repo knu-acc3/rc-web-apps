@@ -76,19 +76,7 @@ function Stick({ x, y, label, sub }: { x: number; y: number; label: string; sub:
   );
 }
 
-export function GamepadCard({
-  locale,
-  pad,
-  drift,
-  onRumble,
-  onDrift,
-}: {
-  locale: Locale;
-  pad: PadSnap;
-  drift: DriftResult | undefined;
-  onRumble: () => void;
-  onDrift: () => void;
-}) {
+export function GamepadCard({ locale, pad, drift, onRumble, onDrift }: { locale: Locale; pad: PadSnap; drift: DriftResult | undefined; onRumble: () => void; onDrift: () => void }) {
   const t = T[locale];
   const f = (n: number, d = 2) => formatNumber(locale, n, { minimumFractionDigits: d, maximumFractionDigits: d });
   const sticks: [number, number][] = [];
@@ -97,7 +85,7 @@ export function GamepadCard({
   const triggers = pad.standard ? [6, 7].filter((i) => pad.buttons[i]) : [];
 
   return (
-    <Panel className="flex flex-col gap-5 p-4 sm:p-5">
+    <Panel className="flex flex-col gap-5 p-4 sm:p-6">
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div className="min-w-0">
           <h2 className="truncate text-[0.9375rem] font-semibold text-fg" title={pad.id}>
@@ -108,11 +96,11 @@ export function GamepadCard({
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <Button size="sm" variant="outline" onClick={onDrift} disabled={drift?.measuring}>
-            <Crosshair aria-hidden />
+          <Button variant="tonal" onClick={onDrift} loading={drift?.measuring}>
+            {!drift?.measuring && <Crosshair aria-hidden />}
             {drift?.measuring ? t.driftRun : t.drift}
           </Button>
-          <Button size="sm" variant="outline" onClick={onRumble} disabled={!pad.vibration} title={pad.vibration ? undefined : t.noVibration}>
+          <Button variant="tonal" onClick={onRumble} disabled={!pad.vibration} title={pad.vibration ? undefined : t.noVibration}>
             <Vibrate aria-hidden />
             {t.vibrate}
           </Button>
@@ -158,8 +146,8 @@ export function GamepadCard({
               <div
                 key={i}
                 className={cn(
-                  "relative flex h-14 flex-col items-center justify-center overflow-hidden rounded-[0.5rem] border text-center leading-tight",
-                  b.pressed ? "border-accent bg-accent text-accent-fg" : pad.ever[i] ? "border-ok/50 bg-ok-soft text-ok" : "border-line bg-surface-2 text-fg-2",
+                  "relative flex h-14 flex-col items-center justify-center overflow-hidden rounded-[0.75rem] text-center leading-tight transition-[background-color,color,transform] duration-75",
+                  b.pressed ? "scale-95 bg-accent text-accent-fg" : pad.ever[i] ? "bg-ok-soft text-ok" : "bg-surface-2 text-fg-2",
                 )}
               >
                 {!b.pressed && b.value > 0.01 && <span className="absolute inset-x-0 bottom-0 bg-accent/30" style={{ height: `${b.value * 100}%` }} aria-hidden />}
@@ -180,10 +168,7 @@ export function GamepadCard({
                 <span className="w-14 shrink-0 font-mono text-fg-3">axis {i}</span>
                 <div className="relative h-2 flex-1 rounded-full bg-surface-2" aria-hidden>
                   <span className="absolute inset-y-0 left-1/2 w-px bg-line-strong" />
-                  <span
-                    className="absolute inset-y-0 rounded-full bg-accent"
-                    style={a >= 0 ? { left: "50%", width: `${a * 50}%` } : { right: "50%", width: `${-a * 50}%` }}
-                  />
+                  <span className="absolute inset-y-0 rounded-full bg-accent" style={a >= 0 ? { left: "50%", width: `${a * 50}%` } : { right: "50%", width: `${-a * 50}%` }} />
                 </div>
                 <span className="tabular w-14 shrink-0 text-right text-fg">{f(a)}</span>
               </div>

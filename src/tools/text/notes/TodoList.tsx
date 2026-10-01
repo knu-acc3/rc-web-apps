@@ -6,8 +6,8 @@ import type { Locale } from "@/i18n/config";
 import { cn } from "@/lib/cn";
 import { downloadText } from "@/lib/clipboard";
 import { Button, buttonClass } from "@/ui/button";
-import { Input, Select } from "@/ui/field";
-import { Notice } from "@/ui/panel";
+import { Checkbox, Input, Select } from "@/ui/field";
+import { Notice, Panel } from "@/ui/panel";
 import { Segmented } from "@/ui/segmented";
 import { lastWriteFailed } from "../text/lib/storage";
 import { countLabel, FileOpenButton, MoreOptions } from "../text/ui/shared";
@@ -199,13 +199,13 @@ export default function TodoList({ locale, template }: { locale: Locale; templat
   }
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex max-w-5xl flex-col gap-4">
       {tpl && (
         <Notice className="flex flex-wrap items-center justify-between gap-3">
           <span>
             {t.template}: <strong className="text-fg">{tpl.name}</strong> · {countLabel(locale, templateItems(template!, locale).length, t.items)}
           </span>
-          <Button size="sm" variant="primary" onClick={() => setActiveId(createList(tpl.name, templateItems(template!, locale)))}>
+          <Button variant="filled" onClick={() => setActiveId(createList(tpl.name, templateItems(template!, locale)))}>
             <ListPlus aria-hidden />
             {t.useTemplate}
           </Button>
@@ -214,7 +214,7 @@ export default function TodoList({ locale, template }: { locale: Locale; templat
 
       <div className="flex flex-wrap items-center gap-2">
         {lists.length > 1 ? (
-          <Select aria-label={t.list} value={listId ?? ""} onChange={(e) => setActiveId(e.target.value)} size="sm" className="min-w-0 flex-1 sm:max-w-72">
+          <Select aria-label={t.list} value={listId ?? ""} onChange={(e) => setActiveId(e.target.value)} variant="tonal" className="mr-auto min-w-0">
             {lists.map((l) => (
               <option key={l.id} value={l.id}>
                 {l.name}
@@ -222,9 +222,9 @@ export default function TodoList({ locale, template }: { locale: Locale; templat
             ))}
           </Select>
         ) : (
-          <h2 className="mr-auto min-w-0 truncate text-lg font-semibold text-fg">{list?.name ?? t.defaultName}</h2>
+          <h2 className="mr-auto min-w-0 truncate text-xl font-semibold text-fg">{list?.name ?? t.defaultName}</h2>
         )}
-        <Button size="sm" variant="ghost" onClick={() => setActiveId(createList(t.newListName))}>
+        <Button variant="tonal" onClick={() => setActiveId(createList(t.newListName))}>
           <Plus aria-hidden />
           {t.newList}
         </Button>
@@ -240,18 +240,18 @@ export default function TodoList({ locale, template }: { locale: Locale; templat
         <label htmlFor={`${id}-new`} className="sr-only">
           {t.newTask}
         </label>
-        <Input id={`${id}-new`} value={draft} onChange={(e) => setDraft(e.target.value)} placeholder={t.placeholder} size="lg" className="min-w-0 flex-1 basis-60 text-base! font-normal!" autoComplete="off" />
+        <Input id={`${id}-new`} value={draft} onChange={(e) => setDraft(e.target.value)} placeholder={t.placeholder} size="lg" className="min-w-0 flex-[1_1_15rem] text-base! font-normal!" autoComplete="off" />
         <label htmlFor={`${id}-due`} className="sr-only">
           {t.due}
         </label>
-        <Input id={`${id}-due`} type="date" value={draftDue} onChange={(e) => setDraftDue(e.target.value)} size="lg" className="w-44 text-base! font-normal!" title={t.due} />
-        <Button type="submit" variant="primary" size="lg" disabled={!draft.trim()}>
+        <Input id={`${id}-due`} type="date" value={draftDue} onChange={(e) => setDraftDue(e.target.value)} size="lg" className="min-w-0 flex-[1_1_9rem] text-base! font-normal! sm:max-w-44" title={t.due} />
+        <Button type="submit" variant="filled" size="lg" disabled={!draft.trim()} className="flex-[1_1_auto] sm:flex-none">
           <Plus aria-hidden />
           {t.add}
         </Button>
       </form>
 
-      <div className="rounded-[0.75rem] border border-line bg-surface">
+      <Panel className="overflow-hidden">
         {items.length === 0 ? (
           <p className="px-4 py-6 text-center text-sm text-fg-3">{t.empty}</p>
         ) : shown.length === 0 ? (
@@ -269,7 +269,7 @@ export default function TodoList({ locale, template }: { locale: Locale; templat
                     else rows.current.delete(item.id);
                   }}
                   className={cn(
-                    "group flex items-center gap-2 border-b border-line px-2 py-1.5 last:border-b-0",
+                    "group/row flex items-center gap-1 border-b border-line px-1.5 py-1 transition-colors last:border-b-0 sm:px-2",
                     drag?.id === item.id && "bg-surface-2",
                     drag && drag.over === idx && drag.id !== item.id && "shadow-[inset_0_2px_0_var(--accent)]",
                   )}
@@ -278,7 +278,7 @@ export default function TodoList({ locale, template }: { locale: Locale; templat
                     type="button"
                     aria-label={t.move(item.text)}
                     title={t.move(item.text)}
-                    className="flex size-8 shrink-0 cursor-grab touch-none items-center justify-center rounded-[0.375rem] text-fg-3 hover:bg-surface-2 hover:text-fg active:cursor-grabbing"
+                    className={buttonClass("neutral", "icon-sm", "shrink-0 cursor-grab touch-none text-fg-3 active:cursor-grabbing")}
                     onKeyDown={(e) => {
                       if (e.key === "ArrowUp" || e.key === "ArrowDown") {
                         e.preventDefault();
@@ -307,19 +307,18 @@ export default function TodoList({ locale, template }: { locale: Locale; templat
                   >
                     <GripVertical className="size-4" aria-hidden />
                   </button>
-                  <input
-                    type="checkbox"
+                  <Checkbox
+                    label={<span className="sr-only">{t.doneLabel(item.text)}</span>}
                     checked={item.done}
-                    aria-label={t.doneLabel(item.text)}
                     onChange={(e) => update((xs) => xs.map((x) => (x.id === item.id ? { ...x, done: e.target.checked } : x)))}
-                    className="size-[1.125rem] shrink-0 cursor-pointer accent-[var(--accent)]"
+                    className="shrink-0 px-2.5"
                   />
                   <input
                     value={item.text}
                     aria-label={t.edit(item.text)}
                     onChange={(e) => update((xs) => xs.map((x) => (x.id === item.id ? { ...x, text: e.target.value } : x)))}
                     className={cn(
-                      "min-w-0 flex-1 rounded-[0.375rem] bg-transparent px-2 py-1.5 text-[0.9375rem] focus:bg-surface-2 focus:outline-none",
+                      "min-h-10 min-w-0 flex-1 rounded-[0.625rem] bg-transparent px-2 py-1.5 text-base transition-colors focus:bg-surface-2 focus:outline-none sm:text-[0.9375rem]",
                       item.done ? "text-fg-3 line-through" : "text-fg",
                     )}
                   />
@@ -330,7 +329,7 @@ export default function TodoList({ locale, template }: { locale: Locale; templat
                     onChange={(e) => update((xs) => xs.map((x) => (x.id === item.id ? { ...x, due: e.target.value } : x)))}
                     className={cn(
                       "hidden w-36 shrink-0 rounded-[0.375rem] bg-transparent px-1.5 py-1 text-[0.8125rem] sm:block",
-                      item.due ? (overdue ? "text-err" : "text-fg-2") : "text-fg-3 opacity-0 group-focus-within:opacity-100 group-hover:opacity-100 focus:opacity-100",
+                      item.due ? (overdue ? "text-err" : "text-fg-2") : "text-fg-3 opacity-0 group-focus-within/row:opacity-100 group-hover/row:opacity-100 focus:opacity-100",
                     )}
                   />
                   {overdue && <span className="shrink-0 text-[0.75rem] text-err sm:hidden">{t.overdue}</span>}
@@ -339,18 +338,18 @@ export default function TodoList({ locale, template }: { locale: Locale; templat
                     aria-label={t.remove(item.text)}
                     title={t.remove(item.text)}
                     onClick={() => update((xs) => xs.filter((x) => x.id !== item.id))}
-                    className="flex size-8 shrink-0 items-center justify-center rounded-[0.375rem] text-fg-3 opacity-60 hover:bg-err-soft hover:text-err hover:opacity-100 focus:opacity-100"
+                    className={buttonClass("neutral", "icon-sm", "shrink-0 text-fg-3 hover:text-err")}
                   >
-                    <X className="size-4" aria-hidden />
+                    <X aria-hidden />
                   </button>
                 </li>
               );
             })}
           </ul>
         )}
-      </div>
+      </Panel>
 
-      <div className="flex flex-wrap items-center gap-3 text-sm">
+      <div className={cn("flex flex-wrap items-center gap-3 text-sm", items.length === 0 && "hidden")}>
         <Segmented
           label={t.filter}
           value={filter}
@@ -362,26 +361,33 @@ export default function TodoList({ locale, template }: { locale: Locale; templat
             { value: "done", label: t.done },
           ]}
         />
-        <span className="tabular text-fg-2">{t.progress(doneCount, items.length)}</span>
+        <span className="flex items-center gap-2.5">
+          <span className="tabular whitespace-nowrap text-fg-2">{t.progress(doneCount, items.length)}</span>
+          {items.length > 0 && (
+            <span className="h-1.5 w-24 overflow-hidden rounded-full bg-surface-2" aria-hidden>
+              <span className="block h-full rounded-full bg-accent transition-[width] duration-300" style={{ width: `${(doneCount / items.length) * 100}%` }} />
+            </span>
+          )}
+        </span>
         {doneCount > 0 && (
           <button type="button" className={buttonClass("ghost", "sm")} onClick={() => update((xs) => xs.filter((x) => !x.done))}>
             {t.clearDone}
           </button>
         )}
-        <span className="sr-only" aria-live="polite">
-          {announce}
-        </span>
       </div>
+      <span className="sr-only" aria-live="polite">
+        {announce}
+      </span>
 
       <MoreOptions locale={locale}>
         {list && (
-          <label className="flex items-center gap-2">
-            <span className="text-fg-2">{t.listName}</span>
+          <label className="flex max-w-full min-w-0 items-center gap-2">
+            <span className="shrink-0 text-fg-2">{t.listName}</span>
             <Input
               value={list.name}
               onChange={(e) => writeLists(readLists().map((l) => (l.id === list.id ? { ...l, name: e.target.value } : l)))}
               size="sm"
-              className="w-56"
+              className="w-56 max-w-full"
             />
           </label>
         )}

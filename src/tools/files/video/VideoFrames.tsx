@@ -1,6 +1,6 @@
 "use client";
 
-import { Camera, Download, Images } from "lucide-react";
+import { Camera, Download, Images, RotateCcw } from "lucide-react";
 import { useEffect, useId, useRef, useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { count, formatBytes, formatNumber } from "@/i18n/format";
@@ -8,10 +8,12 @@ import { downloadBlob } from "@/lib/clipboard";
 import { Button } from "@/ui/button";
 import { Field, Select } from "@/ui/field";
 import { Notice, Panel } from "@/ui/panel";
+import { Segmented } from "@/ui/segmented";
 import { runFrames } from "../shared/client";
 import { formatTime } from "../shared/time";
 import { VIDEO_ACCEPT } from "./ui/FilePicker";
 import { useJob, useProbe } from "./ui/hooks";
+import { Setting, StepSlider } from "./ui/options";
 import { JobProgress } from "./ui/Progress";
 import { UI } from "./ui/strings";
 import { VideoPreview, type PreviewHandle } from "./ui/VideoPreview";
@@ -116,41 +118,32 @@ export default function VideoFrames({ locale }: { locale: Locale }) {
         file && (
           <div className="flex flex-col gap-3">
             <VideoPreview ref={player} file={file} label={t.preview} />
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              {n > 0 && (
-                <p className="text-fg-2" aria-live="polite">
-                  {t.will}: <span className="tabular text-2xl font-semibold text-fg">{count(locale, n, t.frames)}</span>
-                </p>
-              )}
-              <Button variant="outline" onClick={grab}>
-                <Camera aria-hidden />
-                {t.grab}
-              </Button>
-            </div>
+            <Button variant="tonal" onClick={grab} className="self-start">
+              <Camera aria-hidden />
+              {t.grab}
+            </Button>
           </div>
         )
       }
       warning={probe.info && !probe.info.video?.canDecode && !probe.loading ? <Notice tone="warn">{t.unsupported}</Notice> : n > 1500 ? <Notice tone="warn">{t.many}</Notice> : null}
       options={
         <>
-          <Field label={t.every} htmlFor={`${id}-s`} className="w-32">
-            <Select id={`${id}-s`} size="sm" value={String(step)} onChange={(e) => (setStep(Number(e.target.value)), touch())}>
-              {STEPS.map((s) => (
-                <option key={s} value={s}>
-                  {formatNumber(locale, s)} {t.sec}
-                </option>
-              ))}
-            </Select>
-          </Field>
-          <Field label={t.format} htmlFor={`${id}-f`} className="w-28">
-            <Select id={`${id}-f`} size="sm" value={format} onChange={(e) => (setFormat(e.target.value as typeof format), touch())}>
-              <option value="jpeg">JPG</option>
-              <option value="png">PNG</option>
-              <option value="webp">WebP</option>
-            </Select>
-          </Field>
-          <Field label={t.width} htmlFor={`${id}-w`} className="w-36">
-            <Select id={`${id}-w`} size="sm" value={String(width)} onChange={(e) => (setWidth(Number(e.target.value)), touch())}>
+          <StepSlider label={t.every} value={step} steps={STEPS} format={(x) => `${formatNumber(locale, x)} ${t.sec}`} onChange={(x) => (setStep(x), touch())} />
+          <Setting label={t.format}>
+            <Segmented
+              label={t.format}
+              value={format}
+              fill
+              onChange={(x) => (setFormat(x), touch())}
+              options={[
+                { value: "jpeg", label: "JPG" },
+                { value: "png", label: "PNG" },
+                { value: "webp", label: "WebP" },
+              ]}
+            />
+          </Setting>
+          <Field label={t.width} htmlFor={`${id}-w`}>
+            <Select id={`${id}-w`} value={String(width)} onChange={(e) => (setWidth(Number(e.target.value)), touch())}>
               <option value="0">{t.original}</option>
               {[1920, 1280, 960, 640, 320].map((w) => (
                 <option key={w} value={w}>
@@ -159,33 +152,37 @@ export default function VideoFrames({ locale }: { locale: Locale }) {
               ))}
             </Select>
           </Field>
+          {n > 0 && (
+            <div className="flex flex-wrap items-baseline justify-between gap-x-3 rounded-[1rem] bg-surface-2 px-4 py-3" aria-live="polite">
+              <span className="text-sm text-fg-2">{t.will}</span>
+              <span className="tabular text-2xl font-bold tracking-tight text-fg">{count(locale, n, t.frames)}</span>
+            </div>
+          )}
         </>
       }
       action={{ label: t.run, onClick: run, disabled: !n || !probe.info?.video?.canDecode, icon: <Images aria-hidden /> }}
       status={<JobProgress job={job} locale={locale} onCancel={job.cancel} onRetry={run} />}
       result={
         out ? (
-          <Panel className="flex flex-col gap-3 p-4">
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <p className="text-fg-2" aria-live="polite">
-                <span className="text-lg font-semibold text-fg">{count(locale, out.images.length, t.frames)}</span> · ZIP {formatBytes(locale, out.zip.size)}
-              </p>
-              <div className="flex gap-2">
-                <Button variant="primary" onClick={() => downloadBlob(out.zip, `${base}-frames.zip`)}>
-                  <Download aria-hidden />
-                  {t.zip}
-                </Button>
-                <Button variant="outline" onClick={job.reset}>
-                  {UI[locale].edit}
-                </Button>
-              </div>
-            </div>
-            <div className="grid grid-cols-3 gap-2 sm:grid-cols-6">
+          <Panel className="flex flex-col gap-4 p-4 motion-safe:animate-[menu-in_260ms_var(--ease-emph)] sm:p-5">
+            <p className="flex flex-wrap items-baseline gap-x-2 text-fg-2" aria-live="polite">
+              <span className="text-3xl font-bold tracking-tight text-fg">{count(locale, out.images.length, t.frames)}</span>
+              <span className="tabular">ZIP · {formatBytes(locale, out.zip.size)}</span>
+            </p>
+            <Button variant="filled" size="xl" fullWidth onClick={() => downloadBlob(out.zip, `${base}-frames.zip`)}>
+              <Download aria-hidden />
+              {t.zip}
+            </Button>
+            <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
               {out.images.slice(0, 24).map((im) => (
                 <Thumb key={im.name} blob={im.blob} name={im.name} />
               ))}
             </div>
             {out.images.length > 24 && <p className="text-[0.8125rem] text-fg-3">{t.shown.replace("{n}", "24")}</p>}
+            <Button variant="text" size="sm" onClick={job.reset} className="self-end">
+              <RotateCcw aria-hidden />
+              {UI[locale].edit}
+            </Button>
           </Panel>
         ) : null
       }

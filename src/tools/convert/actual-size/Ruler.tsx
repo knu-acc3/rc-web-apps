@@ -261,7 +261,6 @@ export default function Ruler({ locale, unit = "cm" }: { locale: Locale; unit?: 
               setMarker(null);
             }}
             size="sm"
-            className="w-28"
           >
             {LENGTHS[unit].map((n) => (
               <option key={n} value={n}>

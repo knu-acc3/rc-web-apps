@@ -1,19 +1,21 @@
 "use client";
 
 import { ChevronLeft, ChevronRight, Eraser, GripVertical, Save, Type, X } from "lucide-react";
-import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
+import { useEffect, useId, useRef, useState, type PointerEvent as ReactPointerEvent, type ReactNode } from "react";
 import type { Locale } from "@/i18n/config";
 import { cn } from "@/lib/cn";
-import { Button } from "@/ui/button";
+import { IconButton } from "@/ui/button";
+import { Field, Select } from "@/ui/field";
 import { Segmented } from "@/ui/segmented";
 import { loadUnicodeFont } from "./lib/client";
 import { EDIT_LINE_HEIGHT, type EditItem } from "./lib/edit-types";
 import { PageStage } from "./ui/PageStage";
-import { PrimaryButton, workerJob } from "./ui/bits";
+import { Caption, PrimaryButton, workerJob } from "./ui/bits";
 import { FilePanel } from "./ui/FilePanel";
 import { JobStatus, ResultCard, baseName, pdfBlob, type OutputItem } from "./ui/Result";
 import { useJob } from "./ui/use-job";
 import { usePdfFiles, type PdfFile } from "./ui/use-pdf-files";
+import { Controls, Summary, Workspace } from "./ui/Workspace";
 
 const T = {
   ru: {
@@ -26,9 +28,9 @@ const T = {
     page: (n: number, total: number) => `Страница ${n} из ${total}`,
     prev: "Предыдущая страница",
     next: "Следующая страница",
-    hintText: "Нажмите на страницу там, где нужен текст, и печатайте. Тяните за ⋮, чтобы передвинуть.",
-    hintBox: "Проведите по странице, чтобы закрасить лишнее белым прямоугольником.",
-    boxNote: "Закрашивание прячет текст только визуально: под прямоугольником он остаётся в файле. Для персональных данных этого недостаточно.",
+    hintText: "Нажмите на страницу и печатайте; ⋮ — передвинуть",
+    hintBox: "Проведите по странице, чтобы закрасить лишнее",
+    boxNote: "Закрашенный текст остаётся в файле под прямоугольником — для персональных данных этого мало.",
     placeholder: "Текст",
     remove: "Удалить",
     move: "Передвинуть",
@@ -47,9 +49,9 @@ const T = {
     page: (n: number, total: number) => `Page ${n} of ${total}`,
     prev: "Previous page",
     next: "Next page",
-    hintText: "Tap the page where you want text and type. Drag ⋮ to move it.",
-    hintBox: "Drag across the page to cover something with a white rectangle.",
-    boxNote: "White-out hides text only visually: it stays in the file under the box. Not enough for personal data.",
+    hintText: "Tap the page and type; drag ⋮ to move",
+    hintBox: "Drag across the page to cover something",
+    boxNote: "Covered text stays in the file under the box — not enough for personal data.",
     placeholder: "Text",
     remove: "Remove",
     move: "Move",
@@ -82,16 +84,13 @@ export default function EditTool({ locale, tool = "text" }: { locale: Locale; to
   const pdf = usePdfFiles({ thumbnails: false });
   const job = useJob(locale);
   const file = pdf.ready[0] ?? null;
-  return (
-    <div className="flex flex-col gap-4">
-      <FilePanel locale={locale} pdf={pdf} disabled={job.running} />
-      {file?.doc && <Editor key={file.id} locale={locale} file={file} job={job} tool0={tool} onClear={pdf.clear} />}
-    </div>
-  );
+  const files = <FilePanel locale={locale} pdf={pdf} disabled={job.running} />;
+  return <div className="flex flex-col gap-4">{file?.doc ? <Editor key={file.id} locale={locale} file={file} job={job} tool0={tool} onClear={pdf.clear} files={files} /> : files}</div>;
 }
 
-function Editor({ locale, file, job, tool0, onClear }: { locale: Locale; file: PdfFile; job: ReturnType<typeof useJob>; tool0: "text" | "box"; onClear: () => void }) {
+function Editor({ locale, file, job, tool0, onClear, files }: { locale: Locale; file: PdfFile; job: ReturnType<typeof useJob>; tool0: "text" | "box"; onClear: () => void; files: ReactNode }) {
   const t = T[locale];
+  const uid = useId();
   useEditorFont(); // only now: the font (~500 KB) isn't needed until a PDF is open
   const [page, setPage] = useState(0);
   const [tool, setTool] = useState<"text" | "box">(tool0);
@@ -169,81 +168,66 @@ function Editor({ locale, file, job, tool0, onClear }: { locale: Locale; file: P
     requestAnimationFrame(() => document.querySelector<HTMLTextAreaElement>(`[data-edit-item="${index}"] textarea`)?.focus({ preventScroll: true }));
   });
 
-  return (
-    <>
-      <div className="flex flex-wrap items-center gap-x-4 gap-y-3">
-        <Segmented
-          label={t.tool}
-          value={tool}
-          onChange={(v) => {
-            setTool(v);
-            setSelected(null);
-          }}
-          options={[
-            {
-              value: "text",
-              label: (
-                <span className="inline-flex items-center gap-1.5">
-                  <Type className="size-4" aria-hidden />
-                  {t.text}
-                </span>
-              ),
-            },
-            {
-              value: "box",
-              label: (
-                <span className="inline-flex items-center gap-1.5">
-                  <Eraser className="size-4" aria-hidden />
-                  {t.box}
-                </span>
-              ),
-            },
-          ]}
-        />
+  const controls = (
+    <Controls>
+      <Segmented
+        fill
+        label={t.tool}
+        value={tool}
+        onChange={(v) => {
+          setTool(v);
+          setSelected(null);
+        }}
+        options={[
+          { value: "text", label: t.text, icon: <Type className="size-4" aria-hidden /> },
+          { value: "box", label: t.box, icon: <Eraser className="size-4" aria-hidden /> },
+        ]}
+      />
+      <div className="flex flex-wrap items-end gap-x-5 gap-y-3">
         {tool === "text" && (
-          <label className="flex items-center gap-2 text-sm text-fg-2">
-            {t.size}
-            <select value={size} onChange={(e) => setStyle({ size: Number(e.target.value) })} className="control h-9 w-20 pointer-coarse:h-10">
+          <Field label={t.size} htmlFor={`${uid}-size`}>
+            <Select id={`${uid}-size`} value={size} onChange={(e) => setStyle({ size: Number(e.target.value) })}>
               {SIZES.map((s) => (
                 <option key={s} value={s}>
                   {s} pt
                 </option>
               ))}
-            </select>
-          </label>
+            </Select>
+          </Field>
         )}
-        <div role="radiogroup" aria-label={t.color} className="flex items-center gap-1.5">
-          {(Object.keys(COLORS) as ColorId[]).map((id) => (
-            <button
-              key={id}
-              type="button"
-              role="radio"
-              aria-checked={color === id}
-              aria-label={t.colors[id]}
-              title={t.colors[id]}
-              onClick={() => setStyle({ color: id })}
-              className={cn("size-8 rounded-full border border-line-strong pointer-coarse:size-10", color === id && "ring-3 ring-accent ring-offset-2 ring-offset-bg")}
-              style={{ background: css(COLORS[id]) }}
-            />
-          ))}
+        <div>
+          <Caption>{t.color}</Caption>
+          <div role="group" aria-label={t.color} className="flex h-10 items-center gap-2 pointer-coarse:h-11">
+            {(Object.keys(COLORS) as ColorId[]).map((id) => (
+              <button
+                key={id}
+                type="button"
+                aria-pressed={color === id}
+                aria-label={t.colors[id]}
+                title={t.colors[id]}
+                onClick={() => setStyle({ color: id })}
+                className={cn("size-8 rounded-full border border-line-strong transition-transform duration-150 motion-safe:active:scale-90 pointer-coarse:size-10", color === id && "ring-3 ring-accent ring-offset-2 ring-offset-surface")}
+                style={{ background: css(COLORS[id]) }}
+              />
+            ))}
+          </div>
         </div>
       </div>
       <p className="text-sm text-fg-3">{tool === "text" ? t.hintText : t.hintBox}</p>
       {tool === "box" && <p className="text-sm text-warn">{t.boxNote}</p>}
+    </Controls>
+  );
 
+  const stage = (
+    <section className="flex min-w-0 flex-col gap-3 rounded-[1.25rem] bg-surface-2 p-3 sm:p-4">
       {count > 1 && (
-        <div className="flex items-center justify-center gap-2">
-          <Button size="icon" variant="ghost" onClick={() => setPage((p) => Math.max(0, p - 1))} disabled={page === 0} aria-label={t.prev}>
-            <ChevronLeft aria-hidden />
-          </Button>
-          <span className="tabular-nums text-sm text-fg-2">{t.page(page + 1, count)}</span>
-          <Button size="icon" variant="ghost" onClick={() => setPage((p) => Math.min(count - 1, p + 1))} disabled={page >= count - 1} aria-label={t.next}>
-            <ChevronRight aria-hidden />
-          </Button>
+        <div className="flex items-center justify-center gap-1">
+          <IconButton label={t.prev} icon={<ChevronLeft aria-hidden />} onClick={() => setPage((p) => Math.max(0, p - 1))} disabled={page === 0} />
+          <span className="tabular min-w-28 text-center text-sm font-medium text-fg">{t.page(page + 1, count)}</span>
+          <IconButton label={t.next} icon={<ChevronRight aria-hidden />} onClick={() => setPage((p) => Math.min(count - 1, p + 1))} disabled={page >= count - 1} />
         </div>
       )}
-
-      <PageStage doc={file.doc!} index={page} label={t.stage(page + 1)}>
+      <PageStage locale={locale} doc={file.doc!} index={page} label={t.stage(page + 1)}>
         {(stage) => {
           const k = pt && pt.page === page ? stage.width / pt.width : null; // screen px per pt
           return (
@@ -324,25 +308,38 @@ function Editor({ locale, file, job, tool0, onClear }: { locale: Locale; file: P
           );
         }}
       </PageStage>
+    </section>
+  );
 
-      <p className="text-sm text-fg-2">{t.count(items.filter((it) => it.kind === "box" || it.text.trim()).length)}</p>
-      <PrimaryButton disabled={job.running || !items.some((it) => it.kind === "box" || it.text.trim())} onClick={save}>
-        <Save aria-hidden />
-        {t.save}
-      </PrimaryButton>
-      <JobStatus locale={locale} state={job.state} onCancel={job.cancel} />
-      {result && (
-        <ResultCard
-          locale={locale}
-          items={result}
-          onReset={() => {
-            setResult(null);
-            onClear();
-            job.reset();
-          }}
-        />
-      )}
-    </>
+  const ready = items.filter((it) => it.kind === "box" || it.text.trim()).length;
+  return (
+    <Workspace
+      files={files}
+      controls={controls}
+      preview={stage}
+      previewFirst={false}
+      action={
+        <>
+          <Summary size="md" quiet>{t.count(ready)}</Summary>
+          <PrimaryButton disabled={job.running || !ready} done={!!result} onClick={save}>
+            <Save aria-hidden />
+            {t.save}
+          </PrimaryButton>
+          <JobStatus locale={locale} state={job.state} onCancel={job.cancel} />
+          {result && (
+            <ResultCard
+              locale={locale}
+              items={result}
+              onReset={() => {
+                setResult(null);
+                onClear();
+                job.reset();
+              }}
+            />
+          )}
+        </>
+      }
+    />
   );
 }
 

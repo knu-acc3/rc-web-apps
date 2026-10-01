@@ -5,9 +5,11 @@ import { useEffect, useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { cn } from "@/lib/cn";
 import { usePersistentState } from "@/lib/persist";
+import { Button } from "@/ui/button";
 import { Slider } from "@/ui/field";
-import { Kbd } from "@/ui/panel";
+import { Kbd, Panel } from "@/ui/panel";
 import { StageLayer, typingTarget, useStage } from "@/ui/stage";
+import { BarButton } from "./ui/BarButton";
 import { colorById, dim, hexToRgb, whiteAt, luminance, rgbToHex, SCREEN_COLORS, type Rgb } from "./lib/color";
 
 const T = {
@@ -68,8 +70,7 @@ const T = {
 } as const;
 
 const STORE = "screen-color:v1";
-const isLook = (v: unknown): v is { b: number; k: number } =>
-  !!v && typeof v === "object" && Number.isFinite((v as { b: number }).b) && Number.isFinite((v as { k: number }).k);
+const isLook = (v: unknown): v is { b: number; k: number } => !!v && typeof v === "object" && Number.isFinite((v as { b: number }).b) && Number.isFinite((v as { k: number }).k);
 
 export default function ScreenColor({ locale, color = "white" }: { locale: Locale; color?: string }) {
   const t = T[locale];
@@ -107,74 +108,74 @@ export default function ScreenColor({ locale, color = "white" }: { locale: Local
     return () => window.removeEventListener("keydown", onKey);
   }, [stage]);
 
-  const iconBtn = cn("flex size-9 items-center justify-center rounded-full", dark ? "hover:bg-black/10" : "hover:bg-white/15");
-
   return (
-    <div className="flex flex-col gap-5">
-      <button
-        type="button"
+    <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)] lg:gap-6">
+      <div
         onClick={stage.enter}
-        aria-label={t.full}
-        className="group relative flex aspect-[16/9] w-full items-center justify-center overflow-hidden rounded-[1rem] border border-line-strong transition-[background-color] duration-200 sm:aspect-[2/1]"
+        className="group relative flex aspect-[16/9] w-full cursor-pointer items-center justify-center overflow-hidden rounded-[1.25rem] shadow-[var(--shadow-card)] ring-1 ring-black/10 transition-[background-color] duration-200 ring-inset sm:aspect-[16/10]"
         style={{ background: fill }}
       >
-        <span
-          className={cn(
-            "flex items-center gap-2 rounded-full px-5 py-3 text-base font-semibold shadow-[var(--shadow-overlay)] transition-transform group-hover:scale-105",
-            dark ? "bg-white/90 text-black" : "bg-black/75 text-white",
-          )}
-        >
-          <Maximize className="size-5" aria-hidden />
+        <Button variant="filled" size="xl" onClick={(e) => (e.stopPropagation(), stage.enter())} className="motion-safe:transition-transform motion-safe:group-hover:scale-105">
+          <Maximize aria-hidden />
           {t.full}
-        </span>
-      </button>
+        </Button>
+      </div>
 
-      <div className="flex flex-col gap-4">
-        <div role="radiogroup" aria-label={t.color} className="flex flex-wrap items-center gap-2">
-          {SCREEN_COLORS.map((c) => (
-            <button
-              key={c.id}
-              type="button"
-              role="radio"
-              aria-checked={c.hex === hex.toLowerCase()}
-              aria-label={c[locale]}
-              title={c[locale]}
-              onClick={() => setHex(c.hex)}
-              className={cn(
-                "size-10 rounded-full border border-line-strong transition-transform hover:scale-110 pointer-coarse:size-11",
-                c.hex === hex.toLowerCase() && "ring-3 ring-accent ring-offset-2 ring-offset-bg",
-              )}
-              style={{ background: c.hex }}
-            />
-          ))}
-          <label className="relative flex size-10 cursor-pointer items-center justify-center overflow-hidden rounded-full border border-line-strong bg-[conic-gradient(red,yellow,lime,cyan,blue,magenta,red)] pointer-coarse:size-11" title={t.custom}>
-            <span className="sr-only">{t.custom}</span>
-            <input type="color" value={hex} onChange={(e) => setHex(e.target.value)} className="absolute inset-0 cursor-pointer opacity-0" />
-          </label>
+      <Panel className="flex min-w-0 flex-col gap-6 p-4 sm:p-6">
+        <div className="flex flex-col gap-2">
+          <span className="flex items-baseline justify-between gap-2 text-sm font-medium text-fg-2">
+            {t.color}
+            <span className="text-base font-semibold text-fg">{name}</span>
+          </span>
+          <div role="radiogroup" aria-label={t.color} className="flex flex-wrap items-center gap-2">
+            {SCREEN_COLORS.map((c) => (
+              <button
+                key={c.id}
+                type="button"
+                role="radio"
+                aria-checked={c.hex === hex.toLowerCase()}
+                aria-label={c[locale]}
+                title={c[locale]}
+                onClick={() => setHex(c.hex)}
+                className={cn(
+                  "size-10 rounded-full shadow-[inset_0_0_0_1px_rgb(0_0_0/0.18)] transition-transform hover:scale-110 active:scale-95 pointer-coarse:size-11",
+                  c.hex === hex.toLowerCase() && "ring-3 ring-accent ring-offset-2 ring-offset-surface",
+                )}
+                style={{ background: c.hex }}
+              />
+            ))}
+            <label
+              className="relative flex size-10 cursor-pointer items-center justify-center overflow-hidden rounded-full bg-[conic-gradient(red,yellow,lime,cyan,blue,magenta,red)] transition-transform hover:scale-110 has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-accent pointer-coarse:size-11"
+              title={t.custom}
+            >
+              <span className="sr-only">{t.custom}</span>
+              <input type="color" value={hex} onChange={(e) => setHex(e.target.value)} className="absolute inset-0 cursor-pointer opacity-0" />
+            </label>
+          </div>
         </div>
 
         <label className="flex flex-col gap-2">
-          <span className="flex items-center justify-between text-sm font-medium text-fg-2">
+          <span className="flex items-baseline justify-between text-sm font-medium text-fg-2">
             <span className="inline-flex items-center gap-1.5">
               <Sun className="size-4" aria-hidden />
               {t.brightness}
             </span>
-            <span className="tabular-nums text-fg">{brightness}%</span>
+            <span className="text-xl font-bold text-fg tabular-nums">{brightness}%</span>
           </span>
-          <Slider min={5} max={100} step={5} value={brightness} onChange={(e) => setBrightness(Number(e.target.value))} />
+          <Slider min={5} max={100} step={5} value={brightness} onChange={(e) => setBrightness(Number(e.target.value))} format={(v) => `${v}%`} />
         </label>
 
         {isWhite && (
           <div className="flex flex-col gap-2">
-            <span className="flex items-center justify-between text-sm font-medium text-fg-2">
+            <span className="flex items-baseline justify-between text-sm font-medium text-fg-2">
               <span>{t.warmth}</span>
-              <span className="tabular-nums text-fg">{kelvin} K</span>
+              <span className="text-xl font-bold text-fg tabular-nums">{kelvin} K</span>
             </span>
-            <Slider aria-label={t.warmth} min={1900} max={10000} step={100} value={kelvin} onChange={(e) => setKelvin(Number(e.target.value))} className="[background:linear-gradient(90deg,#ff8a12,#ffd6a5,#fff,#cfe0ff)] rounded-full" />
-            <div className="flex flex-wrap gap-2">
+            <Slider aria-label={t.warmth} min={1900} max={10000} step={100} value={kelvin} onChange={(e) => setKelvin(Number(e.target.value))} format={(v) => `${v} K`} />
+            <div className="mt-1 flex flex-wrap gap-2">
               {t.presets.map(([k, label]) => (
                 <button key={k} type="button" onClick={() => setKelvin(k)} className="chip" aria-pressed={kelvin === k}>
-                  <span className="size-3 rounded-full border border-line-strong" style={{ background: rgbToHex(whiteAt(k)) }} aria-hidden />
+                  <span className="size-3.5 rounded-full shadow-[inset_0_0_0_1px_rgb(0_0_0/0.25)]" style={{ background: rgbToHex(whiteAt(k)) }} aria-hidden />
                   {label}
                 </button>
               ))}
@@ -196,8 +197,8 @@ export default function ScreenColor({ locale, color = "white" }: { locale: Local
             <Kbd>Esc</Kbd> {t.exit}
           </span>
         </p>
-        <p className="text-sm text-fg-3">{t.keepOn}</p>
-      </div>
+        <p className="-mt-3 text-sm text-fg-3">{t.keepOn}</p>
+      </Panel>
 
       <StageLayer
         stage={stage}
@@ -222,20 +223,12 @@ export default function ScreenColor({ locale, color = "white" }: { locale: Local
         }}
         bar={
           <>
-            <button type="button" className={iconBtn} onClick={() => step(-1)} aria-label={t.prev} title={t.prev}>
-              <ChevronLeft className="size-5" aria-hidden />
-            </button>
+            <BarButton label={t.prev} icon={<ChevronLeft aria-hidden />} onClick={() => step(-1)} />
             <span className="min-w-16 text-center font-semibold">{name}</span>
-            <button type="button" className={iconBtn} onClick={() => step(1)} aria-label={t.next} title={t.next}>
-              <ChevronRight className="size-5" aria-hidden />
-            </button>
-            <button type="button" className={iconBtn} onClick={() => bright(-10)} aria-label={t.less} title={t.less}>
-              <Minus className="size-5" aria-hidden />
-            </button>
+            <BarButton label={t.next} icon={<ChevronRight aria-hidden />} onClick={() => step(1)} />
+            <BarButton label={t.less} icon={<Minus aria-hidden />} onClick={() => bright(-10)} />
             <span className="min-w-11 text-center tabular-nums">{brightness}%</span>
-            <button type="button" className={iconBtn} onClick={() => bright(10)} aria-label={t.more} title={t.more}>
-              <Plus className="size-5" aria-hidden />
-            </button>
+            <BarButton label={t.more} icon={<Plus aria-hidden />} onClick={() => bright(10)} />
           </>
         }
       />

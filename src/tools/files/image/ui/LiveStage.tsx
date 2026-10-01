@@ -122,7 +122,7 @@ export function LiveStage({
 
   return (
     <div className={cn("relative", className)}>
-      <div className={cn("flex min-h-56 items-center justify-center overflow-hidden rounded-[0.625rem] border border-line", checker)}>
+      <div className={cn("flex min-h-56 items-center justify-center overflow-hidden rounded-[1rem]", checker)}>
         {error ? (
           <p className="max-w-md px-4 py-10 text-center text-sm text-err">{errorText(locale, error)}</p>
         ) : !bitmap ? (
@@ -137,9 +137,9 @@ export function LiveStage({
       </div>
       {bitmap && (
         <Button
-          variant="secondary"
+          variant="elevated"
           size="sm"
-          className="absolute bottom-2 left-2 opacity-90"
+          className="absolute bottom-3 left-3"
           aria-pressed={showOrig}
           onPointerDown={() => setShowOrig(true)}
           onPointerUp={() => setShowOrig(false)}

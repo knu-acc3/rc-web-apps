@@ -1,12 +1,13 @@
 "use client";
 
 import { Droplets, Square } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import type { Locale } from "@/i18n/config";
-import { Button } from "@/ui/button";
 import { Slider } from "@/ui/field";
 import { Notice, Panel } from "@/ui/panel";
 import { Segmented } from "@/ui/segmented";
+import { Fab } from "@/tools/files/video/ui/Fab";
+import { Setting } from "@/tools/files/video/ui/options";
 import { fadeGain, resumeAudio, smoothSet } from "../lib/audio";
 
 const FREQ = 165;
@@ -22,7 +23,7 @@ const T = {
     pulse: "Импульсы",
     volume: "Громкость",
     left: "Осталось",
-    before: "Перед запуском: снимите чехол, отключите наушники и Bluetooth-колонки, положите телефон динамиком вниз.",
+    before: "Снимите чехол, отключите наушники и положите телефон динамиком вниз.",
     err: "Не удалось запустить звук в этом браузере.",
   },
   en: {
@@ -35,13 +36,14 @@ const T = {
     pulse: "Pulses",
     volume: "Volume",
     left: "Remaining",
-    before: "Before you start: remove the case, disconnect headphones and Bluetooth speakers, place the phone speaker-down.",
+    before: "Remove the case, disconnect headphones and place the phone speaker-down.",
     err: "Could not start audio in this browser.",
   },
 } as const;
 
 export default function SpeakerCleaner({ locale }: { locale: Locale }) {
   const t = T[locale];
+  const id = useId();
   const [seconds, setSeconds] = useState("30");
   const [mode, setMode] = useState<"steady" | "pulse">("steady");
   const [volume, setVolume] = useState(0.8);
@@ -117,27 +119,43 @@ export default function SpeakerCleaner({ locale }: { locale: Locale }) {
     return () => clearInterval(h);
   }, [active]);
 
+  const pct = (v: number) => `${Math.round(v * 100)}%`;
   return (
-    <div className="flex flex-col gap-4">
-      <Panel className="flex flex-col items-center gap-5 p-6">
-        <div className="tabular text-6xl font-bold tracking-tight text-fg" aria-live="off">
-          {FREQ} <span className="text-3xl font-semibold text-fg-2">{locale === "ru" ? "Гц" : "Hz"}</span>
-        </div>
-        <Button variant={active ? "danger" : "primary"} size="lg" onClick={() => (active ? stop() : start())} className="h-16! min-w-60 text-lg!">
-          {active ? <Square className="fill-current" aria-hidden /> : <Droplets aria-hidden />}
-          {active ? `${t.stop} · ${left} ${t.s}` : t.start}
-        </Button>
-        <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-3">
-          <Segmented label={t.duration} value={seconds} onChange={setSeconds} size="sm" options={["15", "30", "60", "120"].map((s) => ({ value: s, label: `${s} ${t.s}` }))} />
-          <Segmented label={t.mode} value={mode} onChange={setMode} size="sm" options={[{ value: "steady", label: t.steady }, { value: "pulse", label: t.pulse }]} />
-          <label className="flex items-center gap-2 text-sm text-fg-2">
-            {t.volume}
-            <Slider min={0.2} max={1} step={0.01} value={volume} onChange={(e) => setVolume(Number(e.target.value))} className="w-32" aria-label={t.volume} />
-            <span className="tabular w-10">{Math.round(volume * 100)}%</span>
-          </label>
-        </div>
-        <p className="max-w-lg text-center text-sm text-fg-3">{t.before}</p>
-      </Panel>
+    <div className="flex flex-col gap-3">
+      <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] lg:gap-6">
+        <Panel className="flex min-w-0 flex-col items-center gap-6 p-4 sm:p-6">
+          <div className="tabular text-6xl font-bold tracking-tight text-fg sm:text-7xl" aria-live="off">
+            {FREQ} <span className="text-3xl font-semibold text-fg-2">{locale === "ru" ? "Гц" : "Hz"}</span>
+          </div>
+          <Fab
+            label={active ? t.stop : t.start}
+            caption={active ? `${t.stop} · ${left} ${t.s}` : t.start}
+            icon={active ? <Square className="fill-current" aria-hidden /> : <Droplets aria-hidden />}
+            onClick={() => (active ? stop() : start())}
+            active={active}
+          />
+          <p className="max-w-md text-center text-sm text-fg-3">{t.before}</p>
+        </Panel>
+        <Panel className="flex min-w-0 flex-col gap-5 p-4 sm:p-5">
+          <Setting label={t.duration}>
+            <Segmented label={t.duration} value={seconds} onChange={setSeconds} options={["15", "30", "60", "120"].map((x) => ({ value: x, label: `${x} ${t.s}` }))} />
+          </Setting>
+          <Setting label={t.mode}>
+            <Segmented label={t.mode} value={mode} fill onChange={setMode} options={[{ value: "steady", label: t.steady }, { value: "pulse", label: t.pulse }]} />
+          </Setting>
+          <div className="flex min-w-0 flex-col">
+            <div className="flex items-baseline justify-between gap-3">
+              <label htmlFor={`${id}-v`} className="text-sm font-medium text-fg-2">
+                {t.volume}
+              </label>
+              <output htmlFor={`${id}-v`} className="tabular text-lg font-semibold text-fg">
+                {pct(volume)}
+              </output>
+            </div>
+            <Slider id={`${id}-v`} min={0.2} max={1} step={0.01} value={volume} format={pct} aria-valuetext={pct(volume)} onChange={(e) => setVolume(Number(e.target.value))} />
+          </div>
+        </Panel>
+      </div>
       {error && <Notice tone="err">{t.err}</Notice>}
     </div>
   );

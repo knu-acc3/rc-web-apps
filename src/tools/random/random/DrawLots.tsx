@@ -7,7 +7,8 @@ import { cn } from "@/lib/cn";
 import { usePersistentState } from "@/lib/persist";
 import { linkHere, listHash, useSharedList } from "@/lib/share-link";
 import { Button } from "@/ui/button";
-import { Field, Input, Switch, Textarea } from "@/ui/field";
+import { Field, Switch, Textarea } from "@/ui/field";
+import { NumberInput } from "@/ui/number-input";
 import { Notice } from "@/ui/panel";
 import { ShareLink } from "@/ui/share-link";
 import { Segmented } from "@/ui/segmented";
@@ -26,7 +27,7 @@ const T = {
     mafia: "Мафия",
     detective: "Комиссар",
     doctor: "Доктор",
-    secret: "Тайно: каждый смотрит свой жребий сам",
+    secret: "Тайно: каждый смотрит сам",
     deal: "Разложить жребий",
     again: "Перемешать заново",
     openAll: "Открыть все",
@@ -50,7 +51,7 @@ const T = {
     mafia: "Mafia",
     detective: "Detective",
     doctor: "Doctor",
-    secret: "Secret: each player looks at their own lot",
+    secret: "Secret: each looks alone",
     deal: "Deal the lots",
     again: "Shuffle again",
     openAll: "Reveal all",
@@ -169,9 +170,26 @@ export default function DrawLots({ locale, mode: modeProp = "custom" }: { locale
   };
   const mafiaCount = lots.filter((l) => l.kind === "mafia").length;
 
+  const countField = (
+    <Field label={t.count} htmlFor="lots-count" className="w-44">
+      <NumberInput
+        id="lots-count"
+        locale={locale}
+        min={mode === "mafia" ? 4 : 2}
+        max={LOTS_MAX}
+        value={s.count}
+        onChange={(v) => {
+          if (v === null) return;
+          const count = clampCount(v, mode === "mafia" ? 4 : 2);
+          setS({ ...s, count, marked: mode === "mafia" ? defaultMafia(count) : Math.min(s.marked, count - 1) });
+        }}
+      />
+    </Field>
+  );
+
   return (
     <div className="flex flex-col gap-5">
-      <Segmented wrap label={t.mode} value={mode} onChange={changeMode} options={LOTS_MODES.map((m) => ({ value: m, label: t.modes[m] }))} />
+      <Segmented fill size="lg" className="[&>.seg]:basis-auto!" label={t.mode} value={mode} onChange={changeMode} options={LOTS_MODES.map((m) => ({ value: m, label: t.modes[m] }))} />
 
       <div className="flex flex-wrap items-end gap-x-5 gap-y-3">
         {mode === "custom" ? (
@@ -179,55 +197,26 @@ export default function DrawLots({ locale, mode: modeProp = "custom" }: { locale
             <Textarea id="lots-lines" value={s.text} onChange={(e) => setS({ ...s, text: e.target.value })} className="min-h-28 font-sans text-[0.9375rem]" />
           </Field>
         ) : (
-          <Field label={t.count} htmlFor="lots-count" className="w-36">
-            <Input
-              id="lots-count"
-              type="number"
-              inputMode="numeric"
-              min={mode === "mafia" ? 4 : 2}
-              max={LOTS_MAX}
-              value={s.count}
-              onChange={(e) => {
-                const count = clampCount(Number(e.target.value), mode === "mafia" ? 4 : 2);
-                setS({ ...s, count, marked: mode === "mafia" ? defaultMafia(count) : Math.min(s.marked, count - 1) });
-              }}
-            />
-          </Field>
+          countField
         )}
         {mode === "straws" && (
-          <Field label={t.short} htmlFor="lots-short" className="w-36">
-            <Input
-              id="lots-short"
-              type="number"
-              inputMode="numeric"
-              min={1}
-              max={s.count - 1}
-              value={s.marked}
-              onChange={(e) => setS({ ...s, marked: Math.max(1, Math.min(s.count - 1, Math.round(Number(e.target.value) || 1))) })}
-            />
+          <Field label={t.short} htmlFor="lots-short" className="w-44">
+            <NumberInput id="lots-short" locale={locale} min={1} max={s.count - 1} value={s.marked} onChange={(v) => v !== null && setS({ ...s, marked: Math.max(1, Math.min(s.count - 1, Math.round(v))) })} />
           </Field>
         )}
         {mode === "mafia" && (
           <>
-            <Field label={t.mafia} htmlFor="lots-mafia" className="w-28">
-              <Input
-                id="lots-mafia"
-                type="number"
-                inputMode="numeric"
-                min={1}
-                max={Math.max(1, Math.ceil(s.count / 2) - 1)}
-                value={mafiaCount}
-                onChange={(e) => setS({ ...s, marked: Math.max(1, Math.round(Number(e.target.value) || 1)) })}
-              />
+            <Field label={t.mafia} htmlFor="lots-mafia" className="w-40">
+              <NumberInput id="lots-mafia" locale={locale} min={1} max={Math.max(1, Math.ceil(s.count / 2) - 1)} value={mafiaCount} onChange={(v) => v !== null && setS({ ...s, marked: Math.max(1, Math.round(v)) })} />
             </Field>
-            <Switch label={t.detective} checked={s.detective} onChange={(e) => setS({ ...s, detective: e.target.checked })} className="pb-2" />
-            <Switch label={t.doctor} checked={s.doctor} onChange={(e) => setS({ ...s, doctor: e.target.checked })} className="pb-2" />
+            <Switch label={t.detective} checked={s.detective} onChange={(e) => setS({ ...s, detective: e.target.checked })} />
+            <Switch label={t.doctor} checked={s.doctor} onChange={(e) => setS({ ...s, doctor: e.target.checked })} />
           </>
         )}
       </div>
 
       <div className="flex flex-wrap items-center gap-x-5 gap-y-3">
-        <Button size="lg" variant="primary" onClick={deal}>
+        <Button size="xl" variant="filled" onClick={deal} className="max-sm:w-full">
           <Shuffle aria-hidden />
           {deck ? t.again : t.deal}
         </Button>
@@ -245,7 +234,7 @@ export default function DrawLots({ locale, mode: modeProp = "custom" }: { locale
             </p>
             {showing !== -1 && (left > 0 || secret) && (
               <Button
-                variant="ghost"
+                variant="tonal"
                 size="sm"
                 onClick={() => {
                   setOpen(deck.map(() => true));

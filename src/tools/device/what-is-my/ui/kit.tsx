@@ -88,22 +88,20 @@ export function Hero({
 }) {
   const c = COMMON[locale];
   return (
-    <Panel className="px-5 py-5 sm:px-7 sm:py-6">
-      <div className="flex items-start justify-between gap-3">
-        <p className="pt-1 text-sm text-fg-3">{label}</p>
-        {copy ? <CopyButton value={copy} label={c.copy} copiedLabel={c.copied} size="sm" variant="ghost" className="-mr-2 -mt-1" compact /> : null}
-      </div>
+    <div className="min-w-0 rounded-[1.25rem] bg-accent-soft px-5 py-6 sm:px-7 sm:py-7">
+      <p className="text-sm font-medium text-fg-2">{label}</p>
       <div aria-live={live ? "polite" : undefined} className="mt-1.5 min-h-12">
-        <div className="tabular text-[2rem] leading-[1.15] font-bold tracking-tight break-words text-fg sm:text-5xl">
-          {value === null ? <span className="text-fg-3">{c.detecting}</span> : value}
-        </div>
+        <div className="tabular text-[2rem] leading-[1.15] font-bold tracking-tight break-words text-fg sm:text-5xl lg:text-6xl">{value === null ? <span className="text-fg-3">{c.detecting}</span> : value}</div>
         {sub ? <div className="mt-2 text-[0.9375rem] text-fg-2 sm:text-base">{sub}</div> : null}
       </div>
+      {copy ? <CopyButton value={copy} label={c.copy} copiedLabel={c.copied} size="md" variant="primary" className="mt-4" /> : null}
       {children}
       <noscript>
-        <p className="mt-4 rounded-[0.625rem] bg-warn-soft px-4 py-3 text-sm text-warn">{noscript ?? c.noscript}</p>
+        <Notice tone="warn" className="mt-4">
+          {noscript ?? c.noscript}
+        </Notice>
       </noscript>
-    </Panel>
+    </div>
   );
 }
 
@@ -114,20 +112,30 @@ interface Row {
   mono?: boolean;
 }
 
-/** Quiet key/value list under the main answer. */
+const plain = (x: ReactNode | null) => (typeof x === "string" || typeof x === "number" ? String(x) : null);
+
+/** Key/value tiles under the main answer, with one "copy all" when every value is plain text. */
 export function Facts({ locale, title, rows, className }: { locale: Locale; title?: ReactNode; rows: Row[]; className?: string }) {
+  const c = COMMON[locale];
+  const lines = rows.map((r) => (plain(r.k) !== null && plain(r.v) !== null ? `${plain(r.k)}: ${plain(r.v)}` : null));
+  const text = lines.every((l) => l !== null) ? lines.join("\n") : null;
   return (
-    <section className={className}>
-      {title ? <h2 className="mb-1 text-sm font-semibold text-fg-2">{title}</h2> : null}
-      <dl className="divide-y divide-line border-y border-line">
+    <Panel className={cn("p-4 sm:p-5", className)}>
+      {title || text ? (
+        <div className="mb-3 flex min-h-9 items-center justify-between gap-2">
+          {title ? <h2 className="text-sm font-semibold text-fg">{title}</h2> : <span />}
+          {text ? <CopyButton value={text} label={c.copy} copiedLabel={c.copied} size="sm" variant="ghost" compact /> : null}
+        </div>
+      ) : null}
+      <dl className="grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
         {rows.map((r, i) => (
-          <div key={i} className="flex flex-col gap-0.5 py-2.5 sm:flex-row sm:items-baseline sm:gap-6">
-            <dt className="text-sm text-fg-3 sm:w-72 sm:shrink-0">{r.k}</dt>
-            <dd className={cn("min-w-0 break-words text-[0.9375rem] text-fg", r.mono && "font-mono text-sm")}>{r.v === null ? <Pending locale={locale} /> : r.v}</dd>
+          <div key={i} className="flex min-w-0 flex-col gap-0.5 rounded-[1rem] bg-surface-2 px-4 py-3">
+            <dt className="text-[0.8125rem] text-fg-3">{r.k}</dt>
+            <dd className={cn("min-w-0 break-words text-base font-medium text-fg [overflow-wrap:anywhere]", r.mono && "font-mono text-sm")}>{r.v === null ? <Pending locale={locale} /> : r.v}</dd>
           </div>
         ))}
       </dl>
-    </section>
+    </Panel>
   );
 }
 
@@ -142,7 +150,7 @@ export function Hint({ children, tone = "neutral" }: { children: ReactNode; tone
 }
 
 export function Stack({ children }: { children: ReactNode }) {
-  return <div className="flex flex-col gap-6">{children}</div>;
+  return <div className="flex flex-col gap-4 sm:gap-5">{children}</div>;
 }
 
 /** Width × height. */

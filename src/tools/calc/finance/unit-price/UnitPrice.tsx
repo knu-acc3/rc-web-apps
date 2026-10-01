@@ -1,9 +1,9 @@
 "use client";
 
 import { Plus, X } from "lucide-react";
-import { useId } from "react";
-import { Button } from "@/ui/button";
+import { Button, IconButton } from "@/ui/button";
 import { Input, Select } from "@/ui/field";
+import { Panel } from "@/ui/panel";
 import type { ToolProps } from "../../../types";
 import { CURRENCIES, CURRENCY_SYMBOL, fmtMoney, fmtPct, isCurrency, type Currency } from "../../shared/fmt";
 import { readNum } from "../../shared/num";
@@ -83,7 +83,6 @@ function encode(items: Item[]): string {
 
 export default function UnitPrice({ locale }: ToolProps) {
   const t = T[locale];
-  const id = useId();
   const ru = locale === "ru";
   const defCur: Currency = ru ? "KZT" : "USD";
   const defaults: Item[] = ru
@@ -123,28 +122,30 @@ export default function UnitPrice({ locale }: ToolProps) {
   return (
     <Stack>
       <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)] lg:gap-6">
-        <section className="flex min-w-0 flex-col gap-3 rounded-[0.75rem] border border-line bg-surface p-4 sm:p-5">
+        <Panel className="flex min-w-0 flex-col gap-4 p-4 sm:p-6">
           <h2 className="text-sm font-semibold text-fg-2">{t.items}</h2>
           <ul className="flex flex-col gap-3">
             {computed.map((c, i) => (
-              <li key={i} className="grid grid-cols-[minmax(0,1fr)_auto] gap-2 border-b border-line pb-3 last:border-b-0 last:pb-0">
-                <div className="grid min-w-0 grid-cols-2 gap-2 min-[520px]:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)_minmax(0,0.8fr)_minmax(0,0.8fr)]">
-                  <label className="col-span-2 min-w-0 min-[520px]:col-span-1">
-                    <span className="sr-only">{`${t.name} ${i + 1}`}</span>
-                    <Input value={c.name} onChange={(e) => set(i, { name: e.target.value })} placeholder={t.item(i + 1)} autoComplete="off" />
-                  </label>
+              <li key={i} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 rounded-[1rem] bg-surface-2 p-2.5 min-[520px]:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)_minmax(0,0.8fr)_auto_auto]">
+                <label className="min-w-0">
+                  <span className="sr-only">{`${t.name} ${i + 1}`}</span>
+                  <Input value={c.name} onChange={(e) => set(i, { name: e.target.value })} placeholder={t.item(i + 1)} autoComplete="off" />
+                </label>
+                <IconButton label={`${t.remove}: ${label(c)}`} title={t.remove} icon={<X aria-hidden />} size="sm" className="min-[520px]:order-last" onClick={() => q.set({ l: encode(items.filter((_, j) => j !== i)) })} disabled={items.length <= 1} />
+                {/* Phones: price, quantity and unit on their own line; from 520px everything sits in one row. */}
+                <div className="col-span-2 grid grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)_auto] gap-2 min-[520px]:contents">
                   <label className="relative min-w-0">
                     <span className="sr-only">{`${t.price} ${i + 1}`}</span>
-                    <Input value={c.price} onChange={(e) => set(i, { price: e.target.value })} inputMode="decimal" aria-invalid={c.bad} placeholder={t.price} className="tabular pr-7" autoComplete="off" />
-                    <span aria-hidden className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-sm text-fg-3">
+                    <Input value={c.price} onChange={(e) => set(i, { price: e.target.value })} inputMode="decimal" aria-invalid={c.bad} placeholder={t.price} className="tabular pl-2.5 pr-6 max-[379px]:pr-2.5" autoComplete="off" />
+                    <span aria-hidden className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-sm text-fg-3 max-[379px]:hidden">
                       {sym}
                     </span>
                   </label>
                   <label className="min-w-0">
                     <span className="sr-only">{`${t.qty} ${i + 1}`}</span>
-                    <Input value={c.qty} onChange={(e) => set(i, { qty: e.target.value })} inputMode="decimal" aria-invalid={c.bad} placeholder={t.qty} className="tabular" autoComplete="off" />
+                    <Input value={c.qty} onChange={(e) => set(i, { qty: e.target.value })} inputMode="decimal" aria-invalid={c.bad} placeholder={t.qty} className="tabular px-2.5" autoComplete="off" />
                   </label>
-                  <label className="min-w-0">
+                  <label className="flex min-w-0">
                     <span className="sr-only">{`${t.unit} ${i + 1}`}</span>
                     <Select value={c.unit} onChange={(e) => set(i, { unit: e.target.value as PackUnit })}>
                       {PACK_UNITS.map((u) => (
@@ -154,32 +155,29 @@ export default function UnitPrice({ locale }: ToolProps) {
                       ))}
                     </Select>
                   </label>
-                  {c.up && (
-                    <p className="tabular col-span-2 text-[0.8125rem] text-fg-3 min-[520px]:col-span-4">
-                      <span className={best && c.index === best.index ? "font-semibold text-ok" : "text-fg-2"}>
-                        {money(c.up.perBase)} {perText(c.up.base)}
-                      </span>
-                      {c.up.base !== "pcs" && ` · ${money(c.up.perBase / 10)} ${t.per100[c.up.base]}`}
-                      {best && c.up.base === mainBase && (c.index === best.index ? ` · ${t.cheapest}` : ` · ${t.more(fmtPct(locale, (c.up.perBase / best.up!.perBase - 1) * 100, 1))}`)}
-                    </p>
-                  )}
                 </div>
-                <Button variant="ghost" size="icon-sm" onClick={() => q.set({ l: encode(items.filter((_, j) => j !== i)) })} aria-label={`${t.remove}: ${label(c)}`} title={t.remove} disabled={items.length <= 1}>
-                  <X aria-hidden />
-                </Button>
+                {c.up && (
+                  <p className="tabular col-span-2 px-1 text-[0.8125rem] text-fg-3 min-[520px]:order-last min-[520px]:col-span-5">
+                    <span className={best && c.index === best.index ? "font-semibold text-ok" : "text-fg-2"}>
+                      {money(c.up.perBase)} {perText(c.up.base)}
+                    </span>
+                    {c.up.base !== "pcs" && ` · ${money(c.up.perBase / 10)} ${t.per100[c.up.base]}`}
+                    {best && c.up.base === mainBase && (c.index === best.index ? ` · ${t.cheapest}` : ` · ${t.more(fmtPct(locale, (c.up.perBase / best.up!.perBase - 1) * 100, 1))}`)}
+                  </p>
+                )}
               </li>
             ))}
           </ul>
           <div className="flex flex-wrap items-center justify-between gap-2">
-            <Button variant="outline" size="sm" onClick={() => q.set({ l: encode([...items, { name: "", price: "", qty: "", unit: items[items.length - 1]?.unit ?? "g" }]) })} disabled={items.length >= 12}>
+            <Button variant="tonal" onClick={() => q.set({ l: encode([...items, { name: "", price: "", qty: "", unit: items[items.length - 1]?.unit ?? "g" }]) })} disabled={items.length >= 12}>
               <Plus aria-hidden />
               {t.add}
             </Button>
             <OptionsRow>
-              <CurrencySelect id={`${id}-c`} locale={locale} value={cur} onChange={(c) => q.set({ c })} />
+              <CurrencySelect locale={locale} value={cur} onChange={(c) => q.set({ c })} />
             </OptionsRow>
           </div>
-        </section>
+        </Panel>
         <div className="lg:sticky lg:top-20">
           <ResultMain
             label={t.best}

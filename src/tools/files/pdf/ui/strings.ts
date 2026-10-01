@@ -8,8 +8,13 @@ export const S = {
     dropPdf: "Перетащите PDF сюда или нажмите, чтобы выбрать",
     dropPdfs: "Перетащите PDF-файлы сюда или нажмите, чтобы выбрать",
     dropHint: "Файлы обрабатываются в браузере и никуда не загружаются",
-    addMore: "Добавить ещё файлы",
+    addMore: "Добавить PDF",
     replace: "Другой файл",
+    clearAll: "Очистить",
+    close: "Убрать",
+    engine: "Не удалось запустить просмотр PDF — проверьте интернет и попробуйте ещё раз",
+    retry: "Повторить",
+    previewFailed: "Не удалось показать страницу",
     remove: "Убрать файл",
     moveUp: "Выше",
     moveDown: "Ниже",
@@ -42,13 +47,17 @@ export const S = {
     duplicatePage: "Дублировать страницу",
     moveLeft: "Переместить назад",
     moveRight: "Переместить вперёд",
-    gridHelp: "Нажмите на страницу, чтобы выбрать её (Shift — диапазон), и перетаскивайте мышью. С клавиатуры: стрелки, пробел — выбрать, Alt+стрелка — переместить, R — повернуть, Delete — удалить.",
-    gridHelpSelect: "Нажмите на страницы, чтобы выбрать их (Shift — диапазон). С клавиатуры: стрелки и пробел.",
-    gridHelpMove: "Перетаскивайте мышью, чтобы изменить порядок. С клавиатуры: стрелки, пробел — выбрать, Alt+стрелка — переместить, Delete — убрать.",
-    gridHelpDelete: "Нажмите на страницы, которые нужно удалить (Shift — диапазон). С клавиатуры: стрелки, пробел или Delete.",
+    gridTip: "Нажмите на страницы, чтобы выбрать, и перетащите, чтобы переставить",
+    gridTipSelect: "Нажмите на страницы, чтобы выбрать их",
+    gridTipDelete: "Нажмите на страницы, которые нужно удалить",
+    gridHelp: "Стрелки — перейти, пробел — выбрать (Shift — диапазон), Alt+стрелка — переместить, R — повернуть, Delete — удалить.",
+    gridHelpSelect: "Стрелки — перейти, пробел — выбрать (Shift — диапазон).",
+    gridHelpMove: "Стрелки — перейти, пробел — выбрать, Alt+стрелка — переместить, Delete — убрать.",
+    gridHelpDelete: "Стрелки — перейти, пробел или Delete — отметить для удаления (Shift — диапазон).",
     select: "Выбрать",
     selectAll: "Выбрать все",
     selectNone: "Снять выбор",
+    selectedCount: (n: number) => `выбрано ${n}`,
     invert: "Инвертировать",
     errors: {
       "password-required": "Нужен пароль к файлу",
@@ -60,6 +69,7 @@ export const S = {
       "no-form": "В файле нет полей формы",
       "not-encrypted": "Этот файл не защищён паролем — снимать нечего",
       generic: "Не удалось обработать файл",
+      engine: "Не удалось запустить обработку PDF в браузере — обновите страницу и попробуйте ещё раз",
       memory: "Не хватает памяти браузера: уменьшите DPI или выберите меньше страниц",
     },
     range: {
@@ -73,8 +83,13 @@ export const S = {
     dropPdf: "Drop a PDF here or click to choose",
     dropPdfs: "Drop PDF files here or click to choose",
     dropHint: "Files are processed in your browser and never uploaded",
-    addMore: "Add more files",
+    addMore: "Add PDF",
     replace: "Another file",
+    clearAll: "Clear",
+    close: "Remove",
+    engine: "Couldn't start the PDF viewer — check your connection and try again",
+    retry: "Retry",
+    previewFailed: "Couldn't show the page",
     remove: "Remove file",
     moveUp: "Up",
     moveDown: "Down",
@@ -107,13 +122,17 @@ export const S = {
     duplicatePage: "Duplicate page",
     moveLeft: "Move back",
     moveRight: "Move forward",
-    gridHelp: "Click a page to select it (Shift for a range) and drag to reorder. Keyboard: arrows, Space to select, Alt+arrow to move, R to rotate, Delete to remove.",
-    gridHelpSelect: "Click pages to select them (Shift for a range). Keyboard: arrows and Space.",
-    gridHelpMove: "Drag to change the order. Keyboard: arrows, Space to select, Alt+arrow to move, Delete to remove.",
-    gridHelpDelete: "Click the pages to delete (Shift for a range). Keyboard: arrows, Space or Delete.",
+    gridTip: "Tap pages to select them, drag to reorder",
+    gridTipSelect: "Tap the pages to select them",
+    gridTipDelete: "Tap the pages to delete",
+    gridHelp: "Arrows to move focus, Space to select (Shift for a range), Alt+arrow to move, R to rotate, Delete to remove.",
+    gridHelpSelect: "Arrows to move focus, Space to select (Shift for a range).",
+    gridHelpMove: "Arrows to move focus, Space to select, Alt+arrow to move, Delete to remove.",
+    gridHelpDelete: "Arrows to move focus, Space or Delete to mark for removal (Shift for a range).",
     select: "Select",
     selectAll: "Select all",
     selectNone: "Clear selection",
+    selectedCount: (n: number) => `${n} selected`,
     invert: "Invert",
     errors: {
       "password-required": "The file needs a password",
@@ -125,6 +144,7 @@ export const S = {
       "no-form": "The file has no form fields",
       "not-encrypted": "This file is not password-protected — there is nothing to remove",
       generic: "Couldn't process the file",
+      engine: "Couldn't start PDF processing in the browser — reload the page and try again",
       memory: "The browser ran out of memory: lower the DPI or choose fewer pages",
     },
     range: {
@@ -162,6 +182,10 @@ export function errorText(locale: Locale, e: unknown): string {
     return locale === "ru" ? `Не удалось прочитать картинку «${name}» — файл повреждён или формат не поддерживается` : `Couldn't read the image “${name}” — it is damaged or the format is not supported`;
   }
   if (code && code in t) return t[code as keyof typeof t];
+  // PdfOpenError from pdf.js: a broken file or a viewer that didn't start.
+  const kind = (e as { kind?: string })?.kind;
+  if (kind === "engine") return t.engine;
+  if (kind === "invalid") return t["invalid-pdf"];
   const msg = e instanceof Error ? e.message : "";
   if (/memory|allocation|Array buffer/i.test(msg)) return t.memory;
   return t.generic;

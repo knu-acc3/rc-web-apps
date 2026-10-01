@@ -1,9 +1,11 @@
 "use client";
 
+import { Plus } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { cn } from "@/lib/cn";
-import { Dropzone } from "@/ui/dropzone";
+import { buttonClass } from "@/ui/button";
+import { ScrollRow } from "@/ui/scroll-row";
 import { IMAGE_ACCEPT } from "../lib/detect";
 import { checker } from "./controls";
 
@@ -65,16 +67,18 @@ export function FrameStrip({
   onSelect?: (i: number) => void;
 }) {
   const t = T[locale];
-  const refs = useRef<(HTMLLIElement | null)[]>([]);
+  const refs = useRef<(HTMLDivElement | null)[]>([]);
+  const inputRef = useRef<HTMLInputElement>(null);
   const [dragFrom, setDragFrom] = useState<number | null>(null);
   const focusLater = (i: number) => requestAnimationFrame(() => refs.current[i]?.focus());
   return (
-    <div className="flex flex-col gap-2">
-      <p className="text-[0.8125rem] text-fg-3">{t.help}</p>
-      <ul aria-label={label} className="flex gap-2 overflow-x-auto pb-1 scrollbar-thin">
+    <div className="flex min-w-0 flex-col gap-1">
+      <p className="text-[0.8125rem] text-fg-3 pointer-coarse:hidden">{t.help}</p>
+      <ScrollRow label={label} role="list" rowClassName="gap-2 py-1.5">
         {items.map((it, i) => (
-          <li
+          <div
             key={it.key}
+            role="listitem"
             ref={(el) => {
               refs.current[i] = el;
             }}
@@ -111,27 +115,45 @@ export function FrameStrip({
               }
             }}
             className={cn(
-              "relative flex size-20 shrink-0 cursor-grab items-center justify-center overflow-hidden rounded-[0.5rem] border",
+              "relative flex size-20 shrink-0 cursor-grab items-center justify-center overflow-hidden rounded-[0.875rem] shadow-elev-1 transition-[box-shadow,transform] hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent",
               checker,
-              selected === i ? "border-accent ring-2 ring-accent/30" : "border-line",
+              selected === i && "ring-2 ring-accent",
               dragFrom === i && "opacity-50",
             )}
           >
             <Thumb bitmap={it.bitmap} />
             <span className="absolute left-1 top-1 rounded bg-black/60 px-1 text-[0.6875rem] font-semibold text-white">{i + 1}</span>
-          </li>
+          </div>
         ))}
-        <li className="shrink-0">
-          <Dropzone
-            onFiles={onAdd}
-            accept={IMAGE_ACCEPT}
+        <div role="listitem" className="shrink-0">
+          <button
+            type="button"
+            onClick={() => inputRef.current?.click()}
+            onDragOver={(e) => e.preventDefault()}
+            onDrop={(e) => {
+              e.preventDefault();
+              const files = Array.from(e.dataTransfer.files).filter((f) => f.type.startsWith("image/") || /\.(svg|heic|heif|avif|jxl)$/i.test(f.name));
+              if (files.length) onAdd(files);
+            }}
+            className={buttonClass("tonal", "md", "h-20! w-20! flex-col gap-1 px-0! text-[0.8125rem] [--btn-r:0.875rem]")}
+          >
+            <Plus aria-hidden />
+            {t.add}
+          </button>
+          <input
+            ref={inputRef}
+            type="file"
+            hidden
             multiple
-            compact
-            title={t.add}
-            className="size-20! min-h-0! gap-1! p-1! text-xs [&>span:first-child]:size-7"
+            accept={IMAGE_ACCEPT}
+            onChange={(e) => {
+              const files = Array.from(e.target.files ?? []);
+              e.target.value = "";
+              if (files.length) onAdd(files);
+            }}
           />
-        </li>
-      </ul>
+        </div>
+      </ScrollRow>
     </div>
   );
 }

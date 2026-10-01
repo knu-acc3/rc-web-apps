@@ -7,12 +7,13 @@ import { downloadBlob } from "@/lib/clipboard";
 import { copyText } from "@/lib/clipboard";
 import { Button } from "@/ui/button";
 import { CodeOutput } from "@/ui/code-output";
-import { Select } from "@/ui/field";
+import { Field, Select } from "@/ui/field";
 import { Panel } from "@/ui/panel";
 import { Tabs } from "@/ui/tabs";
 import { randomFloat } from "@/tools/random/random/lib/rng";
 import { fromOklch, parseColor, readableTextColor, toGamut, toHex, type Color } from "../lib/color";
 import { ColorField } from "../ui/ColorField";
+import { NumberSlider } from "@/tools/design/css/ui/kit";
 import { exportCss, exportJson, exportTailwind3, exportTailwind4, harmonyPalette, PALETTE_MODES, randomPalette, type PaletteMode } from "./lib/palette";
 
 const T = {
@@ -129,12 +130,9 @@ export default function PaletteGenerator({ locale, mode: mode0 = "analogous", ba
   return (
     <div className="flex flex-col gap-4">
       <Panel className="p-4 sm:p-5">
-        <div className="grid items-end gap-3 sm:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)_auto_auto]">
+        <div className="grid items-end gap-x-5 gap-y-4 sm:grid-cols-2 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)_minmax(0,1fr)_auto]">
           <ColorField label={t.base} value={base} onChange={setBase} locale={locale} />
-          <div className="flex min-w-0 flex-col gap-1.5">
-            <label htmlFor={`${id}-m`} className="text-sm font-medium text-fg-2">
-              {t.mode}
-            </label>
+          <Field label={t.mode} htmlFor={`${id}-m`}>
             <Select id={`${id}-m`} value={mode} onChange={(e) => setMode(e.target.value as PaletteMode)}>
               {PALETTE_MODES.map((m) => (
                 <option key={m} value={m}>
@@ -142,20 +140,9 @@ export default function PaletteGenerator({ locale, mode: mode0 = "analogous", ba
                 </option>
               ))}
             </Select>
-          </div>
-          <div className="flex min-w-0 flex-col gap-1.5">
-            <label htmlFor={`${id}-n`} className="text-sm font-medium text-fg-2">
-              {t.count}
-            </label>
-            <Select id={`${id}-n`} value={String(count)} onChange={(e) => setCount(Number(e.target.value))} className="w-24">
-              {[3, 4, 5, 6, 7, 8, 9, 10].map((n) => (
-                <option key={n} value={n}>
-                  {n}
-                </option>
-              ))}
-            </Select>
-          </div>
-          <Button variant="primary" onClick={generate}>
+          </Field>
+          <NumberSlider label={t.count} value={count} min={3} max={10} onChange={(v) => setCount(Math.min(10, Math.max(3, Math.round(v))))} />
+          <Button variant="filled" size="lg" onClick={generate}>
             <Shuffle aria-hidden />
             {t.generate}
           </Button>
@@ -163,13 +150,13 @@ export default function PaletteGenerator({ locale, mode: mode0 = "analogous", ba
       </Panel>
 
       <div>
-        <ul className="grid overflow-hidden rounded-[0.75rem] border border-line" style={{ gridTemplateColumns: `repeat(${colors.length}, minmax(0, 1fr))` }}>
+        <ul className="grid overflow-hidden rounded-[1.25rem] shadow-card" style={{ gridTemplateColumns: `repeat(${colors.length}, minmax(0, 1fr))` }}>
           {colors.map((c, i) => {
             const hex = toHex(c);
             const fg = readableTextColor(c);
             const isLocked = !!locked[i];
             return (
-              <li key={i} className="relative flex h-56 flex-col justify-between sm:h-72" style={{ background: hex, color: fg }}>
+              <li key={i} className="relative flex h-56 flex-col justify-between transition-colors duration-300 sm:h-72 lg:h-80" style={{ background: hex, color: fg }}>
                 <button
                   type="button"
                   aria-pressed={isLocked}
@@ -183,13 +170,13 @@ export default function PaletteGenerator({ locale, mode: mode0 = "analogous", ba
                       return next;
                     })
                   }
-                  className={isLocked ? "m-2 self-center rounded-full p-2" : "m-2 self-center rounded-full p-2 opacity-60 hover:opacity-100 focus-visible:opacity-100"}
+                  className={`relative my-2 flex size-10 max-w-[90%] items-center justify-center self-center rounded-full transition-[opacity,transform] duration-150 active:scale-90 before:pointer-events-none before:absolute before:inset-0 before:rounded-[inherit] before:bg-current before:transition-opacity hover:before:opacity-15 ${isLocked ? "before:opacity-15" : "opacity-60 before:opacity-0 hover:opacity-100 focus-visible:opacity-100"}`}
                 >
                   {isLocked ? <Lock className="size-4" aria-hidden /> : <LockOpen className="size-4" aria-hidden />}
                 </button>
                 <button
                   type="button"
-                  className="px-1 pb-3 font-mono text-xs font-semibold break-all sm:text-sm"
+                  className="relative mx-1 mb-2 rounded-[0.75rem] px-1 py-2 font-mono text-xs font-semibold break-all before:pointer-events-none before:absolute before:inset-0 before:rounded-[inherit] before:bg-current before:transition-opacity before:opacity-0 hover:before:opacity-15 active:before:opacity-25 sm:text-sm"
                   aria-label={`${t.copy} ${hex}`}
                   onClick={async () => {
                     if (await copyText(hex)) {
@@ -225,7 +212,7 @@ export default function PaletteGenerator({ locale, mode: mode0 = "analogous", ba
           labels={{ copy: t.copy, copied: t.copied, download: t.download }}
           minRows={Math.min(12, code.split("\n").length)}
           extraActions={
-            <Button variant="ghost" size="sm" onClick={downloadPng}>
+            <Button variant="text" size="sm" onClick={downloadPng}>
               <Download aria-hidden />
               {t.png}
             </Button>

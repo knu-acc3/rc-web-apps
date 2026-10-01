@@ -1,21 +1,23 @@
 "use client";
 
-import { Combine, LayoutGrid, List, RotateCcw, RotateCw, Trash2 } from "lucide-react";
+import { ArrowLeft, ArrowRight, Combine, RotateCcw, RotateCw, Trash2 } from "lucide-react";
 import { useMemo, useRef, useState } from "react";
 import type { Locale } from "@/i18n/config";
-import { Button } from "@/ui/button";
+import { Button, IconButton } from "@/ui/button";
 import { Input } from "@/ui/field";
-import { Notice } from "@/ui/panel";
+import { Panel } from "@/ui/panel";
+import { Segmented } from "@/ui/segmented";
+import { moveItem, shiftSelected, toggleSelection } from "./lib/order";
 import type { PageRef } from "./lib/pdf-ops";
 import { parsePageRanges } from "./lib/ranges";
-import { OptionsRow, PrimaryButton, workerJob } from "./ui/bits";
+import { PrimaryButton, workerJob } from "./ui/bits";
 import { FilePanel } from "./ui/FilePanel";
-import { PageGrid, moveItem, toggleSelection, type GridPage } from "./ui/PageGrid";
-import { ResultCard, baseName, pdfBlob, type OutputItem } from "./ui/Result";
-import { JobStatus } from "./ui/Result";
+import { PageGrid, type GridPage } from "./ui/PageGrid";
+import { JobStatus, ResultCard, baseName, pdfBlob, type OutputItem } from "./ui/Result";
 import { S, filesCount, pagesCount, rangeErrorText } from "./ui/strings";
 import { useJob } from "./ui/use-job";
 import { usePdfFiles, type PdfFile } from "./ui/use-pdf-files";
+import { Controls, Summary, Workspace } from "./ui/Workspace";
 
 const T = {
   ru: {
@@ -23,10 +25,12 @@ const T = {
     all: "все",
     merge: (n: number) => `Объединить ${filesCount("ru", n)}`,
     mergePages: (n: number) => `Объединить ${pagesCount("ru", n)}`,
-    needTwo: "Добавьте ещё хотя бы один PDF или выберите страницы одного файла",
-    waiting: "Дождитесь загрузки файлов, введите пароли или уберите повреждённые файлы",
-    pageMode: "Упорядочить страницы",
-    fileMode: "К списку файлов",
+    needTwo: "Добавьте ещё один PDF или выберите страницы",
+    waiting: "Дождитесь загрузки, введите пароли или уберите повреждённые файлы",
+    mode: "Что объединять",
+    pageMode: "Страницы",
+    fileMode: "Файлы",
+    total: (n: number) => `В новом файле: ${pagesCount("ru", n)}`,
     selected: (n: number) => `Выбрано: ${n}`,
     selectAll: "Выбрать все",
     fileLetter: (l: string, name: string) => `файл ${l} (${name})`,
@@ -37,10 +41,12 @@ const T = {
     all: "all",
     merge: (n: number) => `Merge ${filesCount("en", n)}`,
     mergePages: (n: number) => `Merge ${pagesCount("en", n)}`,
-    needTwo: "Add at least one more PDF or pick pages of a single file",
+    needTwo: "Add one more PDF or pick pages",
     waiting: "Wait for the files to load, enter passwords or remove damaged files",
-    pageMode: "Arrange pages",
-    fileMode: "Back to the file list",
+    mode: "What to merge",
+    pageMode: "Pages",
+    fileMode: "Files",
+    total: (n: number) => `${pagesCount("en", n)} in the new file`,
     selected: (n: number) => `Selected: ${n}`,
     selectAll: "Select all",
     fileLetter: (l: string, name: string) => `file ${l} (${name})`,
@@ -146,119 +152,143 @@ export default function MergeTool({ locale }: { locale: Locale }) {
     commit(gridPages.filter((p) => !selected.has(p.key)));
     setSelected(new Set());
   };
+  const setMode = (m: "files" | "pages") => {
+    if (m === "files") setArrangement(null);
+    else commit(keyed(filePlan.flatMap((x) => (x.pages ? x.pages.map((n) => ({ file: x.file.id, index: n - 1 })) : []))));
+    setSelected(new Set());
+  };
+
+  const files = (
+    <FilePanel
+      locale={locale}
+      pdf={pdf}
+      multiple
+      disabled={job.running}
+      renderExtra={
+        gridPages
+          ? undefined
+          : (f) => {
+              if (f.status !== "ready") return null;
+              const err = filePlan.find((x) => x.file.id === f.id)?.error;
+              return (
+                <div className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 sm:pl-[3.25rem]">
+                  <label htmlFor={`rng-${f.id}`} className="shrink-0 text-sm text-fg-2">
+                    {t.pagesOf}
+                  </label>
+                  <Input
+                    id={`rng-${f.id}`}
+                    size="sm"
+                    className="w-auto min-w-0 flex-1 basis-32 sm:max-w-56"
+                    placeholder={`${t.all} (1-${f.pages})`}
+                    value={ranges[f.id] ?? ""}
+                    onChange={(e) => {
+                      setRanges((r) => ({ ...r, [f.id]: e.target.value }));
+                      setResult(null);
+                    }}
+                    aria-invalid={!!err}
+                    autoComplete="off"
+                    spellCheck={false}
+                  />
+                  {err && (
+                    <span className="basis-full text-sm text-err" role="alert">
+                      {err}
+                    </span>
+                  )}
+                </div>
+              );
+            }
+      }
+    />
+  );
+
+  if (!pdf.files.length) return <div className="flex flex-col gap-4">{files}</div>;
+
+  const modeSwitch =
+    pdf.ready.length > 0 ? (
+      <Segmented
+        label={t.mode}
+        value={gridPages ? "pages" : "files"}
+        onChange={setMode}
+        options={[
+          { value: "files", label: t.fileMode },
+          { value: "pages", label: t.pageMode },
+        ]}
+      />
+    ) : null;
+
+  const controls = gridPages ? (
+    <Controls>
+      <div className="flex flex-col gap-2">
+        <span className="text-sm font-medium text-fg-2">{t.selected(selected.size)}</span>
+        <div className="flex flex-wrap items-center gap-1">
+          <IconButton variant="tonal" label={s.rotateLeft} icon={<RotateCcw aria-hidden />} disabled={!selected.size} onClick={() => rotateSelected(-90)} />
+          <IconButton variant="tonal" label={s.rotateRight} icon={<RotateCw aria-hidden />} disabled={!selected.size} onClick={() => rotateSelected(90)} />
+          <IconButton variant="tonal" label={s.moveLeft} icon={<ArrowLeft aria-hidden />} disabled={!selected.size} onClick={() => commit(shiftSelected(gridPages, selected, -1) as GridPage[])} />
+          <IconButton variant="tonal" label={s.moveRight} icon={<ArrowRight aria-hidden />} disabled={!selected.size} onClick={() => commit(shiftSelected(gridPages, selected, 1) as GridPage[])} />
+          <IconButton variant="tonal" label={s.deletePage} icon={<Trash2 aria-hidden />} disabled={!selected.size} onClick={deleteSelected} />
+        </div>
+        <Button size="sm" variant="text" className="self-start" onClick={() => setSelected(selected.size ? new Set() : new Set(gridPages.map((p) => p.key)))}>
+          {selected.size ? s.selectNone : t.selectAll}
+        </Button>
+      </div>
+    </Controls>
+  ) : null;
 
   return (
-    <div className="flex flex-col gap-4">
-      <FilePanel
-        locale={locale}
-        pdf={pdf}
-        multiple
-        disabled={job.running}
-        renderExtra={
-          gridPages
-            ? undefined
-            : (f) =>
-                f.status === "ready" ? (
-                  <div className="mt-2 flex items-center gap-2 pl-12">
-                    <label htmlFor={`rng-${f.id}`} className="shrink-0 text-sm text-fg-3">
-                      {t.pagesOf}
-                    </label>
-                    <Input
-                      id={`rng-${f.id}`}
-                      size="sm"
-                      className="max-w-56"
-                      placeholder={`${t.all} (1-${f.pages})`}
-                      value={ranges[f.id] ?? ""}
-                      onChange={(e) => {
-                        setRanges((r) => ({ ...r, [f.id]: e.target.value }));
-                        setResult(null);
-                      }}
-                      aria-invalid={!!filePlan.find((x) => x.file.id === f.id)?.error}
-                      autoComplete="off"
-                    />
-                    {filePlan.find((x) => x.file.id === f.id)?.error && (
-                      <span className="text-sm text-err" role="alert">
-                        {filePlan.find((x) => x.file.id === f.id)?.error}
-                      </span>
-                    )}
-                  </div>
-                ) : null
-        }
-      />
-
-      {pdf.files.length > 0 && (
-        <>
-          {gridPages && (
-            <PageGrid
-              locale={locale}
-              pages={gridPages}
-              thumbsOf={(id) => byId.get(id)?.thumbs ?? null}
-              label={(p) => `${letterOf.get(p.file)}·${p.index + 1}`}
-              describe={(p, i) => `${i + 1}: ${s.page} ${p.index + 1}, ${t.fileLetter(letterOf.get(p.file) ?? "", byId.get(p.file)?.name ?? "")}`}
-              selected={selected}
-              onToggle={(key, extend) => setSelected((prev) => toggleSelection(prev, gridPages.map((p) => p.key), key, extend, anchor))}
-              onMove={(from, to) => commit(moveItem(gridPages, from, to))}
-              onRotate={(key, d) => commit(gridPages.map((p) => (p.key === key ? { ...p, rotate: (p.rotate + d + 360) % 360 } : p)))}
-              onDelete={(key) => commit(gridPages.filter((p) => p.key !== key))}
-              toolbar={
-                <OptionsRow className="items-center! gap-x-2!">
-                  <span className="text-sm text-fg-2">{t.selected(selected.size)}</span>
-                  <Button size="sm" variant="ghost" disabled={!selected.size} onClick={() => rotateSelected(-90)} aria-label={s.rotateLeft} title={s.rotateLeft}>
-                    <RotateCcw aria-hidden />
-                  </Button>
-                  <Button size="sm" variant="ghost" disabled={!selected.size} onClick={() => rotateSelected(90)} aria-label={s.rotateRight} title={s.rotateRight}>
-                    <RotateCw aria-hidden />
-                  </Button>
-                  <Button size="sm" variant="ghost" disabled={!selected.size} onClick={deleteSelected} aria-label={s.deletePage} title={s.deletePage}>
-                    <Trash2 aria-hidden />
-                  </Button>
-                  <Button size="sm" variant="ghost" onClick={() => setSelected(selected.size ? new Set() : new Set(gridPages.map((p) => p.key)))}>
-                    {selected.size ? s.selectNone : t.selectAll}
-                  </Button>
-                </OptionsRow>
-              }
-            />
-          )}
-
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-            <PrimaryButton disabled={blocked || tooFew || !plan.length || job.running} onClick={merge}>
-              <Combine aria-hidden />
-              {gridPages ? t.mergePages(plan.length) : t.merge(pdf.files.length)}
-            </PrimaryButton>
-            {pdf.ready.length > 0 && (
-              <Button
-                variant="ghost"
-                onClick={() => {
-                  if (gridPages) setArrangement(null);
-                  else commit(keyed(filePlan.flatMap((x) => (x.pages ? x.pages.map((n) => ({ file: x.file.id, index: n - 1 })) : []))));
-                  setSelected(new Set());
-                }}
-              >
-                {gridPages ? <List aria-hidden /> : <LayoutGrid aria-hidden />}
-                {gridPages ? t.fileMode : t.pageMode}
-              </Button>
-            )}
-          </div>
+    <Workspace
+      files={
+        <div className="flex flex-col gap-3">
+          {modeSwitch}
+          {files}
+        </div>
+      }
+      controls={controls}
+      previewFirst={false}
+      stickyAction={!!gridPages}
+      preview={
+        gridPages ? (
+          <PageGrid
+            locale={locale}
+            pages={gridPages}
+            thumbsOf={(id) => byId.get(id)?.thumbs ?? null}
+            label={(p) => `${letterOf.get(p.file)}·${p.index + 1}`}
+            describe={(p, i) => `${i + 1}: ${s.page} ${p.index + 1}, ${t.fileLetter(letterOf.get(p.file) ?? "", byId.get(p.file)?.name ?? "")}`}
+            selected={selected}
+            onToggle={(key, extend) => setSelected((prev) => toggleSelection(prev, gridPages.map((p) => p.key), key, extend, anchor))}
+            onMove={(from, to) => commit(moveItem(gridPages, from, to))}
+            onRotate={(key, d) => commit(gridPages.map((p) => (p.key === key ? { ...p, rotate: (p.rotate + d + 360) % 360 } : p)))}
+            onDelete={(key) => commit(gridPages.filter((p) => p.key !== key))}
+          />
+        ) : undefined
+      }
+      action={
+        <Panel className="flex flex-col gap-3 p-3 max-lg:shadow-elev-3 sm:p-4">
+          {pdf.allReady && plan.length > 0 && <Summary size="md">{t.total(plan.length)}</Summary>}
+          <PrimaryButton disabled={blocked || tooFew || !plan.length || job.running} done={!!result} onClick={merge}>
+            <Combine aria-hidden />
+            {gridPages ? t.mergePages(plan.length) : t.merge(pdf.files.length)}
+          </PrimaryButton>
           {!pdf.allReady && pdf.files.some((f) => f.status !== "loading") && <p className="text-sm text-fg-3">{t.waiting}</p>}
           {pdf.allReady && tooFew && <p className="text-sm text-fg-3">{t.needTwo}</p>}
           <JobStatus locale={locale} state={job.state} onCancel={job.cancel} />
-          {result && (
-            <ResultCard
-              locale={locale}
-              items={result}
-              notice={t.formsNote}
-              onReset={() => {
-                setResult(null);
-                setArrangement(null);
-                setRanges({});
-                pdf.clear();
-                job.reset();
-              }}
-            />
-          )}
-          {!result && pdf.files.length > 0 && job.state.status === "idle" && pdf.files.some((f) => f.status === "error") && <Notice tone="warn">{s.invalid}</Notice>}
-        </>
-      )}
-    </div>
+        </Panel>
+      }
+      result={
+        result && (
+          <ResultCard
+            locale={locale}
+            items={result}
+            notice={t.formsNote}
+            onReset={() => {
+              setResult(null);
+              setArrangement(null);
+              setRanges({});
+              pdf.clear();
+              job.reset();
+            }}
+          />
+        )
+      }
+    />
   );
 }

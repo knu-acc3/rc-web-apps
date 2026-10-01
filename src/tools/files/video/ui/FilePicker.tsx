@@ -6,7 +6,7 @@ import type { Locale } from "@/i18n/config";
 import { formatBytes, formatNumber } from "@/i18n/format";
 import { Button } from "@/ui/button";
 import { Dropzone } from "@/ui/dropzone";
-import { Notice, Panel } from "@/ui/panel";
+import { Notice } from "@/ui/panel";
 import { codecLabel, type MediaInfo } from "../../shared/spec";
 import { formatTime } from "../../shared/time";
 import type { Probe } from "./hooks";
@@ -19,8 +19,8 @@ const AUDIO_ACCEPT =
 export const MEDIA_ACCEPT = `${AUDIO_ACCEPT},${VIDEO_ACCEPT}`;
 
 /**
- * Drop area when empty; a compact file card with a "choose another" button when a
- * file is loaded (the button lives outside the drop area — no nested controls).
+ * Drop area when empty; a compact file row with a "choose another" button when a file is loaded (the row has no
+ * card of its own: it sits at the top of the tool's settings card).
  */
 export function FilePicker({
   locale,
@@ -47,27 +47,28 @@ export function FilePicker({
         onFiles={(fs) => fs[0] && onFile(fs[0])}
         accept={accept}
         disabled={disabled}
+        locale={locale}
         title={kind === "video" ? t.chooseVideo : kind === "audio" ? t.chooseAudio : t.chooseMedia}
-        hint={`${t.pasteHint}. ${t.localNote}.`}
+        hint={kind === "video" ? t.videoFormats : t.audioFormats}
       />
     );
   }
   const Icon = kind === "audio" ? FileAudio : FileVideo;
   return (
-    <Panel className="flex flex-col gap-3 p-4">
-      <div className="flex flex-wrap items-center gap-3">
-        <span className="flex size-10 shrink-0 items-center justify-center rounded-[0.625rem] bg-accent-soft text-accent">
+    <div className="flex min-w-0 flex-col gap-2">
+      <div className="flex items-center gap-3">
+        <span className="flex size-11 shrink-0 items-center justify-center rounded-[0.875rem] bg-accent-container text-on-accent-container">
           <Icon className="size-5" aria-hidden />
         </span>
         <div className="min-w-0 flex-1">
-          <div className="truncate font-medium text-fg" title={file.name}>
+          <div className="truncate font-semibold text-fg" title={file.name}>
             {file.name}
           </div>
-          <div className="text-sm text-fg-3">{formatBytes(locale, file.size)}</div>
+          <div className="tabular text-sm text-fg-3">{formatBytes(locale, file.size)}</div>
         </div>
-        <Button variant="outline" size="sm" onClick={() => input.current?.click()} disabled={disabled}>
+        <Button variant="tonal" size="sm" onClick={() => input.current?.click()} disabled={disabled}>
           <FolderOpen aria-hidden />
-          {t.change}
+          <span className="max-[22rem]:sr-only">{t.change}</span>
         </Button>
         <input
           ref={input}
@@ -84,7 +85,7 @@ export function FilePicker({
         />
       </div>
       {children}
-    </Panel>
+    </div>
   );
 }
 

@@ -3,11 +3,14 @@
 import { Mic, MicOff, RotateCcw } from "lucide-react";
 import { useEffect, useId, useRef, useState } from "react";
 import type { Locale } from "@/i18n/config";
-import { formatNumber, parseNumber } from "@/i18n/format";
+import { formatNumber } from "@/i18n/format";
 import { Button } from "@/ui/button";
-import { Field, Input } from "@/ui/field";
+import { Field } from "@/ui/field";
+import { NumberInput } from "@/ui/number-input";
 import { Notice, Panel } from "@/ui/panel";
 import { Segmented } from "@/ui/segmented";
+import { Fab } from "@/tools/files/video/ui/Fab";
+import { Setting } from "@/tools/files/video/ui/options";
 import { cssColor, mediaErrorKind, openMicrophone, resumeAudio, stopStream, toDb } from "../lib/audio";
 
 const T = {
@@ -23,11 +26,10 @@ const T = {
     speed: "Усреднение",
     fast: "Быстрое (0,125 с)",
     slow: "Медленное (1 с)",
-    offset: "Калибровка, дБ",
-    offsetHint: "Поправка к dBFS по эталонному шумомеру. Без неё показываются dBFS.",
+    offset: "Калибровка (поправка)",
     unitFs: "dBFS",
     unitCal: "дБ (калибр.)",
-    honest: "Показания — уровень сигнала микрофона в dBFS (0 = максимум цифровой шкалы), а не звуковое давление. Браузер не знает чувствительность вашего микрофона, а телефоны дополнительно обрабатывают звук. Чтобы получить примерные децибелы, сравните с настоящим шумомером и введите поправку.",
+    honest: "Это уровень сигнала микрофона в dBFS (0 = максимум), а не звуковое давление: браузер не знает чувствительность микрофона. Для примерных децибел сравните с настоящим шумомером и введите поправку.",
     errors: {
       denied: "Доступ к микрофону запрещён. Разрешите его в настройках сайта и попробуйте снова.",
       notfound: "Микрофон не найден.",
@@ -49,11 +51,10 @@ const T = {
     speed: "Averaging",
     fast: "Fast (0.125 s)",
     slow: "Slow (1 s)",
-    offset: "Calibration, dB",
-    offsetHint: "Offset to dBFS from a reference sound level meter. Without it the meter shows dBFS.",
+    offset: "Calibration (offset)",
     unitFs: "dBFS",
     unitCal: "dB (calibrated)",
-    honest: "Readings are the microphone signal level in dBFS (0 = digital full scale), not sound pressure. The browser doesn't know your microphone's sensitivity, and phones process audio on top. For approximate decibels, compare with a real sound level meter and enter the offset.",
+    honest: "This is the microphone signal level in dBFS (0 = full scale), not sound pressure: the browser doesn't know the microphone's sensitivity. For approximate decibels, compare with a real sound level meter and enter the offset.",
     errors: {
       denied: "Microphone access was denied. Allow it in the site settings and try again.",
       notfound: "No microphone found.",
@@ -82,14 +83,13 @@ export default function DecibelMeter({ locale }: { locale: Locale }) {
   const [error, setError] = useState<string | null>(null);
   const [stats, setStats] = useState<Stats | null>(null);
   const [speed, setSpeed] = useState<"fast" | "slow">("fast");
-  const [offsetText, setOffsetText] = useState("0");
+  const [offset, setOffset] = useState(0);
   const graph = useRef<HTMLCanvasElement>(null);
   const live = useRef<{ stream: MediaStream; src: MediaStreamAudioSourceNode; raf: number; reset: () => void } | null>(null);
   const tau = useRef(0.125);
   useEffect(() => {
     tau.current = speed === "fast" ? 0.125 : 1;
   }, [speed]);
-  const offset = parseNumber(offsetText) ?? 0;
   const offRef = useRef(offset);
   useEffect(() => {
     offRef.current = offset;
@@ -188,15 +188,15 @@ export default function DecibelMeter({ locale }: { locale: Locale }) {
   const unit = cal ? t.unitCal : t.unitFs;
 
   return (
-    <div className="flex flex-col gap-4">
-      <Panel className="flex flex-col items-center gap-5 p-6">
+    <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] lg:gap-6">
+      <Panel className="flex min-w-0 flex-col items-center gap-5 p-4 sm:p-6">
         <div className="flex flex-col items-center">
-          <span className="text-sm text-fg-3">{t.level}</span>
-          <span className="tabular text-7xl font-bold tracking-tight text-fg">{on && stats ? fmt(stats.level) : "—"}</span>
-          <span className="text-sm text-fg-2">{unit}</span>
+          <span className="text-sm font-medium text-fg-3">{t.level}</span>
+          <span className="tabular text-7xl font-bold leading-none tracking-tight text-fg sm:text-8xl">{on && stats ? fmt(stats.level) : "—"}</span>
+          <span className="mt-1 text-sm font-medium text-fg-2">{unit}</span>
         </div>
-        <canvas ref={graph} className="h-24 w-full rounded-[0.625rem] bg-surface-2" aria-hidden />
-        <dl className="grid w-full max-w-lg grid-cols-2 gap-2 text-center sm:grid-cols-4">
+        <canvas ref={graph} className="h-24 w-full rounded-[1rem] bg-surface-2 sm:h-32" aria-hidden />
+        <dl className="grid w-full grid-cols-2 gap-2 text-center sm:grid-cols-4">
           {(
             [
               [t.peak, stats?.peak],
@@ -205,33 +205,32 @@ export default function DecibelMeter({ locale }: { locale: Locale }) {
               [t.avg, stats?.leq],
             ] as const
           ).map(([k, v]) => (
-            <div key={k} className="rounded-[0.625rem] bg-surface-2 px-2 py-2">
+            <div key={k} className="rounded-[1rem] bg-surface-2 px-2 py-2.5">
               <dt className="text-[0.75rem] text-fg-3">{k}</dt>
-              <dd className="tabular text-lg font-semibold text-fg">{on && v !== undefined ? fmt(v) : "—"}</dd>
+              <dd className="tabular text-xl font-bold text-fg">{on && v !== undefined ? fmt(v) : "—"}</dd>
             </div>
           ))}
         </dl>
-        <div className="flex flex-wrap justify-center gap-2">
-          <Button variant={on ? "outline" : "primary"} size="lg" onClick={() => (on ? stop() : start())} className="min-w-52">
-            {on ? <MicOff aria-hidden /> : <Mic aria-hidden />}
-            {on ? t.stop : t.start}
+        <Fab label={on ? t.stop : t.start} icon={on ? <MicOff aria-hidden /> : <Mic aria-hidden />} onClick={() => (on ? stop() : start())} active={on} />
+        {on && (
+          <Button variant="text" size="sm" onClick={() => live.current?.reset()}>
+            <RotateCcw aria-hidden />
+            {t.reset}
           </Button>
-          {on && (
-            <Button variant="ghost" size="lg" onClick={() => live.current?.reset()}>
-              <RotateCcw aria-hidden />
-              {t.reset}
-            </Button>
-          )}
-        </div>
-        <div className="flex flex-wrap items-end justify-center gap-x-5 gap-y-3 border-t border-line pt-4">
-          <Segmented label={t.speed} value={speed} onChange={setSpeed} size="sm" options={[{ value: "fast", label: t.fast }, { value: "slow", label: t.slow }]} />
-          <Field label={t.offset} htmlFor={`${id}-o`} hint={t.offsetHint} className="w-64">
-            <Input id={`${id}-o`} size="sm" inputMode="decimal" value={offsetText} onChange={(e) => setOffsetText(e.target.value)} className="tabular w-28" />
-          </Field>
-        </div>
+        )}
       </Panel>
-      {error && <Notice tone="err">{error}</Notice>}
-      <Notice>{t.honest}</Notice>
+      <div className="flex min-w-0 flex-col gap-4">
+        <Panel className="flex min-w-0 flex-col gap-5 p-4 sm:p-5">
+          <Setting label={t.speed}>
+            <Segmented label={t.speed} value={speed} onChange={setSpeed} options={[{ value: "fast", label: t.fast }, { value: "slow", label: t.slow }]} />
+          </Setting>
+          <Field label={t.offset} htmlFor={`${id}-o`}>
+            <NumberInput id={`${id}-o`} locale={locale} value={offset} min={-50} max={200} step={1} decimals={1} suffix={locale === "ru" ? "дБ" : "dB"} onChange={(v) => setOffset(v ?? 0)} />
+          </Field>
+        </Panel>
+        {error && <Notice tone="err">{error}</Notice>}
+        <Notice>{t.honest}</Notice>
+      </div>
     </div>
   );
 }

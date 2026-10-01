@@ -1,14 +1,16 @@
 "use client";
 
-import { useId, useState } from "react";
+import { useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { plural } from "@/i18n/format";
-import { Field, Select, Switch } from "@/ui/field";
+import { Field, Switch } from "@/ui/field";
 import { Segmented } from "@/ui/segmented";
 import { gridRects } from "./lib/collage";
 import { centeredAspectRect, type Rect } from "./lib/geometry";
 import { baseName, materialize } from "./lib/source";
 import type { OutFormat, TileResult } from "./lib/types";
+import { NumberField } from "./ui/controls";
+import { ChipChoice } from "@/ui/chip-choice";
 import { DEFAULT_QUALITY, LOSSY, sameFormat } from "./ui/format";
 import { useEngine } from "./ui/hooks";
 import { ImageStage } from "./ui/ImageStage";
@@ -28,7 +30,7 @@ const T = {
     igOrder: "Нумерация для сетки профиля Instagram (публиковать с №1)",
     parts: ["часть", "части", "частей"],
     download: "Скачать части (ZIP)",
-    carouselHint: "Фото обрезается по центру под общий формат ленты и делится на слайды одинакового размера",
+    carouselHint: "Фото обрезается по центру и делится на равные слайды",
   },
   en: {
     mode: "Split into",
@@ -42,7 +44,7 @@ const T = {
     igOrder: "Number for the Instagram profile grid (post #1 first)",
     parts: ["part", "parts"],
     download: "Download parts (ZIP)",
-    carouselHint: "The photo is centre-cropped to the strip shape and cut into equal slides",
+    carouselHint: "The photo is centre-cropped and cut into equal slides",
   },
 } as const;
 
@@ -64,7 +66,6 @@ export default function Split({
   cols?: number;
 }) {
   const t = T[locale];
-  const id = useId();
   const getEngine = useEngine();
   const file = useSingleFile();
   const exp = useExport();
@@ -126,7 +127,7 @@ export default function Split({
   const options = (
     <>
       <Segmented
-        wrap
+        fill
         label={t.mode}
         value={mode}
         onChange={setMode}
@@ -138,8 +139,8 @@ export default function Split({
       {mode === "grid" ? (
         <>
           <Field label={t.presets}>
-            <Segmented
-              wrap
+            <ChipChoice
+            layout="wrap"
               label={t.presets}
               value={`${rows}x${cols}`}
               onChange={(v) => {
@@ -150,33 +151,16 @@ export default function Split({
               options={GRID_PRESETS.map((g) => ({ value: g, label: g.replace("x", "×") }))}
             />
           </Field>
-          <Field label={t.rows} htmlFor={`${id}-r`} className="w-24">
-            <Select id={`${id}-r`} value={rows} onChange={(e) => setRows(Number(e.target.value))}>
-              {[1, 2, 3, 4, 5].map((x) => (
-                <option key={x}>{x}</option>
-              ))}
-            </Select>
-          </Field>
-          <Field label={t.cols} htmlFor={`${id}-c`} className="w-24">
-            <Select id={`${id}-c`} value={cols} onChange={(e) => setCols(Number(e.target.value))}>
-              {[1, 2, 3, 4, 5].map((x) => (
-                <option key={x}>{x}</option>
-              ))}
-            </Select>
-          </Field>
+          <div className="grid grid-cols-2 gap-3">
+            <NumberField label={t.rows} value={rows} onChange={(v) => v && setRows(v)} min={1} max={5} stepper locale={locale} />
+            <NumberField label={t.cols} value={cols} onChange={(v) => v && setCols(v)} min={1} max={5} stepper locale={locale} />
+          </div>
         </>
       ) : (
         <>
-          <Field label={t.slides} htmlFor={`${id}-s`} className="w-24">
-            <Select id={`${id}-s`} value={slides} onChange={(e) => setSlides(Number(e.target.value))}>
-              {[2, 3, 4, 5, 6, 7, 8, 9, 10].map((x) => (
-                <option key={x}>{x}</option>
-              ))}
-            </Select>
-          </Field>
+          <NumberField label={t.slides} value={slides} onChange={(v) => v && setSlides(v)} min={2} max={10} stepper locale={locale} />
           <Field label={t.slide}>
             <Segmented
-              wrap
               label={t.slide}
               value={slideSize}
               onChange={setSlideSize}

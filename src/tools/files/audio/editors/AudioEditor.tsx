@@ -1,11 +1,11 @@
 "use client";
 
-import { Play, Square } from "lucide-react";
-import { useEffect, useId, useRef, useState } from "react";
+import { Gauge, Play, Scissors, Square, Undo2, Volume2 } from "lucide-react";
+import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 import type { Locale } from "@/i18n/config";
 import { formatNumber } from "@/i18n/format";
 import { Button } from "@/ui/button";
-import { Checkbox, Field, Select, Slider } from "@/ui/field";
+import { Slider, Switch } from "@/ui/field";
 import { Notice } from "@/ui/panel";
 import { Segmented } from "@/ui/segmented";
 import { AudioSession, runJob } from "@/tools/files/shared/client";
@@ -18,6 +18,8 @@ import { JobProgress, ProgressBar } from "@/tools/files/video/ui/Progress";
 import { RangeSelector, TimeInput } from "@/tools/files/video/ui/RangeSelector";
 import { ResultCard } from "@/tools/files/video/ui/ResultCard";
 import { UI } from "@/tools/files/video/ui/strings";
+import { Setting, StepSlider } from "@/tools/files/video/ui/options";
+import { ChipChoice } from "@/ui/chip-choice";
 import { Waveform } from "@/tools/files/video/ui/Waveform";
 import { Workbench } from "@/tools/files/video/ui/Workbench";
 import { fromDb, getAudioContext, toDb } from "../lib/audio";
@@ -54,10 +56,10 @@ const T = {
     pitch: "Тональность",
     semis: "полутонов",
     keepPitch: "Сохранить высоту голоса",
-    pitchNote: "Изменение тональности слышно только в готовом файле: в предпрослушивании меняется только скорость.",
+    pitchNote: "Тональность слышна только в готовом файле",
     duration: "Длительность",
     run: { trim: "Обрезать", volume: "Применить громкость", speed: "Изменить скорость", reverse: "Развернуть задом наперёд" } as Record<EditorMode, string>,
-    lossless: "Без перекодирования: фрагмент будет вырезан из исходного потока без потери качества.",
+    lossless: "Без перекодирования и потери качества",
     reverseNote: "Звук будет развёрнут целиком: конец станет началом.",
   },
   en: {
@@ -86,16 +88,25 @@ const T = {
     pitch: "Pitch",
     semis: "semitones",
     keepPitch: "Keep voice pitch",
-    pitchNote: "Pitch changes are only audible in the saved file: the preview changes speed only.",
+    pitchNote: "Pitch is only heard in the saved file",
     duration: "Duration",
     run: { trim: "Trim audio", volume: "Apply volume", speed: "Change speed", reverse: "Reverse audio" } as Record<EditorMode, string>,
-    lossless: "No re-encoding: the part is cut from the original stream without quality loss.",
+    lossless: "No re-encoding, no quality loss",
     reverseNote: "The whole track is reversed: the end becomes the beginning.",
   },
 } as const;
 
 const FADES = [0, 0.5, 1, 2, 3, 5, 10];
+const NORMS = [-6, -3, -2, -1, -0.1];
+const SEMIS = Array.from({ length: 25 }, (_, i) => i - 12);
+const BITRATES = [96, 128, 160, 192, 256, 320].map((k) => k * 1000);
 const SPEEDS = ["0.5", "0.75", "0.9", "1", "1.1", "1.25", "1.5", "2"] as const;
+const RUN_ICON: Record<EditorMode, ReactNode> = {
+  trim: <Scissors aria-hidden />,
+  volume: <Volume2 aria-hidden />,
+  speed: <Gauge aria-hidden />,
+  reverse: <Undo2 aria-hidden />,
+};
 
 function AudioEditorInner({ locale, mode }: { locale: Locale; mode: EditorMode }) {
   const t = T[locale];
@@ -264,34 +275,19 @@ function AudioEditorInner({ locale, mode }: { locale: Locale; mode: EditorMode }
 
   const fmtDb = (x: number) => `${x > 0 ? "+" : x < 0 ? "−" : ""}${formatNumber(locale, Math.abs(x), { maximumFractionDigits: 1 })} dB`;
 
+  const fmtFade = (f: number) => (f ? `${formatNumber(locale, f)} ${t.sec}` : t.none);
   const controls = (() => {
     switch (mode) {
       case "trim":
         return (
           <>
-            <Field label={t.fadeIn} htmlFor={`${id}-fi`} className="w-36">
-              <Select id={`${id}-fi`} size="sm" value={String(fadeIn)} onChange={(e) => (setFadeIn(Number(e.target.value)), touch())}>
-                {FADES.map((f) => (
-                  <option key={f} value={f}>
-                    {f ? `${formatNumber(locale, f)} ${t.sec}` : t.none}
-                  </option>
-                ))}
-              </Select>
-            </Field>
-            <Field label={t.fadeOut} htmlFor={`${id}-fo`} className="w-36">
-              <Select id={`${id}-fo`} size="sm" value={String(fadeOut)} onChange={(e) => (setFadeOut(Number(e.target.value)), touch())}>
-                {FADES.map((f) => (
-                  <option key={f} value={f}>
-                    {f ? `${formatNumber(locale, f)} ${t.sec}` : t.none}
-                  </option>
-                ))}
-              </Select>
-            </Field>
+            <StepSlider label={t.fadeIn} value={fadeIn} steps={FADES} format={fmtFade} onChange={(x) => (setFadeIn(x), touch())} />
+            <StepSlider label={t.fadeOut} value={fadeOut} steps={FADES} format={fmtFade} onChange={(x) => (setFadeOut(x), touch())} />
           </>
         );
       case "volume":
         return (
-          <div className="flex w-full flex-col gap-3">
+          <>
             <Segmented
               label={t.gain}
               value={volMode}
@@ -302,48 +298,44 @@ function AudioEditorInner({ locale, mode }: { locale: Locale; mode: EditorMode }
               ]}
             />
             {volMode === "gain" ? (
-              <div className="flex items-center gap-4">
-                <Slider aria-label={t.gain} min={-20} max={20} step={0.5} value={gainDb} onChange={(e) => (setGainDb(Number(e.target.value)), touch())} className="max-w-md" />
-                <span className="tabular w-24 text-3xl font-semibold text-fg">{fmtDb(gainDb)}</span>
+              <div className="flex min-w-0 flex-col">
+                <div className="flex items-baseline justify-between gap-3">
+                  <label htmlFor={`${id}-g`} className="text-sm font-medium text-fg-2">
+                    {t.gain}
+                  </label>
+                  <output htmlFor={`${id}-g`} className="tabular text-3xl font-bold tracking-tight text-fg">
+                    {fmtDb(gainDb)}
+                  </output>
+                </div>
+                <Slider id={`${id}-g`} min={-20} max={20} step={0.5} value={gainDb} format={fmtDb} aria-valuetext={fmtDb(gainDb)} onChange={(e) => (setGainDb(Number(e.target.value)), touch())} />
+                <div className="flex justify-between text-xs text-fg-3">
+                  <span>{fmtDb(-20)}</span>
+                  <span>{fmtDb(20)}</span>
+                </div>
               </div>
             ) : (
-              <Field label={t.target} htmlFor={`${id}-n`} className="w-48">
-                <Select id={`${id}-n`} size="sm" value={String(normDb)} onChange={(e) => (setNormDb(Number(e.target.value)), touch())}>
-                  {[-0.1, -1, -2, -3, -6].map((x) => (
-                    <option key={x} value={x}>
-                      {fmtDb(x)}FS
-                    </option>
-                  ))}
-                </Select>
-              </Field>
+              <StepSlider label={t.target} value={normDb} steps={NORMS} format={(x) => `${fmtDb(x)}FS`} onChange={(x) => (setNormDb(x), touch())} />
             )}
             {peakDb !== null && Number.isFinite(peakDb) && afterDb !== null && (
-              <p className="tabular text-sm text-fg-2" aria-live="polite">
+              <p className="tabular rounded-[1rem] bg-surface-2 px-4 py-3 text-sm text-fg-2" aria-live="polite">
                 {t.peakNow}: {fmtDb(peakDb)}FS → {t.peakAfter}: <span className="font-semibold text-fg">{fmtDb(Math.min(afterDb, 0))}FS</span>
               </p>
             )}
-          </div>
+          </>
         );
       case "speed":
         return (
-          <div className="flex w-full flex-col gap-3">
-            <Segmented label={t.speed} value={speed as (typeof SPEEDS)[number]} onChange={(x) => (setSpeed(x), touch())} options={SPEEDS.map((x) => ({ value: x, label: `×${formatNumber(locale, Number(x))}` }))} wrap />
-            <div className="flex flex-wrap items-center gap-4">
-              <label htmlFor={`${id}-p`} className="text-sm font-medium text-fg-2">
-                {t.pitch}
-              </label>
-              <Slider id={`${id}-p`} min={-12} max={12} step={1} value={semis} onChange={(e) => (setSemis(Number(e.target.value)), touch())} className="max-w-xs" />
-              <span className="tabular text-lg font-semibold text-fg">
-                {semis > 0 ? "+" : semis < 0 ? "−" : ""}
-                {Math.abs(semis)} {t.semis}
-              </span>
-            </div>
-            <Checkbox label={t.keepPitch} checked={keepPitch} onChange={(e) => (setKeepPitch(e.target.checked), touch())} />
-            {semis !== 0 && <p className="text-[0.8125rem] text-fg-3">{t.pitchNote}</p>}
-          </div>
+          <>
+            <Setting label={t.speed}>
+              <ChipChoice label={t.speed} value={speed} onChange={(x) => (setSpeed(x), touch())} options={SPEEDS.map((x) => ({ value: x, label: `×${formatNumber(locale, Number(x))}` }))} />
+            </Setting>
+            <StepSlider label={t.pitch} value={semis} steps={SEMIS} format={(x) => `${x > 0 ? "+" : x < 0 ? "−" : ""}${Math.abs(x)} ${t.semis}`} onChange={(x) => (setSemis(x), touch())} />
+            <Switch label={t.keepPitch} checked={keepPitch} onChange={(e) => (setKeepPitch(e.target.checked), touch())} />
+            {semis !== 0 && <p className="-mt-3 text-[0.8125rem] text-fg-3">{t.pitchNote}</p>}
+          </>
         );
       case "reverse":
-        return <p className="text-sm text-fg-3">{t.reverseNote}</p>;
+        return <p className="text-sm text-fg-2">{t.reverseNote}</p>;
     }
   })();
 
@@ -361,7 +353,7 @@ function AudioEditorInner({ locale, mode }: { locale: Locale; mode: EditorMode }
           <div className="flex flex-col gap-3">
             <audio ref={audio} preload="auto" className="hidden" />
             {load.running ? (
-              <div className="flex flex-col gap-2 rounded-[0.625rem] bg-surface-2 px-4 py-3">
+              <div className="flex flex-col gap-2 rounded-[1rem] bg-surface-2 px-4 py-3">
                 <span className="text-sm text-fg-2">
                   {t.decoding} {Math.round(load.progress * 100)}%
                 </span>
@@ -386,11 +378,11 @@ function AudioEditorInner({ locale, mode }: { locale: Locale; mode: EditorMode }
                   <div className="grid grid-cols-2 items-end gap-3 sm:grid-cols-[1fr_1fr_auto_auto]">
                     <TimeInput label={t.start} value={range.start} max={duration} onCommit={(x) => setRange(Math.min(x, range.end - 0.05), range.end)} />
                     <TimeInput label={t.end} value={range.end} max={duration} onCommit={(x) => setRange(range.start, Math.max(x, range.start + 0.05))} />
-                    <div className="flex items-center gap-2 sm:flex-col sm:items-start sm:gap-0.5">
+                    <div className="flex flex-col sm:items-start">
                       <span className="text-sm text-fg-3">{t.length}</span>
-                      <span className="tabular text-2xl font-semibold text-fg">{formatTime(range.end - range.start, 2)}</span>
+                      <span className="tabular text-2xl font-bold tracking-tight text-fg">{formatTime(range.end - range.start, 2)}</span>
                     </div>
-                    <Button variant="outline" onClick={listen}>
+                    <Button variant="tonal" onClick={listen}>
                       {playing ? <Square aria-hidden /> : <Play aria-hidden />}
                       {playing ? t.stop : t.play}
                     </Button>
@@ -398,20 +390,20 @@ function AudioEditorInner({ locale, mode }: { locale: Locale; mode: EditorMode }
                 </>
               ) : (
                 <>
-                  <div className="relative h-24 overflow-hidden rounded-[0.625rem] border border-line bg-surface-2">
+                  <div className="relative h-24 overflow-hidden rounded-[1rem] bg-surface-2 sm:h-28">
                     <Waveform peaks={info.peaks} />
                     {playing && playhead !== null && <div className="absolute inset-y-0 w-0.5 bg-fg" style={{ left: `${(playhead / duration) * 100}%` }} aria-hidden />}
                   </div>
                   <div className="flex flex-wrap items-center justify-between gap-3">
-                    <span className="text-fg-2">
-                      {t.duration}:{" "}
-                      <span className="tabular text-xl font-semibold text-fg">
+                    <span className="flex flex-col">
+                      <span className="text-sm text-fg-3">{t.duration}</span>
+                      <span className="tabular text-2xl font-bold tracking-tight text-fg" aria-live="polite">
                         {formatTime(duration, 1)}
                         {mode === "speed" && factor !== 1 ? ` → ${formatTime(duration / factor, 1)}` : ""}
                       </span>
                     </span>
                     {mode !== "reverse" && (
-                      <Button variant="outline" onClick={listen}>
+                      <Button variant="tonal" onClick={listen}>
                         {playing ? <Square aria-hidden /> : <Play aria-hidden />}
                         {playing ? t.stop : t.play}
                       </Button>
@@ -433,31 +425,15 @@ function AudioEditorInner({ locale, mode }: { locale: Locale; mode: EditorMode }
         ready ? (
           <>
             {controls}
-            <Field label={t.format} htmlFor={`${id}-t`} className="w-32">
-              <Select id={`${id}-t`} size="sm" value={out} onChange={(e) => (setTarget(e.target.value as AudioTarget), touch())}>
-                {TARGETS.map((x) => (
-                  <option key={x} value={x}>
-                    {LABEL[x]}
-                  </option>
-                ))}
-              </Select>
-            </Field>
-            {lossy && !copyTrim && (
-              <Field label={t.bitrate} htmlFor={`${id}-b`} className="w-36">
-                <Select id={`${id}-b`} size="sm" value={String(bitrate)} onChange={(e) => (setBitrate(Number(e.target.value)), touch())}>
-                  {[96, 128, 160, 192, 256, 320].filter((k) => out !== "opus" || k <= 256).map((k) => (
-                    <option key={k} value={k * 1000}>
-                      {k} {t.kbps}
-                    </option>
-                  ))}
-                </Select>
-              </Field>
-            )}
-            {copyTrim && <p className="w-full text-[0.8125rem] text-fg-3">{t.lossless}</p>}
+            <Setting label={t.format}>
+              <ChipChoice label={t.format} value={out} onChange={(x) => (setTarget(x), touch())} options={TARGETS.map((x) => ({ value: x, label: LABEL[x] }))} />
+            </Setting>
+            {lossy && !copyTrim && <StepSlider label={t.bitrate} value={bitrate} steps={BITRATES.filter((k) => out !== "opus" || k <= 256000)} format={(k) => `${k / 1000} ${t.kbps}`} onChange={(x) => (setBitrate(x), touch())} />}
+            {copyTrim && <p className="-mt-2 text-[0.8125rem] text-ok">{t.lossless}</p>}
           </>
         ) : null
       }
-      action={ready ? { label: t.run[mode], onClick: run, disabled: mode === "trim" && !(range.end > range.start) } : undefined}
+      action={ready ? { label: t.run[mode], onClick: run, disabled: mode === "trim" && !(range.end > range.start), icon: RUN_ICON[mode] } : undefined}
       status={<JobProgress job={job} locale={locale} onCancel={job.cancel} onRetry={run} />}
       result={
         job.status === "done" && job.result && file ? (

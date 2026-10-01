@@ -6,8 +6,9 @@ import type { Locale } from "@/i18n/config";
 import { formatNumber } from "@/i18n/format";
 import { downloadText } from "@/lib/clipboard";
 import { buttonClass } from "@/ui/button";
-import { Checkbox } from "@/ui/field";
+import { Switch } from "@/ui/field";
 import { Panel, PanelHeader } from "@/ui/panel";
+import { Segmented } from "@/ui/segmented";
 import { wordFrequency } from "./lib/textOps";
 import { countLabel, InlineSelect, InputPanel, MoreOptions, OptionsBar, TX } from "./ui/shared";
 
@@ -82,27 +83,34 @@ export default function WordFrequency({ locale }: { locale: Locale }) {
   const csv = () => ["word,count,share", ...rows.map((r) => `"${r.word.replace(/"/g, '""')}",${r.count},${(r.share * 100).toFixed(2)}`)].join("\n");
 
   return (
-    <div className="flex flex-col gap-4">
-      <InputPanel id={`${id}-in`} locale={locale} value={text} onChange={setText} rows={7} />
-      <OptionsBar>
-        <Checkbox label={t.stop} checked={stop} onChange={(e) => setStop(e.target.checked)} />
-        <InlineSelect
-          id={`${id}-ng`}
-          label={t.ngram}
-          value={ngram}
-          onChange={setNgram}
-          options={[
-            { value: "1", label: t.n1 },
-            { value: "2", label: t.n2 },
-            { value: "3", label: t.n3 },
-          ]}
-        />
-      </OptionsBar>
-      <Panel>
+    <div className="grid items-start gap-4 lg:grid-cols-2">
+      <div className="flex min-w-0 flex-col gap-4">
+        <InputPanel id={`${id}-in`} locale={locale} value={text} onChange={setText} rows={7} />
+        <OptionsBar>
+          <Switch label={t.stop} checked={stop} onChange={(e) => setStop(e.target.checked)} />
+          <Segmented
+            label={t.ngram}
+            value={ngram}
+            onChange={setNgram}
+            size="sm"
+            options={[
+              { value: "1", label: t.n1 },
+              { value: "2", label: t.n2 },
+              { value: "3", label: t.n3 },
+            ]}
+          />
+        </OptionsBar>
+        <MoreOptions locale={locale}>
+          <InlineSelect id={`${id}-min`} label={t.minLen} value={minLen} onChange={setMinLen} options={(["1", "2", "3", "4", "5"] as const).map((v) => ({ value: v, label: v }))} />
+          <Switch label={t.numbers} checked={numbers} onChange={(e) => setNumbers(e.target.checked)} />
+          <Switch label={t.caseSensitive} checked={caseSensitive} onChange={(e) => setCaseSensitive(e.target.checked)} />
+        </MoreOptions>
+      </div>
+      <Panel className="min-w-0 overflow-hidden">
         <PanelHeader
           title={`${t.total}: ${countLabel(locale, total, TX[locale].words)}`}
           actions={
-            <button type="button" className={buttonClass("ghost", "sm")} disabled={!rows.length} onClick={() => downloadText(csv(), "word-frequency.csv", "text/csv;charset=utf-8")}>
+            <button type="button" className={buttonClass("tonal", "sm")} disabled={!rows.length} onClick={() => downloadText(csv(), "word-frequency.csv", "text/csv;charset=utf-8")}>
               <Download aria-hidden />
               {t.csv}
             </button>
@@ -144,11 +152,7 @@ export default function WordFrequency({ locale }: { locale: Locale }) {
           </div>
         )}
       </Panel>
-      <MoreOptions locale={locale}>
-        <InlineSelect id={`${id}-min`} label={t.minLen} value={minLen} onChange={setMinLen} options={(["1", "2", "3", "4", "5"] as const).map((v) => ({ value: v, label: v }))} />
-        <Checkbox label={t.numbers} checked={numbers} onChange={(e) => setNumbers(e.target.checked)} />
-        <Checkbox label={t.caseSensitive} checked={caseSensitive} onChange={(e) => setCaseSensitive(e.target.checked)} />
-      </MoreOptions>
+
     </div>
   );
 }

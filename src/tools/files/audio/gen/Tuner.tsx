@@ -1,13 +1,14 @@
 "use client";
 
 import { Mic, MicOff, Volume2 } from "lucide-react";
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { formatNumber } from "@/i18n/format";
 import { cn } from "@/lib/cn";
-import { Button } from "@/ui/button";
-import { Field, Select } from "@/ui/field";
 import { Notice, Panel } from "@/ui/panel";
+import { Fab } from "@/tools/files/video/ui/Fab";
+import { Setting, StepSlider } from "@/tools/files/video/ui/options";
+import { ChipChoice } from "@/ui/chip-choice";
 import { INSTRUMENTS, type InstrumentId } from "../data/instruments";
 import { mediaErrorKind, openMicrophone, resumeAudio, stopStream } from "../lib/audio";
 import { centsBetween, detectPitch, median, midiToFreq, NOTE_NAMES_RU, noteOf, parseNote } from "../lib/pitch";
@@ -23,7 +24,7 @@ const T = {
     flat: "Ниже — подтяните",
     sharp: "Выше — ослабьте",
     inTune: "Точно",
-    ref: "Эталонный тон",
+    ref: "Эталонный тон струны",
     string: "Струна",
     errors: {
       denied: "Доступ к микрофону запрещён. Разрешите его в настройках сайта и попробуйте снова.",
@@ -33,7 +34,7 @@ const T = {
       unsupported: "Браузер не поддерживает доступ к микрофону.",
       other: "Не удалось включить микрофон.",
     },
-    privacy: "Звук анализируется прямо в браузере и никуда не передаётся и не записывается.",
+    privacy: "Звук анализируется в браузере и никуда не передаётся.",
   },
   en: {
     start: "Turn on microphone",
@@ -45,7 +46,7 @@ const T = {
     flat: "Flat — tune up",
     sharp: "Sharp — tune down",
     inTune: "In tune",
-    ref: "Reference tone",
+    ref: "String reference tone",
     string: "String",
     errors: {
       denied: "Microphone access was denied. Allow it in the site settings and try again.",
@@ -55,9 +56,11 @@ const T = {
       unsupported: "This browser doesn't support microphone access.",
       other: "Could not turn on the microphone.",
     },
-    privacy: "Sound is analysed right in the browser and is never sent or recorded.",
+    privacy: "Sound is analysed in the browser and never sent anywhere.",
   },
 } as const;
+
+const A4 = [430, 432, 435, 438, 440, 441, 442, 443, 444, 446];
 
 interface Reading {
   freq: number;
@@ -69,7 +72,6 @@ interface Reading {
 
 function TunerInner({ locale, instrument: inst0 = "chromatic" }: { locale: Locale; instrument?: InstrumentId }) {
   const t = T[locale];
-  const id = useId();
   const [instrument, setInstrument] = useState<InstrumentId>(inst0);
   const [a4, setA4] = useState(440);
   const [on, setOn] = useState(false);
@@ -173,75 +175,56 @@ function TunerInner({ locale, instrument: inst0 = "chromatic" }: { locale: Local
   const ru = reading ? NOTE_NAMES_RU[(((target ? parseNote(target.s)! : reading.midi) % 12) + 12) % 12] : "";
 
   return (
-    <div className="flex flex-col gap-4">
-      <Panel className="flex flex-col items-center gap-5 p-6">
-        <div className="flex flex-col items-center">
-          <span className={cn("tabular text-7xl font-bold tracking-tight", good ? "text-ok" : "text-fg")}>{on ? noteLabel : "—"}</span>
-          <span className="h-5 text-sm text-fg-3">{on && reading ? `${locale === "ru" ? `${ru} · ` : ""}${formatNumber(locale, reading.freq, { maximumFractionDigits: 1 })} Hz` : ""}</span>
-        </div>
-        <div className="w-full max-w-md" aria-hidden>
-          <div className="relative h-10 rounded-[0.625rem] bg-surface-2">
-            <div className="absolute inset-y-1 left-1/2 w-0.5 -translate-x-1/2 bg-ok" />
-            {[-40, -30, -20, -10, 10, 20, 30, 40].map((c) => (
-              <div key={c} className="absolute bottom-1 h-2 w-px bg-line-strong" style={{ left: `${50 + c}%` }} />
-            ))}
-            {on && reading && (
-              <div
-                className={cn("absolute inset-y-0 w-1.5 -translate-x-1/2 rounded-full transition-[left] duration-100", good ? "bg-ok" : "bg-accent")}
-                style={{ left: `${50 + shownCents}%` }}
-              />
-            )}
+    <div className="flex flex-col gap-3">
+      <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] lg:gap-6">
+        <Panel className="flex min-w-0 flex-col items-center gap-5 p-4 sm:p-6">
+          <div className="flex flex-col items-center">
+            <span className={cn("tabular text-7xl font-bold leading-none tracking-tight transition-colors sm:text-8xl", good ? "text-ok" : on && reading ? "text-fg" : "text-fg-3")}>{on ? noteLabel : "—"}</span>
+            <span className="mt-2 h-5 text-sm text-fg-3">{on && reading ? `${locale === "ru" ? `${ru} · ` : ""}${formatNumber(locale, reading.freq, { maximumFractionDigits: 1 })} Hz` : ""}</span>
           </div>
-          <div className="mt-1 flex justify-between text-[0.75rem] text-fg-3">
-            <span>−50 ¢</span>
-            <span>0</span>
-            <span>+50 ¢</span>
-          </div>
-        </div>
-        <p className={cn("h-6 text-base font-medium", good ? "text-ok" : "text-fg-2")}>
-          {!on ? "" : !reading ? t.listen : good ? t.inTune : `${cents < 0 ? t.flat : t.sharp} (${cents > 0 ? "+" : "−"}${formatNumber(locale, Math.abs(Math.round(cents)))} ¢)`}
-        </p>
-        <Button variant={on ? "outline" : "primary"} size="lg" onClick={() => (on ? stop() : start())} className="min-w-52">
-          {on ? <MicOff aria-hidden /> : <Mic aria-hidden />}
-          {on ? t.stop : t.start}
-        </Button>
-        {strings.length > 0 && (
-          <div className="flex flex-wrap justify-center gap-2" role="group" aria-label={t.ref}>
-            {strings.map((s, i) => (
-              <button
-                key={`${s}-${i}`}
-                type="button"
-                onClick={() => reference(s)}
-                title={`${t.ref}: ${s}`}
-                className={cn("chip tabular", target?.s === s && on && reading && "border-accent! text-accent")}
-              >
-                <Volume2 className="size-3.5" aria-hidden />
-                {s}
-              </button>
-            ))}
-          </div>
-        )}
-        <div className="flex flex-wrap items-end justify-center gap-3 border-t border-line pt-4">
-          <Field label={t.instrument} htmlFor={`${id}-i`} className="w-48">
-            <Select id={`${id}-i`} size="sm" value={instrument} onChange={(e) => setInstrument(e.target.value as InstrumentId)}>
-              {(Object.keys(INSTRUMENTS) as InstrumentId[]).map((k) => (
-                <option key={k} value={k}>
-                  {t.names[k]}
-                </option>
+          <div className="w-full max-w-xl" aria-hidden>
+            <div className={cn("relative h-12 rounded-[1rem] transition-colors", good ? "bg-ok-soft" : "bg-surface-2")}>
+              <div className="absolute inset-y-1.5 left-1/2 w-0.5 -translate-x-1/2 bg-ok" />
+              {[-40, -30, -20, -10, 10, 20, 30, 40].map((c) => (
+                <div key={c} className="absolute bottom-1.5 h-2.5 w-px bg-line-strong" style={{ left: `${50 + c}%` }} />
               ))}
-            </Select>
-          </Field>
-          <Field label={t.a4} htmlFor={`${id}-a`} className="w-48">
-            <Select id={`${id}-a`} size="sm" value={String(a4)} onChange={(e) => setA4(Number(e.target.value))}>
-              {[430, 432, 435, 438, 440, 441, 442, 443, 444, 446].map((f) => (
-                <option key={f} value={f}>
-                  {f} Hz
-                </option>
-              ))}
-            </Select>
-          </Field>
-        </div>
-      </Panel>
+              {on && reading && (
+                <div
+                  className={cn("absolute inset-y-0 w-2 -translate-x-1/2 rounded-full shadow-elev-1 transition-[left] duration-100", good ? "bg-ok" : "bg-accent")}
+                  style={{ left: `${50 + shownCents}%` }}
+                />
+              )}
+            </div>
+            <div className="mt-1 flex justify-between text-xs text-fg-3">
+              <span>−50 ¢</span>
+              <span>0</span>
+              <span>+50 ¢</span>
+            </div>
+          </div>
+          <p className={cn("h-6 text-center text-base font-semibold", good ? "text-ok" : "text-fg-2")} aria-live="polite">
+            {!on ? "" : !reading ? t.listen : good ? t.inTune : `${cents < 0 ? t.flat : t.sharp} (${cents > 0 ? "+" : "−"}${formatNumber(locale, Math.abs(Math.round(cents)))} ¢)`}
+          </p>
+          <Fab label={on ? t.stop : t.start} icon={on ? <MicOff aria-hidden /> : <Mic aria-hidden />} onClick={() => (on ? stop() : start())} active={on} />
+        </Panel>
+        <Panel className="flex min-w-0 flex-col gap-5 p-4 sm:p-5">
+          <Setting label={t.instrument}>
+            <ChipChoice label={t.instrument} value={instrument} onChange={setInstrument} options={(Object.keys(INSTRUMENTS) as InstrumentId[]).map((k) => ({ value: k, label: t.names[k] }))} />
+          </Setting>
+          {strings.length > 0 && (
+            <Setting label={t.ref}>
+              <div className="flex flex-wrap gap-2" role="group" aria-label={t.ref}>
+                {strings.map((s, i) => (
+                  <button key={`${s}-${i}`} type="button" onClick={() => reference(s)} title={`${t.ref}: ${s}`} className={cn("chip tabular min-h-10! font-semibold!", target?.s === s && on && reading && "is-on")}>
+                    <Volume2 className="size-4" aria-hidden />
+                    {s}
+                  </button>
+                ))}
+              </div>
+            </Setting>
+          )}
+          <StepSlider label={t.a4} value={a4} steps={A4} format={(f) => `${f} Hz`} onChange={setA4} />
+        </Panel>
+      </div>
       {error && <Notice tone="err">{error}</Notice>}
       <p className="text-sm text-fg-3">{t.privacy}</p>
     </div>

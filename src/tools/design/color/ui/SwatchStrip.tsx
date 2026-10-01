@@ -36,7 +36,7 @@ export function SwatchStrip({
     [],
   );
   return (
-    <ul className={cn("grid auto-cols-fr grid-flow-col overflow-hidden rounded-[0.625rem] border border-line", className)}>
+    <ul className={cn("grid auto-cols-fr grid-flow-col overflow-hidden rounded-[1rem] shadow-card", className)}>
       {items.map((it, i) => {
         const hex = toHex(it.color);
         const fg = readableTextColor(it.color);
@@ -44,7 +44,10 @@ export function SwatchStrip({
           <li key={i} className="min-w-0" style={CHECKER_STYLE}>
             <button
               type="button"
-              className={cn("flex w-full flex-col items-center justify-end gap-0.5 px-0.5 pb-2 text-center", tall ? "h-28" : "h-20")}
+              className={cn(
+                "relative flex w-full flex-col items-center justify-end gap-0.5 px-0.5 pb-2 text-center after:pointer-events-none after:absolute after:inset-0 after:bg-current after:opacity-0 after:transition-opacity hover:after:opacity-10 focus-visible:outline-offset-[-3px] active:after:opacity-20",
+                tall ? "h-28" : "h-20",
+              )}
               style={{ background: hex, color: fg }}
               aria-label={`${copyLabel} ${hex}`}
               title={`${copyLabel} ${hex}`}
@@ -59,8 +62,8 @@ export function SwatchStrip({
               {it.caption && <span className="text-[0.6875rem] leading-none">{it.caption}</span>}
               <span className="font-mono text-[0.6875rem] leading-tight font-medium break-all sm:text-xs">
                 {copied === i ? (
-                  <span className="inline-flex items-center gap-0.5">
-                    <Check className="size-3" aria-hidden />
+                  <span className="inline-flex items-center gap-0.5 motion-safe:animate-[pop_200ms_ease-out]">
+                    <Check className="size-4" strokeWidth={3} aria-hidden />
                     <span className="sr-only">{copiedLabel}</span>
                   </span>
                 ) : (

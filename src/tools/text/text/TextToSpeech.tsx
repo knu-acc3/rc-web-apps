@@ -5,7 +5,7 @@ import { useEffect, useId, useRef, useState, useSyncExternalStore } from "react"
 import type { Locale } from "@/i18n/config";
 import { formatNumber } from "@/i18n/format";
 import { Button } from "@/ui/button";
-import { Checkbox, Field, Select, Slider } from "@/ui/field";
+import { Field, Select, Slider, Switch } from "@/ui/field";
 import { Notice } from "@/ui/panel";
 import { sentences } from "./lib/textOps";
 import { InputPanel, MoreOptions } from "./ui/shared";
@@ -170,11 +170,11 @@ export default function TextToSpeech({ locale }: { locale: Locale }) {
     <div className="flex flex-col gap-4">
       <InputPanel id={`${id}-in`} locale={locale} value={text} onChange={setText} rows={7} />
       <div className="flex flex-wrap items-end gap-3">
-        <Button variant="primary" size="lg" onClick={speak} disabled={!text.trim() || !voice}>
+        <Button variant="filled" size="xl" onClick={speak} disabled={!text.trim() || !voice}>
           <Play aria-hidden />
           {t.play}
         </Button>
-        <Field label={t.voice} htmlFor={`${id}-v`} className="min-w-56 flex-1">
+        <Field label={t.voice} htmlFor={`${id}-v`} className="min-w-0 flex-[1_1_14rem]">
           <Select id={`${id}-v`} value={voice?.voiceURI ?? ""} onChange={(e) => setVoiceURI(e.target.value)} disabled={!filtered.length}>
             {!voices.length && <option value="">{t.loading}</option>}
             {filtered.map((v) => (
@@ -189,7 +189,7 @@ export default function TextToSpeech({ locale }: { locale: Locale }) {
       {voice && !voice.localService && <Notice tone="warn">{t.onlineWarn}</Notice>}
       <div className="flex flex-wrap items-center gap-2">
         <Button
-          variant="outline"
+          variant="tonal"
           disabled={state === "idle"}
           onClick={() => {
             const synth = window.speechSynthesis;
@@ -206,7 +206,7 @@ export default function TextToSpeech({ locale }: { locale: Locale }) {
           {state === "paused" ? t.resume : t.pause}
         </Button>
         <Button
-          variant="outline"
+          variant="tonal"
           disabled={state === "idle"}
           onClick={() => {
             window.speechSynthesis.cancel();
@@ -243,7 +243,7 @@ export default function TextToSpeech({ locale }: { locale: Locale }) {
             </Field>
           ))}
         </div>
-        <Checkbox label={t.online} checked={showOnline} onChange={(e) => setShowOnline(e.target.checked)} />
+        <Switch label={t.online} checked={showOnline} onChange={(e) => setShowOnline(e.target.checked)} />
       </MoreOptions>
     </div>
   );

@@ -7,7 +7,7 @@ import { Field, Textarea } from "@/ui/field";
 import { Segmented } from "@/ui/segmented";
 import { compress, expand, parseV6Input, reverse6 } from "./lib/ipv6";
 import { special6 } from "./lib/special";
-import { err6 } from "./ui/shared";
+import { err6, Split } from "./ui/shared";
 
 type Out = "compress" | "expand" | "reverse" | "type";
 
@@ -42,7 +42,15 @@ const T = {
   },
 } as const;
 
-export default function Ipv6Tool({ locale, mode: m0 = "compress", value = "2001:0db8:0000:0000:0000:ff00:0042:8329\nfe80::1%eth0\n::ffff:192.0.2.1\n2001:db8:0:0:1:0:0:1/64" }: { locale: Locale; mode?: Out; value?: string }) {
+export default function Ipv6Tool({
+  locale,
+  mode: m0 = "compress",
+  value = "2001:0db8:0000:0000:0000:ff00:0042:8329\nfe80::1%eth0\n::ffff:192.0.2.1\n2001:db8:0:0:1:0:0:1/64",
+}: {
+  locale: Locale;
+  mode?: Out;
+  value?: string;
+}) {
   const t = T[locale];
   const id = useId();
   const [text, setText] = useState(value);
@@ -65,22 +73,27 @@ export default function Ipv6Tool({ locale, mode: m0 = "compress", value = "2001:
     .join("\n");
 
   return (
-    <div className="flex flex-col gap-4">
-      <Field label={t.input} htmlFor={`${id}-in`} hint={t.hint}>
-        <Textarea id={`${id}-in`} value={text} onChange={(e) => setText(e.target.value)} rows={5} autoComplete="off" />
-      </Field>
-      <Segmented
-        label={t.mode}
-        value={mode}
-        onChange={setMode}
-        options={[
-          { value: "compress", label: t.compress },
-          { value: "expand", label: t.expand },
-          { value: "reverse", label: t.reverse },
-          { value: "type", label: t.type },
-        ]}
-      />
+    <Split
+      input={
+        <>
+          <Field label={t.input} htmlFor={`${id}-in`} hint={t.hint}>
+            <Textarea id={`${id}-in`} value={text} onChange={(e) => setText(e.target.value)} rows={5} autoComplete="off" />
+          </Field>
+          <Segmented
+            label={t.mode}
+            value={mode}
+            onChange={setMode}
+            options={[
+              { value: "compress", label: t.compress },
+              { value: "expand", label: t.expand },
+              { value: "reverse", label: t.reverse },
+              { value: "type", label: t.type },
+            ]}
+          />
+        </>
+      }
+    >
       <CodeOutput title={t[mode]} value={out} labels={{ copy: t.copy, copied: t.copied, download: t.download }} filename="ipv6.txt" minRows={5} />
-    </div>
+    </Split>
   );
 }

@@ -208,7 +208,7 @@ export default function MarkdownEditor({ locale }: { locale: Locale }) {
   return (
     <div className="flex flex-col gap-3">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <div role="toolbar" aria-label={t.tools} className="flex flex-wrap items-center gap-0.5">
+        <div role="toolbar" aria-label={t.tools} className="flex flex-wrap items-center gap-0.5 rounded-[1.25rem] bg-surface-2 p-1">
           {ACTIONS.map((a) => (
             <button key={a.key} type="button" className={buttonClass("ghost", "icon-sm")} title={t[a.label] as string} aria-label={t[a.label] as string} onClick={() => apply(a)} disabled={view === "show"}>
               <a.icon aria-hidden />
@@ -230,8 +230,8 @@ export default function MarkdownEditor({ locale }: { locale: Locale }) {
 
       <div className={cn("grid gap-4", view === "split" && "lg:grid-cols-2")}>
         {view !== "show" && (
-          <div className="flex min-w-0 flex-col overflow-hidden rounded-[0.75rem] border border-line bg-surface">
-            <label htmlFor={`${id}-md`} className="border-b border-line px-3 py-2 text-sm font-semibold text-fg">
+          <div className="panel flex min-w-0 flex-col overflow-hidden">
+            <label htmlFor={`${id}-md`} className="flex min-h-12 items-center border-b border-line px-4 text-sm font-semibold text-fg">
               {t.editor}
             </label>
             <textarea
@@ -241,13 +241,13 @@ export default function MarkdownEditor({ locale }: { locale: Locale }) {
               onChange={(e) => setText(e.target.value)}
               spellCheck={false}
               rows={22}
-              className="min-h-80 w-full flex-1 resize-y bg-transparent px-3 py-2.5 font-mono text-sm leading-relaxed text-fg focus:outline-none"
+              className="min-h-80 w-full flex-1 resize-y bg-transparent px-4 py-3 font-mono text-sm leading-relaxed text-fg focus:outline-none max-sm:text-base"
             />
           </div>
         )}
         {view !== "edit" && (
-          <section aria-label={t.preview} className="min-w-0 overflow-hidden rounded-[0.75rem] border border-line bg-surface">
-            <div className="border-b border-line px-3 py-2 text-sm font-semibold text-fg">{t.preview}</div>
+          <section aria-label={t.preview} className="panel min-w-0 overflow-hidden">
+            <div className="flex min-h-12 items-center border-b border-line px-4 text-sm font-semibold text-fg">{t.preview}</div>
             {renderer ? (
               <div className={cn(MD_PROSE, "max-h-[40rem] overflow-auto px-4 py-3")} dangerouslySetInnerHTML={{ __html: html }} />
             ) : (

@@ -44,7 +44,7 @@ export default function DigitalClock({ locale }: NowProps) {
         </>
       }
     >
-      <BigTime parts={p} seconds={o.sec} h12={o.h12} className={o.sec ? "text-[min(19vw,12.5rem)]" : "text-[min(26vw,16.25rem)]"} />
+      <BigTime parts={p} seconds={o.sec} h12={o.h12} className={o.sec ? "text-[min(19vw,12.5rem)] 2xl:text-[min(13vw,16rem)]" : "text-[min(26vw,16.25rem)] 2xl:text-[min(17vw,21rem)]"} />
       {o.date && <p className="mt-4 min-h-8 text-[min(5vw,2rem)] text-fg-2">{p ? longDate(locale, p) : " "}</p>}
     </ClockShell>
   );

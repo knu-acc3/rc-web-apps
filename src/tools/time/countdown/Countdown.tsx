@@ -145,7 +145,7 @@ export default function Countdown({ locale, event: eventRu, eventEn }: Countdown
         </Panel>
       )}
 
-      <Presentable locale={locale} className="rounded-[0.75rem] border border-line bg-surface flex flex-col items-center gap-5 px-4 py-8 text-center sm:py-10" fullClassName="rounded-none border-0 [&_.cd-grid]:max-w-[min(96vw,180vh)] [&_.cd-num]:text-[min(12vw,20vh)]!">
+      <Presentable locale={locale} className="panel flex flex-col items-center gap-5 px-4 pt-14 pb-8 text-center sm:px-14 sm:py-10" fullClassName="rounded-none! shadow-none! [&_.cd-grid]:max-w-[min(96vw,180vh)] [&_.cd-num]:text-[min(12vw,20vh)]!">
         {spec && label && <p className="text-lg font-semibold text-fg-2">{event ? spec.to.charAt(0).toUpperCase() + spec.to.slice(1) : t.to(label)}</p>}
         {!spec ? (
           <p className="text-lg text-fg-3">{event ? t.none : t.pick}</p>
@@ -154,10 +154,10 @@ export default function Countdown({ locale, event: eventRu, eventEn }: Countdown
         ) : (
           <>
             {target?.state === "after" && <p className="text-lg font-semibold text-accent">{t.passed(label)}</p>}
-            <div className="cd-grid grid w-full max-w-2xl grid-cols-4 gap-2 sm:gap-4">
+            <div className="cd-grid grid w-full max-w-3xl grid-cols-4 gap-2 sm:gap-4 2xl:max-w-5xl">
               {values.map((v, i) => (
-                <div key={i} className={cn("flex flex-col items-center rounded-[0.75rem] bg-surface-2 px-1 py-3 sm:py-5", i === 0 && "bg-accent-soft")}>
-                  <span className={cn("cd-num tabular font-bold leading-none tracking-tight text-fg", i === 0 ? "text-[min(11vw,4.5rem)] text-accent" : "text-[min(9vw,3.5rem)]")}>
+                <div key={i} className={cn("flex min-w-0 flex-col items-center rounded-[1rem] px-1 py-3 sm:py-5", i === 0 ? "bg-accent-container" : "bg-surface-2")}>
+                  <span className={cn("cd-num tabular font-bold leading-none tracking-tight", i === 0 ? "text-[min(11vw,4.5rem)] text-on-accent-container 2xl:text-[6rem]" : "text-[min(9vw,3.5rem)] text-fg 2xl:text-[4.75rem]")}>
                     {target ? (i === 0 ? formatNumber(locale, v) : String(v).padStart(2, "0")) : "—"}
                   </span>
                   <span className="mt-1.5 text-[0.75rem] text-fg-3 sm:text-sm">{target ? unitWord(i, v) : t.units[i][locale === "ru" ? 2 : 1]}</span>
@@ -182,7 +182,7 @@ export default function Countdown({ locale, event: eventRu, eventEn }: Countdown
         <div className="flex flex-wrap items-center gap-2 text-sm text-fg-3">
           <Link2 className="size-4" aria-hidden />
           {t.share}
-          <CopyButton value={() => window.location.href} label={t.copy} copiedLabel={t.copied} variant="ghost" />
+          <CopyButton value={() => window.location.href} label={t.copy} copiedLabel={t.copied} variant="secondary" />
         </div>
       )}
     </div>

@@ -4,13 +4,13 @@ import { useId } from "react";
 import { Segmented } from "@/ui/segmented";
 import type { ToolProps } from "../../../types";
 import { LineChart } from "../../shared/charts";
-import { CURRENCIES, CURRENCY_SYMBOL, fmtCompact, fmtMoney, isCurrency, type Currency } from "../../shared/fmt";
+import { CURRENCIES, CURRENCY_SYMBOL, fmtCompact, fmtMoney, isCurrency, moneyMax, type Currency } from "../../shared/fmt";
 import { roundTo } from "../../shared/math";
 import { field, toInput } from "../../shared/num";
-import { CalcGrid, Disclaimer, Explain, FieldRow, NumField, OptionsRow, ResultMain, Stack, SubHeading, ToolActions } from "../../shared/ui";
+import { CalcGrid, Disclaimer, Explain, NumSlider, OptionsRow, ResultMain, Stack, SubHeading, ToolActions } from "../../shared/ui";
 import { useQueryState } from "../../shared/url-state";
 import { monthlyNeeded, monthsNeeded, savingsPath } from "../lib/growth";
-import { CurrencySelect, termText } from "../loan/parts";
+import { CurrencySelect, TERM_UNITS, TermSlider, termText, type TermUnit } from "../loan/parts";
 
 const T = {
   ru: {
@@ -19,12 +19,9 @@ const T = {
     byAmount: "Сколько копить",
     target: "Цель",
     current: "Уже есть",
-    rate: "Доходность, % в год",
+    rate: "Доходность в год",
     rateHint: "0 — если просто откладываете",
-    term: "Срок",
-    years: "лет",
     monthsShort: "мес.",
-    unit: "Единица срока",
     monthly: "Откладываю в месяц",
     needLabel: "Нужно откладывать в месяц",
     timeLabel: "Цель будет достигнута через",
@@ -45,12 +42,9 @@ const T = {
     byAmount: "Time needed",
     target: "Goal",
     current: "Already saved",
-    rate: "Return, % per year",
+    rate: "Return per year",
     rateHint: "0 if you simply put money aside",
-    term: "Time frame",
-    years: "years",
     monthsShort: "mo",
-    unit: "Term unit",
     monthly: "Monthly saving",
     needLabel: "Save each month",
     timeLabel: "You will reach the goal in",
@@ -68,7 +62,6 @@ const T = {
 } as const;
 
 const MODES = ["pmt", "time"] as const;
-const UNITS = ["y", "m"] as const;
 
 export default function SavingsGoal({ locale }: ToolProps) {
   const t = T[locale];
@@ -77,13 +70,13 @@ export default function SavingsGoal({ locale }: ToolProps) {
   const defCur: Currency = ru ? "KZT" : "USD";
   const q = useQueryState(
     { k: "pmt", g: toInput(locale, ru ? 5_000_000 : 50_000), s: toInput(locale, ru ? 500_000 : 5_000), r: toInput(locale, ru ? 12 : 4), t: "3", u: "y", m: toInput(locale, ru ? 100_000 : 1_000), c: defCur },
-    { enums: { k: MODES, u: UNITS, c: CURRENCIES } },
+    { enums: { k: MODES, u: TERM_UNITS, c: CURRENCIES } },
   );
   const cur = isCurrency(q.v.c) ? q.v.c : defCur;
   const sym = CURRENCY_SYMBOL[cur];
   const money = (v: number) => fmtMoney(locale, v, cur, 0);
   const mode = q.v.k as (typeof MODES)[number];
-  const unit = q.v.u as (typeof UNITS)[number];
+  const unit = q.v.u as TermUnit;
   const G = field(locale, q.v.g, { gt: 0 });
   const S = field(locale, q.v.s, { min: 0 });
   const R = field(locale, q.v.r, { gt: -50, max: 100 });
@@ -130,6 +123,7 @@ export default function SavingsGoal({ locale }: ToolProps) {
     <>
       <Segmented
         label={t.mode}
+        fill
         value={mode}
         onChange={(k) => q.set({ k })}
         options={[
@@ -137,41 +131,16 @@ export default function SavingsGoal({ locale }: ToolProps) {
           { value: "time", label: t.byAmount },
         ]}
       />
-      <NumField id={`${id}-g`} label={t.target} value={q.v.g} onChange={(g) => q.set({ g })} suffix={sym} error={G.message} size="lg" />
+      <NumSlider id={`${id}-g`} locale={locale} label={t.target} value={q.v.g} onChange={(g) => q.set({ g })} suffix={sym} error={G.message} min={0} max={moneyMax(cur, 100_000_000)} scale="log" />
       {mode === "pmt" ? (
-        <NumField
-          id={`${id}-t`}
-          label={t.term}
-          value={q.v.t}
-          onChange={(v) => q.set({ t: v })}
-          suffix={unit === "y" ? t.years : t.monthsShort}
-          error={N.message}
-          size="lg"
-          aside={
-            <Segmented
-              size="sm"
-              label={t.unit}
-              value={unit}
-              onChange={(u) => {
-                const nv = N.value;
-                q.set({ u, t: nv === null ? q.v.t : toInput(locale, u === "m" ? Math.round(nv * 12) : roundTo(nv / 12, 2)) });
-              }}
-              options={[
-                { value: "y", label: t.years },
-                { value: "m", label: t.monthsShort },
-              ]}
-            />
-          }
-        />
+        <TermSlider id={`${id}-t`} locale={locale} value={q.v.t} unit={unit} onChange={(v, u) => q.set({ t: v, u })} error={N.message} />
       ) : (
-        <NumField id={`${id}-m`} label={t.monthly} value={q.v.m} onChange={(m) => q.set({ m })} suffix={sym} error={M.message} size="lg" />
+        <NumSlider id={`${id}-m`} locale={locale} label={t.monthly} value={q.v.m} onChange={(m) => q.set({ m })} suffix={sym} error={M.message} min={0} max={moneyMax(cur, 2_000_000)} scale="log" />
       )}
-      <FieldRow>
-        <NumField id={`${id}-s`} label={t.current} value={q.v.s} onChange={(s) => q.set({ s })} suffix={sym} error={S.message} />
-        <NumField id={`${id}-r`} label={t.rate} value={q.v.r} onChange={(r) => q.set({ r })} suffix="%" error={R.message} hint={t.rateHint} />
-      </FieldRow>
+      <NumSlider id={`${id}-s`} locale={locale} label={t.current} value={q.v.s} onChange={(s) => q.set({ s })} suffix={sym} error={S.message} min={0} max={moneyMax(cur, 50_000_000)} scale="log" />
+      <NumSlider id={`${id}-r`} locale={locale} label={t.rate} value={q.v.r} onChange={(r) => q.set({ r })} suffix="%" error={R.message} hint={t.rateHint} min={0} max={30} decimals={1} />
       <OptionsRow>
-        <CurrencySelect id={`${id}-c`} locale={locale} value={cur} onChange={(c) => q.set({ c })} />
+        <CurrencySelect locale={locale} value={cur} onChange={(c) => q.set({ c })} />
       </OptionsRow>
     </>
   );

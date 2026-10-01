@@ -28,8 +28,8 @@ export function CodeOutput({
   extraActions?: ReactNode;
 }) {
   return (
-    <div className={cn("flex min-w-0 flex-col overflow-hidden rounded-[0.75rem] border border-line bg-surface", className)}>
-      <div className="flex min-h-11 items-center justify-between gap-2 border-b border-line px-3 py-1.5">
+    <div className={cn("panel flex min-w-0 flex-col overflow-hidden", className)}>
+      <div className="flex min-h-[3.25rem] items-center justify-between gap-2 border-b border-line py-1.5 pl-4 pr-2">
         <div className="min-w-0 truncate text-sm font-semibold text-fg">{title}</div>
         <div className="flex items-center gap-1">
           {extraActions}
@@ -45,7 +45,7 @@ export function CodeOutput({
               <span className="max-sm:sr-only">{labels.download}</span>
             </button>
           )}
-          <CopyButton value={value} label={labels.copy} copiedLabel={labels.copied} variant="ghost" compact />
+          <CopyButton value={value} label={labels.copy} copiedLabel={labels.copied} variant="secondary" compact />
         </div>
       </div>
       <textarea
@@ -54,7 +54,7 @@ export function CodeOutput({
         rows={minRows}
         spellCheck={false}
         aria-label={typeof title === "string" ? title : labels.copy}
-        className="min-h-32 w-full resize-y bg-transparent px-3 py-2.5 font-mono text-sm leading-relaxed text-fg focus:outline-none"
+        className="min-h-32 w-full resize-y bg-transparent px-4 py-3 font-mono text-sm leading-relaxed text-fg focus:outline-none"
       />
     </div>
   );

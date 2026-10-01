@@ -41,7 +41,7 @@ export function CalendarControls({
         ]}
       />
       {onWeeks && <Switch label={t.weeks} checked={!!weeks} onChange={(e) => onWeeks(e.target.checked)} />}
-      <Button variant="ghost" size="sm" onClick={() => window.print()} className="ml-auto">
+      <Button variant="tonal" size="sm" onClick={() => window.print()} className="ml-auto">
         <Printer aria-hidden />
         {t.print}
       </Button>

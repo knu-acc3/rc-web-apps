@@ -5,10 +5,13 @@ import { useEffect, useId, useRef, useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { formatNumber } from "@/i18n/format";
 import { cn } from "@/lib/cn";
-import { Button } from "@/ui/button";
-import { Checkbox, Field, Select, Slider } from "@/ui/field";
+import { Button, IconButton } from "@/ui/button";
+import { Slider, Switch } from "@/ui/field";
 import { Notice, Panel } from "@/ui/panel";
 import { Segmented } from "@/ui/segmented";
+import { Fab } from "@/tools/files/video/ui/Fab";
+import { Setting } from "@/tools/files/video/ui/options";
+import { ChipChoice } from "@/ui/chip-choice";
 import { resumeAudio } from "../lib/audio";
 import { addTap, tempoFromTaps, tempoMarking } from "../lib/bpm";
 
@@ -27,6 +30,7 @@ const T = {
     meter: "Размер",
     sub: "Доли",
     subs: ["четверти", "восьмые", "триоли", "шестнадцатые"],
+    triplets: "Триоли",
     accent: "Акцент на первую долю",
     sound: "Звук",
     click: "Щелчок",
@@ -45,6 +49,7 @@ const T = {
     meter: "Time signature",
     sub: "Subdivision",
     subs: ["quarters", "eighths", "triplets", "sixteenths"],
+    triplets: "Triplets",
     accent: "Accent the first beat",
     sound: "Sound",
     click: "Click",
@@ -55,6 +60,8 @@ const T = {
   },
 } as const;
 
+/** Subdivisions as note values (the title says it in words). */
+const SUB_LABELS = ["1/4", "1/8", null, "1/16"];
 const METERS = ["2/4", "3/4", "4/4", "5/4", "6/8", "7/8"] as const;
 type Sound = "click" | "wood" | "beep";
 
@@ -157,73 +164,78 @@ function MetronomeInner({ locale, bpm: bpm0 = 120 }: { locale: Locale; bpm?: num
     if (r && next.length >= 3) set(r.bpm);
   };
 
+  const pct = (v: number) => `${formatNumber(locale, Math.round(v * 100))}%`;
   return (
-    <div className="flex flex-col gap-4">
-      <Panel className="flex flex-col items-center gap-5 p-6">
-        <div className="flex items-center gap-3">
-          <Button variant="outline" size="icon" onClick={() => set(bpm - 1)} aria-label={t.slower} title={t.slower}>
-            <Minus aria-hidden />
-          </Button>
-          <div className="flex flex-col items-center">
-            <output htmlFor={`${id}-bpm`} className="tabular text-7xl font-bold tracking-tight text-fg" aria-live="off">
-              {bpm}
-            </output>
-            <span className="text-sm text-fg-3">
-              BPM · {tempoMarking(bpm)}
-            </span>
+    <div className="flex flex-col gap-3">
+      <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] lg:gap-6">
+        <Panel className="flex min-w-0 flex-col items-center gap-6 p-4 sm:p-6">
+          <div className="flex w-full flex-col items-center gap-1">
+            <div className="flex items-center gap-3 sm:gap-5">
+              <IconButton variant="tonal" size="lg" label={t.slower} icon={<Minus aria-hidden />} onClick={() => set(bpm - 1)} disabled={bpm <= MIN} />
+              <div className="flex flex-col items-center">
+                <output htmlFor={`${id}-bpm`} className="tabular text-7xl font-bold leading-none tracking-tight text-fg sm:text-8xl" aria-live="off">
+                  {bpm}
+                </output>
+                <span className="mt-1 text-sm font-medium text-fg-3">BPM · {tempoMarking(bpm)}</span>
+              </div>
+              <IconButton variant="tonal" size="lg" label={t.faster} icon={<Plus aria-hidden />} onClick={() => set(bpm + 1)} disabled={bpm >= MAX} />
+            </div>
+            <Slider id={`${id}-bpm`} aria-label={t.bpm} min={MIN} max={MAX} step={1} value={bpm} onChange={(e) => set(Number(e.target.value))} className="mt-3 max-w-xl" />
+            <div className="flex w-full max-w-xl justify-between text-xs text-fg-3">
+              <span>{MIN}</span>
+              <span>{MAX}</span>
+            </div>
           </div>
-          <Button variant="outline" size="icon" onClick={() => set(bpm + 1)} aria-label={t.faster} title={t.faster}>
-            <Plus aria-hidden />
-          </Button>
-        </div>
-        <Slider id={`${id}-bpm`} aria-label={t.bpm} min={MIN} max={MAX} step={1} value={bpm} onChange={(e) => set(Number(e.target.value))} className="max-w-md" />
-        <div className="flex gap-2" aria-hidden>
-          {Array.from({ length: beats }, (_, i) => (
-            <span
-              key={i}
-              className={cn(
-                "size-4 rounded-full transition-colors duration-75",
-                beat === i ? (i === 0 && accent ? "bg-accent" : "bg-fg") : "bg-surface-2 ring-1 ring-line",
-              )}
-            />
-          ))}
-        </div>
-        <div className="flex flex-wrap justify-center gap-2">
-          <Button variant={running ? "danger" : "primary"} size="lg" onClick={() => (running ? stop() : start())} className="min-w-40">
-            {running ? <Square className="fill-current" aria-hidden /> : <Play className="fill-current" aria-hidden />}
-            {running ? t.stop : t.start}
-          </Button>
-          <Button variant="outline" size="lg" onClick={tap}>
+          <div className="flex flex-wrap justify-center gap-2.5" aria-hidden>
+            {Array.from({ length: beats }, (_, i) => (
+              <span
+                key={i}
+                className={cn(
+                  "size-5 rounded-full transition-[background-color,transform] duration-75 sm:size-6",
+                  beat === i ? (i === 0 && accent ? "scale-125 bg-accent" : "scale-110 bg-fg") : i === 0 && accent ? "bg-accent-container" : "bg-surface-2 ring-1 ring-line",
+                )}
+              />
+            ))}
+          </div>
+          <Fab label={running ? t.stop : t.start} icon={running ? <Square className="fill-current" aria-hidden /> : <Play className="fill-current" aria-hidden />} onClick={() => (running ? stop() : start())} active={running} />
+          <Button variant="tonal" size="lg" onClick={tap}>
             <Hand aria-hidden />
             {t.tap}
           </Button>
-        </div>
-        <div className="flex flex-wrap items-end justify-center gap-x-5 gap-y-3 border-t border-line pt-4">
-          <Segmented label={t.meter} value={meter} onChange={setMeter} size="sm" options={METERS.map((m) => ({ value: m, label: m }))} />
-          <Field label={t.sub} htmlFor={`${id}-sub`} className="w-40">
-            <Select id={`${id}-sub`} size="sm" value={String(sub)} onChange={(e) => setSub(Number(e.target.value))}>
-              {[1, 2, 3, 4].map((s, i) => (
-                <option key={s} value={s}>
-                  {t.subs[i]}
-                </option>
-              ))}
-            </Select>
-          </Field>
-          <Field label={t.sound} htmlFor={`${id}-snd`} className="w-36">
-            <Select id={`${id}-snd`} size="sm" value={sound} onChange={(e) => setSound(e.target.value as Sound)}>
-              <option value="click">{t.click}</option>
-              <option value="wood">{t.wood}</option>
-              <option value="beep">{t.beep}</option>
-            </Select>
-          </Field>
-          <Checkbox label={t.accent} checked={accent} onChange={(e) => setAccent(e.target.checked)} className="pb-1.5" />
-          <label className="flex items-center gap-2 pb-1.5 text-sm text-fg-2">
-            {t.volume}
-            <Slider min={0} max={1} step={0.01} value={volume} onChange={(e) => setVolume(Number(e.target.value))} className="w-28" aria-label={t.volume} />
-            <span className="tabular w-10">{formatNumber(locale, Math.round(volume * 100))}%</span>
-          </label>
-        </div>
-      </Panel>
+        </Panel>
+        <Panel className="flex min-w-0 flex-col gap-5 p-4 sm:p-5">
+          <Setting label={t.meter}>
+            <ChipChoice label={t.meter} value={meter} onChange={setMeter} options={METERS.map((m) => ({ value: m, label: m }))} />
+          </Setting>
+          <Setting label={t.sub}>
+            <Segmented label={t.sub} value={String(sub) as "1" | "2" | "3" | "4"} onChange={(x) => setSub(Number(x))} options={(["1", "2", "3", "4"] as const).map((v, i) => ({ value: v, label: SUB_LABELS[i] ?? t.triplets, title: t.subs[i] }))} />
+          </Setting>
+          <Setting label={t.sound}>
+            <Segmented
+              label={t.sound}
+              value={sound}
+              onChange={setSound}
+              options={[
+                { value: "click", label: t.click },
+                { value: "wood", label: t.wood },
+                { value: "beep", label: t.beep },
+              ]}
+            />
+          </Setting>
+          <Switch label={t.accent} checked={accent} onChange={(e) => setAccent(e.target.checked)} />
+          <div className="flex min-w-0 flex-col">
+            <div className="flex items-baseline justify-between gap-3">
+              <label htmlFor={`${id}-v`} className="text-sm font-medium text-fg-2">
+                {t.volume}
+              </label>
+              <output htmlFor={`${id}-v`} className="tabular text-lg font-semibold text-fg">
+                {pct(volume)}
+              </output>
+            </div>
+            <Slider id={`${id}-v`} min={0} max={1} step={0.01} value={volume} format={pct} aria-valuetext={pct(volume)} onChange={(e) => setVolume(Number(e.target.value))} />
+          </div>
+        </Panel>
+      </div>
       {error && <Notice tone="err">{t.err}</Notice>}
     </div>
   );

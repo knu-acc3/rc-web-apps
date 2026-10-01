@@ -1,7 +1,9 @@
 "use client";
 
 import type { PDFDocumentProxy } from "pdfjs-dist";
-import { useEffect, useRef, useState, type KeyboardEvent, type PointerEvent, type ReactNode } from "react";
+import { useRef, type KeyboardEvent, type PointerEvent, type ReactNode } from "react";
+import type { Locale } from "@/i18n/config";
+import { PageView } from "./PageView";
 
 /** Box in page fractions (0–1, origin top-left); height follows the signature's aspect ratio. */
 export interface Box {
@@ -10,43 +12,17 @@ export interface Box {
   w: number;
 }
 
-/** Renders one page (with its /Rotate) to fit the container width; children are overlaid. */
-export function PageStage({ doc, index, label, children }: { doc: PDFDocumentProxy; index: number; label: string; children?: (size: { width: number; height: number }) => ReactNode }) {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [size, setSize] = useState<{ key: string; width: number; height: number } | null>(null);
-  const key = `${index}`;
-
-  useEffect(() => {
-    let live = true;
-    (async () => {
-      const m = await import("../lib/pdfjs");
-      const page = await doc.getPage(index + 1);
-      const target = canvasRef.current;
-      if (!live || !target) return;
-      const vp = page.getViewport({ scale: 1 });
-      const box = Math.min(720, target.parentElement?.clientWidth || 600);
-      const dpr = Math.min(2, window.devicePixelRatio || 1);
-      const c = await m.renderPage(page, (box * dpr) / vp.width);
-      if (live) {
-        target.width = c.width;
-        target.height = c.height;
-        target.getContext("2d")?.drawImage(c, 0, 0);
-        setSize({ key, width: box, height: (box * vp.height) / vp.width });
-      }
-      m.releaseCanvas(c);
-      page.cleanup();
-    })().catch(() => {});
-    return () => {
-      live = false;
-    };
-  }, [doc, index, key]);
-
-  const shown = size && size.key === key ? size : null;
+/**
+ * One page (with its /Rotate) as wide as the container on phones, fitted into the
+ * window on desktop (≤ 760 px wide), rendered at a
+ * phone-friendly resolution with a retry state; `children` are overlaid at the
+ * page's exact CSS size.
+ */
+export function PageStage({ locale, doc, index, label, children }: { locale: Locale; doc: PDFDocumentProxy; index: number; label: string; children?: (size: { width: number; height: number }) => ReactNode }) {
   return (
-    <div className="relative mx-auto w-full max-w-[45rem]">
-      <canvas ref={canvasRef} role="img" aria-label={label} className="block w-full bg-white shadow-[0_1px_3px_rgb(0_0_0/0.15)]" style={shown ? { height: shown.height } : { aspectRatio: "1 / 1.414" }} />
-      {shown && <div className="absolute inset-0">{children?.(shown)}</div>}
-    </div>
+    <PageView locale={locale} doc={doc} index={index} label={label} fit="stage" maxCssWidth={760}>
+      {children}
+    </PageView>
   );
 }
 
@@ -126,7 +102,7 @@ export function DraggableBox({
         onPointerDown={(e) => down("resize", e)}
         onPointerMove={move}
         onPointerUp={up}
-        className="absolute -right-2 -bottom-2 size-4 cursor-nwse-resize rounded-full border-2 border-surface bg-accent"
+        className="absolute -right-2 -bottom-2 size-4 cursor-nwse-resize rounded-full border-2 border-white bg-accent shadow-elev-1 pointer-coarse:-right-3.5 pointer-coarse:-bottom-3.5 pointer-coarse:size-7"
         aria-hidden
       />
     </div>

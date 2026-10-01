@@ -139,7 +139,7 @@ export default function ScientificNotation({ locale, value = "0.000123" }: Scien
           <label htmlFor={`${id}-s`} className="text-sm text-fg-2">
             {t.sig}
           </label>
-          <Select id={`${id}-s`} size="sm" className="w-20" value={sig} onChange={(e) => setSig(e.target.value as Sig)}>
+          <Select id={`${id}-s`} size="sm" value={sig} onChange={(e) => setSig(e.target.value as Sig)}>
             {SIGS.map((v) => (
               <option key={v} value={v}>
                 {v === "auto" ? t.all : v}

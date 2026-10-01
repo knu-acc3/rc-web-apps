@@ -154,36 +154,35 @@ export default function WordCounter({ locale, platform, initialText = "" }: Word
 
   return (
     <div className="flex flex-col gap-4">
-      <InputPanel id={`${id}-text`} locale={locale} value={text} onChange={setText} rows={9} />
+      <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)]">
+        <InputPanel id={`${id}-text`} locale={locale} value={text} onChange={setText} rows={7} fieldClassName="lg:min-h-[26rem]" />
 
-      {p && platform === "sms" && <SmsPanel locale={locale} text={deferred} />}
-      {p && platform === "x-twitter" && <XPanel locale={locale} text={deferred} />}
-      {p && platform !== "sms" && platform !== "x-twitter" && (
-        <Panel>
-          <ul className="flex flex-col divide-y divide-line">
-            {p.limits.map((l, i) => (
-              <LimitRow key={l.key} locale={locale} limit={l} text={deferred} big={i === 0} />
-            ))}
-          </ul>
-          {platform === "instagram-caption" && (
-            <p className="tabular border-t border-line px-4 py-2.5 text-sm text-fg-2">{countLabel(locale, extractHashtags(deferred).length, t.hashtags)}</p>
+        <div className="flex min-w-0 flex-col gap-4">
+          {p && platform === "sms" && <SmsPanel locale={locale} text={deferred} />}
+          {p && platform === "x-twitter" && <XPanel locale={locale} text={deferred} />}
+          {p && platform !== "sms" && platform !== "x-twitter" && (
+            <Panel>
+              <ul className="flex flex-col divide-y divide-line">
+                {p.limits.map((l, i) => (
+                  <LimitRow key={l.key} locale={locale} limit={l} text={deferred} big={i === 0} />
+                ))}
+              </ul>
+              {platform === "instagram-caption" && (
+                <p className="tabular border-t border-line px-4 py-2.5 text-sm text-fg-2">{countLabel(locale, extractHashtags(deferred).length, t.hashtags)}</p>
+              )}
+            </Panel>
           )}
-        </Panel>
-      )}
 
-      <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-        {main.map(([label, value]) => (
-          <Stat key={label} label={label} value={value} size="lg" />
-        ))}
+          <Panel className="grid grid-cols-2 gap-2 p-2 sm:gap-3 sm:p-3">
+            {main.map(([label, value]) => (
+              <Stat key={label} label={label} value={value} size="xl" className="px-4 py-4 sm:px-5" />
+            ))}
+            {secondary.map(([label, value, sub]) => (
+              <Stat key={label} label={label} value={value} sub={sub} size="md" />
+            ))}
+          </Panel>
+        </div>
       </div>
-      <dl className="flex flex-wrap gap-x-6 gap-y-2 px-1 text-sm">
-        {secondary.map(([label, value, sub]) => (
-          <div key={label} className="flex items-baseline gap-1.5" title={sub}>
-            <dt className="text-fg-3">{label}:</dt>
-            <dd className="tabular font-medium text-fg">{value}</dd>
-          </div>
-        ))}
-      </dl>
 
       <div className="grid gap-4 md:grid-cols-2">
         <Panel>

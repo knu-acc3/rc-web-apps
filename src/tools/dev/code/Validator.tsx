@@ -7,6 +7,7 @@ import { formatNumber, plural } from "@/i18n/format";
 import { CodeEditor } from "@/tools/dev/shared/CodeEditor";
 import { useLiveTask } from "@/tools/dev/shared/hooks";
 import { positionLabel } from "@/tools/dev/shared/labels";
+import { Notice } from "@/ui/panel";
 import { ErrorBox, failOf, useCodeWorker } from "./ui/ErrorBox";
 import { LANG_META, type ValidateLang } from "./lib/langs";
 import type { ValidateResult } from "./lib/run";
@@ -52,23 +53,23 @@ export default function Validator({ locale, lang }: ValidatorProps) {
   const editorId = `${id}-in`;
 
   return (
-    <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_22rem]">
+    <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(20rem,0.6fr)]">
       <CodeEditor id={editorId} locale={locale} label={meta.label} value={text} onChange={setText} rows={18} sample={SAMPLES[lang]} fileAccept={`.${meta.ext},.txt${lang === "yaml" ? ",.yml" : ""}`} invalid={!!fail} />
       <div className="flex min-w-0 flex-col gap-3" aria-live="polite">
-        {!text.trim() && <div className="rounded-[0.625rem] bg-surface-2 px-4 py-3 text-sm text-fg-2">{t.empty}</div>}
-        {text.trim() && live.pending && !fail && !res && <div className="rounded-[0.625rem] bg-surface-2 px-4 py-3 text-sm text-fg-3">{t.working}</div>}
+        {!text.trim() && <Notice>{t.empty}</Notice>}
+        {text.trim() && live.pending && !fail && !res && <Notice>{t.working}</Notice>}
         {fail && <ErrorBox locale={locale} fail={fail} text={text} editorId={editorId} title={t.invalid(meta.label)} />}
         {res && (
-          <div className="rounded-[0.75rem] bg-ok-soft px-5 py-4 text-ok">
-            <div className="flex items-center gap-2 text-2xl font-semibold tracking-tight">
-              <CircleCheck aria-hidden className="size-7 shrink-0" />
+          <div className="rounded-[1.25rem] bg-ok-soft px-5 py-5 text-ok motion-safe:animate-[menu-in_0.2s_ease-out]">
+            <div className="flex items-center gap-2.5 text-2xl font-bold tracking-tight sm:text-3xl">
+              <CircleCheck aria-hidden className="size-8 shrink-0" />
               {t.valid(meta.label)}
             </div>
             <div className="tabular mt-1 text-sm text-fg-2">{summaryText(locale, t, lang, res.summary)}</div>
           </div>
         )}
         {res && res.warnings.length > 0 && (
-          <ul className="flex flex-col gap-2 rounded-[0.625rem] bg-warn-soft px-4 py-3 text-sm text-warn">
+          <ul className="flex flex-col gap-2 rounded-[1rem] bg-warn-soft px-4 py-3 text-sm text-warn">
             {[...groupByCode(res.warnings)].map(([code, ws]) => (
               <li key={code}>
                 {t.warns[code] ?? code}

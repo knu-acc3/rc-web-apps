@@ -4,6 +4,7 @@ import { useEffect, useId, useRef, useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { formatNumber, plural } from "@/i18n/format";
 import { cn } from "@/lib/cn";
+import { Button } from "@/ui/button";
 import { CopyButton } from "@/ui/copy-button";
 import { Input, Switch } from "@/ui/field";
 import { Panel } from "@/ui/panel";
@@ -177,9 +178,9 @@ export default function RomanConverter({ locale, value = 2024 }: RomanConverterP
             <p className="text-[0.9375rem] text-err">{out.message}</p>
             {out.clock && <p className="text-sm text-fg-3">{t.clock}</p>}
             {out.fix && (
-              <button type="button" className="text-sm font-medium text-accent hover:underline" onClick={() => setText(out.fix!)}>
+              <Button variant="tonal" size="sm" onClick={() => setText(out.fix!)}>
                 {t.fix} <Numeral text={out.fix} />
-              </button>
+              </Button>
             )}
           </div>
         ) : ok ? (
@@ -219,7 +220,7 @@ export default function RomanConverter({ locale, value = 2024 }: RomanConverterP
         <Switch label={t.vinculum} checked={vinculum} onChange={(e) => setVinculum(e.target.checked)} className="text-sm!" />
         <Switch label={t.lower} checked={lower} onChange={(e) => setLower(e.target.checked)} className="text-sm!" />
         {vinculum && (
-          <div className="flex flex-wrap items-center gap-1" role="group" aria-label={t.insert}>
+          <div className="flex flex-wrap items-center gap-1.5" role="group" aria-label={t.insert}>
             {BAR_LETTERS.map((l) => (
               <button
                 key={l}
@@ -227,7 +228,7 @@ export default function RomanConverter({ locale, value = 2024 }: RomanConverterP
                 title={`${t.insert} ${l} (×1000)`}
                 aria-label={`${t.insert} ${l}`}
                 onClick={() => insertBar(l)}
-                className="h-8 min-w-8 rounded-[0.375rem] px-1.5 text-fg-2 hover:bg-surface-2 hover:text-fg"
+                className="chip min-w-10 justify-center px-2!"
               >
                 <Numeral text={l + BAR} />
               </button>

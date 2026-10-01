@@ -131,10 +131,10 @@ export function HowTo({ steps, title }: { steps: string[]; title: string }) {
   return (
     <section>
       <SectionTitle icon={ListOrdered}>{title}</SectionTitle>
-      <ol className={cn("grid gap-x-8 gap-y-4", steps.length === 4 ? "sm:grid-cols-2 xl:grid-cols-4" : steps.length === 2 ? "md:grid-cols-2" : "md:grid-cols-3")}>
+      <ol className={cn("grid gap-x-8 gap-y-4 xl:grid-cols-1!", steps.length === 4 ? "sm:grid-cols-2" : steps.length === 2 ? "md:grid-cols-2" : "md:grid-cols-3")}>
         {steps.map((step, i) => (
           <li key={i} className="flex gap-3.5">
-            <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-accent-soft text-[0.9375rem] font-bold text-accent">{i + 1}</span>
+            <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-accent-container text-[0.9375rem] font-bold text-on-accent-container">{i + 1}</span>
             <span className="pt-1 text-[0.9375rem] leading-snug text-fg-2">{step}</span>
           </li>
         ))}
@@ -147,14 +147,16 @@ export function Faq({ items, title }: { items: QA[]; title: string }) {
   return (
     <section>
       <SectionTitle icon={CircleHelp}>{title}</SectionTitle>
-      <div className="divide-y divide-line overflow-hidden rounded-[0.75rem] border border-line bg-surface">
+      <div className="panel divide-y divide-line overflow-hidden">
         {items.map((it, i) => (
           <details key={i} className="group">
-            <summary className="flex items-center justify-between gap-4 px-4 py-3.5 text-fg hover:text-accent">
-              <h3 className="text-[0.9375rem] font-medium">{it.q}</h3>
-              <ChevronDown className="size-4 shrink-0 text-fg-3 transition-transform duration-150 group-open:rotate-180" aria-hidden />
+            <summary className="flex items-center justify-between gap-4 px-5 py-3.5 text-fg transition-colors hover:bg-surface-2 hover:text-accent">
+              <h3 className="text-[0.9375rem] font-semibold">{it.q}</h3>
+              <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-accent-container text-on-accent-container transition-transform duration-200 group-open:rotate-180" aria-hidden>
+                <ChevronDown className="size-4" />
+              </span>
             </summary>
-            <div className="px-4 pb-4 text-[0.9375rem] leading-relaxed text-fg-2">{it.a}</div>
+            <div className="px-5 pb-4 text-[0.9375rem] leading-relaxed text-fg-2">{it.a}</div>
           </details>
         ))}
       </div>

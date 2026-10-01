@@ -45,8 +45,7 @@ function readPads(ever: Map<number, boolean[]>): PadSnap[] {
   return out;
 }
 
-const signature = (pads: PadSnap[]) =>
-  pads.map((p) => `${p.index}:${p.buttons.map((b) => (b.pressed ? 1 : 0) + Math.round(b.value * 100)).join(",")}|${p.axes.map((a) => Math.round(a * 1000)).join(",")}`).join(";");
+const signature = (pads: PadSnap[]) => pads.map((p) => `${p.index}:${p.buttons.map((b) => (b.pressed ? 1 : 0) + Math.round(b.value * 100)).join(",")}|${p.axes.map((a) => Math.round(a * 1000)).join(",")}`).join(";");
 
 export default function GamepadTest({ locale }: { locale: Locale }) {
   const t = T[locale];
@@ -112,15 +111,19 @@ export default function GamepadTest({ locale }: { locale: Locale }) {
   return (
     <div className="flex flex-col gap-4">
       {pads.length === 0 ? (
-        <div className="flex min-h-72 flex-col items-center justify-center gap-3 rounded-[0.75rem] border-2 border-dashed border-line-strong bg-surface px-6 py-10 text-center">
-          <Gamepad2 className="size-14 animate-pulse text-accent" strokeWidth={1.5} aria-hidden />
-          <p className="text-lg font-semibold text-fg">{t.waiting}</p>
+        <div className="panel flex min-h-80 flex-col items-center justify-center gap-4 px-6 py-12 text-center">
+          <span className="flex size-24 items-center justify-center rounded-full bg-accent-soft text-accent" aria-hidden>
+            <Gamepad2 className="size-14 motion-safe:animate-pulse" strokeWidth={1.5} />
+          </span>
+          <p className="text-xl font-semibold text-fg">{t.waiting}</p>
           <p className="max-w-md text-sm text-fg-3">{t.waitingSub}</p>
         </div>
       ) : (
-        pads.map((p) => (
-          <GamepadCard key={p.index} locale={locale} pad={p} drift={drift[p.index]} onRumble={() => rumble(p.index)} onDrift={() => checkDrift(p.index)} />
-        ))
+        <div className="grid gap-4 2xl:grid-cols-2">
+          {pads.map((p) => (
+            <GamepadCard key={p.index} locale={locale} pad={p} drift={drift[p.index]} onRumble={() => rumble(p.index)} onDrift={() => checkDrift(p.index)} />
+          ))}
+        </div>
       )}
     </div>
   );

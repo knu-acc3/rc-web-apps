@@ -4,19 +4,21 @@ import { Play, RotateCcw } from "lucide-react";
 import { useId, useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { Button } from "@/ui/button";
-import { Checkbox, Field, Input, Select } from "@/ui/field";
+import { Field, Input, Select, Switch } from "@/ui/field";
+import { NumberInput } from "@/ui/number-input";
 import { Notice, Panel } from "@/ui/panel";
 import { useReducedMotion } from "@/tools/design/color/ui/hooks";
 import { ANIM_PRESETS, animationCss, isIdent, presetBySlug, settingsFor, type AnimSettings } from "./lib/animation";
-import { CodePanel, Stage } from "./ui/kit";
+import { CodePanel, NumberSlider, Stage } from "./ui/kit";
 
 const T = {
   ru: {
     preset: "Анимация",
     name: "Имя анимации и класса",
     nameError: "Только латиница, цифры, дефис и подчёркивание; не с цифры",
-    duration: "Длительность, с",
-    delay: "Задержка, с",
+    duration: "Длительность",
+    delay: "Задержка",
+    sec: "с",
     iterations: "Повторы",
     infinite: "Бесконечно",
     direction: "Направление",
@@ -36,8 +38,9 @@ const T = {
     preset: "Animation",
     name: "Animation and class name",
     nameError: "Latin letters, digits, hyphen and underscore only; can't start with a digit",
-    duration: "Duration, s",
-    delay: "Delay, s",
+    duration: "Duration",
+    delay: "Delay",
+    sec: "s",
     iterations: "Iterations",
     infinite: "Infinite",
     direction: "Direction",
@@ -114,14 +117,13 @@ export default function AnimationGenerator({ locale, preset: preset0 = "fade-in"
             </div>
           </Stage>
           <div className="flex flex-wrap items-center gap-2">
-            <Button variant="secondary" size="sm" onClick={() => setRun((r) => r + 1)} disabled={!playing}>
+            <Button variant="tonal" onClick={() => setRun((r) => r + 1)} disabled={!playing}>
               <RotateCcw aria-hidden />
               {t.replay}
             </Button>
             {reduced && !forcePlay && (
               <Button
-                variant="outline"
-                size="sm"
+                variant="outlined"
                 onClick={() => {
                   setForcePlay(true);
                   setRun((r) => r + 1);
@@ -135,7 +137,7 @@ export default function AnimationGenerator({ locale, preset: preset0 = "fade-in"
           {reduced && !forcePlay && <Notice>{t.reduced}</Notice>}
         </div>
 
-        <Panel className="flex flex-col gap-3 p-4">
+        <Panel className="flex flex-col gap-4 p-4 sm:p-5">
           <Field label={t.preset} htmlFor={`${id}-p`}>
             <Select id={`${id}-p`} value={slug} onChange={(e) => choosePreset(e.target.value)}>
               {ANIM_PRESETS.map((p) => (
@@ -148,27 +150,24 @@ export default function AnimationGenerator({ locale, preset: preset0 = "fade-in"
           <Field label={t.name} htmlFor={`${id}-n`} error={nameOk ? undefined : t.nameError}>
             <Input id={`${id}-n`} value={s.name} onChange={(e) => set({ name: e.target.value.trim() })} className="font-mono" autoComplete="off" spellCheck={false} aria-invalid={!nameOk} />
           </Field>
+          <div className="grid gap-x-6 gap-y-4 sm:grid-cols-2">
+            <NumberSlider label={t.duration} value={s.duration} min={0} max={5} step={0.1} unit={t.sec} onChange={(v) => set({ duration: Math.max(0, v) })} />
+            <NumberSlider label={t.delay} value={s.delay} min={0} max={5} step={0.1} unit={t.sec} onChange={(v) => set({ delay: v })} />
+          </div>
           <div className="grid grid-cols-2 gap-3">
-            <Field label={t.duration} htmlFor={`${id}-d`}>
-              <Input id={`${id}-d`} type="number" min={0} step={0.1} value={s.duration} onChange={(e) => set({ duration: Math.max(0, Number(e.target.value) || 0) })} size="sm" />
-            </Field>
-            <Field label={t.delay} htmlFor={`${id}-dl`}>
-              <Input id={`${id}-dl`} type="number" step={0.1} value={s.delay} onChange={(e) => set({ delay: Number(e.target.value) || 0 })} size="sm" />
-            </Field>
             <Field label={t.iterations} htmlFor={`${id}-i`}>
-              <Input
+              <NumberInput
                 id={`${id}-i`}
-                type="number"
                 min={0}
-                step={1}
+                max={999}
                 disabled={s.iterations === "infinite"}
-                value={s.iterations === "infinite" ? "" : s.iterations}
-                onChange={(e) => set({ iterations: Math.max(0, Number(e.target.value) || 0) })}
+                value={s.iterations === "infinite" ? null : s.iterations}
+                onChange={(v) => set({ iterations: Math.max(0, v ?? 0) })}
                 size="sm"
               />
             </Field>
-            <div className="flex items-end pb-2">
-              <Checkbox label={t.infinite} checked={s.iterations === "infinite"} onChange={(e) => set({ iterations: e.target.checked ? "infinite" : 1 })} />
+            <div className="flex items-end">
+              <Switch label={t.infinite} checked={s.iterations === "infinite"} onChange={(e) => set({ iterations: e.target.checked ? "infinite" : 1 })} />
             </div>
             <Field label={t.direction} htmlFor={`${id}-dir`}>
               <Select id={`${id}-dir`} value={s.direction} onChange={(e) => set({ direction: e.target.value as AnimSettings["direction"] })} size="sm">
@@ -214,7 +213,7 @@ export default function AnimationGenerator({ locale, preset: preset0 = "fade-in"
           {timingMode === "steps" && (
             <div className="grid grid-cols-2 gap-3">
               <Field label={t.stepsN} htmlFor={`${id}-sn`}>
-                <Input id={`${id}-sn`} type="number" min={1} value={steps.n} onChange={(e) => setSteps((x) => ({ ...x, n: Number(e.target.value) || 1 }))} size="sm" />
+                <NumberInput id={`${id}-sn`} min={1} max={100} value={steps.n} onChange={(v) => setSteps((x) => ({ ...x, n: v ?? 1 }))} size="sm" />
               </Field>
               <Field label={t.jump} htmlFor={`${id}-sj`}>
                 <Select id={`${id}-sj`} value={steps.jump} onChange={(e) => setSteps((x) => ({ ...x, jump: e.target.value }))} size="sm">

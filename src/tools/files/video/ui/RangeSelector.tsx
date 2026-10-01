@@ -96,7 +96,7 @@ export function RangeSelector({
     <div className={cn("select-none", className)}>
       <div
         ref={track}
-        className="relative h-20 w-full touch-none overflow-hidden rounded-[0.625rem] border border-line bg-surface-2"
+        className="relative h-20 w-full touch-none overflow-hidden rounded-[1rem] bg-surface-2 sm:h-24"
         onPointerDown={(ev) => {
           if (ev.target !== ev.currentTarget && !(ev.target as HTMLElement).dataset.bg) return;
           const t = timeAt(ev.clientX);
@@ -183,7 +183,8 @@ export function TimeInput({
   const [editing, setEditing] = useState<string | null>(null);
   const text = editing ?? formatTime(value, digits);
   const parsed = parseTime(text);
-  const invalid = parsed === null || (max !== undefined && parsed > max + 0.001);
+  // Only what the user typed can be wrong: the formatted value may round a hair past `max` (8.046 → "0:08.05").
+  const invalid = editing !== null && (parsed === null || (max !== undefined && parsed > max + 0.001));
   const commit = () => {
     if (editing !== null && !invalid && parsed !== null) onCommit(parsed);
     setEditing(null);

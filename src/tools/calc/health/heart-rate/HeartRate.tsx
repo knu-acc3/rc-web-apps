@@ -1,17 +1,19 @@
 "use client";
 
 import { useId } from "react";
+import { plural } from "@/i18n/format";
 import type { ToolProps } from "../../../types";
 import { field } from "../../shared/num";
-import { CalcGrid, DataTable, Disclaimer, Explain, FieldRow, InlineSelect, NumField, OptionsRow, ResultMain, Stack, SubHeading, ToolActions } from "../../shared/ui";
+import { CalcGrid, DataTable, Disclaimer, Explain, NumSlider, ResultMain, Stack, SubHeading, ToggleField, ToolActions } from "../../shared/ui";
 import { useQueryState } from "../../shared/url-state";
 import { maxHrFox, maxHrTanaka, targetHr, ZONES } from "../lib/body";
 
 const T = {
   ru: {
     age: "Возраст",
+    years: ["год", "года", "лет"],
     rest: "Пульс в покое",
-    restHint: "Утром, лёжа, до подъёма — для метода Карвонена",
+    restHint: "Необязательно: утром, лёжа — для метода Карвонена",
     method: "Формула максимума",
     tanaka: "Танака: 208 − 0,7 × возраст",
     fox: "220 − возраст",
@@ -35,8 +37,9 @@ const T = {
   },
   en: {
     age: "Age",
+    years: ["year", "years"],
     rest: "Resting heart rate",
-    restHint: "In the morning, lying down — for the Karvonen method",
+    restHint: "Optional: in the morning, lying down — for the Karvonen method",
     method: "Max HR formula",
     tanaka: "Tanaka: 208 − 0.7 × age",
     fox: "220 − age",
@@ -67,14 +70,9 @@ export default function HeartRate({ locale }: ToolProps) {
 
   const inputs = (
     <>
-      <FieldRow>
-        <NumField id={`${id}-a`} label={t.age} value={q.v.a} onChange={(a) => q.set({ a })} error={A.message} inputMode="numeric" size="lg" />
-        <NumField id={`${id}-r`} label={t.rest} value={q.v.r} onChange={(r) => q.set({ r })} error={R.message} suffix={t.bpm} inputMode="numeric" size="lg" placeholder="60" />
-      </FieldRow>
-      <p className="text-[0.8125rem] text-fg-3">{t.restHint}</p>
-      <OptionsRow>
-        <InlineSelect id={`${id}-m`} label={t.method} value={q.v.m} onChange={(m) => q.set({ m })} options={[{ value: "tanaka", label: t.tanaka }, { value: "fox", label: t.fox }]} />
-      </OptionsRow>
+      <NumSlider id={`${id}-a`} locale={locale} label={t.age} value={q.v.a} onChange={(a) => q.set({ a })} suffix={plural(locale, A.value ?? 30, t.years)} error={A.message} min={10} max={90} />
+      <NumSlider id={`${id}-r`} locale={locale} label={t.rest} hint={t.restHint} value={q.v.r} onChange={(r) => q.set({ r })} error={R.message} suffix={t.bpm} min={40} max={100} />
+      <ToggleField label={t.method} value={q.v.m as "tanaka" | "fox"} onChange={(m) => q.set({ m })} options={[{ value: "tanaka", label: t.tanaka }, { value: "fox", label: t.fox }]} />
     </>
   );
 

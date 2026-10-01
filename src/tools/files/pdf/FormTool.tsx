@@ -1,11 +1,11 @@
 "use client";
 
-import { FileCheck2 } from "lucide-react";
+import { FileCheck2, Loader2 } from "lucide-react";
 import { useEffect, useId, useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { count } from "@/i18n/format";
-import { Checkbox, Field, Input, Select, Textarea } from "@/ui/field";
-import { Notice, Panel } from "@/ui/panel";
+import { Checkbox, Field, Input, Select, Switch, Textarea } from "@/ui/field";
+import { Notice } from "@/ui/panel";
 import { fontFor, runPdfJob } from "./lib/client";
 import type { FormFieldInfo } from "./lib/pdf-ops";
 import { PrimaryButton, workerJob } from "./ui/bits";
@@ -14,6 +14,7 @@ import { JobStatus, ResultCard, baseName, pdfBlob, type OutputItem } from "./ui/
 import { errorText } from "./ui/strings";
 import { useJob } from "./ui/use-job";
 import { usePdfFiles } from "./ui/use-pdf-files";
+import { Controls, Workspace } from "./ui/Workspace";
 
 type Value = string | boolean | string[];
 
@@ -22,8 +23,8 @@ const T = {
     reading: "Поиск полей формы…",
     none: "В этом PDF нет интерактивных полей. Такие формы (например, сканы бланков) заполняются только поверх страницы — попробуйте «Подписать PDF» или «Водяной знак» для надписей.",
     found: (n: number) => `Найдено ${count("ru", n, ["поле", "поля", "полей"])}`,
-    flatten: "Сделать поля нередактируемыми («сплющить» форму)",
-    flattenHint: "Значения станут обычным текстом страницы: их нельзя будет случайно изменить, и они одинаково выглядят в любой программе.",
+    flatten: "Сделать поля нередактируемыми",
+    flattenHint: "Значения станут текстом страницы и одинаково выглядят в любой программе.",
     readOnly: "только чтение",
     signature: "поле для цифровой подписи — здесь не заполняется",
     button: "кнопка",
@@ -34,8 +35,8 @@ const T = {
     reading: "Looking for form fields…",
     none: "This PDF has no interactive fields. Such forms (e.g. scanned blanks) can only be filled on top of the page — try “Sign PDF” or “Watermark” for text.",
     found: (n: number) => `${count("en", n, ["field", "fields"])} found`,
-    flatten: "Make fields non-editable (flatten the form)",
-    flattenHint: "Values become plain page text: they can't be changed by accident and look the same in every app.",
+    flatten: "Make fields non-editable",
+    flattenHint: "Values become page text and look the same in every app.",
     readOnly: "read-only",
     signature: "digital signature field — not filled here",
     button: "button",
@@ -94,86 +95,104 @@ export default function FormTool({ locale }: { locale: Locale }) {
     if (out) setResult([{ name: `${baseName(file.name)}-filled.pdf`, blob: pdfBlob(out.files[0].bytes) }]);
   }
 
+  const files = <FilePanel locale={locale} pdf={pdf} disabled={job.running} />;
+  if (!file || !list || !editable.length) {
+    return (
+      <div className="flex flex-col gap-4">
+        {files}
+        {file && !current && (
+          <p className="flex items-center gap-2 text-sm text-fg-3" role="status">
+            <Loader2 className="size-4 animate-spin" aria-hidden />
+            {t.reading}
+          </p>
+        )}
+        {current && "error" in current && <Notice tone="err">{current.error}</Notice>}
+        {list && !editable.length && <Notice tone="warn">{t.none}</Notice>}
+      </div>
+    );
+  }
+
   return (
-    <div className="flex flex-col gap-4">
-      <FilePanel locale={locale} pdf={pdf} disabled={job.running} />
-      {file && !current && <p className="text-sm text-fg-3">{t.reading}</p>}
-      {current && "error" in current && <Notice tone="err">{current.error}</Notice>}
-      {list && !editable.length && <Notice tone="warn">{t.none}</Notice>}
-      {list && editable.length > 0 && (
-        <>
-          <Panel className="p-4 sm:p-5">
-            <p className="mb-4 text-sm text-fg-3">{t.found(list.length)}</p>
-            <div className="grid gap-4 sm:grid-cols-2">
-              {editable.map((f, i) => {
-                const fid = `${id}-${i}`;
-                const v = values[f.name];
-                if (f.type === "checkbox") return <Checkbox key={f.name} label={f.name} checked={v === true} onChange={(e) => set(f.name, e.target.checked)} className="sm:col-span-2" />;
-                if (f.type === "radio" || f.type === "dropdown")
-                  return (
-                    <Field key={f.name} label={f.name} htmlFor={fid}>
-                      <Select id={fid} value={typeof v === "string" ? v : ""} onChange={(e) => set(f.name, e.target.value)}>
-                        <option value="">{t.none_}</option>
-                        {f.options?.map((o) => (
-                          <option key={o} value={o}>
-                            {o}
-                          </option>
-                        ))}
-                      </Select>
-                    </Field>
-                  );
-                if (f.type === "optionlist")
-                  return (
-                    <Field key={f.name} label={f.name} htmlFor={fid}>
-                      <select
-                        id={fid}
-                        multiple={f.multiSelect}
-                        className="control min-h-24 py-1.5"
-                        value={Array.isArray(v) ? (f.multiSelect ? v : (v[0] ?? "")) : []}
-                        onChange={(e) => set(f.name, Array.from(e.target.selectedOptions, (o) => o.value))}
-                      >
-                        {f.options?.map((o) => (
-                          <option key={o} value={o}>
-                            {o}
-                          </option>
-                        ))}
-                      </select>
-                    </Field>
-                  );
+    <Workspace
+      files={files}
+      controls={
+        <Controls>
+          <p className="text-sm font-medium text-fg-2">{t.found(list.length)}</p>
+          <div className="grid gap-4 sm:grid-cols-2 2xl:grid-cols-3">
+            {editable.map((f, i) => {
+              const fid = `${id}-${i}`;
+              const v = values[f.name];
+              if (f.type === "checkbox") return <Checkbox key={f.name} label={f.name} checked={v === true} onChange={(e) => set(f.name, e.target.checked)} className="sm:col-span-2 2xl:col-span-3" />;
+              if (f.type === "radio" || f.type === "dropdown")
                 return (
-                  <Field key={f.name} label={f.name} htmlFor={fid} className={f.multiline ? "sm:col-span-2" : undefined}>
-                    {f.multiline ? (
-                      <Textarea id={fid} value={typeof v === "string" ? v : ""} maxLength={f.maxLength} onChange={(e) => set(f.name, e.target.value)} className="min-h-24 font-sans! text-[0.9375rem]!" />
-                    ) : (
-                      <Input id={fid} value={typeof v === "string" ? v : ""} maxLength={f.maxLength} onChange={(e) => set(f.name, e.target.value)} autoComplete="off" />
-                    )}
+                  <Field key={f.name} label={f.name} htmlFor={fid}>
+                    <Select id={fid} value={typeof v === "string" ? v : ""} onChange={(e) => set(f.name, e.target.value)}>
+                      <option value="">{t.none_}</option>
+                      {f.options?.map((o) => (
+                        <option key={o} value={o}>
+                          {o}
+                        </option>
+                      ))}
+                    </Select>
                   </Field>
                 );
-              })}
-            </div>
-            {list.some((f) => f.type === "signature") && <p className="mt-4 text-sm text-fg-3">{list.filter((f) => f.type === "signature").map((f) => `${f.name}: ${t.signature}`).join("; ")}</p>}
-          </Panel>
+              if (f.type === "optionlist")
+                return (
+                  <Field key={f.name} label={f.name} htmlFor={fid}>
+                    <select
+                      id={fid}
+                      multiple={f.multiSelect}
+                      className="control min-h-24 py-1.5"
+                      value={Array.isArray(v) ? (f.multiSelect ? v : (v[0] ?? "")) : []}
+                      onChange={(e) => set(f.name, Array.from(e.target.selectedOptions, (o) => o.value))}
+                    >
+                      {f.options?.map((o) => (
+                        <option key={o} value={o}>
+                          {o}
+                        </option>
+                      ))}
+                    </select>
+                  </Field>
+                );
+              return (
+                <Field key={f.name} label={f.name} htmlFor={fid} className={f.multiline ? "sm:col-span-2 2xl:col-span-3" : undefined}>
+                  {f.multiline ? (
+                    <Textarea id={fid} value={typeof v === "string" ? v : ""} maxLength={f.maxLength} onChange={(e) => set(f.name, e.target.value)} className="min-h-24 font-sans! text-base!" />
+                  ) : (
+                    <Input id={fid} value={typeof v === "string" ? v : ""} maxLength={f.maxLength} onChange={(e) => set(f.name, e.target.value)} autoComplete="off" />
+                  )}
+                </Field>
+              );
+            })}
+          </div>
+          {list.some((f) => f.type === "signature") && <p className="text-sm text-fg-3">{list.filter((f) => f.type === "signature").map((f) => `${f.name}: ${t.signature}`).join("; ")}</p>}
+        </Controls>
+      }
+      action={
+        <>
           <Field hint={t.flattenHint}>
-            <Checkbox label={t.flatten} checked={flatten} onChange={(e) => setFlatten(e.target.checked)} />
+            <Switch label={t.flatten} checked={flatten} onChange={(e) => setFlatten(e.target.checked)} />
           </Field>
-          <PrimaryButton disabled={job.running} onClick={save}>
+          <PrimaryButton disabled={job.running} done={!!result} onClick={save}>
             <FileCheck2 aria-hidden />
             {t.go}
           </PrimaryButton>
           <JobStatus locale={locale} state={job.state} onCancel={job.cancel} />
-          {result && (
-            <ResultCard
-              locale={locale}
-              items={result}
-              onReset={() => {
-                setResult(null);
-                pdf.clear();
-                job.reset();
-              }}
-            />
-          )}
         </>
-      )}
-    </div>
+      }
+      result={
+        result && (
+          <ResultCard
+            locale={locale}
+            items={result}
+            onReset={() => {
+              setResult(null);
+              pdf.clear();
+              job.reset();
+            }}
+          />
+        )
+      }
+    />
   );
 }

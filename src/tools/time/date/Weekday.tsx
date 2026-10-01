@@ -34,11 +34,11 @@ export default function Weekday({ locale }: { locale: Locale }) {
 
   return (
     <div className="flex flex-col gap-4">
-      <Panel className="p-4 sm:p-5">
+      <Panel className="grid gap-6 p-4 sm:p-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:items-center">
         <Field label={t.date} htmlFor={`${id}-d`} hint={!text ? t.today : undefined} className="sm:max-w-xs">
           <Input id={`${id}-d`} type="date" value={text} onChange={(e) => setText(e.target.value)} />
         </Field>
-        <div className="mt-4 border-t border-line pt-6">
+        <div className="min-w-0 rounded-[1rem] bg-surface-2 px-4 py-6 sm:py-8">
           <BigResult
             caption={x ? fmtDate(locale, x) : " "}
             value={x ? cap(names[weekdayOf(x) - 1]) : "—"}

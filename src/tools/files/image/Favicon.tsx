@@ -1,6 +1,6 @@
 "use client";
 
-import { Download, Loader2, Settings2 } from "lucide-react";
+import { Download, Loader2 } from "lucide-react";
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { formatBytes } from "@/i18n/format";
@@ -16,9 +16,10 @@ import { normalizeHex } from "./lib/palette";
 import { roundRectPath } from "./lib/pipeline";
 import { previewFile } from "./lib/run";
 import { prepareFile } from "./lib/source";
-import { checker, ColorField, RangeField } from "./ui/controls";
+import { checker, ColorField, RangeField, replaceDrop } from "./ui/controls";
 import { FONTS, fontCss } from "./ui/fonts";
 import { useBitmap, useEngine } from "./ui/hooks";
+import { OptionsBar, ToolColumns } from "./ui/OptionsBar";
 import { errorText, S } from "./ui/strings";
 import { downloadZip } from "./ui/useBatch";
 
@@ -274,107 +275,129 @@ export default function Favicon({ locale }: { locale: Locale }) {
     }
   }
 
-  return (
-    <div className="flex flex-col gap-4">
-      <div className="rounded-[0.75rem] border border-line bg-surface">
-        <div className="flex flex-wrap items-end gap-x-4 gap-y-3 px-4 py-3">
-          <Field label={t.source}>
+  const side = (
+    <OptionsBar
+      locale={locale}
+      more={
+        <>
+          <Field label={t.fill}>
             <Segmented
-              wrap
-              label={t.source}
-              value={d.mode}
-              onChange={(m) => set({ mode: m })}
+              label={t.fill}
+              value={d.transparent ? "t" : "c"}
+              onChange={(v) => set({ transparent: v === "t" })}
               options={[
-                { value: "text", label: t.text },
-                { value: "emoji", label: t.emoji },
-                { value: "image", label: t.image },
+                { value: "c", label: t.bg },
+                { value: "t", label: t.transparentBg },
               ]}
             />
           </Field>
           {d.mode === "text" && (
-            <Field label={t.textLabel} htmlFor={`${id}-txt`} className="w-40">
-              <Input id={`${id}-txt`} value={d.text} onChange={(e) => set({ text: graphemes(e.target.value).slice(0, 3).join("") })} autoComplete="off" />
-            </Field>
+            <>
+              <ColorField label={t.fg} value={d.fg} onChange={(c) => set({ fg: c })} locale={locale} />
+              <Field label={t.font} htmlFor={`${id}-font`}>
+                <Select id={`${id}-font`} value={d.font} onChange={(e) => set({ font: e.target.value })}>
+                  {FONTS.map((f) => (
+                    <option key={f.id} value={f.id}>
+                      {f.label}
+                    </option>
+                  ))}
+                </Select>
+              </Field>
+            </>
           )}
-          {d.mode === "emoji" && (
-            <Field label={t.emojiLabel} htmlFor={`${id}-emo`} className="w-32" hint={emojiTrimmed ? t.onlyOne : undefined}>
-              <Input
-                id={`${id}-emo`}
-                value={d.emoji}
-                autoComplete="off"
-                onChange={(e) => {
-                  const g = graphemes(e.target.value.trim());
-                  // keep the newest emoji typed or pasted
-                  setEmojiTrimmed(g.length > 1);
-                  set({ emoji: g.length ? g[g.length - 1] : "" });
-                }}
-              />
-            </Field>
-          )}
-          {d.mode === "image" && (
-            <Dropzone onFiles={pick} accept={IMAGE_ACCEPT} compact title={imgName || t.pickImage} className="min-h-14! max-w-sm flex-1 py-2!" />
-          )}
-          <Field label={t.shape}>
-            <Segmented
-              wrap
-              label={t.shape}
-              value={d.shape}
-              onChange={(v) => set({ shape: v })}
-              options={[
-                { value: "square", label: t.square },
-                { value: "rounded", label: t.rounded },
-                { value: "circle", label: t.circle },
-              ]}
-            />
+          <RangeField label={t.padding} value={d.padding} onChange={(v) => set({ padding: v })} min={0} max={30} unit="%" locale={locale} />
+          <Field label={t.appName} htmlFor={`${id}-app`}>
+            <Input id={`${id}-app`} value={appName} onChange={(e) => setAppName(e.target.value)} maxLength={60} />
           </Field>
-          <ColorField label={t.bg} value={d.bg} onChange={(c) => set({ bg: c, transparent: false })} locale={locale} className="w-44" />
-        </div>
-        <details className="border-t border-line">
-          <summary className="flex cursor-pointer items-center gap-2 px-4 py-2.5 text-sm text-fg-2 hover:text-fg">
-            <Settings2 className="size-4" aria-hidden />
-            {locale === "ru" ? "Дополнительно" : "More options"}
-          </summary>
-          <div className="grid gap-4 px-4 pb-4 pt-1 sm:grid-cols-2">
-            <Field label={t.fill}>
-              <Segmented
-                wrap
-                label={t.fill}
-                value={d.transparent ? "t" : "c"}
-                onChange={(v) => set({ transparent: v === "t" })}
-                options={[
-                  { value: "c", label: t.bg },
-                  { value: "t", label: t.transparentBg },
-                ]}
-              />
-            </Field>
-            {d.mode === "text" && (
-              <>
-                <ColorField label={t.fg} value={d.fg} onChange={(c) => set({ fg: c })} locale={locale} />
-                <Field label={t.font} htmlFor={`${id}-font`}>
-                  <Select id={`${id}-font`} value={d.font} onChange={(e) => set({ font: e.target.value })}>
-                    {FONTS.map((f) => (
-                      <option key={f.id} value={f.id}>
-                        {f.label}
-                      </option>
-                    ))}
-                  </Select>
-                </Field>
-              </>
-            )}
-            <RangeField label={t.padding} value={d.padding} onChange={(v) => set({ padding: v })} min={0} max={30} unit="%" locale={locale} />
-            <Field label={t.appName} htmlFor={`${id}-app`}>
-              <Input id={`${id}-app`} value={appName} onChange={(e) => setAppName(e.target.value)} maxLength={60} />
-            </Field>
-            <Field label={t.shortName} htmlFor={`${id}-short`}>
-              <Input id={`${id}-short`} value={shortName} onChange={(e) => setShortName(e.target.value)} maxLength={20} />
-            </Field>
-            <ColorField label={t.theme} value={themeHex} onChange={setTheme} locale={locale} />
-          </div>
-        </details>
-      </div>
+          <Field label={t.shortName} htmlFor={`${id}-short`}>
+            <Input id={`${id}-short`} value={shortName} onChange={(e) => setShortName(e.target.value)} maxLength={20} />
+          </Field>
+          <ColorField label={t.theme} value={themeHex} onChange={setTheme} locale={locale} />
+        </>
+      }
+    >
+      <Segmented
+        fill
+        label={t.source}
+        value={d.mode}
+        onChange={(m) => set({ mode: m })}
+        options={[
+          { value: "text", label: t.text },
+          { value: "emoji", label: t.emoji },
+          { value: "image", label: t.image },
+        ]}
+      />
+      {d.mode === "text" && (
+        <Field label={t.textLabel} htmlFor={`${id}-txt`}>
+          <Input id={`${id}-txt`} value={d.text} onChange={(e) => set({ text: graphemes(e.target.value).slice(0, 3).join("") })} autoComplete="off" size="lg" />
+        </Field>
+      )}
+      {d.mode === "emoji" && (
+        <Field label={t.emojiLabel} htmlFor={`${id}-emo`} hint={emojiTrimmed ? t.onlyOne : undefined}>
+          <Input
+            id={`${id}-emo`}
+            value={d.emoji}
+            autoComplete="off"
+            size="lg"
+            onChange={(e) => {
+              const g = graphemes(e.target.value.trim());
+              // keep the newest emoji typed or pasted
+              setEmojiTrimmed(g.length > 1);
+              set({ emoji: g.length ? g[g.length - 1] : "" });
+            }}
+          />
+        </Field>
+      )}
+      {d.mode === "image" && <Dropzone onFiles={pick} accept={IMAGE_ACCEPT} title={imgName || t.pickImage} locale={locale} className={replaceDrop} />}
+      <Field label={t.shape}>
+        <Segmented
+          label={t.shape}
+          value={d.shape}
+          onChange={(v) => set({ shape: v })}
+          options={[
+            { value: "square", label: t.square },
+            { value: "rounded", label: t.rounded },
+            { value: "circle", label: t.circle },
+          ]}
+        />
+      </Field>
+      <ColorField label={t.bg} value={d.bg} onChange={(c) => set({ bg: c, transparent: false })} locale={locale} />
+    </OptionsBar>
+  );
 
-      <Panel className="overflow-hidden">
-        <div className={`flex flex-wrap items-end justify-center gap-6 p-6 ${checker}`}>
+  return (
+    <ToolColumns
+      side={side}
+      rest={
+        <>
+          <Panel className="flex min-w-0 flex-col gap-2 p-3 sm:p-4">
+            <div className="flex items-center justify-between gap-2 px-1">
+              <label htmlFor={`${id}-html`} className="text-sm font-semibold text-fg">
+                {t.html}
+              </label>
+              <CopyButton
+                value={html}
+                variant="ghost"
+                label={locale === "ru" ? "Копировать" : "Copy"}
+                copiedLabel={locale === "ru" ? "Скопировано" : "Copied"}
+              />
+            </div>
+            <textarea
+              id={`${id}-html`}
+              readOnly
+              value={html}
+              rows={6}
+              spellCheck={false}
+              className="block w-full resize-y rounded-[1rem] bg-surface-2 px-3.5 py-3 font-mono text-xs leading-relaxed text-fg-2 focus:outline-2 focus:outline-accent"
+            />
+          </Panel>
+          {error ? <Notice tone="err">{errorText(locale, error)}</Notice> : null}
+          <p className="sr-only">{s.processingIn}</p>
+        </>
+      }
+    >
+      <Panel className="flex min-w-0 flex-col gap-3 p-3 sm:gap-4 sm:p-4">
+        <div className={`flex flex-wrap items-end justify-center gap-6 rounded-[1rem] p-6 sm:gap-10 sm:p-10 ${checker}`}>
           {PREVIEW.map((n, i) => (
             <figure key={n} className="flex flex-col items-center gap-2">
               <canvas
@@ -397,38 +420,19 @@ export default function Favicon({ locale }: { locale: Locale }) {
             </figure>
           ))}
         </div>
-        <div className="flex flex-col gap-3 border-t border-line px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
-          <div aria-live="polite">
-            <p className="text-lg font-semibold text-fg">favicon.ico + 6 PNG + site.webmanifest</p>
+        <div className="flex flex-col gap-3 px-1 sm:flex-row sm:items-center sm:justify-between">
+          <div aria-live="polite" className="min-w-0">
+            <p className="text-lg font-semibold text-fg sm:text-xl">favicon.ico + 6 PNG + site.webmanifest</p>
             <p className="text-sm text-fg-3">
               {zipSize ? formatBytes(locale, zipSize) : `ICO: ${ICO_SIZES.join(", ")} px · PNG: ${PNG_SIZES.map(([n]) => n).join(", ")} px`}
             </p>
           </div>
-          <Button variant="primary" size="lg" onClick={download} disabled={busy || (d.mode === "image" && !img)}>
+          <Button variant="filled" size="lg" onClick={download} disabled={busy || (d.mode === "image" && !img)}>
             {busy ? <Loader2 className="animate-spin" aria-hidden /> : <Download aria-hidden />}
             {t.download}
           </Button>
         </div>
       </Panel>
-
-      <div className="overflow-hidden rounded-[0.75rem] border border-line bg-surface">
-        <div className="flex items-center justify-between gap-2 border-b border-line px-3 py-1.5">
-          <label htmlFor={`${id}-html`} className="text-sm font-semibold text-fg">
-            {t.html}
-          </label>
-          <CopyButton value={html} variant="ghost" label={locale === "ru" ? "Копировать" : "Copy"} copiedLabel={locale === "ru" ? "Скопировано" : "Copied"} />
-        </div>
-        <textarea
-          id={`${id}-html`}
-          readOnly
-          value={html}
-          rows={6}
-          spellCheck={false}
-          className="block w-full resize-y bg-transparent px-3 py-2.5 font-mono text-xs leading-relaxed text-fg-2 focus:outline-none"
-        />
-      </div>
-      {error ? <Notice tone="err">{errorText(locale, error)}</Notice> : null}
-      <p className="sr-only">{s.processingIn}</p>
-    </div>
+    </ToolColumns>
   );
 }

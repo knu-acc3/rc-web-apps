@@ -25,7 +25,7 @@ const T = {
     cornerColor: "Цвет углов",
     width: "Толщина рамки",
     unit: "Единицы",
-    roundPctHint: "100 % — половина короткой стороны: квадрат станет кругом, прямоугольник — «таблеткой»",
+    roundPctHint: "100 % — круг или «таблетка»",
     pct: "% короткой стороны",
     px: "px",
     color: "Цвет рамки",
@@ -46,7 +46,7 @@ const T = {
     cornerColor: "Corner colour",
     width: "Border width",
     unit: "Units",
-    roundPctHint: "100% is half the shorter side: a square becomes a circle, a rectangle a pill",
+    roundPctHint: "100% makes a circle or a pill",
     pct: "% of short side",
     px: "px",
     color: "Border colour",
@@ -121,12 +121,9 @@ export default function Decorate({ locale, mode }: { locale: Locale; mode: Mode 
   const options =
     mode === "round" ? (
       <>
-        <div className="min-w-52 flex-1">
-          <RangeField label={t.radius} value={radius} onChange={setRadius} min={0} max={rUnit === "%" ? 100 : 1000} unit={rUnit} locale={locale} />
-        </div>
+        <RangeField label={t.radius} value={radius} onChange={setRadius} min={0} max={rUnit === "%" ? 100 : 1000} unit={rUnit} locale={locale} />
         <Field label={t.corners}>
           <Segmented
-            wrap
             label={t.corners}
             value={cornerKind}
             onChange={setCornerKind}
@@ -139,28 +136,25 @@ export default function Decorate({ locale, mode }: { locale: Locale; mode: Mode 
       </>
     ) : mode === "border" ? (
       <>
-        <div className="min-w-52 flex-1">
-          <RangeField
-            label={t.width}
-            value={bw}
-            onChange={setBw}
-            min={0}
-            max={unit === "%" ? 25 : 300}
-            step={unit === "%" ? 0.5 : 1}
-            unit={unit === "%" ? "%" : "px"}
-            locale={locale}
-          />
-        </div>
-        <ColorField label={t.color} value={bColor} onChange={setBColor} locale={locale} className="w-48" />
+        <RangeField
+          label={t.width}
+          value={bw}
+          onChange={setBw}
+          min={0}
+          max={unit === "%" ? 25 : 300}
+          step={unit === "%" ? 0.5 : 1}
+          unit={unit === "%" ? "%" : "px"}
+          locale={locale}
+        />
+        <ColorField label={t.color} value={bColor} onChange={setBColor} locale={locale} />
       </>
     ) : (
       <>
         <Field label={t.ratio}>
-          <Segmented wrap label={t.ratio} value={ratio} onChange={setRatio} options={RATIOS.map((x) => ({ value: x.value, label: x.value }))} />
+          <Segmented label={t.ratio} value={ratio} onChange={setRatio} options={RATIOS.map((x) => ({ value: x.value, label: x.value }))} />
         </Field>
         <Field label={t.fill}>
           <Segmented
-            wrap
             label={t.fill}
             value={fillKind}
             onChange={setFillKind}
@@ -170,7 +164,7 @@ export default function Decorate({ locale, mode }: { locale: Locale; mode: Mode 
             ]}
           />
         </Field>
-        {fillKind === "color" && <ColorField label={t.fillColor} value={fillColor} onChange={setFillColor} locale={locale} className="w-48" />}
+        {fillKind === "color" && <ColorField label={t.fillColor} value={fillColor} onChange={setFillColor} locale={locale} />}
       </>
     );
 
@@ -179,7 +173,6 @@ export default function Decorate({ locale, mode }: { locale: Locale; mode: Mode 
       {mode === "round" && (
         <Field label={t.unit} hint={rUnit === "%" ? t.roundPctHint : undefined}>
           <Segmented
-            wrap
             label={t.unit}
             value={rUnit}
             onChange={(u) => {
@@ -198,7 +191,6 @@ export default function Decorate({ locale, mode }: { locale: Locale; mode: Mode 
         <>
           <Field label={t.unit}>
             <Segmented
-              wrap
               label={t.unit}
               value={unit}
               onChange={(u) => {

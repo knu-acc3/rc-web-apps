@@ -3,9 +3,9 @@
 import { useId } from "react";
 import { Segmented } from "@/ui/segmented";
 import type { ToolProps } from "../../../types";
-import { CURRENCIES, CURRENCY_SYMBOL, fmtMoney, fmtPct, isCurrency, type Currency } from "../../shared/fmt";
+import { CURRENCIES, CURRENCY_SYMBOL, fmtMoney, fmtPct, isCurrency, moneyMax, type Currency } from "../../shared/fmt";
 import { field, toInput } from "../../shared/num";
-import { Advanced, CalcGrid, Explain, FieldRow, NumField, OptionsRow, ResultMain, Stack, ToolActions } from "../../shared/ui";
+import { Advanced, CalcGrid, Explain, NumSlider, OptionsRow, ResultMain, Stack, ToolActions } from "../../shared/ui";
 import { useQueryState } from "../../shared/url-state";
 import { discountPercent, discountPrice, originalPrice, stackedDiscount } from "../lib/money";
 import { CurrencySelect } from "../loan/parts";
@@ -19,9 +19,9 @@ const T = {
     price: "Цена",
     salePrice: "Цена со скидкой",
     oldPrice: "Цена до скидки",
-    pct: "Скидка, %",
+    pct: "Скидка",
     second: "Вторая скидка поверх первой",
-    pct2: "Ещё скидка, %",
+    pct2: "Ещё скидка",
     saved: "Экономия",
     effective: "Итоговая скидка",
     subSaved: (v: string) => `экономия ${v}`,
@@ -38,9 +38,9 @@ const T = {
     price: "Price",
     salePrice: "Sale price",
     oldPrice: "Original price",
-    pct: "Discount, %",
+    pct: "Discount",
     second: "Second discount on top",
-    pct2: "Extra discount, %",
+    pct2: "Extra discount",
     saved: "You save",
     effective: "Total discount",
     subSaved: (v: string) => `you save ${v}`,
@@ -105,10 +105,13 @@ export default function Discount({ locale, mode = "final" }: ToolProps<{ mode?: 
     }
   }
 
+  const priceMax = moneyMax(cur, 1_000_000);
+  const pctSlider = <NumSlider id={`${id}-d`} locale={locale} label={t.pct} value={q.v.d} onChange={(d) => q.set({ d })} suffix="%" error={D.message} min={0} max={90} />;
   const inputs = (
     <>
       <Segmented
         label={t.mode}
+        fill
         value={m}
         onChange={(v) => q.set({ m: v })}
         options={[
@@ -117,30 +120,15 @@ export default function Discount({ locale, mode = "final" }: ToolProps<{ mode?: 
           { value: "percent", label: t.percent },
         ]}
       />
-      {m === "final" && (
-        <FieldRow>
-          <NumField id={`${id}-p`} label={t.price} value={q.v.p} onChange={(p) => q.set({ p })} suffix={sym} error={P.message} size="lg" />
-          <NumField id={`${id}-d`} label={t.pct} value={q.v.d} onChange={(d) => q.set({ d })} suffix="%" error={D.message} size="lg" />
-        </FieldRow>
-      )}
-      {m === "original" && (
-        <FieldRow>
-          <NumField id={`${id}-s`} label={t.salePrice} value={q.v.s} onChange={(s) => q.set({ s })} suffix={sym} error={S.message} size="lg" />
-          <NumField id={`${id}-d`} label={t.pct} value={q.v.d} onChange={(d) => q.set({ d })} suffix="%" error={D.message} size="lg" />
-        </FieldRow>
-      )}
-      {m === "percent" && (
-        <FieldRow>
-          <NumField id={`${id}-p`} label={t.oldPrice} value={q.v.p} onChange={(p) => q.set({ p })} suffix={sym} error={P.message} size="lg" />
-          <NumField id={`${id}-s`} label={t.salePrice} value={q.v.s} onChange={(s) => q.set({ s })} suffix={sym} error={S.message} size="lg" />
-        </FieldRow>
-      )}
+      {m !== "original" && <NumSlider id={`${id}-p`} locale={locale} label={m === "final" ? t.price : t.oldPrice} value={q.v.p} onChange={(p) => q.set({ p })} suffix={sym} error={P.message} min={0} max={priceMax} scale="log" />}
+      {m !== "final" && <NumSlider id={`${id}-s`} locale={locale} label={t.salePrice} value={q.v.s} onChange={(s) => q.set({ s })} suffix={sym} error={S.message} min={0} max={priceMax} scale="log" />}
+      {m !== "percent" && pctSlider}
       <OptionsRow>
-        <CurrencySelect id={`${id}-c`} locale={locale} value={cur} onChange={(c) => q.set({ c })} />
+        <CurrencySelect locale={locale} value={cur} onChange={(c) => q.set({ c })} />
       </OptionsRow>
       {m === "final" && (
         <Advanced title={t.second} open={!!q.v.d2}>
-          <NumField id={`${id}-d2`} label={t.pct2} value={q.v.d2} onChange={(d2) => q.set({ d2 })} suffix="%" error={D2.message} placeholder="0" />
+          <NumSlider id={`${id}-d2`} locale={locale} label={t.pct2} value={q.v.d2} onChange={(d2) => q.set({ d2 })} suffix="%" error={D2.message} min={0} max={90} />
         </Advanced>
       )}
     </>

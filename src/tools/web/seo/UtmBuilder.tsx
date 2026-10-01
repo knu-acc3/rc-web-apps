@@ -3,9 +3,10 @@
 import { useId, useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { CopyButton } from "@/ui/copy-button";
-import { Field, Input, Select } from "@/ui/field";
+import { Field, Input } from "@/ui/field";
 import { buildUtm, parseUtm, utmWarnings, UTM_KEYS, type UtmKey, type UtmParams } from "./lib/utm";
-import { Issues } from "./ui/kit";
+import { Issues, Split } from "./ui/kit";
+import { ChipChoice } from "@/ui/chip-choice";
 
 export type UtmPreset = "" | "yandex" | "google" | "vk" | "telegram" | "email";
 
@@ -78,46 +79,44 @@ export default function UtmBuilder({ locale, preset: initial = "" }: { locale: L
   const hasMacro = Object.values(p).some((x) => x && /\{[^}]+\}/.test(x));
 
   return (
-    <div className="flex flex-col gap-5">
-      <Field label={t.url} htmlFor={`${id}-u`}>
-        <Input id={`${id}-u`} value={url} onChange={(e) => onUrl(e.target.value)} size="lg" className="font-mono" inputMode="url" placeholder="https://example.com/landing" spellCheck={false} autoComplete="off" />
-      </Field>
-
-      <section aria-live="polite" className="rounded-[0.75rem] bg-surface-2 px-4 py-4 sm:px-5">
-        <div className="flex items-center justify-between gap-2">
-          <h2 className="text-sm text-fg-2">{t.result}</h2>
-          {result && <CopyButton value={result} label={t.copy} copiedLabel={t.copied} variant="primary" showLabel />}
-        </div>
-        <p className={result ? "mt-2 font-mono text-[0.9375rem] break-all text-fg select-all" : "mt-2 text-[0.9375rem] text-fg-3"}>{result || t.empty}</p>
-      </section>
-
-      <Issues items={warnings} />
-
-      <div className="grid gap-4 sm:grid-cols-2">
-        <Field label={t.preset} htmlFor={`${id}-p`} className="sm:col-span-2 sm:max-w-xs">
-          <Select
-            id={`${id}-p`}
-            value={preset}
-            onChange={(e) => {
-              const v = e.target.value as UtmPreset;
-              setPreset(v);
-              if (v) setP({ ...PRESETS[v], utm_campaign: PRESETS[v].utm_campaign || p.utm_campaign });
-            }}
-          >
-            {(Object.keys(t.presets) as UtmPreset[]).map((k) => (
-              <option key={k} value={k}>
-                {t.presets[k]}
-              </option>
-            ))}
-          </Select>
-        </Field>
-        {UTM_KEYS.map((k) => (
-          <Field key={k} label={LABEL[k][locale][0]} htmlFor={`${id}-${k}`}>
-            <Input id={`${id}-${k}`} value={p[k] ?? ""} onChange={(e) => setP((o) => ({ ...o, [k]: e.target.value }))} placeholder={LABEL[k][locale][1]} className="font-mono" spellCheck={false} autoComplete="off" />
+    <Split
+      input={
+        <>
+          <Field label={t.url} htmlFor={`${id}-u`}>
+            <Input id={`${id}-u`} value={url} onChange={(e) => onUrl(e.target.value)} size="lg" className="font-mono" inputMode="url" placeholder="https://example.com/landing" spellCheck={false} autoComplete="off" />
           </Field>
-        ))}
-      </div>
-      {hasMacro && <p className="text-sm text-fg-3">{t.macro}</p>}
-    </div>
+          <div role="group" aria-labelledby={`${id}-p`} className="flex flex-col gap-2">
+            <span id={`${id}-p`} className="text-sm font-medium text-fg-2">
+              {t.preset}
+            </span>
+            <ChipChoice
+              layout="wrap"
+              label={t.preset}
+              value={preset}
+              onChange={(v) => {
+                setPreset(v);
+                if (v) setP({ ...PRESETS[v], utm_campaign: PRESETS[v].utm_campaign || p.utm_campaign });
+              }}
+              options={(Object.keys(t.presets) as UtmPreset[]).map((k) => ({ value: k, label: t.presets[k] }))}
+            />
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2">
+            {UTM_KEYS.map((k) => (
+              <Field key={k} label={LABEL[k][locale][0]} htmlFor={`${id}-${k}`}>
+                <Input id={`${id}-${k}`} value={p[k] ?? ""} onChange={(e) => setP((o) => ({ ...o, [k]: e.target.value }))} placeholder={LABEL[k][locale][1]} className="font-mono" spellCheck={false} autoComplete="off" />
+              </Field>
+            ))}
+          </div>
+          {hasMacro && <p className="text-sm text-fg-3">{t.macro}</p>}
+        </>
+      }
+    >
+      <section aria-live="polite" className="min-w-0 rounded-[1.25rem] bg-accent-soft p-5 sm:p-6">
+        <h2 className="text-sm font-medium text-fg-2">{t.result}</h2>
+        <p className={result ? "mt-2 font-mono text-lg break-all text-fg select-all" : "mt-2 text-[0.9375rem] text-fg-3"}>{result || t.empty}</p>
+        {result && <CopyButton value={result} label={t.copy} copiedLabel={t.copied} variant="primary" size="md" showLabel className="mt-4" />}
+      </section>
+      <Issues items={warnings} />
+    </Split>
   );
 }

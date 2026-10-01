@@ -5,9 +5,11 @@ import type { Locale } from "@/i18n/config";
 import { CodeEditor } from "@/tools/dev/shared/CodeEditor";
 import { useLiveTask } from "@/tools/dev/shared/hooks";
 import { outputLabels } from "@/tools/dev/shared/labels";
+import { Opt, OptionsRow } from "@/tools/dev/shared/Pane";
 import { CodeOutput } from "@/ui/code-output";
 import { Select, Switch } from "@/ui/field";
 import { Notice } from "@/ui/panel";
+import { Segmented } from "@/ui/segmented";
 import { ErrorBox, failOf, useCodeWorker } from "./ui/ErrorBox";
 import { LANG_META, SAMPLES, SQL_DIALECTS, type FormatLang, type FormatOptions, type IndentOpt } from "./lib/langs";
 import { CODE_T } from "./content/text";
@@ -37,17 +39,21 @@ export default function FormatterTool({ locale, lang, dialect, sample: preset }:
   const fail = failOf(live.error);
   const editorId = `${id}-in`;
 
-  const sel = (label: string, value: string, onChange: (v: string) => void, items: [string, string][], w = "w-36") => (
-    <label className="flex items-center gap-2">
-      {label}
-      <Select value={value} size="sm" className={w} onChange={(e) => onChange(e.target.value)}>
+  const sel = (label: string, value: string, onChange: (v: string) => void, items: [string, string][]) => (
+    <Opt label={label}>
+      <Select value={value} size="sm" onChange={(e) => onChange(e.target.value)}>
         {items.map(([v, l]) => (
           <option key={v} value={v}>
             {l}
           </option>
         ))}
       </Select>
-    </label>
+    </Opt>
+  );
+  const seg = (label: string, value: string, onChange: (v: string) => void, items: [string, string][]) => (
+    <Opt label={label} group>
+      <Segmented label={label} size="sm" value={value} onChange={onChange} options={items.map(([v, l]) => ({ value: v, label: l }))} />
+    </Opt>
   );
 
   return (
@@ -60,41 +66,39 @@ export default function FormatterTool({ locale, lang, dialect, sample: preset }:
       {fail && <ErrorBox locale={locale} fail={fail} text={text} editorId={editorId} />}
       {!fail && res && res.warnings.length > 0 && <Notice tone="warn">{res.warnings.map((w) => t.warns[w] ?? w).join(". ")}.</Notice>}
 
-      <div className="flex flex-wrap items-center gap-x-5 gap-y-3 text-sm text-fg-2">
+      <OptionsRow>
         {lang === "sql" &&
           sel(
             t.dialect,
             opts.dialect ?? "sql",
             (v) => set("dialect", v),
             SQL_DIALECTS.map((d) => [d.id, d.label]),
-            "w-52",
           )}
         {lang === "sql" &&
-          sel(t.keywords, opts.keywordCase ?? "upper", (v) => set("keywordCase", v as FormatOptions["keywordCase"]), [
+          seg(t.keywords, opts.keywordCase ?? "upper", (v) => set("keywordCase", v as FormatOptions["keywordCase"]), [
             ["upper", t.upper],
             ["lower", t.lower],
             ["preserve", t.preserve],
           ])}
-        {sel(t.indent, opts.indent, (v) => set("indent", v as IndentOpt), [
+        {seg(t.indent, opts.indent, (v) => set("indent", v as IndentOpt), [
           ["2", t.spaces("2")],
           ["4", t.spaces("4")],
           ["tab", t.tab],
         ])}
         {WIDTH_LANGS.has(lang) &&
-          sel(
+          seg(
             t.width,
             String(opts.printWidth ?? 80),
             (v) => set("printWidth", Number(v)),
             ["80", "100", "120"].map((w) => [w, w]),
-            "w-24",
           )}
         {(lang === "javascript" || lang === "typescript") &&
-          sel(t.quotes, opts.singleQuote ? "single" : "double", (v) => set("singleQuote", v === "single"), [
+          seg(t.quotes, opts.singleQuote ? "single" : "double", (v) => set("singleQuote", v === "single"), [
             ["double", `"…" ${t.double}`],
             ["single", `'…' ${t.single}`],
           ])}
         {(lang === "javascript" || lang === "typescript") && <Switch label={t.semi} checked={opts.semi !== false} onChange={(e) => set("semi", e.target.checked)} />}
-      </div>
+      </OptionsRow>
     </div>
   );
 }

@@ -1,18 +1,22 @@
 "use client";
 
-import { ArrowUpDown, Download } from "lucide-react";
+import { ArrowDown, ArrowLeftRight, ArrowUpDown, Download } from "lucide-react";
 import { useEffect, useId, useMemo, useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { formatNumber, plural } from "@/i18n/format";
+import { cn } from "@/lib/cn";
 import { downloadBlob, downloadText } from "@/lib/clipboard";
 import { bytesToHex } from "@/tools/dev/shared/bytes";
 import { CodeEditor } from "@/tools/dev/shared/CodeEditor";
 import { useLiveTask, useWorkerClient } from "@/tools/dev/shared/hooks";
 import { KIT_T, positionLabel } from "@/tools/dev/shared/labels";
-import { Button } from "@/ui/button";
+import { Opt, OptionsRow, Pane } from "@/tools/dev/shared/Pane";
+import { Button, IconButton } from "@/ui/button";
 import { CopyButton } from "@/ui/copy-button";
-import { Input, Select, Switch } from "@/ui/field";
-import { Notice, Panel } from "@/ui/panel";
+import { Select, Switch } from "@/ui/field";
+import { Fold } from "@/ui/fold";
+import { NumberInput } from "@/ui/number-input";
+import { Panel } from "@/ui/panel";
 import { Segmented } from "@/ui/segmented";
 import { caesar, CYRILLIC, LATIN } from "./lib/codecs";
 import { loadCodec, type CodecId } from "./lib/registry";
@@ -229,17 +233,24 @@ export default function Codec({ locale, codec, dir: dir0, samples, outputs, opti
   const shown = out.length > SHOW_MAX ? out.slice(0, SHOW_MAX) : out;
   const count = [...out.slice(0, SHOW_MAX)].length + Math.max(0, out.length - SHOW_MAX);
 
-  const sel = (key: string, labels: Record<string, string>, def: string, w = "w-48") => (
-    <label className="flex items-center gap-2">
-      {key === "mode" ? o.mode : key === "group" ? o.group : key === "charset" ? o.charset : key === "variant" ? o.variant : key === "style" ? o.style : key === "alphabet" ? o.alphabet : key}
-      <Select value={String(opts[key] ?? def)} size="sm" className={w} onChange={(e) => set(key, e.target.value)}>
+  const caption = (key: string) => (key === "mode" ? o.mode : key === "group" ? o.group : key === "charset" ? o.charset : key === "variant" ? o.variant : key === "style" ? o.style : key === "alphabet" ? o.alphabet : key);
+  /** Many or long choices: a drop-down list sized to its text. */
+  const sel = (key: string, labels: Record<string, string>, def: string) => (
+    <Opt label={caption(key)}>
+      <Select value={String(opts[key] ?? def)} size="sm" onChange={(e) => set(key, e.target.value)}>
         {Object.entries(labels).map(([v, l]) => (
           <option key={v} value={v}>
             {l}
           </option>
         ))}
       </Select>
-    </label>
+    </Opt>
+  );
+  /** Two to four short choices: segmented buttons (they wrap into pills on a narrow screen). */
+  const seg = (key: string, labels: Record<string, string>, def: string) => (
+    <Opt label={caption(key)} group>
+      <Segmented label={caption(key)} size="sm" value={String(opts[key] ?? def)} onChange={(v) => set(key, v)} options={Object.entries(labels).map(([value, label]) => ({ value, label }))} />
+    </Opt>
   );
   const sw = (key: string, label: string, def = false) => <Switch label={label} checked={opts[key] === undefined ? def : !!opts[key]} onChange={(e) => set(key, e.target.checked)} />;
   const charsets = { "utf-8": "UTF-8", "windows-1251": "Windows-1251", "koi8-r": "KOI8-R", "iso-8859-1": "ISO-8859-1" };
@@ -253,26 +264,26 @@ export default function Codec({ locale, codec, dir: dir0, samples, outputs, opti
           {sw("wrap", o.wrap)}
         </>
       )}
-      {codec === "url" && (dir === "encode" ? sel("mode", o.modes, "component", "w-56") : sw("plus", o.plus))}
-      {codec === "html" && dir === "encode" && sel("mode", o.htmlModes, "basic", "w-56")}
+      {codec === "url" && (dir === "encode" ? seg("mode", o.modes, "component") : sw("plus", o.plus))}
+      {codec === "html" && dir === "encode" && sel("mode", o.htmlModes, "basic")}
       {numeric && dir === "encode" && (
         <>
-          {sel("group", o.groups, "1", "w-36")}
+          {seg("group", o.groups, "1")}
           {codec !== "decimal" && sw("prefix", `${o.prefix} ${codec === "hex" ? "0x" : codec === "binary" ? "0b" : "0o"}`)}
           {codec === "hex" && sw("upper", o.upper)}
         </>
       )}
-      {(numeric || codec === "qp") && dir === "decode" && sel("charset", charsets, "utf-8", "w-40")}
-      {codec === "base32" && sel("variant", o.b32, "rfc4648", "w-36")}
+      {(numeric || codec === "qp") && dir === "decode" && seg("charset", charsets, "utf-8")}
+      {codec === "base32" && seg("variant", o.b32, "rfc4648")}
       {codec === "base85" && (
         <>
-          {sel("variant", o.b85, "ascii85", "w-44")}
+          {seg("variant", o.b85, "ascii85")}
           {dir === "encode" && opts.variant !== "z85" && sw("delimiters", o.delimiters, true)}
         </>
       )}
       {codec === "unicode" && dir === "encode" && (
         <>
-          {sel("style", o.styles, "js", "w-56")}
+          {sel("style", o.styles, "js")}
           {sw("all", o.all)}
         </>
       )}
@@ -282,72 +293,85 @@ export default function Codec({ locale, codec, dir: dir0, samples, outputs, opti
           {sw("ascii", o.ascii)}
         </>
       )}
-      {codec === "rot" && sel("variant", o.rotv, "rot13", "w-44")}
-      {(codec === "caesar" || codec === "atbash") && sel("alphabet", o.alphabets, "both", "w-52")}
+      {codec === "rot" && seg("variant", o.rotv, "rot13")}
+      {(codec === "caesar" || codec === "atbash") && seg("alphabet", o.alphabets, "both")}
       {codec === "caesar" && (
-        <label className="flex items-center gap-2" htmlFor={`${id}-shift`}>
-          {t.shift}
-          <Input id={`${id}-shift`} size="sm" type="number" min={1} max={32} className="w-20" value={String(opts.shift ?? 3)} onChange={(e) => set("shift", Math.max(0, Math.min(32, Number(e.target.value) || 0)))} />
-        </label>
+        <Opt label={t.shift} htmlFor={`${id}-shift`}>
+          <NumberInput id={`${id}-shift`} size="sm" locale={locale} min={1} max={32} value={Number(opts.shift ?? 3)} onChange={(v) => v !== null && set("shift", v)} className="w-32" />
+        </Opt>
       )}
     </>
   );
 
   const dirLabels = cipher ? { encode: t.encrypt, decode: t.decrypt } : { encode: t.encode, decode: t.decode };
+  const canSwap = codec !== "rot" && codec !== "atbash";
+  const pending = big && live.pending;
 
   return (
-    <Panel className="p-4 sm:p-6">
-      {codec !== "rot" && codec !== "atbash" && (
-        <div className="mb-4 flex items-center gap-2">
-          <Segmented label={t.dir} value={dir} onChange={(d) => d !== dir && swap()} options={[{ value: "encode", label: dirLabels.encode }, { value: "decode", label: dirLabels.decode }]} size="sm" />
-        </div>
-      )}
-      <CodeEditor id={`${id}-in`} locale={locale} label={inName} value={text} onChange={setText} rows={5} wrap invalid={!!res?.error && !res.bytes} fileAccept="" />
+    <Panel className="flex flex-col gap-4 p-4 sm:p-6">
+      {canSwap && <Segmented label={t.dir} value={dir} onChange={(d) => d !== dir && swap()} options={[{ value: "encode", label: dirLabels.encode }, { value: "decode", label: dirLabels.decode }]} className="self-start" />}
 
-      <div className="mt-4 rounded-[0.625rem] bg-surface-2 p-4">
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <span className="text-sm font-medium text-fg-2">{outName}</span>
-          <div className="flex items-center gap-1">
-            {codec !== "rot" && codec !== "atbash" && (
-              <Button variant="ghost" size="sm" onClick={swap} disabled={!out} title={t.swap}>
-                <ArrowUpDown aria-hidden />
-                <span className="max-sm:sr-only">{t.swap}</span>
-              </Button>
-            )}
-            {out.length > 2000 && (
-              <Button variant="ghost" size="sm" onClick={() => downloadText(out, `${codec}-${dir}.txt`)}>
-                <Download aria-hidden />
-                <span className="max-sm:sr-only">{t.download}</span>
-              </Button>
-            )}
-            <CopyButton value={out} label={KIT_T[locale].copy} copiedLabel={KIT_T[locale].copied} variant="outline" />
-          </div>
+      <div className="grid gap-2 lg:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] lg:gap-3">
+        <CodeEditor id={`${id}-in`} locale={locale} label={inName} value={text} onChange={setText} rows={6} wrap invalid={!!res?.error && !res.bytes} fileAccept="" />
+
+        <div className="flex items-center justify-center">
+          {canSwap ? (
+            <IconButton
+              variant="tonal"
+              label={t.swap}
+              onClick={swap}
+              disabled={!out}
+              icon={
+                <>
+                  <ArrowUpDown aria-hidden className="lg:hidden" />
+                  <ArrowLeftRight aria-hidden className="max-lg:hidden" />
+                </>
+              }
+            />
+          ) : (
+            <ArrowDown aria-hidden className="size-5 text-fg-3 lg:-rotate-90" />
+          )}
         </div>
-        {res?.bytes ? (
-          <div className="mt-2 text-sm text-fg-2">
-            <p>{t.binary}</p>
-            <code className="mt-1 block font-mono text-[0.8125rem] break-all text-fg">{bytesToHex(res.bytes.slice(0, 64)).replace(/(..)/g, "$1 ")}</code>
-            <Button className="mt-2" size="sm" variant="outline" onClick={() => downloadBlob(new Blob([res.bytes as BlobPart]), "decoded.bin")}>
-              <Download aria-hidden />
-              {t.downloadBin} ({formatNumber(locale, res.bytes.length)} {plural(locale, res.bytes.length, t.bytes)})
-            </Button>
-          </div>
-        ) : res?.error ? (
-          <Notice tone="err" className="mt-2">
-            {errorText(res.error, locale, text)}
-          </Notice>
-        ) : (
-          <pre className={`mt-2 max-h-[45vh] min-h-8 overflow-auto font-mono break-all whitespace-pre-wrap text-fg ${out.length < 240 ? "text-lg font-semibold" : "text-sm"} ${big && live.pending ? "opacity-60" : ""}`}>{shown || (big && live.pending ? t.loading : "")}</pre>
-        )}
-        {out && (
-          <p className="mt-2 text-[0.8125rem] text-fg-3" aria-live="polite">
-            {formatNumber(locale, count)} {plural(locale, count, t.chars)}
-            {out.length > SHOW_MAX ? ` · ${t.truncated(formatNumber(locale, SHOW_MAX))}` : ""}
-          </p>
-        )}
+
+        <Pane
+          title={outName}
+          actions={
+            <>
+              {out.length > 2000 && <IconButton label={t.download} icon={<Download aria-hidden />} onClick={() => downloadText(out, `${codec}-${dir}.txt`)} />}
+              <CopyButton value={out} label={KIT_T[locale].copy} copiedLabel={KIT_T[locale].copied} variant="secondary" compact />
+            </>
+          }
+          footer={
+            out ? (
+              <span aria-live="polite">
+                {formatNumber(locale, count)} {plural(locale, count, t.chars)}
+                {out.length > SHOW_MAX ? ` · ${t.truncated(formatNumber(locale, SHOW_MAX))}` : ""}
+              </span>
+            ) : undefined
+          }
+        >
+          {res?.bytes ? (
+            <div className="flex flex-col items-start gap-2 px-4 py-3 text-sm text-fg-2">
+              <p>{t.binary}</p>
+              <code className="block font-mono text-[0.8125rem] break-all text-fg">{bytesToHex(res.bytes.slice(0, 64)).replace(/(..)/g, "$1 ")}</code>
+              <Button size="sm" variant="tonal" onClick={() => downloadBlob(new Blob([res.bytes as BlobPart]), "decoded.bin")}>
+                <Download aria-hidden />
+                {t.downloadBin} ({formatNumber(locale, res.bytes.length)} {plural(locale, res.bytes.length, t.bytes)})
+              </Button>
+            </div>
+          ) : res?.error ? (
+            <p role="alert" className="flex-1 px-4 py-3 text-[0.9375rem] font-medium text-err">
+              {errorText(res.error, locale, text)}
+            </p>
+          ) : (
+            <pre aria-live="polite" className={cn("max-h-[45vh] min-h-24 flex-1 overflow-auto px-4 py-3 font-mono break-all whitespace-pre-wrap text-fg motion-safe:transition-opacity", out.length < 240 ? "text-lg font-semibold sm:text-xl" : "text-sm", pending && "opacity-60")}>
+              {shown || (pending ? t.loading : "")}
+            </pre>
+          )}
+        </Pane>
       </div>
 
-      <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-3 text-sm text-fg-2 empty:hidden">{optionRow}</div>
+      <OptionsRow>{optionRow}</OptionsRow>
 
       {codec === "caesar" && dir === "decode" && text.trim() && !big && <AllShifts locale={locale} text={text} alphabet={String(opts.alphabet ?? "both")} />}
     </Panel>
@@ -360,16 +384,15 @@ function AllShifts({ locale, text, alphabet }: { locale: Locale; text: string; a
   const n = alphabet === "latin" ? 26 : 33;
   const sample = text.slice(0, 160);
   return (
-    <details className="mt-4 rounded-[0.625rem] border border-line">
-      <summary className="cursor-pointer px-3 py-2 text-sm font-medium text-fg-2">{t.allShifts}</summary>
-      <ol className="divide-y divide-line border-t border-line font-mono text-[0.8125rem]">
+    <Fold variant="inline" title={t.allShifts}>
+      <ol className="divide-y divide-line rounded-[1rem] bg-surface-2 font-mono text-[0.8125rem]">
         {Array.from({ length: n - 1 }, (_, i) => i + 1).map((s) => (
-          <li key={s} className="flex gap-3 px-3 py-1.5">
+          <li key={s} className="flex gap-3 px-4 py-1.5">
             <span className="w-6 shrink-0 text-right text-fg-3">{s}</span>
             <span className="min-w-0 break-all text-fg">{caesar(sample, -s, abc)}</span>
           </li>
         ))}
       </ol>
-    </details>
+    </Fold>
   );
 }

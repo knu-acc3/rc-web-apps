@@ -7,6 +7,8 @@ import { formatNumber, plural } from "@/i18n/format";
 import { cn } from "@/lib/cn";
 import { buttonClass } from "@/ui/button";
 import { CodeOutput } from "@/ui/code-output";
+import { Select } from "@/ui/field";
+import { Fold } from "@/ui/fold";
 import { graphemeCount } from "../lib/textOps";
 
 export const TX = {
@@ -96,6 +98,7 @@ export function InputPanel({
   footer,
   allowFile = true,
   className,
+  fieldClassName,
 }: {
   id: string;
   locale: Locale;
@@ -109,12 +112,14 @@ export function InputPanel({
   footer?: ReactNode;
   allowFile?: boolean;
   className?: string;
+  /** Extra classes of the textarea (e.g. a taller minimum height on desktop). */
+  fieldClassName?: string;
 }) {
   const t = TX[locale];
   const n = graphemeCount(value);
   return (
-    <div className={cn("flex min-w-0 flex-col overflow-hidden rounded-[0.75rem] border border-line bg-surface", className)}>
-      <div className="flex min-h-11 items-center justify-between gap-2 border-b border-line px-3 py-1.5">
+    <div className={cn("panel flex min-w-0 flex-col overflow-hidden", className)}>
+      <div className="flex min-h-12 items-center justify-between gap-2 border-b border-line py-1.5 pr-2 pl-4">
         <label htmlFor={id} className="min-w-0 truncate text-sm font-semibold text-fg">
           {label ?? t.input}
         </label>
@@ -136,8 +141,9 @@ export function InputPanel({
         placeholder={placeholder ?? t.placeholder}
         onChange={(e) => onChange(e.target.value)}
         className={cn(
-          "min-h-40 w-full resize-y bg-transparent px-3 py-2.5 leading-relaxed text-fg placeholder:text-fg-3 focus:outline-none",
-          mono ? "font-mono text-sm" : "text-[0.9375rem]",
+          "min-h-40 w-full resize-y bg-transparent px-4 py-3 leading-relaxed text-fg placeholder:text-fg-3 focus:outline-none",
+          mono ? "font-mono text-sm max-sm:text-base" : "text-base sm:text-[0.9375rem]",
+          fieldClassName,
         )}
       />
       {footer}
@@ -189,19 +195,13 @@ export function OptionsBar({ children, className }: { children: ReactNode; class
 /** Secondary options, collapsed by default so the tool has one focal point. */
 export function MoreOptions({ locale, children, className }: { locale: Locale; children: ReactNode; className?: string }) {
   return (
-    <details className={cn("group rounded-[0.75rem] border border-line bg-surface", className)}>
-      <summary className="flex cursor-pointer list-none items-center gap-2 px-4 py-2.5 text-sm font-medium text-fg-2 hover:text-fg">
-        <svg aria-hidden viewBox="0 0 24 24" className="size-4 transition-transform duration-150 group-open:rotate-90" fill="none" stroke="currentColor" strokeWidth="2">
-          <path d="m9 6 6 6-6 6" />
-        </svg>
-        {TX[locale].more}
-      </summary>
-      <div className="flex flex-wrap items-center gap-x-5 gap-y-3 border-t border-line px-4 py-3 text-sm">{children}</div>
-    </details>
+    <Fold variant="inline" title={TX[locale].more} className={className} bodyClassName="flex flex-wrap items-center gap-x-5 gap-y-3 text-sm">
+      {children}
+    </Fold>
   );
 }
 
-/** Small uncontrolled-label select row for options bars. */
+/** A labelled drop-down for options bars: the shared Material Select (tonal), sized to its longest option. */
 export function InlineSelect<T extends string>({
   id,
   label,
@@ -216,22 +216,18 @@ export function InlineSelect<T extends string>({
   options: readonly { value: T; label: string }[];
 }) {
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex min-w-0 max-w-full flex-wrap items-center gap-x-2 gap-y-1">
       <label htmlFor={id} className="text-sm text-fg-2">
         {label}
       </label>
-      <div className="relative">
-        <select id={id} value={value} onChange={(e) => onChange(e.target.value as T)} className="control h-9 appearance-none pr-8 text-sm">
-          {options.map((o) => (
-            <option key={o.value} value={o.value}>
-              {o.label}
-            </option>
-          ))}
-        </select>
-        <svg aria-hidden viewBox="0 0 24 24" className="pointer-events-none absolute right-2.5 top-1/2 size-4 -translate-y-1/2 text-fg-3" fill="none" stroke="currentColor" strokeWidth="2">
-          <path d="m6 9 6 6 6-6" />
-        </svg>
-      </div>
+      <Select id={id} value={value} onChange={(e) => onChange(e.target.value as T)} size="sm" variant="tonal" className="min-w-0 max-w-full">
+        {options.map((o) => (
+          <option key={o.value} value={o.value}>
+            {o.label}
+          </option>
+        ))}
+      </Select>
     </div>
   );
 }
+

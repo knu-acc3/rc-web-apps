@@ -6,7 +6,8 @@
  *
  *   <CalcGrid
  *     inputs={<>
- *       <NumField size="lg" …/>             primary inputs (1–3)
+ *       <NumSlider …/>                       numbers with a sensible range: value on the line + a slider
+ *       <NumField size="lg" …/>             free numbers (1–3)
  *       <OptionsRow>…</OptionsRow>           at most one quiet row of secondary options
  *       <Advanced title=…>…</Advanced>       rarely used inputs, collapsed
  *     </>}
@@ -18,7 +19,7 @@
  * output formatted with ./fmt, state in the URL via `useQueryState`, `aria-live` only on ResultMain.
  */
 
-import { Info, RotateCcw } from "lucide-react";
+import { ChevronDown, Info, RotateCcw } from "lucide-react";
 import type { ReactNode } from "react";
 import type { Locale } from "@/i18n/config";
 import { cn } from "@/lib/cn";
@@ -27,6 +28,10 @@ import { CopyButton } from "@/ui/copy-button";
 import { Field, Input, Select } from "@/ui/field";
 import { Notice, Panel } from "@/ui/panel";
 import { Segmented } from "@/ui/segmented";
+import { SliderField } from "@/ui/slider-field";
+import type { Scale } from "@/lib/slider-scale";
+import { fmtCompact } from "./fmt";
+import { parseLocaleNumber, toInput } from "./num";
 
 const K = {
   ru: {
@@ -106,6 +111,75 @@ export function NumField({
   );
 }
 
+/**
+ * A number with a sensible range — age, sum, rate, term: the value is written on the line (tap to type) and a slider
+ * under it changes it by dragging. Same text state as NumField. Money ranges use `scale="log"`; big ranges get short
+ * ends ("50 млн"). `aside` — a small unit or mode switch next to the label.
+ */
+export function NumSlider({
+  id,
+  locale,
+  label,
+  value,
+  onChange,
+  min,
+  max,
+  step,
+  scale,
+  suffix,
+  hint,
+  error,
+  decimals = 0,
+  inputMode,
+  ends,
+  aside,
+  className,
+}: {
+  id: string;
+  locale: Locale;
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  min: number;
+  max: number;
+  step?: number;
+  scale?: Scale;
+  suffix?: string;
+  hint?: ReactNode;
+  error?: ReactNode;
+  /** Decimals kept when dragging (rates: 1). */
+  decimals?: number;
+  inputMode?: "decimal" | "numeric";
+  /** Labels under the two ends of the track (default: min and max, shortened from 100 000). */
+  ends?: [ReactNode, ReactNode];
+  /** A small switch (units, % or amount) next to the label. */
+  aside?: ReactNode;
+  className?: string;
+}) {
+  const end = (n: number) => (Math.abs(n) >= 100_000 ? fmtCompact(locale, n) : toInput(locale, n, decimals));
+  return (
+    <SliderField
+      id={id}
+      label={label}
+      value={value}
+      onChange={onChange}
+      parse={(t) => parseLocaleNumber(locale, t)}
+      format={(n) => toInput(locale, n, decimals)}
+      min={min}
+      max={max}
+      step={step ?? (decimals > 0 ? 10 ** -decimals : undefined)}
+      scale={scale}
+      suffix={suffix}
+      hint={hint}
+      error={error}
+      ends={ends ?? [end(min), end(max)]}
+      inputMode={inputMode ?? "decimal"}
+      aside={aside}
+      className={className}
+    />
+  );
+}
+
 interface Option<T extends string> {
   value: T;
   label: string;
@@ -146,6 +220,11 @@ export function SelectField<T extends string>({
 /** Two inputs side by side (stacks below 480px). */
 export function FieldRow({ children, className }: { children: ReactNode; className?: string }) {
   return <div className={cn("grid items-end gap-3 min-[480px]:grid-cols-2", className)}>{children}</div>;
+}
+
+/** Two or three sliders side by side (stacks below 480px), tops aligned. */
+export function SliderRow({ children, cols = 2, className }: { children: ReactNode; cols?: 2 | 3; className?: string }) {
+  return <div className={cn("grid items-start gap-x-6 gap-y-5", cols === 3 ? "min-[480px]:grid-cols-3" : "min-[480px]:grid-cols-2", className)}>{children}</div>;
 }
 
 /** The single quiet row of secondary options (small segmented controls / selects). */
@@ -205,17 +284,45 @@ export function InlineToggle<T extends string>({
   );
 }
 
-/** Rarely used inputs, collapsed by default. */
+/** A labelled choice of 2–5 options as segmented buttons (wraps into pills when it doesn't fit). */
+export function ToggleField<T extends string>({
+  label,
+  value,
+  onChange,
+  options,
+  size = "sm",
+  fill,
+  className,
+}: {
+  label: string;
+  value: T;
+  onChange: (v: T) => void;
+  options: readonly { value: T; label: ReactNode; title?: string }[];
+  size?: "sm" | "md";
+  fill?: boolean;
+  className?: string;
+}) {
+  return (
+    <div className={cn("flex min-w-0 flex-col gap-2", className)}>
+      <span aria-hidden className="text-sm font-medium text-fg-2">
+        {label}
+      </span>
+      <Segmented size={size} fill={fill} label={label} value={value} onChange={onChange} options={options} />
+    </div>
+  );
+}
+
+/** Rarely used inputs, collapsed by default: a text button with a chevron. */
 export function Advanced({ title, children, open }: { title: ReactNode; children: ReactNode; open?: boolean }) {
   return (
-    <details className="group border-t border-line pt-3" open={open || undefined}>
-      <summary className="flex cursor-pointer items-center gap-1.5 text-sm font-medium text-fg-2 hover:text-fg">
-        <span aria-hidden className="inline-block transition-transform duration-150 group-open:rotate-90">
-          ›
+    <details className="fold fold-inline group -ml-2" open={open || undefined}>
+      <summary>
+        <span className="fold-i" aria-hidden>
+          <ChevronDown className="size-4" />
         </span>
         {title}
       </summary>
-      <div className="mt-3 flex flex-col gap-3">{children}</div>
+      <div className="mt-2 flex flex-col gap-4 pl-2">{children}</div>
     </details>
   );
 }
@@ -226,7 +333,7 @@ export function Advanced({ title, children, open }: { title: ReactNode; children
 export function CalcGrid({ inputs, result, className }: { inputs: ReactNode; result: ReactNode; className?: string }) {
   return (
     <div className={cn("grid items-start gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-6", className)}>
-      <Panel className="flex min-w-0 flex-col gap-4 p-4 sm:p-5">{inputs}</Panel>
+      <Panel className="flex min-w-0 flex-col gap-5 p-4 sm:p-6">{inputs}</Panel>
       <div className="flex min-w-0 flex-col gap-4 lg:sticky lg:top-20">{result}</div>
     </div>
   );
@@ -269,8 +376,8 @@ export function ResultMain({
   size?: "md" | "lg";
 }) {
   return (
-    <div className={cn("min-w-0 rounded-[0.75rem] bg-accent-soft p-5 sm:p-6", className)}>
-      <div className="text-sm font-medium text-fg-2">{label}</div>
+    <div className={cn("min-w-0 rounded-[1.25rem] bg-accent-soft p-5 sm:p-6", className)}>
+      <div className="text-sm font-medium text-fg-2 [overflow-wrap:anywhere]">{label}</div>
       <div
         aria-live="polite"
         aria-atomic="true"
@@ -287,12 +394,12 @@ export function ResultMain({
       {rows && rows.length > 0 && (
         <dl className="mt-4 divide-y divide-[color-mix(in_oklab,var(--accent)_14%,transparent)] border-t border-[color-mix(in_oklab,var(--accent)_14%,transparent)]">
           {rows.map((r, i) => (
-            <div key={i} className="flex items-baseline justify-between gap-4 py-2">
-              <dt className="min-w-0 text-sm text-fg-2">
+            <div key={i} className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-0.5 py-2">
+              <dt className="min-w-0 flex-[1_1_9rem] text-sm text-fg-2">
                 {r.label}
                 {r.hint && <span className="block text-[0.75rem] text-fg-3">{r.hint}</span>}
               </dt>
-              <dd className="tabular shrink-0 text-right text-[0.9375rem] font-semibold text-fg">{r.value}</dd>
+              <dd className="tabular ml-auto min-w-0 max-w-full text-right text-[0.9375rem] font-semibold text-fg [overflow-wrap:anywhere]">{r.value}</dd>
             </div>
           ))}
         </dl>
@@ -307,14 +414,14 @@ export function ResultRows({ rows, title, className }: { rows: ResultRow[]; titl
   return (
     <section className={cn("min-w-0", className)}>
       {title && <h2 className="mb-2 text-base font-semibold text-fg">{title}</h2>}
-      <dl className="divide-y divide-line overflow-hidden rounded-[0.75rem] border border-line bg-surface">
+      <dl className="panel divide-y divide-line overflow-hidden">
         {rows.map((r, i) => (
-          <div key={i} className="flex items-baseline justify-between gap-4 px-4 py-2.5">
-            <dt className="min-w-0 text-[0.9375rem] text-fg-2">
+          <div key={i} className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-0.5 px-4 py-2.5">
+            <dt className="min-w-0 flex-[1_1_9rem] text-[0.9375rem] text-fg-2">
               {r.label}
               {r.hint && <span className="block text-[0.8125rem] text-fg-3">{r.hint}</span>}
             </dt>
-            <dd className="tabular shrink-0 text-right font-semibold text-fg">{r.value}</dd>
+            <dd className="tabular ml-auto min-w-0 max-w-full text-right font-semibold text-fg [overflow-wrap:anywhere]">{r.value}</dd>
           </div>
         ))}
       </dl>
@@ -344,9 +451,10 @@ export function Explain({
     <section className={cn("min-w-0", className)}>
       <h2 className="text-base font-semibold text-fg">{title ?? K[locale].how}</h2>
       {formula && formula.length > 0 && (
-        <div className="mt-3 overflow-x-auto rounded-[0.625rem] border border-line bg-surface px-4 py-3 font-mono text-[0.8125rem] leading-relaxed text-fg sm:text-sm">
+        <div className="mt-3 flex flex-col gap-2 rounded-[1rem] bg-surface-2 px-4 py-3 font-mono text-[0.8125rem] leading-relaxed text-fg sm:text-sm">
           {formula.map((l, i) => (
-            <div key={i} className="whitespace-pre">
+            // Long formulas wrap (with a hanging indent) instead of running off a phone screen.
+            <div key={i} className="whitespace-pre-wrap pl-4 -indent-4 [overflow-wrap:anywhere]">
               {l}
             </div>
           ))}
@@ -433,7 +541,10 @@ export function DataTable({
 
 /* ───────────── Actions & notices ───────────── */
 
-/** Quiet "Link to this result" + "Reset" (+ extra buttons as children). Put it in ResultMain `actions`. */
+/**
+ * "Link to this result" + "Reset" (+ extra buttons as children) as raised buttons, so they read as buttons on the
+ * tinted result card. Put it in ResultMain `actions`.
+ */
 export function ToolActions({
   locale,
   onReset,
@@ -449,11 +560,11 @@ export function ToolActions({
 }) {
   const t = K[locale];
   return (
-    <div className={cn("-ml-2 flex flex-wrap items-center gap-1", className)}>
+    <div className={cn("flex flex-wrap items-center gap-2", className)}>
       {children}
-      {shareUrl && <CopyButton value={shareUrl} label={t.copyLink} copiedLabel={t.linkCopied} variant="ghost" size="sm" />}
+      {shareUrl && <CopyButton value={shareUrl} label={t.copyLink} copiedLabel={t.linkCopied} variant="elevated" size="sm" />}
       {onReset && (
-        <Button variant="ghost" size="sm" onClick={onReset}>
+        <Button variant="elevated" size="sm" onClick={onReset}>
           <RotateCcw aria-hidden />
           {t.reset}
         </Button>
@@ -461,6 +572,7 @@ export function ToolActions({
     </div>
   );
 }
+
 
 /** Standard disclaimers. `kind="medical"` is mandatory on every health page. */
 export function Disclaimer({ locale, kind, children, className }: { locale: Locale; kind?: "medical" | "finance"; children?: ReactNode; className?: string }) {

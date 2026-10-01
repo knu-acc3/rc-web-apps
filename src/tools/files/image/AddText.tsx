@@ -1,9 +1,9 @@
 "use client";
 
-import { AlignCenter, AlignLeft, AlignRight, Download, Loader2, Plus, Trash2, Settings2 } from "lucide-react";
+import { AlignCenter, AlignLeft, AlignRight, Download, Loader2, Plus, Trash2 } from "lucide-react";
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 import type { Locale } from "@/i18n/config";
-import { Button } from "@/ui/button";
+import { Button, IconButton } from "@/ui/button";
 import { Field, Select, Switch, Textarea } from "@/ui/field";
 import { Panel } from "@/ui/panel";
 import { Segmented } from "@/ui/segmented";
@@ -16,6 +16,7 @@ import { FONTS, fontCss } from "./ui/fonts";
 import { DEFAULT_QUALITY, LOSSY, sameFormat } from "./ui/format";
 import { useEngine } from "./ui/hooks";
 import { ImageStage } from "./ui/ImageStage";
+import { OptionsBar, ToolColumns } from "./ui/OptionsBar";
 import { usePreviewBitmap } from "./ui/LiveStage";
 import { SingleImageShell, useExport, useSingleFile } from "./ui/SingleImage";
 import { errorText, S } from "./ui/strings";
@@ -175,7 +176,6 @@ function BlockEditor({ b, set, locale, compact }: { b: B; set: (p: Partial<B>) =
       <RangeField label={t.strokeWidth} value={b.strokeWidth} onChange={(v) => set({ strokeWidth: v })} min={0} max={30} unit="%" locale={locale} />
       <Field label={t.align}>
         <Segmented
-          wrap
           label={t.align}
           value={b.align}
           onChange={(v) => set({ align: v })}
@@ -205,7 +205,6 @@ function BlockEditor({ b, set, locale, compact }: { b: B; set: (p: Partial<B>) =
 
 export default function AddText({ locale, mode: mode0 = "photo" }: { locale: Locale; mode?: "photo" | "quote" | "date" }) {
   const t = T[locale];
-  const s = S(locale);
   const id = useId();
   const getEngine = useEngine();
   const [mode, setMode] = useState<"photo" | "quote" | "date">(mode0);
@@ -260,69 +259,65 @@ export default function AddText({ locale, mode: mode0 = "photo" }: { locale: Loc
     set({ x: Math.min(1, Math.max(0, (e.clientX - r.left) / r.width)), y: Math.min(1, Math.max(0, (e.clientY - r.top) / r.height)), anchor: "middle" });
   };
 
-  const doExport = () => {
+  const doExport = (download = true) => {
     const p = file.prepared;
-    if (!p) return;
-    exp.run(async (signal, onProgress) => {
-      const fmt = sameFormat(p.format);
-      const res = await processFile(
-        getEngine(),
-        p,
-        [{ t: "text", blocks: shown }],
-        { format: fmt, quality: LOSSY.has(fmt) ? 92 : DEFAULT_QUALITY[fmt], background: "#FFFFFF" },
-        { signal, onProgress },
-      );
-      return { blob: toBlob(res), name: `${baseName(p.file.name)}-${mode === "date" ? "date" : "text"}.${res.ext}` };
-    });
+    if (!p) return null;
+    return exp.run(
+      async (signal, onProgress) => {
+        const fmt = sameFormat(p.format);
+        const res = await processFile(
+          getEngine(),
+          p,
+          [{ t: "text", blocks: shown }],
+          { format: fmt, quality: LOSSY.has(fmt) ? 92 : DEFAULT_QUALITY[fmt], background: "#FFFFFF" },
+          { signal, onProgress },
+        );
+        return { blob: toBlob(res), name: `${baseName(p.file.name)}-${mode === "date" ? "date" : "text"}.${res.ext}` };
+      },
+      { download },
+    );
   };
 
   const blockTabs = (
-    <div className="flex items-end gap-1.5">
-      <Field label={t.block}>
+    <Field label={t.block}>
+      <div className="flex items-center gap-1">
         <Segmented
-          wrap
+          size="sm"
+          className="min-w-0"
           label={t.block}
           value={String(sel)}
           onChange={(v) => setSel(Number(v))}
           options={blocks.map((_, i) => ({ value: String(i), label: names(i) }))}
         />
-      </Field>
-      <Button
-        variant="ghost"
-        size="icon"
-        aria-label={t.add}
-        title={t.add}
-        onClick={() => {
-          setBlocks((bs) => [...bs, { ...meme(0.5, "middle"), size: 7 }]);
-          setSel(blocks.length);
-        }}
-      >
-        <Plus aria-hidden />
-      </Button>
-      {blocks.length > 1 && (
-        <Button
-          variant="ghost"
-          size="icon"
-          aria-label={t.del}
-          title={t.del}
+        <IconButton
+          label={t.add}
+          icon={<Plus aria-hidden />}
           onClick={() => {
-            setBlocks((bs) => bs.filter((_, i) => i !== sel));
-            setSel(0);
+            setBlocks((bs) => [...bs, { ...meme(0.5, "middle"), size: 7 }]);
+            setSel(blocks.length);
           }}
-        >
-          <Trash2 aria-hidden />
-        </Button>
-      )}
-    </div>
+        />
+        {blocks.length > 1 && (
+          <IconButton
+            label={t.del}
+            icon={<Trash2 aria-hidden />}
+            onClick={() => {
+              setBlocks((bs) => bs.filter((_, i) => i !== sel));
+              setSel(0);
+            }}
+          />
+        )}
+      </div>
+    </Field>
   );
 
   const textField = (
-    <Field label={`${t.text}: ${names(sel).toLowerCase()}`} htmlFor={`${id}-text`} className="min-w-56 flex-1">
+    <Field label={`${t.text}: ${names(sel).toLowerCase()}`} htmlFor={`${id}-text`}>
       <Textarea id={`${id}-text`} value={cur.text} onChange={(e) => set({ text: e.target.value })} rows={2} className="min-h-0! font-sans! text-[0.9375rem]!" />
     </Field>
   );
   const fontField = (
-    <Field label={t.font} htmlFor={`${id}-font`} className="w-44">
+    <Field label={t.font} htmlFor={`${id}-font`}>
       <Select id={`${id}-font`} value={cur.fontId} onChange={(e) => set({ fontId: e.target.value })}>
         {FONTS.map((f) => (
           <option key={f.id} value={f.id}>
@@ -335,7 +330,6 @@ export default function AddText({ locale, mode: mode0 = "photo" }: { locale: Loc
 
   const modeSwitch = (
     <Segmented
-      wrap
       label={t.mode}
       value={mode}
       onChange={(m) => {
@@ -397,21 +391,30 @@ export default function AddText({ locale, mode: mode0 = "photo" }: { locale: Loc
         file={file}
         exp={exp}
         onExport={doExport}
+        next
+        self="add-text"
         exportLabel={t.download}
         options={
           mode === "date" ? (
             <>
               {modeSwitch}
               <Field label={t.style}>
-                <Segmented wrap label={t.style} value={dateStyle} onChange={setDateStyle} options={(["camera", "dmy", "dmyhm"] as const).map((v) => ({ value: v, label: t.styles[v] }))} />
+                <Segmented
+                  label={t.style}
+                  value={dateStyle}
+                  onChange={setDateStyle}
+                  options={(["camera", "dmy", "dmyhm"] as const).map((v) => ({ value: v, label: t.styles[v] }))}
+                />
               </Field>
-              <Field label={t.when} htmlFor={`${id}-when`} className="w-56" hint={stampDate ? (stampDate.exif ? t.fromExif : t.fromFile) : undefined}>
+              <Field label={t.when} htmlFor={`${id}-when`} hint={stampDate ? (stampDate.exif ? t.fromExif : t.fromFile) : undefined}>
                 <input
                   id={`${id}-when`}
                   type="datetime-local"
                   className="control h-10 pointer-coarse:h-11"
                   value={stampDate ? toLocalInput(stampDate.date) : ""}
-                  onChange={(e) => prepared && e.target.value && setStamp({ file: prepared.id, date: new Date(e.target.value), exif: stampDate?.exif ?? false })}
+                  onChange={(e) =>
+                    prepared && e.target.value && setStamp({ file: prepared.id, date: new Date(e.target.value), exif: stampDate?.exif ?? false })
+                  }
                 />
               </Field>
             </>
@@ -445,7 +448,6 @@ export default function AddText({ locale, mode: mode0 = "photo" }: { locale: Loc
           </ImageStage>
         }
       />
-      {!file.prepared && <p className="text-sm text-fg-3">{s.dropHint}</p>}
     </div>
   );
 }
@@ -512,66 +514,64 @@ function QuoteCard({
   }
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="rounded-[0.75rem] border border-line bg-surface">
-        <div className="flex flex-wrap items-end gap-x-4 gap-y-3 px-4 py-3">
+    <ToolColumns
+      side={
+        <OptionsBar
+          locale={locale}
+          more={
+            <>
+              <Field label={t.format}>
+                <Segmented label={t.format} value={card} onChange={setCard} options={CARDS.map((c) => ({ value: c.value, label: `${c.w}×${c.h}` }))} />
+              </Field>
+              <Field label={t.bg}>
+                <Segmented
+                  label={t.bg}
+                  value={bgKind}
+                  onChange={setBgKind}
+                  options={[
+                    { value: "gradient", label: t.gradient },
+                    { value: "solid", label: t.solid },
+                  ]}
+                />
+              </Field>
+              <ColorField label={t.bg1} value={bg1} onChange={setBg1} locale={locale} />
+              {bgKind === "gradient" && <ColorField label={t.bg2} value={bg2} onChange={setBg2} locale={locale} />}
+              {editor}
+            </>
+          }
+        >
           {modeSwitch}
           {blockTabs}
           {textField}
           {fontField}
-        </div>
-        <details className="border-t border-line">
-          <summary className="flex cursor-pointer items-center gap-2 px-4 py-2.5 text-sm text-fg-2 hover:text-fg">
-            <Settings2 className="size-4" aria-hidden />
-            {locale === "ru" ? "Дополнительно" : "More options"}
-          </summary>
-          <div className="grid gap-4 px-4 pb-4 pt-1 sm:grid-cols-2">
-            <Field label={t.format}>
-              <Segmented wrap label={t.format} value={card} onChange={setCard} options={CARDS.map((c) => ({ value: c.value, label: `${c.w}×${c.h}` }))} />
-            </Field>
-            <Field label={t.bg}>
-              <Segmented
-                wrap
-                label={t.bg}
-                value={bgKind}
-                onChange={setBgKind}
-                options={[
-                  { value: "gradient", label: t.gradient },
-                  { value: "solid", label: t.solid },
-                ]}
-              />
-            </Field>
-            <ColorField label={t.bg1} value={bg1} onChange={setBg1} locale={locale} />
-            {bgKind === "gradient" && <ColorField label={t.bg2} value={bg2} onChange={setBg2} locale={locale} />}
-            {editor}
-          </div>
-        </details>
-      </div>
-      <Panel className="overflow-hidden">
-        <div className={`flex justify-center p-3 sm:p-4 ${checker}`}>
+        </OptionsBar>
+      }
+    >
+      <Panel className="flex min-w-0 flex-col gap-3 p-3 sm:gap-4 sm:p-4">
+        <div className={`flex justify-center rounded-[1rem] p-3 sm:p-4 ${checker}`}>
           <canvas
             ref={canvasRef}
             role="img"
             aria-label={blocks.map((b) => b.text).join(" ")}
-            className="block h-auto max-h-[65vh] w-auto max-w-full rounded-[0.375rem]"
+            className="block h-auto max-h-[65vh] w-auto max-w-full rounded-[0.375rem] shadow-elev-1"
           />
         </div>
-        <div className="flex flex-col gap-3 border-t border-line px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
-          <p className="tabular text-2xl font-semibold tracking-tight text-fg" aria-live="polite">
+        <div className="flex flex-col gap-3 px-1 sm:flex-row sm:items-center sm:justify-between">
+          <p className="tabular text-2xl font-semibold tracking-tight text-fg sm:text-3xl" aria-live="polite">
             {size.w} × {size.h} px <span className="text-base font-normal text-fg-3">PNG</span>
           </p>
-          <Button variant="primary" size="lg" onClick={download} disabled={busy}>
+          <Button variant="filled" size="lg" onClick={download} disabled={busy}>
             {busy ? <Loader2 className="animate-spin" aria-hidden /> : <Download aria-hidden />}
             {t.download}
           </Button>
         </div>
         {error ? (
-          <p className="border-t border-line px-4 py-2.5 text-[0.8125rem] text-err" role="alert">
+          <p className="px-1 text-[0.8125rem] text-err" role="alert">
             {errorText(locale, error)}
           </p>
         ) : null}
+        <p className="sr-only">{s.processingIn}</p>
       </Panel>
-      <p className="sr-only">{s.processingIn}</p>
-    </div>
+    </ToolColumns>
   );
 }

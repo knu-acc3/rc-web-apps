@@ -1,14 +1,16 @@
 "use client";
 
-import { ArrowUpDown, Download, Play, Square } from "lucide-react";
+import { ArrowLeftRight, ArrowUpDown, Download, Play, Square } from "lucide-react";
 import { useId, useMemo, useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { downloadBlob } from "@/lib/clipboard";
+import { cn } from "@/lib/cn";
 import { CodeEditor } from "@/tools/dev/shared/CodeEditor";
 import { KIT_T } from "@/tools/dev/shared/labels";
-import { Button } from "@/ui/button";
+import { Opt, OptionsRow, Pane } from "@/tools/dev/shared/Pane";
+import { Button, IconButton } from "@/ui/button";
 import { CopyButton } from "@/ui/copy-button";
-import { Select } from "@/ui/field";
+import { Select, Slider } from "@/ui/field";
 import { Notice, Panel } from "@/ui/panel";
 import { Segmented } from "@/ui/segmented";
 import { decodeMorse, encodeMorse, morseTimeline, renderWav } from "./lib/morse";
@@ -97,7 +99,7 @@ export default function MorseTool({ locale, dir: dir0 = "encode", sample }: { lo
   const noteText = (n: { code: string; detail?: string }) => (n.code === "morse.kazakh" ? t.kazakh(n.detail ?? "") : n.code === "morse.unknown" ? t.unknown(n.detail ?? "") : t.badCode(n.detail ?? ""));
 
   return (
-    <Panel className="p-4 sm:p-6">
+    <Panel className="flex flex-col gap-4 p-4 sm:p-6">
       <Segmented
         label={t.dir}
         value={dir}
@@ -106,85 +108,90 @@ export default function MorseTool({ locale, dir: dir0 = "encode", sample }: { lo
           { value: "encode", label: t.encode },
           { value: "decode", label: t.decode },
         ]}
-        size="sm"
-        className="mb-4"
+        className="self-start"
       />
-      <CodeEditor id={`${id}-in`} locale={locale} label={dir === "encode" ? t.text : t.code} value={text} onChange={setText} rows={4} wrap />
-
-      <div className="mt-4 rounded-[0.625rem] bg-surface-2 p-4">
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <span className="flex items-center gap-2 text-sm font-medium text-fg-2">
-            <span className={`inline-block size-3 rounded-full transition-colors duration-75 ${player.light ? "bg-accent" : "bg-line-strong"}`} role="img" aria-label={t.light} />
-            {dir === "encode" ? t.code : t.text}
-          </span>
-          <div className="flex items-center gap-1">
-            <Button variant="ghost" size="sm" onClick={swap} disabled={!res.text} title={t.swap}>
-              <ArrowUpDown aria-hidden />
-              <span className="max-sm:sr-only">{t.swap}</span>
-            </Button>
-            <Button variant="ghost" size="sm" onClick={wav} disabled={!code.trim()}>
-              <Download aria-hidden />
-              {t.wav}
-            </Button>
-            <CopyButton value={res.text} label={KIT_T[locale].copy} copiedLabel={KIT_T[locale].copied} variant="outline" />
-          </div>
+      <div className="grid gap-2 lg:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] lg:gap-3">
+        <CodeEditor id={`${id}-in`} locale={locale} label={dir === "encode" ? t.text : t.code} value={text} onChange={setText} rows={5} wrap />
+        <div className="flex items-center justify-center">
+          <IconButton
+            variant="tonal"
+            label={t.swap}
+            onClick={swap}
+            disabled={!res.text}
+            icon={
+              <>
+                <ArrowUpDown aria-hidden className="lg:hidden" />
+                <ArrowLeftRight aria-hidden className="max-lg:hidden" />
+              </>
+            }
+          />
         </div>
-        <output className="mt-2 block min-h-8 font-mono text-xl font-semibold tracking-wide break-words whitespace-pre-wrap text-fg" aria-live="polite">
-          {res.text}
-        </output>
-        <Button className="mt-3" variant="primary" onClick={() => (player.playing ? player.stop() : player.play(code, audio))} disabled={!code.trim()}>
-          {player.playing ? <Square aria-hidden /> : <Play aria-hidden />}
-          {player.playing ? t.stop : t.play}
-        </Button>
+        <Pane
+          title={
+            <span className="flex items-center gap-2">
+              <span className={cn("inline-block size-3 shrink-0 rounded-full transition-colors duration-75", player.light ? "bg-accent shadow-[0_0_0_4px_var(--accent-soft)]" : "bg-line-strong")} role="img" aria-label={t.light} />
+              {dir === "encode" ? t.code : t.text}
+            </span>
+          }
+          actions={
+            <>
+              <Button variant="text" size="sm" className="px-3!" onClick={wav} disabled={!code.trim()} title={`${t.wav} — ${KIT_T[locale].download}`}>
+                <Download aria-hidden />
+                {t.wav}
+              </Button>
+              <CopyButton value={res.text} label={KIT_T[locale].copy} copiedLabel={KIT_T[locale].copied} variant="secondary" compact />
+            </>
+          }
+        >
+          <output className="block min-h-24 flex-1 px-4 py-3 font-mono text-xl font-semibold tracking-wide break-words whitespace-pre-wrap text-fg sm:text-2xl" aria-live="polite">
+            {res.text}
+          </output>
+        </Pane>
       </div>
 
       {notes.map((n, i) => (
-        <Notice key={i} tone="warn" className="mt-3">
+        <Notice key={i} tone="warn">
           {noteText(n)}
         </Notice>
       ))}
 
-      <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-3 text-sm text-fg-2">
-        {dir === "decode" && (
-          <label className="flex items-center gap-2">
-            {t.alphabet}
-            <Select value={alphabet} size="sm" className="w-36" onChange={(e) => setAlphabet(e.target.value as "latin" | "cyrillic")}>
-              <option value="latin">{t.latin}</option>
-              <option value="cyrillic">{t.cyrillic}</option>
+      <div className="flex flex-wrap items-center gap-x-6 gap-y-4">
+        <Button variant="filled" size="lg" onClick={() => (player.playing ? player.stop() : player.play(code, audio))} disabled={!code.trim()}>
+          {player.playing ? <Square aria-hidden /> : <Play aria-hidden />}
+          {player.playing ? t.stop : t.play}
+        </Button>
+        <OptionsRow>
+          {dir === "decode" && (
+            <Opt label={t.alphabet} group>
+              <Segmented
+                size="sm"
+                label={t.alphabet}
+                value={alphabet}
+                onChange={setAlphabet}
+                options={[
+                  { value: "cyrillic", label: t.cyrillic },
+                  { value: "latin", label: t.latin },
+                ]}
+              />
+            </Opt>
+          )}
+          <Opt label={`${t.wpm}: ${wpm} ${t.wpmUnit}`}>
+            <Slider min={5} max={40} step={1} value={wpm} onChange={(e) => setWpm(Number(e.target.value))} className="w-40!" />
+          </Opt>
+          <Opt label={`${t.freq}: ${freq} Hz`}>
+            <Slider min={300} max={1000} step={50} value={freq} onChange={(e) => setFreq(Number(e.target.value))} className="w-40!" />
+          </Opt>
+          <Opt label={t.fwpm}>
+            <Select value={String(fwpm)} size="sm" onChange={(e) => setFwpm(Number(e.target.value))}>
+              <option value="0">{t.off}</option>
+              {[5, 8, 10, 12, 15].map((v) => (
+                <option key={v} value={v}>
+                  {v} {t.wpmUnit}
+                </option>
+              ))}
             </Select>
-          </label>
-        )}
-        <label className="flex items-center gap-2">
-          {t.wpm}
-          <Select value={String(wpm)} size="sm" className="w-32" onChange={(e) => setWpm(Number(e.target.value))}>
-            {[5, 8, 10, 12, 15, 18, 20, 25, 30, 35, 40].map((v) => (
-              <option key={v} value={v}>
-                {v} {t.wpmUnit}
-              </option>
-            ))}
-          </Select>
-        </label>
-        <label className="flex items-center gap-2">
-          {t.fwpm}
-          <Select value={String(fwpm)} size="sm" className="w-32" onChange={(e) => setFwpm(Number(e.target.value))}>
-            <option value="0">{t.off}</option>
-            {[5, 8, 10, 12, 15].map((v) => (
-              <option key={v} value={v}>
-                {v} {t.wpmUnit}
-              </option>
-            ))}
-          </Select>
-        </label>
-        <label className="flex items-center gap-2">
-          {t.freq}
-          <Select value={String(freq)} size="sm" className="w-28" onChange={(e) => setFreq(Number(e.target.value))}>
-            {[400, 500, 600, 700, 800, 1000].map((v) => (
-              <option key={v} value={v}>
-                {v} Hz
-              </option>
-            ))}
-          </Select>
-        </label>
+          </Opt>
+        </OptionsRow>
       </div>
     </Panel>
   );

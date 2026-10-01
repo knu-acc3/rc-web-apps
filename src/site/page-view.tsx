@@ -27,7 +27,6 @@ export function PageView({ page, locale }: { page: PageModel; locale: Locale }) 
   const layout = layoutOf(page);
   const centred = layout === "file";
   const compactHead = page.compactHeader || layout === "screen";
-  const narrow = !page.wide && layout !== "reference";
   // The next thing people usually do: the first related tools, right under the result — minus the ones the family tabs
   // above the tool already show.
   const family = page.kind === "tool" || page.kind === "variant" ? familyOf(page.path[0]) : undefined;
@@ -38,7 +37,7 @@ export function PageView({ page, locale }: { page: PageModel; locale: Locale }) 
     <div className="tone" style={toneVars(page.hue) as React.CSSProperties}>
       <JsonLd data={pageJsonLd(page, locale)} />
       <section className="stage">
-        <div className={cn("container-page pb-8 pt-3 sm:pb-10 sm:pt-4", narrow && "lg:max-w-[68rem]")}>
+        <div className="container-page pb-8 pt-3 sm:pb-10 sm:pt-4">
           <div className="mb-3 flex min-h-9 items-center justify-between gap-3">
             <Breadcrumbs items={page.breadcrumbs} current={page.h1} locale={locale} className="mb-0! min-w-0 flex-1" />
             {page.kind !== "hub" && <PageActions path={page.path} title={page.h1} locale={locale} />}
@@ -53,7 +52,7 @@ export function PageView({ page, locale }: { page: PageModel; locale: Locale }) 
           </header>
 
           {page.tool && (
-            <div className={cn(centred && "mx-auto max-w-3xl")}>
+            <div>
               {(page.kind === "tool" || page.kind === "variant") && <FamilyTabs slug={page.path[0]} locale={locale} />}
               <p className="js-note mb-4 rounded-[0.75rem] bg-warn-soft px-4 py-3 text-sm text-warn">
                 <TriangleAlert className="mr-1.5 inline size-4 align-[-3px]" aria-hidden />
@@ -88,11 +87,16 @@ export function PageView({ page, locale }: { page: PageModel; locale: Locale }) 
         </div>
       </section>
 
-      <div className={cn("container-page flex flex-col gap-11 pb-16 pt-9 sm:gap-12 sm:pt-10", narrow && "lg:max-w-[68rem]")}>
+      <div className="container-page flex flex-col gap-11 pb-16 pt-9 sm:gap-12 sm:pt-10">
         {page.topBlocks?.map((b, i) => <BlockView key={`t${i}`} block={b} locale={locale} />)}
         {page.blocks?.filter((b) => !(b.type === "text" && b.fold)).map((b, i) => <BlockView key={`b${i}`} block={b} locale={locale} />)}
-        {page.howTo && page.howTo.length > 0 && <HowTo steps={page.howTo} title={t.howTo} />}
-        {page.faq && page.faq.length > 0 && <Faq items={page.faq} title={t.faq} />}
+        {/* Wide screens: the steps and the questions side by side instead of one long column. */}
+        {(page.howTo?.length || page.faq?.length) && (
+          <div className="grid items-start gap-11 sm:gap-12 xl:grid-cols-2 xl:gap-10">
+            {page.howTo && page.howTo.length > 0 && <HowTo steps={page.howTo} title={t.howTo} />}
+            {page.faq && page.faq.length > 0 && <Faq items={page.faq} title={t.faq} />}
+          </div>
+        )}
         {page.blocks?.filter((b) => b.type === "text" && b.fold).map((b, i) => <BlockView key={`f${i}`} block={b} locale={locale} />)}
         {page.related && (page.tool ? nextAll.length > next.length : page.related.length > 0) && (
           <section>

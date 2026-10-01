@@ -8,15 +8,16 @@ import { FilePanel } from "./ui/FilePanel";
 import { JobStatus, ResultCard, baseName, pdfBlob, type OutputItem } from "./ui/Result";
 import { useJob } from "./ui/use-job";
 import { usePdfFiles } from "./ui/use-pdf-files";
+import { Workspace } from "./ui/Workspace";
 
 const T = {
   ru: {
-    intro: "Если файл просит пароль при открытии, введите его выше. Файлы, которые открываются без пароля, но запрещают печать или копирование, разблокируются сразу.",
+    intro: "Если файл просит пароль при открытии, введите его выше; запреты на печать и копирование снимаются без пароля.",
     go: "Снять пароль",
     done: "Шифрование и ограничения сняты — файл открывается без пароля в любой программе.",
   },
   en: {
-    intro: "If the file asks for a password when opened, enter it above. Files that open without a password but block printing or copying are unlocked right away.",
+    intro: "If the file asks for a password when opened, enter it above; print and copy restrictions are removed without one.",
     go: "Remove password",
     done: "Encryption and restrictions removed — the file opens without a password in any app.",
   },
@@ -36,31 +37,41 @@ export default function UnlockTool({ locale }: { locale: Locale }) {
     if (out) setResult([{ name: `${baseName(file.name)}-unlocked.pdf`, blob: pdfBlob(out.files[0].bytes) }]);
   }
 
+  const files = <FilePanel locale={locale} pdf={pdf} disabled={job.running} />;
+  if (!file) {
+    return (
+      <div className="flex flex-col gap-4">
+        {files}
+        {pdf.files.length > 0 && <p className="text-sm text-fg-3">{t.intro}</p>}
+      </div>
+    );
+  }
   return (
-    <div className="flex flex-col gap-4">
-      <FilePanel locale={locale} pdf={pdf} disabled={job.running} />
-      {pdf.files.length > 0 && !result && <p className="max-w-3xl text-sm text-fg-3">{t.intro}</p>}
-      {file && (
+    <Workspace
+      files={files}
+      action={
         <>
-          <PrimaryButton disabled={job.running} onClick={unlock}>
+          <PrimaryButton disabled={job.running} done={!!result} onClick={unlock}>
             <LockOpen aria-hidden />
             {t.go}
           </PrimaryButton>
           <JobStatus locale={locale} state={job.state} onCancel={job.cancel} />
-          {result && (
-            <ResultCard
-              locale={locale}
-              items={result}
-              notice={t.done}
-              onReset={() => {
-                setResult(null);
-                pdf.clear();
-                job.reset();
-              }}
-            />
-          )}
         </>
-      )}
-    </div>
+      }
+      result={
+        result && (
+          <ResultCard
+            locale={locale}
+            items={result}
+            notice={t.done}
+            onReset={() => {
+              setResult(null);
+              pdf.clear();
+              job.reset();
+            }}
+          />
+        )
+      }
+    />
   );
 }

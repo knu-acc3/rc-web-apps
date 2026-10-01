@@ -2,7 +2,7 @@
 
 import { useId, useMemo, useState } from "react";
 import type { Locale } from "@/i18n/config";
-import { Checkbox } from "@/ui/field";
+import { Switch } from "@/ui/field";
 import { removeDuplicateLines, type BlankMode, type DedupeMode } from "./lib/textOps";
 import { countLabel, InlineSelect, InputPanel, MoreOptions, OptionsBar, OutputPanel, TwoPane, TX } from "./ui/shared";
 
@@ -56,8 +56,8 @@ export default function RemoveDuplicates({ locale }: { locale: Locale }) {
   return (
     <div className="flex flex-col gap-4">
       <OptionsBar>
-        <Checkbox label={t.ignoreCase} checked={ignoreCase} onChange={(e) => setIgnoreCase(e.target.checked)} />
-        <Checkbox label={t.trim} checked={trim} onChange={(e) => setTrim(e.target.checked)} />
+        <Switch label={t.ignoreCase} checked={ignoreCase} onChange={(e) => setIgnoreCase(e.target.checked)} />
+        <Switch label={t.trim} checked={trim} onChange={(e) => setTrim(e.target.checked)} />
       </OptionsBar>
       <TwoPane>
         <InputPanel id={`${id}-in`} locale={locale} value={text} onChange={setText} mono />
@@ -69,7 +69,7 @@ export default function RemoveDuplicates({ locale }: { locale: Locale }) {
         />
       </TwoPane>
       <MoreOptions locale={locale}>
-        <Checkbox label={t.collapse} checked={collapse} onChange={(e) => setCollapse(e.target.checked)} />
+        <Switch label={t.collapse} checked={collapse} onChange={(e) => setCollapse(e.target.checked)} />
         <InlineSelect
           id={`${id}-blank`}
           label={t.blank}

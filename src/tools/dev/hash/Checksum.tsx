@@ -4,8 +4,10 @@ import { CircleCheck, CircleHelp, CircleX, X } from "lucide-react";
 import { useId, useMemo, useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { formatBytes } from "@/i18n/format";
+import { cn } from "@/lib/cn";
 import { CodeEditor } from "@/tools/dev/shared/CodeEditor";
 import { useWorkerClient } from "@/tools/dev/shared/hooks";
+import { Opt, OptionsRow } from "@/tools/dev/shared/Pane";
 import { isCancelled } from "@/tools/dev/shared/worker-client";
 import { Button } from "@/ui/button";
 import { Dropzone } from "@/ui/dropzone";
@@ -105,35 +107,39 @@ export default function Checksum({ locale }: { locale: Locale }) {
   const matched = done.filter((r) => r.digest === r.expected).length;
 
   return (
-    <Panel className="p-4 sm:p-6">
-      <CodeEditor id={`${id}-exp`} locale={locale} label={t.expected} value={text} onChange={setText} placeholder={t.placeholder} rows={3} fileAccept=".sha256,.sha512,.sha1,.md5,.txt,.sum,text/plain" maxFileBytes={2 * 1024 * 1024} />
-      <div className="mt-3 flex flex-wrap items-center gap-2 text-sm text-fg-2">
-        <label className="flex items-center gap-2">
-          {t.algo}
-          <Select value={forced} size="sm" className="w-52" onChange={(e) => setForced(e.target.value as AlgoId | "auto")}>
+    <Panel className="flex flex-col gap-4 p-4 sm:p-6">
+      <div className="grid gap-4 lg:grid-cols-2">
+        <div className="flex min-w-0 flex-col gap-3">
+          <CodeEditor id={`${id}-exp`} locale={locale} label={t.expected} value={text} onChange={setText} placeholder={t.placeholder} rows={4} fileAccept=".sha256,.sha512,.sha1,.md5,.txt,.sum,text/plain" maxFileBytes={2 * 1024 * 1024} />
+          <OptionsRow>
+            <Opt label={t.algo}>
+              <Select value={forced} size="sm" onChange={(e) => setForced(e.target.value as AlgoId | "auto")}>
             <option value="auto">{t.auto}</option>
             {ALGOS.map((a) => (
               <option key={a.id} value={a.id}>
                 {a.name}
               </option>
             ))}
-          </Select>
-        </label>
+              </Select>
+            </Opt>
+          </OptionsRow>
+        </div>
+        <Dropzone multiple onFiles={start} title={t.drop} hint={t.dropHint} locale={locale} compact={rows.length > 0} />
       </div>
-      <Dropzone multiple onFiles={start} title={t.drop} hint={t.dropHint} className="mt-4" compact={rows.length > 0} />
 
       {rows.length > 0 && (
-        <div className="mt-4 overflow-hidden rounded-[0.625rem] border border-line">
+        <div className="flex flex-col gap-2">
           {done.length > 0 && !busy && (
-            <p className={`border-b border-line px-3 py-2.5 text-lg font-semibold ${matched === done.length ? "text-ok" : "text-err"}`} aria-live="polite">
+            <p className={cn("flex items-center gap-2 rounded-[1rem] px-4 py-3 text-xl font-bold motion-safe:animate-[menu-in_0.2s_ease-out]", matched === done.length ? "bg-ok-soft text-ok" : "bg-err-soft text-err")} aria-live="polite">
+              {matched === done.length ? <CircleCheck className="size-6 shrink-0" aria-hidden /> : <CircleX className="size-6 shrink-0" aria-hidden />}
               {t.summary(matched, done.length)}
             </p>
           )}
-          <ul className="divide-y divide-line">
+          <ul className="flex flex-col gap-1.5">
             {rows.map((r, i) => {
               const verdict = r.state !== "done" ? null : !r.expected ? "none" : r.digest === r.expected ? "ok" : "bad";
               return (
-                <li key={i} className="flex flex-col gap-1 px-3 py-2.5">
+                <li key={i} className="flex flex-col gap-1 rounded-[1rem] bg-surface-2 px-4 py-3">
                   <div className="flex items-center justify-between gap-2 text-sm">
                     <span className="min-w-0 truncate text-fg-2">{r.file.name}</span>
                     <span className="shrink-0 text-[0.8125rem] text-fg-3">
@@ -141,7 +147,7 @@ export default function Checksum({ locale }: { locale: Locale }) {
                     </span>
                   </div>
                   {r.state === "run" ? (
-                    <progress className="h-1.5 w-full accent-[var(--accent)]" max={100} value={r.file.size ? Math.round((r.done / r.file.size) * 100) : 100} aria-label={r.file.name} />
+                    <progress className="h-1.5 w-full overflow-hidden rounded-full accent-[var(--accent)]" max={100} value={r.file.size ? Math.round((r.done / r.file.size) * 100) : 100} aria-label={r.file.name} />
                   ) : r.state === "done" ? (
                     <div className={`flex items-center gap-1.5 text-sm ${verdict === "ok" ? "text-ok" : verdict === "bad" ? "text-err" : "text-fg-3"}`}>
                       {verdict === "ok" ? <CircleCheck className="size-4 shrink-0" aria-hidden /> : verdict === "bad" ? <CircleX className="size-4 shrink-0" aria-hidden /> : <CircleHelp className="size-4 shrink-0" aria-hidden />}
@@ -156,8 +162,8 @@ export default function Checksum({ locale }: { locale: Locale }) {
             })}
           </ul>
           {busy && (
-            <div className="flex justify-end border-t border-line bg-surface-2 px-2 py-1.5">
-              <Button size="sm" variant="ghost" onClick={() => client.cancel()}>
+            <div className="flex justify-end">
+              <Button size="sm" variant="outlined" onClick={() => client.cancel()}>
                 <X aria-hidden />
                 {t.cancel}
               </Button>

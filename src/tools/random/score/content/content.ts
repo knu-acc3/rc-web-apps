@@ -26,7 +26,7 @@ const SPORT_PAGES: SportPage[] = [
         ["Время", "4 четверти по 10 минут (в НБА по 12), овертайм — 5 минут"],
         ["Командные фолы", "с 5-го фола команды в четверти соперник бьёт штрафные"],
       ],
-      tips: ["Нажмите на счёт команды — добавится 1 очко, кнопки +2 и +3 — под ним.", "Фолы отмечайте маленьким счётчиком, а в новой четверти сбрасывайте их кнопкой −.", "Ошиблись — нажмите «Отменить» или Z: вернётся предыдущий счёт."],
+      tips: ["Нажмите на счёт команды — добавится 1 очко; кнопки −1, +1, +2 и +3 — под ним.", "Время четверти идёт от 10:00 к нулю: ▶ запускает и останавливает, на весь экран — ещё и пробел. В конце звучит сигнал.", "Фолы отмечайте маленьким счётчиком, а в новой четверти сбрасывайте их кнопкой −.", "Ошиблись — нажмите «Отменить» или Z: вернётся предыдущий счёт."],
     },
     en: {
       name: "Basketball",
@@ -39,7 +39,7 @@ const SPORT_PAGES: SportPage[] = [
         ["Time", "4 quarters of 10 minutes (12 in the NBA), 5-minute overtime"],
         ["Team fouls", "from a team's 5th foul in a quarter the opponent shoots free throws"],
       ],
-      tips: ["Tap a team's score to add 1 point; +2 and +3 are right below.", "Track fouls with the small counter and clear them with − in a new quarter.", "Made a mistake? Press Undo or Z to restore the previous score."],
+      tips: ["Tap a team's score to add 1 point; −1, +1, +2 and +3 are right below.", "The quarter clock runs from 10:00 down to zero: ▶ starts and stops it, Space too in full screen. A buzzer sounds at the end.", "Track fouls with the small counter and clear them with − in a new quarter.", "Made a mistake? Press Undo or Z to restore the previous score."],
     },
   },
   {
@@ -84,7 +84,7 @@ const SPORT_PAGES: SportPage[] = [
         ["Ничья в плей-офф", "серия пенальти по 5 ударов, затем по одному"],
         ["Гол", "1 очко; засчитывается, если мяч полностью пересёк линию ворот"],
       ],
-      tips: ["Нажмите на счёт, чтобы добавить гол, проведите вниз — отменить.", "Тайм переключается внизу, под табло.", "Для мини-футбола и футзала подойдёт то же табло."],
+      tips: ["Нажмите на счёт, чтобы добавить гол, проведите вниз — отменить.", "Время тайма идёт от 0:00 до 45:00 — длину можно поменять под табло, например на 20 минут для мини-футбола.", "Тайм переключается в тёмной полосе под счётом."],
     },
     en: {
       name: "Football",
@@ -97,7 +97,7 @@ const SPORT_PAGES: SportPage[] = [
         ["Knockout draw", "a penalty shoot-out of 5 kicks each, then sudden death"],
         ["Goal", "1 point; counts when the whole ball crosses the goal line"],
       ],
-      tips: ["Tap a score to add a goal, swipe down to take it back.", "Switch the half below the board.", "The same board works for five-a-side and futsal."],
+      tips: ["Tap a score to add a goal, swipe down to take it back.", "The half clock runs from 0:00 to 45:00 — change the length below the board, e.g. to 20 minutes for five-a-side.", "Switch the half in the dark strip under the score."],
     },
   },
   {
@@ -113,7 +113,7 @@ const SPORT_PAGES: SportPage[] = [
         ["Ничья", "овертайм, затем серия буллитов"],
         ["Шайба", "1 очко, засчитывается после полного пересечения линии ворот"],
       ],
-      tips: ["Нажмите на счёт — шайба засчитана; провести вниз — отменить.", "Период переключается кнопками − и + под табло.", "Подойдёт и для флорбола, и для хоккея с мячом."],
+      tips: ["Нажмите на счёт — шайба засчитана; провести вниз — отменить.", "Время периода — 20 минут обратного отсчёта, ▶ запускает и останавливает его.", "Период переключается кнопками − и + под счётом.", "Подойдёт и для флорбола, и для хоккея с мячом."],
     },
     en: {
       name: "Hockey",
@@ -126,7 +126,7 @@ const SPORT_PAGES: SportPage[] = [
         ["Tie", "overtime, then a shootout"],
         ["Goal", "1 point, counts when the whole puck crosses the goal line"],
       ],
-      tips: ["Tap the score to add a goal; swipe down to cancel it.", "Switch the period with − and + below the board.", "Also fits floorball and bandy."],
+      tips: ["Tap the score to add a goal; swipe down to cancel it.", "The period clock counts 20 minutes down; ▶ starts and stops it.", "Switch the period with − and + under the score.", "Also fits floorball and bandy."],
     },
   },
   {
@@ -247,24 +247,26 @@ export const scoreboardTool: ToolDef = {
   about: {
     ru: [
       "Табло запоминает счёт, названия и цвета в браузере: если случайно закрыть вкладку или телефон перезагрузится, счёт останется. Каждая ошибка отменяется кнопкой «Отменить» — хоть десять шагов назад.",
-      "Для волейбола, настольного тенниса и бадминтона табло само отмечает подачу и видит конец партии; для баскетбола есть кнопки +2 и +3 и командные фолы.",
+      "Для волейбола, настольного тенниса и бадминтона табло само отмечает подачу и видит конец партии; для баскетбола есть кнопки +2 и +3 и командные фолы. На странице любой игры кнопки выбираются: +1, +1 +2 +3 или +1 +5 +10.",
+      "Время матча включается переключателем под табло: обратный отсчёт или прямой, своя длина периода, сигнал в конце. Время продолжает идти, даже если перезагрузить страницу.",
     ],
     en: [
       "The board remembers the score, names and colours in the browser: close the tab by accident or restart the phone and the score is still there. Undo takes back any mistake — even ten steps back.",
-      "For volleyball, table tennis and badminton the board tracks the serve and spots the end of a set; for basketball there are +2 and +3 buttons and team fouls.",
+      "For volleyball, table tennis and badminton the board tracks the serve and spots the end of a set; for basketball there are +2 and +3 buttons and team fouls. For any other game pick the buttons: +1, +1 +2 +3 or +1 +5 +10.",
+      "Turn on the game clock below the board: counting down or up, your own period length and a buzzer at the end. It keeps running even if you reload the page.",
     ],
   },
   faq: {
     ru: [
       { q: "Как вывести табло на телевизор?", a: "Откройте страницу в браузере телевизора или выведите экран ноутбука через HDMI и нажмите «На весь экран». На смарт-ТВ можно управлять счётом пультом: стрелками выберите кнопку и нажмите OK." },
       { q: "Сохранится ли счёт, если закрыть страницу?", a: "Да, счёт хранится в этом браузере на этом устройстве. На другом устройстве табло будет пустым." },
-      { q: "Можно ли управлять с клавиатуры?", a: "Да: Q и A — плюс и минус левой команде, P и L — правой, S — поменять стороны, Z — отменить, F — на весь экран. Клавиши работают в любой раскладке." },
+      { q: "Можно ли управлять с клавиатуры?", a: "Да: Q и A — плюс и минус левой команде, P и L — правой, S — поменять стороны, Z — отменить, F — на весь экран, пробел на весь экран — запустить или остановить время. Клавиши работают в любой раскладке." },
       { q: "Как считать больше двух команд?", a: "Откройте счётчик со списком — в нём сколько угодно строк с названиями и общий итог." },
     ],
     en: [
       { q: "How do I show the board on a TV?", a: "Open the page in the TV's browser or connect a laptop over HDMI and press Full screen. On a smart TV you can keep score with the remote: move to a button with the arrows and press OK." },
       { q: "Is the score kept if I close the page?", a: "Yes, it is stored in this browser on this device. On another device the board starts empty." },
-      { q: "Can I use the keyboard?", a: "Yes: Q and A add and subtract for the left team, P and L for the right, S swaps sides, Z undoes, F goes full screen. Keys work in any keyboard layout." },
+      { q: "Can I use the keyboard?", a: "Yes: Q and A add and subtract for the left team, P and L for the right, S swaps sides, Z undoes, F goes full screen, Space in full screen starts or stops the clock. Keys work in any keyboard layout." },
       { q: "How do I count more than two teams?", a: "Use the counter with a list — as many named rows as you need and a total." },
     ],
   },
@@ -290,7 +292,7 @@ export const scoreboardTool: ToolDef = {
       head: [tt(l, "Вид", "Sport"), tt(l, "Кнопки очков", "Point buttons"), tt(l, "Дополнительно", "Extras")],
       rows: SPORT_PAGES.map((p) => {
         const c = SPORTS[p.sport];
-        const extras = [c.small?.[l], c.period?.[l], c.serve ? tt(l, "подача", "serve") : "", c.win ? tt(l, `партия до ${c.win.to}`, `set to ${c.win.to}`) : ""].filter(Boolean).join(", ");
+        const extras = [c.small?.[l], c.period?.[l], c.serve ? tt(l, "подача", "serve") : "", c.win ? tt(l, `партия до ${c.win.to}`, `set to ${c.win.to}`) : "", c.clock ? tt(l, `время ${c.clock.min} мин`, `${c.clock.min}-min clock`) : ""].filter(Boolean).join(", ");
         return [p[l].name, c.steps.map((s) => `+${s}`).join(" "), extras.charAt(0).toUpperCase() + extras.slice(1)];
       }),
     },
@@ -422,8 +424,8 @@ export const counterTool: ToolDef = {
   lead: { ru: "Нажимайте «+» или пробел — счётчик запомнит значение даже после перезагрузки.", en: "Press + or Space — the counter keeps its value even after a reload." },
   keywords: { ru: ["счётчик онлайн", "кликер", "счётчик нажатий", "тапалка", "ручной счётчик"], en: ["tally counter", "click counter", "clicker", "online counter"] },
   howTo: {
-    ru: ["Нажимайте большую кнопку «+», пробел или стрелку вверх; «−» и стрелка вниз отнимают.", "При необходимости задайте шаг и цель — после цели счётчик может начинать заново и считать круги.", "Нужно считать несколько вещей — нажмите «Ещё счётчик»: появится список с итогом."],
-    en: ["Press the big + button, Space or the up arrow; − and the down arrow subtract.", "Set a step and a goal if needed — after the goal the counter can start over and count laps.", "Counting several things? Press Add counter to get a list with a total."],
+    ru: ["Нажимайте большую кнопку «+», пробел или стрелку вверх; «−» и стрелка вниз отнимают.", "При необходимости задайте шаг и цель — после цели счётчик может начинать заново и считать круги. Вид «Палочки» рисует счёт чёрточками по пять, как на бумаге.", "Нужно считать несколько вещей — нажмите «Ещё счётчик»: появится список с итогом."],
+    en: ["Press the big + button, Space or the up arrow; − and the down arrow subtract.", "Set a step and a goal if needed — after the goal the counter can start over and count laps. The Tally marks view draws the count in strokes of five, like on paper.", "Counting several things? Press Add counter to get a list with a total."],
   },
   about: {
     ru: [

@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { formatNumber } from "@/i18n/format";
 import { Button } from "@/ui/button";
-import { Badge, Notice } from "@/ui/panel";
+import { Badge, Notice, Panel } from "@/ui/panel";
 import { cssVar } from "./lib/media";
 import { frameStats, snapRate, stability, type FrameStats, type Stability } from "./lib/refresh";
 
@@ -175,90 +175,94 @@ export default function RefreshRateTest({ locale }: { locale: Locale }) {
   const nf = (n: number, d = 1) => formatNumber(locale, n, { maximumFractionDigits: d, minimumFractionDigits: d });
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex flex-col items-center gap-2 rounded-[0.75rem] border border-line bg-surface px-4 py-8 text-center sm:py-10">
-        <div aria-live="polite" className="flex flex-col items-center gap-2">
-          {stats && snap ? (
-            <>
-              <div className="tabular text-6xl font-bold tracking-tight text-fg sm:text-7xl">
-                {snap.close ? snap.rate : nf(stats.medianHz)} <span className="text-3xl font-semibold text-fg-2 sm:text-4xl">{t.hz}</span>
-              </div>
-              <div className="text-[0.9375rem] text-fg-2">{snap.close ? t.measured(nf(stats.medianHz, 2)) : t.notStandard}</div>
-              {stab && <Badge tone={stab === "stable" ? "ok" : stab === "ok" ? "neutral" : "warn"}>{t.stability[stab]}</Badge>}
-            </>
-          ) : (
-            <>
-              <div className="tabular text-6xl font-bold tracking-tight text-fg-3 sm:text-7xl">
-                {live ? Math.round(live) : "—"} <span className="text-3xl font-semibold sm:text-4xl">{t.hz}</span>
-              </div>
-              <div className="text-[0.9375rem] text-fg-2">
-                {t.measuring} {t.keep}
-              </div>
-            </>
+    <div className="grid items-start gap-4 lg:grid-cols-2 lg:gap-6">
+      <div className="flex min-w-0 flex-col gap-4">
+        <div className="flex flex-col items-center gap-2 rounded-[1.25rem] bg-accent-soft px-4 py-10 text-center sm:py-14">
+          <div aria-live="polite" className="flex flex-col items-center gap-2">
+            {stats && snap ? (
+              <>
+                <div className="tabular text-6xl font-bold tracking-tight text-fg sm:text-7xl">
+                  {snap.close ? snap.rate : nf(stats.medianHz)} <span className="text-3xl font-semibold text-fg-2 sm:text-4xl">{t.hz}</span>
+                </div>
+                <div className="text-[0.9375rem] text-fg-2">{snap.close ? t.measured(nf(stats.medianHz, 2)) : t.notStandard}</div>
+                {stab && <Badge tone={stab === "stable" ? "ok" : stab === "ok" ? "neutral" : "warn"}>{t.stability[stab]}</Badge>}
+              </>
+            ) : (
+              <>
+                <div className="tabular text-6xl font-bold tracking-tight text-fg-3 sm:text-7xl">
+                  {live ? Math.round(live) : "—"} <span className="text-3xl font-semibold sm:text-4xl">{t.hz}</span>
+                </div>
+                <div className="text-[0.9375rem] text-fg-2">
+                  {t.measuring} {t.keep}
+                </div>
+              </>
+            )}
+          </div>
+          {!stats && (
+            <div className="mt-2 h-2 w-full max-w-xs overflow-hidden rounded-full bg-surface" aria-hidden>
+              <div className="h-full bg-accent transition-[width] duration-200" style={{ width: `${progress * 100}%` }} />
+            </div>
+          )}
+          {stats && (
+            <Button variant="filled" size="lg" onClick={again} className="mt-4">
+              <RotateCcw aria-hidden />
+              {t.again}
+            </Button>
           )}
         </div>
-        {!stats && (
-          <div className="mt-2 h-1.5 w-full max-w-xs overflow-hidden rounded-full bg-surface-2" aria-hidden>
-            <div className="h-full bg-accent transition-[width] duration-200" style={{ width: `${progress * 100}%` }} />
+
+        {restarted && !stats && <Notice>{t.hidden}</Notice>}
+        {stab === "unstable" && <Notice tone="warn">{t.unstableHint}</Notice>}
+      </div>
+
+      <div className="flex min-w-0 flex-col gap-4">
+        <Panel className="p-4 sm:p-5">
+          <div className="mb-1.5 flex items-baseline justify-between gap-2 text-sm">
+            <span className="font-medium text-fg-2">{t.graph}</span>
+            <span className="tabular text-fg-3">
+              {t.live}: {live ? `${nf(live)} ${t.hz}` : "—"}
+            </span>
           </div>
-        )}
+          <canvas ref={canvasRef} className="block h-28 w-full rounded-[1rem] bg-surface-2" aria-hidden />
+        </Panel>
+
         {stats && (
-          <Button variant="outline" size="sm" onClick={again} className="mt-3">
-            <RotateCcw aria-hidden />
-            {t.again}
-          </Button>
+          <dl className="facts">
+            <div>
+              <dt>{t.median}</dt>
+              <dd className="tabular">
+                {nf(stats.medianMs, 2)} {t.ms} ({nf(stats.medianHz, 2)} {t.hz})
+              </dd>
+            </div>
+            <div>
+              <dt>{t.mean}</dt>
+              <dd className="tabular">
+                {nf(stats.meanHz, 2)} {t.hz}
+              </dd>
+            </div>
+            <div>
+              <dt>{t.jitter}</dt>
+              <dd className="tabular">
+                {nf(stats.stdDevMs, 2)} {t.ms}
+              </dd>
+            </div>
+            <div>
+              <dt>{t.dropped}</dt>
+              <dd className="tabular">{stats.dropped}</dd>
+            </div>
+            <div>
+              <dt>{t.range}</dt>
+              <dd className="tabular">
+                {nf(stats.minMs, 2)} / {nf(stats.maxMs, 2)} {t.ms}
+              </dd>
+            </div>
+            <div>
+              <dt>{t.frames}</dt>
+              <dd className="tabular">{stats.frames}</dd>
+            </div>
+          </dl>
         )}
       </div>
-
-      {restarted && !stats && <Notice>{t.hidden}</Notice>}
-      {stab === "unstable" && <Notice tone="warn">{t.unstableHint}</Notice>}
-
-      <div>
-        <div className="mb-1.5 flex items-baseline justify-between gap-2 text-sm">
-          <span className="font-medium text-fg-2">{t.graph}</span>
-          <span className="tabular text-fg-3">
-            {t.live}: {live ? `${nf(live)} ${t.hz}` : "—"}
-          </span>
-        </div>
-        <canvas ref={canvasRef} className="block h-24 w-full rounded-[0.625rem] bg-surface-2" aria-hidden />
-      </div>
-
-      {stats && (
-        <dl className="facts">
-          <div>
-            <dt>{t.median}</dt>
-            <dd className="tabular">
-              {nf(stats.medianMs, 2)} {t.ms} ({nf(stats.medianHz, 2)} {t.hz})
-            </dd>
-          </div>
-          <div>
-            <dt>{t.mean}</dt>
-            <dd className="tabular">
-              {nf(stats.meanHz, 2)} {t.hz}
-            </dd>
-          </div>
-          <div>
-            <dt>{t.jitter}</dt>
-            <dd className="tabular">
-              {nf(stats.stdDevMs, 2)} {t.ms}
-            </dd>
-          </div>
-          <div>
-            <dt>{t.dropped}</dt>
-            <dd className="tabular">{stats.dropped}</dd>
-          </div>
-          <div>
-            <dt>{t.range}</dt>
-            <dd className="tabular">
-              {nf(stats.minMs, 2)} / {nf(stats.maxMs, 2)} {t.ms}
-            </dd>
-          </div>
-          <div>
-            <dt>{t.frames}</dt>
-            <dd className="tabular">{stats.frames}</dd>
-          </div>
-        </dl>
-      )}
     </div>
   );
 }

@@ -4,8 +4,7 @@ import Link from "@/ui/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useState } from "react";
 import { href, type Locale } from "@/i18n/config";
-import { buttonClass } from "@/ui/button";
-import { Button } from "@/ui/button";
+import { buttonClass, IconButton } from "@/ui/button";
 import { useStoredJson } from "@/tools/time/time/lib/storage";
 import { useNow } from "@/tools/time/time/lib/use-now";
 import { CalendarControls, Legend } from "./ui/CalendarControls";
@@ -46,13 +45,11 @@ export default function YearCalendar({ locale, year, follow = false, prev, next 
     const icon = dir < 0 ? <ChevronLeft aria-hidden /> : <ChevronRight aria-hidden />;
     if (follow)
       return (
-        <Button variant="ghost" size="icon" aria-label={label} title={label} onClick={() => setChosen(y + dir)}>
-          {icon}
-        </Button>
+        <IconButton label={label} variant="tonal" onClick={() => setChosen(y + dir)} icon={icon} />
       );
     if (!target) return <span className="size-10" />;
     return (
-      <Link href={href(locale, target)} className={buttonClass("ghost", "icon")} aria-label={label} title={label}>
+      <Link href={href(locale, target)} className={buttonClass("tonal", "icon")} aria-label={label} title={label}>
         {icon}
       </Link>
     );
@@ -66,7 +63,7 @@ export default function YearCalendar({ locale, year, follow = false, prev, next 
         {nav(1)}
       </div>
       <CalendarControls locale={locale} choice={choice} onChoice={setChoice} weeks={weeks} onWeeks={setWeeks} />
-      <div className="grid gap-x-6 gap-y-5 rounded-[0.75rem] border border-line bg-surface p-4 sm:grid-cols-2 sm:p-5 lg:grid-cols-3 xl:grid-cols-4 print:grid-cols-3 print:border-0 print:p-0">
+      <div className="panel grid gap-x-6 gap-y-5 p-4 sm:grid-cols-2 sm:p-5 lg:grid-cols-3 xl:grid-cols-4 print:grid-cols-3 print:p-0 print:shadow-none">
         {MONTHS.map((m) => (
           <MonthGrid key={m} locale={locale} year={y} month={m} mark={mark} today={today} weekNumbers={weeks} />
         ))}

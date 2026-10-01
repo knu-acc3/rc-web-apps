@@ -191,7 +191,7 @@ export function StageLayer({
           onClick={exit}
           aria-label={closeLabel}
           title={closeLabel}
-          className={cn("flex size-9 shrink-0 items-center justify-center rounded-full", dark ? "hover:bg-black/10" : "hover:bg-white/15")}
+          className="btn btn-neutral btn-round size-10 shrink-0 text-inherit! [&_svg]:size-5!"
         >
           <X className="size-5" aria-hidden />
         </button>

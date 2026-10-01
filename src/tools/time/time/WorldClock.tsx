@@ -3,7 +3,7 @@
 import { Moon, Sun, X } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/cn";
-import { Button } from "@/ui/button";
+import { Button, IconButton } from "@/ui/button";
 import { Panel } from "@/ui/panel";
 import { PlaceSearch } from "./ui/PlaceSearch";
 import { sunElevation } from "./lib/sun";
@@ -39,7 +39,7 @@ export default function WorldClock({ locale, defaults }: WorldClockProps) {
         </p>
       </div>
 
-      <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+      <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
         {places.map((p) => {
           const q = now !== null ? placeParts(p, now) : null;
           const d = q && me ? q.off - me.off : null;
@@ -51,21 +51,14 @@ export default function WorldClock({ locale, defaults }: WorldClockProps) {
                 <div className="flex items-center justify-between gap-2">
                   <span className="truncate font-semibold text-fg">{p.name}</span>
                   {editing ? (
-                    <button
-                      type="button"
-                      onClick={() => setPlaces(places.filter((x) => x.key !== p.key))}
-                      className="rounded-[0.375rem] p-1 text-fg-3 hover:bg-surface-2 hover:text-err"
-                      aria-label={`${t.remove}: ${p.name}`}
-                    >
-                      <X className="size-4" aria-hidden />
-                    </button>
+                    <IconButton label={`${t.remove}: ${p.name}`} size="sm" variant="tonal" onClick={() => setPlaces(places.filter((x) => x.key !== p.key))} icon={<X aria-hidden />} className="-my-1 hover:text-err" />
                   ) : isDay === null ? null : isDay ? (
                     <Sun className="size-4 shrink-0 text-warn" aria-label={t.day} />
                   ) : (
                     <Moon className="size-4 shrink-0 text-fg-3" aria-label={t.night} />
                   )}
                 </div>
-                <span className="tabular text-4xl font-semibold tracking-tight text-fg">{q ? hms(q, false) : "--:--"}</span>
+                <span className="tabular text-4xl font-semibold tracking-tight text-fg 2xl:text-5xl">{q ? hms(q, false) : "--:--"}</span>
                 <span className="text-[0.8125rem] text-fg-3">
                   {q ? (
                     <>
@@ -90,12 +83,12 @@ export default function WorldClock({ locale, defaults }: WorldClockProps) {
           exclude={places.map((p) => p.key)}
           onPick={(p) => setPlaces([...places, p])}
         />
-        <div className="flex gap-1">
-          <Button variant="ghost" size="sm" onClick={() => setEditing(!editing)} aria-pressed={editing}>
+        <div className="flex gap-2">
+          <Button variant={editing ? "filled" : "tonal"} onClick={() => setEditing(!editing)} aria-pressed={editing}>
             {editing ? t.done : t.edit}
           </Button>
           {editing && (
-            <Button variant="ghost" size="sm" onClick={() => setPlaces(null)}>
+            <Button variant="text" onClick={() => setPlaces(null)}>
               {t.reset}
             </Button>
           )}

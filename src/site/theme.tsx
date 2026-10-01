@@ -85,29 +85,19 @@ export function ThemeToggle({ labels, className }: { labels: Labels; className?:
   );
 }
 
-/** Labelled three-way switch (menu, footer): no guessing what an icon means. */
+/** Labelled three-way choice (menu, footer): three separate chips with an icon and a word, the chosen one tinted. */
 export function ThemeSwitch({ labels, className }: { labels: Labels; className?: string }) {
   const [mode, setMode] = useThemeMode();
   const options: [Mode, string, typeof Sun][] = [
-    ["system", labels.system, SunMoon],
     ["light", labels.light, Sun],
     ["dark", labels.dark, Moon],
+    ["system", labels.system, SunMoon],
   ];
   return (
-    <div role="radiogroup" aria-label={labels.theme} className={cn("inline-flex max-w-full gap-1 rounded-[0.625rem] bg-surface-2 p-1", className)}>
+    <div role="radiogroup" aria-label={labels.theme} className={cn("flex max-w-full flex-wrap gap-2", className)}>
       {options.map(([m, label, Icon]) => (
-        <button
-          key={m}
-          type="button"
-          role="radio"
-          aria-checked={mode === m}
-          onClick={() => setMode(m)}
-          className={cn(
-            "inline-flex h-8 items-center gap-1.5 rounded-[0.4375rem] px-2.5 text-[0.8125rem] font-medium whitespace-nowrap transition-colors",
-            mode === m ? "bg-surface text-fg shadow-[0_1px_2px_rgb(0_0_0/0.08)]" : "text-fg-2 hover:text-fg",
-          )}
-        >
-          <Icon className="size-3.5" aria-hidden />
+        <button key={m} type="button" role="radio" aria-checked={mode === m} onClick={() => setMode(m)} className="chip h-10 gap-2 px-3.5">
+          <Icon className="size-4" aria-hidden />
           {label}
         </button>
       ))}

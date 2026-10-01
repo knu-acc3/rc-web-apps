@@ -1,5 +1,6 @@
 "use client";
 
+import { Eraser } from "lucide-react";
 import Link from "@/ui/link";
 import { useCallback, useState } from "react";
 import { href, type Locale } from "@/i18n/config";
@@ -86,10 +87,11 @@ export default function MimeDetect({ locale, known }: { locale: Locale; known: s
 
   return (
     <div className="flex flex-col gap-4">
-      <Dropzone onFiles={onFiles} multiple title={t.drop} hint={t.hint} />
+      <Dropzone onFiles={onFiles} multiple title={t.drop} hint={t.hint} locale={locale} compact={results.length > 0} />
       {results.length > 0 && (
         <div className="flex justify-end">
-          <Button variant="ghost" size="sm" onClick={() => setResults([])}>
+          <Button variant="outlined" size="sm" onClick={() => setResults([])}>
+            <Eraser aria-hidden />
             {t.clear}
           </Button>
         </div>
@@ -100,7 +102,7 @@ export default function MimeDetect({ locale, known }: { locale: Locale; known: s
           const all = d ? [d.ext, ...(d.alt ?? [])] : [];
           const matches = !!d && !!r.claimedExt && (all.includes(r.claimedExt) || (r.claimedExt === "jpeg" && d.ext === "jpg") || (r.claimedExt === "tiff" && d.ext === "tif"));
           return (
-            <li key={r.key} className="rounded-[0.75rem] border border-line bg-surface p-4">
+            <li key={r.key} className="panel p-4 motion-safe:animate-[menu-in_0.2s_ease-out] sm:p-5">
               <div className="flex flex-wrap items-baseline justify-between gap-2">
                 <span className="min-w-0 font-medium break-all text-fg">{r.name}</span>
                 <span className="text-sm text-fg-3">{formatBytes(locale, r.size)}</span>
@@ -109,7 +111,7 @@ export default function MimeDetect({ locale, known }: { locale: Locale; known: s
                 <div className="mt-2">
                   <div className="text-[0.8125rem] text-fg-3">{t.detected}</div>
                   <div className="mt-0.5 flex flex-wrap items-baseline gap-x-3 gap-y-1">
-                    <span className="text-xl font-semibold text-fg">{d.name[locale === "ru" ? 0 : 1]}</span>
+                    <span className="text-2xl font-bold tracking-tight text-fg">{d.name[locale === "ru" ? 0 : 1]}</span>
                     <span className="font-mono text-sm break-all text-fg-2">{d.mime}</span>
                   </div>
                   <div className="mt-2 flex flex-wrap items-center gap-2">

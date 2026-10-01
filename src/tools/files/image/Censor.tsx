@@ -4,8 +4,7 @@ import { Plus, Trash2 } from "lucide-react";
 import { useCallback, useRef, useState, type PointerEvent } from "react";
 import type { Locale } from "@/i18n/config";
 import { plural } from "@/i18n/format";
-import { Button } from "@/ui/button";
-import { Field } from "@/ui/field";
+import { Button, IconButton } from "@/ui/button";
 import { Segmented } from "@/ui/segmented";
 import { centeredAspectRect, clampRect, type Rect } from "./lib/geometry";
 import { censorOn } from "./lib/pipeline";
@@ -31,9 +30,9 @@ const T = {
     add: "Добавить область",
     del: "Удалить область",
     area: (n: number) => `Область ${n}`,
-    hint: "Выделите область мышью или пальцем; стрелки перемещают выбранную область",
+    hint: "Обведите область на фото — можно несколько",
     areas: (n: number) => `${n} ${plural("ru", n, ["область", "области", "областей"])}`,
-    safest: "Для номеров и текста надёжнее заливка или крупная пикселизация: слабое размытие иногда частично обратимо.",
+    safest: "Слабое размытие иногда обратимо — для номеров и текста надёжнее «Пиксели» или «Заливка»",
     download: "Скачать результат",
   },
   en: {
@@ -46,9 +45,9 @@ const T = {
     add: "Add area",
     del: "Delete area",
     area: (n: number) => `Area ${n}`,
-    hint: "Drag on the image to select an area; arrow keys move the selected area",
+    hint: "Draw areas on the photo — as many as you need",
     areas: (n: number) => `${n} ${plural("en", n, ["area", "areas"])}`,
-    safest: "For plates and text a solid box or strong pixelation is safest: weak blur can sometimes be partially reversed.",
+    safest: "Weak blur can sometimes be reversed — for plates and text use Pixelate or Solid box",
     download: "Download result",
   },
 } as const;
@@ -92,47 +91,47 @@ export default function Censor({ locale }: { locale: Locale }) {
     return { x: (e.clientX - b.left) / factor, y: (e.clientY - b.top) / factor };
   };
 
-  const doExport = () => {
+  const doExport = (download = true) => {
     const p = file.prepared;
-    if (!p) return;
-    exp.run(async (signal, onProgress) => {
-      const fmt = sameFormat(p.format);
-      const res = await processFile(
-        getEngine(),
-        p,
-        [op],
-        { format: fmt, quality: LOSSY.has(fmt) ? 90 : DEFAULT_QUALITY[fmt], background: "#FFFFFF" },
-        { signal, onProgress },
-      );
-      return { blob: toBlob(res), name: `${baseName(p.file.name)}-censored.${res.ext}` };
-    });
+    if (!p) return null;
+    return exp.run(
+      async (signal, onProgress) => {
+        const fmt = sameFormat(p.format);
+        const res = await processFile(
+          getEngine(),
+          p,
+          [op],
+          { format: fmt, quality: LOSSY.has(fmt) ? 90 : DEFAULT_QUALITY[fmt], background: "#FFFFFF" },
+          { signal, onProgress },
+        );
+        return { blob: toBlob(res), name: `${baseName(p.file.name)}-censored.${res.ext}` };
+      },
+      { download },
+    );
   };
 
   const options = (
     <>
-      <Field label={t.mode}>
-        <Segmented
-          wrap
-          label={t.mode}
-          value={mode}
-          onChange={setMode}
-          options={[
-            { value: "pixelate", label: t.pixelate },
-            { value: "blur", label: t.blur },
-            { value: "box", label: t.box },
-          ]}
-        />
-      </Field>
+      <Segmented
+        fill
+        label={t.mode}
+        value={mode}
+        onChange={setMode}
+        options={[
+          { value: "pixelate", label: t.pixelate },
+          { value: "blur", label: t.blur },
+          { value: "box", label: t.box },
+        ]}
+      />
       {mode === "box" ? (
-        <ColorField label={t.color} value={color} onChange={setColor} locale={locale} className="w-48" />
+        <ColorField label={t.color} value={color} onChange={setColor} locale={locale} />
       ) : (
-        <div className="min-w-44 flex-1">
-          <RangeField label={t.strength} value={strength} onChange={setStrength} min={0} max={100} unit="%" locale={locale} />
-        </div>
+        <RangeField label={t.strength} value={strength} onChange={setStrength} min={0} max={100} unit="%" locale={locale} />
       )}
-      <div className="flex gap-1.5">
+      <div className="flex items-center gap-2">
         <Button
-          variant="outline"
+          variant="tonal"
+          className="flex-1"
           onClick={() => {
             setAreas((a) => [...a, centeredAspectRect(W, H, null, 0.25)]);
             setSel(areas.length);
@@ -142,19 +141,15 @@ export default function Censor({ locale }: { locale: Locale }) {
           <Plus aria-hidden />
           {t.add}
         </Button>
-        <Button
-          variant="ghost"
-          size="icon"
-          aria-label={t.del}
-          title={t.del}
+        <IconButton
+          label={t.del}
+          icon={<Trash2 aria-hidden />}
           disabled={!areas.length}
           onClick={() => {
             setAreas((a) => a.filter((_, i) => i !== sel));
             setSel(0);
           }}
-        >
-          <Trash2 aria-hidden />
-        </Button>
+        />
       </div>
     </>
   );
@@ -166,9 +161,15 @@ export default function Censor({ locale }: { locale: Locale }) {
       options={options}
       exp={exp}
       onExport={doExport}
+      next
       exportLabel={t.download}
       figure={t.areas(areas.length)}
-      extra={<p className="text-fg-3">{mode === "box" ? t.hint : `${t.hint}. ${t.safest}`}</p>}
+      extra={
+        <>
+          <p className="text-fg-3">{t.hint}</p>
+          {mode === "blur" && <p className="text-warn">{t.safest}</p>}
+        </>
+      }
       stage={
         <ImageStage bitmap={bitmap} srcWidth={W} locale={locale} draw={draw}>
           {(factor) => (

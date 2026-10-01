@@ -3,9 +3,9 @@
 import { useId, useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { formatNumber, parseNumber } from "@/i18n/format";
-import { Field, Input } from "@/ui/field";
 import { Panel } from "@/ui/panel";
 import { Segmented } from "@/ui/segmented";
+import { SliderField } from "@/ui/slider-field";
 import { QuietFacts, plainSpaces } from "../ui/kit";
 import { CM_PER_INCH, diagonalForAcuity, diagonalForAngle, screenDims, tvDistances } from "./engine";
 
@@ -74,7 +74,6 @@ export default function TvSize({ locale, diag = 55 }: { locale: Locale; diag?: n
     <div className="flex flex-col gap-4">
       <Panel className="p-4 sm:p-6">
         <Segmented
-          size="sm"
           label={t.mode}
           value={mode}
           onChange={setMode}
@@ -83,21 +82,38 @@ export default function TvSize({ locale, diag = 55 }: { locale: Locale; diag?: n
             { value: "dist", label: t.byDist },
           ]}
         />
-        <div className="mt-4 grid gap-5 sm:grid-cols-[minmax(0,14rem)_minmax(0,1fr)] sm:items-end">
+        <div className="mt-5 grid gap-6 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] md:items-center md:gap-8">
           {mode === "diag" ? (
-            <Field label={t.diag} htmlFor={`${id}-d`} error={dText.trim() && !diagOk ? t.invalidDiag : undefined}>
-              <Input id={`${id}-d`} inputMode="decimal" autoComplete="off" value={dText} onChange={(e) => setD(e.target.value)} aria-invalid={!!dText.trim() && !diagOk} size="lg" className="tabular" />
-            </Field>
+            <SliderField
+              id={`${id}-d`}
+              label={t.diag}
+              value={dText}
+              onChange={setD}
+              parse={(x) => parseNumber(x)}
+              format={(v) => n(v, 0)}
+              min={20}
+              max={120}
+              error={dText.trim() && !diagOk ? t.invalidDiag : undefined}
+            />
           ) : (
-            <Field label={t.dist} htmlFor={`${id}-m`} error={mText.trim() && !distOk ? t.invalidDist : undefined}>
-              <Input id={`${id}-m`} inputMode="decimal" autoComplete="off" value={mText} onChange={(e) => setM(e.target.value)} aria-invalid={!!mText.trim() && !distOk} size="lg" className="tabular" />
-            </Field>
+            <SliderField
+              id={`${id}-m`}
+              label={t.dist}
+              value={mText}
+              onChange={setM}
+              parse={(x) => parseNumber(x)}
+              format={(v) => n(v, 1)}
+              min={1}
+              max={6}
+              step={0.1}
+              error={mText.trim() && !distOk ? t.invalidDist : undefined}
+            />
           )}
           <div className="min-w-0" aria-live="polite">
             {mode === "diag" && dist && (
               <>
                 <div className="text-sm text-fg-2">{t.distResult}</div>
-                <div className="tabular text-4xl font-semibold tracking-tight text-fg sm:text-5xl">
+                <div className="tabular text-5xl font-semibold tracking-tight text-fg sm:text-6xl">
                   {`${n(dist.thx)}–${n(dist.smpte)}`} <span className="text-xl font-medium text-fg-3">{t.m}</span>
                 </div>
                 <div className="text-sm text-fg-3">{t.rangeNote}</div>
@@ -106,7 +122,7 @@ export default function TvSize({ locale, diag = 55 }: { locale: Locale; diag?: n
             {mode === "dist" && distOk && (
               <>
                 <div className="text-sm text-fg-2">{t.diagResult}</div>
-                <div className="tabular text-4xl font-semibold tracking-tight text-fg sm:text-5xl">
+                <div className="tabular text-5xl font-semibold tracking-tight text-fg sm:text-6xl">
                   {`${n(diagonalForAngle(M, 30), 0)}–${n(diagonalForAngle(M, 40), 0)}″`}
                 </div>
                 <div className="text-sm text-fg-3">{t.rangeNote}</div>

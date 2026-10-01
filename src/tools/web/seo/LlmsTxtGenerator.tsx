@@ -4,7 +4,7 @@ import { useId, useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { Field, Input, Textarea } from "@/ui/field";
 import { buildLlmsTxt } from "./lib/outline";
-import { Issues, More, Output } from "./ui/kit";
+import { Issues, More, Output, Split } from "./ui/kit";
 
 const T = {
   ru: {
@@ -47,28 +47,31 @@ export default function LlmsTxtGenerator({ locale }: { locale: Locale }) {
   const r = buildLlmsTxt({ name, summary, details, links });
 
   return (
-    <div className="flex flex-col gap-5">
-      <div className="grid gap-4 sm:grid-cols-2">
-        <Field label={t.name} htmlFor={`${id}-n`}>
-          <Input id={`${id}-n`} value={name} onChange={(e) => setName(e.target.value)} autoComplete="off" />
-        </Field>
-        <Field label={t.summary} htmlFor={`${id}-s`}>
-          <Input id={`${id}-s`} value={summary} onChange={(e) => setSummary(e.target.value)} autoComplete="off" />
-        </Field>
-      </div>
-      <Field label={t.links} htmlFor={`${id}-l`} hint={t.linksHint}>
-        <Textarea id={`${id}-l`} value={links} onChange={(e) => setLinks(e.target.value)} rows={8} className="font-mono text-sm" spellCheck={false} />
-      </Field>
-      <More label={t.more}>
-        <Field label={t.details} htmlFor={`${id}-d`}>
-          <Textarea id={`${id}-d`} value={details} onChange={(e) => setDetails(e.target.value)} rows={4} />
-        </Field>
-      </More>
-      <div aria-live="polite">
-        <Issues items={r.bad.map(t.bad)} />
-      </div>
-      <Output locale={locale} value={r.text} title={t.out} filename="llms.txt" mime="text/markdown;charset=utf-8" rows={12} />
+    <Split
+      input={
+        <>
+          <Field label={t.name} htmlFor={`${id}-n`}>
+            <Input id={`${id}-n`} value={name} onChange={(e) => setName(e.target.value)} autoComplete="off" />
+          </Field>
+          <Field label={t.summary} htmlFor={`${id}-s`}>
+            <Input id={`${id}-s`} value={summary} onChange={(e) => setSummary(e.target.value)} autoComplete="off" />
+          </Field>
+          <Field label={t.links} htmlFor={`${id}-l`} hint={t.linksHint}>
+            <Textarea id={`${id}-l`} value={links} onChange={(e) => setLinks(e.target.value)} rows={8} className="font-mono text-sm" spellCheck={false} />
+          </Field>
+          <More label={t.more}>
+            <Field label={t.details} htmlFor={`${id}-d`}>
+              <Textarea id={`${id}-d`} value={details} onChange={(e) => setDetails(e.target.value)} rows={4} />
+            </Field>
+          </More>
+          <div aria-live="polite">
+            <Issues items={r.bad.map(t.bad)} />
+          </div>
+        </>
+      }
+    >
+      <Output locale={locale} value={r.text} title={t.out} filename="llms.txt" mime="text/markdown;charset=utf-8" rows={16} />
       <p className="text-sm text-fg-3">{t.where}</p>
-    </div>
+    </Split>
   );
 }

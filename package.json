@@ -67,6 +67,7 @@
   "devDependencies": {
     "@axe-core/playwright": "^4.13.0",
     "@csstools/postcss-cascade-layers": "^6.0.1",
+    "@eslint/compat": "^2.1.1",
     "@playwright/test": "^1.63.0",
     "@tailwindcss/postcss": "^4.3.3",
     "@types/node": "^24.13.6",
@@ -74,7 +75,7 @@
     "@types/react-dom": "^19.3.0",
     "@types/ua-parser-js": "^0.7.39",
     "acorn": "^8.18.0",
-    "eslint": "^9.39.5",
+    "eslint": "^10.11.0",
     "eslint-config-next": "^16.3.8",
     "knip": "^5.88.1",
     "lightningcss": "^1.33.0",
@@ -109,5 +110,16 @@
       "@ffmpeg/core",
       "html-entities"
     ]
+  },
+  "overrides": {
+    "eslint-plugin-react": {
+      "eslint": "$eslint"
+    },
+    "eslint-plugin-import": {
+      "eslint": "$eslint"
+    },
+    "eslint-plugin-jsx-a11y": {
+      "eslint": "$eslint"
+    }
   }
 }

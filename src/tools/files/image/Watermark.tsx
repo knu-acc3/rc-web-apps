@@ -132,25 +132,23 @@ export default function Watermark({ locale }: { locale: Locale }) {
 
   const options = (
     <>
-      <Field label={t.kind}>
-        <Segmented
-          wrap
-          label={t.kind}
-          value={kind}
-          onChange={setKind}
-          options={[
-            { value: "text", label: t.text },
-            { value: "image", label: t.logo },
-          ]}
-        />
-      </Field>
+      <Segmented
+        fill
+        label={t.kind}
+        value={kind}
+        onChange={setKind}
+        options={[
+          { value: "text", label: t.text },
+          { value: "image", label: t.logo },
+        ]}
+      />
       {kind === "text" ? (
-        <Field label={t.textValue} htmlFor={`${id}-txt`} className="min-w-48 flex-1">
+        <Field label={t.textValue} htmlFor={`${id}-txt`}>
           <Input id={`${id}-txt`} value={text} placeholder={t.placeholder} onChange={(e) => setText(e.target.value)} maxLength={120} />
         </Field>
       ) : (
-        <div className="flex min-w-48 flex-1 flex-col gap-1.5">
-          <Button variant="outline" onClick={() => fileRef.current?.click()}>
+        <div className="flex flex-col gap-1.5">
+          <Button variant="tonal" onClick={() => fileRef.current?.click()}>
             <ImagePlus aria-hidden />
             {logo ? t.change : t.choose}
           </Button>
@@ -173,9 +171,7 @@ export default function Watermark({ locale }: { locale: Locale }) {
         </div>
       )}
       <PositionPicker label={t.position} value={position} onChange={setPosition} locale={locale} />
-      <div className="w-44">
-        <RangeField label={t.opacity} value={opacity} onChange={setOpacity} min={5} max={100} unit="%" locale={locale} />
-      </div>
+      <RangeField label={t.opacity} value={opacity} onChange={setOpacity} min={5} max={100} unit="%" locale={locale} />
     </>
   );
 
@@ -194,7 +190,7 @@ export default function Watermark({ locale }: { locale: Locale }) {
             </Select>
           </Field>
           <ColorField label={t.color} value={color} onChange={setColor} locale={locale} />
-          <div className="flex flex-wrap gap-4">
+          <div className="flex flex-wrap gap-x-5 gap-y-1">
             <Switch label={t.bold} checked={bold} onChange={(e) => setBold(e.target.checked)} />
             <Switch label={t.shadow} checked={shadow} onChange={(e) => setShadow(e.target.checked)} />
           </div>
@@ -211,6 +207,7 @@ export default function Watermark({ locale }: { locale: Locale }) {
 
   return (
     <BatchWorkspace
+      self="watermark"
       locale={locale}
       batch={batch}
       options={options}

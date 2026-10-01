@@ -3,9 +3,10 @@
 import { Bell, BellOff, Play, Settings2, Volume2 } from "lucide-react";
 import { useState } from "react";
 import type { Locale } from "@/i18n/config";
-import { Button } from "@/ui/button";
-import { Select, Switch } from "@/ui/field";
+import { IconButton } from "@/ui/button";
+import { Switch } from "@/ui/field";
 import { Fold } from "@/ui/fold";
+import { Segmented } from "@/ui/segmented";
 import { useStoredJson } from "@/tools/time/time/lib/storage";
 import { schedule, SOUND_IDS, type SoundId } from "../lib/audio";
 import { requestNotifications, useNotificationsSupported } from "../lib/notify";
@@ -55,7 +56,6 @@ export function useAlertOptions(): [AlertOptions, (o: AlertOptions) => void] {
   return [o, set];
 }
 
-/** One quiet row: sound, notification, full screen. */
 /** Sound and notification settings, folded away: the timer itself stays the only thing in focus. */
 export function TimerOptions({ locale, options, onChange }: { locale: Locale; options: AlertOptions; onChange: (o: AlertOptions) => void }) {
   const t = T[locale];
@@ -72,18 +72,16 @@ export function TimerOptions({ locale, options, onChange }: { locale: Locale; op
       hint={`${t[options.sound]}${options.notify ? ` · ${t.notify}` : ""}`}
       bodyClassName="flex flex-wrap items-center gap-x-4 gap-y-3 p-4 text-sm"
     >
-      <div className="flex items-center gap-1.5">
-        <Volume2 className="size-4 text-fg-3" aria-hidden />
-        <Select aria-label={t.sound} size="sm" className="w-36" value={options.sound} onChange={(e) => onChange({ ...options, sound: e.target.value as SoundChoice })}>
-          {(["beep", "digital", "bell", "soft", "off"] as SoundChoice[]).map((s) => (
-            <option key={s} value={s}>
-              {t[s]}
-            </option>
-          ))}
-        </Select>
-        <Button variant="ghost" size="icon-sm" aria-label={t.test} title={t.test} disabled={options.sound === "off"} onClick={() => options.sound !== "off" && schedule(options.sound, 0, 1)}>
-          <Play aria-hidden />
-        </Button>
+      <div className="flex min-w-0 flex-wrap items-center gap-2">
+        <Volume2 className="size-4 shrink-0 text-fg-3" aria-hidden />
+        <Segmented
+          size="sm"
+          label={t.sound}
+          value={options.sound}
+          onChange={(v) => onChange({ ...options, sound: v })}
+          options={(["beep", "digital", "bell", "soft", "off"] as SoundChoice[]).map((v) => ({ value: v, label: t[v] }))}
+        />
+        <IconButton label={t.test} variant="tonal" size="sm" disabled={options.sound === "off"} onClick={() => options.sound !== "off" && schedule(options.sound, 0, 1)} icon={<Play aria-hidden />} />
       </div>
       {supported && (
         <Switch

@@ -5,6 +5,7 @@ import type { Locale } from "@/i18n/config";
 import { formatNumber } from "@/i18n/format";
 import { cn } from "@/lib/cn";
 import { Field, Input, Slider } from "@/ui/field";
+import { NumberInput } from "@/ui/number-input";
 import { normalizeHex } from "../lib/palette";
 import { S } from "./strings";
 
@@ -84,69 +85,59 @@ export function RangeField({
   format?: (v: number) => string;
 }) {
   const id = useId();
-  const shown = format ? format(value) : `${formatNumber(locale, value)}${unit ? (unit === "%" || unit === "°" ? unit : ` ${unit}`) : ""}`;
+  const show = (v: number) => (format ? format(v) : `${formatNumber(locale, v)}${unit ? (unit === "°" ? unit : ` ${unit}`) : ""}`);
+  const shown = show(value);
   return (
-    <Field label={label} htmlFor={id} hint={hint} aside={<span className="tabular text-sm font-medium text-fg">{shown}</span>}>
-      <Slider id={id} min={min} max={max} step={step} value={value} onChange={(e) => onChange(Number(e.target.value))} aria-valuetext={shown} />
+    <Field label={label} htmlFor={id} hint={hint} aside={<span className="tabular text-[0.9375rem] font-semibold text-fg">{shown}</span>}>
+      <Slider id={id} min={min} max={max} step={step} value={value} onChange={(e) => onChange(Number(e.target.value))} aria-valuetext={shown} format={show} />
     </Field>
   );
 }
 
-/** Integer input that accepts only digits and clamps on blur. */
+/** Labelled number field (− / + optional): clamps on blur; empty = null. */
 export function NumberField({
   label,
   value,
   onChange,
   min = 1,
   max = 100000,
+  step = 1,
   suffix,
   className,
   placeholder,
+  stepper = false,
+  locale,
+  hint,
 }: {
   label: ReactNode;
   value: number | null;
   onChange: (v: number | null) => void;
   min?: number;
   max?: number;
+  step?: number;
   suffix?: string;
   className?: string;
   placeholder?: string;
+  /** Show − / + (for small values: DPI, delays, counts). */
+  stepper?: boolean;
+  locale?: Locale;
+  hint?: ReactNode;
 }) {
   const id = useId();
-  const [text, setText] = useState(value === null ? "" : String(value));
-  const [prev, setPrev] = useState(value);
-  if (prev !== value) {
-    setPrev(value);
-    if ((text === "" ? null : Number(text)) !== value) setText(value === null ? "" : String(value));
-  }
   return (
-    <Field label={label} htmlFor={id} className={className}>
-      <div className="relative">
-        <Input
-          id={id}
-          inputMode="numeric"
-          autoComplete="off"
-          value={text}
-          placeholder={placeholder}
-          className={cn("tabular", suffix && "pr-10")}
-          onChange={(e) => {
-            const t = e.target.value.replace(/[^\d]/g, "");
-            setText(t);
-            if (t === "") onChange(null);
-            else {
-              const n = Number(t);
-              if (n >= min && n <= max) onChange(n);
-            }
-          }}
-          onBlur={() => {
-            if (text === "") return;
-            const n = Math.min(max, Math.max(min, Number(text)));
-            setText(String(n));
-            onChange(n);
-          }}
-        />
-        {suffix && <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-sm text-fg-3">{suffix}</span>}
-      </div>
+    <Field label={label} htmlFor={id} className={className} hint={hint}>
+      <NumberInput
+        id={id}
+        value={value}
+        onChange={onChange}
+        min={min}
+        max={max}
+        step={step}
+        suffix={suffix}
+        placeholder={placeholder}
+        stepper={stepper}
+        locale={locale}
+      />
     </Field>
   );
 }
@@ -166,3 +157,9 @@ export function ProgressBar({ value, className }: { value: number; className?: s
 /** Checkerboard background that works in light and dark themes. */
 export const checker =
   "bg-[length:16px_16px] bg-[position:0_0,8px_8px] [background-image:linear-gradient(45deg,var(--surface-2)_25%,transparent_25%,transparent_75%,var(--surface-2)_75%),linear-gradient(45deg,var(--surface-2)_25%,transparent_25%,transparent_75%,var(--surface-2)_75%)] bg-surface";
+
+/**
+ * A drop zone that replaces the current file: the full zone's "Choose file" button (the compact zone says "Add more"),
+ * squeezed to the height of a compact one.
+ */
+export const replaceDrop = "min-h-0! gap-2! px-4! py-5!";

@@ -5,7 +5,7 @@ import { useSyncExternalStore } from "react";
 import type { Locale } from "@/i18n/config";
 import { formatNumber } from "@/i18n/format";
 import { CopyButton } from "@/ui/copy-button";
-import { Panel } from "@/ui/panel";
+import { Notice, Panel } from "@/ui/panel";
 import type { ToolProps } from "../../types";
 import { physicalSize, resolutionName } from "./lib/screen";
 import { tzOffsetMinutes, utcLabel } from "./lib/tz";
@@ -89,9 +89,9 @@ function detectMisc(): Misc {
 
 function Item({ locale, label, value, slug }: { locale: Locale; label: string; value: string | null; slug: string }) {
   return (
-    <div className="flex min-w-0 flex-col gap-0.5 border-b border-line py-3">
+    <div className="flex min-w-0 flex-col gap-0.5 rounded-[1rem] bg-surface-2 px-4 py-3">
       <dt>
-        <Link href={`/${locale}/${slug}`} className="text-[0.8125rem] text-fg-3 hover:text-accent">
+        <Link href={`/${locale}/${slug}`} className="text-[0.8125rem] text-fg-3 underline-offset-2 hover:text-accent hover:underline">
           {label}
         </Link>
       </dt>
@@ -132,20 +132,20 @@ export default function Summary({ locale }: ToolProps) {
   const report = ready ? items.map((x) => `${x.label}: ${x.value}`).join("\n") : "";
 
   return (
-    <Panel className="overflow-hidden">
-      <div className="flex flex-wrap items-center justify-between gap-3 px-5 pt-5 pb-2 sm:px-7">
+    <Panel className="flex flex-col gap-4 p-4 sm:p-6">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <h2 className="text-lg font-semibold text-fg">{t.title}</h2>
         <CopyButton value={report} label={t.copyAll} copiedLabel={c.copied} variant="primary" size="md" />
       </div>
       {/* The viewport row changes on resize, so the list is not a live region. */}
-      <dl className="grid px-5 pb-2 sm:grid-cols-2 sm:gap-x-10 sm:px-7">
+      <dl className="grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
         {items.map((x) => (
           <Item key={x.slug} locale={locale} label={x.label} value={x.value} slug={x.slug} />
         ))}
       </dl>
-      <p className="px-5 py-3 text-[0.8125rem] text-fg-3 sm:px-7">{c.local}</p>
+      <p className="text-[0.8125rem] text-fg-3">{c.local}</p>
       <noscript>
-        <p className="border-t border-line bg-warn-soft px-5 py-3 text-sm text-warn sm:px-7">{c.noscript}</p>
+        <Notice tone="warn">{c.noscript}</Notice>
       </noscript>
     </Panel>
   );

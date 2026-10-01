@@ -4,8 +4,8 @@ import { useId, useState, type ReactNode } from "react";
 import type { Locale } from "@/i18n/config";
 import { cn } from "@/lib/cn";
 import { CodeOutput } from "@/ui/code-output";
-import { Input, Slider } from "@/ui/field";
 import { Segmented } from "@/ui/segmented";
+import { SliderField } from "@/ui/slider-field";
 import { Tabs } from "@/ui/tabs";
 import { CHECKER_STYLE } from "@/tools/design/color/ui/ColorField";
 
@@ -47,7 +47,7 @@ export function Stage({
   const t = STAGE_T[locale];
   const [bg, setBg] = useState<StageBg>(defaultBg);
   return (
-    <div className={cn("relative overflow-hidden rounded-[0.75rem] border border-line", className)} style={surface ? { background: surface } : STAGE_BG[bg]}>
+    <div className={cn("relative overflow-hidden rounded-[1.25rem] shadow-card", className)} style={surface ? { background: surface } : STAGE_BG[bg]}>
       {switcher && !surface && (
         <div className="absolute top-2 right-2 z-10">
           <Segmented
@@ -103,7 +103,24 @@ export function CodePanel({ tabs, locale, minRows = 4 }: { tabs: CodeTab[]; loca
   );
 }
 
-/** Label + range slider + number input, all bound to one value. */
+/** Decimals implied by a slider step: 1 → 0, 0.1 → 1, 0.125 → 3. */
+function stepDecimals(step: number): number {
+  const str = String(step);
+  return str.includes(".") ? str.length - str.indexOf(".") - 1 : 0;
+}
+
+/** Reads what the user typed: "12", "-4", "1,5", "−3" (typographic minus). */
+function parseNum(text: string): number | null {
+  const s = text.trim().replace(",", ".").replace(/^[−–]/, "-");
+  if (!s || s === "-" || s === ".") return null;
+  const n = Number(s);
+  return Number.isFinite(n) ? n : null;
+}
+
+/**
+ * A CSS length or percentage you can drag: the value written on the line (tap it to type an exact number, even past
+ * the slider's ends) and a Material slider under it. Keeps the number API of the generators.
+ */
 export function NumberSlider({
   label,
   value,
@@ -124,28 +141,31 @@ export function NumberSlider({
   className?: string;
 }) {
   const id = useId();
+  const decimals = stepDecimals(step);
+  const format = (n: number) => String(Number(n.toFixed(decimals)));
+  const [text, setText] = useState(() => format(Number.isFinite(value) ? value : 0));
+  const [prev, setPrev] = useState(value);
+  if (prev !== value) {
+    setPrev(value);
+    if (parseNum(text) !== value) setText(format(value));
+  }
   return (
-    <div className={cn("grid grid-cols-[minmax(0,1fr)_5.5rem] items-center gap-x-3 gap-y-1", className)}>
-      <label htmlFor={`${id}-n`} className="col-span-2 text-sm text-fg-2">
-        {label}
-      </label>
-      <Slider aria-label={label} min={min} max={max} step={step} value={Math.min(max, Math.max(min, value))} onChange={(e) => onChange(Number(e.target.value))} />
-      <div className="relative">
-        <Input
-          id={`${id}-n`}
-          type="number"
-          inputMode="decimal"
-          step={step}
-          value={Number.isFinite(value) ? value : 0}
-          onChange={(e) => {
-            const n = Number(e.target.value);
-            if (Number.isFinite(n)) onChange(n);
-          }}
-          size="sm"
-          className={unit ? "pr-8" : undefined}
-        />
-        {unit && <span className="pointer-events-none absolute top-1/2 right-2.5 -translate-y-1/2 text-xs text-fg-3">{unit}</span>}
-      </div>
-    </div>
+    <SliderField
+      id={id}
+      label={label}
+      value={text}
+      onChange={(s) => {
+        setText(s);
+        const n = parseNum(s);
+        if (n !== null) onChange(n);
+      }}
+      parse={parseNum}
+      format={format}
+      min={min}
+      max={max}
+      step={step}
+      suffix={unit}
+      className={className}
+    />
   );
 }

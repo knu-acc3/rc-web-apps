@@ -4,8 +4,9 @@ import type { ReactNode } from "react";
 import type { Locale } from "@/i18n/config";
 import { cn } from "@/lib/cn";
 import { CodeOutput } from "@/ui/code-output";
-import { Checkbox, Field, Input, Select, Textarea } from "@/ui/field";
-import { Notice } from "@/ui/panel";
+import { Field, Input, Select, Switch, Textarea } from "@/ui/field";
+import { Fold } from "@/ui/fold";
+import { Notice, Panel } from "@/ui/panel";
 
 export type L = Record<Locale, string>;
 export type Fields = Record<string, string>;
@@ -44,14 +45,22 @@ export function FieldGrid({ specs, f, set, locale, id }: { specs: FieldSpec[]; f
         const value = f[s.key] ?? "";
         if (s.kind === "checkbox")
           return (
-            <div key={s.key} className={cn("flex items-end pb-2", cls)}>
-              <Checkbox label={s.label[locale]} checked={value === "true"} onChange={(e) => set(s.key, e.target.checked ? "true" : "")} />
+            <div key={s.key} className={cn("flex items-end", cls)}>
+              <Switch label={s.label[locale]} checked={value === "true"} onChange={(e) => set(s.key, e.target.checked ? "true" : "")} />
             </div>
           );
         return (
           <Field key={s.key} label={s.label[locale]} htmlFor={fid} hint={s.hint?.[locale]} className={cls}>
             {s.kind === "textarea" ? (
-              <Textarea id={fid} value={value} onChange={(e) => set(s.key, e.target.value)} placeholder={s.placeholder} rows={s.rows ?? 3} className={s.mono ? "font-mono text-sm" : undefined} spellCheck={s.mono ? false : undefined} />
+              <Textarea
+                id={fid}
+                value={value}
+                onChange={(e) => set(s.key, e.target.value)}
+                placeholder={s.placeholder}
+                rows={s.rows ?? 3}
+                className={s.mono ? "font-mono text-sm" : undefined}
+                spellCheck={s.mono ? false : undefined}
+              />
             ) : s.kind === "select" ? (
               <Select id={fid} value={value || s.options?.[0][0]} onChange={(e) => set(s.key, e.target.value)}>
                 {s.options?.map(([v, l]) => (
@@ -80,13 +89,22 @@ export function FieldGrid({ specs, f, set, locale, id }: { specs: FieldSpec[]; f
   );
 }
 
-/** Secondary fields tucked under a disclosure. */
+/** Secondary fields tucked under a quiet "More" text button inside the input card. */
 export function More({ label, children }: { label: string; children: ReactNode }) {
   return (
-    <details className="rounded-[0.75rem] border border-line">
-      <summary className="cursor-pointer px-4 py-2.5 text-sm font-medium text-fg-2 select-none hover:text-fg">{label}</summary>
-      <div className="px-4 pt-1 pb-4">{children}</div>
-    </details>
+    <Fold variant="inline" title={label}>
+      {children}
+    </Fold>
+  );
+}
+
+/** Inputs in a card on the left, the generated result on the right from `lg` (stacked on phones). */
+export function Split({ input, children, className }: { input: ReactNode; children?: ReactNode; className?: string }) {
+  return (
+    <div className={cn("grid items-start gap-4 lg:grid-cols-2 lg:gap-6", className)}>
+      <Panel className="flex min-w-0 flex-col gap-5 p-4 sm:p-6">{input}</Panel>
+      <div className="flex min-w-0 flex-col gap-4 empty:hidden">{children}</div>
+    </div>
   );
 }
 

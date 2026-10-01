@@ -7,9 +7,10 @@ import { CodeEditor } from "@/tools/dev/shared/CodeEditor";
 import { useLiveTask } from "@/tools/dev/shared/hooks";
 import { outputLabels, positionLabel } from "@/tools/dev/shared/labels";
 import type { JsonWarning } from "@/tools/dev/shared/json";
+import { Opt, OptionsRow, Pane } from "@/tools/dev/shared/Pane";
 import { CodeOutput } from "@/ui/code-output";
 import { CopyButton } from "@/ui/copy-button";
-import { Select, Switch } from "@/ui/field";
+import { Switch } from "@/ui/field";
 import { Notice } from "@/ui/panel";
 import { Segmented } from "@/ui/segmented";
 import { ErrorBox, failOf, useCodeWorker } from "./ui/ErrorBox";
@@ -40,37 +41,19 @@ export default function JsonFormatter({ locale, indent: initialIndent = "2" }: J
   const editorId = `${id}-in`;
   const output = fail ? "" : (res?.output ?? "");
 
-  const toggle = (
-    <Segmented
-      size="sm"
-      label={`${t.text} / ${t.tree}`}
-      value={view}
-      onChange={setView}
-      options={[
-        { value: "text", label: t.text },
-        { value: "tree", label: t.tree },
-      ]}
-    />
-  );
-
   const warnings = groupWarnings(res && !fail ? res.warnings : []);
+  const labels = outputLabels(locale);
 
   return (
     <div className="flex flex-col gap-4">
       <div className="grid gap-4 lg:grid-cols-2">
         <CodeEditor id={editorId} locale={locale} label={`${t.input}: JSON`} value={text} onChange={setText} rows={18} sample={SAMPLES.json} fileAccept=".json,.txt,application/json" invalid={!!fail} />
         {view === "text" ? (
-          <CodeOutput value={output} title={t.result} filename="formatted.json" mime="application/json" labels={outputLabels(locale)} minRows={18} className={live.pending ? "[&>textarea]:text-fg-3" : undefined} />
+          <CodeOutput value={output} title={t.result} filename="formatted.json" mime="application/json" labels={labels} minRows={18} className={live.pending ? "[&>textarea]:text-fg-3" : undefined} />
         ) : (
-          <div className="flex min-w-0 flex-col overflow-hidden rounded-[0.75rem] border border-line bg-surface">
-            <div className="flex min-h-11 items-center justify-between gap-2 border-b border-line px-3 py-1.5">
-              <div className="min-w-0 truncate text-sm font-semibold text-fg">{t.result}</div>
-              <div className="flex items-center gap-1">
-                <CopyButton value={output} label={outputLabels(locale).copy} copiedLabel={outputLabels(locale).copied} variant="ghost" />
-              </div>
-            </div>
+          <Pane title={t.result} actions={<CopyButton value={output} label={labels.copy} copiedLabel={labels.copied} variant="secondary" compact />}>
             <div className={live.pending ? "opacity-70" : undefined}>{res?.tree && !fail ? <JsonTree root={res.tree} locale={locale} label={t.tree} /> : <div className="min-h-32" />}</div>
-          </div>
+          </Pane>
         )}
       </div>
 
@@ -89,17 +72,31 @@ export default function JsonFormatter({ locale, indent: initialIndent = "2" }: J
         </Notice>
       )}
 
-      <div className="flex flex-wrap items-center gap-x-5 gap-y-3 text-sm text-fg-2">
-        {toggle}
-        <label className="flex items-center gap-2">
-          {t.indent}
-          <Select value={indent} size="sm" className="w-40" onChange={(e) => setIndent(e.target.value)}>
-            <option value="2">{t.spaces("2")}</option>
-            <option value="4">{t.spaces("4")}</option>
-            <option value="tab">{t.tab}</option>
-            <option value="0">{t.minified}</option>
-          </Select>
-        </label>
+      <OptionsRow>
+        <Segmented
+          size="sm"
+          label={`${t.text} / ${t.tree}`}
+          value={view}
+          onChange={setView}
+          options={[
+            { value: "text", label: t.text },
+            { value: "tree", label: t.tree },
+          ]}
+        />
+        <Opt label={t.indent} group>
+          <Segmented
+            size="sm"
+            label={t.indent}
+            value={indent}
+            onChange={setIndent}
+            options={[
+              { value: "2", label: t.spaces("2") },
+              { value: "4", label: t.spaces("4") },
+              { value: "tab", label: t.tab },
+              { value: "0", label: t.minified },
+            ]}
+          />
+        </Opt>
         <Switch label={t.sortKeys} checked={sortKeys} onChange={(e) => setSortKeys(e.target.checked)} />
         <Switch label={t.ascii} checked={ascii} onChange={(e) => setAscii(e.target.checked)} />
         {res && !fail && (
@@ -107,7 +104,7 @@ export default function JsonFormatter({ locale, indent: initialIndent = "2" }: J
             {formatNumber(locale, res.nodes)} {plural(locale, res.nodes, t.nodes)} · {t.depth} {formatNumber(locale, res.depth)} · {formatBytes(locale, res.bytes)}
           </span>
         )}
-      </div>
+      </OptionsRow>
     </div>
   );
 }

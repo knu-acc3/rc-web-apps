@@ -3,9 +3,9 @@
 import { useId } from "react";
 import { Segmented } from "@/ui/segmented";
 import type { ToolProps } from "../../../types";
-import { CURRENCIES, CURRENCY_SYMBOL, fmtMoney, fmtPct, isCurrency, type Currency } from "../../shared/fmt";
+import { CURRENCIES, CURRENCY_SYMBOL, fmtMoney, fmtPct, isCurrency, moneyMax, type Currency } from "../../shared/fmt";
 import { field, toInput } from "../../shared/num";
-import { CalcGrid, Disclaimer, Explain, InlineSelect, NumField, OptionsRow, ResultMain, Stack, ToolActions } from "../../shared/ui";
+import { CalcGrid, Disclaimer, Explain, NumSlider, OptionsRow, ResultMain, SelectField, Stack, ToolActions } from "../../shared/ui";
 import { useQueryState } from "../../shared/url-state";
 import { addVat, extractVat, VAT_PRESETS } from "../lib/money";
 import { CurrencySelect } from "../loan/parts";
@@ -19,7 +19,7 @@ const T = {
     amountGross: "Сумма с НДС",
     rate: "Ставка",
     custom: "своя ставка",
-    customRate: "Ставка НДС, %",
+    customRate: "Ставка НДС",
     presets: {
       "kz-2026": "Казахстан с 2026 — 16 %",
       "kz-2025": "Казахстан до 2026 — 12 %",
@@ -45,7 +45,7 @@ const T = {
     amountGross: "Amount including VAT",
     rate: "Rate",
     custom: "custom rate",
-    customRate: "VAT rate, %",
+    customRate: "VAT rate",
     presets: {
       "kz-2026": "Kazakhstan from 2026 — 16%",
       "kz-2025": "Kazakhstan before 2026 — 12%",
@@ -90,6 +90,7 @@ export default function Vat({ locale, preset = "kz-2026", mode = "add", amount =
     <>
       <Segmented
         label={t.mode}
+        fill
         value={m}
         onChange={(v) => q.set({ m: v })}
         options={[
@@ -97,12 +98,16 @@ export default function Vat({ locale, preset = "kz-2026", mode = "add", amount =
           { value: "extract", label: t.extract },
         ]}
       />
-      <NumField id={`${id}-a`} label={m === "add" ? t.amountNet : t.amountGross} value={q.v.a} onChange={(a) => q.set({ a })} suffix={sym} error={A.message} size="lg" />
-      <OptionsRow>
-        <InlineSelect id={`${id}-p`} label={t.rate} value={q.v.p} onChange={(v) => q.set({ p: v })} options={PRESET_IDS.map((x) => ({ value: x, label: x === "custom" ? t.custom : t.presets[x] }))} />
-        {!p && <CurrencySelect id={`${id}-c`} locale={locale} value={cur} onChange={(c) => q.set({ c })} />}
-      </OptionsRow>
-      {!p && <NumField id={`${id}-r`} label={t.customRate} value={q.v.r} onChange={(r) => q.set({ r })} suffix="%" error={R.message} />}
+      <NumSlider id={`${id}-a`} locale={locale} label={m === "add" ? t.amountNet : t.amountGross} value={q.v.a} onChange={(a) => q.set({ a })} suffix={sym} error={A.message} min={0} max={moneyMax(cur, 10_000_000)} scale="log" />
+      <SelectField id={`${id}-p`} label={t.rate} value={q.v.p} onChange={(v) => q.set({ p: v })} options={PRESET_IDS.map((x) => ({ value: x, label: x === "custom" ? t.custom : t.presets[x] }))} />
+      {!p && (
+        <>
+          <NumSlider id={`${id}-r`} locale={locale} label={t.customRate} value={q.v.r} onChange={(r) => q.set({ r })} suffix="%" error={R.message} min={0} max={30} decimals={1} />
+          <OptionsRow>
+            <CurrencySelect locale={locale} value={cur} onChange={(c) => q.set({ c })} />
+          </OptionsRow>
+        </>
+      )}
     </>
   );
 

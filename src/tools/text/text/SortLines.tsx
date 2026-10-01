@@ -4,9 +4,10 @@ import { Shuffle } from "lucide-react";
 import { useId, useMemo, useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { Button } from "@/ui/button";
-import { Checkbox } from "@/ui/field";
+import { Switch } from "@/ui/field";
 import { prepareLines, shuffle, sortLines, type SortMode } from "./lib/textOps";
 import { InlineSelect, InputPanel, MoreOptions, OptionsBar, OutputPanel, TwoPane } from "./ui/shared";
+import { ChipChoice } from "@/ui/chip-choice";
 
 const T = {
   ru: {
@@ -90,24 +91,24 @@ export default function SortLines({ locale, mode: mode0 = "alpha", descending = 
   const sortable = mode !== "random" && mode !== "reverse";
   return (
     <div className="flex flex-col gap-4">
+      <ChipChoice
+        label={t.mode}
+        value={mode}
+        onChange={(m) => {
+          setMode(m);
+          if (m === "random") reshuffle(text);
+        }}
+        grid="grid-cols-2 sm:grid-cols-3 lg:grid-cols-6"
+        options={(["alpha", "natural", "numeric", "length", "random", "reverse"] as const).map((m) => ({ value: m, label: t[m] }))}
+      />
       <OptionsBar>
-        <InlineSelect
-          id={`${id}-mode`}
-          label={t.mode}
-          value={mode}
-          onChange={(m) => {
-            setMode(m);
-            if (m === "random") reshuffle(text);
-          }}
-          options={(["alpha", "natural", "numeric", "length", "random", "reverse"] as const).map((m) => ({ value: m, label: t[m] }))}
-        />
         {mode === "random" && (
-          <Button size="sm" variant="primary" onClick={() => reshuffle(text)}>
+          <Button size="lg" variant="filled" onClick={() => reshuffle(text)}>
             <Shuffle aria-hidden />
             {t.shuffle}
           </Button>
         )}
-        {sortable && <Checkbox label={t.desc} checked={desc} onChange={(e) => setDesc(e.target.checked)} />}
+        {sortable && <Switch label={t.desc} checked={desc} onChange={(e) => setDesc(e.target.checked)} />}
       </OptionsBar>
       <TwoPane>
         <InputPanel
@@ -125,7 +126,7 @@ export default function SortLines({ locale, mode: mode0 = "alpha", descending = 
       {mode === "numeric" && <p className="text-sm text-fg-3">{t.numericNote}</p>}
       {mode === "random" && !shuffled && <p className="text-sm text-fg-3">{t.shuffleHint}</p>}
       <MoreOptions locale={locale}>
-        {sortable && <Checkbox label={t.ignoreCase} checked={ignoreCase} onChange={(e) => setIgnoreCase(e.target.checked)} />}
+        {sortable && <Switch label={t.ignoreCase} checked={ignoreCase} onChange={(e) => setIgnoreCase(e.target.checked)} />}
         {sortable && (
           <InlineSelect
             id={`${id}-coll`}
@@ -139,9 +140,9 @@ export default function SortLines({ locale, mode: mode0 = "alpha", descending = 
             ]}
           />
         )}
-        <Checkbox label={t.removeEmpty} checked={removeEmpty} onChange={(e) => setRemoveEmpty(e.target.checked)} />
-        <Checkbox label={t.trim} checked={trim} onChange={(e) => setTrim(e.target.checked)} />
-        <Checkbox label={t.unique} checked={unique} onChange={(e) => setUnique(e.target.checked)} />
+        <Switch label={t.removeEmpty} checked={removeEmpty} onChange={(e) => setRemoveEmpty(e.target.checked)} />
+        <Switch label={t.trim} checked={trim} onChange={(e) => setTrim(e.target.checked)} />
+        <Switch label={t.unique} checked={unique} onChange={(e) => setUnique(e.target.checked)} />
       </MoreOptions>
     </div>
   );

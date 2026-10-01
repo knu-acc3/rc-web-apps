@@ -168,7 +168,7 @@ function Dial({
       viewBox="0 0 200 200"
       role="img"
       aria-label={`${t.clock}: ${label12(total)}`}
-      className={cn("aspect-square touch-none select-none", big ? "w-[min(86vh,92vw)]" : "w-full max-w-[26rem]", onChange && "cursor-pointer")}
+      className={cn("aspect-square touch-none select-none", big ? "w-[min(86vh,92vw)]" : "w-full max-w-[26rem] 2xl:max-w-[34rem]", onChange && "cursor-pointer")}
       onPointerDown={(e) => {
         if (!onChange) return;
         const { angle, dist } = angleOf(e);
@@ -270,13 +270,13 @@ export default function TeachingClock({ locale }: { locale: Locale }) {
     <div className="flex flex-col gap-5">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <Segmented wrap label={t.mode} value={mode} onChange={changeMode} options={(["free", "read", "set"] as Mode[]).map((v) => ({ value: v, label: t.modes[v] }))} />
-        <Button variant="primary" onClick={stage.enter} title={t.full}>
+        <Button variant="tonal" onClick={stage.enter} title={t.full}>
           <Maximize aria-hidden />
           <span className="max-sm:sr-only">{t.full}</span>
         </Button>
       </div>
 
-      <div className="grid items-center gap-6 md:grid-cols-[minmax(0,26rem)_1fr]">
+      <div className="grid items-center gap-6 md:grid-cols-[minmax(0,26rem)_1fr] 2xl:grid-cols-[minmax(0,34rem)_1fr]">
         <div className="flex justify-center">
           <Dial total={mode === "read" && task ? task.answer : total} ring={o.ring} t={t} onChange={mode === "read" ? undefined : setTotal} />
         </div>
@@ -330,11 +330,11 @@ export default function TeachingClock({ locale }: { locale: Locale }) {
                         setScore((s) => ({ right: s.right + (isRight ? 1 : 0), all: s.all + 1 }));
                       }}
                       className={cn(
-                        "flex min-h-14 items-center justify-between gap-2 rounded-[0.75rem] border px-4 py-2 text-left font-medium transition-colors",
-                        task.picked === null && "border-line bg-surface hover:border-accent",
-                        task.picked !== null && isRight && "border-ok bg-ok-soft text-ok",
-                        picked && !isRight && "border-err bg-err-soft text-err",
-                        task.picked !== null && !isRight && !picked && "border-line opacity-60",
+                        "flex min-h-14 items-center justify-between gap-2 rounded-[1rem] px-4 py-2 text-left font-medium transition-[background-color,color,box-shadow,transform] duration-150",
+                        task.picked === null && "bg-surface shadow-card hover:bg-accent-container hover:text-on-accent-container hover:shadow-elev-1 active:scale-[0.98]",
+                        task.picked !== null && isRight && "bg-ok-soft text-ok ring-2 ring-ok",
+                        picked && !isRight && "bg-err-soft text-err ring-2 ring-err",
+                        task.picked !== null && !isRight && !picked && "bg-surface-2 opacity-60",
                       )}
                     >
                       <span>{o.words ? answer(x) : label12(x)}</span>
@@ -349,7 +349,7 @@ export default function TeachingClock({ locale }: { locale: Locale }) {
                   <span className={cn("font-semibold", task.picked === task.answer ? "text-ok" : "text-err")} role="status">
                     {task.picked === task.answer ? t.right : t.wrong(answer(task.answer))}
                   </span>
-                  <Button variant="primary" onClick={() => newTask("read")}>
+                  <Button variant="filled" size="lg" onClick={() => newTask("read")}>
                     {t.next}
                   </Button>
                 </div>
@@ -367,7 +367,8 @@ export default function TeachingClock({ locale }: { locale: Locale }) {
               <div className="flex flex-wrap items-center gap-3">
                 {task.checked === null ? (
                   <Button
-                    variant="primary"
+                    variant="filled"
+                    size="lg"
                     onClick={() => {
                       const ok = total % 720 === task.answer;
                       setTask({ ...task, checked: ok });
@@ -382,7 +383,7 @@ export default function TeachingClock({ locale }: { locale: Locale }) {
                     <span className={cn("font-semibold", task.checked ? "text-ok" : "text-err")} role="status">
                       {task.checked ? t.right : t.wrong(label12(task.answer))}
                     </span>
-                    <Button variant="primary" onClick={() => newTask("set")}>
+                    <Button variant="filled" size="lg" onClick={() => newTask("set")}>
                       {t.next}
                     </Button>
                   </>

@@ -5,6 +5,7 @@ import type { Locale } from "@/i18n/config";
 import { CodeEditor } from "@/tools/dev/shared/CodeEditor";
 import { useDebounced } from "@/tools/dev/shared/hooks";
 import { outputLabels } from "@/tools/dev/shared/labels";
+import { Opt, OptionsRow } from "@/tools/dev/shared/Pane";
 import { CodeOutput } from "@/ui/code-output";
 import { Input, Switch } from "@/ui/field";
 import { Notice } from "@/ui/panel";
@@ -54,13 +55,12 @@ export default function HtmlToJsx({ locale }: { locale: Locale }) {
         <CodeEditor id={`${id}-in`} locale={locale} label={t.input} value={html} onChange={setHtml} rows={14} sample={SAMPLE} fileAccept=".html,.htm,.svg,text/html" />
         <CodeOutput value={res.code} title={t.output} filename={`${name || "component"}.jsx`} labels={outputLabels(locale)} minRows={14} />
       </div>
-      <div className="flex flex-wrap items-center gap-x-5 gap-y-3 text-sm text-fg-2">
-        <label className="flex items-center gap-2" htmlFor={`${id}-c`}>
-          {t.component}
-          <Input id={`${id}-c`} size="sm" className="w-44 font-mono" value={name} onChange={(e) => setName(e.target.value)} placeholder={t.componentPh} spellCheck={false} />
-        </label>
+      <OptionsRow>
+        <Opt label={t.component} htmlFor={`${id}-c`}>
+          <Input id={`${id}-c`} size="sm" className="w-52 font-mono" value={name} onChange={(e) => setName(e.target.value)} placeholder={t.componentPh} spellCheck={false} />
+        </Opt>
         <Switch label={t.uncontrolled} checked={uncontrolled} onChange={(e) => setUncontrolled(e.target.checked)} />
-      </div>
+      </OptionsRow>
       {res.warnings.includes("events") && <Notice tone="warn">{t.events}</Notice>}
       {(res.warnings.includes("script") || res.warnings.includes("style")) && <Notice tone="warn">{t.script}</Notice>}
     </div>

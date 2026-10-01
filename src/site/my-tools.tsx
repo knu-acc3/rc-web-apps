@@ -40,7 +40,7 @@ export function MyTools({ locale, labels }: { locale: Locale; labels: { favorite
       </div>
     );
   return (
-    <section className="flex flex-col gap-4 rounded-[1rem] border border-line bg-surface p-4 sm:p-5">
+    <section className="panel flex flex-col gap-4 p-4 sm:p-5">
       {row(fav, labels.favorites, Star)}
       {row(recent, labels.recent, Clock3)}
     </section>

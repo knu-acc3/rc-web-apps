@@ -64,7 +64,7 @@ export function BigResult({ value, caption, sub }: { value: React.ReactNode; cap
   return (
     <div className="text-center" aria-live="polite">
       {caption && <p className="text-sm font-medium text-fg-3">{caption}</p>}
-      <p className="tabular mt-1 text-4xl font-bold tracking-tight text-fg sm:text-5xl">{value}</p>
+      <p className="tabular mt-1 text-4xl font-bold tracking-tight break-words text-fg sm:text-5xl 2xl:text-6xl">{value}</p>
       {sub && <p className="mt-2 text-[0.9375rem] text-fg-2">{sub}</p>}
     </div>
   );

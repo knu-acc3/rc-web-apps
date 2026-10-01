@@ -126,14 +126,14 @@ export default function Notepad({ locale }: { locale: Locale }) {
     <div className="grid gap-4 lg:grid-cols-[16rem_minmax(0,1fr)]">
       {/* Notes list: sidebar on desktop, select on mobile */}
       <aside className="hidden min-w-0 flex-col gap-2 lg:flex" aria-label={t.notes}>
-        <Button variant="primary" onClick={() => setActiveId(createNote(""))} className="w-full">
+        <Button variant="filled" size="lg" onClick={() => setActiveId(createNote(""))} className="w-full">
           <Plus aria-hidden />
           {t.newNote}
         </Button>
         {list.length === 0 ? (
           <p className="px-1 py-2 text-sm text-fg-3">{t.empty}</p>
         ) : (
-          <ul className="flex max-h-[34rem] flex-col gap-1 overflow-y-auto">
+          <ul className="flex max-h-[36rem] flex-col gap-1 overflow-y-auto">
             {list.map((n) => (
               <li key={n.id}>
                 <button
@@ -144,8 +144,8 @@ export default function Notepad({ locale }: { locale: Locale }) {
                   }}
                   aria-current={n.id === active?.id ? "true" : undefined}
                   className={cn(
-                    "flex w-full flex-col items-start rounded-[0.5rem] px-3 py-2 text-left transition-colors duration-150",
-                    n.id === active?.id ? "bg-accent-soft text-accent" : "text-fg hover:bg-surface-2",
+                    "flex w-full flex-col items-start rounded-[1rem] px-3.5 py-2.5 text-left transition-colors duration-150 active:bg-surface-3",
+                    n.id === active?.id ? "bg-accent-container text-on-accent-container" : "text-fg hover:bg-surface-2",
                   )}
                 >
                   <span className="w-full truncate text-sm font-medium">{noteTitle(n.text, t.untitled)}</span>
@@ -160,7 +160,7 @@ export default function Notepad({ locale }: { locale: Locale }) {
       <div className="flex min-w-0 flex-col gap-3">
         <div className="flex flex-wrap items-center gap-2 lg:hidden">
           {list.length > 0 && (
-            <Select aria-label={t.choose} value={active?.id ?? ""} onChange={(e) => setActiveId(e.target.value)} size="sm" className="min-w-0 flex-1">
+            <Select aria-label={t.choose} value={active?.id ?? ""} onChange={(e) => setActiveId(e.target.value)} variant="tonal" className="min-w-0 flex-1">
               {list.map((n) => (
                 <option key={n.id} value={n.id}>
                   {noteTitle(n.text, t.untitled)}
@@ -168,14 +168,14 @@ export default function Notepad({ locale }: { locale: Locale }) {
               ))}
             </Select>
           )}
-          <Button variant="primary" size="sm" onClick={() => setActiveId(createNote(""))}>
+          <Button variant="filled" onClick={() => setActiveId(createNote(""))}>
             <Plus aria-hidden />
             {t.newNote}
           </Button>
         </div>
 
-        <div className="flex min-w-0 flex-col overflow-hidden rounded-[0.75rem] border border-line bg-surface">
-          <div className="flex min-h-11 items-center justify-between gap-2 border-b border-line px-3 py-1.5">
+        <div className="panel flex min-w-0 flex-col overflow-hidden">
+          <div className="flex min-h-12 items-center justify-between gap-2 border-b border-line py-1.5 pr-2 pl-4">
             <label htmlFor={`${id}-note`} className="min-w-0 truncate text-sm font-semibold text-fg">
               {active ? title : t.editor}
             </label>

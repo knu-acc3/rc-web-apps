@@ -4,12 +4,12 @@ import { useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { formatNumber, plural } from "@/i18n/format";
 import { Field } from "@/ui/field";
-import { Segmented } from "@/ui/segmented";
 import { readPngDpi, readPngHeader, setPngDpi } from "./lib/container";
 import { jpegDisplaySize, readJfifDensity, setJpegDpi } from "./lib/jpeg";
 import { baseName, type Prepared } from "./lib/source";
 import { BatchWorkspace } from "./ui/BatchWorkspace";
 import { NumberField } from "./ui/controls";
+import { ChipChoice } from "@/ui/chip-choice";
 import { useBatch, type Runner } from "./ui/useBatch";
 
 const T = {
@@ -81,15 +81,9 @@ export default function Dpi({ locale }: { locale: Locale }) {
 
   const options = (
     <>
-      <NumberField label={t.dpi} value={dpi} onChange={setDpi} min={1} max={2400} suffix="dpi" className="w-40" />
+      <NumberField label={t.dpi} value={dpi} onChange={setDpi} min={1} max={2400} step={1} suffix="dpi" stepper locale={locale} />
       <Field label={t.presets}>
-        <Segmented
-          wrap
-          label={t.presets}
-          value={PRESETS.includes(value as (typeof PRESETS)[number]) ? String(value) : ""}
-          onChange={(v) => setDpi(Number(v))}
-          options={PRESETS.map((d) => ({ value: String(d), label: String(d) }))}
-        />
+        <ChipChoice layout="wrap" label={t.presets} value={value} onChange={setDpi} options={PRESETS.map((d) => ({ value: d as number, label: String(d) }))} />
       </Field>
     </>
   );
@@ -107,7 +101,7 @@ export default function Dpi({ locale }: { locale: Locale }) {
       accept="image/jpeg,image/png,.jpg,.jpeg,.jfif,.png"
       dropHint={t.pngAccept}
       stat={(it, r) => (
-        <p className="tabular text-2xl font-semibold tracking-tight text-fg">
+        <p className="tabular text-2xl font-semibold tracking-tight text-fg sm:text-3xl">
           {value} dpi · {cm(r.width)} × {cm(r.height)} {t.cm}{" "}
           <span className="text-base font-normal text-fg-3">
             ({inch(r.width)} × {inch(r.height)} {plural(locale, Math.round((r.height / value) * 100) / 100, t.inch)}; {t.was}{" "}

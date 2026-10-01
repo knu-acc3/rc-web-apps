@@ -1,8 +1,8 @@
 "use client";
 
-import { useId, useState } from "react";
+import { useState } from "react";
 import type { Locale } from "@/i18n/config";
-import { Field, Select, Switch } from "@/ui/field";
+import { Field, Switch } from "@/ui/field";
 import { Segmented } from "@/ui/segmented";
 import { centeredAspectRect, roundRect, type Rect } from "./lib/geometry";
 import { setJpegDpi } from "./lib/jpeg";
@@ -50,7 +50,6 @@ const PHOTO_DPI = 600;
 
 export default function PassportPhoto({ locale, format: format0 = "35x45" }: { locale: Locale; format?: string }) {
   const t = T[locale];
-  const id = useId();
   const getEngine = useEngine();
   const file = useSingleFile();
   const exp = useExport();
@@ -80,9 +79,18 @@ export default function PassportPhoto({ locale, format: format0 = "35x45" }: { l
     if (!p || !r) return;
     exp.run(async (signal, onProgress) => {
       const dpi = sheet === "single" ? PHOTO_DPI : PRINT_DPI;
-      const ops: Op[] = [{ t: "crop", rect: r }, { t: "size", w: mmToPx(fmt.w, dpi), h: mmToPx(fmt.h, dpi) }];
+      const ops: Op[] = [
+        { t: "crop", rect: r },
+        { t: "size", w: mmToPx(fmt.w, dpi), h: mmToPx(fmt.h, dpi) },
+      ];
       if (gray) ops.push({ t: "filter", id: "grayscale", params: { amount: 100 } });
-      const res = await processFile(getEngine(), p, ops, { format: "jpg", quality: 95, dpi, background: "#ffffff" }, { signal, onProgress: (v) => onProgress(sheet === "single" ? v : v * 0.7) });
+      const res = await processFile(
+        getEngine(),
+        p,
+        ops,
+        { format: "jpg", quality: 95, dpi, background: "#ffffff" },
+        { signal, onProgress: (v) => onProgress(sheet === "single" ? v : v * 0.7) },
+      );
       const name = `${baseName(p.file.name)}-${formatId}`;
       if (sheet === "single") return { blob: toBlob(res), name: `${name}.jpg` };
 
@@ -115,17 +123,33 @@ export default function PassportPhoto({ locale, format: format0 = "35x45" }: { l
 
   const options = (
     <>
-      <Field label={t.format} htmlFor={`${id}-f`} className="w-full sm:w-96">
-        <Select id={`${id}-f`} value={formatId} onChange={(e) => setFormatId(e.target.value)}>
-          {PHOTO_FORMATS.map((f) => (
-            <option key={f.id} value={f.id}>
-              {f[locale]}
-            </option>
-          ))}
-        </Select>
+      <Field label={t.format}>
+        <div role="radiogroup" aria-label={t.format} className="flex flex-col gap-1.5">
+          {PHOTO_FORMATS.map((f) => {
+            const [size, use] = f[locale].split(" — ");
+            return (
+              <button
+                key={f.id}
+                type="button"
+                role="radio"
+                aria-checked={f.id === formatId}
+                onClick={() => setFormatId(f.id)}
+                className="chip h-auto w-full flex-col items-start gap-0 whitespace-normal py-2 text-left"
+              >
+                <span className="font-semibold">{size}</span>
+                {use && <span className="text-[0.8125rem] font-normal opacity-80">{use}</span>}
+              </button>
+            );
+          })}
+        </div>
       </Field>
       <Field label={t.sheet}>
-        <Segmented wrap label={t.sheet} value={sheet} onChange={setSheet} options={(["single", "10x15", "a4"] as const).map((v) => ({ value: v, label: t.sheets[v] }))} />
+        <Segmented
+          label={t.sheet}
+          value={sheet}
+          onChange={setSheet}
+          options={(["single", "10x15", "a4"] as const).map((v) => ({ value: v, label: t.sheets[v] }))}
+        />
       </Field>
     </>
   );
@@ -176,7 +200,11 @@ export default function PassportPhoto({ locale, format: format0 = "35x45" }: { l
 function Guides({ rect, factor, fmt }: { rect: Rect; factor: number; fmt: (typeof PHOTO_FORMATS)[number] }) {
   const pct = (mm: number) => `${(mm / fmt.h) * 100}%`;
   return (
-    <div className="pointer-events-none absolute" style={{ left: rect.x * factor, top: rect.y * factor, width: rect.w * factor, height: rect.h * factor }} aria-hidden>
+    <div
+      className="pointer-events-none absolute"
+      style={{ left: rect.x * factor, top: rect.y * factor, width: rect.w * factor, height: rect.h * factor }}
+      aria-hidden
+    >
       <div className="absolute inset-y-0 left-1/2 border-l border-dashed border-white/70 mix-blend-difference" />
       {fmt.head && fmt.top !== undefined ? (
         <>

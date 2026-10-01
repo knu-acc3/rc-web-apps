@@ -7,18 +7,22 @@ import type { Locale } from "@/i18n/config";
 import { formatBytes, formatNumber } from "@/i18n/format";
 import { cn } from "@/lib/cn";
 import { downloadBlob } from "@/lib/clipboard";
-import { Button } from "@/ui/button";
+import { Button, IconButton } from "@/ui/button";
 import { Dropzone } from "@/ui/dropzone";
 import { Panel } from "@/ui/panel";
 import { IMAGE_ACCEPT } from "../lib/detect";
 import { previewFile } from "../lib/run";
 import { displayable, type Prepared } from "../lib/source";
+import { wsSelect } from "../../shared/workspace";
 import { CompareSlider } from "./CompareSlider";
-import { OptionsBar } from "./OptionsBar";
-import { checker, ProgressBar } from "./controls";
+import { checker, ProgressBar, replaceDrop } from "./controls";
+import type { HandoffId } from "./handoff-targets";
 import { useEngine } from "./hooks";
+import { OptionsBar, ToolColumns } from "./OptionsBar";
 import { errorText, filesCount, S } from "./strings";
 import { downloadZip, type BatchItem, type BatchResult, type useBatch } from "./useBatch";
+import { useWorkspace } from "./useWorkspace";
+import { NextMenu, RestoringPlaceholder, WorkspaceBar } from "./Workspace";
 
 type Batch = ReturnType<typeof useBatch>;
 
@@ -40,7 +44,9 @@ function useOriginalUrl(p: Prepared | undefined, maxSide = 2048): string | null 
     const ac = new AbortController();
     (async () => {
       try {
-        const r = await previewFile(getEngine(), p, maxSide, { signal: ac.signal });
+        const r = await previewFile(getEngine(), p, maxSide, {
+          signal: ac.signal,
+        });
         const c = document.createElement("canvas");
         c.width = r.bitmap.width;
         c.height = r.bitmap.height;
@@ -113,9 +119,9 @@ function Notes({ it, locale, grewNote }: { it: BatchItem; locale: Locale; grewNo
 }
 
 /**
- * Batch tool layout with one focal point: the selected result (before/after,
- * size in large type, one Download button). Options sit in a single quiet row
- * above; extra options are collapsed; the file list below stays quiet.
+ * Batch tool layout with one focal point: the selected result (before/after, size in large type, one Download
+ * button). From `lg` the settings card sits on the left (sticky) and the result on the right; on phones the photo
+ * comes first. The file list below stays quiet. Files are kept in the tab's workspace for the next photo tool.
  */
 export function BatchWorkspace({
   locale,
@@ -131,11 +137,12 @@ export function BatchWorkspace({
   stage,
   stat,
   sizeFocus = false,
+  self,
 }: {
   locale: Locale;
   batch: Batch;
-  /** One quiet row of the main options. */
-  options?: ReactNode;
+  /** The main options (stacked in the settings card); a function gets the selected file. */
+  options?: ReactNode | ((sel: BatchItem | undefined) => ReactNode);
   /** Collapsed secondary options. */
   more?: ReactNode;
   zipName: string;
@@ -152,6 +159,8 @@ export function BatchWorkspace({
   stat?: (it: BatchItem, r: BatchResult) => ReactNode;
   /** The tool is about file size: explain when a result grows. */
   sizeFocus?: boolean;
+  /** This tool in the "Next" menu (left out of it). */
+  self?: HandoffId;
 }) {
   const t = S(locale);
   const { items } = batch;
@@ -160,6 +169,10 @@ export function BatchWorkspace({
   const selectedKey = sel?.key ?? null;
   const { prioritize } = batch;
   useEffect(() => prioritize(selectedKey), [prioritize, selectedKey]);
+  const selIndex = sel ? items.indexOf(sel) : -1;
+  useEffect(() => {
+    if (selIndex >= 0) wsSelect(selIndex);
+  }, [selIndex]);
   const origUrl = useOriginalUrl(compare && !stage ? sel?.prepared : undefined);
   const done = items.filter((i) => i.result);
   const totalIn = done.reduce((n, i) => n + i.file.size, 0);
@@ -170,46 +183,182 @@ export function BatchWorkspace({
     if (single) batch.clear();
     batch.addFiles(single ? files.slice(0, 1) : files);
   };
+  const ws = useWorkspace({
+    files: items.map((i) => i.file),
+    mode: "sync",
+    accept,
+    restore: (files) => batch.addFiles(single ? files.slice(0, 1) : files),
+  });
+  const bar = (
+    <WorkspaceBar
+      locale={locale}
+      count={ws.restored}
+      onStartOver={() => {
+        ws.startOver();
+        batch.clear();
+      }}
+    />
+  );
 
   const statusText = !items.length ? "" : batch.busy ? t.working : `${t.done}: ${filesCount(locale, done.length)}`;
+  const optionsNode = typeof options === "function" ? options(sel) : options;
+  const side = optionsNode ? (
+    <OptionsBar more={more} locale={locale}>
+      {optionsNode}
+    </OptionsBar>
+  ) : undefined;
 
   if (!items.length) {
     return (
-      <div className="flex flex-col gap-4">
-        {options && (
-          <OptionsBar more={more} locale={locale}>
-            {options}
-          </OptionsBar>
+      <ToolColumns side={side}>
+        {ws.restoring ? (
+          <RestoringPlaceholder locale={locale} className="lg:min-h-80" />
+        ) : (
+          <Dropzone
+            onFiles={add}
+            accept={accept}
+            multiple={!single}
+            title={single ? t.dropOne : t.dropMany}
+            hint={dropHint ?? t.dropHint}
+            locale={locale}
+            className="lg:min-h-80"
+          />
         )}
-        {/* On a phone the file comes first: settings can wait until there is something to apply them to. */}
-        <Dropzone onFiles={add} accept={accept} multiple={!single} title={single ? t.dropOne : t.dropMany} hint={dropHint ?? t.dropHint} className="max-sm:order-first" />
-      </div>
+      </ToolColumns>
     );
   }
 
   const r = sel?.result;
   const extraNode = sel && extra ? extra(sel) : null;
+  const hasNotes =
+    sel &&
+    (sel.prepared?.animated ||
+      r?.keptOriginal ||
+      r?.limited ||
+      r?.missedTarget ||
+      (sizeFocus && r && !r.keptOriginal && r.blob.size > sel.file.size * 1.02) ||
+      extraNode);
   return (
     <div className="flex flex-col gap-4">
-      {options && (
-        <OptionsBar more={more} locale={locale}>
-          {options}
-        </OptionsBar>
-      )}
+      {bar}
+      <ToolColumns
+        side={side}
+        rest={
+          <>
+            {items.length > 1 && (
+              <Panel className="flex min-w-0 flex-col gap-1 p-2 sm:p-3">
+                <div className="flex flex-wrap items-center justify-between gap-2 px-2 pb-1">
+                  <p className="tabular text-sm text-fg-2">
+                    {statusText}
+                    {done.length > 0 && (
+                      <>
+                        {" · "}
+                        {formatBytes(locale, totalIn)} → {formatBytes(locale, totalOut)}{" "}
+                        <span className={totalOut <= totalIn ? "text-ok" : "text-warn"}>{delta(locale, totalIn, totalOut)}</span>
+                      </>
+                    )}
+                  </p>
+                  <Button
+                    variant="tonal"
+                    size="sm"
+                    disabled={!done.length || zipping}
+                    loading={zipping}
+                    onClick={async () => {
+                      setZipping(true);
+                      try {
+                        await downloadZip(
+                          done.map((i) => ({
+                            name: i.result!.name,
+                            blob: i.result!.blob,
+                          })),
+                          zipName,
+                        );
+                      } finally {
+                        setZipping(false);
+                      }
+                    }}
+                  >
+                    {!zipping && <Download aria-hidden />}
+                    {zipping ? t.zipping : t.downloadAll}
+                  </Button>
+                </div>
+                <ul className="flex flex-col gap-0.5">
+                  {items.map((it) => (
+                    <li
+                      key={it.key}
+                      className={cn(
+                        "flex items-center gap-1 rounded-[0.875rem] pr-1 transition-colors",
+                        it === sel ? "bg-accent-container/60" : "hover:bg-surface-2",
+                      )}
+                    >
+                      <button
+                        type="button"
+                        onClick={() => setSelKey(it.key)}
+                        className="flex min-w-0 flex-1 items-center gap-3 rounded-[0.875rem] px-2 py-1.5 text-left focus-visible:outline-2 focus-visible:outline-accent"
+                        aria-pressed={it === sel}
+                        aria-label={it.file.name}
+                      >
+                        <span className={cn("flex size-11 shrink-0 items-center justify-center overflow-hidden rounded-[0.625rem]", checker)}>
+                          {it.result ? (
+                            <img src={it.result.url} alt="" className="size-full object-cover" />
+                          ) : it.status === "error" ? (
+                            <AlertTriangle className="size-4 text-err" aria-hidden />
+                          ) : (
+                            <Loader2 className="size-4 animate-spin text-fg-3" aria-hidden />
+                          )}
+                        </span>
+                        <span className="min-w-0 flex-1">
+                          <span className="block truncate text-sm font-medium text-fg">{it.file.name}</span>
+                          <span className="block truncate text-[0.8125rem] text-fg-3">
+                            <StatusLine it={it} locale={locale} />
+                          </span>
+                          {it.status === "working" && <ProgressBar value={it.progress} className="mt-1" />}
+                        </span>
+                      </button>
+                      {it.result && (
+                        <IconButton
+                          size="sm"
+                          label={`${t.download}: ${it.result.name}`}
+                          icon={<Download aria-hidden />}
+                          onClick={() => downloadBlob(it.result!.blob, it.result!.name)}
+                        />
+                      )}
+                      <IconButton size="sm" label={`${t.removeFile}: ${it.file.name}`} icon={<X aria-hidden />} onClick={() => batch.remove(it.key)} />
+                    </li>
+                  ))}
+                </ul>
+              </Panel>
+            )}
 
-      {sel && (
-        <Panel className="overflow-hidden">
-          <div className="p-3 sm:p-4">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-stretch">
+              <Dropzone
+                onFiles={add}
+                accept={accept}
+                multiple={!single}
+                compact={!single}
+                title={single ? t.dropOne : t.addMore}
+                locale={locale}
+                className={cn("flex-1", single && replaceDrop)}
+              />
+              <Button variant="text" size="sm" className="self-end sm:self-center" onClick={batch.clear}>
+                {t.clear}
+              </Button>
+            </div>
+          </>
+        }
+      >
+        {sel && (
+          <Panel className="flex min-w-0 flex-col gap-3 p-3 sm:gap-4 sm:p-4">
             {stage ? (
               stage(sel)
             ) : r && compare && origUrl ? (
               <CompareSlider before={origUrl} after={r.url} locale={locale} beforeLabel={t.original} afterLabel={t.result} />
             ) : r ? (
-              <div className={cn("flex max-h-[70vh] justify-center overflow-auto rounded-[0.625rem] border border-line", checker)}>
-                <img src={r.url} alt={t.result} className="block h-auto max-w-full object-contain" />
+              <div className={cn("flex justify-center rounded-[1rem]", checker)}>
+                <img src={r.url} alt={t.result} className="block h-auto max-h-[64vh] w-auto max-w-full object-contain" />
               </div>
             ) : (
-              <div className={cn("flex min-h-56 flex-col items-center justify-center gap-3 rounded-[0.625rem] border border-line text-sm text-fg-2", checker)}>
+              <div className={cn("flex min-h-56 flex-col items-center justify-center gap-3 rounded-[1rem] text-sm text-fg-2", checker)}>
                 {sel.status === "error" ? (
                   <span className="max-w-md px-4 text-center text-err">{errorText(locale, sel.error)}</span>
                 ) : (
@@ -222,140 +371,64 @@ export function BatchWorkspace({
                 )}
               </div>
             )}
-          </div>
-          <div className="flex flex-col gap-3 border-t border-line px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
-            <div className="min-w-0" aria-live="polite">
-              {r ? (
-                <>
-                  {stat ? (
-                    stat(sel, r)
-                  ) : (
-                    <p className="tabular text-2xl font-semibold tracking-tight text-fg">
-                      {formatBytes(locale, r.blob.size)}{" "}
-                      <span className={cn("text-lg", r.blob.size <= sel.file.size ? "text-ok" : "text-warn")}>{delta(locale, sel.file.size, r.blob.size)}</span>
-                    </p>
-                  )}
-                  <p className="tabular truncate text-sm text-fg-3">
-                    {r.name} · {r.width}×{r.height} · {t.original.toLowerCase()} {formatBytes(locale, sel.file.size)}
-                  </p>
-                </>
-              ) : (
-                <p className="truncate text-sm text-fg-2">{sel.file.name}</p>
-              )}
-            </div>
-            <div className="flex flex-wrap items-center justify-end gap-2 sm:shrink-0">
-              {batch.busy && (
-                <Button variant="ghost" size="sm" onClick={batch.cancelAll}>
-                  {t.cancel}
-                </Button>
-              )}
-              <Button variant="primary" size="lg" className="flex-1 sm:flex-none" disabled={!r} onClick={() => r && downloadBlob(r.blob, r.name)}>
-                <Download aria-hidden />
-                {t.download}
-              </Button>
-            </div>
-          </div>
-          {(sel.prepared?.animated ||
-            r?.keptOriginal ||
-            r?.limited ||
-            r?.missedTarget ||
-            (sizeFocus && r && !r.keptOriginal && r.blob.size > sel.file.size * 1.02) ||
-            extraNode) && (
-            <div className="flex flex-col gap-1 border-t border-line px-4 py-2.5">
-              <Notes it={sel} locale={locale} grewNote={sizeFocus} />
-              {extraNode}
-            </div>
-          )}
-          {sel.status === "working" && sel.result && <ProgressBar value={sel.progress} className="rounded-none" />}
-        </Panel>
-      )}
-
-      {items.length > 1 && (
-        <Panel>
-          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-line px-4 py-2.5">
-            <p className="tabular text-sm text-fg-2">
-              {statusText}
-              {done.length > 0 && (
-                <>
-                  {" · "}
-                  {formatBytes(locale, totalIn)} → {formatBytes(locale, totalOut)}{" "}
-                  <span className={totalOut <= totalIn ? "text-ok" : "text-warn"}>{delta(locale, totalIn, totalOut)}</span>
-                </>
-              )}
-            </p>
-            <Button
-              variant="secondary"
-              size="sm"
-              disabled={!done.length || zipping}
-              onClick={async () => {
-                setZipping(true);
-                try {
-                  await downloadZip(
-                    done.map((i) => ({ name: i.result!.name, blob: i.result!.blob })),
-                    zipName,
-                  );
-                } finally {
-                  setZipping(false);
-                }
-              }}
-            >
-              <Download aria-hidden />
-              {zipping ? t.zipping : t.downloadAll}
-            </Button>
-          </div>
-          <ul className="divide-y divide-line">
-            {items.map((it) => (
-              <li key={it.key} className={cn("flex items-center gap-3 px-3 py-2", it === sel && "bg-surface-2")}>
-                <button
-                  type="button"
-                  onClick={() => setSelKey(it.key)}
-                  className="flex min-w-0 flex-1 items-center gap-3 text-left"
-                  aria-pressed={it === sel}
-                  aria-label={it.file.name}
-                >
-                  <span className={cn("flex size-11 shrink-0 items-center justify-center overflow-hidden rounded-[0.375rem] border border-line", checker)}>
-                    {it.result ? (
-                      <img src={it.result.url} alt="" className="size-full object-cover" />
-                    ) : it.status === "error" ? (
-                      <AlertTriangle className="size-4 text-err" aria-hidden />
+            {sel.status === "working" && sel.result && <ProgressBar value={sel.progress} />}
+            <div className="flex flex-col gap-3 px-1 sm:flex-row sm:items-center sm:justify-between">
+              <div className="min-w-0" aria-live="polite">
+                {r ? (
+                  <>
+                    {stat ? (
+                      stat(sel, r)
                     ) : (
-                      <Loader2 className="size-4 animate-spin text-fg-3" aria-hidden />
+                      <p className="tabular text-2xl font-semibold tracking-tight text-fg sm:text-3xl">
+                        {formatBytes(locale, r.blob.size)}{" "}
+                        <span className={cn("text-lg", r.blob.size <= sel.file.size ? "text-ok" : "text-warn")}>
+                          {delta(locale, sel.file.size, r.blob.size)}
+                        </span>
+                      </p>
                     )}
-                  </span>
-                  <span className="min-w-0 flex-1">
-                    <span className="block truncate text-sm font-medium text-fg">{it.file.name}</span>
-                    <span className="block truncate text-[0.8125rem] text-fg-3">
-                      <StatusLine it={it} locale={locale} />
-                    </span>
-                    {it.status === "working" && <ProgressBar value={it.progress} className="mt-1" />}
-                  </span>
-                </button>
-                {it.result && (
-                  <Button
-                    variant="ghost"
-                    size="icon-sm"
-                    aria-label={`${t.download}: ${it.result.name}`}
-                    title={t.download}
-                    onClick={() => downloadBlob(it.result!.blob, it.result!.name)}
-                  >
-                    <Download aria-hidden />
+                    <p className="tabular truncate text-sm text-fg-3">
+                      {r.name} · {r.width}×{r.height} · {t.original.toLowerCase()} {formatBytes(locale, sel.file.size)}
+                    </p>
+                  </>
+                ) : (
+                  <p className="truncate text-sm text-fg-2">{sel.file.name}</p>
+                )}
+              </div>
+              <div className="flex flex-wrap items-center gap-2 sm:shrink-0 sm:justify-end">
+                {batch.busy && (
+                  <Button variant="text" size="sm" onClick={batch.cancelAll}>
+                    {t.cancel}
                   </Button>
                 )}
-                <Button variant="ghost" size="icon-sm" aria-label={`${t.removeFile}: ${it.file.name}`} title={t.remove} onClick={() => batch.remove(it.key)}>
-                  <X aria-hidden />
+                <NextMenu
+                  locale={locale}
+                  self={self}
+                  disabled={!done.length}
+                  getFiles={() =>
+                    done.map(
+                      (i) =>
+                        new File([i.result!.blob], i.result!.name, {
+                          type: i.result!.blob.type,
+                          lastModified: Date.now(),
+                        }),
+                    )
+                  }
+                />
+                <Button variant="filled" size="lg" className="flex-1 sm:flex-none" disabled={!r} onClick={() => r && downloadBlob(r.blob, r.name)}>
+                  <Download aria-hidden />
+                  {t.download}
                 </Button>
-              </li>
-            ))}
-          </ul>
-        </Panel>
-      )}
-
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-stretch">
-        <Dropzone onFiles={add} accept={accept} multiple={!single} compact title={single ? t.dropOne : t.addMore} className="flex-1" />
-        <Button variant="ghost" size="sm" className="self-end sm:self-center" onClick={batch.clear}>
-          {t.clear}
-        </Button>
-      </div>
+              </div>
+            </div>
+            {hasNotes && (
+              <div className="flex flex-col gap-1 px-1">
+                <Notes it={sel} locale={locale} grewNote={sizeFocus} />
+                {extraNode}
+              </div>
+            )}
+          </Panel>
+        )}
+      </ToolColumns>
     </div>
   );
 }

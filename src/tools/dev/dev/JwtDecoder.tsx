@@ -2,12 +2,17 @@
 
 import { useEffect, useId, useMemo, useState } from "react";
 import type { Locale } from "@/i18n/config";
+import { cn } from "@/lib/cn";
 import { base64ToBytes, utf8Encode } from "@/tools/dev/shared/bytes";
 import { CodeEditor } from "@/tools/dev/shared/CodeEditor";
 import { useHydrated, useNow } from "@/tools/dev/shared/hooks";
+import { KIT_T } from "@/tools/dev/shared/labels";
+import { Opt, OptionsRow, Pane } from "@/tools/dev/shared/Pane";
 import { CopyButton } from "@/ui/copy-button";
-import { Field, Input, Select, Textarea } from "@/ui/field";
+import { Field, Input, Textarea } from "@/ui/field";
+import { Fold } from "@/ui/fold";
 import { Badge, Notice, Panel } from "@/ui/panel";
+import { Segmented } from "@/ui/segmented";
 import { ASYM_ALGS, asymVerify, hasSubtle, HMAC_ALGS, hmacVerify, parseJwt, parseKey, timeStatus, TIME_CLAIMS, type ParseError } from "./lib/jwt";
 import { relTime } from "./lib/reltime";
 
@@ -161,78 +166,73 @@ export default function JwtDecoder({ locale, sample }: { locale: Locale; sample:
 
   const claimRows = jwt ? [...Object.entries(jwt.header).map(([k, v]) => ["header", k, v] as const), ...Object.entries(payload).map(([k, v]) => ["payload", k, v] as const)] : [];
 
+  const encSeg = (
+    <Segmented
+      size="sm"
+      label={t.secretEnc}
+      value={secretEnc}
+      onChange={setSecretEnc}
+      options={[
+        { value: "text", label: t.text },
+        { value: "b64", label: t.b64 },
+      ]}
+    />
+  );
+
   return (
     <div className="flex flex-col gap-4">
-      <Panel className="p-4 sm:p-6">
-        <CodeEditor id={`${id}-t`} locale={locale} label={t.token} value={token} onChange={setToken} placeholder={t.placeholder} rows={4} wrap invalid={!parsed.ok && parsed.error !== "empty"} />
-        {!parsed.ok && parsed.error !== "empty" && (
-          <Notice tone="err" className="mt-3">
-            {t.errors[parsed.error]}
-          </Notice>
-        )}
-        {jwt && (
-          <div className="mt-4 flex flex-wrap items-center gap-2 text-sm">
-            {alg && <Badge tone="accent">{alg}</Badge>}
-            {sigBadge}
-            {nowSec !== null && typeof payload.exp === "number" && <Badge tone={ts.exp === "expired" ? "err" : "ok"}>{ts.exp === "expired" ? t.expired(rel(payload.exp)) : t.valid(rel(payload.exp))}</Badge>}
-            {typeof payload.exp !== "number" && <Badge tone="warn">{t.noExp}</Badge>}
-            {ts.nbf === "future" && typeof payload.nbf === "number" && <Badge tone="warn">{t.nbfFuture(rel(payload.nbf))}</Badge>}
-            {ts.iat === "future" && <Badge tone="warn">{t.iatFuture}</Badge>}
-          </div>
-        )}
+      <div className={cn("grid items-start gap-4", jwt && "lg:grid-cols-2")}>
+        <Panel className="flex min-w-0 flex-col gap-4 p-4 sm:p-6">
+          <CodeEditor id={`${id}-t`} locale={locale} label={t.token} value={token} onChange={setToken} placeholder={t.placeholder} rows={6} wrap invalid={!parsed.ok && parsed.error !== "empty"} />
+          {!parsed.ok && parsed.error !== "empty" && <Notice tone="err">{t.errors[parsed.error]}</Notice>}
+          {jwt && (
+            <div className="flex flex-wrap items-center gap-2 text-sm" aria-live="polite">
+              {alg && <Badge tone="accent">{alg}</Badge>}
+              {sigBadge}
+              {nowSec !== null && typeof payload.exp === "number" && <Badge tone={ts.exp === "expired" ? "err" : "ok"}>{ts.exp === "expired" ? t.expired(rel(payload.exp)) : t.valid(rel(payload.exp))}</Badge>}
+              {typeof payload.exp !== "number" && <Badge tone="warn">{t.noExp}</Badge>}
+              {ts.nbf === "future" && typeof payload.nbf === "number" && <Badge tone="warn">{t.nbfFuture(rel(payload.nbf))}</Badge>}
+              {ts.iat === "future" && <Badge tone="warn">{t.iatFuture}</Badge>}
+            </div>
+          )}
 
-        {jwt && (isHmac || isAsym) && (
-          <details className="mt-4 rounded-[0.625rem] border border-line" open={!!secret || !!keyText}>
-            <summary className="cursor-pointer px-3 py-2 text-sm font-medium text-fg-2">{t.verify}</summary>
-            <div className="flex flex-col gap-3 border-t border-line p-3">
-              {isHmac ? (
-                <div className="grid gap-2 sm:grid-cols-[1fr_9rem] sm:items-end">
-                  <Field label={t.secret} htmlFor={`${id}-s`}>
+          {jwt && (isHmac || isAsym) && (
+            <Fold variant="inline" title={t.verify} open={!!secret || !!keyText}>
+              <div className="flex flex-col gap-4">
+                {isHmac ? (
+                  <Field label={t.secret} htmlFor={`${id}-s`} aside={encSeg}>
                     <Input id={`${id}-s`} value={secret} onChange={(e) => setSecret(e.target.value)} className="font-mono" autoComplete="off" spellCheck={false} />
                   </Field>
-                  <Select aria-label={t.secretEnc} value={secretEnc} onChange={(e) => setSecretEnc(e.target.value as "text" | "b64")}>
-                    <option value="text">{t.text}</option>
-                    <option value="b64">{t.b64}</option>
-                  </Select>
-                </div>
-              ) : canSubtle ? (
-                <Field label={t.key} htmlFor={`${id}-k`}>
-                  <Textarea id={`${id}-k`} value={keyText} onChange={(e) => setKeyText(e.target.value)} rows={5} placeholder="-----BEGIN PUBLIC KEY-----" />
-                </Field>
-              ) : (
-                <Notice tone="warn">{t.noSubtle}</Notice>
-              )}
-              <label className="flex items-center gap-2 text-sm text-fg-2">
-                {t.skew}
-                <Select value={String(skew)} size="sm" className="w-28" onChange={(e) => setSkew(Number(e.target.value))}>
-                  {[0, 30, 60, 300].map((s) => (
-                    <option key={s} value={s}>
-                      {s} s
-                    </option>
-                  ))}
-                </Select>
-              </label>
-            </div>
-          </details>
-        )}
-      </Panel>
-
-      {jwt && (
-        <div className="grid gap-4 md:grid-cols-2">
-          {[
-            [t.header, jwt.headerJson],
-            [t.payload, jwt.payloadJson],
-          ].map(([title, json]) => (
-            <div key={title} className="min-w-0 overflow-hidden rounded-[0.75rem] border border-line bg-surface">
-              <div className="flex items-center justify-between border-b border-line px-3 py-1.5">
-                <span className="text-sm font-semibold text-fg">{title}</span>
-                <CopyButton value={json} size="icon-sm" variant="ghost" />
+                ) : canSubtle ? (
+                  <Field label={t.key} htmlFor={`${id}-k`}>
+                    <Textarea id={`${id}-k`} value={keyText} onChange={(e) => setKeyText(e.target.value)} rows={5} placeholder="-----BEGIN PUBLIC KEY-----" />
+                  </Field>
+                ) : (
+                  <Notice tone="warn">{t.noSubtle}</Notice>
+                )}
+                <OptionsRow>
+                  <Opt label={t.skew} group>
+                    <Segmented size="sm" label={t.skew} value={String(skew)} onChange={(v) => setSkew(Number(v))} options={[0, 30, 60, 300].map((v) => ({ value: String(v), label: `${v} s` }))} />
+                  </Opt>
+                </OptionsRow>
               </div>
-              <pre className="max-h-80 overflow-auto px-3 py-2 font-mono text-[0.8125rem] whitespace-pre-wrap break-all text-fg">{json}</pre>
-            </div>
-          ))}
-        </div>
-      )}
+            </Fold>
+          )}
+        </Panel>
+
+        {jwt && (
+          <div className="flex min-w-0 flex-col gap-4">
+            {[
+              [t.header, jwt.headerJson, "text-err"],
+              [t.payload, jwt.payloadJson, "text-accent"],
+            ].map(([title, json, tone]) => (
+              <Pane key={title} title={<span className={tone}>{title}</span>} actions={<CopyButton value={json} label={KIT_T[locale].copy} copiedLabel={KIT_T[locale].copied} variant="secondary" compact />}>
+                <pre className="max-h-96 overflow-auto px-4 py-3 font-mono text-[0.875rem] leading-relaxed break-all whitespace-pre-wrap text-fg">{json}</pre>
+              </Pane>
+            ))}
+          </div>
+        )}
+      </div>
 
       {claimRows.length > 0 && (
         <div tabIndex={0} className="tbl">
@@ -250,7 +250,7 @@ export default function JwtDecoder({ locale, sample }: { locale: Locale; sample:
                 return (
                   <tr key={`${part}.${k}`}>
                     <td className="font-mono text-[0.8125rem]">{k}</td>
-                    <td className="max-w-[18rem] text-[0.8125rem] break-all">
+                    <td className="max-w-[18rem] text-[0.8125rem] [overflow-wrap:anywhere]">
                       <span className="font-mono">{typeof v === "string" ? v : JSON.stringify(v)}</span>
                       {isTime && (
                         <span className="block text-fg-3">

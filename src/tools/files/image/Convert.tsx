@@ -2,15 +2,14 @@
 
 import { useState } from "react";
 import type { Locale } from "@/i18n/config";
-import { cn } from "@/lib/cn";
 import { Field } from "@/ui/field";
-import { Segmented } from "@/ui/segmented";
 import { FORMAT_META } from "./lib/detect";
 import { processFile, toBlob } from "./lib/run";
 import { baseName } from "./lib/source";
 import type { OutFormat } from "./lib/types";
 import { BatchWorkspace } from "./ui/BatchWorkspace";
 import { ColorField, NumberField, RangeField } from "./ui/controls";
+import { ChipChoice } from "@/ui/chip-choice";
 import { DEFAULT_QUALITY, LOSSY, OUT_LABEL } from "./ui/format";
 import { S } from "./ui/strings";
 import { useBatch, type Runner } from "./ui/useBatch";
@@ -78,17 +77,12 @@ export default function Convert({ locale, from, to: to0 = "jpg" }: ConvertProps)
   const options = (
     <>
       <Field label={t.to}>
-        <Segmented wrap label={t.to} value={to} onChange={setTo} options={TARGETS.map((f) => ({ value: f, label: OUT_LABEL[f] }))} />
+        <ChipChoice layout="wrap" label={t.to} value={to} onChange={setTo} options={TARGETS.map((f) => ({ value: f, label: OUT_LABEL[f] }))} />
       </Field>
-      {LOSSY.has(to) && (
-        <div className="min-w-44 flex-1">
-          <RangeField label={s.quality} value={q} onChange={setQuality} min={1} max={100} locale={locale} />
-        </div>
-      )}
+      {LOSSY.has(to) && <RangeField label={s.quality} value={q} onChange={setQuality} min={1} max={100} locale={locale} />}
       {to === "ico" && (
-        <fieldset className="flex flex-col gap-1.5">
-          <legend className="mb-1.5 text-sm font-medium text-fg-2">{t.sizes}</legend>
-          <div className="flex flex-wrap gap-1.5">
+        <Field label={t.sizes}>
+          <div className="flex flex-wrap gap-2" role="group" aria-label={t.sizes}>
             {ICO_SIZES.map((n) => {
               const on = icoSizes.includes(n);
               return (
@@ -97,17 +91,14 @@ export default function Convert({ locale, from, to: to0 = "jpg" }: ConvertProps)
                   type="button"
                   aria-pressed={on}
                   onClick={() => setIcoSizes((xs) => (on ? (xs.length > 1 ? xs.filter((x) => x !== n) : xs) : [...xs, n].sort((a, b) => a - b)))}
-                  className={cn(
-                    "h-8 rounded-[0.4375rem] border px-2.5 text-[0.8125rem] font-medium",
-                    on ? "border-accent bg-accent-soft text-accent" : "border-line text-fg-2 hover:text-fg",
-                  )}
+                  className="chip tabular"
                 >
                   {n}
                 </button>
               );
             })}
           </div>
-        </fieldset>
+        </Field>
       )}
     </>
   );
@@ -115,8 +106,10 @@ export default function Convert({ locale, from, to: to0 = "jpg" }: ConvertProps)
   const more = (
     <>
       <ColorField label={`${s.background} (JPG)`} value={bg} onChange={setBg} locale={locale} />
-      {hasSvg && <NumberField label={t.svgWidth} value={svgWidth} onChange={setSvgWidth} min={16} max={16384} suffix="px" placeholder={t.svgAuto} />}
-      {to === "gif" && <p className="text-sm text-fg-3 sm:col-span-2">{t.gifNote}</p>}
+      {hasSvg && (
+        <NumberField label={t.svgWidth} value={svgWidth} onChange={setSvgWidth} min={16} max={16384} suffix="px" placeholder={t.svgAuto} locale={locale} />
+      )}
+      {to === "gif" && <p className="text-sm text-fg-3">{t.gifNote}</p>}
     </>
   );
 
@@ -124,6 +117,7 @@ export default function Convert({ locale, from, to: to0 = "jpg" }: ConvertProps)
   return (
     <BatchWorkspace
       sizeFocus
+      self="convert"
       locale={locale}
       batch={batch}
       options={options}

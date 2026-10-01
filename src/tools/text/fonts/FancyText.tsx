@@ -90,7 +90,7 @@ function Generator({ locale, style, platform, t }: { locale: Locale; style?: Sty
           hint={text ? undefined : t.sampleHint}
           aside={
             text ? (
-              <Button variant="ghost" size="sm" onClick={() => setText("")} className="-my-1 h-7!">
+              <Button variant="text" size="sm" onClick={() => setText("")} className="-my-2">
                 {t.clear}
               </Button>
             ) : undefined
@@ -108,7 +108,7 @@ function Generator({ locale, style, platform, t }: { locale: Locale; style?: Sty
           />
         </Field>
 
-        <div className={cn("mt-4 rounded-[0.625rem] bg-surface-2 px-4 sm:px-5", info.random ? "overflow-hidden py-6" : "py-4")}>
+        <div className={cn("mt-4 rounded-[1rem] bg-surface-2 px-4 sm:px-5", info.random ? "overflow-hidden py-6" : "py-4")}>
           <div className="flex flex-wrap items-baseline justify-between gap-x-3 text-[0.8125rem] text-fg-2">
             <span className="font-medium">{STYLE_NAMES[selected][locale]}</span>
             {pf?.xCounter && <XCount text={result} label={t.xCount} />}
@@ -123,7 +123,7 @@ function Generator({ locale, style, platform, t }: { locale: Locale; style?: Sty
                 <Segmented label={t.intensity} value={zalgo} onChange={setZalgo} options={ZALGO_LEVELS.map((z) => ({ value: z, label: t.zalgo[z] }))} size="sm" />
               )}
               {info.random && (
-                <Button variant="ghost" size="sm" onClick={() => setSeed(randomSeed())} aria-label={t.regenerateLabel} title={t.regenerateLabel}>
+                <Button variant="tonal" size="sm" onClick={() => setSeed(randomSeed())} aria-label={t.regenerateLabel} title={t.regenerateLabel}>
                   <RefreshCw aria-hidden />
                   {t.regenerate}
                 </Button>

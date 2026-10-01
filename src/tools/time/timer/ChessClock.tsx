@@ -4,8 +4,8 @@ import { Pause, Play, RotateCcw } from "lucide-react";
 import { useId, useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { cn } from "@/lib/cn";
-import { Button } from "@/ui/button";
-import { Select } from "@/ui/field";
+import { IconButton } from "@/ui/button";
+import { ScrollRow } from "@/ui/scroll-row";
 import { useWakeLock } from "@/ui/stage";
 import { schedule, scheduleTick, unlockAudio } from "./lib/audio";
 import { clock } from "./lib/format";
@@ -163,9 +163,13 @@ export default function ChessClock({ locale, minutes = 5, increment = 0 }: Chess
         disabled={status === "flag" || status === "paused" || (status === "running" && active !== side)}
         aria-label={`${t.player(side + 1)}: ${clock(left)}. ${t.tap}`}
         className={cn(
-          "flex min-h-[34vh] flex-1 flex-col items-center justify-center gap-2 rounded-[0.75rem] border-2 transition-colors sm:min-h-[46vh]",
+          "flex min-h-[34vh] min-w-0 flex-1 flex-col items-center justify-center gap-2 rounded-[1.25rem] transition-[background-color,color,box-shadow,transform] duration-200 enabled:active:scale-[0.985] sm:min-h-[46vh]",
           side === 0 && "max-sm:rotate-180",
-          lost ? "border-err bg-err-soft text-err" : isActive ? "border-accent bg-accent text-accent-fg" : "border-line bg-surface text-fg disabled:opacity-70",
+          lost
+            ? "bg-err-soft text-err ring-2 ring-err"
+            : isActive
+              ? "bg-accent text-accent-fg shadow-elev-2"
+              : "bg-surface text-fg shadow-card enabled:hover:shadow-elev-1 disabled:text-fg-2",
         )}
       >
         <span className="text-sm font-medium opacity-80">{t.player(side + 1)}</span>
@@ -181,45 +185,37 @@ export default function ChessClock({ locale, minutes = 5, increment = 0 }: Chess
         {half(0)}
         <div className="flex items-center justify-center gap-2 sm:flex-col">
           {status === "running" ? (
-            <Button variant="secondary" size="icon" onClick={pause} aria-label={t.pause} title={t.pause}>
-              <Pause aria-hidden />
-            </Button>
+            <IconButton label={t.pause} variant="tonal" size="lg" onClick={pause} icon={<Pause aria-hidden />} />
           ) : status === "paused" ? (
-            <Button variant="primary" size="icon" onClick={resume} aria-label={t.resume} title={t.resume}>
-              <Play aria-hidden />
-            </Button>
+            <IconButton label={t.resume} variant="filled" size="lg" onClick={resume} icon={<Play aria-hidden />} />
           ) : null}
-          <Button variant="ghost" size="icon" onClick={() => reset()} aria-label={t.reset} title={t.reset}>
-            <RotateCcw aria-hidden />
-          </Button>
+          <IconButton label={t.reset} size="lg" onClick={() => reset()} icon={<RotateCcw aria-hidden />} />
         </div>
         {half(1)}
       </div>
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-2">
-          <label htmlFor={`${id}-c`} className="text-sm text-fg-2">
-            {t.control}
-          </label>
-          <Select
-            id={`${id}-c`}
-            size="sm"
-            className="w-36"
-            value={`${ctl[0]}+${ctl[1]}`}
-            disabled={status === "running"}
-            onChange={(e) => {
-              const [m, i] = e.target.value.split("+").map(Number);
-              setCtl([m, i]);
-              reset([m, i]);
-            }}
-          >
-            {(PRESETS.some(([m, i]) => m === ctl[0] && i === ctl[1]) ? PRESETS : [ctl, ...PRESETS]).map(([m, i]) => (
-              <option key={`${m}+${i}`} value={`${m}+${i}`}>
-                {m} {t.minShort} + {i} {t.secShort}
-              </option>
-            ))}
-          </Select>
-        </div>
-        <p className="text-[0.8125rem] text-fg-3">{status === "idle" ? t.startHint : t.keys}</p>
+      <div className="flex min-w-0 flex-col gap-1">
+        <span id={`${id}-c`} className="text-sm font-medium text-fg-2">
+          {t.control}
+        </span>
+        <ScrollRow label={t.control} role="radiogroup" rowClassName="gap-1.5">
+          {(PRESETS.some(([m, i]) => m === ctl[0] && i === ctl[1]) ? PRESETS : [ctl, ...PRESETS]).map(([m, i]) => (
+            <button
+              key={`${m}+${i}`}
+              type="button"
+              role="radio"
+              aria-checked={m === ctl[0] && i === ctl[1]}
+              disabled={status === "running"}
+              onClick={() => {
+                setCtl([m, i]);
+                reset([m, i]);
+              }}
+              className="chip tabular"
+            >
+              {m} {t.minShort} + {i} {t.secShort}
+            </button>
+          ))}
+        </ScrollRow>
+        <p className="px-1 text-[0.8125rem] text-fg-3">{status === "idle" ? t.startHint : t.keys}</p>
       </div>
     </div>
   );

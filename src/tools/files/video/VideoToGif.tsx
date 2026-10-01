@@ -3,7 +3,7 @@
 import { ImagePlay } from "lucide-react";
 import { useRef, useState } from "react";
 import type { Locale } from "@/i18n/config";
-import { count, formatNumber } from "@/i18n/format";
+import { count } from "@/i18n/format";
 import { Notice } from "@/ui/panel";
 import { runJob } from "../shared/client";
 import { GIF_HEAVY_PIXELS, gifFrameCount, gifSize, gifWorkload } from "../shared/gif";
@@ -107,16 +107,16 @@ export default function VideoToGif({ locale }: { locale: Locale }) {
                   <TimeInput label={t.start} value={range.start} max={duration} onCommit={(x) => setRange(Math.min(x, range.end - 0.1), range.end)} />
                   <TimeInput label={t.end} value={range.end} max={duration} onCommit={(x) => setRange(range.start, Math.max(x, range.start + 0.1))} />
                   {size && (
-                    <p className="col-span-2 text-lg font-semibold text-fg sm:col-span-1" aria-live="polite">
-                      {t.summary
-                        .replace("{w}", String(size.width))
-                        .replace("{h}", String(size.height))
-                        .replace("{n}", count(locale, frames, t.frames))
-                        .replace("{d}", formatTime(range.end - range.start, 1))}
-                      <span className="block text-[0.8125rem] font-normal text-fg-3">
-                        {t.maxHint} · {formatNumber(locale, gif.fps)} fps
+                    <div className="col-span-2 flex flex-col sm:col-span-1" aria-live="polite">
+                      <span className="tabular text-xl font-bold tracking-tight text-fg">
+                        {t.summary
+                          .replace("{w}", String(size.width))
+                          .replace("{h}", String(size.height))
+                          .replace("{n}", count(locale, frames, t.frames))
+                          .replace("{d}", formatTime(range.end - range.start, 1))}
                       </span>
-                    </p>
+                      <span className="text-[0.8125rem] text-fg-3">{t.maxHint}</span>
+                    </div>
                   )}
                 </div>
               </>

@@ -3,6 +3,7 @@
 import { useId, useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { formatNumber } from "@/i18n/format";
+import { cn } from "@/lib/cn";
 import { CopyButton } from "@/ui/copy-button";
 import { Field, Input } from "@/ui/field";
 import { Notice, Panel } from "@/ui/panel";
@@ -109,74 +110,76 @@ export default function UnixTime({ locale, value = "" }: UnixTimeProps) {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex flex-wrap items-center justify-between gap-2 rounded-[0.75rem] bg-surface-2 px-4 py-2.5">
+      <div className="flex flex-wrap items-center justify-between gap-2 rounded-[1rem] bg-surface-2 px-4 py-2.5">
         <span className="text-sm text-fg-3">
           {t.now}: <span className="tabular font-mono text-[0.9375rem] font-semibold text-fg">{now !== null ? Math.floor(now / 1000) : "—"}</span>
         </span>
-        <CopyButton value={() => String(Math.floor(nowMs() / 1000))} label={t.copy} copiedLabel={t.copied} variant="ghost" />
+        <CopyButton value={() => String(Math.floor(nowMs() / 1000))} label={t.copy} copiedLabel={t.copied} variant="secondary" />
       </div>
 
-      <Panel className="p-4 sm:p-5">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
-          <Field label={t.input} htmlFor={`${id}-ts`} className="sm:flex-1">
-            <Input id={`${id}-ts`} inputMode="numeric" autoComplete="off" spellCheck={false} placeholder={t.ph} size="lg" className="tabular font-mono" value={text} onChange={(e) => setText(e.target.value)} aria-invalid={!!text.trim() && !parsed} />
-          </Field>
-          <div className="flex flex-col gap-1.5">
-            <span className="text-sm font-medium text-fg-2">{t.unit}</span>
-            <Segmented
-              label={t.unit}
-              size="sm"
-              value={unit}
-              onChange={setUnit}
-              options={[
-                { value: "auto", label: t.auto },
-                { value: "s", label: locale === "ru" ? "с" : "s" },
-                { value: "ms", label: locale === "ru" ? "мс" : "ms" },
-                { value: "us", label: locale === "ru" ? "мкс" : "µs" },
-                { value: "ns", label: locale === "ru" ? "нс" : "ns" },
-              ]}
-            />
+      <div className={cn("grid gap-4", rows.length > 0 && "lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:items-start")}>
+        <Panel className="p-4 sm:p-6">
+          <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end">
+            <Field label={t.input} htmlFor={`${id}-ts`} className="sm:min-w-56 sm:flex-1">
+              <Input id={`${id}-ts`} inputMode="numeric" autoComplete="off" spellCheck={false} placeholder={t.ph} size="lg" className="tabular font-mono" value={text} onChange={(e) => setText(e.target.value)} aria-invalid={!!text.trim() && !parsed} />
+            </Field>
+            <div className="flex flex-col gap-1.5">
+              <span className="text-sm font-medium text-fg-2">{t.unit}</span>
+              <Segmented
+                label={t.unit}
+                size="sm"
+                value={unit}
+                onChange={setUnit}
+                options={[
+                  { value: "auto", label: t.auto },
+                  { value: "s", label: locale === "ru" ? "с" : "s" },
+                  { value: "ms", label: locale === "ru" ? "мс" : "ms" },
+                  { value: "us", label: locale === "ru" ? "мкс" : "µs" },
+                  { value: "ns", label: locale === "ru" ? "нс" : "ns" },
+                ]}
+              />
+            </div>
           </div>
-        </div>
 
-        <div className="mt-5 border-t border-line pt-5 text-center" aria-live="polite">
-          {text.trim() && !parsed ? (
-            <p className="text-err">{t.invalid}</p>
-          ) : parsed && p ? (
-            <>
-              <p className="text-sm font-medium text-fg-3">
-                {t.local}: {tz ? `${modernZone(tz)}, ${fmtOffset(p.off)}` : ""}
-              </p>
-              <p className="tabular mt-1 text-2xl font-bold tracking-tight text-fg sm:text-4xl">
-                {pad2(p.h)}:{pad2(p.mi)}:{pad2(p.s)}
-              </p>
-              <p className="mt-1 text-lg text-fg-2">{fmtDateLong(locale, { y: p.y, m: p.m, d: p.d })}</p>
-            </>
-          ) : (
-            <p className="text-fg-3">{t.ph}</p>
+          <div className="mt-5 border-t border-line pt-5 text-center" aria-live="polite">
+            {text.trim() && !parsed ? (
+              <p className="text-err">{t.invalid}</p>
+            ) : parsed && p ? (
+              <>
+                <p className="text-sm font-medium text-fg-3">
+                  {t.local}: {tz ? `${modernZone(tz)}, ${fmtOffset(p.off)}` : ""}
+                </p>
+                <p className="tabular mt-1 text-4xl font-bold tracking-tight text-fg sm:text-5xl">
+                  {pad2(p.h)}:{pad2(p.mi)}:{pad2(p.s)}
+                </p>
+                <p className="mt-1 text-lg text-fg-2">{fmtDateLong(locale, { y: p.y, m: p.m, d: p.d })}</p>
+              </>
+            ) : (
+              <p className="text-fg-3">{t.ph}</p>
+            )}
+          </div>
+          {parsed?.guessed && digits > 11 && <p className="mt-3 text-center text-[0.8125rem] text-fg-3">{t.guessed(t.units[parsed.unit], digits)}</p>}
+          {parsed?.suspicious && (
+            <Notice tone="warn" className="mt-3">
+              {t.suspicious}
+            </Notice>
           )}
-        </div>
-        {parsed?.guessed && digits > 11 && <p className="mt-3 text-center text-[0.8125rem] text-fg-3">{t.guessed(t.units[parsed.unit], digits)}</p>}
-        {parsed?.suspicious && (
-          <Notice tone="warn" className="mt-3">
-            {t.suspicious}
-          </Notice>
-        )}
-      </Panel>
+        </Panel>
 
-      {rows.length > 0 && (
-        <ul className="divide-y divide-line overflow-hidden rounded-[0.75rem] border border-line bg-surface">
-          {rows.map(([k, v]) => (
-            <li key={k} className="flex min-h-11 items-center justify-between gap-3 px-4 py-1.5">
-              <span className="shrink-0 text-sm text-fg-3">{k}</span>
-              <span className="flex min-w-0 items-center gap-1">
-                <span className="truncate font-mono text-[0.875rem] text-fg">{v}</span>
-                <CopyButton value={v} label={t.copy} copiedLabel={t.copied} showLabel={false} size="icon-sm" variant="ghost" />
-              </span>
-            </li>
-          ))}
-        </ul>
-      )}
+        {rows.length > 0 && (
+          <ul className="panel min-w-0 divide-y divide-line overflow-hidden">
+            {rows.map(([k, v]) => (
+              <li key={k} className="flex min-h-11 items-center justify-between gap-3 px-4 py-1.5">
+                <span className="shrink-0 text-sm text-fg-3">{k}</span>
+                <span className="flex min-w-0 items-center gap-1">
+                  <span className="truncate font-mono text-[0.875rem] text-fg">{v}</span>
+                  <CopyButton value={v} label={t.copy} copiedLabel={t.copied} showLabel={false} size="icon-sm" variant="ghost" />
+                </span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
 
       <Panel className="p-4 sm:p-5">
         <h2 className="mb-3 text-sm font-semibold text-fg">{t.reverse}</h2>

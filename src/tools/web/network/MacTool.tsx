@@ -5,14 +5,17 @@ import type { Locale } from "@/i18n/config";
 import { Field, Input, Switch } from "@/ui/field";
 import { Badge, Notice } from "@/ui/panel";
 import { eui64, linkLocalFromMac, macBits, macFormats, parseMac, type MacError } from "./lib/mac";
-import { DetailList, ResultCard } from "./ui/shared";
+import { DetailList, ResultCard, Split } from "./ui/shared";
 
 const T = {
   ru: {
     input: "MAC-адрес",
     hint: "Любой формат: 00:1A:2B:3C:4D:5E, 00-1a-2b-3c-4d-5e, 001a.2b3c.4d5e, 001A2B3C4D5E",
     upper: "Заглавные буквы",
-    errors: { empty: "Введите MAC-адрес", chars: "Допустимы только шестнадцатеричные цифры и разделители : - .", length: "MAC-адрес — это 12 шестнадцатеричных цифр (6 байт) в одном из стандартных форматов" } as Record<MacError, string>,
+    errors: { empty: "Введите MAC-адрес", chars: "Допустимы только шестнадцатеричные цифры и разделители : - .", length: "MAC-адрес — это 12 шестнадцатеричных цифр (6 байт) в одном из стандартных форматов" } as Record<
+      MacError,
+      string
+    >,
     formats: "Форматы записи",
     colon: "Через двоеточие (Linux, macOS)",
     hyphen: "Через дефис (Windows)",
@@ -62,12 +65,18 @@ export default function MacTool({ locale, value = "00:1A:2B:3C:4D:5E" }: { local
   const r = parseMac(text);
 
   return (
-    <div className="flex flex-col gap-4">
-      <Field label={t.input} htmlFor={`${id}-in`} hint={t.hint} aside={<Switch label={t.upper} checked={upper} onChange={(e) => setUpper(e.target.checked)} className="text-sm" />}>
-        <Input id={`${id}-in`} value={text} onChange={(e) => setText(e.target.value)} size="lg" className="font-mono" autoComplete="off" spellCheck={false} aria-invalid={!r.ok && text.trim() !== ""} />
-      </Field>
+    <Split
+      input={
+        <>
+          <Field label={t.input} htmlFor={`${id}-in`} hint={t.hint}>
+            <Input id={`${id}-in`} value={text} onChange={(e) => setText(e.target.value)} size="lg" className="font-mono" autoComplete="off" spellCheck={false} aria-invalid={!r.ok && text.trim() !== ""} />
+          </Field>
+          <Switch label={t.upper} checked={upper} onChange={(e) => setUpper(e.target.checked)} />
+        </>
+      }
+    >
       {r.ok ? <MacResult locale={locale} bytes={r.bytes} upper={upper} /> : text.trim() !== "" && <Notice tone="err">{t.errors[r.error]}</Notice>}
-    </div>
+    </Split>
   );
 }
 
@@ -97,7 +106,12 @@ function MacResult({ locale, bytes, upper }: { locale: Locale; bytes: number[]; 
           { label: t.cisco, value: f.cisco },
           { label: t.bare, value: f.bare },
           { label: t.oui, value: upper ? b.oui : b.oui.toLowerCase() },
-          ...(!b.multicast ? [{ label: t.eui, value: eui64(bytes) }, { label: t.ll, value: linkLocalFromMac(bytes) }] : []),
+          ...(!b.multicast
+            ? [
+                { label: t.eui, value: eui64(bytes) },
+                { label: t.ll, value: linkLocalFromMac(bytes) },
+              ]
+            : []),
         ]}
       />
       {b.local && !b.multicast && <p className="text-sm text-fg-2">{t.localNote}</p>}

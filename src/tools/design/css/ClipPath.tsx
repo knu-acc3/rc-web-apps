@@ -4,7 +4,7 @@ import { Plus, Trash2 } from "lucide-react";
 import { useId, useRef, useState, type PointerEvent } from "react";
 import type { Locale } from "@/i18n/config";
 import { Button } from "@/ui/button";
-import { Field, Input, Select } from "@/ui/field";
+import { Field, Input } from "@/ui/field";
 import { Panel } from "@/ui/panel";
 import { CLIP_SHAPES, clipBySlug, polygonCss, type Point } from "./lib/shapes";
 import { CodePanel, Stage } from "./ui/kit";
@@ -15,7 +15,7 @@ const T = {
     point: (n: number, x: number, y: number) => `Точка ${n}: ${x} %, ${y} %`,
     add: "Добавить точку",
     remove: "Удалить точку",
-    hint: "Перетаскивайте точки мышью или выберите точку клавишей Tab и двигайте стрелками (Shift — шаг 10 %). Delete удаляет точку.",
+    hint: "Тяните точки; с клавиатуры — Tab и стрелки (Shift — шаг 10 %), Delete удаляет.",
     value: "Функция clip-path",
     shapes: {
       triangle: "Треугольник",
@@ -40,7 +40,7 @@ const T = {
     point: (n: number, x: number, y: number) => `Point ${n}: ${x}%, ${y}%`,
     add: "Add point",
     remove: "Remove point",
-    hint: "Drag the points, or Tab to a point and move it with the arrow keys (Shift = 10% steps). Delete removes the point.",
+    hint: "Drag the points; keyboard: Tab and arrows (Shift = 10%), Delete removes.",
     value: "clip-path function",
     shapes: {
       triangle: "Triangle",
@@ -130,7 +130,7 @@ export default function ClipPathGenerator({ locale, shape: shape0 = "hexagon" }:
                   type="button"
                   aria-label={t.point(i + 1, x, y)}
                   aria-pressed={i === sel}
-                  className={`absolute size-4 -translate-x-1/2 -translate-y-1/2 cursor-grab rounded-full border-2 border-white shadow-[0_0_0_1px_rgb(0_0_0/0.5)] ${i === sel ? "bg-zinc-900" : "bg-indigo-500"}`}
+                  className={`absolute size-5 -translate-x-1/2 -translate-y-1/2 cursor-grab rounded-full border-2 border-white shadow-[0_0_0_1px_rgb(0_0_0/0.5)] transition-transform hover:scale-125 active:cursor-grabbing pointer-coarse:size-7 ${i === sel ? "scale-110 bg-zinc-900" : "bg-indigo-500"}`}
                   style={{ left: `${x}%`, top: `${y}%` }}
                   onFocus={() => setSel(i)}
                   onPointerDown={(e) => {
@@ -153,25 +153,37 @@ export default function ClipPathGenerator({ locale, shape: shape0 = "hexagon" }:
               ))}
           </div>
         </Stage>
-        <Panel className="flex flex-col gap-3 p-4">
-          <Field label={t.shape} htmlFor={`${id}-s`}>
-            <Select id={`${id}-s`} value={slug} onChange={(e) => choose(e.target.value)}>
-              {CLIP_SHAPES.map((s) => (
-                <option key={s.slug} value={s.slug}>
-                  {t.shapes[s.slug]}
-                </option>
+        <Panel className="flex flex-col gap-4 p-4 sm:p-5">
+          <div>
+            <div id={`${id}-s`} className="mb-2 text-sm font-medium text-fg-2">
+              {t.shape}
+            </div>
+            <div role="radiogroup" aria-labelledby={`${id}-s`} className="grid grid-cols-5 gap-1.5 sm:grid-cols-8 lg:grid-cols-5 xl:grid-cols-8">
+              {CLIP_SHAPES.map((sh) => (
+                <button
+                  key={sh.slug}
+                  type="button"
+                  role="radio"
+                  aria-checked={slug === sh.slug}
+                  aria-label={t.shapes[sh.slug]}
+                  title={t.shapes[sh.slug]}
+                  onClick={() => choose(sh.slug)}
+                  className="chip aspect-square h-auto! min-h-11 justify-center p-1.5!"
+                >
+                  <span aria-hidden className="block size-full max-h-9 max-w-9 bg-current opacity-80" style={{ clipPath: sh.points ? polygonCss(sh.points) : sh.css }} />
+                </button>
               ))}
-            </Select>
-          </Field>
+            </div>
+          </div>
           {isPolygon ? (
             <>
               <p className="text-sm text-fg-3">{t.hint}</p>
-              <div className="flex gap-2">
-                <Button variant="outline" size="sm" onClick={addPoint}>
+              <div className="flex flex-wrap gap-2">
+                <Button variant="tonal" onClick={addPoint}>
                   <Plus aria-hidden />
                   {t.add}
                 </Button>
-                <Button variant="ghost" size="sm" onClick={() => removePoint(sel)} disabled={points.length <= 3}>
+                <Button variant="text" onClick={() => removePoint(sel)} disabled={points.length <= 3}>
                   <Trash2 aria-hidden />
                   {t.remove}
                 </Button>

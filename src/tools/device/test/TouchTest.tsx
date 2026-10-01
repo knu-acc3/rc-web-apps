@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { formatNumber, plural } from "@/i18n/format";
 import { cn } from "@/lib/cn";
-import { Button } from "@/ui/button";
+import { Button, IconButton } from "@/ui/button";
 import { Switch } from "@/ui/field";
 import { useClientValue } from "./lib/client";
 
@@ -67,7 +67,7 @@ export default function TouchTest({ locale }: { locale: Locale }) {
   const [pressure, setPressure] = useState<number | null>(null);
   const [trails, setTrails] = useState(true);
   const [full, setFull] = useState(false);
-  const maxPoints = useClientValue(() => (typeof navigator !== "undefined" ? navigator.maxTouchPoints ?? 0 : null), null);
+  const maxPoints = useClientValue(() => (typeof navigator !== "undefined" ? (navigator.maxTouchPoints ?? 0) : null), null);
   const canFull = useClientValue(() => typeof document !== "undefined" && !!document.documentElement.requestFullscreen, false);
 
   const wrapRef = useRef<HTMLDivElement>(null);
@@ -234,33 +234,28 @@ export default function TouchTest({ locale }: { locale: Locale }) {
 
   return (
     <div className="flex flex-col gap-3">
-      <div ref={wrapRef} className={cn("relative overflow-hidden rounded-[0.75rem] border border-line bg-surface-2", full && "rounded-none border-0")}>
-        <canvas
-          ref={canvasRef}
-          aria-label={t.area}
-          role="img"
-          className={cn("block w-full touch-none select-none text-fg", full ? "h-dvh" : "h-[60vh] min-h-80")}
-        />
+      <div ref={wrapRef} className={cn("relative overflow-hidden rounded-[1.25rem] bg-surface-2 shadow-[inset_0_0_0_1px_var(--line)]", full && "rounded-none shadow-none")}>
+        <canvas ref={canvasRef} aria-label={t.area} role="img" className={cn("block w-full touch-none select-none text-fg", full ? "h-dvh" : "h-[60vh] min-h-80")} />
         <div className="pointer-events-none absolute inset-x-0 top-3 flex flex-col items-center gap-1 text-center">
           <span className="tabular text-5xl font-bold text-fg">{active}</span>
-          <span className="text-sm text-fg-2">
-            {active === 0 ? t.hint : `${plural(locale, active, t.touches)} ${t.now}`}
-          </span>
+          <span className="text-sm text-fg-2">{active === 0 ? t.hint : `${plural(locale, active, t.touches)} ${t.now}`}</span>
         </div>
-        {full && (
-          <Button variant="secondary" size="sm" onClick={toggleFull} className="absolute right-3 top-3">
+        {full ? (
+          <Button variant="filled" onClick={toggleFull} className="absolute top-3 right-3">
             <Minimize aria-hidden />
             {t.exitFull}
           </Button>
+        ) : (
+          canFull && <IconButton variant="filled" size="lg" label={t.full} icon={<Maximize aria-hidden />} onClick={toggleFull} className="absolute top-3 right-3" />
         )}
       </div>
 
-      <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-fg-2">
+      <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-[0.9375rem] text-fg-2">
         <span>
-          {t.max}: <span className="tabular font-semibold text-fg">{max}</span>
+          {t.max}: <span className="tabular text-xl font-bold text-fg">{max}</span>
         </span>
         <span>
-          {t.device}: <span className="tabular font-semibold text-fg">{maxPoints === null ? "—" : maxPoints === 0 ? t.noTouch : formatNumber(locale, maxPoints)}</span>
+          {t.device}: <span className="tabular text-xl font-bold text-fg">{maxPoints === null ? "—" : maxPoints === 0 ? t.noTouch : formatNumber(locale, maxPoints)}</span>
         </span>
         {lastType && (
           <span>
@@ -274,16 +269,10 @@ export default function TouchTest({ locale }: { locale: Locale }) {
         )}
         <span className="flex-1" />
         <Switch label={t.trails} checked={trails} onChange={(e) => setTrails(e.target.checked)} />
-        <Button variant="ghost" size="sm" onClick={clear}>
+        <Button variant="tonal" onClick={clear}>
           <Eraser aria-hidden />
           {t.clear}
         </Button>
-        {canFull && !full && (
-          <Button variant="outline" size="sm" onClick={toggleFull}>
-            <Maximize aria-hidden />
-            {t.full}
-          </Button>
-        )}
       </div>
     </div>
   );

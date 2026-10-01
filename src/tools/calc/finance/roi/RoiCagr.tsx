@@ -1,11 +1,12 @@
 "use client";
 
 import { useId } from "react";
+import { plural } from "@/i18n/format";
 import { Segmented } from "@/ui/segmented";
 import type { ToolProps } from "../../../types";
-import { CURRENCIES, CURRENCY_SYMBOL, fmtMoney, fmtPct, fmtRound, isCurrency, type Currency } from "../../shared/fmt";
+import { CURRENCIES, CURRENCY_SYMBOL, fmtMoney, fmtPct, fmtRound, isCurrency, moneyMax, type Currency } from "../../shared/fmt";
 import { field, toInput } from "../../shared/num";
-import { CalcGrid, Explain, FieldRow, NumField, OptionsRow, ResultMain, Stack, ToolActions } from "../../shared/ui";
+import { CalcGrid, Explain, NumSlider, OptionsRow, ResultMain, Stack, ToolActions } from "../../shared/ui";
 import { useQueryState } from "../../shared/url-state";
 import { cagr, roi } from "../lib/money";
 import { CurrencySelect } from "../loan/parts";
@@ -19,8 +20,9 @@ const T = {
     final: "Получено (итоговая стоимость)",
     start: "Начальная стоимость",
     end: "Конечная стоимость",
-    years: "Срок, лет",
-    yearsOpt: "Срок, лет (необязательно)",
+    years: "Срок",
+    yearsOpt: "Срок (необязательно)",
+    yearForms: ["год", "года", "лет"],
     roiLabel: "Доходность вложений (ROI)",
     cagrLabel: "Среднегодовой рост (CAGR)",
     profit: (v: string) => `прибыль ${v}`,
@@ -39,8 +41,9 @@ const T = {
     final: "Final value",
     start: "Starting value",
     end: "Ending value",
-    years: "Years",
-    yearsOpt: "Years (optional)",
+    years: "Term",
+    yearsOpt: "Term (optional)",
+    yearForms: ["year", "years"],
     roiLabel: "Return on investment (ROI)",
     cagrLabel: "Compound annual growth rate (CAGR)",
     profit: (v: string) => `profit ${v}`,
@@ -100,6 +103,7 @@ export default function RoiCagr({ locale, mode = "roi" }: ToolProps<{ mode?: (ty
     <>
       <Segmented
         label={t.mode}
+        fill
         value={m}
         onChange={(v) => q.set({ m: v })}
         options={[
@@ -107,13 +111,11 @@ export default function RoiCagr({ locale, mode = "roi" }: ToolProps<{ mode?: (ty
           { value: "cagr", label: t.cagr },
         ]}
       />
-      <FieldRow>
-        <NumField id={`${id}-a`} label={m === "roi" ? t.invested : t.start} value={q.v.a} onChange={(a) => q.set({ a })} suffix={sym} error={A.message} size="lg" />
-        <NumField id={`${id}-b`} label={m === "roi" ? t.final : t.end} value={q.v.b} onChange={(b) => q.set({ b })} suffix={sym} error={B.message} size="lg" />
-      </FieldRow>
-      <NumField id={`${id}-y`} label={m === "roi" ? t.yearsOpt : t.years} value={q.v.y} onChange={(y) => q.set({ y })} error={Y.message} />
+      <NumSlider id={`${id}-a`} locale={locale} label={m === "roi" ? t.invested : t.start} value={q.v.a} onChange={(a) => q.set({ a })} suffix={sym} error={A.message} min={0} max={moneyMax(cur, 100_000_000)} scale="log" />
+      <NumSlider id={`${id}-b`} locale={locale} label={m === "roi" ? t.final : t.end} value={q.v.b} onChange={(b) => q.set({ b })} suffix={sym} error={B.message} min={0} max={moneyMax(cur, 100_000_000)} scale="log" />
+      <NumSlider id={`${id}-y`} locale={locale} label={m === "roi" ? t.yearsOpt : t.years} value={q.v.y} onChange={(y) => q.set({ y })} suffix={plural(locale, Y.value ?? 5, t.yearForms)} error={Y.message} min={1} max={50} />
       <OptionsRow>
-        <CurrencySelect id={`${id}-c`} locale={locale} value={cur} onChange={(c) => q.set({ c })} />
+        <CurrencySelect locale={locale} value={cur} onChange={(c) => q.set({ c })} />
       </OptionsRow>
     </>
   );

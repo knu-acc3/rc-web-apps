@@ -2,10 +2,13 @@
 
 import { useId, useMemo, useState } from "react";
 import type { Locale } from "@/i18n/config";
-import { Checkbox, Input } from "@/ui/field";
+import { Input, Switch } from "@/ui/field";
+import { NumberInput } from "@/ui/number-input";
+import { SliderField } from "@/ui/slider-field";
 import { addPrefixSuffix, filterLines, joinLines, LINE_OPS, numberLines, removeEmptyLines, splitToLines, wrapText, type LineOp } from "./lib/lineTools";
 import { splitLines } from "./lib/textOps";
 import { countLabel, InlineSelect, InputPanel, OptionsBar, OutputPanel, TwoPane, TX } from "./ui/shared";
+import { ChipChoice } from "@/ui/chip-choice";
 
 const T = {
   ru: {
@@ -33,7 +36,8 @@ const T = {
     delimiter: "Разбить по",
     trim: "Обрезать пробелы",
     wsEmpty: "Строки из пробелов тоже пустые",
-    width: "Ширина, символов",
+    width: "Ширина строки",
+    chars: "симв.",
     breakWords: "Разрывать длинные слова",
     query: "Строки, содержащие",
     keep: "оставить",
@@ -75,7 +79,8 @@ const T = {
     delimiter: "Split on",
     trim: "Trim spaces",
     wsEmpty: "Whitespace-only lines count as empty",
-    width: "Width, characters",
+    width: "Line width",
+    chars: "chars",
     breakWords: "Break long words",
     query: "Lines containing",
     keep: "keep",
@@ -139,11 +144,11 @@ export default function LineTools({ locale, op: op0 = "number" }: { locale: Loca
   }, [op, text, prefix, suffix, skipEmpty, start, format, pad, joinSep, trim, delimiter, wsEmpty, width, breakWords, query, filterMode, ignoreCase]);
 
   const lineCount = splitLines(out).length;
-  const small = "h-9 text-sm";
+  const small = "h-10 text-base sm:text-sm";
   return (
     <div className="flex flex-col gap-4">
-      <OptionsBar>
-        <InlineSelect id={`${id}-op`} label={t.op} value={op} onChange={setOp} options={LINE_OPS.map((o) => ({ value: o, label: t[o] }))} />
+      <ChipChoice label={t.op} value={op} onChange={setOp} grid="grid-cols-2 sm:grid-cols-4 xl:grid-cols-7" options={LINE_OPS.map((o) => ({ value: o, label: t[o] }))} />
+      <OptionsBar className="min-h-10">
         {op === "prefix" && (
           <>
             <label className="flex items-center gap-2">
@@ -154,18 +159,20 @@ export default function LineTools({ locale, op: op0 = "number" }: { locale: Loca
               <span className="text-fg-2">{t.after}</span>
               <Input value={suffix} onChange={(e) => setSuffix(e.target.value)} className={`${small} w-28`} autoComplete="off" />
             </label>
-            <Checkbox label={t.skipEmpty} checked={skipEmpty} onChange={(e) => setSkipEmpty(e.target.checked)} />
+            <Switch label={t.skipEmpty} checked={skipEmpty} onChange={(e) => setSkipEmpty(e.target.checked)} />
           </>
         )}
         {op === "number" && (
           <>
             <InlineSelect id={`${id}-fmt`} label={t.format} value={format} onChange={setFormat} options={FORMATS.map((f) => ({ value: f, label: f.replace("{n}", "1").trim() }))} />
-            <label className="flex items-center gap-2">
-              <span className="text-fg-2">{t.start}</span>
-              <Input value={start} onChange={(e) => setStart(e.target.value)} inputMode="numeric" className={`${small} w-20`} autoComplete="off" />
-            </label>
-            <Checkbox label={t.pad} checked={pad} onChange={(e) => setPad(e.target.checked)} />
-            <Checkbox label={t.skipEmpty} checked={skipEmpty} onChange={(e) => setSkipEmpty(e.target.checked)} />
+            <div className="flex items-center gap-2">
+              <label htmlFor={`${id}-st`} className="text-fg-2">
+                {t.start}
+              </label>
+              <NumberInput id={`${id}-st`} value={Number.parseInt(start, 10) || 0} onChange={(v) => setStart(String(v ?? 0))} min={0} max={1000000} size="sm" className="w-32" />
+            </div>
+            <Switch label={t.pad} checked={pad} onChange={(e) => setPad(e.target.checked)} />
+            <Switch label={t.skipEmpty} checked={skipEmpty} onChange={(e) => setSkipEmpty(e.target.checked)} />
           </>
         )}
         {op === "join" && (
@@ -177,7 +184,7 @@ export default function LineTools({ locale, op: op0 = "number" }: { locale: Loca
               onChange={setJoinSep}
               options={(["space", "comma", "commaSpace", "semicolon", "pipe", "none"] as const).map((s) => ({ value: s, label: t[s] }))}
             />
-            <Checkbox label={t.trim} checked={trim} onChange={(e) => setTrim(e.target.checked)} />
+            <Switch label={t.trim} checked={trim} onChange={(e) => setTrim(e.target.checked)} />
           </>
         )}
         {op === "split" && (
@@ -186,17 +193,29 @@ export default function LineTools({ locale, op: op0 = "number" }: { locale: Loca
               <span className="text-fg-2">{t.delimiter}</span>
               <Input value={delimiter} onChange={(e) => setDelimiter(e.target.value)} className={`${small} w-24 font-mono`} autoComplete="off" />
             </label>
-            <Checkbox label={t.trim} checked={trim} onChange={(e) => setTrim(e.target.checked)} />
+            <Switch label={t.trim} checked={trim} onChange={(e) => setTrim(e.target.checked)} />
           </>
         )}
-        {op === "remove-empty" && <Checkbox label={t.wsEmpty} checked={wsEmpty} onChange={(e) => setWsEmpty(e.target.checked)} />}
+        {op === "remove-empty" && <Switch label={t.wsEmpty} checked={wsEmpty} onChange={(e) => setWsEmpty(e.target.checked)} />}
         {op === "wrap" && (
           <>
-            <label className="flex items-center gap-2">
-              <span className="text-fg-2">{t.width}</span>
-              <Input value={width} onChange={(e) => setWidth(e.target.value)} inputMode="numeric" className={`${small} w-20`} autoComplete="off" />
-            </label>
-            <Checkbox label={t.breakWords} checked={breakWords} onChange={(e) => setBreakWords(e.target.checked)} />
+            <SliderField
+              id={`${id}-w`}
+              label={t.width}
+              value={width}
+              onChange={setWidth}
+              parse={(v) => {
+                const x = Number.parseInt(v, 10);
+                return Number.isFinite(x) ? x : null;
+              }}
+              format={String}
+              min={10}
+              max={160}
+              suffix={t.chars}
+              inputMode="numeric"
+              className="w-full max-w-md"
+            />
+            <Switch label={t.breakWords} checked={breakWords} onChange={(e) => setBreakWords(e.target.checked)} />
           </>
         )}
         {op === "filter" && (
@@ -215,7 +234,7 @@ export default function LineTools({ locale, op: op0 = "number" }: { locale: Loca
                 { value: "remove", label: t.remove },
               ]}
             />
-            <Checkbox label={t.ignoreCase} checked={ignoreCase} onChange={(e) => setIgnoreCase(e.target.checked)} />
+            <Switch label={t.ignoreCase} checked={ignoreCase} onChange={(e) => setIgnoreCase(e.target.checked)} />
           </>
         )}
       </OptionsBar>

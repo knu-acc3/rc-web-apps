@@ -112,6 +112,9 @@ export interface ProcessResult {
   ext: string;
   width: number;
   height: number;
+  /** Size of the decoded source, before the ops. */
+  srcWidth?: number;
+  srcHeight?: number;
   /** The original file was returned unchanged (it was smaller). */
   keptOriginal?: boolean;
   /** Quality actually used (target-size mode). */

@@ -1,11 +1,12 @@
 "use client";
 
 import { useId } from "react";
+import { plural } from "@/i18n/format";
 import type { ToolProps } from "../../../types";
 import { BarChart } from "../../shared/charts";
-import { CURRENCIES, CURRENCY_SYMBOL, fmtCompact, fmtMoney, fmtPct, fmtRound, isCurrency, type Currency } from "../../shared/fmt";
+import { CURRENCIES, CURRENCY_SYMBOL, fmtCompact, fmtMoney, fmtPct, fmtRound, isCurrency, moneyMax, type Currency } from "../../shared/fmt";
 import { field, toInput } from "../../shared/num";
-import { Advanced, CalcGrid, DataTable, Disclaimer, Explain, FieldRow, InlineSelect, InlineToggle, NumField, OptionsRow, ResultMain, Stack, SubHeading, ToolActions } from "../../shared/ui";
+import { Advanced, CalcGrid, DataTable, Disclaimer, Explain, InlineSelect, InlineToggle, NumSlider, OptionsRow, ResultMain, Stack, SubHeading, ToolActions, SliderRow } from "../../shared/ui";
 import { useQueryState } from "../../shared/url-state";
 import { compound, COMPOUNDINGS, monthlyFactor, type Compounding } from "../lib/growth";
 import { CurrencySelect } from "../loan/parts";
@@ -13,8 +14,9 @@ import { CurrencySelect } from "../loan/parts";
 const T = {
   ru: {
     principal: "Начальная сумма",
-    rate: "Ставка, % годовых",
-    years: "Срок, лет",
+    rate: "Ставка в год",
+    years: "Срок",
+    yearForms: ["год", "года", "лет"],
     comp: "Начисление",
     comps: { yearly: "раз в год", semiannual: "раз в полгода", quarterly: "раз в квартал", monthly: "каждый месяц", daily: "каждый день", continuous: "непрерывно" } satisfies Record<Compounding, string>,
     contrib: "Регулярные пополнения",
@@ -39,8 +41,9 @@ const T = {
   },
   en: {
     principal: "Initial amount",
-    rate: "Interest rate, % per year",
-    years: "Term, years",
+    rate: "Interest rate per year",
+    years: "Term",
+    yearForms: ["year", "years"],
     comp: "Compounding",
     comps: { yearly: "yearly", semiannual: "semiannually", quarterly: "quarterly", monthly: "monthly", daily: "daily", continuous: "continuously" } satisfies Record<Compounding, string>,
     contrib: "Regular contributions",
@@ -92,20 +95,21 @@ export default function CompoundInterest({ locale, principal = locale === "ru" ?
 
   const inputs = (
     <>
-      <NumField id={`${id}-p`} label={t.principal} value={q.v.p} onChange={(p) => q.set({ p })} suffix={sym} error={P.message} size="lg" />
-      <FieldRow>
-        <NumField id={`${id}-r`} label={t.rate} value={q.v.r} onChange={(r) => q.set({ r })} suffix="%" error={R.message} size="lg" />
-        <NumField id={`${id}-y`} label={t.years} value={q.v.y} onChange={(y) => q.set({ y })} error={Y.message} size="lg" />
-      </FieldRow>
+      <NumSlider id={`${id}-p`} locale={locale} label={t.principal} value={q.v.p} onChange={(p) => q.set({ p })} suffix={sym} error={P.message} min={0} max={moneyMax(cur, 100_000_000)} scale="log" />
+      <SliderRow>
+        <NumSlider id={`${id}-r`} locale={locale} label={t.rate} value={q.v.r} onChange={(r) => q.set({ r })} suffix="%" error={R.message} min={0} max={30} decimals={1} />
+        <NumSlider id={`${id}-y`} locale={locale} label={t.years} value={q.v.y} onChange={(y) => q.set({ y })} suffix={plural(locale, Y.value ?? 5, t.yearForms)} error={Y.message} min={1} max={50} />
+      </SliderRow>
       <OptionsRow>
         <InlineSelect id={`${id}-n`} label={t.comp} value={comp} onChange={(n) => q.set({ n })} options={COMPOUNDINGS.map((c) => ({ value: c, label: t.comps[c] }))} />
-        <CurrencySelect id={`${id}-c`} locale={locale} value={cur} onChange={(c) => q.set({ c })} />
+        <CurrencySelect locale={locale} value={cur} onChange={(c) => q.set({ c })} />
       </OptionsRow>
       <Advanced title={t.contrib} open={!!q.v.a}>
-        <NumField id={`${id}-a`} label={t.amount} value={q.v.a} onChange={(a) => q.set({ a })} suffix={sym} error={A.message} placeholder="0" />
+        <NumSlider id={`${id}-a`} locale={locale} label={t.amount} value={q.v.a} onChange={(a) => q.set({ a })} suffix={sym} error={A.message} min={0} max={moneyMax(cur, 5_000_000)} scale="log" />
         <OptionsRow>
           <InlineToggle
             label={t.freq}
+            showLabel
             value={q.v.f as (typeof FREQ)[number]}
             onChange={(f) => q.set({ f })}
             options={[
@@ -115,6 +119,7 @@ export default function CompoundInterest({ locale, principal = locale === "ru" ?
           />
           <InlineToggle
             label={t.timing}
+            showLabel
             value={q.v.w as (typeof TIMING)[number]}
             onChange={(w) => q.set({ w })}
             options={[

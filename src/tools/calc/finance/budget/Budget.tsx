@@ -2,20 +2,21 @@
 
 import { Plus, Trash2, X } from "lucide-react";
 import { useId } from "react";
-import { Button } from "@/ui/button";
+import { Button, IconButton } from "@/ui/button";
 import { Input, Select } from "@/ui/field";
+import { Panel } from "@/ui/panel";
 import type { ToolProps } from "../../../types";
 import { Donut } from "../../shared/charts";
-import { CURRENCY_SYMBOL, fmtMoney, fmtPct, isCurrency, type Currency } from "../../shared/fmt";
+import { CURRENCY_SYMBOL, fmtMoney, fmtPct, isCurrency, moneyMax, type Currency } from "../../shared/fmt";
 import { readNum, toInput } from "../../shared/num";
 import { useStored } from "../../shared/storage";
-import { Explain, NumField, ResultMain, Stack, SubHeading } from "../../shared/ui";
+import { Explain, NumSlider, OptionsRow, ResultMain, Stack, SubHeading } from "../../shared/ui";
 import { BUCKETS, rule503020, type Bucket } from "../lib/money";
 import { CurrencySelect } from "../loan/parts";
 
 const T = {
   ru: {
-    income: "Доход в месяц (после налогов)",
+    income: "Доход в месяц после налогов",
     stored: "Данные хранятся только в этом браузере",
     categories: "Расходы по категориям",
     name: "Категория",
@@ -46,7 +47,7 @@ const T = {
     defIncome: 450000,
   },
   en: {
-    income: "Monthly income (after tax)",
+    income: "Monthly income after tax",
     stored: "Your data stays in this browser only",
     categories: "Spending by category",
     name: "Category",
@@ -122,32 +123,31 @@ export default function Budget({ locale }: ToolProps) {
   return (
     <Stack>
       <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)] lg:gap-6">
-        <section className="flex min-w-0 flex-col gap-4 rounded-[0.75rem] border border-line bg-surface p-4 sm:p-5">
-          <NumField
-            id={`${id}-inc`}
-            label={t.income}
-            hint={t.stored}
-            value={st.income}
-            onChange={(v) => update({ income: v })}
-            suffix={CURRENCY_SYMBOL[cur]}
-            size="lg"
-            aside={<CurrencySelect id={`${id}-c`} locale={locale} value={cur} onChange={(c) => update({ cur: c })} />}
-          />
+        <Panel className="flex min-w-0 flex-col gap-5 p-4 sm:p-6">
+          <NumSlider id={`${id}-inc`} locale={locale} label={t.income} hint={t.stored} value={st.income} onChange={(v) => update({ income: v })} suffix={CURRENCY_SYMBOL[cur]} min={0} max={moneyMax(cur, 5_000_000)} scale="log" />
+          <OptionsRow>
+            <CurrencySelect locale={locale} value={cur} onChange={(c) => update({ cur: c })} />
+          </OptionsRow>
           <div>
             <h2 className="mb-2 text-sm font-semibold text-fg-2">{t.categories}</h2>
             <ul className="flex flex-col gap-2">
               {st.rows.map((r, i) => (
-                <li key={i} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2">
-                  <div className="grid min-w-0 grid-cols-2 gap-2 min-[520px]:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)_minmax(0,1fr)]">
-                    <label className="col-span-2 min-w-0 min-[520px]:col-span-1">
-                      <span className="sr-only">{`${t.name} ${i + 1}`}</span>
-                      <Input value={r.name} onChange={(e) => setRow(i, { name: e.target.value })} autoComplete="off" />
-                    </label>
-                    <label className="min-w-0">
+                <li key={i} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 max-[519px]:rounded-[1rem] max-[519px]:bg-surface-2 max-[519px]:p-2 min-[520px]:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)_auto_auto]">
+                  <label className="min-w-0">
+                    <span className="sr-only">{`${t.name} ${i + 1}`}</span>
+                    <Input value={r.name} onChange={(e) => setRow(i, { name: e.target.value })} autoComplete="off" />
+                  </label>
+                  <IconButton label={`${t.remove}: ${r.name}`} title={t.remove} icon={<X aria-hidden />} size="sm" className="min-[520px]:order-last" onClick={() => update({ rows: st.rows.filter((_, j) => j !== i) })} />
+                  {/* Phones: amount and group on their own line; from 520px all four sit in one row. */}
+                  <div className="col-span-2 grid grid-cols-[minmax(4.75rem,1fr)_auto] gap-2 max-[379px]:grid-cols-[minmax(0,1fr)] min-[520px]:contents">
+                    <label className="relative min-w-0">
                       <span className="sr-only">{`${t.amount}: ${r.name}`}</span>
-                      <Input value={r.amount} onChange={(e) => setRow(i, { amount: e.target.value })} inputMode="decimal" className="tabular" autoComplete="off" aria-invalid={!!readNum(locale, r.amount, { min: 0 }).error} />
+                      <Input value={r.amount} onChange={(e) => setRow(i, { amount: e.target.value })} inputMode="decimal" className="tabular pl-2.5 pr-6" autoComplete="off" aria-invalid={!!readNum(locale, r.amount, { min: 0 }).error} />
+                      <span aria-hidden className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-sm text-fg-3">
+                        {CURRENCY_SYMBOL[cur]}
+                      </span>
                     </label>
-                    <label className="min-w-0">
+                    <label className="flex min-w-0">
                       <span className="sr-only">{`${t.bucket}: ${r.name}`}</span>
                       <Select value={r.bucket} onChange={(e) => setRow(i, { bucket: e.target.value as Bucket })}>
                         {BUCKETS.map((b) => (
@@ -158,24 +158,21 @@ export default function Budget({ locale }: ToolProps) {
                       </Select>
                     </label>
                   </div>
-                  <Button variant="ghost" size="icon-sm" onClick={() => update({ rows: st.rows.filter((_, j) => j !== i) })} aria-label={`${t.remove}: ${r.name}`} title={t.remove}>
-                    <X aria-hidden />
-                  </Button>
                 </li>
               ))}
             </ul>
           </div>
           <div className="flex flex-wrap items-center justify-between gap-2">
-            <Button variant="outline" size="sm" onClick={() => update({ rows: [...st.rows, { name: "", amount: "", bucket: "wants" }] })} disabled={st.rows.length >= 40}>
+            <Button variant="tonal" onClick={() => update({ rows: [...st.rows, { name: "", amount: "", bucket: "wants" }] })} disabled={st.rows.length >= 40}>
               <Plus aria-hidden />
               {t.add}
             </Button>
-            <Button variant="ghost" size="sm" onClick={() => save(null)}>
+            <Button variant="text" size="sm" onClick={() => save(null)}>
               <Trash2 aria-hidden />
               {t.clear}
             </Button>
           </div>
-        </section>
+        </Panel>
         <div className="flex min-w-0 flex-col gap-4 lg:sticky lg:top-20">
           <ResultMain
             label={left !== null && left < 0 ? t.over : t.left}
@@ -195,7 +192,7 @@ export default function Budget({ locale }: ToolProps) {
       {plan && income.value ? (
         <section>
           <SubHeading>{t.split}</SubHeading>
-          <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+          <Panel className="grid gap-6 p-4 sm:p-6 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
             <ul className="flex flex-col gap-4">
               {BUCKETS.map((b) => {
                 const share = plan[b] > 0 ? Math.min(1.5, byBucket[b] / plan[b]) : 0;
@@ -220,7 +217,7 @@ export default function Budget({ locale }: ToolProps) {
               parts={BUCKETS.map((b) => ({ label: t.buckets[b], value: byBucket[b], tone: TONES[b] }))}
               size={132}
             />
-          </div>
+          </Panel>
         </section>
       ) : null}
       {locale === "ru" ? (

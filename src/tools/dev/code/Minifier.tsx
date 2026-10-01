@@ -6,6 +6,7 @@ import { formatBytes, formatNumber } from "@/i18n/format";
 import { CodeEditor } from "@/tools/dev/shared/CodeEditor";
 import { useLiveTask } from "@/tools/dev/shared/hooks";
 import { outputLabels } from "@/tools/dev/shared/labels";
+import { OptionsRow } from "@/tools/dev/shared/Pane";
 import { CodeOutput } from "@/ui/code-output";
 import { Switch } from "@/ui/field";
 import { ErrorBox, failOf, useCodeWorker } from "./ui/ErrorBox";
@@ -53,15 +54,15 @@ export default function Minifier({ locale, lang }: MinifierProps) {
       {fail && <ErrorBox locale={locale} fail={fail} text={text} editorId={editorId} />}
 
       {res && !fail && (
-        <div className="flex flex-wrap items-end gap-x-6 gap-y-2 rounded-[0.75rem] bg-surface-2 px-5 py-4" aria-live="polite">
+        <div className="flex flex-wrap items-end gap-x-6 gap-y-2 rounded-[1.25rem] bg-accent-container px-5 py-4 text-on-accent-container motion-safe:animate-[menu-in_0.2s_ease-out]" aria-live="polite">
           <div>
-            <div className="text-[0.8125rem] font-medium text-fg-2">{t.saved}</div>
-            <div className="tabular text-3xl font-semibold tracking-tight text-fg sm:text-4xl">{formatNumber(locale, saved, { style: "percent", maximumFractionDigits: 1 })}</div>
+            <div className="text-[0.8125rem] font-medium opacity-80">{t.saved}</div>
+            <div className="tabular text-4xl font-bold tracking-tight sm:text-5xl">{formatNumber(locale, saved, { style: "percent", maximumFractionDigits: 1 })}</div>
           </div>
-          <div className="tabular pb-1 text-sm text-fg-2">
-            {formatBytes(locale, res.before)} → <span className="font-semibold text-fg">{formatBytes(locale, res.after)}</span>
+          <div className="tabular pb-1.5 text-sm">
+            {formatBytes(locale, res.before)} → <span className="font-semibold">{formatBytes(locale, res.after)}</span>
             {res.gzBefore !== null && res.gzAfter !== null && (
-              <span className="text-fg-3">
+              <span className="opacity-75">
                 {" "}
                 · {t.gzip} {formatBytes(locale, res.gzBefore)} → {formatBytes(locale, res.gzAfter)}
                 {gzSaved !== null ? ` (${formatNumber(locale, gzSaved, { style: "percent", maximumFractionDigits: 1 })})` : ""}
@@ -72,9 +73,9 @@ export default function Minifier({ locale, lang }: MinifierProps) {
       )}
 
       {(lang === "css" || lang === "javascript" || lang === "html") && (
-        <div className="flex flex-wrap items-center gap-x-5 gap-y-3 text-sm text-fg-2">
+        <OptionsRow>
           <Switch label={lang === "html" ? t.keepComments : t.keepLicense} checked={keep} onChange={(e) => setKeep(e.target.checked)} />
-        </div>
+        </OptionsRow>
       )}
     </div>
   );

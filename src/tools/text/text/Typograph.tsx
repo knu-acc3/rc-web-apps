@@ -2,7 +2,7 @@
 
 import { useId, useMemo, useState } from "react";
 import type { Locale } from "@/i18n/config";
-import { Checkbox, Switch } from "@/ui/field";
+import { Switch } from "@/ui/field";
 import { Panel, PanelHeader } from "@/ui/panel";
 import { toHtmlEntities, typograph, type TypoLang } from "./lib/typograph";
 import { InputPanel, MoreOptions, OutputPanel, TwoPane } from "./ui/shared";
@@ -80,13 +80,13 @@ export default function Typograph({ locale, lang = "ru" }: { locale: Locale; lan
         {visible && <p className="border-t border-line px-4 py-2 text-[0.8125rem] text-fg-3">{t.legend}</p>}
       </Panel>
       <MoreOptions locale={locale}>
-        <Checkbox label={t.entities} checked={entities} onChange={(e) => setEntities(e.target.checked)} />
-        <Checkbox label={t.quotes} checked={o.quotes} onChange={flag("quotes")} />
-        <Checkbox label={t.dashes} checked={o.dashes} onChange={flag("dashes")} />
-        <Checkbox label={t.nbsp} checked={o.nbsp} onChange={flag("nbsp")} />
-        {lang === "ru" && <Checkbox label={t.digits} checked={o.digits} onChange={flag("digits")} />}
-        <Checkbox label={t.symbols} checked={o.symbols} onChange={flag("symbols")} />
-        <Checkbox label={t.spaces} checked={o.spaces} onChange={flag("spaces")} />
+        <Switch label={t.entities} checked={entities} onChange={(e) => setEntities(e.target.checked)} />
+        <Switch label={t.quotes} checked={o.quotes} onChange={flag("quotes")} />
+        <Switch label={t.dashes} checked={o.dashes} onChange={flag("dashes")} />
+        <Switch label={t.nbsp} checked={o.nbsp} onChange={flag("nbsp")} />
+        {lang === "ru" && <Switch label={t.digits} checked={o.digits} onChange={flag("digits")} />}
+        <Switch label={t.symbols} checked={o.symbols} onChange={flag("symbols")} />
+        <Switch label={t.spaces} checked={o.spaces} onChange={flag("spaces")} />
       </MoreOptions>
     </div>
   );

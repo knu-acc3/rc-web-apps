@@ -6,7 +6,9 @@ import type { Locale } from "@/i18n/config";
 import { Presentable } from "@/ui/fullscreen";
 import { count, formatNumber } from "@/i18n/format";
 import { Button } from "@/ui/button";
-import { Field, Select } from "@/ui/field";
+import { Field } from "@/ui/field";
+import { NumberInput } from "@/ui/number-input";
+import { cn } from "@/lib/cn";
 import { Panel, PanelHeader } from "@/ui/panel";
 import { randomInt } from "./lib/rng";
 import { prefersReducedMotion } from "./lib/storage";
@@ -166,14 +168,21 @@ export default function Coin({ locale, coins: coins0 = 1 }: CoinProps) {
 
   const pct = (n: number) => (seq.length ? `${formatNumber(locale, (n / seq.length) * 100, { maximumFractionDigits: 1 })} %` : "—");
 
+  const stat = (label: string, value: string, wide = false) => (
+    <div key={label} className={cn("min-w-0 rounded-[1rem] bg-surface-2 px-4 py-2.5", wide && "col-span-2")}>
+      <dt className="text-[0.8125rem] text-fg-3">{label}</dt>
+      <dd className="tabular font-semibold text-fg">{value}</dd>
+    </div>
+  );
+
   return (
-    <div className="flex flex-col gap-4">
-      <Presentable locale={locale} className="flex flex-col items-center gap-5 rounded-[0.75rem] border border-line bg-surface p-4 sm:p-6" fullClassName="rounded-none border-0 [&_.coin-one]:size-[min(60vw,45vh)]!">
-        <div className="flex flex-wrap items-center justify-center gap-4 [perspective:900px]">
+    <div className="grid gap-4 lg:grid-cols-[minmax(0,1.5fr)_minmax(18rem,1fr)] lg:items-start">
+      <Presentable locale={locale} className="panel flex flex-col items-center gap-5 p-4 sm:p-6" fullClassName="rounded-none shadow-none [&_.coin-one]:size-[min(60vw,45vh)]!">
+        <div className="flex min-h-44 flex-wrap items-center justify-center gap-4 pt-6 [perspective:900px] sm:min-h-56">
           {Array.from({ length: coins }, (_, i) => (
             <div
               key={i}
-              className={coins === 1 ? "coin-one relative size-40 sm:size-48" : "relative size-20 sm:size-24"}
+              className={coins === 1 ? "coin-one relative size-40 sm:size-52" : "relative size-20 sm:size-24"}
               style={{
                 transformStyle: "preserve-3d",
                 transform: `rotateX(${angles[i]}deg)`,
@@ -187,31 +196,19 @@ export default function Coin({ locale, coins: coins0 = 1 }: CoinProps) {
           ))}
         </div>
 
-        <div className="flex w-full flex-col items-center gap-3 sm:flex-row sm:justify-center">
-          <Field label={t.coins} htmlFor={`${id}-n`} className="w-full sm:w-44">
-            <Select id={`${id}-n`} value={coins} onChange={(e) => setCoins(Number(e.target.value))} disabled={flipping}>
-              {Array.from({ length: 10 }, (_, i) => (
-                <option key={i + 1} value={i + 1}>
-                  {i + 1}
-                </option>
-              ))}
-            </Select>
-          </Field>
-          <Button variant="primary" size="lg" onClick={flip} disabled={flipping} className="w-full self-end sm:w-auto sm:min-w-48">
-            {flipping ? t.flipping : coins > 1 ? t.flipMany : t.flip}
-          </Button>
+        <div aria-live="polite" className="min-h-10 text-center text-3xl font-bold text-fg">
+          {last ? <span key={history[0]?.id} className="inline-block motion-safe:animate-[pop_0.4s_ease-out]">{describe(last)}</span> : flipping ? "" : <span className="text-base font-normal text-fg-3">{t.idle}</span>}
         </div>
 
-        <div className="flex min-h-[4.75rem] w-full flex-col items-center justify-center rounded-[0.625rem] bg-surface-2 px-4 py-3 text-center">
-          <div className="text-[0.8125rem] font-medium text-fg-2">{t.result}</div>
-          <div aria-live="polite" className="min-h-8 text-2xl font-semibold text-fg">
-            {last ? describe(last) : ""}
-          </div>
-          {!last && !flipping && <div className="text-sm text-fg-3">{t.idle}</div>}
-        </div>
+        <Button variant="filled" size="xl" onClick={flip} disabled={flipping} className="w-full sm:w-auto sm:min-w-64">
+          {flipping ? t.flipping : coins > 1 ? t.flipMany : t.flip}
+        </Button>
+        <Field label={t.coins} htmlFor={`${id}-n`} className="w-44">
+          <NumberInput id={`${id}-n`} locale={locale} min={1} max={10} value={coins} disabled={flipping} onChange={(v) => v !== null && setCoins(Math.min(10, Math.max(1, v)))} />
+        </Field>
       </Presentable>
 
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="flex min-w-0 flex-col gap-4">
         <Panel>
           <PanelHeader
             title={t.stats}
@@ -224,19 +221,12 @@ export default function Coin({ locale, coins: coins0 = 1 }: CoinProps) {
               )
             }
           />
-          <dl className="grid grid-cols-2 gap-px bg-line">
-            {[
-              [t.total, count(locale, seq.length, t.flipForms)],
-              [t.heads, `${formatNumber(locale, stats.heads)} · ${pct(stats.heads)}`],
-              [t.tails, `${formatNumber(locale, stats.tails)} · ${pct(stats.tails)}`],
-              [t.streak, stats.longestSide === null ? "—" : `${formatNumber(locale, stats.longest)} · ${sideName(stats.longestSide)}`],
-              [t.current, stats.currentSide === null ? "—" : `${formatNumber(locale, stats.current)} · ${sideName(stats.currentSide)}`],
-            ].map(([k, v], i) => (
-              <div key={k} className={i === 0 ? "col-span-2 bg-surface px-4 py-2.5" : "bg-surface px-4 py-2.5"}>
-                <dt className="text-[0.8125rem] text-fg-3">{k}</dt>
-                <dd className="tabular font-semibold text-fg">{v}</dd>
-              </div>
-            ))}
+          <dl className="grid grid-cols-2 gap-2 p-3">
+            {stat(t.total, count(locale, seq.length, t.flipForms), true)}
+            {stat(t.heads, `${formatNumber(locale, stats.heads)} · ${pct(stats.heads)}`)}
+            {stat(t.tails, `${formatNumber(locale, stats.tails)} · ${pct(stats.tails)}`)}
+            {stat(t.streak, stats.longestSide === null ? "—" : `${formatNumber(locale, stats.longest)} · ${sideName(stats.longestSide)}`)}
+            {stat(t.current, stats.currentSide === null ? "—" : `${formatNumber(locale, stats.current)} · ${sideName(stats.currentSide)}`)}
           </dl>
         </Panel>
         <HistoryPanel title={t.history} items={history} onClear={() => setHistory([])} clearLabel={t.clear} emptyLabel={t.empty} render="inline" />

@@ -36,7 +36,7 @@ export default function MonthCalendar({ locale, year, month, prev, next }: Month
 
   const link = (path: string[] | null | undefined, label: string, icon: React.ReactNode) =>
     path ? (
-      <Link href={href(locale, path)} className={buttonClass("ghost", "icon")} aria-label={label} title={label}>
+      <Link href={href(locale, path)} className={buttonClass("tonal", "icon")} aria-label={label} title={label}>
         {icon}
       </Link>
     ) : (
@@ -53,7 +53,7 @@ export default function MonthCalendar({ locale, year, month, prev, next }: Month
         {link(next, t.next, <ChevronRight aria-hidden />)}
       </div>
       <CalendarControls locale={locale} choice={choice} onChoice={setChoice} weeks={weeks} onWeeks={setWeeks} />
-      <div className="rounded-[0.75rem] border border-line bg-surface p-3 sm:p-5 print:border-0 print:p-0">
+      <div className="panel p-3 sm:p-5 print:p-0 print:shadow-none">
         <MonthGrid locale={locale} year={year} month={month} mark={holidayMarker(choice, locale)} today={today} weekNumbers={weeks} size="lg" showTitle={false} />
       </div>
       <Legend locale={locale} choice={choice} />

@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronDown } from "lucide-react";
+import { Fold } from "@/ui/fold";
 import type { Locale } from "@/i18n/config";
 import { baseName } from "../data/base-names";
 import { DIGITS, divisionSteps, expansionTerms } from "../lib/bases";
@@ -100,7 +100,7 @@ export function BaseSteps({ locale, value, from, to, upper }: { locale: Locale; 
         {steps.length > 0 && (
           <div className={terms.length ? "mt-4" : undefined}>
             <p>{t.fromDec(to)}</p>
-            <div tabIndex={0} className="tbl mt-2">
+            <div tabIndex={0} className="tbl mt-2 shadow-none!">
               <table>
                 <thead>
                   <tr>
@@ -136,14 +136,14 @@ export function BaseSteps({ locale, value, from, to, upper }: { locale: Locale; 
   }
 
   return (
-    <details className="group rounded-[0.75rem] border border-line bg-surface">
-      <summary className="flex items-center justify-between gap-3 px-4 py-3 text-sm font-semibold text-fg">
-        <span>
+    <Fold
+      title={
+        <span className="text-[0.9375rem]">
           {t.title}: {baseName(from, locale)} → {baseName(to, locale)}
         </span>
-        <ChevronDown className="size-4 shrink-0 text-fg-3 transition-transform group-open:rotate-180" aria-hidden />
-      </summary>
-      <div className="border-t border-line px-4 py-3 text-[0.9375rem] text-fg-2">{body}</div>
-    </details>
+      }
+    >
+      <div className="text-[0.9375rem] text-fg-2">{body}</div>
+    </Fold>
   );
 }

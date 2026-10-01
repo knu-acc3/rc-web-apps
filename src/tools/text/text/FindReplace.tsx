@@ -4,9 +4,9 @@ import { useEffect, useId, useMemo, useRef, useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { formatNumber, plural } from "@/i18n/format";
 import { cn } from "@/lib/cn";
-import { Checkbox, Field, Input } from "@/ui/field";
+import { Field, Input, Switch } from "@/ui/field";
 import { replaceText, type ReplaceRequest, type ReplaceResult } from "./lib/replace";
-import { InlineSelect, InputPanel, MoreOptions, OptionsBar, OutputPanel, TwoPane, useDebounced } from "./ui/shared";
+import { InputPanel, MoreOptions, OptionsBar, OutputPanel, TwoPane, useDebounced } from "./ui/shared";
 
 const T = {
   ru: {
@@ -154,9 +154,9 @@ export default function FindReplace({ locale, find: find0, replace: replace0 = "
         </Field>
       </div>
       <OptionsBar>
-        <Checkbox label={t.caseSensitive} checked={flags.caseSensitive} onChange={set("caseSensitive")} />
-        <Checkbox label={t.wholeWord} checked={flags.wholeWord} onChange={set("wholeWord")} />
-        <Checkbox label={t.regex} checked={flags.regex} onChange={set("regex")} />
+        <Switch label={t.caseSensitive} checked={flags.caseSensitive} onChange={set("caseSensitive")} />
+        <Switch label={t.wholeWord} checked={flags.wholeWord} onChange={set("wholeWord")} />
+        <Switch label={t.regex} checked={flags.regex} onChange={set("regex")} />
       </OptionsBar>
       <TwoPane>
         <InputPanel id={`${id}-in`} locale={locale} value={text} onChange={setText} />
@@ -167,23 +167,30 @@ export default function FindReplace({ locale, find: find0, replace: replace0 = "
         {announce}
       </span>
       <MoreOptions locale={locale}>
-        <Checkbox label={t.all} checked={flags.all} onChange={set("all")} />
-        <Checkbox label={t.escapes} checked={flags.escapes} onChange={set("escapes")} />
-        {flags.regex && <Checkbox label={t.multiline} checked={flags.multiline} onChange={set("multiline")} />}
-        {flags.regex && <Checkbox label={t.dotAll} checked={flags.dotAll} onChange={set("dotAll")} />}
-        <InlineSelect
-          id={`${id}-preset`}
-          label={t.presets}
-          value={"" as string}
-          onChange={(key) => {
-            const p = PRESETS.find((x) => x.key === key);
-            if (!p) return;
-            setFind(p.find);
-            setReplacement(p.replace);
-            setFlags((f) => ({ ...f, regex: true, multiline: true, all: true, wholeWord: false }));
-          }}
-          options={[{ value: "", label: "—" }, ...PRESETS.map((p) => ({ value: p.key as string, label: t[p.key] }))]}
-        />
+        <Switch label={t.all} checked={flags.all} onChange={set("all")} />
+        <Switch label={t.escapes} checked={flags.escapes} onChange={set("escapes")} />
+        {flags.regex && <Switch label={t.multiline} checked={flags.multiline} onChange={set("multiline")} />}
+        {flags.regex && <Switch label={t.dotAll} checked={flags.dotAll} onChange={set("dotAll")} />}
+        <div className="flex w-full flex-col gap-1.5">
+          <span className="text-fg-2">{t.presets}</span>
+          <div className="flex flex-wrap gap-1.5">
+            {PRESETS.map((p) => (
+              <button
+                key={p.key}
+                type="button"
+                className="chip"
+                aria-pressed={flags.regex && find === p.find && replacement === p.replace}
+                onClick={() => {
+                  setFind(p.find);
+                  setReplacement(p.replace);
+                  setFlags((f) => ({ ...f, regex: true, multiline: true, all: true, wholeWord: false }));
+                }}
+              >
+                {t[p.key]}
+              </button>
+            ))}
+          </div>
+        </div>
       </MoreOptions>
     </div>
   );

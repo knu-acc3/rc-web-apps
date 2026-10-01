@@ -146,8 +146,8 @@ export default function UuidDecoder({ locale, sample = SAMPLE }: { locale: Local
   };
 
   return (
-    <div className="flex flex-col gap-4">
-      <CodeEditor id={`${id}-in`} locale={locale} label={t.input} value={text} onChange={setText} placeholder={t.placeholder} rows={6} sample={SAMPLE} />
+    <div className="grid items-start gap-4 xl:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
+      <CodeEditor id={`${id}-in`} locale={locale} label={t.input} value={text} onChange={setText} placeholder={t.placeholder} rows={8} sample={SAMPLE} />
       {rows.length > 0 && (
         <div tabIndex={0} className="tbl" aria-live="polite">
           <table>

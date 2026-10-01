@@ -15,14 +15,14 @@ import {
   Redo2,
   Trash2,
   Undo2,
-  Settings2,
 } from "lucide-react";
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { cn } from "@/lib/cn";
 import { downloadBlob } from "@/lib/clipboard";
-import { Button } from "@/ui/button";
+import { Button, IconButton } from "@/ui/button";
 import { Field, Select } from "@/ui/field";
+import { Fold } from "@/ui/fold";
 import { Notice, Panel } from "@/ui/panel";
 import { Segmented } from "@/ui/segmented";
 import { indexFrame } from "./lib/pixel-gif";
@@ -336,22 +336,19 @@ export default function PixelArt({ locale }: { locale: Locale }) {
   }
 
   const toolBtn = (v: Tool, Icon: typeof Pencil, label: string) => (
-    <Button
+    <IconButton
       key={v}
-      variant={tool === v ? "primary" : "outline"}
-      size="icon"
-      aria-label={label}
-      title={label}
-      aria-pressed={tool === v}
+      label={label}
+      icon={<Icon aria-hidden />}
+      selected={tool === v}
+      variant={tool === v ? "filled" : "standard"}
       onClick={() => setTool(v)}
-    >
-      <Icon aria-hidden />
-    </Button>
+    />
   );
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex flex-wrap items-end gap-x-4 gap-y-3 rounded-[0.75rem] border border-line bg-surface px-4 py-3">
+      <Panel className="flex flex-wrap items-end gap-x-6 gap-y-4 p-4 sm:p-5">
         <div role="group" aria-label={t.tools} className="flex gap-1.5">
           {toolBtn("pencil", Pencil, t.pencil)}
           {toolBtn("eraser", Eraser, t.eraser)}
@@ -366,34 +363,38 @@ export default function PixelArt({ locale }: { locale: Locale }) {
             remember(c);
           }}
           locale={locale}
-          className="w-44"
+          className="w-full max-w-[13rem]"
         />
-        <div className="flex flex-col gap-1.5">
+        <div className="flex min-w-0 flex-col gap-1.5">
           <span className="text-sm font-medium text-fg-2">{t.recent}</span>
-          <div className="flex flex-wrap gap-1">
+          <div className="flex flex-wrap gap-1.5">
             {recent.map((c) => (
               <button
                 key={c}
                 type="button"
                 aria-label={t.useColor(c)}
+                aria-pressed={c === color}
                 title={c}
                 onClick={() => setColor(c)}
-                className={cn("size-6 rounded-[0.3125rem] border", c === color ? "border-accent ring-2 ring-accent/40" : "border-line")}
+                className={cn(
+                  "size-9 rounded-full shadow-[inset_0_0_0_1px_rgb(0_0_0/0.15)] transition-transform hover:scale-110 pointer-coarse:size-10",
+                  c === color && "ring-2 ring-accent ring-offset-2 ring-offset-surface",
+                )}
                 style={{ background: c }}
               />
             ))}
           </div>
         </div>
-      </div>
+      </Panel>
 
-      <Panel className="overflow-hidden">
-        <div className="grid gap-4 p-3 sm:p-4 md:grid-cols-[minmax(0,1fr)_13.75rem]">
+      <Panel className="flex flex-col gap-4 p-3 sm:p-4">
+        <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_14rem]">
           <canvas
             ref={canvasRef}
             tabIndex={0}
             role="application"
             aria-label={t.canvas}
-            className="mx-auto block aspect-square w-full max-w-[35rem] cursor-crosshair touch-none rounded-[0.5rem] border border-line [image-rendering:pixelated]"
+            className="mx-auto block aspect-square w-full max-w-[min(44rem,72vh)] cursor-crosshair touch-none rounded-[1rem] shadow-elev-1 [image-rendering:pixelated] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
             onPointerDown={(e) => {
               const p = cellAt(e);
               e.currentTarget.setPointerCapture(e.pointerId);
@@ -443,7 +444,7 @@ export default function PixelArt({ locale }: { locale: Locale }) {
               }
             }}
           />
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-4">
             <Field label={t.size} htmlFor={`${id}-size`}>
               <Select id={`${id}-size`} value={size} onChange={(e) => changeSize(Number(e.target.value))}>
                 {SIZES.map((n) => (
@@ -453,59 +454,24 @@ export default function PixelArt({ locale }: { locale: Locale }) {
                 ))}
               </Select>
             </Field>
-            <div className="flex flex-wrap gap-1.5">
-              <Button variant="outline" size="icon" aria-label={t.undo} title={t.undo} onClick={doUndo} disabled={!undo.length}>
-                <Undo2 aria-hidden />
-              </Button>
-              <Button variant="outline" size="icon" aria-label={t.redo} title={t.redo} onClick={doRedo} disabled={!redo.length}>
-                <Redo2 aria-hidden />
-              </Button>
-              <Button
-                variant={mirrorX ? "primary" : "outline"}
-                size="icon"
-                aria-label={t.mirrorX}
-                title={t.mirrorX}
-                aria-pressed={mirrorX}
-                onClick={() => setMirrorX((x) => !x)}
-              >
-                <FlipHorizontal2 aria-hidden />
-              </Button>
-              <Button
-                variant={mirrorY ? "primary" : "outline"}
-                size="icon"
-                aria-label={t.mirrorY}
-                title={t.mirrorY}
-                aria-pressed={mirrorY}
-                onClick={() => setMirrorY((x) => !x)}
-              >
-                <FlipVertical2 aria-hidden />
-              </Button>
-              <Button
-                variant={grid ? "primary" : "outline"}
-                size="icon"
-                aria-label={t.grid}
-                title={t.grid}
-                aria-pressed={grid}
-                onClick={() => setGrid((x) => !x)}
-              >
-                <Grid3x3 aria-hidden />
-              </Button>
-              <Button
-                variant="outline"
-                size="icon"
-                aria-label={t.clear}
-                title={t.clear}
+            <div className="flex flex-wrap gap-1">
+              <IconButton label={t.undo} icon={<Undo2 aria-hidden />} onClick={doUndo} disabled={!undo.length} />
+              <IconButton label={t.redo} icon={<Redo2 aria-hidden />} onClick={doRedo} disabled={!redo.length} />
+              <IconButton label={t.mirrorX} icon={<FlipHorizontal2 aria-hidden />} selected={mirrorX} onClick={() => setMirrorX((x) => !x)} />
+              <IconButton label={t.mirrorY} icon={<FlipVertical2 aria-hidden />} selected={mirrorY} onClick={() => setMirrorY((x) => !x)} />
+              <IconButton label={t.grid} icon={<Grid3x3 aria-hidden />} selected={grid} onClick={() => setGrid((x) => !x)} />
+              <IconButton
+                label={t.clear}
+                icon={<Trash2 aria-hidden />}
                 onClick={() => {
                   pushHistory();
                   setFrames((fs) => fs.map((f, i) => (i === cur ? new Uint32Array(size * size) : f)));
                 }}
-              >
-                <Trash2 aria-hidden />
-              </Button>
+              />
             </div>
             <div className="flex flex-col gap-1.5">
               <span className="text-sm font-medium text-fg-2">{t.frames}</span>
-              <div role="radiogroup" aria-label={t.frames} className="flex flex-wrap gap-1">
+              <div role="radiogroup" aria-label={t.frames} className="flex flex-wrap gap-1.5">
                 {frames.map((_, i) => (
                   <button
                     key={i}
@@ -514,102 +480,94 @@ export default function PixelArt({ locale }: { locale: Locale }) {
                     aria-checked={i === cur}
                     aria-label={t.frame(i + 1)}
                     onClick={() => setCur(i)}
-                    className={cn(
-                      "h-8 min-w-8 rounded-[0.375rem] border px-2 text-sm font-medium",
-                      i === cur ? "border-accent bg-accent-soft text-accent" : "border-line text-fg-2",
-                    )}
+                    className="chip tabular min-w-10 justify-center px-2"
                   >
                     {i + 1}
                   </button>
                 ))}
               </div>
-              <div className="flex gap-1.5">
-                <Button
-                  variant="ghost"
-                  size="icon-sm"
-                  aria-label={t.addFrame}
-                  title={t.addFrame}
+              <div className="flex gap-1">
+                <IconButton
+                  size="sm"
+                  label={t.addFrame}
+                  icon={<Plus aria-hidden />}
                   onClick={() => {
                     pushHistory();
                     setFrames((fs) => [...fs, new Uint32Array(size * size)]);
                     setCur(frames.length);
                   }}
-                >
-                  <Plus aria-hidden />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="icon-sm"
-                  aria-label={t.dupFrame}
-                  title={t.dupFrame}
+                />
+                <IconButton
+                  size="sm"
+                  label={t.dupFrame}
+                  icon={<Copy aria-hidden />}
                   onClick={() => {
                     pushHistory();
                     setFrames((fs) => [...fs.slice(0, cur + 1), fs[cur].slice(), ...fs.slice(cur + 1)]);
                     setCur(cur + 1);
                   }}
-                >
-                  <Copy aria-hidden />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="icon-sm"
-                  aria-label={t.delFrame}
-                  title={t.delFrame}
+                />
+                <IconButton
+                  size="sm"
+                  label={t.delFrame}
+                  icon={<Trash2 aria-hidden />}
                   disabled={frames.length < 2}
                   onClick={() => {
                     pushHistory();
                     setFrames((fs) => fs.filter((_, i) => i !== cur));
                     setCur(Math.max(0, cur - 1));
                   }}
-                >
-                  <Trash2 aria-hidden />
-                </Button>
+                />
               </div>
             </div>
           </div>
         </div>
-        <div className="flex flex-col gap-3 border-t border-line px-4 py-3 sm:flex-row sm:items-end sm:justify-between">
+        <div className="flex flex-col gap-3 px-1 sm:flex-row sm:items-end sm:justify-between">
           <div className="flex flex-wrap items-end gap-3">
             <Field label={t.format}>
               <Segmented
-                wrap
                 label={t.format}
                 value={format}
                 onChange={setFormat}
                 options={(["png", "jpg", "webp", "gif"] as const).map((f) => ({ value: f, label: f.toUpperCase() }))}
               />
             </Field>
-            <NumberField label={t.scale} value={scale} onChange={setScale} min={1} max={32} className="w-32" />
+            <NumberField label={t.scale} value={scale} onChange={setScale} min={1} max={32} stepper locale={locale} className="w-40" />
           </div>
-          <Button variant="primary" size="lg" onClick={exportArt} disabled={busy}>
+          <Button variant="filled" size="lg" onClick={exportArt} disabled={busy}>
             {busy ? <Loader2 className="animate-spin" aria-hidden /> : <Download aria-hidden />}
             {t.download} {format.toUpperCase()} · {size * Math.max(1, Math.min(32, scale ?? 16)) + 2 * (padding ?? 0)} px
           </Button>
         </div>
-        <details className="border-t border-line">
-          <summary className="flex cursor-pointer items-center gap-2 px-4 py-2.5 text-sm text-fg-2 hover:text-fg">
-            <Settings2 className="size-4" aria-hidden />
-            {locale === "ru" ? "Дополнительно" : "More options"}
-          </summary>
-          <div className="grid gap-4 px-4 pb-4 pt-1 sm:grid-cols-2">
-            <NumberField label={t.padding} value={padding} onChange={setPadding} min={0} max={256} suffix="px" />
-            <Field label={t.bg}>
-              <Segmented
-                wrap
-                label={t.bg}
-                value={bgKind}
-                onChange={setBgKind}
-                options={[
-                  { value: "transparent", label: t.transparent },
-                  { value: "color", label: t.solid },
-                ]}
-              />
-            </Field>
-            {(bgKind === "color" || format === "jpg") && <ColorField label={t.bgColor} value={bg} onChange={setBg} locale={locale} />}
-            {format === "gif" && <NumberField label={t.delay} value={delay} onChange={setDelay} min={20} max={10000} suffix={locale === "ru" ? "мс" : "ms"} />}
-            {format === "gif" && <p className="text-sm text-fg-3 sm:col-span-2">{t.gifNote}</p>}
-          </div>
-        </details>
+        <Fold variant="inline" title={locale === "ru" ? "Дополнительно" : "More options"} bodyClassName="grid gap-4 px-1 pb-1 sm:grid-cols-2">
+          <NumberField label={t.padding} value={padding} onChange={setPadding} min={0} max={256} suffix="px" locale={locale} />
+          <Field label={t.bg}>
+            <Segmented
+              label={t.bg}
+              value={bgKind}
+              onChange={setBgKind}
+              options={[
+                { value: "transparent", label: t.transparent },
+                { value: "color", label: t.solid },
+              ]}
+            />
+          </Field>
+          {(bgKind === "color" || format === "jpg") && <ColorField label={t.bgColor} value={bg} onChange={setBg} locale={locale} />}
+          {format === "gif" && (
+            <NumberField
+              label={t.delay}
+              value={delay}
+              onChange={setDelay}
+              min={20}
+              max={10000}
+              step={50}
+              suffix={locale === "ru" ? "мс" : "ms"}
+              stepper
+              locale={locale}
+            />
+          )}
+          {format === "gif" && <p className="text-sm text-fg-3 sm:col-span-2">{t.gifNote}</p>}
+        </Fold>
       </Panel>
       {error ? <Notice tone="err">{errorText(locale, error)}</Notice> : null}
     </div>

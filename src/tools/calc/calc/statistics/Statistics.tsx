@@ -3,6 +3,7 @@
 import { useId } from "react";
 import type { Locale } from "@/i18n/config";
 import { Field, Textarea } from "@/ui/field";
+import { Panel } from "@/ui/panel";
 import type { ToolProps } from "../../../types";
 import { BarChart } from "../../shared/charts";
 import { fmtN } from "../../shared/fmt";
@@ -94,7 +95,7 @@ function BoxPlot({ s, locale }: { s: Stats; locale: Locale }) {
   const wHi = Math.max(...s.sorted.filter((x) => x <= s.upperFence));
   const f = (v: number) => fmtN(locale, v, 3);
   return (
-    <figure className="min-w-0" role="img" aria-label={`${T[locale].box}: Q1 ${f(s.q1)}, ${T[locale].median} ${f(s.median)}, Q3 ${f(s.q3)}`}>
+    <figure className="panel min-w-0 p-3 sm:p-4" role="img" aria-label={`${T[locale].box}: Q1 ${f(s.q1)}, ${T[locale].median} ${f(s.median)}, Q3 ${f(s.q3)}`}>
       <svg viewBox="0 0 1000 120" className="h-28 w-full" preserveAspectRatio="none" aria-hidden>
         <line x1={X(wLo)} x2={X(s.q1)} y1={50} y2={50} stroke="var(--fg-3)" strokeWidth={2} vectorEffect="non-scaling-stroke" />
         <line x1={X(s.q3)} x2={X(wHi)} y1={50} y2={50} stroke="var(--fg-3)" strokeWidth={2} vectorEffect="non-scaling-stroke" />
@@ -106,9 +107,9 @@ function BoxPlot({ s, locale }: { s: Stats; locale: Locale }) {
           <circle key={i} cx={X(o)} cy={50} r={6} fill="var(--err)" />
         ))}
       </svg>
-      <div className="tabular flex justify-between text-[0.75rem] text-fg-3">
+      <div className="tabular flex flex-wrap justify-between gap-x-3 text-[0.75rem] text-fg-3">
         <span>{f(lo)}</span>
-        <span>
+        <span className="text-center">
           Q1 {f(s.q1)} · Me {f(s.median)} · Q3 {f(s.q3)}
         </span>
         <span>{f(hi)}</span>
@@ -152,11 +153,11 @@ export default function Statistics({ locale }: ToolProps) {
   return (
     <Stack>
       <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-6">
-        <section className="rounded-[0.75rem] border border-line bg-surface p-4 sm:p-5">
+        <Panel className="p-4 sm:p-6">
           <Field label={t.data} htmlFor={`${id}-d`} hint={t.hint}>
             <Textarea id={`${id}-d`} value={q.v.d} onChange={(e) => q.set({ d: e.target.value })} rows={8} className="tabular text-base" />
           </Field>
-        </section>
+        </Panel>
         <div className="lg:sticky lg:top-20">{result}</div>
       </div>
       {s && (
@@ -203,7 +204,7 @@ export default function Statistics({ locale }: ToolProps) {
       {s && (
         <section>
           <SubHeading>{t.sorted}</SubHeading>
-          <p className="tabular break-words text-sm text-fg-2">{s.sorted.slice(0, 500).map(f).join("; ")}{s.n > 500 ? " …" : ""}</p>
+          <p className="tabular panel max-h-72 overflow-y-auto break-words p-4 text-sm text-fg-2">{s.sorted.slice(0, 500).map(f).join("; ")}{s.n > 500 ? " …" : ""}</p>
         </section>
       )}
       {ru ? (

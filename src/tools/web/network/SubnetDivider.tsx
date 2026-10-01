@@ -1,14 +1,16 @@
 "use client";
 
+import { Download } from "lucide-react";
 import { useId, useMemo, useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { plural } from "@/i18n/format";
 import { downloadText } from "@/lib/clipboard";
 import { Button } from "@/ui/button";
 import { CopyButton } from "@/ui/copy-button";
-import { Checkbox, Field, Input, Textarea } from "@/ui/field";
+import { Field, Input, Switch, Textarea } from "@/ui/field";
 import { Notice, Panel, PanelHeader } from "@/ui/panel";
 import { Segmented } from "@/ui/segmented";
+import { SliderField } from "@/ui/slider-field";
 import { splitEqual, vlsm, type DivideError } from "./lib/divider";
 import { cidr4, maskOf, parseV4Input, toDotted, usableHosts, type Cidr4 } from "./lib/ipv4";
 import { bigFmt, err4 } from "./ui/shared";
@@ -142,7 +144,15 @@ export default function SubnetDivider({ locale, network = "192.168.0.0/24", mode
     if (!result || "error" in result) return "";
     const head = [mode === "vlsm" ? t.name : null, mode === "vlsm" ? t.need : null, t.subnet, t.mask, t.range, t.broadcast, t.hosts].filter(Boolean).join(",");
     const lines = result.rows.map((r) =>
-      [mode === "vlsm" ? `"${(r.name ?? "").replace(/"/g, '""')}"` : null, mode === "vlsm" ? r.need : null, cidr4(r.block), toDotted(maskOf(r.block.prefix)), hostRange(r.block), r.block.prefix >= 31 ? "" : toDotted(r.block.network + 2 ** (32 - r.block.prefix) - 1), usableHosts(r.block.prefix)]
+      [
+        mode === "vlsm" ? `"${(r.name ?? "").replace(/"/g, '""')}"` : null,
+        mode === "vlsm" ? r.need : null,
+        cidr4(r.block),
+        toDotted(maskOf(r.block.prefix)),
+        hostRange(r.block),
+        r.block.prefix >= 31 ? "" : toDotted(r.block.network + 2 ** (32 - r.block.prefix) - 1),
+        usableHosts(r.block.prefix),
+      ]
         .filter((x) => x !== null)
         .join(","),
     );
@@ -151,29 +161,45 @@ export default function SubnetDivider({ locale, network = "192.168.0.0/24", mode
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="grid gap-4">
-        <div className="grid gap-3 sm:grid-cols-2">
+      <Panel className="flex min-w-0 flex-col gap-5 p-4 sm:p-6">
+        <div className="grid items-start gap-x-6 gap-y-4 lg:grid-cols-2">
           <Field label={t.network} htmlFor={`${id}-net`} hint={t.networkHint} error={!parsed.ok && net.trim() ? err4(locale, parsed.error) : undefined}>
             <Input id={`${id}-net`} value={net} onChange={(e) => setNet(e.target.value)} size="lg" className="font-mono" autoComplete="off" spellCheck={false} aria-invalid={!parsed.ok} />
           </Field>
-          <div className="flex flex-col gap-1.5">
-            <span className="text-sm font-medium text-fg-2">{t.mode}</span>
-            <Segmented label={t.mode} value={mode} onChange={setMode} options={[{ value: "equal", label: t.equal }, { value: "vlsm", label: t.vlsm }]} />
+          <div className="flex flex-col gap-4">
+            <Segmented
+              label={t.mode}
+              value={mode}
+              onChange={setMode}
+              options={[
+                { value: "equal", label: t.equal },
+                { value: "vlsm", label: t.vlsm },
+              ]}
+            />
+            {mode === "equal" ? (
+              <SliderField
+                id={`${id}-n`}
+                label={t.count}
+                value={count}
+                onChange={setCount}
+                parse={(v) => (/^\d{1,9}$/.test(v.trim()) ? Number(v.trim()) : null)}
+                format={(n) => String(Math.round(n))}
+                min={2}
+                max={1024}
+                scale="log"
+                inputMode="numeric"
+              />
+            ) : (
+              <>
+                <Field label={t.reqs} htmlFor={`${id}-r`} hint={t.reqsHint}>
+                  <Textarea id={`${id}-r`} value={reqs} onChange={(e) => setReqs(e.target.value)} rows={6} className="font-sans" />
+                </Field>
+                <Switch label={t.p2p} checked={p2p} onChange={(e) => setP2p(e.target.checked)} />
+              </>
+            )}
           </div>
         </div>
-        {mode === "equal" ? (
-          <Field label={t.count} htmlFor={`${id}-n`} className="max-w-60">
-            <Input id={`${id}-n`} value={count} onChange={(e) => setCount(e.target.value)} inputMode="numeric" autoComplete="off" />
-          </Field>
-        ) : (
-          <>
-            <Field label={t.reqs} htmlFor={`${id}-r`} hint={t.reqsHint}>
-              <Textarea id={`${id}-r`} value={reqs} onChange={(e) => setReqs(e.target.value)} rows={6} className="font-sans" />
-            </Field>
-            <Checkbox label={t.p2p} checked={p2p} onChange={(e) => setP2p(e.target.checked)} />
-          </>
-        )}
-      </div>
+      </Panel>
 
       {result && "error" in result && <Notice tone="err">{result.error}</Notice>}
       {result && !("error" in result) && base && (
@@ -190,6 +216,7 @@ export default function SubnetDivider({ locale, network = "192.168.0.0/24", mode
                 <>
                   <CopyButton value={csv} label={t.copy} copiedLabel={t.copied} variant="ghost" />
                   <Button variant="ghost" size="sm" onClick={() => downloadText(csv, "subnets.csv", "text/csv;charset=utf-8")}>
+                    <Download aria-hidden />
                     {t.download}
                   </Button>
                 </>

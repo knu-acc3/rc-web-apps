@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { flushSync } from "react-dom";
 import type { Locale } from "@/i18n/config";
 import { cn } from "@/lib/cn";
-import { Button } from "@/ui/button";
+import { Button, IconButton } from "@/ui/button";
 import { Kbd } from "@/ui/panel";
 
 const COLORS = [
@@ -132,13 +132,13 @@ export default function DeadPixelTest({ locale }: { locale: Locale }) {
 
   return (
     <div className="flex flex-col gap-5">
-      <div className="flex flex-col items-center gap-4 rounded-[0.75rem] border border-line bg-surface px-4 py-10 text-center sm:py-12">
-        <div className="flex h-20 w-36 overflow-hidden rounded-[0.5rem] border border-line-strong" aria-hidden>
+      <div className="panel flex flex-col items-center gap-5 px-4 py-10 text-center sm:py-14">
+        <div className="flex h-24 w-full max-w-md overflow-hidden rounded-[1rem] shadow-[inset_0_0_0_1px_rgb(0_0_0/0.12)] sm:h-32" aria-hidden>
           {COLORS.map((col) => (
             <span key={col.hex} className="flex-1" style={{ background: col.hex }} />
           ))}
         </div>
-        <Button ref={startRef} variant="primary" size="lg" onClick={() => start(0)}>
+        <Button ref={startRef} variant="filled" size="xl" onClick={() => start(0)}>
           <Maximize aria-hidden />
           {t.start}
         </Button>
@@ -151,7 +151,7 @@ export default function DeadPixelTest({ locale }: { locale: Locale }) {
               onClick={() => start(i)}
               aria-label={t.startWith(col[locale])}
               title={col[locale]}
-              className="size-7 rounded-full border border-line-strong transition-transform hover:scale-110"
+              className="size-10 rounded-full shadow-[inset_0_0_0_1px_rgb(0_0_0/0.18)] transition-transform hover:scale-110 active:scale-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
               style={{ background: col.hex }}
             />
           ))}
@@ -224,17 +224,15 @@ export default function DeadPixelTest({ locale }: { locale: Locale }) {
             · Space/→ {t.next} · Esc {t.exit}
           </span>
           <span className="opacity-80 md:hidden">· {t.tap}</span>
-          <button
-            type="button"
+          <IconButton
             onClick={(e) => {
               e.stopPropagation();
               close();
             }}
-            aria-label={t.close}
-            className="-mr-1 flex size-8 items-center justify-center rounded-full hover:bg-black/10"
-          >
-            <X className="size-4" aria-hidden />
-          </button>
+            label={t.close}
+            icon={<X aria-hidden />}
+            className="-mr-1 text-inherit!"
+          />
         </div>
       </div>
     </div>

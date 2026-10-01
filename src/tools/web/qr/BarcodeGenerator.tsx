@@ -6,8 +6,11 @@ import type { Locale } from "@/i18n/config";
 import { downloadBlob, downloadText } from "@/lib/clipboard";
 import { cn } from "@/lib/cn";
 import { Button } from "@/ui/button";
-import { Field, Input, Select, Switch } from "@/ui/field";
+import { Field, Input, Switch } from "@/ui/field";
+import { Panel } from "@/ui/panel";
 import { Segmented } from "@/ui/segmented";
+import { ChipChoice } from "@/ui/chip-choice";
+import { OptionGroup } from "./ui/kit";
 import { JS_FORMAT, LABEL, prepareBarcode, SAMPLE, SYMBOLOGIES, type BarcodeError, type Symbology } from "./lib/barcode";
 
 const T = {
@@ -44,6 +47,7 @@ const T = {
     bar: "Толщина штриха",
     png: "Скачать PNG",
     svg: "SVG",
+    svgTitle: "Скачать SVG",
     alt: "Штрихкод",
   },
   en: {
@@ -79,6 +83,7 @@ const T = {
     bar: "Bar width",
     png: "Download PNG",
     svg: "SVG",
+    svgTitle: "Download SVG",
     alt: "Barcode",
   },
 } as const;
@@ -87,7 +92,18 @@ type JsBarcodeFn = typeof import("jsbarcode");
 
 /** JsBarcode options; `k` scales everything by a whole number for crisp high-resolution PNG. */
 function renderOptions(sym: Symbology, bar: number, showText: boolean, k: number) {
-  return { format: JS_FORMAT[sym], displayValue: showText, width: bar * k, height: 90 * k, margin: 12 * k, fontSize: 18 * k, textMargin: 4 * k, background: "#ffffff", lineColor: "#000000", font: "ui-monospace, monospace" };
+  return {
+    format: JS_FORMAT[sym],
+    displayValue: showText,
+    width: bar * k,
+    height: 90 * k,
+    margin: 12 * k,
+    fontSize: 18 * k,
+    textMargin: 4 * k,
+    background: "#ffffff",
+    lineColor: "#000000",
+    font: "ui-monospace, monospace",
+  };
 }
 
 export default function BarcodeGenerator({ locale, symbology = "ean13" }: { locale: Locale; symbology?: Symbology }) {
@@ -144,60 +160,57 @@ export default function BarcodeGenerator({ locale, symbology = "ean13" }: { loca
   else if (r.check) status = { tone: "ok", text: r.added ? t.added(r.check) : t.checkOk(r.check) };
 
   return (
-    <div className="flex flex-col gap-5">
-      <div className="grid gap-4 sm:grid-cols-[200px_minmax(0,1fr)]">
-        <Field label={t.type} htmlFor={`${id}-type`}>
-          <Select
-            id={`${id}-type`}
-            value={sym}
-            onChange={(e) => {
-              const s = e.target.value as Symbology;
-              setSym(s);
-              setValue(SAMPLE[s]);
-            }}
-          >
-            {SYMBOLOGIES.map((s) => (
-              <option key={s} value={s}>
-                {LABEL[s]}
-              </option>
-            ))}
-          </Select>
-        </Field>
-        <Field label={t.value} htmlFor={`${id}-v`}>
-          <Input id={`${id}-v`} value={value} onChange={(e) => setValue(e.target.value)} size="lg" className="font-mono" autoComplete="off" autoCapitalize="off" spellCheck={false} inputMode={["code128", "code39", "codabar"].includes(sym) ? "text" : "numeric"} aria-invalid={!r.ok} />
-        </Field>
-      </div>
+    <div className="flex flex-col gap-4">
+      <ChipChoice
+        label={t.type}
+        value={sym}
+        onChange={(v) => {
+          setSym(v);
+          setValue(SAMPLE[v]);
+        }}
+        options={SYMBOLOGIES.map((s) => ({ value: s, label: LABEL[s] }))}
+      />
+      <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] lg:gap-6">
+        <Panel className="flex min-w-0 flex-col gap-5 p-4 sm:p-6">
+          <Field label={t.value} htmlFor={`${id}-v`}>
+            <Input
+              id={`${id}-v`}
+              value={value}
+              onChange={(e) => setValue(e.target.value)}
+              size="lg"
+              className="font-mono"
+              autoComplete="off"
+              autoCapitalize="off"
+              spellCheck={false}
+              inputMode={["code128", "code39", "codabar"].includes(sym) ? "text" : "numeric"}
+              aria-invalid={!r.ok}
+            />
+          </Field>
+          <p aria-live="polite" className={cn("-mt-3 text-[0.9375rem]", status.tone === "err" ? "text-err" : status.tone === "ok" ? "text-ok" : "text-fg-3")}>
+            {status.text}
+          </p>
+          <div className="flex flex-wrap items-end gap-x-8 gap-y-4">
+            <OptionGroup id={`${id}-bar`} label={t.bar}>
+              <Segmented<"1" | "2" | "3" | "4"> label={t.bar} value={bar} onChange={setBar} options={(["1", "2", "3", "4"] as const).map((v) => ({ value: v, label: v }))} />
+            </OptionGroup>
+            <Switch label={t.text} checked={showText} onChange={(e) => setShowText(e.target.checked)} />
+          </div>
+        </Panel>
 
-      <div className="flex flex-col items-center gap-3">
-        <div className={cn("flex min-h-[10rem] w-full items-center justify-center overflow-x-auto rounded-[0.75rem] border border-line bg-white p-4", !r.ok && "opacity-40")}>
-          <svg ref={svg} role="img" aria-label={`${t.alt} ${LABEL[sym]} ${encoded}`} className="block h-auto w-full max-w-[27.5rem]" />
-        </div>
-        <p aria-live="polite" className={cn("text-center text-[0.9375rem]", status.tone === "err" ? "text-err" : status.tone === "ok" ? "text-ok" : "text-fg-3")}>
-          {status.text}
-        </p>
-        <div className="flex gap-2">
-          <Button variant="primary" onClick={savePng} disabled={!r.ok || !lib}>
-            <Download className="size-4" aria-hidden />
-            {t.png}
-          </Button>
-          <Button variant="outline" onClick={saveSvg} disabled={!r.ok || !lib}>
-            {t.svg}
-          </Button>
-        </div>
-      </div>
-
-      <div className="flex flex-wrap items-center gap-x-6 gap-y-3 text-sm text-fg-2">
-        <Switch label={t.text} checked={showText} onChange={(e) => setShowText(e.target.checked)} />
-        <div className="flex items-center gap-2">
-          <span>{t.bar}</span>
-          <Segmented<"1" | "2" | "3" | "4">
-            size="sm"
-            label={t.bar}
-            value={bar}
-            onChange={setBar}
-            options={(["1", "2", "3", "4"] as const).map((v) => ({ value: v, label: v }))}
-          />
-        </div>
+        <Panel className="flex min-w-0 flex-col items-center gap-4 p-4 sm:p-6">
+          <div className={cn("flex min-h-[10rem] w-full items-center justify-center rounded-[1rem] bg-white p-4 shadow-elev-1 transition-opacity", !r.ok && "opacity-40")}>
+            <svg ref={svg} role="img" aria-label={`${t.alt} ${LABEL[sym]} ${encoded}`} className="block h-auto w-full max-w-[27.5rem]" />
+          </div>
+          <div className="flex w-full max-w-[27.5rem] gap-2">
+            <Button variant="filled" size="lg" className="min-w-0 flex-1" onClick={savePng} disabled={!r.ok || !lib}>
+              <Download aria-hidden />
+              {t.png}
+            </Button>
+            <Button variant="outlined" size="lg" onClick={saveSvg} disabled={!r.ok || !lib} title={t.svgTitle}>
+              {t.svg}
+            </Button>
+          </div>
+        </Panel>
       </div>
     </div>
   );

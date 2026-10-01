@@ -90,8 +90,8 @@ const examples = (locale: Locale, head: L, rows: [string, string][]): Block => (
 });
 
 const HOW_ENC = (what: string, extra: string): LL => ({
-  ru: [`Введите или вставьте текст — ${what} появится сразу под полем.`, extra, "Скопируйте результат кнопкой «Копировать» или нажмите «Поменять местами», чтобы проверить обратное преобразование."],
-  en: [`Type or paste text — the ${what} appears right below.`, extra, "Copy the result, or press Swap to check the reverse conversion."],
+  ru: [`Введите или вставьте текст — ${what} появится сразу рядом с полем.`, extra, "Скопируйте результат кнопкой «Копировать» или нажмите «Поменять местами», чтобы проверить обратное преобразование."],
+  en: [`Type or paste text — the ${what} appears right next to it.`, extra, "Copy the result, or press Swap to check the reverse conversion."],
 });
 
 /* ───────────── Base64 ───────────── */
@@ -172,8 +172,8 @@ const specs: Spec[] = [
     lead: { ru: "Вставьте Base64 — текст появится сразу; URL-safe и строки без = тоже принимаются.", en: "Paste Base64 and get the text instantly; URL-safe strings and missing padding are accepted." },
     keywords: { ru: ["base64 декодировать", "base64 в текст", "расшифровать base64", "base64 decode"], en: ["base64 decode", "base64 to text", "decode base64 online", "base64 decoder"] },
     howTo: {
-      ru: ["Вставьте строку Base64 или data URI — префикс data:…;base64, отбросится сам.", "Если это текст, он появится ниже. Если внутри файл или двоичные данные, их можно скачать.", "При ошибке смотрите позицию: чаще всего в строку попал лишний символ при копировании."],
-      en: ["Paste a Base64 string or a data URI — the data:…;base64, prefix is removed automatically.", "Text appears below. If it's a file or binary data, you can download it.", "On an error check the position: usually a stray character slipped in while copying."],
+      ru: ["Вставьте строку Base64 или data URI — префикс data:…;base64, отбросится сам.", "Если это текст, он появится рядом с полем. Если внутри файл или двоичные данные, их можно скачать.", "При ошибке смотрите позицию: чаще всего в строку попал лишний символ при копировании."],
+      en: ["Paste a Base64 string or a data URI — the data:…;base64, prefix is removed automatically.", "Text appears next to the input. If it's a file or binary data, you can download it.", "On an error check the position: usually a stray character slipped in while copying."],
     },
     faq: {
       ru: [

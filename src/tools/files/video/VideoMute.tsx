@@ -17,13 +17,13 @@ const T = {
   ru: {
     run: "Убрать звук",
     silent: "В этом видео уже нет звуковой дорожки.",
-    note: "Видеодорожка копируется без перекодирования, поэтому качество не меняется, а обработка занимает секунды.",
+    note: "Видео копируется без перекодирования — качество не меняется",
     preview: "Предпросмотр видео",
   },
   en: {
     run: "Remove audio",
     silent: "This video already has no audio track.",
-    note: "The video track is copied without re-encoding, so quality is unchanged and it takes seconds.",
+    note: "The video is copied without re-encoding — quality is unchanged",
     preview: "Video preview",
   },
 } as const;
@@ -56,7 +56,7 @@ export default function VideoMute({ locale }: { locale: Locale }) {
       probe={probe}
       busy={job.running}
       preview={file && <VideoPreview file={file} label={t.preview} />}
-      warning={silent ? <Notice>{t.silent}</Notice> : !probe.loading && file ? <p className="text-sm text-fg-3">{t.note}</p> : null}
+      warning={silent ? <Notice>{t.silent}</Notice> : !probe.loading && file ? <p className="text-[0.8125rem] text-fg-3">{t.note}</p> : null}
       action={{ label: t.run, onClick: run, disabled: silent || probe.loading, icon: <VolumeX aria-hidden /> }}
       status={<JobProgress job={job} locale={locale} onCancel={job.cancel} onRetry={run} />}
       result={

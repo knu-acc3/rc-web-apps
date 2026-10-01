@@ -4,7 +4,8 @@
  * Tiny hand-written SVG charts (no chart library). Lines/bars are drawn in a
  * stretched 1000×1000 SVG with non-scaling strokes; axis labels are HTML, so
  * text stays readable at any width (works at 360px). Colors come from design
- * tokens only, so charts follow light/dark themes.
+ * tokens only, so charts follow light/dark themes. Line and bar charts sit on their own card (no border; inside
+ * another card it turns into a tonal inset).
  */
 
 import { useState, type ReactNode } from "react";
@@ -29,7 +30,7 @@ interface Series {
   area?: boolean;
 }
 
-const PAD = { l: 60, r: 10, t: 10, b: 26 };
+const PAD = { l: 68, r: 10, t: 10, b: 26 };
 
 function Legend({ items }: { items: { label: string; tone: Tone; dashed?: boolean }[] }) {
   return (
@@ -108,7 +109,7 @@ export function LineChart({
   const h = hover;
 
   return (
-    <figure className={cn("min-w-0", className)}>
+    <figure className={cn("panel min-w-0 p-3 sm:p-4", className)}>
       <div className="relative select-none" style={{ height }} role="img" aria-label={ariaLabel}>
         {yt.values.map((v) => (
           <div
@@ -180,7 +181,7 @@ export function LineChart({
           </svg>
           {h !== null && (
             <div
-              className="pointer-events-none absolute top-1 z-[2] min-w-36 rounded-[0.5rem] border border-line bg-surface px-2.5 py-1.5 text-[0.75rem] shadow-[var(--shadow-overlay)]"
+              className="pointer-events-none absolute top-1 z-[2] min-w-36 rounded-[0.75rem] bg-surface px-2.5 py-1.5 text-[0.75rem] shadow-[var(--elev-2)]"
               style={fx(x[h]) > 0.55 ? { right: `${(1 - fx(x[h])) * 100}%`, marginRight: 8 } : { left: `${fx(x[h]) * 100}%`, marginLeft: 8 }}
             >
               <div className="font-semibold text-fg">{xFormat(x[h])}</div>
@@ -231,7 +232,7 @@ export function BarChart({
   const step = Math.max(1, Math.ceil(n / maxLabels));
 
   return (
-    <figure className={cn("min-w-0", className)}>
+    <figure className={cn("panel min-w-0 p-3 sm:p-4", className)}>
       <div className="relative select-none" style={{ height }} role="img" aria-label={ariaLabel}>
         {yt.values.map((v) => (
           <div
@@ -280,7 +281,7 @@ export function BarChart({
           </svg>
           {hover !== null && (
             <div
-              className="pointer-events-none absolute top-1 z-[2] min-w-36 rounded-[0.5rem] border border-line bg-surface px-2.5 py-1.5 text-[0.75rem] shadow-[var(--shadow-overlay)]"
+              className="pointer-events-none absolute top-1 z-[2] min-w-36 rounded-[0.75rem] bg-surface px-2.5 py-1.5 text-[0.75rem] shadow-[var(--elev-2)]"
               style={(hover + 0.5) / n > 0.55 ? { right: `${(1 - hover / n) * 100}%`, marginRight: 4 } : { left: `${((hover + 1) / n) * 100}%`, marginLeft: 4 }}
             >
               <div className="font-semibold text-fg">{labels[hover]}</div>

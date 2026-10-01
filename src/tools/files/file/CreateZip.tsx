@@ -4,14 +4,15 @@ import { FileArchive, FolderPlus, X } from "lucide-react";
 import { useId, useRef, useState, type DragEvent } from "react";
 import type { Locale } from "@/i18n/config";
 import { count, formatBytes } from "@/i18n/format";
-import { Button } from "@/ui/button";
+import { Button, IconButton } from "@/ui/button";
 import { Dropzone } from "@/ui/dropzone";
 import { Field, Input } from "@/ui/field";
-import { Notice, Panel, PanelHeader } from "@/ui/panel";
+import { Notice, Panel } from "@/ui/panel";
 import { Segmented } from "@/ui/segmented";
 import { useJob } from "@/tools/files/video/ui/hooks";
 import { JobProgress } from "@/tools/files/video/ui/Progress";
 import { ResultCard } from "@/tools/files/video/ui/ResultCard";
+import { Setting } from "@/tools/files/video/ui/options";
 import { UI } from "@/tools/files/video/ui/strings";
 import { buildZip } from "./lib/zip-client";
 
@@ -29,7 +30,7 @@ const T = {
     max: "Максимальное",
     run: "Создать ZIP",
     big: "Всего больше 1 ГБ: архив собирается в памяти браузера, на слабых устройствах её может не хватить.",
-    hint: "Фото, видео и архивы уже сжаты — для них хватит режима «Без сжатия», он самый быстрый.",
+    hint: "Для фото, видео и архивов хватит «Без сжатия» — так быстрее всего",
     remove: "Убрать",
   },
   en: {
@@ -45,7 +46,7 @@ const T = {
     max: "Maximum",
     run: "Create ZIP",
     big: "Over 1 GB in total: the archive is built in browser memory, which low-memory devices may not have.",
-    hint: "Photos, videos and archives are already compressed — “None” is enough for them and is the fastest.",
+    hint: "Photos, videos and archives are already compressed — “None” is fastest",
     remove: "Remove",
   },
 } as const;
@@ -123,20 +124,21 @@ export default function CreateZip({ locale }: { locale: Locale }) {
   const zipName = `${(name.trim() || "archive").replace(/\.zip$/i, "")}.zip`;
 
   return (
-    <div className="flex flex-col gap-4">
-      <div onDropCapture={onDropCapture}>
-        <Dropzone
-          multiple
-          onFiles={(fs) => {
-            const dirs = droppedDirs.current;
-            add(fs.filter((f) => !(dirs.has(f.name) && (f.size === 0 || !f.type) && dirs.delete(f.name))).map((file) => ({ path: file.webkitRelativePath || file.name, file })));
-          }}
-          title={t.drop}
-          compact={entries.length > 0}
-        />
-      </div>
-      <div className="-mt-2 flex justify-end">
-        <Button variant="ghost" size="sm" onClick={() => folderInput.current?.click()}>
+    <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-6">
+      <div className="flex min-w-0 flex-col gap-3">
+        <div onDropCapture={onDropCapture}>
+          <Dropzone
+            multiple
+            locale={locale}
+            onFiles={(fs) => {
+              const dirs = droppedDirs.current;
+              add(fs.filter((f) => !(dirs.has(f.name) && (f.size === 0 || !f.type) && dirs.delete(f.name))).map((file) => ({ path: file.webkitRelativePath || file.name, file })));
+            }}
+            title={t.drop}
+            compact={entries.length > 0}
+          />
+        </div>
+        <Button variant="tonal" size="sm" onClick={() => folderInput.current?.click()} className="self-start">
           <FolderPlus aria-hidden />
           {t.folder}
         </Button>
@@ -153,69 +155,64 @@ export default function CreateZip({ locale }: { locale: Locale }) {
             e.target.value = "";
           }}
         />
+        {entries.length > 0 && (
+          <Panel>
+            <ul className="max-h-80 divide-y divide-line overflow-auto">
+              {entries.map((e) => (
+                <li key={e.path} className="flex items-center gap-3 py-1.5 pl-4 pr-2 text-sm">
+                  <span className="min-w-0 flex-1 truncate text-fg" title={e.path}>
+                    {e.path}
+                  </span>
+                  <span className="tabular shrink-0 text-fg-3">{formatBytes(locale, e.file.size)}</span>
+                  <IconButton size="sm" label={`${t.remove}: ${e.path}`} title={t.remove} icon={<X aria-hidden />} onClick={() => (setEntries((l) => l.filter((x) => x !== e)), job.reset())} disabled={job.running} />
+                </li>
+              ))}
+            </ul>
+          </Panel>
+        )}
       </div>
 
-      {entries.length > 0 && (
-        <Panel>
-          <PanelHeader
-            title={`${count(locale, entries.length, t.files)} · ${formatBytes(locale, total)}`}
-            actions={
-              <Button size="sm" variant="ghost" onClick={() => (setEntries([]), job.reset())} disabled={job.running}>
-                {t.clear}
-              </Button>
-            }
-          />
-          <ul className="max-h-72 divide-y divide-line overflow-auto">
-            {entries.map((e) => (
-              <li key={e.path} className="flex items-center gap-3 px-4 py-2 text-sm">
-                <span className="min-w-0 flex-1 truncate text-fg" title={e.path}>
-                  {e.path}
-                </span>
-                <span className="tabular shrink-0 text-fg-3">{formatBytes(locale, e.file.size)}</span>
-                <Button size="icon-sm" variant="ghost" onClick={() => (setEntries((l) => l.filter((x) => x !== e)), job.reset())} disabled={job.running} aria-label={`${t.remove}: ${e.path}`} title={t.remove}>
-                  <X aria-hidden />
+      <div className="flex min-w-0 flex-col gap-4">
+        <Panel className="flex min-w-0 flex-col gap-5 p-4 sm:p-5">
+          <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
+            <span className="text-2xl font-bold tracking-tight text-fg">{count(locale, entries.length, t.files)}</span>
+            <span className="flex items-center gap-1">
+              {entries.length > 0 && <span className="tabular text-fg-2">{formatBytes(locale, total)}</span>}
+              {entries.length > 0 && (
+                <Button size="sm" variant="text" onClick={() => (setEntries([]), job.reset())} disabled={job.running}>
+                  {t.clear}
                 </Button>
-              </li>
-            ))}
-          </ul>
-        </Panel>
-      )}
-
-      {total > 1024 ** 3 && <Notice tone="warn">{t.big}</Notice>}
-
-      {entries.length > 0 && (
-        <>
-          <div className="flex flex-wrap items-end gap-3">
-            <Field label={t.name} htmlFor={`${id}-n`} className="w-56">
-              <Input id={`${id}-n`} size="sm" value={name} onChange={(e) => (setName(e.target.value), job.reset())} />
-            </Field>
-            <div className="flex flex-col gap-1.5">
-              <span className="text-sm font-medium text-fg-2">{t.level}</span>
-              <Segmented
-                label={t.level}
-                value={level}
-                onChange={(x) => (setLevel(x), job.reset())}
-                size="sm"
-                options={[
-                  { value: "store", label: t.store },
-                  { value: "fast", label: t.fast },
-                  { value: "normal", label: t.normal },
-                  { value: "max", label: t.max },
-                ]}
-              />
-            </div>
+              )}
+            </span>
           </div>
-          <p className="-mt-2 text-[0.8125rem] text-fg-3">{t.hint}</p>
-          {job.status !== "done" && (
-            <Button variant="primary" size="lg" onClick={run} disabled={job.running} className="w-full sm:w-auto sm:self-start">
+          <Field label={t.name} htmlFor={`${id}-n`}>
+            <Input id={`${id}-n`} value={name} onChange={(e) => (setName(e.target.value), job.reset())} />
+          </Field>
+          <Setting label={t.level}>
+            <Segmented
+              label={t.level}
+              value={level}
+              onChange={(x) => (setLevel(x), job.reset())}
+              options={[
+                { value: "store", label: t.store },
+                { value: "fast", label: t.fast },
+                { value: "normal", label: t.normal },
+                { value: "max", label: t.max },
+              ]}
+            />
+            <p className="text-[0.8125rem] text-fg-3">{t.hint}</p>
+          </Setting>
+          {total > 1024 ** 3 && <Notice tone="warn">{t.big}</Notice>}
+          {job.status !== "done" && !job.running && (
+            <Button variant="filled" size="xl" fullWidth onClick={run} disabled={!entries.length}>
               <FileArchive aria-hidden />
               {t.run}
             </Button>
           )}
-        </>
-      )}
-      <JobProgress job={job} locale={locale} onCancel={job.cancel} onRetry={run} />
-      {job.status === "done" && job.result && <ResultCard blob={job.result} name={zipName} locale={locale} kind="file" inputSize={total} onReset={job.reset} resetLabel={UI[locale].edit} />}
+          <JobProgress job={job} locale={locale} onCancel={job.cancel} onRetry={run} />
+        </Panel>
+        {job.status === "done" && job.result && <ResultCard blob={job.result} name={zipName} locale={locale} kind="file" inputSize={total} onReset={job.reset} resetLabel={UI[locale].edit} />}
+      </div>
     </div>
   );
 }

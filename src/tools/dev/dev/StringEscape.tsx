@@ -1,9 +1,12 @@
 "use client";
 
+import { ArrowLeftRight, ArrowUpDown } from "lucide-react";
 import { useId, useMemo, useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { CodeEditor } from "@/tools/dev/shared/CodeEditor";
 import { KIT_T } from "@/tools/dev/shared/labels";
+import { Opt, Pane } from "@/tools/dev/shared/Pane";
+import { IconButton } from "@/ui/button";
 import { CopyButton } from "@/ui/copy-button";
 import { Select } from "@/ui/field";
 import { Notice, Panel } from "@/ui/panel";
@@ -107,49 +110,57 @@ export default function StringEscape({ locale, target: target0 = "js" }: { local
   const [dir, setDir] = useState<"escape" | "unescape">("escape");
   const out = useMemo(() => run(target, dir, text), [target, dir, text]);
 
+  const flip = (d: "escape" | "unescape") => {
+    if (d === dir) return;
+    setText(out);
+    setDir(d);
+  };
+
   return (
-    <Panel className="p-4 sm:p-6">
-      <div className="mb-4 flex flex-wrap items-center gap-3">
+    <Panel className="flex flex-col gap-4 p-4 sm:p-6">
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-3">
         <Segmented
           label={t.dir}
           value={dir}
-          onChange={(d) => {
-            setText(out);
-            setDir(d);
-          }}
+          onChange={flip}
           options={[
             { value: "escape", label: t.escape },
             { value: "unescape", label: t.unescape },
           ]}
-          size="sm"
         />
-        <label className="flex items-center gap-2 text-sm text-fg-2">
-          {t.target}
-          <Select value={target} size="sm" className="w-48" onChange={(e) => setTarget(e.target.value as Target)}>
+        <Opt label={t.target} className="text-sm text-fg-2">
+          <Select value={target} onChange={(e) => setTarget(e.target.value as Target)}>
             {(Object.keys(LABEL) as Target[]).map((k) => (
               <option key={k} value={k}>
                 {LABEL[k]}
               </option>
             ))}
           </Select>
-        </label>
+        </Opt>
       </div>
-      <CodeEditor id={`${id}-in`} locale={locale} label={t.input} value={text} onChange={setText} rows={5} wrap />
-      <div className="mt-4 rounded-[0.625rem] bg-surface-2 p-4">
-        <div className="flex items-center justify-between gap-2">
-          <span className="text-sm font-medium text-fg-2">{LABEL[target]}</span>
-          <CopyButton value={out} label={KIT_T[locale].copy} copiedLabel={KIT_T[locale].copied} variant="outline" />
+      <div className="grid gap-2 lg:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] lg:gap-3">
+        <CodeEditor id={`${id}-in`} locale={locale} label={dir === "escape" ? t.input : LABEL[target]} value={text} onChange={setText} rows={6} wrap />
+        <div className="flex items-center justify-center">
+          <IconButton
+            variant="tonal"
+            label={dir === "escape" ? t.unescape : t.escape}
+            onClick={() => flip(dir === "escape" ? "unescape" : "escape")}
+            icon={
+              <>
+                <ArrowUpDown aria-hidden className="lg:hidden" />
+                <ArrowLeftRight aria-hidden className="max-lg:hidden" />
+              </>
+            }
+          />
         </div>
-        <pre className="mt-2 max-h-[40vh] overflow-auto font-mono text-lg font-semibold break-all whitespace-pre-wrap text-fg" aria-live="polite">
-          {out}
-        </pre>
+        <Pane title={dir === "escape" ? LABEL[target] : t.input} actions={<CopyButton value={out} label={KIT_T[locale].copy} copiedLabel={KIT_T[locale].copied} variant="secondary" compact />}>
+          <pre className="max-h-[45vh] min-h-24 flex-1 overflow-auto px-4 py-3 font-mono text-lg font-semibold break-all whitespace-pre-wrap text-fg" aria-live="polite">
+            {out}
+          </pre>
+        </Pane>
       </div>
-      {(target === "sql" || target === "mysql") && (
-        <Notice tone="warn" className="mt-3">
-          {t.sql}
-        </Notice>
-      )}
-      {target === "regex" && dir === "escape" && <p className="mt-3 text-[0.8125rem] text-fg-3">{t.regex}</p>}
+      {(target === "sql" || target === "mysql") && <Notice tone="warn">{t.sql}</Notice>}
+      {target === "regex" && dir === "escape" && <p className="text-[0.8125rem] text-fg-3">{t.regex}</p>}
     </Panel>
   );
 }

@@ -224,10 +224,10 @@ export default function TypingTest({ locale, seconds = 60 }: { locale: Locale; s
         </span>
       </div>
 
-      <div className="flex flex-col overflow-hidden rounded-[0.75rem] border border-line bg-surface">
-        <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 border-b border-line px-4 py-2 text-sm whitespace-nowrap text-fg-2 tabular">
+      <div className="panel flex flex-col overflow-hidden">
+        <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 bg-surface-2 px-4 py-2.5 text-sm whitespace-nowrap text-fg-2 tabular sm:px-5">
           <span>
-            <span className="text-lg font-semibold text-fg">{clockText}</span> {mode > 0 ? t.left : t.elapsed}
+            <span className="text-xl font-bold text-fg">{clockText}</span> {mode > 0 ? t.left : t.elapsed}
           </span>
           <span className="flex gap-3 sm:gap-4">
             <span>
@@ -244,7 +244,7 @@ export default function TypingTest({ locale, seconds = 60 }: { locale: Locale; s
         <div
           ref={boxRef}
           lang={lang}
-          className="relative max-h-[calc(8em+1.5rem)] overflow-hidden px-4 py-3 text-lg leading-[1.6] tracking-[0.01em] sm:text-xl"
+          className="relative max-h-[calc(8em+1.5rem)] overflow-hidden px-4 py-3 text-lg leading-[1.6] tracking-[0.01em] sm:px-5 sm:text-xl lg:text-2xl"
           onClick={() => inputRef.current?.focus()}
         >
           {runs.before.map((r, i) => (
@@ -288,7 +288,7 @@ export default function TypingTest({ locale, seconds = 60 }: { locale: Locale; s
 
       <div aria-live="polite">
         {phase === "done" && result && (
-          <div className="flex flex-col gap-3 rounded-[0.75rem] border border-line bg-surface p-4 sm:p-5">
+          <div className="flex flex-col gap-3 rounded-[1.25rem] bg-accent-soft p-5 motion-safe:animate-[menu-in_200ms_ease-out] sm:p-6">
             <div className="flex flex-wrap items-end gap-x-8 gap-y-3">
               <div>
                 <div className="tabular text-5xl font-bold tracking-tight text-fg">{nf(locale === "ru" ? result.cpm : result.wpm)}</div>
@@ -315,11 +315,11 @@ export default function TypingTest({ locale, seconds = 60 }: { locale: Locale; s
       </div>
 
       <div className="flex flex-wrap gap-2">
-        <Button variant={phase === "done" ? "primary" : "outline"} onClick={() => reset()}>
+        <Button variant={phase === "done" ? "filled" : "tonal"} size="lg" onClick={() => reset()}>
           <RotateCcw aria-hidden />
           {t.again}
         </Button>
-        <Button variant="ghost" onClick={() => reset({ seed: randomIndex(TYPING_TEXTS[lang].length) })}>
+        <Button variant="text" size="lg" onClick={() => reset({ seed: randomIndex(TYPING_TEXTS[lang].length) })}>
           <Shuffle aria-hidden />
           {t.other}
         </Button>

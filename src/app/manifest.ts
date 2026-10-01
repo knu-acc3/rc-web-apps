@@ -8,7 +8,7 @@ export default function manifest(): MetadataRoute.Manifest {
     description: BRAND.tagline.en,
     start_url: "/ru",
     display: "standalone",
-    background_color: "#f6f6f3",
+    background_color: "#fff3e8",
     theme_color: BRAND.color,
     icons: [
       { src: "/web-app-manifest-192x192.png", sizes: "192x192", type: "image/png", purpose: "maskable" },

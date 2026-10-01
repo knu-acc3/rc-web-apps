@@ -9,7 +9,7 @@ import { Notice } from "@/ui/panel";
 import { cidrRange, rangeToCidrs } from "./lib/cidr";
 import { parseIPv4, toDotted } from "./lib/ipv4";
 import { compress, parseIPv6 } from "./lib/ipv6";
-import { bigFmt } from "./ui/shared";
+import { bigFmt, Split } from "./ui/shared";
 
 type Mode = "cidr-to-range" | "range-to-cidr";
 
@@ -116,26 +116,25 @@ export default function CidrRange({ locale, mode = "cidr-to-range", sample }: { 
   const summary = t.summary(`${bigFmt(locale, res.blocks)} ${plural(locale, res.blocks, t.blocks)}`, `${bigFmt(locale, res.addrs)} ${plural(locale, addrsForPlural, t.addrs)}`);
 
   return (
-    <div className="grid gap-4 lg:grid-cols-2">
-      <div>
+    <Split
+      input={
         <Field label={mode === "cidr-to-range" ? t.inCidr : t.inRange} htmlFor={`${id}-in`} hint={mode === "cidr-to-range" ? t.hintCidr : t.hintRange}>
           <Textarea id={`${id}-in`} value={text} onChange={(e) => setText(e.target.value)} rows={8} autoComplete="off" />
         </Field>
-      </div>
-      <div className="flex min-w-0 flex-col gap-3">
-        <CodeOutput value={res.out} title={t.out} filename={mode === "cidr-to-range" ? "ranges.txt" : "cidr.txt"} labels={{ copy: t.copy, copied: t.copied, download: t.download }} minRows={8} />
-        <p className="text-sm text-fg-2" aria-live="polite">
-          {summary}
-        </p>
-        {res.truncated && <Notice tone="warn">{t.limit}</Notice>}
-        {res.errors.length > 0 && (
-          <Notice tone="err">
-            {res.errors.slice(0, 5).map((e) => (
-              <div key={e}>{e}</div>
-            ))}
-          </Notice>
-        )}
-      </div>
-    </div>
+      }
+    >
+      <CodeOutput value={res.out} title={t.out} filename={mode === "cidr-to-range" ? "ranges.txt" : "cidr.txt"} labels={{ copy: t.copy, copied: t.copied, download: t.download }} minRows={8} />
+      <p className="text-sm text-fg-2" aria-live="polite">
+        {summary}
+      </p>
+      {res.truncated && <Notice tone="warn">{t.limit}</Notice>}
+      {res.errors.length > 0 && (
+        <Notice tone="err">
+          {res.errors.slice(0, 5).map((e) => (
+            <div key={e}>{e}</div>
+          ))}
+        </Notice>
+      )}
+    </Split>
   );
 }

@@ -1,12 +1,14 @@
 "use client";
 
-import { Maximize2, Minimize2, Pause, Play, Plus, RotateCcw, Square } from "lucide-react";
+import { ChevronDown, ChevronUp, Maximize2, Minimize2, Pause, Play, Plus, RotateCcw, Square } from "lucide-react";
 import { useEffect, useId, useRef, useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { cn } from "@/lib/cn";
 import { linkHere, useQueryParam } from "@/lib/share-link";
-import { Button } from "@/ui/button";
+import { Button, IconButton } from "@/ui/button";
 import { useFullscreen } from "@/ui/fullscreen";
+import { Panel } from "@/ui/panel";
+import { ScrollRow } from "@/ui/scroll-row";
 import { ShareLink } from "@/ui/share-link";
 import { ToolTitle } from "@/ui/tool-title";
 import { useWakeLock } from "@/ui/stage";
@@ -204,85 +206,116 @@ export default function Timer({ locale, seconds = 300 }: TimerProps) {
 
   const editable = status === "idle" || status === "done";
   const shown = clock(status === "done" ? 0 : left, { forceHours: true, padHours: true });
-  const big = full ? "text-[min(22vw,40vh)]" : "text-[min(19vw,8rem)]";
-  const field = (k: "h" | "m" | "s", label: string) => (
-    <input
-      id={`${id}-${k}`}
-      aria-label={label}
-      inputMode="numeric"
-      autoComplete="off"
-      value={fields[k]}
-      onChange={(e) => onField(k, e.target.value)}
-      onFocus={(e) => e.target.select()}
-      onBlur={() => setFields((f) => ({ ...f, [k]: String(clampInt(f[k], k === "h" ? 99 : 59)).padStart(2, "0") }))}
-      className="tabular w-[2.1ch] rounded-[0.12em] bg-transparent text-center font-semibold text-fg outline-none hover:bg-surface-2 focus:bg-accent-soft"
-    />
+  const big = full ? "text-[min(20vw,36vh)]" : "text-[min(18vw,8rem)] 2xl:text-[10rem]";
+  const UNIT = { h: 3600, m: 60, s: 1 } as const;
+  const LABEL = { h: t.h, m: t.m, s: t.s } as const;
+  const bump = (k: "h" | "m" | "s", dir: 1 | -1) => setDuration(dur + dir * UNIT[k]);
+  const pair = (k: "h" | "m" | "s") => (
+    <div className="flex flex-col items-center gap-[0.06em]">
+      <IconButton
+        label={`${LABEL[k]} +1`}
+        size="sm"
+        variant="tonal"
+        onClick={() => bump(k, 1)}
+        className={cn("text-base", !editable && "invisible")}
+        tabIndex={editable ? undefined : -1}
+        icon={<ChevronUp aria-hidden />}
+      />
+      {editable ? (
+        <input
+          id={`${id}-${k}`}
+          aria-label={LABEL[k]}
+          inputMode="numeric"
+          autoComplete="off"
+          value={fields[k]}
+          onChange={(e) => onField(k, e.target.value)}
+          onFocus={(e) => e.target.select()}
+          onKeyDown={(e) => {
+            if (e.key === "ArrowUp" || e.key === "ArrowDown") {
+              e.preventDefault();
+              bump(k, e.key === "ArrowUp" ? 1 : -1);
+            }
+          }}
+          onBlur={() => setFields((f) => ({ ...f, [k]: String(clampInt(f[k], k === "h" ? 99 : 59)).padStart(2, "0") }))}
+          className="tabular w-[2.3ch] cursor-text rounded-[0.14em] bg-surface-2 text-center font-semibold text-fg caret-accent outline-none transition-colors hover:bg-accent-container hover:text-on-accent-container focus:bg-accent-container focus:text-on-accent-container focus:ring-[0.04em] focus:ring-accent"
+        />
+      ) : (
+        <span className="tabular w-[2.3ch] text-center font-semibold">{shown.split(":")[k === "h" ? 0 : k === "m" ? 1 : 2]}</span>
+      )}
+      <IconButton
+        label={`${LABEL[k]} −1`}
+        size="sm"
+        variant="tonal"
+        onClick={() => bump(k, -1)}
+        disabled={editable && dur < UNIT[k]}
+        className={cn("text-base", !editable && "invisible")}
+        tabIndex={editable ? undefined : -1}
+        icon={<ChevronDown aria-hidden />}
+      />
+    </div>
   );
+  const colon = <span className="pb-[0.04em] text-fg-3">:</span>;
 
   return (
     <div className="flex flex-col gap-4">
-      <div
+      <Panel
         ref={ref}
         className={cn(
-          "flex flex-col items-center justify-center gap-6 rounded-[0.75rem] border border-line bg-surface px-3 py-8 sm:py-10",
-          full && "min-h-screen rounded-none border-0",
-          status === "done" && "border-accent",
+          "flex flex-col items-center justify-center gap-5 px-3 py-6 transition-shadow sm:py-8",
+          full && "min-h-screen rounded-none! shadow-none!",
+          status === "done" && "ring-2 ring-accent",
         )}
       >
         <ToolTitle value={name} onChange={setName} locale={locale} placeholder={t.namePh} full={full} />
-        {editable ? (
-          <div className={cn("flex items-baseline leading-none tracking-tight", big)}>
-            {field("h", t.h)}
-            <span className="text-fg-3">:</span>
-            {field("m", t.m)}
-            <span className="text-fg-3">:</span>
-            {field("s", t.s)}
-          </div>
-        ) : (
-          <div className={cn("tabular font-semibold leading-none tracking-tight text-fg", big, status === "paused" && "text-fg-2")}>{shown}</div>
-        )}
+        <div className={cn("flex items-center leading-none tracking-tight", big, status === "paused" ? "text-fg-2" : "text-fg")}>
+          {pair("h")}
+          {colon}
+          {pair("m")}
+          {colon}
+          {pair("s")}
+        </div>
 
         <p className="min-h-7 text-lg font-semibold text-accent" aria-live="polite">
           {status === "done" ? `${t.done} +${clock(over, { up: true })}` : ""}
         </p>
 
-        <div className="flex w-full max-w-md items-center justify-center gap-2">
+        <div className="flex w-full max-w-lg flex-wrap items-center justify-center gap-2 sm:gap-3">
           {status === "done" ? (
-            <Button variant="primary" size="lg" onClick={reset} className="min-w-0 flex-1 sm:max-w-52">
+            <Button variant="filled" size="xl" onClick={reset} className="min-w-40 flex-1 sm:max-w-60">
               <Square aria-hidden />
               {t.stop}
             </Button>
           ) : running ? (
-            <Button variant="primary" size="lg" onClick={pause} className="min-w-0 flex-1 sm:max-w-52">
+            <Button variant="filled" size="xl" onClick={pause} className="min-w-40 flex-1 sm:max-w-60">
               <Pause aria-hidden />
               {t.pause}
             </Button>
           ) : (
-            <Button variant="primary" size="lg" onClick={start} disabled={dur === 0 && status === "idle"} className="min-w-0 flex-1 sm:max-w-52">
+            <Button variant="filled" size="xl" onClick={start} disabled={dur === 0 && status === "idle"} className="min-w-40 flex-1 sm:max-w-60">
               <Play aria-hidden />
               {status === "paused" ? t.resume : t.start}
             </Button>
           )}
-          <Button variant="secondary" size="lg" onClick={addMinute} aria-label={t.add} title={t.add} className="w-12 px-0 sm:w-auto sm:px-5">
-            <Plus aria-hidden />
-            <span className="max-sm:sr-only">1</span>
-          </Button>
-          <Button variant="ghost" size="lg" onClick={reset} disabled={status === "idle"} aria-label={t.reset} title={`${t.reset} (R)`} className="w-12 px-0">
-            <RotateCcw aria-hidden />
-          </Button>
-          <Button variant="ghost" size="lg" onClick={toggleFull} aria-label={t.full} title={`${t.full} (F)`} className="w-12 px-0">
-            {full ? <Minimize2 aria-hidden /> : <Maximize2 aria-hidden />}
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button variant="tonal" size="xl" onClick={addMinute} aria-label={t.add} title={t.add} className="px-5">
+              <Plus aria-hidden />
+              <span aria-hidden>1</span>
+            </Button>
+            <IconButton label={`${t.reset} (R)`} size="lg" variant="tonal" onClick={reset} disabled={status === "idle"} icon={<RotateCcw aria-hidden />} />
+            <IconButton label={`${t.full} (F)`} size="lg" onClick={toggleFull} icon={full ? <Minimize2 aria-hidden /> : <Maximize2 aria-hidden />} />
+          </div>
         </div>
-      </div>
+      </Panel>
 
-      <div className="flex flex-wrap items-center gap-2" role="group" aria-label={t.presets}>
-        {PRESETS.map((p) => (
-          <button key={p} type="button" className={cn("chip h-8! px-3! text-[0.8125rem]!", dur === p && editable && "border-accent! text-accent!")} onClick={() => (editable ? setDuration(p) : undefined)} disabled={!editable}>
-            {durationShort(p, locale)}
-          </button>
-        ))}
-        <ShareLink locale={locale} url={() => linkHere({ query: { ...(dur > 0 ? { t: durationParam(dur) } : {}), ...(name.trim() ? { n: name.trim() } : {}) } })} className="ml-auto" />
+      <div className="flex items-center gap-2">
+        <ScrollRow label={t.presets} className="flex-1">
+          {PRESETS.map((p) => (
+            <button key={p} type="button" aria-pressed={dur === p && editable} className="chip" onClick={() => (editable ? setDuration(p) : undefined)} disabled={!editable}>
+              {durationShort(p, locale)}
+            </button>
+          ))}
+        </ScrollRow>
+        <ShareLink locale={locale} url={() => linkHere({ query: { ...(dur > 0 ? { t: durationParam(dur) } : {}), ...(name.trim() ? { n: name.trim() } : {}) } })} className="shrink-0" />
       </div>
 
       <TimerOptions locale={locale} options={opts} onChange={setOpts} />

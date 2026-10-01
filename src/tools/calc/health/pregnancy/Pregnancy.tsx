@@ -9,7 +9,7 @@ import type { ToolProps } from "../../../types";
 import { useToday } from "../../shared/clock";
 import { fmtDay, isoOf, parseIso } from "../../shared/dates";
 import { field } from "../../shared/num";
-import { CalcGrid, Disclaimer, Explain, FieldRow, NumField, ResultMain, SelectField, Stack, SubHeading, ToolActions } from "../../shared/ui";
+import { CalcGrid, Disclaimer, Explain, NumSlider, ResultMain, SelectField, SliderRow, Stack, SubHeading, ToolActions } from "../../shared/ui";
 import { useQueryState } from "../../shared/url-state";
 import { eddFromConception, eddFromIvf, eddFromLmp, eddFromUltrasound, gestationalAge, keyDates, splitWeeks, trimester, type DatingMethod } from "../lib/cycle";
 import { weekInfo } from "./weeks";
@@ -21,12 +21,12 @@ const T = {
     method: "Как считать",
     methods: { lmp: "По первому дню последних месячных", conception: "По дате зачатия", ivf5: "ЭКО: перенос 5-дневного эмбриона", ivf3: "ЭКО: перенос 3-дневного эмбриона", ultrasound: "По данным УЗИ" } satisfies Record<DatingMethod, string>,
     lmp: "Первый день последних месячных",
-    cycle: "Длина цикла, дней",
+    cycle: "Длина цикла",
     conception: "Дата зачатия",
     transfer: "Дата переноса эмбриона",
     scan: "Дата УЗИ",
-    gaW: "Срок по УЗИ, недель",
-    gaD: "и дней",
+    gaW: "Срок по УЗИ",
+    gaD: "и ещё",
     label: "Предполагаемая дата родов",
     enter: "Укажите дату",
     future: "Дата не может быть в будущем",
@@ -51,12 +51,12 @@ const T = {
     method: "Method",
     methods: { lmp: "First day of last period", conception: "Conception date", ivf5: "IVF: day-5 embryo transfer", ivf3: "IVF: day-3 embryo transfer", ultrasound: "Ultrasound dating" } satisfies Record<DatingMethod, string>,
     lmp: "First day of your last period",
-    cycle: "Cycle length, days",
+    cycle: "Cycle length",
     conception: "Conception date",
     transfer: "Embryo transfer date",
     scan: "Ultrasound date",
-    gaW: "Age at the scan, weeks",
-    gaD: "and days",
+    gaW: "Age at the scan",
+    gaD: "plus",
     label: "Estimated due date",
     enter: "Enter a date",
     future: "The date cannot be in the future",
@@ -136,12 +136,12 @@ export default function Pregnancy({ locale, week }: ToolProps<{ week?: number }>
       <Field label={dateLabel} htmlFor={`${id}-d`} error={dateErr}>
         <Input id={`${id}-d`} type="date" size="lg" value={q.v.d || (assumed !== null ? isoOf(assumed) : "")} onChange={(e) => q.set({ d: e.target.value })} max={today ?? undefined} aria-invalid={!!dateErr} />
       </Field>
-      {method === "lmp" && <NumField id={`${id}-c`} label={t.cycle} value={q.v.c} onChange={(c) => q.set({ c })} error={C.message} inputMode="numeric" />}
+      {method === "lmp" && <NumSlider id={`${id}-c`} locale={locale} label={t.cycle} value={q.v.c} onChange={(c) => q.set({ c })} suffix={plural(locale, C.value ?? 28, t.days)} error={C.message} min={21} max={45} />}
       {method === "ultrasound" && (
-        <FieldRow>
-          <NumField id={`${id}-w`} label={t.gaW} value={q.v.w} onChange={(w) => q.set({ w })} error={GW.message} inputMode="numeric" />
-          <NumField id={`${id}-dd`} label={t.gaD} value={q.v.dd} onChange={(dd) => q.set({ dd })} error={GD.message} inputMode="numeric" />
-        </FieldRow>
+        <SliderRow>
+          <NumSlider id={`${id}-w`} locale={locale} label={t.gaW} value={q.v.w} onChange={(w) => q.set({ w })} suffix={plural(locale, GW.value ?? 8, t.weeks)} error={GW.message} min={4} max={42} />
+          <NumSlider id={`${id}-dd`} locale={locale} label={t.gaD} value={q.v.dd} onChange={(dd) => q.set({ dd })} suffix={plural(locale, GD.value ?? 0, t.days)} error={GD.message} min={0} max={6} />
+        </SliderRow>
       )}
     </>
   );

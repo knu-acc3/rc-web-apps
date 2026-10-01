@@ -34,6 +34,8 @@ export function Dropzone({
   compact = false,
   disabled = false,
   children,
+  locale,
+  action,
 }: {
   onFiles: (files: File[]) => void;
   accept?: string;
@@ -44,6 +46,10 @@ export function Dropzone({
   compact?: boolean;
   disabled?: boolean;
   children?: ReactNode;
+  /** Language of the button inside the zone (guessed from the title when omitted). */
+  locale?: "ru" | "en";
+  /** Text of the button inside the zone instead of "Выбрать файл(ы)" / "Добавить ещё" (e.g. "Другой файл"). */
+  action?: string;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const rootRef = useRef<HTMLDivElement>(null);
@@ -107,15 +113,24 @@ export function Dropzone({
         emit(e.dataTransfer.files);
       }}
       className={cn(
-        "flex w-full cursor-pointer flex-col items-center justify-center gap-2.5 rounded-[0.875rem] border-2 border-dashed text-center transition-colors duration-150",
-        compact ? "min-h-24 px-4 py-4" : "min-h-40 px-5 py-7",
-        over ? "border-accent bg-accent-soft" : "border-line-strong bg-surface hover:border-accent",
+        "group flex w-full cursor-pointer flex-col items-center justify-center gap-3 rounded-[1.25rem] border-2 border-dashed text-center transition-[border-color,background-color,transform] duration-200",
+        compact ? "min-h-24 px-4 py-4" : "min-h-48 px-5 py-8",
+        over ? "scale-[1.01] border-accent bg-accent-soft" : "border-outline/60 bg-surface hover:border-accent hover:bg-accent-soft/40",
         disabled && "pointer-events-none opacity-60",
         className,
       )}
     >
-      <span className={cn("flex items-center justify-center rounded-full bg-accent text-accent-fg", compact ? "size-9" : "size-12")}>
-        <Upload className={compact ? "size-4" : "size-5"} aria-hidden />
+      {/* Looks like the button it is: the whole zone opens the file picker (it is the control, so this is a span). */}
+      <span
+        aria-hidden
+        className={cn(
+          "btn btn-filled pointer-events-none transition-transform duration-200 group-hover:-translate-y-0.5",
+          compact ? "h-10 px-5 text-[0.9375rem] [--btn-r:1.25rem]" : "h-12 px-6 text-base [--btn-r:1.5rem] [&_svg]:size-5",
+          over && "scale-105",
+        )}
+      >
+        <Upload aria-hidden />
+        {action ?? CHOOSE[locale ?? lang(title)][compact ? "more" : multiple ? "many" : "one"]}
       </span>
       <span id={`${id}-title`} className={cn("font-semibold text-fg", compact ? "text-[0.9375rem]" : "text-base")}>
         {typeof title === "string" && touchTitle(title) ? (
@@ -152,6 +167,13 @@ export function Dropzone({
     </div>
   );
 }
+
+const CHOOSE = {
+  ru: { one: "Выбрать файл", many: "Выбрать файлы", more: "Добавить ещё" },
+  en: { one: "Choose file", many: "Choose files", more: "Add more" },
+} as const;
+/** Without a `locale` prop the title tells the language. */
+const lang = (title: ReactNode): "ru" | "en" => (typeof title === "string" && /[а-яё]/i.test(title) ? "ru" : typeof title === "string" ? "en" : "ru");
 
 function matchesAccept(file: File, accept?: string): boolean {
   if (!accept) return true;

@@ -1,21 +1,24 @@
 "use client";
 
-import { ArrowDownUp, Copy, FileOutput, RotateCcw, RotateCw, Save, Trash2 } from "lucide-react";
+import { ArrowDownUp, ArrowLeft, ArrowRight, Copy, FileOutput, RotateCcw, RotateCw, Save, Trash2 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import type { Locale } from "@/i18n/config";
 import { formatNumber } from "@/i18n/format";
-import { Button } from "@/ui/button";
-import { Checkbox } from "@/ui/field";
+import { Button, IconButton } from "@/ui/button";
+import { Field, Switch } from "@/ui/field";
+import { Panel } from "@/ui/panel";
 import { Segmented } from "@/ui/segmented";
+import { moveItem, shiftSelected, toggleSelection } from "./lib/order";
 import { formatPageRanges, parsePageRanges } from "./lib/ranges";
-import { OptionsRow, PrimaryButton, workerJob } from "./ui/bits";
+import { PrimaryButton, workerJob } from "./ui/bits";
 import { FilePanel } from "./ui/FilePanel";
-import { PageGrid, moveItem, toggleSelection, type GridPage } from "./ui/PageGrid";
+import { PageGrid, type GridPage } from "./ui/PageGrid";
 import { RangeField } from "./ui/RangeField";
 import { JobStatus, ResultCard, baseName, pdfBlob, type OutputItem } from "./ui/Result";
 import { S, pagesCount } from "./ui/strings";
 import { useJob, type Job } from "./ui/use-job";
 import { usePdfFiles, type PdfFile } from "./ui/use-pdf-files";
+import { Controls, Summary, Workspace } from "./ui/Workspace";
 
 export type PagesMode = "organize" | "delete" | "extract" | "rotate" | "reverse" | "blank";
 
@@ -35,15 +38,14 @@ const T = {
     extractBtn: (n: number) => `Извлечь ${pagesCount("ru", n)}`,
     separate: "Каждую страницу отдельным файлом",
     angle: "Угол поворота",
-    angles: { 90: "90° по часовой", 180: "180°", 270: "90° против часовой" } as Record<number, string>,
-    rotateScope: (n: number, total: number) =>
-      n ? `Повернутся выбранные страницы: ${formatNumber("ru", n)} из ${formatNumber("ru", total)}` : `Повернутся все ${pagesCount("ru", total)}. Чтобы повернуть только некоторые — выберите их.`,
+    angles: { 90: "Вправо 90°", 180: "180°", 270: "Влево 90°" } as Record<number, string>,
+    rotateScope: (n: number, total: number) => (n ? `Повернутся выбранные: ${formatNumber("ru", n)} из ${formatNumber("ru", total)}` : `Повернутся все ${pagesCount("ru", total)}`),
     rotateBtn: "Повернуть PDF",
     organizeInfo: (n: number) => `В новом файле: ${pagesCount("ru", n)}`,
     reverseInfo: (n: number) => `Страницы пойдут с ${formatNumber("ru", n)}-й по 1-ю`,
     reverseBtn: "Сохранить в обратном порядке",
     scanning: (done: number, total: number) => `Проверяем страницы: ${formatNumber("ru", done)} из ${formatNumber("ru", total)}…`,
-    blankFound: (n: number, total: number) => (n ? `Пустых страниц: ${formatNumber("ru", n)} из ${formatNumber("ru", total)}. Нажмите на страницу, чтобы оставить или убрать её.` : "Пустых страниц не найдено"),
+    blankFound: (n: number, total: number) => (n ? `Пустых страниц: ${formatNumber("ru", n)} из ${formatNumber("ru", total)}` : "Пустых страниц не найдено"),
     blankBtn: (n: number) => `Удалить пустые: ${pagesCount("ru", n)}`,
     sensitivity: "Что считать пустой страницей",
     levels: { strict: "Совсем белую", normal: "Почти белую", scan: "Скан с пятнами" },
@@ -63,15 +65,14 @@ const T = {
     extractBtn: (n: number) => `Extract ${pagesCount("en", n)}`,
     separate: "Each page as a separate file",
     angle: "Rotation",
-    angles: { 90: "90° clockwise", 180: "180°", 270: "90° counter-clockwise" } as Record<number, string>,
-    rotateScope: (n: number, total: number) =>
-      n ? `Selected pages will rotate: ${formatNumber("en", n)} of ${formatNumber("en", total)}` : `All ${pagesCount("en", total)} will rotate. Select pages to rotate only some.`,
+    angles: { 90: "Right 90°", 180: "180°", 270: "Left 90°" } as Record<number, string>,
+    rotateScope: (n: number, total: number) => (n ? `${formatNumber("en", n)} of ${formatNumber("en", total)} selected pages will rotate` : `All ${pagesCount("en", total)} will rotate`),
     rotateBtn: "Rotate PDF",
     organizeInfo: (n: number) => `${pagesCount("en", n)} in the new file`,
     reverseInfo: (n: number) => `Pages will run from ${formatNumber("en", n)} back to 1`,
     reverseBtn: "Save in reverse order",
     scanning: (done: number, total: number) => `Checking pages: ${formatNumber("en", done)} of ${formatNumber("en", total)}…`,
-    blankFound: (n: number, total: number) => (n ? `Blank pages: ${formatNumber("en", n)} of ${formatNumber("en", total)}. Tap a page to keep or remove it.` : "No blank pages found"),
+    blankFound: (n: number, total: number) => (n ? `Blank pages: ${formatNumber("en", n)} of ${formatNumber("en", total)}` : "No blank pages found"),
     blankBtn: (n: number) => `Remove blank: ${pagesCount("en", n)}`,
     sensitivity: "What counts as blank",
     levels: { strict: "Pure white", normal: "Nearly white", scan: "Scan with specks" },
@@ -82,16 +83,16 @@ export default function PagesTool({ locale, mode, angle = 90 }: { locale: Locale
   const pdf = usePdfFiles();
   const job = useJob(locale);
   const file = pdf.ready[0] ?? null;
+  const files = <FilePanel locale={locale} pdf={pdf} disabled={job.running} />;
   return (
     <div className="flex flex-col gap-4">
-      <FilePanel locale={locale} pdf={pdf} disabled={job.running} />
       {/* Keyed by file: selection and arrangement never leak into a newly opened file. */}
-      {file && <PagesBody key={file.id} locale={locale} mode={mode} angle0={angle} file={file} job={job} onClear={pdf.clear} />}
+      {file ? <PagesBody key={file.id} locale={locale} mode={mode} angle0={angle} file={file} job={job} onClear={pdf.clear} files={files} /> : files}
     </div>
   );
 }
 
-function PagesBody({ locale, mode, angle0, file, job, onClear }: { locale: Locale; mode: PagesMode; angle0: 90 | 180 | 270; file: PdfFile; job: Job; onClear: () => void }) {
+function PagesBody({ locale, mode, angle0, file, job, onClear, files }: { locale: Locale; mode: PagesMode; angle0: 90 | 180 | 270; file: PdfFile; job: Job; onClear: () => void; files: ReactNode }) {
   const t = T[locale];
   const s = S[locale];
   const count = file.pages;
@@ -266,56 +267,40 @@ function PagesBody({ locale, mode, angle0, file, job, onClear }: { locale: Local
     }
   }
 
+  const rotateSel = (d: number) => setPages(pages.map((p) => (selected.has(p.key) ? { ...p, rotate: (p.rotate + d + 360) % 360 } : p)));
   const toolbar =
     mode === "organize" ? (
-      <OptionsRow className="items-center! gap-x-1!">
-        <span className="mr-2 text-sm text-fg-2">{t.selected(selected.size)}</span>
-        <Button
-          size="sm"
-          variant="ghost"
-          disabled={!selected.size}
-          aria-label={s.rotateLeft}
-          title={s.rotateLeft}
-          onClick={() => setPages(pages.map((p) => (selected.has(p.key) ? { ...p, rotate: (p.rotate + 270) % 360 } : p)))}
-        >
-          <RotateCcw aria-hidden />
-        </Button>
-        <Button
-          size="sm"
-          variant="ghost"
-          disabled={!selected.size}
-          aria-label={s.rotateRight}
-          title={s.rotateRight}
-          onClick={() => setPages(pages.map((p) => (selected.has(p.key) ? { ...p, rotate: (p.rotate + 90) % 360 } : p)))}
-        >
-          <RotateCw aria-hidden />
-        </Button>
-        <Button size="sm" variant="ghost" disabled={!selected.size} onClick={() => setPages(pages.flatMap((p) => (selected.has(p.key) ? [p, { ...p, key: `${p.index}:d${++dup.current}` }] : [p])))}>
-          <Copy aria-hidden />
-          <span className="max-sm:sr-only">{t.duplicate}</span>
-        </Button>
-        <Button
-          size="sm"
-          variant="ghost"
-          disabled={!selected.size || selected.size >= pages.length}
-          onClick={() => {
-            setPages(pages.filter((p) => !selected.has(p.key)));
-            setSelected(new Set());
-          }}
-        >
-          <Trash2 aria-hidden />
-          <span className="max-sm:sr-only">{s.deletePage}</span>
-        </Button>
-        <Button size="sm" variant="ghost" onClick={() => setPages(pages.slice().reverse())}>
-          <ArrowDownUp aria-hidden />
-          <span className="max-sm:sr-only">{t.reverse}</span>
-        </Button>
-        <Button size="sm" variant="ghost" onClick={() => setSelected(selected.size ? new Set() : new Set(pages.map((p) => p.key)))}>
-          {selected.size ? s.selectNone : t.selectAll}
-        </Button>
-      </OptionsRow>
+      <div className="flex flex-col gap-2">
+        <span className="text-sm font-medium text-fg-2">{t.selected(selected.size)}</span>
+        <div className="flex flex-wrap items-center gap-1">
+          <IconButton variant="tonal" label={s.rotateLeft} icon={<RotateCcw aria-hidden />} disabled={!selected.size} onClick={() => rotateSel(-90)} />
+          <IconButton variant="tonal" label={s.rotateRight} icon={<RotateCw aria-hidden />} disabled={!selected.size} onClick={() => rotateSel(90)} />
+          <IconButton variant="tonal" label={s.moveLeft} icon={<ArrowLeft aria-hidden />} disabled={!selected.size} onClick={() => setPages(shiftSelected(pages, selected, -1) as GridPage[])} />
+          <IconButton variant="tonal" label={s.moveRight} icon={<ArrowRight aria-hidden />} disabled={!selected.size} onClick={() => setPages(shiftSelected(pages, selected, 1) as GridPage[])} />
+          <IconButton variant="tonal" label={t.duplicate} icon={<Copy aria-hidden />} disabled={!selected.size} onClick={() => setPages(pages.flatMap((p) => (selected.has(p.key) ? [p, { ...p, key: `${p.index}:d${++dup.current}` }] : [p])))} />
+          <IconButton
+            variant="tonal"
+            label={s.deletePage}
+            icon={<Trash2 aria-hidden />}
+            disabled={!selected.size || selected.size >= pages.length}
+            onClick={() => {
+              setPages(pages.filter((p) => !selected.has(p.key)));
+              setSelected(new Set());
+            }}
+          />
+        </div>
+        <div className="flex flex-wrap gap-1">
+          <Button size="sm" variant="text" onClick={() => setPages(pages.slice().reverse())}>
+            <ArrowDownUp aria-hidden />
+            {t.reverse}
+          </Button>
+          <Button size="sm" variant="text" onClick={() => setSelected(selected.size ? new Set() : new Set(pages.map((p) => p.key)))}>
+            {selected.size ? s.selectNone : t.selectAll}
+          </Button>
+        </div>
+      </div>
     ) : mode === "reverse" ? null : mode === "blank" ? (
-      <OptionsRow className="items-center!">
+      <Field label={t.sensitivity}>
         <Segmented
           label={t.sensitivity}
           value={level}
@@ -326,30 +311,32 @@ function PagesBody({ locale, mode, angle0, file, job, onClear }: { locale: Local
           }}
           options={(["strict", "normal", "scan"] as const).map((v) => ({ value: v, label: t.levels[v] }))}
         />
-      </OptionsRow>
+      </Field>
     ) : mode === "rotate" ? (
-      <OptionsRow className="items-center!">
-        <Segmented
-          label={t.angle}
-          value={String(angle) as "90" | "180" | "270"}
-          onChange={(v) => {
-            setAngle(Number(v) as 90 | 180 | 270);
-            setResult(null);
-          }}
-          options={[
-            { value: "90", label: t.angles[90] },
-            { value: "180", label: t.angles[180] },
-            { value: "270", label: t.angles[270] },
-          ]}
-        />
+      <div className="flex flex-col gap-2">
+        <Field label={t.angle}>
+          <Segmented
+            label={t.angle}
+            value={String(angle) as "90" | "180" | "270"}
+            onChange={(v) => {
+              setAngle(Number(v) as 90 | 180 | 270);
+              setResult(null);
+            }}
+            options={[
+              { value: "90", label: t.angles[90], icon: <RotateCw className="size-4" aria-hidden /> },
+              { value: "180", label: t.angles[180] },
+              { value: "270", label: t.angles[270], icon: <RotateCcw className="size-4" aria-hidden /> },
+            ]}
+          />
+        </Field>
         {selected.size > 0 && (
-          <button type="button" className="text-sm text-accent hover:underline" onClick={() => setSelected(new Set())}>
+          <Button size="sm" variant="text" className="self-start" onClick={() => setSelected(new Set())}>
             {s.selectNone}
-          </button>
+          </Button>
         )}
-      </OptionsRow>
+      </div>
     ) : (
-      <OptionsRow>
+      <>
         <RangeField
           locale={locale}
           label={mode === "delete" ? t.deleteLabel : t.extractLabel}
@@ -358,36 +345,44 @@ function PagesBody({ locale, mode, angle0, file, job, onClear }: { locale: Local
           result={rangeResult ?? { ok: true, segments: [], pages: [] }}
           pageCount={count}
           placeholder="2, 5-7"
-          className="w-full sm:w-80"
         />
-        {mode === "extract" && <Checkbox label={t.separate} checked={separate} onChange={(e) => setSeparate(e.target.checked)} className="pb-7" />}
-      </OptionsRow>
+        {mode === "extract" && <Switch label={t.separate} checked={separate} onChange={(e) => setSeparate(e.target.checked)} />}
+      </>
     );
 
   if (!action) return null;
   return (
-    <>
-      <PageGrid
-        locale={locale}
-        pages={mode === "reverse" ? pages.slice().reverse() : pages.map(rotated)}
-        thumbsOf={() => file.thumbs}
-        label={(p) => formatNumber(locale, p.index + 1)}
-        selected={selected}
-        mark={mode === "delete" || mode === "blank" ? "delete" : "select"}
-        onToggle={mode === "reverse" ? undefined : toggle}
-        onMove={mode === "organize" ? (from, to) => setPages(moveItem(pages, from, to)) : undefined}
-        onRotate={mode === "organize" ? (key, d) => setPages(pages.map((p) => (p.key === key ? { ...p, rotate: (p.rotate + d + 360) % 360 } : p))) : undefined}
-        onDelete={mode === "organize" ? (key) => pages.length > 1 && setPages(pages.filter((p) => p.key !== key)) : mode === "delete" || mode === "blank" ? (key) => toggle(key, false) : undefined}
-        toolbar={toolbar}
-      />
-      <p className="text-lg font-semibold text-fg">{info}</p>
-      <PrimaryButton disabled={action.disabled || job.running} onClick={action.go}>
-        {action.icon}
-        {action.label}
-      </PrimaryButton>
-      <JobStatus locale={locale} state={job.state} onCancel={job.cancel} />
-      {result && <ResultCard locale={locale} items={result} originalSize={result.length === 1 ? file.size : undefined} zipName={`${base}-pages.zip`} onReset={reset} />}
-    </>
+    <Workspace
+      files={files}
+      controls={toolbar ? <Controls>{toolbar}</Controls> : null}
+      previewFirst={false}
+      stickyAction
+      preview={
+        <PageGrid
+          locale={locale}
+          pages={mode === "reverse" ? pages.slice().reverse() : pages.map(rotated)}
+          thumbsOf={() => file.thumbs}
+          label={(p) => formatNumber(locale, p.index + 1)}
+          selected={selected}
+          mark={mode === "delete" || mode === "blank" ? "delete" : "select"}
+          onToggle={mode === "reverse" ? undefined : toggle}
+          onMove={mode === "organize" ? (from, to) => setPages(moveItem(pages, from, to)) : undefined}
+          onRotate={mode === "organize" ? (key, d) => setPages(pages.map((p) => (p.key === key ? { ...p, rotate: (p.rotate + d + 360) % 360 } : p))) : undefined}
+          onDelete={mode === "organize" ? (key) => pages.length > 1 && setPages(pages.filter((p) => p.key !== key)) : mode === "delete" || mode === "blank" ? (key) => toggle(key, false) : undefined}
+        />
+      }
+      action={
+        <Panel className="flex flex-col gap-3 p-3 max-lg:shadow-elev-3 sm:p-4">
+          <Summary size="md">{info}</Summary>
+          <PrimaryButton disabled={action.disabled || job.running} done={!!result} onClick={action.go}>
+            {action.icon}
+            {action.label}
+          </PrimaryButton>
+          <JobStatus locale={locale} state={job.state} onCancel={job.cancel} />
+        </Panel>
+      }
+      result={result && <ResultCard locale={locale} items={result} originalSize={result.length === 1 ? file.size : undefined} zipName={`${base}-pages.zip`} onReset={reset} />}
+    />
   );
 }
 

@@ -3,9 +3,9 @@
 import { ArrowLeftRight } from "lucide-react";
 import { useId, useState } from "react";
 import type { Locale } from "@/i18n/config";
-import { Button } from "@/ui/button";
+import { IconButton } from "@/ui/button";
 import { CopyButton } from "@/ui/copy-button";
-import { Input, Select, Switch } from "@/ui/field";
+import { Field, Input, Select, Switch } from "@/ui/field";
 import { Panel } from "@/ui/panel";
 import { Segmented } from "@/ui/segmented";
 import { BaseSteps } from "./ui/BaseSteps";
@@ -190,32 +190,24 @@ export default function BaseConverter({ locale, from: from0 = 10, to: to0 = 2, v
               autoCorrect="off"
               spellCheck={false}
               size="lg"
-              className="mt-1.5 h-14! font-mono text-2xl!"
+              className="mt-1.5 font-mono text-2xl!"
               value={text}
               aria-invalid={!!error}
               onChange={(e) => setText(e.target.value)}
             />
           </div>
-          <div className="grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-end gap-2 md:w-[26rem]">
-            <div className="min-w-0">
-              <label htmlFor={`${id}-f`} className="text-sm font-medium text-fg-2">
-                {t.from}
-              </label>
-              <Select id={`${id}-f`} size="lg" className="mt-1.5" value={from} onChange={(e) => setFrom(Number(e.target.value))}>
+          <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] sm:items-end md:min-w-[26rem]">
+            <Field label={t.from} htmlFor={`${id}-f`}>
+              <Select id={`${id}-f`} size="lg" value={from} onChange={(e) => setFrom(Number(e.target.value))}>
                 {baseOptions}
               </Select>
-            </div>
-            <Button variant="ghost" size="icon" onClick={swap} aria-label={t.swap} title={t.swap} className="mb-1">
-              <ArrowLeftRight />
-            </Button>
-            <div className="min-w-0">
-              <label htmlFor={`${id}-t`} className="text-sm font-medium text-fg-2">
-                {t.to}
-              </label>
-              <Select id={`${id}-t`} size="lg" className="mt-1.5" value={to} onChange={(e) => setTo(Number(e.target.value))}>
+            </Field>
+            <IconButton label={t.swap} variant="tonal" onClick={swap} className="justify-self-center sm:mb-1" icon={<ArrowLeftRight aria-hidden className="max-sm:rotate-90" />} />
+            <Field label={t.to} htmlFor={`${id}-t`}>
+              <Select id={`${id}-t`} size="lg" value={to} onChange={(e) => setTo(Number(e.target.value))}>
                 {baseOptions}
               </Select>
-            </div>
+            </Field>
           </div>
         </div>
 

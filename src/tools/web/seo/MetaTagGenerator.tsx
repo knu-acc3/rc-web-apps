@@ -3,11 +3,12 @@
 import { useId, useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { cn } from "@/lib/cn";
-import { Checkbox, Field, Input, Textarea } from "@/ui/field";
+import { Field, Input, Switch, Textarea } from "@/ui/field";
+import { Panel } from "@/ui/panel";
 import { Segmented } from "@/ui/segmented";
 import { attr, breadcrumbUrl, FONTS, html, LIMITS, truncateToWidth } from "./lib/serp";
 import { measurer, useClient } from "./lib/measure";
-import { Issues, Meter, More, Output } from "./ui/kit";
+import { Issues, Meter, More, Output, Split } from "./ui/kit";
 
 const T = {
   ru: {
@@ -110,9 +111,43 @@ export default function MetaTagGenerator({ locale }: { locale: Locale }) {
     .filter(Boolean)
     .join("\n");
 
+  const inputs = (
+    <>
+      <Field label={t.title} htmlFor={`${id}-t`} aside={<span className="text-[0.8125rem] text-fg-3 tabular-nums">{t.chars(title.trim().length)}</span>}>
+        <Input id={`${id}-t`} value={title} onChange={(e) => setTitle(e.target.value)} size="lg" autoComplete="off" />
+      </Field>
+      <Field label={t.desc} htmlFor={`${id}-d`} aside={<span className="text-[0.8125rem] text-fg-3 tabular-nums">{t.chars(desc.trim().length)}</span>}>
+        <Textarea id={`${id}-d`} value={desc} onChange={(e) => setDesc(e.target.value)} rows={3} />
+      </Field>
+      <Field label={t.url} htmlFor={`${id}-u`}>
+        <Input id={`${id}-u`} value={url} onChange={(e) => setUrl(e.target.value)} inputMode="url" placeholder="https://example.com/page" className="font-mono" spellCheck={false} autoComplete="off" />
+      </Field>
+      <More label={t.more}>
+        <div className="flex flex-col gap-3">
+          <Field label={t.canonical} htmlFor={`${id}-c`}>
+            <Input id={`${id}-c`} value={canonical} onChange={(e) => setCanonical(e.target.value)} inputMode="url" className="font-mono" spellCheck={false} autoComplete="off" />
+          </Field>
+          <div className="flex flex-col">
+            <Switch label={t.noindex} checked={noindex} onChange={(e) => setNoindex(e.target.checked)} />
+            <Switch label={t.nofollow} checked={nofollow} onChange={(e) => setNofollow(e.target.checked)} />
+          </div>
+        </div>
+      </More>
+    </>
+  );
+
   return (
-    <div className="flex flex-col gap-5">
-      <div className={cn("w-full rounded-[0.75rem] border border-line bg-surface p-4 sm:p-5", device === "mobile" ? "mx-auto max-w-[25rem]" : "max-w-[40.75rem]")}>
+    <Split input={inputs}>
+      <Segmented<Device>
+        label={t.device}
+        value={device}
+        onChange={setDevice}
+        options={[
+          { value: "desktop", label: t.desktop },
+          { value: "mobile", label: t.mobile },
+        ]}
+      />
+      <Panel className={cn("w-full p-4 sm:p-5", device === "mobile" ? "max-w-[25rem]" : "max-w-[40.75rem]")}>
         <div className="flex items-center gap-2.5">
           <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-surface-2 text-xs font-semibold text-fg-2" aria-hidden>
             {crumb.site.slice(0, 1).toUpperCase()}
@@ -127,51 +162,19 @@ export default function MetaTagGenerator({ locale }: { locale: Locale }) {
         </div>
         <div className={cn("mt-2 text-xl leading-snug break-words [font-family:Arial,sans-serif]", title.trim() ? "text-accent" : "text-fg-3")}>{tt.text}</div>
         <p className={cn("mt-1 text-sm leading-[1.375rem] [font-family:Arial,sans-serif]", desc.trim() ? "text-fg-2" : "text-fg-3")}>{dd.text}</p>
-      </div>
+      </Panel>
 
       <div className="grid gap-4 sm:grid-cols-2">
         <Meter label={t.titleW} value={titleW} max={LIMITS.desktop.title} unit={t.px} />
         <Meter label={t.descW} value={descW} max={LIMITS.desktop.description} unit={t.px} />
       </div>
 
-      <Field label={t.title} htmlFor={`${id}-t`} aside={<span className="text-[0.8125rem] text-fg-3 tabular-nums">{t.chars(title.trim().length)}</span>}>
-        <Input id={`${id}-t`} value={title} onChange={(e) => setTitle(e.target.value)} size="lg" autoComplete="off" />
-      </Field>
-      <Field label={t.desc} htmlFor={`${id}-d`} aside={<span className="text-[0.8125rem] text-fg-3 tabular-nums">{t.chars(desc.trim().length)}</span>}>
-        <Textarea id={`${id}-d`} value={desc} onChange={(e) => setDesc(e.target.value)} rows={3} />
-      </Field>
-
-      <div className="flex flex-wrap items-end gap-4">
-        <Field label={t.url} htmlFor={`${id}-u`} className="min-w-0 flex-1 basis-64">
-          <Input id={`${id}-u`} value={url} onChange={(e) => setUrl(e.target.value)} inputMode="url" placeholder="https://example.com/page" className="font-mono" spellCheck={false} autoComplete="off" />
-        </Field>
-        <Segmented<Device>
-          label={t.device}
-          value={device}
-          onChange={setDevice}
-          options={[
-            { value: "desktop", label: t.desktop },
-            { value: "mobile", label: t.mobile },
-          ]}
-        />
-      </div>
-
       <div aria-live="polite">
         <Issues items={issues} />
       </div>
 
-      <More label={t.more}>
-        <div className="flex flex-col gap-3">
-          <Field label={t.canonical} htmlFor={`${id}-c`}>
-            <Input id={`${id}-c`} value={canonical} onChange={(e) => setCanonical(e.target.value)} inputMode="url" className="font-mono" spellCheck={false} autoComplete="off" />
-          </Field>
-          <Checkbox label={t.noindex} checked={noindex} onChange={(e) => setNoindex(e.target.checked)} />
-          <Checkbox label={t.nofollow} checked={nofollow} onChange={(e) => setNofollow(e.target.checked)} />
-        </div>
-      </More>
-
       <Output locale={locale} value={code} title={t.code} rows={5} />
       <p className="text-sm text-fg-3">{t.note}</p>
-    </div>
+    </Split>
   );
 }

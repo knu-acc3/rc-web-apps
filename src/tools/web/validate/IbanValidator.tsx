@@ -2,9 +2,10 @@
 
 import { useId, useState } from "react";
 import type { Locale } from "@/i18n/config";
+import { Notice } from "@/ui/panel";
 import { IBAN_BY_CODE } from "./data/iban-countries";
 import { validateIban, type IbanError } from "./lib/iban";
-import { BigInput, Details, Problems, Verdict, type Row } from "./ui/kit";
+import { BigInput, Details, Layout, Problems, type Row, Verdict } from "./ui/kit";
 
 const T = {
   ru: {
@@ -30,7 +31,8 @@ const T = {
     } as Record<IbanError, string>,
     expected: (d: string) => `При таком номере счёта контрольные цифры должны быть ${d}. Проверьте, в каком символе опечатка.`,
     note: "Проверяется формат и контрольная сумма ISO 13616. Существование счёта и название банка проверить без запроса в банк нельзя.",
-    ruNote: "Россия есть в реестре IBAN с 2023 года: 33 символа — RU, контрольные цифры, БИК банка и 20-значный номер счёта. Но российские банки IBAN клиентам почти не выдают: для перевода в Россию обычно указывают БИК, корреспондентский счёт и номер счёта, а из-за рубежа ещё и SWIFT-код банка.",
+    ruNote:
+      "Россия есть в реестре IBAN с 2023 года: 33 символа — RU, контрольные цифры, БИК банка и 20-значный номер счёта. Но российские банки IBAN клиентам почти не выдают: для перевода в Россию обычно указывают БИК, корреспондентский счёт и номер счёта, а из-за рубежа ещё и SWIFT-код банка.",
   },
   en: {
     label: "IBAN",
@@ -55,7 +57,8 @@ const T = {
     } as Record<IbanError, string>,
     expected: (d: string) => `For this account number the check digits would be ${d}. Look for the mistyped character.`,
     note: "The format and ISO 13616 checksum are checked. Whether the account exists or which bank holds it can't be checked without asking the bank.",
-    ruNote: "Russia has been in the IBAN registry since 2023: 33 characters — RU, check digits, the bank's BIK and the 20-digit account number. Russian banks rarely give customers an IBAN, though: payments to Russia usually need the BIK, the correspondent account and the account number, plus the bank's SWIFT code from abroad.",
+    ruNote:
+      "Russia has been in the IBAN registry since 2023: 33 characters — RU, check digits, the bank's BIK and the 20-digit account number. Russian banks rarely give customers an IBAN, though: payments to Russia usually need the BIK, the correspondent account and the account number, plus the bank's SWIFT code from abroad.",
   },
 } as const;
 
@@ -81,8 +84,7 @@ export default function IbanValidator({ locale, country, value }: { locale: Loca
 
   const empty = r.errors[0] === "empty";
   return (
-    <div className="flex flex-col gap-4">
-      <BigInput id={`${id}-iban`} label={t.label} value={text} onChange={setText} placeholder={sample} hint={t.hint} invalid={!empty && !r.valid} />
+    <Layout input={<BigInput id={`${id}-iban`} label={t.label} value={text} onChange={setText} placeholder={sample} hint={t.hint} invalid={!empty && !r.valid} />} note={t.note}>
       {!empty && (
         <Verdict tone={r.valid ? "ok" : "err"} title={r.valid ? `${t.valid}${name ? ` · ${name}` : ""}` : t.invalid} value={r.valid ? r.formatted : undefined}>
           <Problems items={r.errors.map((e) => t.errors[e])} />
@@ -90,8 +92,7 @@ export default function IbanValidator({ locale, country, value }: { locale: Loca
         </Verdict>
       )}
       <Details rows={rows} locale={locale} />
-      {c?.code === "RU" && <p className="rounded-[0.75rem] bg-warn-soft px-4 py-3 text-sm text-warn">{t.ruNote}</p>}
-      <p className="text-sm text-fg-3">{t.note}</p>
-    </div>
+      {c?.code === "RU" && <Notice tone="warn">{t.ruNote}</Notice>}
+    </Layout>
   );
 }

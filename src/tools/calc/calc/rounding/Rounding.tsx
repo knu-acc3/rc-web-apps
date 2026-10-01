@@ -2,14 +2,16 @@
 
 import { useId } from "react";
 import { CopyButton } from "@/ui/copy-button";
+import { ScrollRow } from "@/ui/scroll-row";
 import { Segmented } from "@/ui/segmented";
 import type { ToolProps } from "../../../types";
 import type { Q } from "../algebra/rational";
-import { CalcGrid, DataTable, Explain, InlineSelect, NumField, OptionsRow, ResultMain, Stack, SubHeading, ToolActions } from "../../shared/ui";
+import { CalcGrid, DataTable, Explain, InlineSelect, NumField, NumSlider, OptionsRow, ResultMain, Stack, SubHeading, ToolActions } from "../../shared/ui";
 import { useQueryState } from "../../shared/url-state";
 import { decimalText, parseDecimal, ROUND_MODES, roundDecimals, roundSignificant, roundTo, type RoundMode } from "../numbers/engines";
 
 const KINDS = ["decimals", "significant", "step"] as const;
+const STEP_PRESETS = ["0.01", "0.1", "0.5", "1", "5", "10", "50", "100", "1000"] as const;
 type Kind = (typeof KINDS)[number];
 
 const T = {
@@ -19,7 +21,7 @@ const T = {
     kinds: { decimals: "До знаков после запятой", significant: "До значащих цифр", step: "До разряда или шага" } satisfies Record<Kind, string>,
     decimals: "Знаков после запятой",
     significant: "Значащих цифр",
-    step: "Шаг (10, 100, 1000, 0,5, 5…)",
+    step: "Шаг",
     method: "Правило",
     methods: {
       "half-up": "математическое (0,5 — от нуля)",
@@ -43,7 +45,7 @@ const T = {
     kinds: { decimals: "Decimal places", significant: "Significant figures", step: "Nearest 10, 100 or any step" } satisfies Record<Kind, string>,
     decimals: "Decimal places",
     significant: "Significant figures",
-    step: "Step (10, 100, 1000, 0.5, 5…)",
+    step: "Step",
     method: "Rule",
     methods: {
       "half-up": "half up (away from zero)",
@@ -96,10 +98,24 @@ export default function Rounding({ locale }: ToolProps) {
         inputs={
           <>
             <NumField id={`${id}-x`} label={t.number} value={q.v.x} onChange={(v) => q.set({ x: v })} error={q.v.x.trim() && !x ? t.bad : undefined} size="lg" />
-            <Segmented label={t.kind} value={kind} onChange={(k) => q.set({ k })} options={KINDS.map((k) => ({ value: k, label: t.kinds[k] }))} wrap />
-            {kind === "decimals" && <NumField id={`${id}-d`} label={t.decimals} value={q.v.d} onChange={(v) => q.set({ d: v })} inputMode="numeric" error={d === null && q.v.d.trim() ? "0–99" : undefined} />}
-            {kind === "significant" && <NumField id={`${id}-s`} label={t.significant} value={q.v.s} onChange={(v) => q.set({ s: v })} inputMode="numeric" error={s === null && q.v.s.trim() ? "1–99" : undefined} />}
-            {kind === "step" && <NumField id={`${id}-st`} label={t.step} value={q.v.st} onChange={(v) => q.set({ st: v })} error={q.v.st.trim() && !stepOk ? t.bad : undefined} />}
+            <Segmented label={t.kind} fill value={kind} onChange={(k) => q.set({ k })} options={KINDS.map((k) => ({ value: k, label: t.kinds[k] }))} wrap />
+            {kind === "decimals" && <NumSlider id={`${id}-d`} locale={locale} label={t.decimals} value={q.v.d} onChange={(v) => q.set({ d: v })} min={0} max={10} error={d === null && q.v.d.trim() ? "0–99" : undefined} />}
+            {kind === "significant" && <NumSlider id={`${id}-s`} locale={locale} label={t.significant} value={q.v.s} onChange={(v) => q.set({ s: v })} min={1} max={15} error={s === null && q.v.s.trim() ? "1–99" : undefined} />}
+            {kind === "step" && (
+              <div className="flex flex-col gap-2">
+                <NumField id={`${id}-st`} label={t.step} value={q.v.st} onChange={(v) => q.set({ st: v })} error={q.v.st.trim() && !stepOk ? t.bad : undefined} />
+                <ScrollRow label={t.step} rowClassName="gap-2">
+                  {STEP_PRESETS.map((p) => {
+                    const v = ru ? p.replace(".", ",") : p;
+                    return (
+                      <button key={p} type="button" className="chip shrink-0 tabular" aria-pressed={q.v.st.trim() === v} onClick={() => q.set({ st: v })}>
+                        {ru ? v.replace(/\B(?=(\d{3})+(?!\d))/g, " ") : v.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                      </button>
+                    );
+                  })}
+                </ScrollRow>
+              </div>
+            )}
             <OptionsRow>
               <InlineSelect id={`${id}-r`} label={t.method} value={mode} onChange={(v) => q.set({ r: v })} options={ROUND_MODES.map((m) => ({ value: m, label: t.methods[m] }))} />
             </OptionsRow>
@@ -112,7 +128,7 @@ export default function Rounding({ locale }: ToolProps) {
             sub={text ? t.methods[mode] : x ? undefined : t.enter}
             actions={
               <ToolActions locale={locale} onReset={q.reset} shareUrl={q.shareUrl}>
-                {text && <CopyButton value={text} label={t.copy} copiedLabel={t.copied} variant="ghost" />}
+                {text && <CopyButton value={text} label={t.copy} copiedLabel={t.copied} variant="elevated" />}
               </ToolActions>
             }
           />

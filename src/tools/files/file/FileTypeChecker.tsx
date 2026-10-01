@@ -4,9 +4,10 @@ import { AlertTriangle, CheckCircle2, Hash, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { formatBytes, formatDate, formatNumber } from "@/i18n/format";
-import { Button } from "@/ui/button";
+import { Button, IconButton } from "@/ui/button";
 import { CopyButton } from "@/ui/copy-button";
 import { Dropzone } from "@/ui/dropzone";
+import { Fold } from "@/ui/fold";
 import { Badge, Panel } from "@/ui/panel";
 import { probeMedia } from "@/tools/files/shared/client";
 import { formatTime } from "@/tools/files/shared/time";
@@ -17,7 +18,7 @@ import { extensionMatches, extOf, sniffFile, type Detected } from "./lib/magic";
 const T = {
   ru: {
     drop: "Перетащите файлы сюда или нажмите, чтобы выбрать",
-    hint: "Файл читается локально: для определения типа хватает первых килобайт",
+    hint: "Тип определяется по содержимому, а не по расширению",
     unknown: "Неизвестный формат",
     unknownHint: "Сигнатура не распознана. Это могут быть зашифрованные или сырые данные либо редкий формат.",
     kinds: { image: "изображение", audio: "аудио", video: "видео", archive: "архив", document: "документ", font: "шрифт", executable: "программа", text: "текст", data: "данные" } as Record<string, string>,
@@ -30,7 +31,6 @@ const T = {
     size: "Размер",
     bytes: "байт",
     modified: "Изменён",
-    created: "Дату создания браузер не сообщает — только дату изменения.",
     dims: "Размер изображения",
     animated: "Анимация",
     yes: "да",
@@ -44,7 +44,7 @@ const T = {
   },
   en: {
     drop: "Drop files here or click to choose",
-    hint: "Files are read locally: the first kilobytes are enough to detect the type",
+    hint: "The type is detected from the content, not the extension",
     unknown: "Unknown format",
     unknownHint: "The signature wasn't recognised. It may be encrypted or raw data, or a rare format.",
     kinds: { image: "image", audio: "audio", video: "video", archive: "archive", document: "document", font: "font", executable: "program", text: "text", data: "data" } as Record<string, string>,
@@ -57,7 +57,6 @@ const T = {
     size: "Size",
     bytes: "bytes",
     modified: "Modified",
-    created: "Browsers don't expose the creation date — only the modification date.",
     dims: "Image size",
     animated: "Animated",
     yes: "yes",
@@ -128,35 +127,33 @@ function Card({ file, locale, onRemove }: { file: File; locale: Locale; onRemove
   rows.push([t.modified, formatDate(locale, new Date(file.lastModified), { dateStyle: "long", timeStyle: "medium" })]);
 
   return (
-    <Panel className="flex flex-col gap-3 p-4">
+    <Panel className="flex min-w-0 flex-col gap-4 p-4 motion-safe:animate-[menu-in_240ms_var(--ease-emph)] sm:p-5">
       <div className="flex items-start gap-3">
         <div className="min-w-0 flex-1">
           <div className="truncate text-sm text-fg-3" title={file.name}>
             {file.name}
           </div>
-          <div className="text-2xl font-semibold text-fg" aria-live="polite">
+          <div className="text-3xl font-bold tracking-tight text-fg" aria-live="polite">
             {!info ? "…" : d ? d.name : t.unknown}
           </div>
           {d && (
-            <div className="mt-1 flex flex-wrap gap-1.5">
+            <div className="mt-2 flex flex-wrap gap-1.5">
               <Badge tone="accent">{t.kinds[d.kind]}</Badge>
               {d.ext && <Badge>.{d.ext}</Badge>}
               <Badge>{t.conf[d.confidence]}</Badge>
             </div>
           )}
         </div>
-        <Button size="icon-sm" variant="ghost" onClick={onRemove} aria-label={`${t.remove}: ${file.name}`} title={t.remove}>
-          <X aria-hidden />
-        </Button>
+        <IconButton size="sm" label={`${t.remove}: ${file.name}`} title={t.remove} icon={<X aria-hidden />} onClick={onRemove} />
       </div>
       {info && !d && <p className="text-sm text-fg-2">{t.unknownHint}</p>}
       {d && d.ext && (
-        <p className={`flex items-center gap-1.5 text-sm ${ok ? "text-ok" : "text-warn"}`}>
-          {ok ? <CheckCircle2 className="size-4" aria-hidden /> : <AlertTriangle className="size-4" aria-hidden />}
+        <p className={`flex items-center gap-2 rounded-[1rem] px-4 py-2.5 text-sm font-medium ${ok ? "bg-ok-soft text-ok" : "bg-warn-soft text-warn"}`}>
+          {ok ? <CheckCircle2 className="size-4 shrink-0" aria-hidden /> : <AlertTriangle className="size-4 shrink-0" aria-hidden />}
           {ok ? t.match : t.mismatch.replace("{e}", d.ext)}
         </p>
       )}
-      <dl className="grid gap-x-4 gap-y-1 text-sm sm:grid-cols-[max-content_1fr]">
+      <dl className="grid gap-x-4 gap-y-1.5 text-sm sm:grid-cols-[max-content_1fr]">
         {rows.map(([k, v]) => (
           <div key={k} className="contents">
             <dt className="text-fg-3">{k}</dt>
@@ -164,15 +161,13 @@ function Card({ file, locale, onRemove }: { file: File; locale: Locale; onRemove
           </div>
         ))}
       </dl>
-      <p className="text-[0.8125rem] text-fg-3">{t.created}</p>
       {info && (
-        <details className="text-sm">
-          <summary className="cursor-pointer text-fg-3 hover:text-fg">{t.hex}</summary>
-          <div className="mt-2 flex items-start gap-2">
-            <pre className="min-w-0 flex-1 overflow-x-auto rounded-[0.5rem] bg-surface-2 p-3 font-mono text-[0.75rem] leading-relaxed text-fg">{info.hex}</pre>
+        <Fold variant="inline" title={t.hex} className="text-sm">
+          <div className="flex items-start gap-2">
+            <pre className="min-w-0 flex-1 overflow-x-auto rounded-[1rem] bg-surface-2 p-3 font-mono text-[0.75rem] leading-relaxed text-fg">{info.hex}</pre>
             <CopyButton value={info.hex} showLabel={false} size="icon-sm" variant="ghost" label={locale === "ru" ? "Копировать" : "Copy"} copiedLabel={locale === "ru" ? "Скопировано" : "Copied"} />
           </div>
-        </details>
+        </Fold>
       )}
       <Hashes file={file} locale={locale} />
     </Panel>
@@ -225,7 +220,7 @@ function Hashes({ file, locale }: { file: File; locale: Locale }) {
   return (
     <div className="flex flex-col gap-2">
       {!job.running && (
-        <Button variant="ghost" size="sm" className="self-start text-accent" onClick={run}>
+        <Button variant="tonal" size="sm" className="self-start" onClick={run}>
           <Hash aria-hidden />
           {t.hash}
         </Button>
@@ -242,10 +237,14 @@ export default function FileTypeChecker({ locale }: { locale: Locale }) {
   const [files, setFiles] = useState<{ id: number; file: File }[]>([]);
   return (
     <div className="flex flex-col gap-4">
-      <Dropzone multiple onFiles={(fs) => setFiles((l) => [...fs.map((file) => ({ id: ++seq, file })), ...l])} title={t.drop} hint={t.hint} compact={files.length > 0} />
-      {files.map((f) => (
-        <Card key={f.id} file={f.file} locale={locale} onRemove={() => setFiles((l) => l.filter((x) => x.id !== f.id))} />
-      ))}
+      <Dropzone multiple locale={locale} onFiles={(fs) => setFiles((l) => [...fs.map((file) => ({ id: ++seq, file })), ...l])} title={t.drop} hint={t.hint} compact={files.length > 0} />
+      {files.length > 0 && (
+        <div className={files.length > 1 ? "grid items-start gap-4 lg:grid-cols-2 lg:gap-6" : "flex flex-col"}>
+          {files.map((f) => (
+            <Card key={f.id} file={f.file} locale={locale} onRemove={() => setFiles((l) => l.filter((x) => x.id !== f.id))} />
+          ))}
+        </div>
+      )}
     </div>
   );
 }

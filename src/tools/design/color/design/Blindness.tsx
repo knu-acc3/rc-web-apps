@@ -3,19 +3,19 @@
 import { useEffect, useId, useRef, useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { Dropzone } from "@/ui/dropzone";
-import { Slider, Textarea } from "@/ui/field";
+import { Textarea } from "@/ui/field";
 import { Notice, Panel } from "@/ui/panel";
 import { Segmented } from "@/ui/segmented";
 import { Tabs } from "@/ui/tabs";
 import { parseColor, readableTextColor, toHex, type Color } from "../lib/color";
 import { CVD_TYPES, cvdMatrix, simulate, type CvdType } from "./lib/cvd";
+import { NumberSlider } from "@/tools/design/css/ui/kit";
 
 const T = {
   ru: {
     type: "Тип нарушения",
     types: { protanopia: "Протанопия", deuteranopia: "Дейтеранопия", tritanopia: "Тританопия", achromatopsia: "Ахроматопсия" } as Record<CvdType, string>,
     severity: "Выраженность",
-    full: "полная",
     mode: "Что проверять",
     palette: "Палитра",
     image: "Изображение",
@@ -33,7 +33,6 @@ const T = {
     type: "Deficiency type",
     types: { protanopia: "Protanopia", deuteranopia: "Deuteranopia", tritanopia: "Tritanopia", achromatopsia: "Achromatopsia" } as Record<CvdType, string>,
     severity: "Severity",
-    full: "full",
     mode: "What to check",
     palette: "Palette",
     image: "Image",
@@ -80,16 +79,10 @@ export default function BlindnessSimulator({ locale, type: type0 = "deuteranopia
   return (
     <div className="flex flex-col gap-4">
       <Panel className="flex flex-col gap-3 p-4 sm:p-5">
-        <Segmented label={t.type} value={type} onChange={setType} options={CVD_TYPES.map((x) => ({ value: x, label: t.types[x] }))} wrap />
-        {type !== "achromatopsia" && (
-          <div className="flex max-w-md items-center gap-3">
-            <label htmlFor={`${id}-sev`} className="shrink-0 text-sm text-fg-3">
-              {t.severity}
-            </label>
-            <Slider id={`${id}-sev`} min={10} max={100} step={10} value={severity} onChange={(e) => setSeverity(Number(e.target.value))} />
-            <span className="tabular w-14 shrink-0 text-sm text-fg-2">{severity === 100 ? t.full : `${severity} %`}</span>
-          </div>
-        )}
+        <div className="grid items-end gap-x-8 gap-y-4 lg:grid-cols-[auto_minmax(0,1fr)]">
+          <Segmented label={t.type} value={type} onChange={setType} options={CVD_TYPES.map((x) => ({ value: x, label: t.types[x] }))} />
+          {type !== "achromatopsia" && <NumberSlider label={t.severity} value={severity} min={10} max={100} step={10} unit="%" onChange={(v) => setSeverity(Math.min(100, Math.max(0, v)))} />}
+        </div>
       </Panel>
 
       <Tabs
@@ -108,7 +101,7 @@ export default function BlindnessSimulator({ locale, type: type0 = "deuteranopia
             <label htmlFor={`${id}-list`} className="text-sm font-medium text-fg-2">
               {t.colors}
             </label>
-            <Textarea id={`${id}-list`} value={text} onChange={(e) => setText(e.target.value)} rows={8} />
+            <Textarea id={`${id}-list`} value={text} onChange={(e) => setText(e.target.value)} rows={8} className="max-sm:text-base" />
             {bad > 0 && <p className="text-sm text-warn">{t.invalid(bad)}</p>}
           </div>
           <div className="flex flex-col gap-3">
@@ -128,7 +121,7 @@ function Strip({ title, colors, big = false }: { title: string; colors: Color[];
   return (
     <section>
       <h2 className="mb-1.5 text-sm font-semibold text-fg-2">{title}</h2>
-      <ul className="grid overflow-hidden rounded-[0.625rem] border border-line" style={{ gridTemplateColumns: `repeat(${Math.max(1, colors.length)}, minmax(0, 1fr))` }}>
+      <ul className="grid overflow-hidden rounded-[1rem] shadow-card" style={{ gridTemplateColumns: `repeat(${Math.max(1, colors.length)}, minmax(0, 1fr))` }}>
         {colors.map((c, i) => (
           <li key={i} className={big ? "flex h-28 items-end justify-center pb-2" : "flex h-16 items-end justify-center pb-1.5"} style={{ background: toHex(c), color: readableTextColor(c) }}>
             <span className="font-mono text-[0.6875rem] font-medium">{toHex(c).slice(1, 7)}</span>
@@ -216,11 +209,11 @@ function ImageMode({ type, severity, t }: { type: CvdType; severity: number; t: 
       <div className={size ? "grid gap-3 md:grid-cols-2" : "hidden"}>
         <figure className="min-w-0">
           <figcaption className="mb-1.5 text-sm font-semibold text-fg-2">{t.original}</figcaption>
-          <canvas ref={origRef} className="h-auto w-full rounded-[0.625rem] border border-line" aria-label={t.original} role="img" />
+          <canvas ref={origRef} className="h-auto w-full rounded-[1rem] shadow-card" aria-label={t.original} role="img" />
         </figure>
         <figure className="min-w-0">
           <figcaption className="mb-1.5 text-sm font-semibold text-fg-2">{t.types[type]}</figcaption>
-          <canvas ref={simRef} className="h-auto w-full rounded-[0.625rem] border border-line" aria-label={t.types[type]} role="img" />
+          <canvas ref={simRef} className="h-auto w-full rounded-[1rem] shadow-card" aria-label={t.types[type]} role="img" />
         </figure>
       </div>
     </div>

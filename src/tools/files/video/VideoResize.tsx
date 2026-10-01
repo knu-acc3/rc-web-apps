@@ -1,15 +1,15 @@
 "use client";
 
 import { Crop } from "lucide-react";
-import { useId, useState } from "react";
+import { useState } from "react";
 import type { Locale } from "@/i18n/config";
-import { Field, Select } from "@/ui/field";
 import { Segmented } from "@/ui/segmented";
 import { aspectPlan, longSideFor, parseAspect, type AspectMode } from "../shared/aspect";
 import { runJob } from "../shared/client";
 import { outputName, type JobResult } from "../shared/spec";
 import { VIDEO_ACCEPT } from "./ui/FilePicker";
 import { useJob, useProbe } from "./ui/hooks";
+import { Setting } from "./ui/options";
 import { JobProgress } from "./ui/Progress";
 import { ResultCard } from "./ui/ResultCard";
 import { UI } from "./ui/strings";
@@ -25,7 +25,8 @@ const T = {
     crop: "Обрезать края",
     fit: "Вписать с полями",
     size: "Качество",
-    keep: "Максимальное",
+    keep: "Макс.",
+    keepTitle: "Максимальное: без уменьшения",
     out: "Размер на выходе",
     run: "Изменить размер",
     preview: "Предпросмотр видео",
@@ -36,7 +37,8 @@ const T = {
     crop: "Crop edges",
     fit: "Fit with bars",
     size: "Quality",
-    keep: "Maximum",
+    keep: "Max",
+    keepTitle: "Maximum: no downscaling",
     out: "Output size",
     run: "Resize video",
     preview: "Video preview",
@@ -45,7 +47,6 @@ const T = {
 
 function VideoResizeInner({ locale, aspect: aspect0 = "9:16" }: { locale: Locale; aspect?: string }) {
   const t = T[locale];
-  const id = useId();
   const [file, setFile] = useState<File | null>(null);
   const probe = useProbe(file);
   const job = useJob<JobResult>();
@@ -95,8 +96,11 @@ function VideoResizeInner({ locale, aspect: aspect0 = "9:16" }: { locale: Locale
               )}
             </div>
             {plan && (
-              <p className="text-center text-fg-2" aria-live="polite">
-                {t.out}: <span className="tabular text-2xl font-semibold text-fg">{plan.width}×{plan.height}</span>
+              <p className="flex flex-wrap items-baseline justify-center gap-x-2 text-fg-2" aria-live="polite">
+                <span className="text-sm text-fg-3">{t.out}</span>
+                <span className="tabular text-2xl font-bold tracking-tight text-fg">
+                  {plan.width}×{plan.height}
+                </span>
               </p>
             )}
           </div>
@@ -104,43 +108,47 @@ function VideoResizeInner({ locale, aspect: aspect0 = "9:16" }: { locale: Locale
       }
       options={
         <>
-          <Segmented
-            label={t.aspect}
-            value={aspect as (typeof ASPECTS)[number]}
-            onChange={(x) => {
-              setAspect(x);
-              changed();
-            }}
-            options={ASPECTS.map((a) => ({ value: a, label: a }))}
-          />
-          <Segmented
-            label={t.mode}
-            value={mode}
-            onChange={(x) => {
-              setMode(x);
-              changed();
-            }}
-            options={[
-              { value: "crop", label: t.crop },
-              { value: "fit", label: t.fit },
-            ]}
-          />
-          <Field label={t.size} htmlFor={`${id}-q`} className="w-40">
-            <Select
-              id={`${id}-q`}
-              size="sm"
-              value={String(preset)}
-              onChange={(e) => {
-                setPreset(Number(e.target.value));
+          <Setting label={t.aspect}>
+            <Segmented
+              label={t.aspect}
+              value={aspect as (typeof ASPECTS)[number]}
+              onChange={(x) => {
+                setAspect(x);
                 changed();
               }}
-            >
-              <option value="1080">1080p</option>
-              <option value="720">720p</option>
-              <option value="480">480p</option>
-              <option value="0">{t.keep}</option>
-            </Select>
-          </Field>
+              options={ASPECTS.map((a) => ({ value: a, label: a }))}
+            />
+          </Setting>
+          <Setting label={t.mode}>
+            <Segmented
+              label={t.mode}
+              value={mode}
+              onChange={(x) => {
+                setMode(x);
+                changed();
+              }}
+              options={[
+                { value: "crop", label: t.crop },
+                { value: "fit", label: t.fit },
+              ]}
+            />
+          </Setting>
+          <Setting label={t.size}>
+            <Segmented
+              label={t.size}
+              value={String(preset) as "1080" | "720" | "480" | "0"}
+              onChange={(x) => {
+                setPreset(Number(x));
+                changed();
+              }}
+              options={[
+                { value: "1080", label: "1080p" },
+                { value: "720", label: "720p" },
+                { value: "480", label: "480p" },
+                { value: "0", label: t.keep, title: t.keepTitle },
+              ]}
+            />
+          </Setting>
         </>
       }
       action={{ label: t.run, onClick: run, disabled: !plan, icon: <Crop aria-hidden /> }}

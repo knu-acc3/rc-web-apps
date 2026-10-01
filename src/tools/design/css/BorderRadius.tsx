@@ -1,10 +1,11 @@
 "use client";
 
 import { Shuffle } from "lucide-react";
-import { useId, useState } from "react";
+import { useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { Button } from "@/ui/button";
-import { Checkbox, Field, Input, Select } from "@/ui/field";
+import { Field, Input, Switch } from "@/ui/field";
+import { Fold } from "@/ui/fold";
 import { Panel } from "@/ui/panel";
 import { Segmented } from "@/ui/segmented";
 import { randomFloat } from "@/tools/random/random/lib/rng";
@@ -19,7 +20,7 @@ const T = {
     blob: "Блоб",
     all: "Все углы",
     link: "Одинаковые углы",
-    elliptical: "Эллиптические углы (значения через /)",
+    elliptical: "Эллиптические углы",
     corner: ["Верхний левый", "Верхний правый", "Нижний правый", "Нижний левый"],
     horizontal: "по горизонтали",
     vertical: "по вертикали",
@@ -35,7 +36,7 @@ const T = {
     blob: "Blob",
     all: "All corners",
     link: "Same radius for all corners",
-    elliptical: "Elliptical corners (values with /)",
+    elliptical: "Elliptical corners",
     corner: ["Top left", "Top right", "Bottom right", "Bottom left"],
     horizontal: "horizontal",
     vertical: "vertical",
@@ -54,7 +55,6 @@ const DEFAULT_BLOB: Radii = parseRadius("30% 70% 70% 30% / 30% 30% 70% 70%")!;
 
 export default function BorderRadiusGenerator({ locale, mode: mode0 = "corners" }: { locale: Locale; mode?: "corners" | "blob" }) {
   const t = T[locale];
-  const id = useId();
   const [mode, setMode] = useState<"corners" | "blob">(mode0);
   const [unit, setUnit] = useState<Unit>(mode0 === "blob" ? "%" : "px");
   const [linked, setLinked] = useState(true);
@@ -99,49 +99,44 @@ export default function BorderRadiusGenerator({ locale, mode: mode0 = "corners" 
             style={{ borderRadius: value, background: mode === "blob" ? "linear-gradient(135deg, #6366f1, #ec4899)" : "#6366f1", transition: "border-radius 0.4s ease" }}
           />
         </Stage>
-        <Panel className="flex flex-col gap-3 p-4">
+        <Panel className="flex flex-col gap-4 p-4 sm:p-5">
           <Segmented
             label={t.mode}
             value={mode}
             onChange={switchMode}
+            fill
             options={[
               { value: "corners", label: t.corners },
               { value: "blob", label: t.blob },
             ]}
           />
           {mode === "blob" ? (
-            <Button variant="primary" onClick={() => setR(blobRadii(randomFloat))} className="self-start">
+            <Button variant="filled" size="lg" onClick={() => setR(blobRadii(randomFloat))} fullWidth>
               <Shuffle aria-hidden />
               {t.random}
             </Button>
           ) : (
             <>
-              <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-                <Checkbox label={t.link} checked={linked} onChange={(e) => setLinked(e.target.checked)} />
-                <Checkbox label={t.elliptical} checked={elliptical} onChange={(e) => setElliptical(e.target.checked)} />
+              <div className="flex flex-wrap items-center gap-x-5 gap-y-1">
+                <Switch label={t.link} checked={linked} onChange={(e) => setLinked(e.target.checked)} />
+                <Switch label={t.elliptical} checked={elliptical} onChange={(e) => setElliptical(e.target.checked)} />
               </div>
-              <div className="flex items-center gap-2">
-                <label htmlFor={`${id}-u`} className="text-sm text-fg-2">
-                  {t.unit}
-                </label>
-                <Select
-                  id={`${id}-u`}
-                  value={unit}
-                  size="sm"
-                  className="w-24"
-                  onChange={(e) => {
-                    const u = e.target.value as Unit;
-                    setUnit(u);
-                    setR((prev) => ({ h: prev.h.map((l) => L(l.value, u)) as Radii["h"], v: prev.v.map((l) => L(l.value, u)) as Radii["v"] }));
-                  }}
-                >
-                  <option value="px">px</option>
-                  <option value="%">%</option>
-                  <option value="rem">rem</option>
-                </Select>
-              </div>
+              <Segmented
+                label={t.unit}
+                value={unit}
+                size="sm"
+                onChange={(u) => {
+                  setUnit(u);
+                  setR((prev) => ({ h: prev.h.map((l) => L(l.value, u)) as Radii["h"], v: prev.v.map((l) => L(l.value, u)) as Radii["v"] }));
+                }}
+                options={[
+                  { value: "px", label: "px" },
+                  { value: "%", label: "%" },
+                  { value: "rem", label: "rem" },
+                ]}
+              />
               {(linked ? [0] : [0, 1, 2, 3]).map((i) => (
-                <div key={i} className="flex flex-col gap-2">
+                <div key={i} className="flex flex-col gap-4">
                   <NumberSlider
                     label={`${linked ? t.all : t.corner[i]}${elliptical ? ` — ${t.horizontal}` : ""}`}
                     value={r.h[i].value}
@@ -166,21 +161,22 @@ export default function BorderRadiusGenerator({ locale, mode: mode0 = "corners" 
               ))}
             </>
           )}
-          <Field label={t.paste} htmlFor={`${id}-p`} error={pasteBad ? t.invalid : undefined}>
-            <Input
-              id={`${id}-p`}
-              value={paste}
-              placeholder="12px 24px / 8px"
-              className="font-mono"
-              autoComplete="off"
-              size="sm"
-              onChange={(e) => {
-                setPaste(e.target.value);
-                const p = parseRadius(e.target.value);
-                if (p) setR(p);
-              }}
-            />
-          </Field>
+          <Fold variant="inline" title={t.paste}>
+            <Field error={pasteBad ? t.invalid : undefined}>
+              <Input
+                aria-label={t.paste}
+                value={paste}
+                placeholder="12px 24px / 8px"
+                className="font-mono"
+                autoComplete="off"
+                onChange={(e) => {
+                  setPaste(e.target.value);
+                  const p = parseRadius(e.target.value);
+                  if (p) setR(p);
+                }}
+              />
+            </Field>
+          </Fold>
         </Panel>
       </div>
       <CodePanel locale={locale} tabs={[{ id: "css", label: "CSS", code: `border-radius: ${value};`, filename: "border-radius.css" }]} minRows={2} />

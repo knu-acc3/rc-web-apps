@@ -3,8 +3,11 @@
 import { useId, useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { formatNumber, parseNumber } from "@/i18n/format";
-import { Field, Input, Select } from "@/ui/field";
+import { Field, Select } from "@/ui/field";
+import { Fold } from "@/ui/fold";
+import { NumberInput } from "@/ui/number-input";
 import { Panel } from "@/ui/panel";
+import { ScrollRow } from "@/ui/scroll-row";
 import { Segmented } from "@/ui/segmented";
 import { ResultTiles, plainSpaces } from "../ui/kit";
 import { MEN, SHIRTS, WOMEN, menByMeasure, shirtByNeck, span, womenByMeasure, type ClothingChart } from "./data";
@@ -160,67 +163,71 @@ export default function ClothingSize({ locale, chart: c0 = "women-tops", ru, col
 
   return (
     <Panel className="p-4 sm:p-6">
-      <Segmented
-        size="sm"
-        label={t.chart}
-        value={chart}
-        onChange={changeChart}
-        options={(Object.keys(t.charts) as ClothingChart[]).map((k) => ({ value: k, label: t.charts[k] }))}
-      />
+      <Segmented label={t.chart} value={chart} onChange={changeChart} options={(Object.keys(t.charts) as ClothingChart[]).map((k) => ({ value: k, label: t.charts[k] }))} />
 
-      <div className="mt-4 grid grid-cols-2 gap-3 sm:max-w-md">
-        <Field label={t.system} htmlFor={`${id}-s`}>
-          <Select id={`${id}-s`} value={col.key} onChange={(e) => setSys(e.target.value)} size="lg">
-            {cols.map((c) => (
-              <option key={c.key} value={c.key}>
-                {c.label[locale]}
-              </option>
-            ))}
-          </Select>
-        </Field>
-        <Field label={t.size} htmlFor={`${id}-v`}>
-          <Select
-            id={`${id}-v`}
-            value={String(row)}
-            onChange={(e) => {
-              setIdx(Number(e.target.value));
-              setM({ a: "", waist: "", hips: "" });
-            }}
-            size="lg"
-          >
-            {Array.from({ length: rowsCount(chart) }, (_, k) => (
-              <option key={k} value={String(k)}>
-                {col.get(k)}
-              </option>
-            ))}
-          </Select>
-        </Field>
-      </div>
+      <div className="mt-5 grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-8">
+        <div className="flex min-w-0 flex-col gap-4">
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+            <label htmlFor={`${id}-s`} className="text-sm font-medium text-fg-2">
+              {t.system}
+            </label>
+            <Select id={`${id}-s`} value={col.key} onChange={(e) => setSys(e.target.value)} variant="tonal" fit="selected" size="lg">
+              {cols.map((c) => (
+                <option key={c.key} value={c.key}>
+                  {c.label[locale]}
+                </option>
+              ))}
+            </Select>
+          </div>
+          <div className="min-w-0">
+            <div id={`${id}-v`} className="mb-1 text-sm font-medium text-fg-2">
+              {t.size}
+            </div>
+            <ScrollRow label={t.size} role="radiogroup" rowClassName="gap-1.5">
+              {Array.from({ length: rowsCount(chart) }, (_, k) => (
+                <button
+                  key={k}
+                  type="button"
+                  role="radio"
+                  aria-checked={k === row}
+                  onClick={() => {
+                    setIdx(k);
+                    setM({ a: "", waist: "", hips: "" });
+                  }}
+                  className="chip tabular min-w-12 justify-center text-base!"
+                >
+                  {col.get(k)}
+                </button>
+              ))}
+            </ScrollRow>
+          </div>
 
-      <div className="mt-5" aria-live="polite">
-        <ResultTiles items={cols.filter((c) => c.key !== col.key).map((c) => ({ label: c.label[locale], value: c.get(row) }))} />
-        {body && <p className="tabular mt-3 text-sm text-fg-2">{body}</p>}
-      </div>
-
-      <details className="group mt-5 border-t border-line pt-4">
-        <summary className="text-sm font-medium text-accent">{t.byMeasure}</summary>
-        <div className="mt-3 grid max-w-md grid-cols-2 gap-3">
-          {measureFields.map((f) => (
-            <Field key={f.key} label={f.label} htmlFor={`${id}-${f.key}`}>
-              <Input
-                id={`${id}-${f.key}`}
-                inputMode="decimal"
-                autoComplete="off"
-                value={m[f.key]}
-                onChange={(e) => setM({ ...m, [f.key]: e.target.value })}
-                className="tabular"
-              />
-            </Field>
-          ))}
+          <Fold variant="inline" title={t.byMeasure}>
+            <div className="grid grid-cols-2 gap-3 sm:max-w-md">
+              {measureFields.map((f) => (
+                <Field key={f.key} label={f.label} htmlFor={`${id}-${f.key}`}>
+                  <NumberInput
+                    id={`${id}-${f.key}`}
+                    locale={locale}
+                    value={num(m[f.key]) ?? null}
+                    onChange={(v) => setM({ ...m, [f.key]: v === null ? "" : String(v) })}
+                    min={0}
+                    max={200}
+                    decimals={1}
+                  />
+                </Field>
+              ))}
+            </div>
+            {anyMeasure && found === null && <p className="mt-2 text-sm text-err">{t.outOfRange}</p>}
+          </Fold>
         </div>
-        {anyMeasure && found === null && <p className="mt-2 text-sm text-err">{t.outOfRange}</p>}
-      </details>
-      <p className="mt-4 text-sm text-fg-3">{t.note}</p>
+
+        <div className="min-w-0" aria-live="polite">
+          <ResultTiles items={cols.filter((c) => c.key !== col.key).map((c) => ({ label: c.label[locale], value: c.get(row) }))} className="lg:grid-cols-3!" />
+          {body && <p className="tabular mt-3 text-sm text-fg-2">{body}</p>}
+        </div>
+      </div>
+      <p className="mt-5 text-sm text-fg-3">{t.note}</p>
     </Panel>
   );
 }
