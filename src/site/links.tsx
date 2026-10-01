@@ -32,7 +32,7 @@ export function LinkChips({ items, locale, className, limit }: { items: LinkItem
       </ul>
       {rest.length > 0 && (
         <details className="group mt-2">
-          <summary className="inline-flex min-h-9 items-center gap-1.5 rounded-full px-1 text-sm font-medium text-accent hover:underline group-open:hidden">
+          <summary className="btn btn-tonal h-9 px-4 text-sm [--btn-r:1.125rem] group-open:hidden">
             {ui(locale).showAllCount} · {items.length}
           </summary>
           <ul className="flex flex-wrap gap-2">

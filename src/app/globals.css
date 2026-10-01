@@ -1033,6 +1033,7 @@ dialog:not([open]) {
     pointer-events: none;
   }
   .chip[aria-current="page"],
+  .chip[aria-current="true"],
   .chip[aria-pressed="true"],
   .chip[aria-checked="true"],
   .chip.is-on {

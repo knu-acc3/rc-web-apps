@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
+import { PDFDocument, StandardFonts } from "@cantoo/pdf-lib";
 
 /** One representative page per section (tools, variants, catalogues) + home and static pages. */
 const SAMPLE = [
@@ -11,7 +12,7 @@ const SAMPLE = [
   "color", "color-picker", "css", "box-shadow-generator", "json-formatter", "json-to-csv", "regex", "cron", "base64-encode",
   "hash-generator", "uuid-generator", "jwt-decoder", "http-status", "http-status/404", "mime", "port", "password-generator",
   "qr-code-generator", "iban-validator", "subnet-calculator", "meta-tag-generator", "microphone-test", "keyboard-test",
-  "what-is-my-browser", "about/privacy",
+  "what-is-my-browser", "about/privacy", "scoreboard/basketball", "counter", "draw-lots", "crop-image", "retirement-calculator",
 ];
 const PAGES = ["/ru", "/en", ...SAMPLE.map((p) => `/ru/${p}`), "/en/celsius-to-fahrenheit", "/en/merge-pdf", "/en/emoji"];
 
@@ -36,6 +37,38 @@ test("unit converter computes live", async ({ page }) => {
   await expect(page.getByLabel("Результат", { exact: true })).toHaveValue("6,213712");
 });
 
+/** A small PDF with one form field, made on the fly. */
+async function samplePdf(): Promise<Buffer> {
+  const doc = await PDFDocument.create();
+  const font = await doc.embedFont(StandardFonts.Helvetica);
+  const page = doc.addPage([595, 842]);
+  page.drawText("Sample", { x: 60, y: 760, size: 32, font });
+  doc.getForm().createTextField("name").addToPage(page, { x: 60, y: 300, width: 200, height: 24 });
+  return Buffer.from(await doc.save());
+}
+
+// The service worker once answered Web Worker scripts from its cache, which dropped Turbopack's "#params" and left
+// every PDF/photo/video worker empty ("Не удалось обработать файл"). Check a PDF tool with the worker in control.
+test("PDF tools work under the service worker", async ({ page }) => {
+  await page.goto("/ru/fill-pdf-form");
+  await page.evaluate(async () => {
+    await navigator.serviceWorker.register("/sw.js");
+    await navigator.serviceWorker.ready;
+  });
+  await page.reload();
+  await expect.poll(() => page.evaluate(() => !!navigator.serviceWorker.controller)).toBe(true);
+  await page.locator('input[type="file"]').first().setInputFiles({ name: "form.pdf", mimeType: "application/pdf", buffer: await samplePdf() });
+  await expect(page.getByLabel("name")).toBeVisible({ timeout: 30_000 });
+  await expect(page.getByText("Не удалось обработать файл")).toHaveCount(0);
+});
+
+test("a Select keeps working as a native list", async ({ page }) => {
+  await page.goto("/ru/kilometers-to-miles");
+  const unit = page.getByLabel("Единица результата");
+  await unit.selectOption({ index: 0 });
+  await expect(unit).toBeVisible();
+});
+
 test("live search finds a page", async ({ page }) => {
   await page.goto("/ru");
   await page.getByRole("combobox").first().fill("мили");
@@ -48,7 +81,7 @@ test("unknown pages get the site's 404 page", async ({ page }) => {
   await expect(page.locator("h1")).toHaveText("Страница не найдена");
 });
 
-const AXE_PAGES = ["/ru", "/ru/merge-pdf", "/ru/word-counter", "/ru/emoji", "/ru/timer/5-minutes", "/ru/percentage-calculator", "/ru/color-picker", "/ru/json-formatter", "/ru/password-generator", "/ru/microphone-test", "/ru/kilometers-to-miles", "/ru/spin-the-wheel"];
+const AXE_PAGES = ["/ru", "/ru/merge-pdf", "/ru/word-counter", "/ru/emoji", "/ru/timer/5-minutes", "/ru/percentage-calculator", "/ru/color-picker", "/ru/json-formatter", "/ru/password-generator", "/ru/microphone-test", "/ru/kilometers-to-miles", "/ru/spin-the-wheel", "/ru/compress-image", "/ru/scoreboard", "/ru/retirement-calculator", "/ru/counter"];
 for (const path of AXE_PAGES) {
   test(`no serious accessibility violations on ${path}`, async ({ page }) => {
     await page.goto(path);

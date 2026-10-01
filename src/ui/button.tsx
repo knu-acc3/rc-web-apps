@@ -13,7 +13,7 @@ import { cn } from "@/lib/cn";
  *  - danger   — deleting things
  * Old names still work: primary → filled, secondary → tonal, outline → outlined, ghost → text (neutral for icons).
  */
-export type ButtonVariant = "filled" | "tonal" | "outlined" | "text" | "neutral" | "elevated" | "danger" | "primary" | "secondary" | "ghost" | "outline";
+type ButtonVariant = "filled" | "tonal" | "outlined" | "text" | "neutral" | "elevated" | "danger" | "primary" | "secondary" | "ghost" | "outline";
 type Size = "sm" | "md" | "lg" | "xl" | "icon" | "icon-sm" | "icon-lg";
 
 const VARIANT: Record<ButtonVariant, string> = {
