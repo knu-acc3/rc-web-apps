@@ -343,7 +343,46 @@ export const imageSection = defineToolSection({
     }),
     tool("censor", "image/censor", "EyeOff", { related: ["photo-filters/pixelate", "photo-filters/blur", "exif-viewer", "crop-image"] }),
     tool("watermark", "image/watermark", "Stamp", { popular: true, related: ["add-text-to-image", "compress-image", "resize-image"] }),
-    tool("add-text", "image/add-text", "Type", { related: ["add-watermark", "photo-collage", "add-border-to-image"] }),
+    tool("add-text", "image/add-text", "Type", {
+      related: ["add-watermark", "photo-collage", "add-border-to-image"],
+      variants: {
+        title: L("Ещё", "More"),
+        list: (): VariantDef[] => [
+          {
+            slug: "date",
+            name: L("Дата на фото", "Date stamp"),
+            title: L("Поставить дату на фото онлайн | как на плёночном фотоаппарате", "Add a Date Stamp to a Photo — Film Camera Style"),
+            h1: L("Дата на фото онлайн", "Add a date to a photo"),
+            description: L(
+              "Поставьте на фото дату съёмки оранжевыми цифрами, как на плёночной «мыльнице». Дата берётся из EXIF, её можно поменять. Без регистрации и водяных знаков.",
+              "Stamp the shooting date on a photo in orange digits, like an old point-and-shoot film camera. The date comes from EXIF and can be changed. No sign-up, no watermark.",
+            ),
+            lead: L("Загрузите фото — дата съёмки появится в углу, как на снимках из 90-х.", "Upload a photo — the shooting date appears in the corner, like a 90s print."),
+            props: { mode: "date" },
+            blocks: (l) => [
+              {
+                type: "facts",
+                title: l === "ru" ? "Варианты даты" : "Date styles",
+                rows: [
+                  [l === "ru" ? "Как на плёночном фотоаппарате" : "Film camera", "’24 10 01"],
+                  [l === "ru" ? "Только дата" : "Date only", "01.10.2024"],
+                  [l === "ru" ? "Дата и время" : "Date and time", "01.10.2024 14:35"],
+                ],
+              },
+              {
+                type: "text",
+                title: l === "ru" ? "Откуда берётся дата" : "Where the date comes from",
+                paragraphs: [
+                  l === "ru"
+                    ? "Телефоны и фотоаппараты записывают в файл дату и время съёмки (тег EXIF DateTimeOriginal). Если фото пересылали через мессенджер, эти данные обычно стираются — тогда подставляется дата файла, и её можно исправить вручную."
+                    : "Phones and cameras store the shooting date and time in the file (the EXIF DateTimeOriginal tag). Messengers usually strip it when sending — then the file date is used, and you can correct it by hand.",
+                ],
+              },
+            ],
+          },
+        ],
+      },
+    }),
     tool("collage", "image/collage", "LayoutGrid", { related: ["split-image", "make-image-square", "gif-maker"] }),
     tool("split", "image/split", "Scissors", { related: ["photo-collage", "crop-image", "make-image-square"] }),
     tool("square", "image/decorate", "Square", {

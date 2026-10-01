@@ -25,3 +25,13 @@ describe("document photos", () => {
     expect(left).toBeCloseTo(right, 6);
   });
 });
+
+import { stampText } from "@/sections/image/tools/AddText";
+describe("date stamp", () => {
+  it("formats like a film camera and as plain dates", () => {
+    const d = new Date(2024, 9, 1, 14, 35);
+    expect(stampText(d, "camera")).toBe("’24 10 01");
+    expect(stampText(d, "dmy")).toBe("01.10.2024");
+    expect(stampText(d, "dmyhm")).toBe("01.10.2024 14:35");
+  });
+});

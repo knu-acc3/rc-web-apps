@@ -57,6 +57,12 @@ const T = {
     quoteText: "«Лучший способ предсказать будущее — создать его»",
     author: "— Питер Друкер",
     download: "Скачать картинку",
+    date: "Дата на фото",
+    when: "Дата и время",
+    style: "Вид",
+    styles: { camera: "’24 10 01", dmy: "01.10.2024", dmyhm: "01.10.2024 14:35" },
+    fromExif: "Дата съёмки взята из EXIF фотографии.",
+    fromFile: "В фото нет даты съёмки — взята дата файла. Её можно поменять.",
   },
   en: {
     mode: "Mode",
@@ -94,8 +100,45 @@ const T = {
     quoteText: "“The best way to predict the future is to create it”",
     author: "— Peter Drucker",
     download: "Download image",
+    date: "Date stamp",
+    when: "Date and time",
+    style: "Style",
+    styles: { camera: "’24 10 01", dmy: "01.10.2024", dmyhm: "01.10.2024 14:35" },
+    fromExif: "The shooting date comes from the photo's EXIF.",
+    fromFile: "The photo has no shooting date — the file date is used. You can change it.",
   },
 } as const;
+
+type DateStyle = "camera" | "dmy" | "dmyhm";
+const p2 = (n: number) => String(n).padStart(2, "0");
+/** The date as old film cameras printed it ('24 10 01) or as plain digits. */
+export function stampText(d: Date, style: DateStyle): string {
+  const y = d.getFullYear();
+  if (style === "camera") return `’${String(y).slice(2)} ${p2(d.getMonth() + 1)} ${p2(d.getDate())}`;
+  const dmy = `${p2(d.getDate())}.${p2(d.getMonth() + 1)}.${y}`;
+  return style === "dmy" ? dmy : `${dmy} ${p2(d.getHours())}:${p2(d.getMinutes())}`;
+}
+
+/** Orange digits in the bottom-right corner, like a film camera's date back. */
+const DATE_BLOCK: TextBlock & { fontId: string } = {
+  text: "",
+  fontId: "courier",
+  font: "'Courier New', Courier, monospace",
+  size: 4.5,
+  color: "#FF8A1F",
+  stroke: "#000000",
+  strokeWidth: 0,
+  align: "right",
+  // x is the centre of a box maxWidth wide: its right edge sits 5 % from the photo's edge.
+  x: 0.65,
+  y: 0.95,
+  anchor: "bottom",
+  maxWidth: 60,
+  bold: true,
+  shadow: true,
+};
+
+const toLocalInput = (d: Date) => `${d.getFullYear()}-${p2(d.getMonth() + 1)}-${p2(d.getDate())}T${p2(d.getHours())}:${p2(d.getMinutes())}`;
 
 type B = TextBlock & { fontId: string };
 
@@ -160,22 +203,48 @@ function BlockEditor({ b, set, locale, compact }: { b: B; set: (p: Partial<B>) =
   );
 }
 
-export default function AddText({ locale }: { locale: Locale }) {
+export default function AddText({ locale, mode: mode0 = "photo" }: { locale: Locale; mode?: "photo" | "quote" | "date" }) {
   const t = T[locale];
   const s = S(locale);
   const id = useId();
   const getEngine = useEngine();
-  const [mode, setMode] = useState<"photo" | "quote">("photo");
+  const [mode, setMode] = useState<"photo" | "quote" | "date">(mode0);
   const file = useSingleFile();
   const exp = useExport();
-  const { bitmap, info } = usePreviewBitmap(mode === "photo" ? (file.prepared ?? undefined) : undefined, 1600);
-  const [blocks, setBlocks] = useState<B[]>(() => [meme(0.03, "top"), meme(0.97, "bottom")]);
+  const { bitmap, info } = usePreviewBitmap(mode !== "quote" ? (file.prepared ?? undefined) : undefined, 1600);
+  const [blocks, setBlocks] = useState<B[]>(() => (mode0 === "date" ? [DATE_BLOCK] : [meme(0.03, "top"), meme(0.97, "bottom")]));
+  const [stamp, setStamp] = useState<{ file: string; date: Date; exif: boolean } | null>(null);
+  const [dateStyle, setDateStyle] = useState<DateStyle>("camera");
+  const prepared = file.prepared;
+
+  // Date mode: the shooting date from EXIF, otherwise the file date.
+  useEffect(() => {
+    if (mode !== "date" || !prepared) return;
+    let live = true;
+    (async () => {
+      let d: Date | null = null;
+      try {
+        const exifr = (await import("exifr")).default;
+        const tags = (await exifr.parse(prepared.file, ["DateTimeOriginal", "CreateDate"])) as { DateTimeOriginal?: Date; CreateDate?: Date } | undefined;
+        d = tags?.DateTimeOriginal ?? tags?.CreateDate ?? null;
+      } catch {
+        // no EXIF
+      }
+      if (live) setStamp({ file: prepared.id, date: d && !Number.isNaN(+d) ? d : new Date(prepared.file.lastModified), exif: !!d });
+    })();
+    return () => {
+      live = false;
+    };
+  }, [mode, prepared]);
+  const stampDate = stamp && prepared && stamp.file === prepared.id ? stamp : null;
+  // In date mode the first caption shows the date.
+  const shown: B[] = mode === "date" && stampDate ? blocks.map((b, i) => (i === 0 ? { ...b, text: stampText(stampDate.date, dateStyle) } : b)) : blocks;
   const [sel, setSel] = useState(0);
   const cur = blocks[sel] ?? blocks[0];
   const set = (p: Partial<B>) => setBlocks((bs) => bs.map((b, i) => (i === sel ? { ...b, ...p, font: p.fontId ? fontCss(p.fontId) : (p.font ?? b.font) } : b)));
   const names = (i: number) => (i === 0 ? t.top : i === 1 ? t.bottom : t.extra(i + 1));
 
-  const blocksKey = JSON.stringify(blocks);
+  const blocksKey = JSON.stringify(shown);
   const draw = useCallback(
     (ctx: CanvasRenderingContext2D, bmp: ImageBitmap) => {
       ctx.drawImage(bmp, 0, 0);
@@ -199,11 +268,11 @@ export default function AddText({ locale }: { locale: Locale }) {
       const res = await processFile(
         getEngine(),
         p,
-        [{ t: "text", blocks }],
+        [{ t: "text", blocks: shown }],
         { format: fmt, quality: LOSSY.has(fmt) ? 92 : DEFAULT_QUALITY[fmt], background: "#FFFFFF" },
         { signal, onProgress },
       );
-      return { blob: toBlob(res), name: `${baseName(p.file.name)}-text.${res.ext}` };
+      return { blob: toBlob(res), name: `${baseName(p.file.name)}-${mode === "date" ? "date" : "text"}.${res.ext}` };
     });
   };
 
@@ -271,7 +340,8 @@ export default function AddText({ locale }: { locale: Locale }) {
       value={mode}
       onChange={(m) => {
         setMode(m);
-        if (m === "quote") {
+        if (m === "date") setBlocks([DATE_BLOCK]);
+        else if (m === "quote") {
           setBlocks([
             {
               ...meme(0.45, "middle"),
@@ -300,6 +370,7 @@ export default function AddText({ locale }: { locale: Locale }) {
       }}
       options={[
         { value: "photo", label: t.photo },
+        { value: "date", label: t.date },
         { value: "quote", label: t.quote },
       ]}
     />
@@ -328,12 +399,30 @@ export default function AddText({ locale }: { locale: Locale }) {
         onExport={doExport}
         exportLabel={t.download}
         options={
-          <>
-            {modeSwitch}
-            {blockTabs}
-            {textField}
-            {fontField}
-          </>
+          mode === "date" ? (
+            <>
+              {modeSwitch}
+              <Field label={t.style}>
+                <Segmented wrap label={t.style} value={dateStyle} onChange={setDateStyle} options={(["camera", "dmy", "dmyhm"] as const).map((v) => ({ value: v, label: t.styles[v] }))} />
+              </Field>
+              <Field label={t.when} htmlFor={`${id}-when`} className="w-56" hint={stampDate ? (stampDate.exif ? t.fromExif : t.fromFile) : undefined}>
+                <input
+                  id={`${id}-when`}
+                  type="datetime-local"
+                  className="control h-10 pointer-coarse:h-11"
+                  value={stampDate ? toLocalInput(stampDate.date) : ""}
+                  onChange={(e) => prepared && e.target.value && setStamp({ file: prepared.id, date: new Date(e.target.value), exif: stampDate?.exif ?? false })}
+                />
+              </Field>
+            </>
+          ) : (
+            <>
+              {modeSwitch}
+              {blockTabs}
+              {textField}
+              {fontField}
+            </>
+          )
         }
         more={<BlockEditor b={cur} set={set} locale={locale} />}
         figure={info ? `${info.srcWidth} × ${info.srcHeight} px` : "—"}
