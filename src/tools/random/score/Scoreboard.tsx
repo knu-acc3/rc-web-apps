@@ -661,6 +661,14 @@ interface HalfProps {
 }
 
 /** One team: name, the big number (tap +, swipe down −), a row of score buttons and the small counter. */
+/** True for a light colour ("#ffffff", "#fde047"): a light team colour gets a light veil, a dark one a dark veil. */
+function isLight(hex: string): boolean {
+  const m = /^#?([0-9a-f]{6})$/i.exec(hex.trim());
+  if (!m) return false;
+  const n = parseInt(m[1], 16);
+  return 0.299 * (n >> 16) + 0.587 * ((n >> 8) & 255) + 0.114 * (n & 255) > 150;
+}
+
 function Half({ big, side, name, shown, placeholder, score, small, steps, serving, canServe, hint, bg, fg, led, t, onScore, onSmall, onServe, onName }: HalfProps & { big: boolean }) {
   const startY = useRef<number | null>(null);
   const swiped = useRef(false);
@@ -756,8 +764,9 @@ function Half({ big, side, name, shown, placeholder, score, small, steps, servin
 
       {hint && (
         <span
-          className={cn("pointer-events-none inline-flex max-w-full items-center gap-1.5 whitespace-nowrap rounded-full px-3 py-1 font-medium", big ? "[font-size:clamp(0.875rem,2.6vmin,1.5rem)]" : "text-xs sm:text-[0.8125rem]")}
-          style={{ background: `color-mix(in srgb, ${fg} 16%, transparent)` }}
+          className={cn("pointer-events-none inline-flex max-w-full items-center gap-1.5 whitespace-nowrap rounded-full px-3 py-1 font-semibold", big ? "[font-size:clamp(0.875rem,2.6vmin,1.5rem)]" : "text-[0.8125rem] sm:text-sm")}
+          // A veil darker (or lighter) than the team colour keeps the hint readable on any theme.
+          style={{ background: isLight(bg) ? "rgb(255 255 255 / 0.72)" : "rgb(0 0 0 / 0.38)" }}
         >
           <Pointer className="size-[1.1em] shrink-0" aria-hidden />
           <span className="min-w-0 truncate">{t.tapHint(steps[0])}</span>
@@ -786,7 +795,7 @@ function Half({ big, side, name, shown, placeholder, score, small, steps, servin
 function SmallCounter({ big, label, value, cls, tonal, onSmall }: { big: boolean; label: string; value: number; cls: string; tonal: CSSProperties; onSmall: (d: number) => void }): ReactNode {
   return (
     <div className={cn("flex items-center gap-2", big ? "[font-size:clamp(1rem,3vmin,1.75rem)]" : "text-sm")}>
-      <span className="opacity-85">{label}</span>
+      <span className="font-medium">{label}</span>
       <button type="button" onClick={() => onSmall(-1)} disabled={value === 0} aria-label={`${label} −1`} className={cls} style={tonal}>
         <Minus className="size-[45%]" aria-hidden />
       </button>
