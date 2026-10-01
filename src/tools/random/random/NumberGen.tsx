@@ -1,15 +1,17 @@
 "use client";
 
-import { ArrowUpDown } from "lucide-react";
+import { ArrowLeftRight, Dices } from "lucide-react";
 import { useId, useRef, useState, type KeyboardEvent } from "react";
 import type { Locale } from "@/i18n/config";
 import { usePersistentState } from "@/lib/persist";
 import { Presentable } from "@/ui/fullscreen";
 import { ToolTitle } from "@/ui/tool-title";
-import { count as countOf, formatNumber, parseNumber } from "@/i18n/format";
-import { Button } from "@/ui/button";
+import { count as countOf, formatNumber } from "@/i18n/format";
+import { Button, IconButton } from "@/ui/button";
 import { CopyButton } from "@/ui/copy-button";
-import { Field, Input, Select, Switch } from "@/ui/field";
+import { Field, Switch } from "@/ui/field";
+import { NumberInput } from "@/ui/number-input";
+import { ScrollRow } from "@/ui/scroll-row";
 import { Panel, PanelHeader } from "@/ui/panel";
 import { generateNumbers, MAX_COUNT, MAX_DECIMALS, numberGrid, type NumberError } from "./lib/numbers";
 import { HistoryPanel, pushHistory } from "./ui/shared";
@@ -30,7 +32,7 @@ const T = {
     max: "До",
     count: "Сколько чисел",
     decimals: "Знаков после запятой",
-    integers: "Целые числа",
+    presets: "Готовые диапазоны",
     unique: "Без повторов",
     sorted: "По возрастанию",
     swap: "Поменять «от» и «до»",
@@ -57,7 +59,7 @@ const T = {
     max: "Max",
     count: "How many numbers",
     decimals: "Decimal places",
-    integers: "Whole numbers",
+    presets: "Ready ranges",
     unique: "No repeats",
     sorted: "Sort ascending",
     swap: "Swap min and max",
@@ -83,14 +85,22 @@ const T = {
 
 const isTitle = (v: unknown): v is string => typeof v === "string" && v.length <= 60;
 
+const PRESETS: [number, number][] = [
+  [1, 6],
+  [1, 10],
+  [1, 20],
+  [1, 50],
+  [1, 100],
+  [1, 1000],
+];
+
 export default function NumberGen({ locale, min = 1, max = 100, count = 1, decimals: dec0 = 0, unique: uniq0 = false, sorted: sort0 = false }: NumberGenProps) {
   const t = T[locale];
   const [title, setTitle] = usePersistentState("random:number:title:v1", "", isTitle);
   const id = useId();
-  const fmtIn = (n: number) => formatNumber(locale, n, { useGrouping: false, maximumFractionDigits: MAX_DECIMALS });
-  const [minText, setMinText] = useState(fmtIn(min));
-  const [maxText, setMaxText] = useState(fmtIn(max));
-  const [countText, setCountText] = useState(String(count));
+  const [lo, setLo] = useState<number | null>(min);
+  const [hi, setHi] = useState<number | null>(max);
+  const [n, setN] = useState<number | null>(count);
   const [decimals, setDecimals] = useState(dec0);
   const [unique, setUnique] = useState(uniq0);
   const [sorted, setSorted] = useState(sort0);
@@ -99,9 +109,6 @@ export default function NumberGen({ locale, min = 1, max = 100, count = 1, decim
   const [history, setHistory] = useState<{ id: number; text: string }[]>([]);
   const hid = useRef(0);
 
-  const lo = parseNumber(minText);
-  const hi = parseNumber(maxText);
-  const n = parseNumber(countText);
   const grid = lo !== null && hi !== null ? numberGrid({ min: lo, max: hi, decimals }) : null;
 
   const fmt = (v: number) => formatNumber(locale, v, { minimumFractionDigits: decimals, maximumFractionDigits: decimals, useGrouping: false });
@@ -123,121 +130,103 @@ export default function NumberGen({ locale, min = 1, max = 100, count = 1, decim
     setHistory((h) => pushHistory(h, { id: hid.current++, text: shown }));
   }
 
+  // Enter in any field generates (NumberInput has no key prop of its own).
   const onEnter = (e: KeyboardEvent) => {
-    if (e.key === "Enter") generate();
+    if (e.key === "Enter" && (e.target as HTMLElement).tagName === "INPUT") generate();
   };
   const text = values ? values.map(fmt).join(values.length > 1 ? ", " : "") : "";
 
   return (
-    <div className="flex flex-col gap-4">
-      <Panel className="flex flex-col gap-4 p-4 sm:p-5">
+    <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] lg:items-start">
+      <Panel className="flex flex-col gap-4 p-4 sm:p-5" onKeyDown={onEnter}>
+        <ScrollRow label={t.presets} rowClassName="gap-2">
+          {PRESETS.map(([a, b]) => (
+            <button
+              key={b}
+              type="button"
+              className="chip tabular shrink-0"
+              aria-pressed={lo === a && hi === b && decimals === 0}
+              onClick={() => {
+                setLo(a);
+                setHi(b);
+                setDecimals(0);
+              }}
+            >
+              {a}–{b}
+            </button>
+          ))}
+        </ScrollRow>
         <div className="grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-end gap-2">
           <Field label={t.min} htmlFor={`${id}-min`}>
-            <Input
-              id={`${id}-min`}
-              inputMode="decimal"
-              autoComplete="off"
-              value={minText}
-              onChange={(e) => setMinText(e.target.value)}
-              onKeyDown={onEnter}
-              aria-invalid={lo === null}
-              size="lg"
-              className="tabular"
-            />
+            <NumberInput id={`${id}-min`} locale={locale} size="lg" decimals={MAX_DECIMALS} value={lo} onChange={setLo} invalid={lo === null} />
           </Field>
-          <Button
-            variant="ghost"
-            size="icon"
-            aria-label={t.swap}
-            title={t.swap}
+          <IconButton
+            label={t.swap}
+            icon={<ArrowLeftRight aria-hidden />}
             className="mb-1"
             onClick={() => {
-              setMinText(maxText);
-              setMaxText(minText);
+              setLo(hi);
+              setHi(lo);
             }}
-          >
-            <ArrowUpDown className="rotate-90" />
-          </Button>
+          />
           <Field label={t.max} htmlFor={`${id}-max`}>
-            <Input
-              id={`${id}-max`}
-              inputMode="decimal"
-              autoComplete="off"
-              value={maxText}
-              onChange={(e) => setMaxText(e.target.value)}
-              onKeyDown={onEnter}
-              aria-invalid={hi === null}
-              size="lg"
-              className="tabular"
-            />
+            <NumberInput id={`${id}-max`} locale={locale} size="lg" decimals={MAX_DECIMALS} value={hi} onChange={setHi} invalid={hi === null} />
           </Field>
         </div>
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 gap-3 min-[400px]:grid-cols-2">
           <Field label={t.count} htmlFor={`${id}-n`}>
-            <Input
-              id={`${id}-n`}
-              inputMode="numeric"
-              autoComplete="off"
-              value={countText}
-              onChange={(e) => setCountText(e.target.value)}
-              onKeyDown={onEnter}
-              aria-invalid={n === null}
-              size="sm"
-              className="tabular"
-            />
+            <NumberInput id={`${id}-n`} locale={locale} min={1} max={MAX_COUNT} value={n} onChange={setN} invalid={n === null} />
           </Field>
           <Field label={t.decimals} htmlFor={`${id}-d`}>
-            <Select id={`${id}-d`} value={decimals} onChange={(e) => setDecimals(Number(e.target.value))} size="sm">
-              {Array.from({ length: MAX_DECIMALS + 1 }, (_, i) => (
-                <option key={i} value={i}>
-                  {i === 0 ? t.integers : i}
-                </option>
-              ))}
-            </Select>
+            <NumberInput id={`${id}-d`} locale={locale} min={0} max={MAX_DECIMALS} value={decimals} onChange={(v) => v !== null && setDecimals(v)} />
           </Field>
         </div>
         <div className="flex flex-wrap gap-x-6 gap-y-2">
           <Switch label={t.unique} checked={unique} onChange={(e) => setUnique(e.target.checked)} />
           <Switch label={t.sorted} checked={sorted} onChange={(e) => setSorted(e.target.checked)} />
         </div>
-        {grid && <p className="tabular text-sm text-fg-3">{`${t.possible}: ${formatNumber(locale, grid.size)}`}</p>}
-        <Button variant="primary" size="lg" onClick={generate} className="w-full sm:w-auto sm:self-start sm:min-w-48">
+        <Button variant="filled" size="xl" onClick={generate} className="w-full">
+          <Dices aria-hidden />
           {t.generate}
         </Button>
+        {grid && <p className="tabular -mt-1 text-center text-sm text-fg-3">{`${t.possible}: ${formatNumber(locale, grid.size)}`}</p>}
       </Panel>
 
-      <Presentable locale={locale} className="rounded-[0.75rem] border border-line bg-surface">
-        {(full) => (
-          <>
-            {full ? <ToolTitle value={title} onChange={setTitle} locale={locale} full /> : null}
-            <PanelHeader
-              title={values && values.length > 1 ? `${t.results} · ${countOf(locale, values.length, t.values)}` : t.result}
-              actions={values && <CopyButton value={text} label={t.copy} copiedLabel={t.copied} variant="ghost" />}
-            />
-            <div className="px-4 py-4">
-              <div
-                aria-live="polite"
-                className={
-                  values && values.length === 1
-                    ? "fs-big tabular text-center text-5xl font-bold tracking-tight break-all text-fg sm:text-6xl"
-                    : "tabular max-h-80 overflow-y-auto text-lg leading-relaxed break-words text-fg scrollbar-thin"
-                }
-              >
-                {error ? "" : text}
+      <div className="flex min-w-0 flex-col gap-4">
+        <Presentable locale={locale} className="panel overflow-hidden" fullClassName="rounded-none shadow-none">
+          {(full) => (
+            <>
+              {full ? <ToolTitle value={title} onChange={setTitle} locale={locale} full /> : null}
+              <PanelHeader
+                className="pr-14"
+                title={values && values.length > 1 ? `${t.results} · ${countOf(locale, values.length, t.values)}` : t.result}
+                actions={values && <CopyButton value={text} label={t.copy} copiedLabel={t.copied} variant="ghost" />}
+              />
+              <div className="flex min-h-36 flex-col justify-center px-4 py-5">
+                <div
+                  aria-live="polite"
+                  className={
+                    values && values.length === 1
+                      ? "fs-big tabular text-center text-6xl font-bold tracking-tight break-all text-fg sm:text-7xl"
+                      : "tabular max-h-80 overflow-y-auto text-xl leading-relaxed break-words text-fg scrollbar-thin"
+                  }
+                >
+                  {error ? "" : <span key={history[0]?.id} className="inline-block motion-safe:animate-[pop_0.4s_ease-out]">{text}</span>}
+                </div>
+                {error && (
+                  <p className="text-center text-sm text-err" role="alert">
+                    {error}
+                  </p>
+                )}
+                {!values && !error && <p className="text-center text-sm text-fg-3">{t.idle}</p>}
               </div>
-              {error && (
-                <p className="text-sm text-err" role="alert">
-                  {error}
-                </p>
-              )}
-              {!values && !error && <p className="text-center text-sm text-fg-3">{t.idle}</p>}
-            </div>
-            {!full && <ToolTitle value={title} onChange={setTitle} locale={locale} className="mx-auto mb-3 block text-base" />}
-          </>
-        )}
-      </Presentable>
+              {!full && <ToolTitle value={title} onChange={setTitle} locale={locale} className="mx-auto mb-3 block text-base" />}
+            </>
+          )}
+        </Presentable>
 
-      <HistoryPanel title={t.history} items={history} onClear={() => setHistory([])} clearLabel={t.clear} emptyLabel={t.empty} />
+        <HistoryPanel title={t.history} items={history} onClear={() => setHistory([])} clearLabel={t.clear} emptyLabel={t.empty} />
+      </div>
     </div>
   );
 }

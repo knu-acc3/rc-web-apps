@@ -107,7 +107,7 @@ function Details({ idx, cp, locale }: { idx: Index; cp: number; locale: Locale }
   ];
   return (
     <Panel className="flex flex-col gap-4 p-4 sm:flex-row sm:p-5">
-      <div className="flex size-32 shrink-0 items-center justify-center self-center rounded-[0.75rem] bg-surface-2 text-[4.5rem] leading-none text-fg sm:self-start">
+      <div className="flex size-32 shrink-0 items-center justify-center self-center rounded-[1rem] bg-surface-2 text-[4.5rem] leading-none text-fg sm:self-start">
         {f.label ? <span className="font-mono text-lg text-fg-3">{f.label}</span> : f.text}
       </div>
       <div className="flex min-w-0 flex-1 flex-col gap-3">
@@ -202,8 +202,8 @@ export default function UnicodeTable({ locale, mode, popular }: UnicodeTableProp
 
   return (
     <div className="flex flex-col gap-4">
-      <div className={mode === "table" ? "grid gap-3 sm:grid-cols-[1fr_16.25rem]" : ""}>
-        <Field label={t.search} htmlFor={`${id}-q`}>
+      <div className={mode === "table" ? "flex flex-col gap-3 sm:flex-row sm:items-end" : ""}>
+        <Field label={t.search} htmlFor={`${id}-q`} className="sm:flex-1">
           <div className="relative">
             <Search className="pointer-events-none absolute left-3 top-1/2 size-5 -translate-y-1/2 text-fg-3" aria-hidden />
             <Input
@@ -225,8 +225,9 @@ export default function UnicodeTable({ locale, mode, popular }: UnicodeTableProp
           </div>
         </Field>
         {mode === "table" && (
-          <Field label={t.block} htmlFor={`${id}-b`}>
+          <Field label={t.block} htmlFor={`${id}-b`} className="sm:max-w-[50%]">
             <Select
+              fit="selected"
               id={`${id}-b`}
               value={block}
               onChange={(e) => {
@@ -249,7 +250,7 @@ export default function UnicodeTable({ locale, mode, popular }: UnicodeTableProp
       </div>
 
       {mode === "table" && idx && selected !== null && <Details idx={idx} cp={selected} locale={locale} />}
-      {mode === "hub" && <div className="rounded-[0.75rem] border border-line bg-surface p-3">{panel}</div>}
+      {mode === "hub" && <div className="panel z-10 p-3 sm:sticky sm:top-16 sm:p-4">{panel}</div>}
 
       <div>
         <h2 className="mb-2 text-base font-semibold text-fg" aria-live="polite">
@@ -258,7 +259,7 @@ export default function UnicodeTable({ locale, mode, popular }: UnicodeTableProp
         {mode === "hub" ? (
           <Cells items={active ? toItems(visible) : popular} base={base} kind="symbol" onPick={onPick} />
         ) : (
-          <div className={`${cellGrid("symbol")} [&>[aria-pressed=true]]:border-accent [&>[aria-pressed=true]]:bg-accent-soft`}>
+          <div className={`${cellGrid("symbol")} [&>[aria-pressed=true]]:bg-accent-container [&>[aria-pressed=true]]:ring-2 [&>[aria-pressed=true]]:ring-accent`}>
             {(active ? visible : popular.map((it) => it[0].codePointAt(0)!)).map((cp) => {
               const f = face(cp);
               return (
@@ -270,7 +271,7 @@ export default function UnicodeTable({ locale, mode, popular }: UnicodeTableProp
           </div>
         )}
         {results && results.length > limit && (
-          <Button variant="outline" className="mt-3" onClick={() => setLimit((l) => l + 600)}>
+          <Button variant="tonal" className="mt-3" onClick={() => setLimit((l) => l + 600)}>
             {t.more}
           </Button>
         )}

@@ -6,7 +6,8 @@ import type { Locale } from "@/i18n/config";
 import { count } from "@/i18n/format";
 import { cn } from "@/lib/cn";
 import { Button } from "@/ui/button";
-import { Field, Select } from "@/ui/field";
+import { Field } from "@/ui/field";
+import { NumberInput } from "@/ui/number-input";
 import { Panel, PanelHeader } from "@/ui/panel";
 import { Segmented } from "@/ui/segmented";
 import { buildDeck, cardName, isRed, rankLabel, SUIT_SYMBOL, type Card, type DeckSize } from "./lib/cards";
@@ -60,7 +61,7 @@ function CardFace({ card, locale, size = "lg" }: { card: Card; locale: Locale; s
       role="img"
       aria-label={cardName(card, locale)}
       className={cn(
-        "relative flex shrink-0 flex-col justify-between rounded-[0.625rem] border font-semibold select-none",
+        "relative flex shrink-0 flex-col justify-between rounded-[0.75rem] border font-semibold shadow-elev-1 select-none",
         size === "lg" ? "h-44 w-32 p-2.5 sm:h-52 sm:w-36" : "h-20 w-14 rounded-[0.4375rem] p-1",
       )}
       style={{ background: "#ffffff", borderColor: "#c9c9c2", color: red ? "#c62828" : "#15161a" }}
@@ -109,41 +110,46 @@ export default function CardDraw({ locale, deck: deck0 = 52 }: CardDrawProps) {
   }
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="grid gap-4 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)] lg:items-start">
       <Panel className="flex flex-col items-center gap-5 p-4 sm:p-6">
-        <div className="flex min-h-44 flex-wrap items-center justify-center gap-3 sm:min-h-52">
-          {last.length ? last.map((c) => <CardFace key={`${c.rank}${c.suit}`} card={c} locale={locale} />) : <span className="text-sm text-fg-3">{remaining.length ? t.idle : t.empty}</span>}
+        <div key={drawn.length} className="flex min-h-44 flex-wrap items-center justify-center gap-3 motion-safe:animate-[menu-in_0.3s_ease-out] sm:min-h-52">
+          {last.length ? (
+            last.map((c) => <CardFace key={`${c.rank}${c.suit}`} card={c} locale={locale} />)
+          ) : (
+            <button
+              type="button"
+              onClick={draw}
+              disabled={remaining.length === 0}
+              aria-label={t.draw}
+              className="relative flex h-44 w-32 items-center justify-center rounded-[0.75rem] bg-[linear-gradient(135deg,var(--accent),color-mix(in_srgb,var(--accent)_55%,#000))] text-3xl font-bold text-white shadow-[4px_4px_0_-1px_var(--surface),5px_5px_0_0_var(--line-strong),8px_8px_0_-1px_var(--surface),9px_9px_0_0_var(--line-strong)] transition-transform hover:-translate-y-1 disabled:opacity-40 sm:h-52 sm:w-36"
+            >
+              <span className="tabular opacity-90">{remaining.length}</span>
+            </button>
+          )}
         </div>
         <p aria-live="polite" className="min-h-7 text-center text-xl font-semibold text-fg">
-          {last.map((c) => cardName(c, locale)).join(", ")}
+          {last.length ? last.map((c) => cardName(c, locale)).join(", ") : <span className="text-sm font-normal text-fg-3">{remaining.length ? t.idle : t.empty}</span>}
         </p>
-        <div className="flex w-full flex-col items-center gap-2 sm:flex-row sm:justify-center">
-          <Button variant="primary" size="lg" onClick={draw} disabled={remaining.length === 0} className="w-full sm:w-auto sm:min-w-56">
+        <div className="flex w-full flex-col items-center gap-2 sm:flex-row sm:flex-wrap sm:justify-center">
+          <Button variant="filled" size="xl" onClick={draw} disabled={remaining.length === 0} className="w-full sm:w-auto sm:min-w-64">
             {n > 1 ? t.drawMany : t.draw}
           </Button>
-          <Button variant="ghost" size="lg" onClick={() => reset()} disabled={drawn.length === 0}>
+          <Button variant="tonal" size="lg" onClick={() => reset()} disabled={drawn.length === 0}>
             <RotateCcw aria-hidden />
             {t.reshuffle}
           </Button>
         </div>
-        <div className="flex w-full flex-wrap items-end justify-center gap-4 border-t border-line pt-4">
-          <div className="flex flex-col gap-1.5">
-            <span className="text-sm font-medium text-fg-2">{t.deck}</span>
-            <Segmented label={t.deck} value={String(size)} onChange={(v) => reset(Number(v) as DeckSize)} options={[{ value: "36", label: t.decks[36] }, { value: "52", label: t.decks[52] }]} size="sm" />
-          </div>
-          <Field label={t.count} htmlFor={`${id}-n`} className="w-32">
-            <Select id={`${id}-n`} value={n} onChange={(e) => setN(Number(e.target.value))} size="sm">
-              {[1, 2, 3, 4, 5, 6].map((k) => (
-                <option key={k} value={k}>
-                  {k}
-                </option>
-              ))}
-            </Select>
+        <div className="flex w-full flex-wrap items-end justify-center gap-x-5 gap-y-3 pt-2">
+          <Field label={t.deck}>
+            <Segmented label={t.deck} value={String(size)} onChange={(v) => reset(Number(v) as DeckSize)} options={[{ value: "36", label: t.decks[36] }, { value: "52", label: t.decks[52] }]} />
           </Field>
-          <p className="tabular pb-1.5 text-sm text-fg-2">
-            {t.left}: {remaining.length} {t.of} {count(locale, size, t.cardForms)}
-          </p>
+          <Field label={t.count} htmlFor={`${id}-n`} className="w-36">
+            <NumberInput id={`${id}-n`} locale={locale} min={1} max={6} value={n} onChange={(v) => v !== null && setN(v)} />
+          </Field>
         </div>
+        <p className="tabular text-sm text-fg-2">
+          {t.left}: {remaining.length} {t.of} {count(locale, size, t.cardForms)}
+        </p>
       </Panel>
 
       <Panel>

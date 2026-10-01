@@ -1,13 +1,14 @@
 "use client";
 
-import { Shuffle } from "lucide-react";
+import { Dices, Shuffle } from "lucide-react";
 import { useId, useRef, useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { count } from "@/i18n/format";
 import { Button } from "@/ui/button";
 import { CopyButton } from "@/ui/copy-button";
 import { linkHere, listHash, useSharedList } from "@/lib/share-link";
-import { Field, Select, Switch, Textarea } from "@/ui/field";
+import { Field, Switch, Textarea } from "@/ui/field";
+import { NumberInput } from "@/ui/number-input";
 import { ShareLink } from "@/ui/share-link";
 import { Panel, PanelHeader } from "@/ui/panel";
 import { sample, shuffle } from "./lib/rng";
@@ -22,7 +23,7 @@ const MAX_ITEMS = 1000;
 
 const T = {
   ru: {
-    list: "Список — по одному варианту на строку",
+    list: "Варианты — по одному на строку",
     itemForms: ["вариант", "варианта", "вариантов"],
     pickCount: "Сколько выбрать",
     remove: "Убирать выбранное из списка",
@@ -30,14 +31,13 @@ const T = {
     shuffle: "Перемешать весь список",
     picked: "Выбрано",
     shuffled: "Список в случайном порядке",
-    idle: "Нажмите «Выбрать случайно» или «Перемешать весь список»",
+    idle: "Нажмите «Выбрать случайно»",
     needOne: "Добавьте в список хотя бы один вариант",
     copy: "Копировать",
     copied: "Скопировано",
     history: "История выбора",
     clear: "Очистить",
     empty: "Здесь появятся выбранные варианты",
-    limit: `До ${MAX_ITEMS} строк. Повторяющиеся строки считаются отдельными вариантами.`,
   },
   en: {
     list: "List — one item per line",
@@ -48,14 +48,13 @@ const T = {
     shuffle: "Shuffle the whole list",
     picked: "Picked",
     shuffled: "List in random order",
-    idle: "Press “Pick at random” or “Shuffle the whole list”",
+    idle: "Press “Pick at random”",
     needOne: "Add at least one item to the list",
     copy: "Copy",
     copied: "Copied",
     history: "Pick history",
     clear: "Clear",
     empty: "Picked items will appear here",
-    limit: `Up to ${MAX_ITEMS} lines. Duplicate lines count as separate items.`,
   },
 } as const;
 
@@ -115,30 +114,25 @@ export default function ListPicker({ locale, items = DEFAULT }: ListPickerProps)
   return (
     <div className="grid gap-4 lg:grid-cols-2">
       <Panel className="flex flex-col gap-4 p-4 sm:p-5">
-        <Field label={t.list} htmlFor={`${id}-l`} aside={<span className="tabular text-[0.8125rem] text-fg-3">{count(locale, list.length, t.itemForms)}</span>} hint={t.limit}>
+        <Field label={t.list} htmlFor={`${id}-l`} aside={<span className="tabular shrink-0 whitespace-nowrap text-[0.8125rem] text-fg-3">{count(locale, list.length, t.itemForms)}</span>}>
           <Textarea id={`${id}-l`} value={text} rows={10} onChange={(e) => setText(e.target.value)} className="font-sans! text-[0.9375rem]!" />
         </Field>
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
-          <Field label={t.pickCount} htmlFor={`${id}-k`} className="sm:w-40">
-            <Select id={`${id}-k`} value={Math.min(pickCount, maxPick)} onChange={(e) => setPickCount(Number(e.target.value))}>
-              {Array.from({ length: maxPick }, (_, i) => (
-                <option key={i + 1} value={i + 1}>
-                  {i + 1}
-                </option>
-              ))}
-            </Select>
+        <div className="flex flex-wrap items-end gap-x-5 gap-y-3">
+          <Field label={t.pickCount} htmlFor={`${id}-k`} className="w-40">
+            <NumberInput id={`${id}-k`} locale={locale} min={1} max={maxPick} value={Math.min(pickCount, maxPick)} onChange={(v) => v !== null && setPickCount(v)} />
           </Field>
-          <Switch label={t.remove} checked={removePicked} onChange={(e) => setRemovePicked(e.target.checked)} className="sm:mb-2" />
+          <Switch label={t.remove} checked={removePicked} onChange={(e) => setRemovePicked(e.target.checked)} />
         </div>
-        <div className="flex flex-col gap-2 sm:flex-row">
-          <Button variant="primary" size="lg" onClick={pick} className="sm:min-w-48">
+        <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
+          <Button variant="filled" size="xl" onClick={pick} className="sm:min-w-56">
+            <Dices aria-hidden />
             {t.pick}
           </Button>
-          <Button variant="outline" size="lg" onClick={shuffleAll}>
+          <Button variant="tonal" size="lg" onClick={shuffleAll}>
             <Shuffle aria-hidden />
             {t.shuffle}
           </Button>
-          <ShareLink locale={locale} url={() => linkHere({ hash: listHash("l", list) })} className="sm:ml-auto sm:self-center" />
+          <ShareLink locale={locale} url={() => linkHere({ hash: listHash("l", list) })} className="self-center sm:ml-auto" />
         </div>
       </Panel>
 
@@ -154,11 +148,11 @@ export default function ListPicker({ locale, items = DEFAULT }: ListPickerProps)
                 {error}
               </p>
             )}
-            {!result && !error && <p className="text-sm text-fg-3">{t.idle}</p>}
+            {!result && !error && <p className="py-6 text-center text-sm text-fg-3">{t.idle}</p>}
             <div aria-live="polite">
               {result &&
                 (result.kind === "pick" && result.items.length === 1 ? (
-                  <p className="text-center text-3xl font-semibold break-words text-fg">{result.items[0]}</p>
+                  <p key={history[0]?.id} className="py-4 text-center text-4xl font-bold break-words text-fg motion-safe:animate-[pop_0.4s_ease-out]">{result.items[0]}</p>
                 ) : (
                   <ol className="max-h-96 list-decimal overflow-y-auto pl-7 text-[0.9375rem] leading-relaxed text-fg scrollbar-thin">
                     {result.items.map((x, i) => (

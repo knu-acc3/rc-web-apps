@@ -1,11 +1,11 @@
 "use client";
 
-import { ChevronDown, Eye, EyeOff, Plus, X } from "lucide-react";
+import { Eye, EyeOff, Gift, Plus, X } from "lucide-react";
 import { useId, useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { count } from "@/i18n/format";
-import { cn } from "@/lib/cn";
-import { Button } from "@/ui/button";
+import { Button, IconButton } from "@/ui/button";
+import { Fold } from "@/ui/fold";
 import { CopyButton } from "@/ui/copy-button";
 import { Field, Select, Textarea } from "@/ui/field";
 import { Notice, Panel, PanelHeader } from "@/ui/panel";
@@ -18,7 +18,7 @@ export interface SecretSantaProps {
 
 const T = {
   ru: {
-    people: "Участники — по одному на строку",
+    people: "Имена — по одному на строку",
     personForms: ["участник", "участника", "участников"],
     exclusions: "Исключения",
     exclusionsHint: "Пары, которые не должны дарить подарки друг другу (например, супруги).",
@@ -37,7 +37,7 @@ const T = {
     copyAll: "Копировать всё",
     copy: "Копировать сообщение",
     copied: "Скопировано",
-    idle: "Впишите участников и нажмите «Провести жеребьёвку». Каждый получит одного получателя, никто не вытянет сам себя.",
+    idle: "Нажмите «Провести жеребьёвку»",
     stale: "Список участников изменился — проведите жеребьёвку заново.",
     duplicate: (n: string) => `Имя «${n}» встречается дважды — сделайте имена различимыми (например, добавьте фамилию).`,
     tooMany: `Не больше ${SANTA_MAX} участников`,
@@ -51,7 +51,7 @@ const T = {
     arrow: "→",
   },
   en: {
-    people: "Participants — one per line",
+    people: "Names — one per line",
     personForms: ["participant", "participants"],
     exclusions: "Exclusions",
     exclusionsHint: "Pairs who must not give gifts to each other (for example, partners).",
@@ -70,7 +70,7 @@ const T = {
     copyAll: "Copy all",
     copy: "Copy message",
     copied: "Copied",
-    idle: "Enter the participants and press “Draw names”. Everyone gets exactly one person, and nobody draws themselves.",
+    idle: "Press “Draw names”",
     stale: "The participant list has changed — draw again.",
     duplicate: (n: string) => `“${n}” appears twice — make the names distinct (add a surname, for example).`,
     tooMany: `Up to ${SANTA_MAX} participants`,
@@ -97,7 +97,6 @@ export default function SecretSanta({ locale }: SecretSantaProps) {
   const [pairs, setPairs] = useState<[string, string][]>([]);
   const [a, setA] = useState("");
   const [b, setB] = useState("");
-  const [showEx, setShowEx] = useState(false);
   const [result, setResult] = useState<{ names: string[]; to: number[] } | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [who, setWho] = useState("");
@@ -144,66 +143,53 @@ export default function SecretSanta({ locale }: SecretSantaProps) {
   const allText = result ? result.names.map((_, g) => message(g)).join("\n") : "";
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] lg:items-start">
       <Panel className="flex flex-col gap-4 p-4 sm:p-5">
-        <Field label={t.people} htmlFor={`${id}-p`} aside={<span className="tabular text-[0.8125rem] text-fg-3">{count(locale, names.length, t.personForms)}</span>}>
+        <Field label={t.people} htmlFor={`${id}-p`} aside={<span className="tabular shrink-0 whitespace-nowrap text-[0.8125rem] text-fg-3">{count(locale, names.length, t.personForms)}</span>}>
           <Textarea id={`${id}-p`} value={text} rows={7} onChange={(e) => setText(e.target.value)} className="font-sans! text-[0.9375rem]!" />
         </Field>
 
-        <div>
-          <Button variant="ghost" size="sm" onClick={() => setShowEx((v) => !v)} aria-expanded={showEx} aria-controls={`${id}-ex`} className="-ml-2">
-            <ChevronDown aria-hidden className={cn("transition-transform duration-150", showEx && "rotate-180")} />
-            {t.exclusions}
-            {validPairs.length > 0 && ` (${validPairs.length})`}
-          </Button>
-          {showEx && (
-            <div id={`${id}-ex`} className="mt-2 flex flex-col gap-3">
-              <p className="text-sm text-fg-3">{t.exclusionsHint}</p>
-              <div className="grid grid-cols-2 gap-2 sm:grid-cols-[1fr_1fr_auto] sm:items-end">
-                {(
-                  [
-                    [t.first, a, setA, "a"],
-                    [t.second, b, setB, "b"],
-                  ] as const
-                ).map(([label, value, set, key]) => (
-                  <Field key={key} label={label} htmlFor={`${id}-${key}`}>
-                    <Select id={`${id}-${key}`} value={value} onChange={(e) => set(e.target.value)} size="sm">
-                      <option value="">—</option>
-                      {names.map((n) => (
-                        <option key={n} value={n}>
-                          {n}
-                        </option>
-                      ))}
-                    </Select>
-                  </Field>
-                ))}
-                <Button variant="outline" size="sm" onClick={addPair} disabled={!a || !b || a === b} className="col-span-2 h-9! sm:col-span-1">
-                  <Plus aria-hidden />
-                  {t.add}
-                </Button>
-              </div>
-              {validPairs.length > 0 && (
-                <ul className="flex flex-wrap gap-2">
-                  {validPairs.map(([x, y]) => (
-                    <li key={`${x}|${y}`} className="inline-flex items-center gap-1 rounded-full border border-line bg-surface-2 py-0.5 pr-1 pl-3 text-sm text-fg">
-                      {x} ✕ {y}
-                      <button
-                        type="button"
-                        onClick={() => setPairs(validPairs.filter((p) => p[0] !== x || p[1] !== y))}
-                        aria-label={`${t.removePair}: ${x}, ${y}`}
-                        className="rounded-full p-1 text-fg-3 hover:bg-line hover:text-fg"
-                      >
-                        <X className="size-3.5" aria-hidden />
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              )}
+        <Fold variant="inline" title={`${t.exclusions}${validPairs.length > 0 ? ` (${validPairs.length})` : ""}`} className="-ml-2">
+          <div className="flex flex-col gap-3 pl-2">
+            <p className="text-sm text-fg-3">{t.exclusionsHint}</p>
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-[1fr_1fr_auto] sm:items-end">
+              {(
+                [
+                  [t.first, a, setA, "a"],
+                  [t.second, b, setB, "b"],
+                ] as const
+              ).map(([label, value, set, key]) => (
+                <Field key={key} label={label} htmlFor={`${id}-${key}`}>
+                  <Select id={`${id}-${key}`} value={value} onChange={(e) => set(e.target.value)}>
+                    <option value="">—</option>
+                    {names.map((n) => (
+                      <option key={n} value={n}>
+                        {n}
+                      </option>
+                    ))}
+                  </Select>
+                </Field>
+              ))}
+              <Button variant="tonal" onClick={addPair} disabled={!a || !b || a === b} className="col-span-2 sm:col-span-1">
+                <Plus aria-hidden />
+                {t.add}
+              </Button>
             </div>
-          )}
-        </div>
+            {validPairs.length > 0 && (
+              <ul className="flex flex-wrap gap-2">
+                {validPairs.map(([x, y]) => (
+                  <li key={`${x}|${y}`} className="chip is-on gap-1 py-0.5 pr-1">
+                    {x} ✕ {y}
+                    <IconButton size="sm" label={`${t.removePair}: ${x}, ${y}`} icon={<X aria-hidden />} onClick={() => setPairs(validPairs.filter((p) => p[0] !== x || p[1] !== y))} className="text-inherit!" />
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </Fold>
 
-        <Button variant="primary" size="lg" onClick={draw} className="w-full sm:w-auto sm:self-start sm:min-w-56">
+        <Button variant="filled" size="xl" onClick={draw} className="w-full sm:w-auto sm:self-start sm:min-w-64">
+          <Gift aria-hidden />
           {result ? t.redraw : t.draw}
         </Button>
         {error && <Notice tone="err">{error}</Notice>}
@@ -215,7 +201,7 @@ export default function SecretSanta({ locale }: SecretSantaProps) {
           actions={
             result &&
             !stale && (
-              <Button variant="ghost" size="sm" onClick={() => setAll((v) => !v)}>
+              <Button variant="text" size="sm" onClick={() => setAll((v) => !v)}>
                 {all ? <EyeOff aria-hidden /> : <Eye aria-hidden />}
                 {all ? t.hideAll : t.showAll}
               </Button>
@@ -223,11 +209,11 @@ export default function SecretSanta({ locale }: SecretSantaProps) {
           }
         />
         <div className="flex flex-col gap-4 px-4 py-4">
-          {!result && <p className="text-sm text-fg-3">{t.idle}</p>}
+          {!result && <p className="py-6 text-center text-sm text-fg-3">{t.idle}</p>}
           {stale && <Notice tone="warn">{t.stale}</Notice>}
           {result && !stale && (
             <>
-              <Field label={t.whose} htmlFor={`${id}-who`} className="sm:max-w-xs">
+              <Field label={t.whose} htmlFor={`${id}-who`}>
                 <Select id={`${id}-who`} value={who} onChange={(e) => setWho(e.target.value)}>
                   <option value="">{t.choose}</option>
                   {result.names.map((n) => (
@@ -239,8 +225,8 @@ export default function SecretSanta({ locale }: SecretSantaProps) {
               </Field>
               <div aria-live="polite" className="min-h-8">
                 {whoIndex >= 0 && (
-                  <div className="flex flex-col gap-3 rounded-[0.625rem] bg-accent-soft px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
-                    <p className="text-xl font-semibold break-words text-fg">{message(whoIndex)}</p>
+                  <div key={who} className="flex flex-col gap-3 rounded-[1rem] bg-accent-container px-4 py-4 text-on-accent-container motion-safe:animate-[menu-in_0.3s_ease-out] sm:flex-row sm:items-center sm:justify-between">
+                    <p className="text-xl font-semibold break-words">{message(whoIndex)}</p>
                     <CopyButton value={message(whoIndex)} label={t.copy} copiedLabel={t.copied} />
                   </div>
                 )}

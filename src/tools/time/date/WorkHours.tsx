@@ -4,6 +4,7 @@ import { useId, useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { formatNumber, parseNumber } from "@/i18n/format";
 import { Field, Input } from "@/ui/field";
+import { NumberInput } from "@/ui/number-input";
 import { Panel } from "@/ui/panel";
 import { WEEKDAYS } from "@/tools/time/calendar/lib/dates";
 import { formatDuration, parseClock, shiftMinutes } from "./lib/engine";
@@ -66,31 +67,24 @@ export default function WorkHours({ locale }: { locale: Locale }) {
   const set = (i: number, patch: Partial<Row>) => setRows((rs) => rs.map((r, j) => (j === i ? { ...r, ...patch } : r)));
 
   return (
-    <div className="flex flex-col gap-4">
-      <Panel className="p-4 sm:p-5">
-        <BigResult
-          caption={t.total}
-          value={formatDuration(total * 60, false)}
-          sub={`${t.decimal(formatNumber(locale, total / 60, { maximumFractionDigits: 2 }))}${rateNum ? ` · ${t.pay}: ${formatNumber(locale, (total / 60) * rateNum, { maximumFractionDigits: 2 })}` : ""}`}
-        />
-      </Panel>
-      <div className="overflow-x-auto rounded-[0.75rem] border border-line bg-surface">
+    <div className="grid gap-4 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] lg:items-start">
+      <Panel className="min-w-0 overflow-x-auto">
         <table className="w-full text-left text-sm">
           <thead className="bg-surface-2 text-[0.8125rem] text-fg-2">
             <tr>
-              <th scope="col" className="px-3 py-2 font-medium">
+              <th scope="col" className="px-3 py-2.5 font-medium sm:pl-5">
                 {t.day}
               </th>
-              <th scope="col" className="px-2 py-2 font-medium">
+              <th scope="col" className="px-2 py-2.5 font-medium">
                 {t.start}
               </th>
-              <th scope="col" className="px-2 py-2 font-medium">
+              <th scope="col" className="px-2 py-2.5 font-medium">
                 {t.end}
               </th>
-              <th scope="col" className="px-2 py-2 font-medium">
+              <th scope="col" className="px-2 py-2.5 font-medium">
                 {t.brk}
               </th>
-              <th scope="col" className="px-3 py-2 text-right font-medium">
+              <th scope="col" className="px-3 py-2.5 text-right font-medium sm:pr-5">
                 {t.hours}
               </th>
             </tr>
@@ -98,19 +92,19 @@ export default function WorkHours({ locale }: { locale: Locale }) {
           <tbody>
             {rows.map((r, i) => (
               <tr key={i} className="border-t border-line">
-                <th scope="row" className="px-3 py-1.5 font-medium text-fg">
+                <th scope="row" className="px-3 py-1.5 font-medium text-fg sm:pl-5">
                   {days[i]}
                 </th>
                 <td className="px-2 py-1.5">
-                  <input aria-label={`${days[i]}: ${t.start}`} type="time" className="control h-9 w-auto min-w-24 text-sm" value={r.start} onChange={(e) => set(i, { start: e.target.value })} />
+                  <Input aria-label={`${days[i]}: ${t.start}`} type="time" className="w-auto min-w-24" value={r.start} onChange={(e) => set(i, { start: e.target.value })} />
                 </td>
                 <td className="px-2 py-1.5">
-                  <input aria-label={`${days[i]}: ${t.end}`} type="time" className="control h-9 w-auto min-w-24 text-sm" value={r.end} onChange={(e) => set(i, { end: e.target.value })} />
+                  <Input aria-label={`${days[i]}: ${t.end}`} type="time" className="w-auto min-w-24" value={r.end} onChange={(e) => set(i, { end: e.target.value })} />
                 </td>
                 <td className="px-2 py-1.5">
-                  <input aria-label={`${days[i]}: ${t.brk}`} inputMode="numeric" className="control h-9 w-20 text-sm" value={r.brk} onChange={(e) => set(i, { brk: e.target.value.replace(/\D/g, "").slice(0, 3) })} />
+                  <NumberInput aria-label={`${days[i]}: ${t.brk}`} locale={locale} value={r.brk.trim() === "" ? null : Number(r.brk)} onChange={(v) => set(i, { brk: v === null ? "" : String(v) })} min={0} max={999} step={5} className="w-32" />
                 </td>
-                <td className="tabular px-3 py-1.5 text-right text-fg">
+                <td className="tabular px-3 py-1.5 text-right text-fg sm:pr-5">
                   {mins[i] ? (
                     <>
                       {formatDuration(mins[i]!.m * 60, false)}
@@ -124,12 +118,19 @@ export default function WorkHours({ locale }: { locale: Locale }) {
             ))}
           </tbody>
         </table>
-      </div>
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <Field label={t.rate} htmlFor={`${id}-r`} className="w-56">
-          <Input id={`${id}-r`} inputMode="decimal" value={rate} onChange={(e) => setRate(e.target.value)} />
-        </Field>
-        <p className="max-w-md text-[0.8125rem] text-fg-3">{t.hint}</p>
+      </Panel>
+      <div className="flex min-w-0 flex-col gap-4 lg:sticky lg:top-20">
+        <Panel className="flex flex-col gap-5 p-5 sm:p-6">
+          <BigResult
+            caption={t.total}
+            value={formatDuration(total * 60, false)}
+            sub={`${t.decimal(formatNumber(locale, total / 60, { maximumFractionDigits: 2 }))}${rateNum ? ` · ${t.pay}: ${formatNumber(locale, (total / 60) * rateNum, { maximumFractionDigits: 2 })}` : ""}`}
+          />
+          <Field label={t.rate} htmlFor={`${id}-r`} className="mx-auto w-full max-w-60">
+            <NumberInput id={`${id}-r`} locale={locale} value={rateNum} onChange={(v) => setRate(v === null ? "" : String(v))} min={0} max={1e9} decimals={2} stepper={false} />
+          </Field>
+        </Panel>
+        <p className="px-1 text-[0.8125rem] text-fg-3">{t.hint}</p>
       </div>
     </div>
   );

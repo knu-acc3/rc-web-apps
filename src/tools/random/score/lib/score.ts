@@ -6,7 +6,12 @@ const SPORT_IDS: Sport[] = ["default", "basketball", "volleyball", "football", "
 
 type L = { ru: string; en: string };
 
+export type ClockDir = "down" | "up";
+
 interface SportConfig {
+  /** Short name for the sport switch (with an emoji that reads at a glance). */
+  label: L;
+  emoji: string;
   /** Score buttons; a tap on the big number adds the first one. */
   steps: number[];
   /** Small per-team number: sets won, games, team fouls. */
@@ -20,6 +25,8 @@ interface SportConfig {
   serve: "rally" | "two" | null;
   /** A set/game is won at `to` points with a lead of `by`; `cap` ends it regardless (badminton 30); `last` = deciding set. */
   win: { to: number; by: number; cap?: number; last?: number; bestOf: number } | null;
+  /** Game clock offered by default: minutes per period and direction (null — off, can be switched on). */
+  clock: { min: number; dir: ClockDir } | null;
 }
 
 const HOME: SportConfig["names"] = { ru: ["Хозяева", "Гости"], en: ["Home", "Guest"] };
@@ -27,15 +34,17 @@ const TEAMS: SportConfig["names"] = { ru: ["Команда 1", "Команда 2
 const PLAYERS: SportConfig["names"] = { ru: ["Игрок 1", "Игрок 2"], en: ["Player 1", "Player 2"] };
 
 export const SPORTS: Record<Sport, SportConfig> = {
-  default: { steps: [1], small: { ru: "Сеты", en: "Sets" }, period: null, periods: 9, names: HOME, serve: null, win: null },
-  basketball: { steps: [1, 2, 3], small: { ru: "Фолы", en: "Fouls" }, period: { ru: "Четверть", en: "Quarter" }, periods: 9, names: HOME, serve: null, win: null },
-  volleyball: { steps: [1], small: { ru: "Партии", en: "Sets" }, period: null, periods: 5, names: TEAMS, serve: "rally", win: { to: 25, by: 2, last: 15, bestOf: 5 } },
-  football: { steps: [1], small: null, period: { ru: "Тайм", en: "Half" }, periods: 4, names: HOME, serve: null, win: null },
-  hockey: { steps: [1], small: null, period: { ru: "Период", en: "Period" }, periods: 5, names: HOME, serve: null, win: null },
-  "table-tennis": { steps: [1], small: { ru: "Партии", en: "Games" }, period: null, periods: 7, names: PLAYERS, serve: "two", win: { to: 11, by: 2, bestOf: 5 } },
-  badminton: { steps: [1], small: { ru: "Геймы", en: "Games" }, period: null, periods: 3, names: PLAYERS, serve: "rally", win: { to: 21, by: 2, cap: 30, bestOf: 3 } },
-  quiz: { steps: [1, 5, 10], small: null, period: { ru: "Раунд", en: "Round" }, periods: 99, names: TEAMS, serve: null, win: null },
+  default: { label: { ru: "Любая игра", en: "Any game" }, emoji: "🏆", steps: [1], small: { ru: "Сеты", en: "Sets" }, period: null, periods: 9, names: HOME, serve: null, win: null, clock: null },
+  basketball: { label: { ru: "Баскетбол", en: "Basketball" }, emoji: "🏀", steps: [1, 2, 3], small: { ru: "Фолы", en: "Fouls" }, period: { ru: "Четверть", en: "Quarter" }, periods: 9, names: HOME, serve: null, win: null, clock: { min: 10, dir: "down" } },
+  volleyball: { label: { ru: "Волейбол", en: "Volleyball" }, emoji: "🏐", steps: [1], small: { ru: "Партии", en: "Sets" }, period: null, periods: 5, names: TEAMS, serve: "rally", win: { to: 25, by: 2, last: 15, bestOf: 5 }, clock: null },
+  football: { label: { ru: "Футбол", en: "Football" }, emoji: "⚽", steps: [1], small: null, period: { ru: "Тайм", en: "Half" }, periods: 4, names: HOME, serve: null, win: null, clock: { min: 45, dir: "up" } },
+  hockey: { label: { ru: "Хоккей", en: "Hockey" }, emoji: "🏒", steps: [1], small: null, period: { ru: "Период", en: "Period" }, periods: 5, names: HOME, serve: null, win: null, clock: { min: 20, dir: "down" } },
+  "table-tennis": { label: { ru: "Настольный теннис", en: "Table tennis" }, emoji: "🏓", steps: [1], small: { ru: "Партии", en: "Games" }, period: null, periods: 7, names: PLAYERS, serve: "two", win: { to: 11, by: 2, bestOf: 5 }, clock: null },
+  badminton: { label: { ru: "Бадминтон", en: "Badminton" }, emoji: "🏸", steps: [1], small: { ru: "Геймы", en: "Games" }, period: null, periods: 3, names: PLAYERS, serve: "rally", win: { to: 21, by: 2, cap: 30, bestOf: 3 }, clock: null },
+  quiz: { label: { ru: "Квиз", en: "Quiz" }, emoji: "💡", steps: [1, 5, 10], small: null, period: { ru: "Раунд", en: "Round" }, periods: 99, names: TEAMS, serve: null, win: null, clock: null },
 };
+
+export const SPORT_LIST: readonly Sport[] = SPORT_IDS;
 
 export const isSport = (s: unknown): s is Sport => typeof s === "string" && (SPORT_IDS as string[]).includes(s);
 
@@ -116,4 +125,105 @@ export function countStep(value: number, laps: number, delta: number, goal: numb
     return { value: next, laps, reached: true };
   }
   return { value: next, laps, reached: false };
+}
+
+/* ───────────── score buttons ───────────── */
+
+/** Button sets offered on the generic board. */
+export const STEP_SETS: readonly (readonly number[])[] = [[1], [1, 2, 3], [1, 5, 10]];
+
+/** A saved set of score buttons: 1–4 whole numbers from 1 to 100. */
+export const isSteps = (v: unknown): v is number[] =>
+  Array.isArray(v) && v.length >= 1 && v.length <= 4 && v.every((n) => typeof n === "number" && Number.isInteger(n) && n >= 1 && n <= 100);
+
+/* ───────────── game clock ───────────── */
+
+/**
+ * A game clock that survives reloads: while running, the time is `baseMs` plus what passed since `startedAt`
+ * (a Date.now() timestamp), so nothing has to tick in the background.
+ */
+export interface GameClock {
+  running: boolean;
+  /** Time already played (ms) when the clock was last paused. */
+  baseMs: number;
+  startedAt: number | null;
+  /** Length of a period (ms). */
+  lengthMs: number;
+  /** "down" shows the time left (basketball, hockey), "up" the time played (football). */
+  dir: ClockDir;
+}
+
+export const CLOCK_MAX_MIN = 99;
+const MIN = 60_000;
+
+export const newClock = (min: number, dir: ClockDir): GameClock => ({ running: false, baseMs: 0, startedAt: null, lengthMs: Math.max(1, Math.min(CLOCK_MAX_MIN, Math.round(min))) * MIN, dir });
+
+/** The clock a sport starts with; sports without one get a 10-minute countdown when it is switched on. */
+export const sportClock = (sport: Sport): GameClock | null => (SPORTS[sport].clock ? newClock(SPORTS[sport].clock!.min, SPORTS[sport].clock!.dir) : null);
+export const fallbackClock = (sport: Sport): GameClock => sportClock(sport) ?? newClock(10, "down");
+
+export const isClock = (v: unknown): v is GameClock => {
+  if (!v || typeof v !== "object") return false;
+  const c = v as GameClock;
+  return (
+    typeof c.running === "boolean" &&
+    typeof c.baseMs === "number" &&
+    Number.isFinite(c.baseMs) &&
+    c.baseMs >= 0 &&
+    (c.startedAt === null || (typeof c.startedAt === "number" && Number.isFinite(c.startedAt))) &&
+    typeof c.lengthMs === "number" &&
+    c.lengthMs >= MIN &&
+    c.lengthMs <= CLOCK_MAX_MIN * MIN &&
+    (c.dir === "down" || c.dir === "up")
+  );
+};
+
+/** Time played (ms), never more than the period. */
+export function clockElapsed(c: GameClock, now: number): number {
+  const run = c.running && c.startedAt !== null ? Math.max(0, now - c.startedAt) : 0;
+  return Math.min(c.lengthMs, Math.max(0, c.baseMs + run));
+}
+
+/** What the clock shows (ms): the time left for "down", the time played for "up". */
+export const clockMs = (c: GameClock, now: number): number => (c.dir === "down" ? c.lengthMs - clockElapsed(c, now) : clockElapsed(c, now));
+
+/** The period is over. */
+export const clockOver = (c: GameClock, now: number): boolean => clockElapsed(c, now) >= c.lengthMs;
+
+/** Start, or pause a running clock. Starting a finished clock begins the next period from zero. */
+export function clockToggle(c: GameClock, now: number): GameClock {
+  if (c.running) return { ...c, running: false, baseMs: clockElapsed(c, now), startedAt: null };
+  return { ...c, running: true, baseMs: clockOver(c, now) ? 0 : clockElapsed(c, now), startedAt: now };
+}
+
+export const clockReset = (c: GameClock): GameClock => ({ ...c, running: false, baseMs: 0, startedAt: null });
+
+/** "10:00", "9:05"; a countdown shows tenths in its last minute ("59.9"), like a basketball clock. */
+export function formatClock(ms: number, dir: ClockDir): string {
+  const v = Math.max(0, ms);
+  if (dir === "down" && v < MIN) return (Math.floor(v / 100) / 10).toFixed(1);
+  const s = dir === "down" ? Math.ceil(v / 1000) : Math.floor(v / 1000);
+  return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
+}
+
+/* ───────────── tally marks ───────────── */
+
+/** Strokes in groups of five: 12 → [5, 5, 2]. Zero or less → no groups. */
+export function tallyGroups(n: number): number[] {
+  const k = Math.max(0, Math.floor(n));
+  const out: number[] = Array.from({ length: Math.floor(k / 5) }, () => 5);
+  if (k % 5) out.push(k % 5);
+  return out;
+}
+
+export const TALLY_MAX = 500;
+
+/**
+ * How a value is drawn as tally marks: up to 500 — only marks; above that the number plus the strokes of the
+ * current hundred (1–100); negative values — only digits.
+ */
+export function tallyView(n: number): { marks: number; digits: boolean } {
+  if (n < 0) return { marks: 0, digits: true };
+  if (n <= TALLY_MAX) return { marks: Math.floor(n), digits: false };
+  return { marks: ((Math.floor(n) - 1) % 100) + 1, digits: true };
 }

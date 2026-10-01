@@ -4,6 +4,7 @@ import { useId, useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { CopyButton } from "@/ui/copy-button";
 import { Input, Switch } from "@/ui/field";
+import { Fold } from "@/ui/fold";
 import { Panel } from "@/ui/panel";
 import { Segmented } from "@/ui/segmented";
 import { CASES, CASE_NAMES, ruCardinalCase } from "./lib/declension";
@@ -150,9 +151,8 @@ export default function NumberInWords({ locale, value = "2024" }: NumberInWordsP
       </Panel>
 
       {ok && !d.frac && (
-        <details className="group rounded-[0.75rem] border border-line bg-surface" open={locale === "ru"}>
-          <summary className="px-4 py-3 text-sm font-semibold text-fg">{t.cases}</summary>
-          <div tabIndex={0} className="tbl rounded-none! border-0! border-t! border-line!">
+        <Fold title={t.cases} open={locale === "ru"} bodyClassName="px-0! pb-2! pt-0!">
+          <div tabIndex={0} className="tbl rounded-none! border-0! border-t! border-line! shadow-none!">
             <table>
               <tbody>
                 {CASES.map((k) => (
@@ -166,7 +166,7 @@ export default function NumberInWords({ locale, value = "2024" }: NumberInWordsP
               </tbody>
             </table>
           </div>
-        </details>
+        </Fold>
       )}
     </div>
   );

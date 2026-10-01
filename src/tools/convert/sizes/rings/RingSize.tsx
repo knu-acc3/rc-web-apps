@@ -3,8 +3,10 @@
 import { useId, useMemo, useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { formatNumber, parseNumber } from "@/i18n/format";
-import { Field, Input, Select } from "@/ui/field";
+import { Field, Select } from "@/ui/field";
 import { Panel } from "@/ui/panel";
+import { ScrollRow } from "@/ui/scroll-row";
+import { SliderField } from "@/ui/slider-field";
 import { ResultTiles, plainSpaces, type Tile } from "../ui/kit";
 import { DIAMETER_RANGE, RING_SYSTEMS, diameterFrom, diameterToJp, diameterToUs, ringSizes, ukIndexFromCirc, ukOptions, type RingSystem } from "./engine";
 
@@ -67,21 +69,32 @@ export default function RingSize({ locale, system: s0 = "ru", value = 17 }: { lo
   const fmt = (k: SizeKey) => (!s ? "—" : k === "uk" ? s.uk : k === "ru" ? n(s.ru, 1) : k === "us" ? n(s.us, 2) : String(s[k]));
   const tiles: Tile[] = show.map((k) => ({ label: t.tiles[k], value: fmt(k) }));
 
+  // Slider range of the chosen system, from the diameter range of rings.
+  const [d0, d1] = DIAMETER_RANGE;
+  const range: Record<Exclude<RingSystem, "uk">, [number, number, number, number]> = {
+    ru: [d0, d1, 0.5, 1],
+    d: [d0, d1, 0.1, 2],
+    c: [38, 78, 0.5, 1],
+    eu: [38, 78, 1, 1],
+    us: [1, 16, 0.25, 2],
+    jp: [1, 37, 1, 0],
+  };
+
   return (
     <Panel className="p-4 sm:p-6">
-      <div className="grid grid-cols-2 gap-3 sm:max-w-md">
-        <Field label={t.system} htmlFor={`${id}-s`}>
-          <Select id={`${id}-s`} value={system} onChange={(e) => changeSystem(e.target.value as RingSystem)} size="lg">
-            {RING_SYSTEMS.map((k) => (
-              <option key={k} value={k}>
-                {t.labels[k]}
-              </option>
-            ))}
-          </Select>
-        </Field>
+      <div className="mb-1 text-sm font-medium text-fg-2">{t.system}</div>
+      <ScrollRow label={t.system} role="radiogroup" rowClassName="gap-1.5">
+        {RING_SYSTEMS.map((k) => (
+          <button key={k} type="button" role="radio" aria-checked={k === system} onClick={() => changeSystem(k)} className="chip">
+            {t.labels[k]}
+          </button>
+        ))}
+      </ScrollRow>
+
+      <div className="mt-5 grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:items-start lg:gap-8">
         {system === "uk" ? (
           <Field label={t.value} htmlFor={`${id}-v`}>
-            <Select id={`${id}-v`} value={String(ukIdx)} onChange={(e) => setUkIdx(Number(e.target.value))} size="lg">
+            <Select id={`${id}-v`} value={String(ukIdx)} onChange={(e) => setUkIdx(Number(e.target.value))} size="lg" fit="selected" className="self-start">
               {uk.map((o) => (
                 <option key={o.index} value={String(o.index)}>
                   {o.label}
@@ -90,32 +103,32 @@ export default function RingSize({ locale, system: s0 = "ru", value = 17 }: { lo
             </Select>
           </Field>
         ) : (
-          <Field label={t.value} htmlFor={`${id}-v`} error={error ?? undefined}>
-            <Input
-              id={`${id}-v`}
-              inputMode="decimal"
-              autoComplete="off"
-              value={text}
-              onChange={(e) => setText(e.target.value)}
-              aria-invalid={!!error}
-              size="lg"
-              className="tabular"
-            />
-          </Field>
+          <SliderField
+            id={`${id}-v`}
+            label={t.labels[system]}
+            value={text}
+            onChange={setText}
+            parse={(x) => parseNumber(x)}
+            format={(v) => n(v, range[system][3])}
+            min={range[system][0]}
+            max={range[system][1]}
+            step={range[system][2]}
+            error={error ?? undefined}
+          />
         )}
-      </div>
 
-      <div className="mt-5" aria-live="polite">
-        {s && (
-          <>
-            <ResultTiles items={tiles} />
-            <p className="tabular mt-3 text-sm text-fg-2">
-              {t.diameter} {n(s.d, 2)} {t.mm} · {t.circ} {n(s.c, 1)} {t.mm}
-            </p>
-          </>
-        )}
+        <div className="min-w-0" aria-live="polite">
+          {s && (
+            <>
+              <ResultTiles items={tiles} />
+              <p className="tabular mt-3 text-sm text-fg-2">
+                {t.diameter} {n(s.d, 2)} {t.mm} · {t.circ} {n(s.c, 1)} {t.mm}
+              </p>
+            </>
+          )}
+        </div>
       </div>
-      <p className="mt-4 text-sm text-fg-3">{t.note}</p>
+      <p className="mt-5 text-sm text-fg-3">{t.note}</p>
     </Panel>
   );
 }

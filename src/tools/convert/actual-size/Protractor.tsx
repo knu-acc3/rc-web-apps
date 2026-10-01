@@ -203,7 +203,7 @@ export default function Protractor({ locale }: { locale: Locale }) {
             {t.supplement}: {nf(180 - angle)}° · {t.radians}: {nf((angle * Math.PI) / 180, 4)} · {t.arm(1)} {nf(arms[0])}°, {t.arm(2)} {nf(arms[1])}°
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <Segmented
             label={t.step}
             value={step}
@@ -215,7 +215,7 @@ export default function Protractor({ locale }: { locale: Locale }) {
               { value: "0.1", label: formatNumber(locale, 0.1) + "°" },
             ]}
           />
-          <Button variant="ghost" size="sm" onClick={() => setArms([0, 60])}>
+          <Button variant="text" onClick={() => setArms([0, 60])}>
             {t.reset}
           </Button>
         </div>

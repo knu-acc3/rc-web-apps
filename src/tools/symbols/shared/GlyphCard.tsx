@@ -33,7 +33,7 @@ export default function GlyphCard({ locale, glyph, name, variants, codes, kind =
     <Panel className="flex flex-col items-center gap-4 p-5 sm:flex-row sm:items-stretch sm:gap-6">
       <div
         className={cn(
-          "flex size-40 shrink-0 select-all items-center justify-center rounded-[0.75rem] bg-surface-2 leading-none sm:size-48",
+          "flex size-40 shrink-0 select-all items-center justify-center rounded-[1rem] bg-surface-2 leading-none sm:size-48",
           kind === "emoji" ? "text-[6rem] sm:text-[7.5rem]" : "text-[5.5rem] text-fg sm:text-[6.875rem]",
         )}
         title={name}
@@ -50,7 +50,7 @@ export default function GlyphCard({ locale, glyph, name, variants, codes, kind =
         {variants?.map((row) => (
           <div key={row.title}>
             <p className="mb-1.5 text-sm font-medium text-fg-2">{row.title}</p>
-            <div role="group" aria-label={row.title} className="flex flex-wrap gap-1">
+            <div role="group" aria-label={row.title} className="flex flex-wrap gap-1.5">
               {row.items.map(([g, l]) => (
                 <button
                   key={g}
@@ -63,8 +63,8 @@ export default function GlyphCard({ locale, glyph, name, variants, codes, kind =
                     setLabel(l);
                   }}
                   className={cn(
-                    "flex size-11 items-center justify-center rounded-[0.5rem] border text-[1.625rem] leading-none transition-colors",
-                    current === g ? "border-accent bg-accent-soft" : "border-line bg-surface hover:border-line-strong",
+                    "flex size-12 items-center justify-center rounded-[0.75rem] text-[1.625rem] leading-none transition-[background-color,box-shadow,transform] duration-150 motion-safe:active:scale-90",
+                    current === g ? "bg-accent-container ring-2 ring-accent" : "bg-surface-2 hover:bg-accent-container hover:shadow-elev-1",
                   )}
                 >
                   {g}

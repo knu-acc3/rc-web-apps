@@ -31,13 +31,13 @@ export default function UtcNow({ locale }: NowProps) {
   ];
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="grid gap-4 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] lg:items-center">
       <Panel className="flex flex-col items-center gap-3 px-4 py-8 text-center sm:py-12">
         <p className="text-sm font-semibold tracking-wide text-fg-3">UTC</p>
-        <BigTime parts={u} className="text-[3.75rem] sm:text-[6.5rem]" />
+        <BigTime parts={u} className="text-[min(18vw,3.75rem)] sm:text-[6.5rem] 2xl:text-[8rem]" />
         <p className="min-h-7 text-lg text-fg-2 sm:text-xl">{u ? longDate(locale, u) : " "}</p>
       </Panel>
-      <Panel>
+      <Panel className="min-w-0 overflow-hidden">
         <ul className="divide-y divide-line">
           {rows.map(([k, v, copy]) => (
             <li key={k} className="flex min-h-12 items-center justify-between gap-3 px-4 py-2">

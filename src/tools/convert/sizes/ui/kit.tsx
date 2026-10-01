@@ -15,7 +15,7 @@ export function ResultTiles({ items, className }: { items: Tile[]; className?: s
   return (
     <dl className={cn("grid grid-cols-2 gap-2 sm:grid-cols-4", className)}>
       {items.map((t) => (
-        <div key={t.label} className="min-w-0 rounded-[0.625rem] bg-surface-2 px-3 py-2.5">
+        <div key={t.label} className="min-w-0 rounded-[1rem] bg-surface-2 px-3.5 py-3">
           <dt className="truncate text-[0.8125rem] text-fg-2">{t.label}</dt>
           <dd className="tabular mt-0.5 truncate text-2xl font-semibold tracking-tight text-fg sm:text-[1.75rem]">{t.value}</dd>
           {t.hint && <dd className="truncate text-[0.8125rem] text-fg-3">{t.hint}</dd>}

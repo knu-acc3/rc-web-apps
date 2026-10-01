@@ -23,7 +23,7 @@ const T = {
     ask: "Получить ответ",
     maybe: "Добавить вариант «Может быть»",
     answers: { yes: "Да", no: "Нет", maybe: "Может быть" },
-    idle: "Задайте вопрос и нажмите кнопку",
+    idle: "Нажмите кнопку",
     history: "История ответов",
     clear: "Очистить",
     empty: "Здесь появятся ответы",
@@ -34,7 +34,7 @@ const T = {
     ask: "Get an answer",
     maybe: "Add “Maybe”",
     answers: { yes: "Yes", no: "No", maybe: "Maybe" },
-    idle: "Ask a question and press the button",
+    idle: "Press the button",
     history: "Answer history",
     clear: "Clear",
     empty: "Answers will appear here",
@@ -62,8 +62,8 @@ export default function YesNo({ locale, maybe: maybe0 = false }: YesNoProps) {
   }
 
   return (
-    <div className="flex flex-col gap-4">
-      <Presentable locale={locale} className="rounded-[0.75rem] border border-line bg-surface flex flex-col items-center gap-5 p-4 sm:p-6">
+    <div className="grid gap-4 lg:grid-cols-[minmax(0,1.6fr)_minmax(17rem,1fr)] lg:items-start">
+      <Presentable locale={locale} className="panel flex flex-col items-center gap-5 p-4 pt-14 sm:p-6 sm:pt-14" fullClassName="rounded-none shadow-none">
         <Field label={t.question} htmlFor={`${id}-q`} className="w-full">
           <Input
             id={`${id}-q`}
@@ -81,13 +81,13 @@ export default function YesNo({ locale, maybe: maybe0 = false }: YesNoProps) {
         <div
           aria-live="polite"
           className={cn(
-            "fs-big flex min-h-32 w-full items-center justify-center rounded-[1rem] text-6xl font-bold tracking-tight transition-colors duration-150 sm:min-h-40 sm:text-7xl",
+            "fs-big flex min-h-36 w-full items-center justify-center rounded-[1.25rem] text-6xl font-bold tracking-tight transition-colors duration-150 sm:min-h-48 sm:text-8xl",
             answer ? TONE[answer.a] : "bg-surface-2 text-fg-3",
           )}
         >
-          {answer ? <span key={answer.n}>{t.answers[answer.a]}</span> : <span className="text-base font-normal">{t.idle}</span>}
+          {answer ? <span key={answer.n} className="motion-safe:animate-[menu-in_0.35s_ease-out]">{t.answers[answer.a]}</span> : <span className="text-base font-normal tracking-normal">{t.idle}</span>}
         </div>
-        <Button variant="primary" size="lg" onClick={ask} className="w-full sm:w-auto sm:min-w-56">
+        <Button variant="filled" size="xl" onClick={ask} className="w-full sm:w-auto sm:min-w-64">
           {t.ask}
         </Button>
         <Switch label={t.maybe} checked={maybe} onChange={(e) => setMaybe(e.target.checked)} />

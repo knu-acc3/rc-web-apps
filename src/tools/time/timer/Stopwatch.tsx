@@ -1,13 +1,13 @@
 "use client";
 
-import { Download, Flag, Maximize2, Pause, Play, RotateCcw } from "lucide-react";
+import { Download, Flag, Maximize2, Minimize2, Pause, Play, RotateCcw } from "lucide-react";
 import { useRef, useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { cn } from "@/lib/cn";
 import { downloadText } from "@/lib/clipboard";
-import { Button } from "@/ui/button";
+import { Button, IconButton } from "@/ui/button";
 import { CopyButton } from "@/ui/copy-button";
-import { Kbd } from "@/ui/panel";
+import { Kbd, Panel, PanelHeader } from "@/ui/panel";
 import { usePersistentState } from "@/lib/persist";
 import { useFullscreen } from "@/ui/fullscreen";
 import { ToolTitle } from "@/ui/tool-title";
@@ -119,74 +119,70 @@ export default function Stopwatch({ locale }: { locale: Locale }) {
   const asCsv = () => [`n,lap_ms,total_ms,lap,total`, ...[...laps].reverse().map((l) => `${l.n},${l.lap},${l.total},${fmt(l.lap)},${fmt(l.total)}`)].join("\n");
 
   return (
-    <div className="flex flex-col gap-4">
-      <div
-        ref={ref}
-        className={cn("flex flex-col items-center justify-center gap-6 rounded-[0.75rem] border border-line bg-surface px-3 py-8 sm:py-10", full && "min-h-screen rounded-none border-0")}
-      >
-        <ToolTitle value={title} onChange={setTitle} locale={locale} full={full} />
-        <div className={cn("tabular font-semibold leading-none tracking-tight text-fg", full ? "text-[min(16vw,34vh)]" : "text-[min(15vw,7rem)]")}>
-          {clock(elapsed, { up: true })}
-          <span className="text-[0.55em] text-fg-3">.{String(Math.floor((elapsed % 1000) / 10)).padStart(2, "0")}</span>
-        </div>
-        <div className="flex items-center gap-2">
-          {running ? (
-            <Button variant="primary" size="lg" onClick={stop} className="min-w-36">
-              <Pause aria-hidden />
-              {t.stop}
-            </Button>
-          ) : (
-            <Button variant="primary" size="lg" onClick={start} className="min-w-36">
-              <Play aria-hidden />
-              {elapsed > 0 ? t.resume : t.start}
-            </Button>
-          )}
-          {running ? (
-            <Button variant="secondary" size="lg" onClick={lap} className="min-w-28">
-              <Flag aria-hidden />
-              {t.lap}
-            </Button>
-          ) : (
-            <Button variant="secondary" size="lg" onClick={reset} disabled={elapsed === 0} className="min-w-28">
-              <RotateCcw aria-hidden />
-              {t.reset}
-            </Button>
-          )}
-        </div>
-      </div>
+    <div className={cn("grid gap-4", laps.length > 0 && "lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] lg:items-start")}>
+      <div className="flex min-w-0 flex-col gap-3">
+        <Panel ref={ref} className={cn("flex flex-col items-center justify-center gap-6 px-3 py-8 sm:py-10", full && "min-h-screen rounded-none! shadow-none!")}>
+          <ToolTitle value={title} onChange={setTitle} locale={locale} full={full} />
+          <div className={cn("tabular font-semibold leading-none tracking-tight text-fg", full ? "text-[min(16vw,34vh)]" : "text-[min(15vw,7rem)] 2xl:text-[9rem]")}>
+            {clock(elapsed, { up: true })}
+            <span className="text-[0.55em] text-fg-3">.{String(Math.floor((elapsed % 1000) / 10)).padStart(2, "0")}</span>
+          </div>
+          <div className="flex w-full max-w-lg flex-wrap items-center justify-center gap-2 sm:gap-3">
+            {running ? (
+              <Button variant="filled" size="xl" onClick={stop} className="min-w-40 flex-1 sm:max-w-60">
+                <Pause aria-hidden />
+                {t.stop}
+              </Button>
+            ) : (
+              <Button variant="filled" size="xl" onClick={start} className="min-w-40 flex-1 sm:max-w-60">
+                <Play aria-hidden />
+                {elapsed > 0 ? t.resume : t.start}
+              </Button>
+            )}
+            <div className="flex items-center gap-2">
+              {running ? (
+                <Button variant="tonal" size="xl" onClick={lap} className="min-w-32">
+                  <Flag aria-hidden />
+                  {t.lap}
+                </Button>
+              ) : (
+                <Button variant="tonal" size="xl" onClick={reset} disabled={elapsed === 0} className="min-w-32">
+                  <RotateCcw aria-hidden />
+                  {t.reset}
+                </Button>
+              )}
+              <IconButton label={t.full} size="lg" onClick={toggle} icon={full ? <Minimize2 aria-hidden /> : <Maximize2 aria-hidden />} />
+            </div>
+          </div>
+        </Panel>
 
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <p className="hidden flex-wrap gap-x-4 text-[0.8125rem] text-fg-3 sm:flex">
+        <p className="hidden flex-wrap gap-x-4 px-1 text-[0.8125rem] text-fg-3 sm:flex">
           {t.keys.map(([k, label]) => (
             <span key={k}>
               <Kbd>{k}</Kbd> {label}
             </span>
           ))}
         </p>
-        <Button variant="ghost" size="sm" onClick={toggle} className="ml-auto">
-          <Maximize2 aria-hidden />
-          {t.full}
-        </Button>
       </div>
 
       {laps.length > 0 && (
-        <section className="overflow-hidden rounded-[0.75rem] border border-line bg-surface">
-          <div className="flex items-center justify-between gap-2 border-b border-line px-4 py-2">
-            <h2 className="text-sm font-semibold text-fg">
-              {t.laps}: {laps.length}
-            </h2>
-            <div className="flex items-center gap-1">
-              <CopyButton value={asText} label={t.copy} copiedLabel={t.copied} variant="ghost" />
-              <Button variant="ghost" size="sm" onClick={() => downloadText(asCsv(), `${t.file}.csv`, "text/csv;charset=utf-8")}>
-                <Download aria-hidden />
-                {t.csv}
-              </Button>
-              <Button variant="ghost" size="sm" onClick={() => downloadText(asText(), `${t.file}.txt`)}>
-                {t.txt}
-              </Button>
-            </div>
-          </div>
-          <div className="max-h-96 overflow-auto">
+        <Panel className="min-w-0 overflow-hidden">
+          <PanelHeader
+            title={`${t.laps}: ${laps.length}`}
+            actions={
+              <>
+                <CopyButton value={asText} label={t.copy} copiedLabel={t.copied} variant="ghost" size="icon-sm" />
+                <Button variant="text" size="sm" onClick={() => downloadText(asCsv(), `${t.file}.csv`, "text/csv;charset=utf-8")}>
+                  <Download aria-hidden />
+                  {t.csv}
+                </Button>
+                <Button variant="text" size="sm" onClick={() => downloadText(asText(), `${t.file}.txt`)}>
+                  {t.txt}
+                </Button>
+              </>
+            }
+          />
+          <div className="max-h-[28rem] overflow-auto">
             <table className="w-full text-left text-[0.9375rem]">
               <thead className="sticky top-0 bg-surface-2 text-[0.8125rem] text-fg-2">
                 <tr>
@@ -203,7 +199,7 @@ export default function Stopwatch({ locale }: { locale: Locale }) {
               </thead>
               <tbody className="tabular">
                 {laps.map((l) => (
-                  <tr key={l.n} className="border-t border-line">
+                  <tr key={l.n} className="border-t border-line motion-safe:animate-[menu-in_200ms_ease-out]">
                     <td className="px-4 py-2 text-fg-3">{l.n}</td>
                     <td className={cn("px-4 py-2 font-semibold", l.lap === best ? "text-ok" : l.lap === worst ? "text-err" : "text-fg")}>
                       {fmt(l.lap)}
@@ -216,7 +212,7 @@ export default function Stopwatch({ locale }: { locale: Locale }) {
               </tbody>
             </table>
           </div>
-        </section>
+        </Panel>
       )}
     </div>
   );

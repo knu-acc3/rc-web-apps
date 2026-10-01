@@ -3,7 +3,7 @@
 import { useId, useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { CopyButton } from "@/ui/copy-button";
-import { Input, Select, Switch } from "@/ui/field";
+import { Field, Input, Select, Switch } from "@/ui/field";
 import { Panel } from "@/ui/panel";
 import { Segmented } from "@/ui/segmented";
 import { amountEn, amountRu, CURRENCIES, currencyByCode, moneyNumeric, parseMoney, type CurrencyCode, type MinorStyle, type Wrap } from "./lib/amount";
@@ -76,7 +76,7 @@ export default function AmountInWords({ locale, currency: cur0 = "RUB", value = 
 
   return (
     <Panel className="p-4 sm:p-6">
-      <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_minmax(0,15rem)]">
+      <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end">
         <div className="min-w-0">
           <label htmlFor={`${id}-a`} className="text-sm font-medium text-fg-2">
             {t.amount}
@@ -86,24 +86,21 @@ export default function AmountInWords({ locale, currency: cur0 = "RUB", value = 
             inputMode="decimal"
             autoComplete="off"
             size="lg"
-            className="mt-1.5 h-14! text-2xl! tabular"
+            className="mt-1.5 text-2xl! tabular"
             value={text}
             aria-invalid={!!error}
             onChange={(e) => setText(e.target.value)}
           />
         </div>
-        <div className="min-w-0">
-          <label htmlFor={`${id}-c`} className="text-sm font-medium text-fg-2">
-            {t.currency}
-          </label>
-          <Select id={`${id}-c`} size="lg" className="mt-1.5 [&_select]:h-14!" value={code} onChange={(e) => setCode(e.target.value as CurrencyCode)}>
+        <Field label={t.currency} htmlFor={`${id}-c`}>
+          <Select id={`${id}-c`} size="lg" value={code} onChange={(e) => setCode(e.target.value as CurrencyCode)}>
             {CURRENCIES.map((c) => (
               <option key={c.code} value={c.code}>
                 {c.symbol} {locale === "ru" ? c.ru.name : c.en.name}
               </option>
             ))}
           </Select>
-        </div>
+        </Field>
       </div>
 
       <div className="mt-5 min-h-16" aria-live="polite">

@@ -1,4 +1,4 @@
-import type { ComponentProps, ReactNode } from "react";
+import { createElement, type ComponentProps, type ReactNode } from "react";
 import { cn } from "@/lib/cn";
 
 /**
@@ -6,8 +6,13 @@ import { cn } from "@/lib/cn";
  * "filled"/"inset": a tonal block; "outlined": a hairline. A card inside a card automatically becomes a tonal inset
  * (`.panel .panel` in globals.css), so borders never nest.
  */
-export function Panel({ className, variant = "elevated", ...props }: ComponentProps<"div"> & { variant?: "elevated" | "filled" | "outlined" | "inset" }) {
-  return <div className={cn("panel", variant !== "elevated" && `panel-${variant}`, className)} {...props} />;
+export function Panel({
+  className,
+  variant = "elevated",
+  as = "div",
+  ...props
+}: ComponentProps<"div"> & { variant?: "elevated" | "filled" | "outlined" | "inset"; as?: "div" | "section" | "article" | "aside" | "ul" | "ol" }) {
+  return createElement(as, { className: cn("panel", variant !== "elevated" && `panel-${variant}`, className), ...props });
 }
 
 export function PanelHeader({

@@ -27,7 +27,7 @@ export default function Now({ locale }: NowProps) {
   return (
     <Panel className="flex flex-col items-center gap-4 px-4 py-8 text-center sm:py-12">
       <p className="text-sm font-medium text-fg-3">{t.device}</p>
-      <BigTime parts={p} className="text-[4rem] sm:text-[7rem]" />
+      <BigTime parts={p} className="text-[min(19vw,4rem)] sm:text-[7rem] 2xl:text-[9rem]" />
       <p className="min-h-7 text-lg text-fg-2 sm:text-xl">
         {p ? (
           <>
@@ -50,7 +50,7 @@ export default function Now({ locale }: NowProps) {
           " "
         )}
       </p>
-      <Link href={href(locale, ["online-clock"])} className={buttonClass("ghost", "sm")}>
+      <Link href={href(locale, ["online-clock"])} className={buttonClass("tonal", "md")}>
         <Maximize2 aria-hidden />
         {t.full}
       </Link>

@@ -5,9 +5,10 @@ import { useEffect, useId, useRef, useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { formatDate, formatNumber, parseNumber } from "@/i18n/format";
 import { Button } from "@/ui/button";
-import { Field, Input } from "@/ui/field";
 import { Notice, Panel } from "@/ui/panel";
+import { ScrollRow } from "@/ui/scroll-row";
 import { Segmented } from "@/ui/segmented";
+import { SliderField } from "@/ui/slider-field";
 import {
   clearCalibration,
   cssPpi,
@@ -131,7 +132,6 @@ export default function Calibrate({ locale }: { locale: Locale }) {
           label={t.method}
           value={method}
           onChange={setMethod}
-          size="sm"
           options={[
             { value: "card", label: t.card },
             { value: "diagonal", label: t.diagonal },
@@ -143,27 +143,31 @@ export default function Calibrate({ locale }: { locale: Locale }) {
           <CardMatcher key={state.ready ? "client" : "server"} locale={locale} initial={p} onSave={(v) => saveCalibration(v, "card") !== null} />
         ) : (
           <div className="flex flex-col gap-4">
-            <Field label={t.diagLabel} htmlFor={`${id}-d`} hint={t.diagHint} error={diagText.trim() && !diagValid ? t.invalid : undefined}>
-              <Input
-                id={`${id}-d`}
-                inputMode="decimal"
-                autoComplete="off"
-                value={diagText}
-                onChange={(e) => {
-                  setDiagText(e.target.value);
-                  setDiagSaved(false);
-                }}
-                aria-invalid={!!diagText.trim() && !diagValid}
-                size="lg"
-                className="tabular max-w-48"
-              />
-            </Field>
-            <div className="flex flex-wrap gap-1.5" role="group" aria-label={t.presets}>
+            <SliderField
+              id={`${id}-d`}
+              label={t.diagLabel}
+              value={diagText}
+              onChange={(v) => {
+                setDiagText(v);
+                setDiagSaved(false);
+              }}
+              parse={(x) => parseNumber(x)}
+              format={(v) => nf(v, 1)}
+              min={5}
+              max={32}
+              step={0.1}
+              scale="log"
+              hint={t.diagHint}
+              error={diagText.trim() && !diagValid ? t.invalid : undefined}
+              className="lg:max-w-2xl"
+            />
+            <ScrollRow label={t.presets} rowClassName="gap-1.5">
               {PRESETS.map((d) => (
                 <button
                   key={d}
                   type="button"
-                  className="chip h-8! px-3! text-[0.8125rem]!"
+                  aria-pressed={diag === d}
+                  className="chip tabular"
                   onClick={() => {
                     setDiagText(nf(d, 1));
                     setDiagSaved(false);
@@ -172,7 +176,7 @@ export default function Calibrate({ locale }: { locale: Locale }) {
                   {nf(d, 1)}″
                 </button>
               ))}
-            </div>
+            </ScrollRow>
             <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
               <div>
                 <p className="tabular text-2xl font-semibold tracking-tight text-fg sm:text-3xl" aria-live="polite">
@@ -184,7 +188,7 @@ export default function Calibrate({ locale }: { locale: Locale }) {
                   </p>
                 )}
               </div>
-              <Button variant="primary" onClick={saveDiagonal} disabled={diagPx === null || !isPlausiblePxPerMm(diagPx)}>
+              <Button variant="filled" size="lg" onClick={saveDiagonal} disabled={diagPx === null || !isPlausiblePxPerMm(diagPx)}>
                 {diagSaved && <Check aria-hidden />}
                 {diagSaved ? t.saved : t.save}
               </Button>
@@ -250,7 +254,7 @@ export default function Calibrate({ locale }: { locale: Locale }) {
         <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
           <p className="text-sm text-fg-3">{t.storage}</p>
           {state.calibrated && (
-            <Button variant="ghost" size="sm" onClick={clearCalibration}>
+            <Button variant="text" onClick={clearCalibration}>
               {t.reset}
             </Button>
           )}

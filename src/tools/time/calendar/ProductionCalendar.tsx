@@ -45,7 +45,7 @@ export default function ProductionCalendar({ locale, country, year, others }: Pr
                 key={`${o.country}${o.year}`}
                 href={href(locale, o.path)}
                 aria-current={active ? "page" : undefined}
-                className={active ? "chip border-accent! text-accent!" : "chip"}
+                className="chip"
               >
                 {t[o.country]} {o.year}
               </Link>
@@ -58,14 +58,14 @@ export default function ProductionCalendar({ locale, country, year, others }: Pr
         <Stat label={t.off} value={formatNumber(locale, norm.offDays)} />
         <Stat label={t.hours} value={formatNumber(locale, norm.hours40)} />
       </div>
-      <div className="grid gap-x-6 gap-y-5 rounded-[0.75rem] border border-line bg-surface p-4 sm:grid-cols-2 sm:p-5 lg:grid-cols-3 xl:grid-cols-4 print:grid-cols-3 print:border-0 print:p-0">
+      <div className="panel grid gap-x-6 gap-y-5 p-4 sm:grid-cols-2 sm:p-5 lg:grid-cols-3 xl:grid-cols-4 print:grid-cols-3 print:p-0 print:shadow-none">
         {MONTHS.map((m) => (
           <MonthGrid key={m} locale={locale} year={year} month={m} mark={mark} today={today} />
         ))}
       </div>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <Legend locale={locale} choice={country} />
-        <Button variant="ghost" size="sm" onClick={() => window.print()} className="print:hidden">
+        <Button variant="tonal" size="sm" onClick={() => window.print()} className="print:hidden">
           <Printer aria-hidden />
           {t.print}
         </Button>

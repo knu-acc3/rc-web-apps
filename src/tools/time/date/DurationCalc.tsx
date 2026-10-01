@@ -58,7 +58,7 @@ export default function DurationCalc({ locale }: { locale: Locale }) {
 
   return (
     <div className="flex flex-col gap-4">
-      <Panel className="grid gap-5 p-4 sm:grid-cols-2 sm:p-5">
+      <Panel className="grid gap-5 p-4 sm:p-6 md:grid-cols-2">
         <div className="flex flex-col gap-2">
           <label htmlFor={`${id}-t`} className="text-sm font-medium text-fg-2">
             {t.label}
@@ -80,9 +80,9 @@ export default function DurationCalc({ locale }: { locale: Locale }) {
             />
           </div>
         </div>
-        <div className="flex flex-col items-center justify-center gap-3 rounded-[0.625rem] bg-surface-2 p-4">
+        <div className="flex min-w-0 flex-col items-center justify-center gap-4 rounded-[1rem] bg-surface-2 p-4 sm:p-6">
           <BigResult caption={t.total} value={hasInput ? shown : "—"} />
-          {hasInput && <CopyButton value={shown} label={t.copy} copiedLabel={t.copied} variant="ghost" />}
+          {hasInput && <CopyButton value={shown} label={t.copy} copiedLabel={t.copied} variant="secondary" />}
           {hasInput && (
             <dl className="grid w-full grid-cols-3 gap-2 text-center text-[0.8125rem]">
               <div>

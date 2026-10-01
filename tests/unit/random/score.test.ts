@@ -1,5 +1,26 @@
 import { describe, expect, it } from "vitest";
-import { addScore, countStep, digitsScale, matchWinner, percentOf, setWinner, tableTennisServer } from "@/tools/random/score/lib/score";
+import {
+  addScore,
+  clockElapsed,
+  clockMs,
+  clockOver,
+  clockReset,
+  clockToggle,
+  countStep,
+  digitsScale,
+  formatClock,
+  isClock,
+  isSteps,
+  matchWinner,
+  newClock,
+  percentOf,
+  setWinner,
+  sportClock,
+  tableTennisServer,
+  tallyGroups,
+  tallyView,
+} from "@/tools/random/score/lib/score";
+import { isBoard, isTally } from "@/tools/random/score/lib/state";
 import { buildLots, defaultMafia } from "@/tools/random/random/lib/lots";
 
 describe("scoreboard", () => {
@@ -52,7 +73,121 @@ describe("scoreboard", () => {
   });
 });
 
+describe("saved boards", () => {
+  // Exactly what the previous version stored in localStorage.
+  const old = { title: "Финал", names: ["", "Гости"], scores: [12, 9], small: [1, 0], period: 2, serve: null, theme: "led", showSmall: true, flip: false };
+
+  it("still accepts a board saved before buttons and the clock existed", () => {
+    expect(isBoard(old)).toBe(true);
+  });
+
+  it("accepts the new optional fields and rejects broken ones", () => {
+    expect(isBoard({ ...old, steps: [1, 2, 3], clock: newClock(10, "down") })).toBe(true);
+    expect(isBoard({ ...old, clock: null })).toBe(true);
+    expect(isBoard({ ...old, steps: [] })).toBe(false);
+    expect(isBoard({ ...old, steps: [1, 0.5] })).toBe(false);
+    expect(isBoard({ ...old, clock: { running: true } })).toBe(false);
+    expect(isBoard({ ...old, theme: "pink" })).toBe(false);
+  });
+
+  it("validates button sets", () => {
+    expect(isSteps([1, 5, 10])).toBe(true);
+    expect(isSteps([1, 2, 3, 4, 5])).toBe(false);
+    expect(isSteps("1")).toBe(false);
+  });
+});
+
+describe("game clock", () => {
+  const t0 = 1_700_000_000_000;
+
+  it("has sport defaults", () => {
+    expect(sportClock("basketball")).toMatchObject({ lengthMs: 600_000, dir: "down", running: false });
+    expect(sportClock("football")).toMatchObject({ lengthMs: 2_700_000, dir: "up" });
+    expect(sportClock("hockey")).toMatchObject({ lengthMs: 1_200_000, dir: "down" });
+    expect(sportClock("volleyball")).toBeNull();
+  });
+
+  it("counts down from the period length and stops at zero", () => {
+    const c = clockToggle(newClock(10, "down"), t0);
+    expect(c.running).toBe(true);
+    expect(clockMs(c, t0)).toBe(600_000);
+    expect(clockMs(c, t0 + 61_000)).toBe(539_000);
+    expect(clockMs(c, t0 + 700_000)).toBe(0);
+    expect(clockOver(c, t0 + 600_000)).toBe(true);
+    expect(clockOver(c, t0 + 599_999)).toBe(false);
+  });
+
+  it("counts up and never past the period", () => {
+    const c = clockToggle(newClock(45, "up"), t0);
+    expect(clockMs(c, t0 + 90_000)).toBe(90_000);
+    expect(clockMs(c, t0 + 99 * 60_000)).toBe(45 * 60_000);
+  });
+
+  it("pauses, resumes and resets", () => {
+    let c = clockToggle(newClock(10, "down"), t0);
+    c = clockToggle(c, t0 + 30_000);
+    expect(c).toMatchObject({ running: false, baseMs: 30_000, startedAt: null });
+    expect(clockMs(c, t0 + 999_999)).toBe(570_000);
+    c = clockToggle(c, t0 + 100_000);
+    expect(clockElapsed(c, t0 + 110_000)).toBe(40_000);
+    expect(clockReset(c)).toMatchObject({ running: false, baseMs: 0, startedAt: null });
+  });
+
+  it("starts the next period from zero once the time ran out", () => {
+    const over = { ...newClock(1, "down"), baseMs: 60_000 };
+    expect(clockMs(clockToggle(over, t0), t0)).toBe(60_000);
+  });
+
+  it("ignores a start time in the future (clock changed)", () => {
+    const c = clockToggle(newClock(10, "up"), t0);
+    expect(clockMs(c, t0 - 5_000)).toBe(0);
+  });
+
+  it("formats like a scoreboard", () => {
+    expect(formatClock(600_000, "down")).toBe("10:00");
+    expect(formatClock(599_001, "down")).toBe("10:00");
+    expect(formatClock(545_000, "down")).toBe("9:05");
+    expect(formatClock(59_950, "down")).toBe("59.9");
+    expect(formatClock(0, "down")).toBe("0.0");
+    expect(formatClock(61_999, "up")).toBe("1:01");
+    expect(formatClock(2_700_000, "up")).toBe("45:00");
+  });
+
+  it("validates saved clocks", () => {
+    expect(isClock(newClock(20, "down"))).toBe(true);
+    expect(isClock({ ...newClock(20, "down"), dir: "left" })).toBe(false);
+    expect(isClock({ ...newClock(20, "down"), lengthMs: 0 })).toBe(false);
+  });
+});
+
+describe("tally marks", () => {
+  it("groups strokes by five", () => {
+    expect(tallyGroups(0)).toEqual([]);
+    expect(tallyGroups(-3)).toEqual([]);
+    expect(tallyGroups(4)).toEqual([4]);
+    expect(tallyGroups(5)).toEqual([5]);
+    expect(tallyGroups(12)).toEqual([5, 5, 2]);
+    expect(tallyGroups(500)).toHaveLength(100);
+  });
+
+  it("falls back to digits for negatives and big numbers", () => {
+    expect(tallyView(12)).toEqual({ marks: 12, digits: false });
+    expect(tallyView(500)).toEqual({ marks: 500, digits: false });
+    expect(tallyView(501)).toEqual({ marks: 1, digits: true });
+    expect(tallyView(600)).toEqual({ marks: 100, digits: true });
+    expect(tallyView(1234)).toEqual({ marks: 34, digits: true });
+    expect(tallyView(-2)).toEqual({ marks: 0, digits: true });
+  });
+});
+
 describe("counter", () => {
+  it("still accepts a counter saved before the tally view existed", () => {
+    const old = { title: "", items: [{ name: "", value: 7 }], step: 1, goal: 33, loop: true, laps: 2, sound: false, active: 0 };
+    expect(isTally(old)).toBe(true);
+    expect(isTally({ ...old, view: "tally" })).toBe(true);
+    expect(isTally({ ...old, view: "dots" })).toBe(false);
+  });
+
   it("counts laps when looping", () => {
     expect(countStep(32, 0, 1, 33, true)).toEqual({ value: 0, laps: 1, reached: true });
     expect(countStep(31, 2, 5, 33, true)).toEqual({ value: 3, laps: 3, reached: true });

@@ -32,6 +32,7 @@ export function NumberInput({
   disabled,
   invalid,
   className,
+  onEnter,
   "aria-label": ariaLabel,
   "aria-describedby": describedBy,
 }: {
@@ -52,6 +53,8 @@ export function NumberInput({
   disabled?: boolean;
   invalid?: boolean;
   className?: string;
+  /** Enter in the field (e.g. "generate"). */
+  onEnter?: () => void;
   "aria-label"?: string;
   "aria-describedby"?: string;
 }) {
@@ -90,7 +93,10 @@ export function NumberInput({
   };
 
   const onKey = (e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "ArrowUp" || e.key === "ArrowDown") {
+    if (e.key === "Enter" && onEnter) {
+      e.preventDefault();
+      onEnter();
+    } else if (e.key === "ArrowUp" || e.key === "ArrowDown") {
       e.preventDefault();
       bump(e.key === "ArrowUp" ? 1 : -1);
     }

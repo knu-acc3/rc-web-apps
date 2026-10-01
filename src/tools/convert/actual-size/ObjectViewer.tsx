@@ -176,17 +176,17 @@ export default function ObjectViewer({ locale, items, initial, fixed = false, re
       <CalibrationBar locale={locale} state={cal} />
 
       {!fixed && items.length > 1 && (
-        <div className="max-w-md">
+        <div className="min-w-0">
           <label htmlFor={`${id}-o`} className="sr-only">
             {t.object}
           </label>
-          <Select id={`${id}-o`} value={main.slug} onChange={(e) => setSlug(e.target.value)} size="lg">
+          <Select id={`${id}-o`} value={main.slug} onChange={(e) => setSlug(e.target.value)} size="lg" variant="tonal" fit="selected">
             {grouped(items)}
           </Select>
         </div>
       )}
 
-      <div ref={stageRef} className="scrollbar-thin overflow-x-auto rounded-[0.75rem] border border-line bg-bg">
+      <div ref={stageRef} className="scrollbar-thin overflow-x-auto rounded-[1.25rem] bg-surface shadow-card">
         <svg role="img" aria-label={`${name}: ${size(main)}`} viewBox={`0 0 ${TW} ${TH}`} width={naturalW * scale} height={naturalH * scale} className="mx-auto block max-w-none">
           <g transform={place(a)}>
             <ObjectArt o={main} />
@@ -231,18 +231,18 @@ export default function ObjectViewer({ locale, items, initial, fixed = false, re
         </div>
         <div className="flex flex-wrap items-center gap-2">
           {pool.length > 1 && (
-            <div className="w-48">
+            <div className="min-w-0 max-w-full">
               <label htmlFor={`${id}-c`} className="sr-only">
                 {t.compare}
               </label>
-              <Select id={`${id}-c`} value={other ? other.slug : ""} onChange={(e) => setCmp(e.target.value)} size="sm">
+              <Select id={`${id}-c`} value={other ? other.slug : ""} onChange={(e) => setCmp(e.target.value)} size="sm" fit="selected">
                 <option value="">{t.none}</option>
                 {grouped(pool.filter((x) => x.slug !== main.slug))}
               </Select>
             </div>
           )}
           {!(round && (!other || ROUND_SHAPES.has(other.shape))) && (
-            <Button variant="ghost" size="sm" onClick={() => setRotation(!rotated)} aria-pressed={rotated} title={t.rotateLabel}>
+            <Button variant="tonal" size="sm" onClick={() => setRotation(!rotated)} aria-pressed={rotated} title={t.rotateLabel}>
               <RotateCw aria-hidden />
               {t.rotate}
             </Button>

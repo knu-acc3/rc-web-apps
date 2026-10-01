@@ -95,10 +95,10 @@ export default function CityTime({ locale, city, compare, world }: CityTimeProps
   }, [compare, world, city.key]);
 
   return (
-    <div className="flex flex-col gap-4">
-      <Panel className="px-4 py-7 sm:px-8 sm:py-10">
+    <div className="grid gap-4 xl:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] xl:items-start">
+      <Panel className="min-w-0 px-4 py-7 sm:px-8 sm:py-10">
         <div className="flex flex-col items-center gap-3 text-center">
-          <BigTime parts={p} className="text-[3.75rem] sm:text-[6.5rem]" />
+          <BigTime parts={p} className="text-[min(18vw,3.75rem)] sm:text-[6.5rem] 2xl:text-[8rem]" />
           <p className="min-h-7 text-lg text-fg-2 sm:text-xl">{p ? longDate(locale, p) : " "}</p>
           <p className="min-h-6 text-[0.9375rem] text-fg-3">
             {p ? fmtOffset(p.off) : "UTC"}
@@ -128,9 +128,9 @@ export default function CityTime({ locale, city, compare, world }: CityTimeProps
         <p className="mt-4 min-h-5 text-center text-sm text-fg-3">{dst ?? " "}</p>
       </Panel>
 
-      <Panel>
+      <Panel className="min-w-0 overflow-hidden">
         <h2 className="border-b border-line px-4 py-3 text-sm font-semibold text-fg">{t.table}</h2>
-        <ul className="rows">
+        <ul className="rows xl:grid-cols-1! xl:[&>li]:border-r-0!">
           {others.map((x) => {
             const q = now !== null ? placeParts(x, now) : null;
             const shift = q && p ? dayShift(locale, p, q) : "";

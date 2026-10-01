@@ -1,17 +1,21 @@
 "use client";
 
-import { Maximize, Minus, Plus, RotateCcw, Trash2, Undo2, Volume2, VolumeX } from "lucide-react";
+import { Hash, Maximize, Minus, Plus, RotateCcw, Tally5, Trash2, Undo2, Volume2, VolumeX } from "lucide-react";
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import type { Locale } from "@/i18n/config";
 import { cn } from "@/lib/cn";
 import { usePersistentState } from "@/lib/persist";
-import { Button } from "@/ui/button";
+import { Button, IconButton } from "@/ui/button";
 import { CopyButton } from "@/ui/copy-button";
 import { Field, Input, Switch } from "@/ui/field";
-import { Kbd } from "@/ui/panel";
+import { NumberInput } from "@/ui/number-input";
+import { Kbd, Panel } from "@/ui/panel";
 import { Segmented } from "@/ui/segmented";
 import { StageLayer, typingTarget, useStage } from "@/ui/stage";
-import { clampCounter, countStep, digitsScale, percentOf, total } from "./lib/score";
+import { clampCounter, countStep, digitsScale, percentOf, tallyView, total } from "./lib/score";
+import { isTally, MAX_COUNTERS, type CounterView, type Tally } from "./lib/state";
+import { useSound } from "./ui/sound";
+import { TallyMarks } from "./ui/TallyMarks";
 
 export type CounterPreset = "single" | "people" | "votes" | "beads";
 const PRESETS: CounterPreset[] = ["single", "people", "votes", "beads"];
@@ -30,9 +34,11 @@ const T = {
     reset: "Сбросить",
     full: "На весь экран",
     step: "Шаг",
+    view: "Вид",
+    views: { number: "Число", tally: "Палочки" },
     goal: "Цель",
     goalPh: "Без цели",
-    loop: "После цели начинать заново",
+    loop: "После цели — заново",
     laps: "Кругов",
     sound: "Звук",
     total: "Всего",
@@ -40,13 +46,12 @@ const T = {
     copy: "Копировать итог",
     copied: "Скопировано",
     reached: "Цель достигнута",
-    keys: "Клавиши",
     plusKeys: "плюс",
     minusKeys: "минус",
     rowKeys: "плюс к счётчику",
     stage: "Счётчик на весь экран",
     close: "Закрыть",
-    tapHint: "Нажмите в любом месте экрана, чтобы добавить",
+    tapHint: "Нажмите в любом месте экрана",
   },
   en: {
     title: "What are you counting",
@@ -61,6 +66,8 @@ const T = {
     reset: "Reset",
     full: "Full screen",
     step: "Step",
+    view: "View",
+    views: { number: "Number", tally: "Tally marks" },
     goal: "Goal",
     goalPh: "No goal",
     loop: "Start over after the goal",
@@ -71,34 +78,22 @@ const T = {
     copy: "Copy result",
     copied: "Copied",
     reached: "Goal reached",
-    keys: "Keys",
     plusKeys: "plus",
     minusKeys: "minus",
     rowKeys: "add to counter",
     stage: "Full-screen counter",
     close: "Close",
-    tapHint: "Tap anywhere on the screen to add",
+    tapHint: "Tap anywhere on the screen",
   },
 } as const;
 
-interface Item {
-  name: string;
-  value: number;
-}
-
-interface Tally {
-  title: string;
-  items: Item[];
-  step: number;
-  goal: number | null;
-  loop: boolean;
-  laps: number;
-  sound: boolean;
-  active: number;
-}
+type View = CounterView;
 
 const STEPS = [1, 2, 5, 10] as const;
-const MAX_ITEMS = 24;
+const MAX_ITEMS = MAX_COUNTERS;
+const MAX_GOAL = 1_000_000;
+/** Above this a list row shows only digits: the small marks would not fit. */
+const ROW_TALLY_MAX = 100;
 
 const fresh = (preset: CounterPreset, locale: Locale): Tally => ({
   title: "",
@@ -111,54 +106,6 @@ const fresh = (preset: CounterPreset, locale: Locale): Tally => ({
   active: 0,
 });
 
-const isTally = (v: unknown): v is Tally => {
-  if (!v || typeof v !== "object") return false;
-  const s = v as Tally;
-  return (
-    typeof s.title === "string" &&
-    Array.isArray(s.items) &&
-    s.items.length > 0 &&
-    s.items.length <= MAX_ITEMS &&
-    s.items.every((i) => i && typeof i.name === "string" && typeof i.value === "number" && Number.isFinite(i.value)) &&
-    typeof s.step === "number" &&
-    (s.goal === null || typeof s.goal === "number") &&
-    typeof s.loop === "boolean" &&
-    typeof s.laps === "number" &&
-    typeof s.sound === "boolean" &&
-    typeof s.active === "number"
-  );
-};
-
-/** A short click (or a higher two-tone beep when the goal is reached), made on the fly. */
-function useTick() {
-  const ctx = useRef<AudioContext | null>(null);
-  return (goal: boolean) => {
-    try {
-      const AC = window.AudioContext ?? (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
-      if (!AC) return;
-      ctx.current ??= new AC();
-      const c = ctx.current;
-      if (c.state === "suspended") void c.resume();
-      const tones = goal ? [880, 1320] : [1400];
-      tones.forEach((f, i) => {
-        const o = c.createOscillator();
-        const g = c.createGain();
-        const t0 = c.currentTime + i * 0.12;
-        const len = goal ? 0.11 : 0.025;
-        o.frequency.value = f;
-        o.type = goal ? "sine" : "square";
-        g.gain.setValueAtTime(goal ? 0.25 : 0.08, t0);
-        g.gain.exponentialRampToValueAtTime(0.0001, t0 + len);
-        o.connect(g).connect(c.destination);
-        o.start(t0);
-        o.stop(t0 + len + 0.01);
-      });
-    } catch {
-      // audio unavailable
-    }
-  };
-}
-
 export default function Counter({ locale, preset: presetProp = "single" }: { locale: Locale; preset?: string }) {
   const t = T[locale];
   const preset: CounterPreset = (PRESETS as string[]).includes(presetProp) ? (presetProp as CounterPreset) : "single";
@@ -166,12 +113,13 @@ export default function Counter({ locale, preset: presetProp = "single" }: { loc
   const [past, setPast] = useState<Tally[]>([]);
   const [flash, setFlash] = useState(0);
   const stage = useStage();
-  const tick = useTick();
+  const { play: playSound } = useSound();
 
   const single = s.items.length === 1;
   const active = Math.min(s.active, s.items.length - 1);
   const sum = total(s.items.map((i) => i.value));
   const showPercent = preset === "votes" && !single;
+  const view: View = s.view ?? "number";
 
   const commit = (next: Tally) => {
     setPast((p) => [...p.slice(-199), s]);
@@ -204,7 +152,7 @@ export default function Counter({ locale, preset: presetProp = "single" }: { loc
     } catch {
       // not supported
     }
-    if (s.sound) tick(reached);
+    if (s.sound) playSound(reached ? "goal" : "tick");
     if (reached) setFlash((f) => f + 1);
     commit({ ...s, items, laps, active: index });
   };
@@ -262,33 +210,59 @@ export default function Counter({ locale, preset: presetProp = "single" }: { loc
   }, []);
 
   const value = s.items[0].value;
+  const tv = tallyView(value);
   const goalShare = single && s.goal ? Math.min(1, Math.max(0, value / s.goal)) : 0;
   const bigNumber = (cls: string, style?: CSSProperties) => (
     <span
       key={flash}
-      className={cn("inline-block tabular-nums font-bold leading-none tracking-tight", flash > 0 && "animate-[pop_0.5s_ease-out]", cls)}
+      className={cn("inline-block tabular-nums font-bold leading-none tracking-tight", flash > 0 && "motion-safe:animate-[pop_0.5s_ease-out]", cls)}
       style={{ ["--k" as string]: digitsScale(value), ...style }}
     >
       {value}
     </span>
   );
-
-  const toolbar = (
-    <div className="flex items-center gap-1">
-      <Button size="icon" variant="ghost" onClick={undo} disabled={past.length === 0} aria-label={t.undo} title={t.undo}>
-        <Undo2 aria-hidden />
-      </Button>
-      <Button size="icon" variant="ghost" onClick={reset} aria-label={t.reset} title={t.reset}>
-        <RotateCcw aria-hidden />
-      </Button>
-      <Button size="icon" variant="ghost" onClick={() => setS({ ...s, sound: !s.sound })} aria-pressed={s.sound} aria-label={t.sound} title={t.sound}>
-        {s.sound ? <Volume2 aria-hidden /> : <VolumeX aria-hidden />}
-      </Button>
-      <Button variant="primary" onClick={stage.enter} title={t.full}>
-        <Maximize aria-hidden />
-        <span className="max-sm:sr-only">{t.full}</span>
-      </Button>
+  /** The single counter as tally marks (with the number under them) or, past 500 or below 0, digits first. */
+  const tallyDisplay = (big: boolean) => (
+    <div key={flash} className={cn("flex w-full flex-col items-center", big ? "gap-[3vmin]" : "gap-3", flash > 0 && "motion-safe:animate-[pop_0.5s_ease-out]")}>
+      {tv.digits && bigNumber(big ? "[font-size:calc(min(30vh,24vw)*var(--k))]" : "text-fg [font-size:calc(min(24cqw,8rem)*var(--k))]")}
+      {(!tv.digits || tv.marks > 0) && <TallyMarks count={tv.marks} size={big ? "full" : "md"} label={String(value)} className={big ? "max-w-[94vw]" : undefined} />}
+      {!tv.digits && <span className={cn("tabular-nums font-bold leading-none", big ? "text-white/70 [font-size:clamp(1.5rem,6vmin,4rem)]" : "text-3xl text-fg-2")}>{value}</span>}
     </div>
+  );
+
+  const goalLine = (s.goal || s.laps > 0) && (
+    <div className="flex w-full max-w-sm flex-col items-center gap-1.5">
+      {s.goal ? (
+        <div className="h-2 w-full overflow-hidden rounded-full bg-surface-2" role="progressbar" aria-valuemin={0} aria-valuemax={s.goal} aria-valuenow={Math.min(value, s.goal)} aria-label={t.goal}>
+          <div className={cn("h-full rounded-full transition-[width] duration-200", goalShare >= 1 ? "bg-ok" : "bg-accent")} style={{ width: `${goalShare * 100}%` }} />
+        </div>
+      ) : null}
+      <span className="tabular-nums text-sm text-fg-2">
+        {s.goal ? `${Math.min(value, s.goal)} / ${s.goal}` : ""}
+        {s.goal && s.laps > 0 ? " · " : ""}
+        {s.laps > 0 ? `${t.laps}: ${s.laps}` : ""}
+        {s.goal && !s.loop && value >= s.goal ? ` · ${t.reached}` : ""}
+      </span>
+    </div>
+  );
+
+  const viewSwitch = (
+    <Field label={t.view}>
+      <Segmented
+        label={t.view}
+        value={view}
+        onChange={(v) => setS({ ...s, view: v })}
+        options={[
+          { value: "number", label: t.views.number, icon: <Hash className="size-4 shrink-0" aria-hidden /> },
+          { value: "tally", label: t.views.tally, icon: <Tally5 className="size-4 shrink-0" aria-hidden /> },
+        ]}
+      />
+    </Field>
+  );
+  const stepSwitch = (
+    <Field label={t.step}>
+      <Segmented label={t.step} value={String(s.step)} onChange={(v) => setS({ ...s, step: Number(v) })} options={STEPS.map((n) => ({ value: String(n), label: String(n) }))} />
+    </Field>
   );
 
   return (
@@ -302,89 +276,96 @@ export default function Counter({ locale, preset: presetProp = "single" }: { loc
           onChange={(e) => setS({ ...s, title: e.target.value })}
           className="min-w-0 flex-1 basis-40 font-semibold"
         />
-        {toolbar}
+        <div className="flex items-center gap-1">
+          <IconButton label={t.undo} icon={<Undo2 aria-hidden />} onClick={undo} disabled={past.length === 0} />
+          <IconButton label={t.reset} icon={<RotateCcw aria-hidden />} onClick={reset} />
+          <IconButton label={t.sound} icon={s.sound ? <Volume2 aria-hidden /> : <VolumeX aria-hidden />} selected={s.sound} onClick={() => setS({ ...s, sound: !s.sound })} />
+          <Button variant="tonal" onClick={stage.enter} title={t.full}>
+            <Maximize aria-hidden />
+            <span className="max-sm:sr-only">{t.full}</span>
+          </Button>
+        </div>
       </div>
 
       {single ? (
-        <div className="@container flex flex-col gap-3 rounded-[1rem] border border-line-strong bg-surface p-3 sm:p-4">
-          <div className="flex min-h-[38cqw] flex-col items-center justify-center gap-2 py-2 sm:min-h-0 sm:py-6">
-            {bigNumber("text-fg [font-size:calc(min(34cqw,12rem)*var(--k))]")}
-            {(s.goal || s.laps > 0) && (
-              <div className="flex w-full max-w-sm flex-col items-center gap-1.5">
-                {s.goal ? (
-                  <div
-                    className="h-2 w-full overflow-hidden rounded-full bg-surface-2"
-                    role="progressbar"
-                    aria-valuemin={0}
-                    aria-valuemax={s.goal}
-                    aria-valuenow={Math.min(value, s.goal)}
-                    aria-label={t.goal}
-                  >
-                    <div className={cn("h-full rounded-full transition-[width] duration-200", goalShare >= 1 ? "bg-ok" : "bg-accent")} style={{ width: `${goalShare * 100}%` }} />
-                  </div>
-                ) : null}
-                <span className="tabular-nums text-sm text-fg-2">
-                  {s.goal ? `${Math.min(value, s.goal)} / ${s.goal}` : ""}
-                  {s.goal && s.laps > 0 ? " · " : ""}
-                  {s.laps > 0 ? `${t.laps}: ${s.laps}` : ""}
-                  {s.goal && !s.loop && value >= s.goal ? ` · ${t.reached}` : ""}
-                </span>
+        <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(17rem,22rem)] lg:items-start">
+          <Panel className="@container flex flex-col gap-3 p-3 [--tally-cross:var(--accent)] sm:p-4">
+            <div className="flex min-h-[38cqw] flex-col items-center justify-center gap-3 py-2 sm:min-h-[16rem] sm:py-6">
+              {view === "tally" ? tallyDisplay(false) : bigNumber("text-fg [font-size:calc(min(34cqw,12rem)*var(--k))]")}
+              {goalLine}
+            </div>
+            <div className="grid grid-cols-[1fr_3fr] gap-2">
+              <Button size="lg" variant="tonal" onClick={() => bump(0, -s.step)} aria-label={t.sub(s.step)} className="h-20 text-2xl sm:h-24">
+                <Minus className="size-7!" aria-hidden />
+              </Button>
+              <Button size="lg" variant="filled" onClick={() => bump(0, s.step)} aria-label={t.add(s.step)} className="h-20 text-3xl font-bold sm:h-24">
+                <Plus className="size-8!" aria-hidden />
+                {s.step > 1 && <span className="tabular-nums">{s.step}</span>}
+              </Button>
+            </div>
+          </Panel>
+
+          <div className="flex flex-wrap items-end gap-x-5 gap-y-4 lg:flex-col lg:items-stretch">
+            {viewSwitch}
+            {stepSwitch}
+            <Field label={t.goal} htmlFor="counter-goal" className="w-44">
+              <NumberInput id="counter-goal" locale={locale} min={1} max={MAX_GOAL} placeholder={t.goalPh} value={s.goal} onChange={(g) => setS({ ...s, goal: g && g > 0 ? g : null })} />
+            </Field>
+            {preset === "beads" && (
+              <div className="flex flex-wrap gap-1.5">
+                {[33, 99, 100, 108].map((g) => (
+                  <button key={g} type="button" className="chip tabular-nums" aria-pressed={s.goal === g} onClick={() => setS({ ...s, goal: g })}>
+                    {g}
+                  </button>
+                ))}
               </div>
             )}
-          </div>
-          <div className="grid grid-cols-[1fr_3fr] gap-2">
-            <Button size="lg" variant="secondary" onClick={() => bump(0, -s.step)} aria-label={t.sub(s.step)} className="h-20 text-2xl sm:h-24">
-              <Minus className="size-7!" aria-hidden />
-            </Button>
-            <Button size="lg" variant="primary" onClick={() => bump(0, s.step)} aria-label={t.add(s.step)} className="h-20 text-3xl font-bold sm:h-24">
-              <Plus className="size-8!" aria-hidden />
-              {s.step > 1 && <span className="tabular-nums">{s.step}</span>}
-            </Button>
+            {s.goal ? <Switch label={t.loop} checked={s.loop} onChange={(e) => setS({ ...s, loop: e.target.checked })} /> : null}
+            <div className="flex flex-wrap items-center gap-2">
+              <Button variant="outlined" onClick={addItem}>
+                <Plus aria-hidden />
+                {t.addCounter}
+              </Button>
+              <CopyButton value={resultText} label={t.copy} copiedLabel={t.copied} variant="ghost" compact />
+            </div>
           </div>
         </div>
       ) : (
         <div className="flex flex-col gap-2">
-          <ul className="flex flex-col gap-2">
+          <ul className="grid gap-2 xl:grid-cols-2">
             {s.items.map((it, i) => {
               const pct = percentOf(it.value, sum);
+              const marks = view === "tally" && it.value > 0 && it.value <= ROW_TALLY_MAX;
               return (
                 <li
                   key={i}
-                  className={cn(
-                    "relative flex items-center gap-1.5 overflow-hidden rounded-[0.75rem] border bg-surface p-1.5 sm:gap-2 sm:p-2",
-                    i === active ? "border-accent" : "border-line",
-                  )}
+                  className={cn("relative overflow-hidden rounded-[1rem] bg-surface-2 p-1.5 [--tally-cross:var(--accent)] sm:p-2", i === active && "ring-2 ring-accent")}
                   onFocusCapture={() => s.active !== i && setS({ ...s, active: i })}
                 >
-                  {showPercent && (
-                    <span aria-hidden className="pointer-events-none absolute inset-y-0 left-0 bg-accent/10 transition-[width] duration-200" style={{ width: `${pct}%` }} />
-                  )}
-                  <span className="relative hidden w-5 shrink-0 text-center text-sm text-fg-3 sm:block">{i < 9 ? i + 1 : ""}</span>
-                  <input
-                    value={it.name}
-                    onChange={(e) => rename(i, e.target.value)}
-                    placeholder={t.itemPh(i + 1)}
-                    aria-label={t.itemPh(i + 1)}
-                    maxLength={40}
-                    className="relative min-w-0 flex-1 rounded-[0.375rem] bg-transparent px-1.5 py-1.5 font-medium outline-none focus:ring-2 focus:ring-accent/40"
-                  />
-                  {showPercent && <span className="tabular-nums relative w-12 shrink-0 text-right text-sm text-fg-2 max-[379px]:hidden">{pct} %</span>}
-                  <Button size="icon" variant="ghost" onClick={() => bump(i, -s.step)} aria-label={`${nameOf(i)}: ${t.sub(s.step)}`} className="relative">
-                    <Minus aria-hidden />
-                  </Button>
-                  <span className="tabular-nums relative min-w-10 text-center text-2xl font-bold">{it.value}</span>
-                  <Button size="icon" variant="primary" onClick={() => bump(i, s.step)} aria-label={`${nameOf(i)}: ${t.add(s.step)}`} className="relative">
-                    <Plus aria-hidden />
-                  </Button>
-                  <Button size="icon-sm" variant="ghost" onClick={() => removeItem(i)} aria-label={`${t.remove}: ${nameOf(i)}`} title={t.remove} className="relative text-fg-3">
-                    <Trash2 aria-hidden />
-                  </Button>
+                  {showPercent && <span aria-hidden className="pointer-events-none absolute inset-y-0 left-0 bg-accent/10 transition-[width] duration-200" style={{ width: `${pct}%` }} />}
+                  <div className="relative flex items-center gap-1.5 sm:gap-2">
+                    <span className="hidden w-5 shrink-0 text-center text-sm text-fg-3 sm:block">{i < 9 ? i + 1 : ""}</span>
+                    <input
+                      value={it.name}
+                      onChange={(e) => rename(i, e.target.value)}
+                      placeholder={t.itemPh(i + 1)}
+                      aria-label={t.itemPh(i + 1)}
+                      maxLength={40}
+                      className="min-w-0 flex-1 rounded-[0.5rem] bg-transparent px-1.5 py-1.5 font-medium outline-none focus:ring-2 focus:ring-accent/40"
+                    />
+                    {showPercent && <span className="tabular-nums w-12 shrink-0 text-right text-sm text-fg-2 max-[379px]:hidden">{pct} %</span>}
+                    <IconButton label={`${nameOf(i)}: ${t.sub(s.step)}`} icon={<Minus aria-hidden />} variant="outlined" onClick={() => bump(i, -s.step)} />
+                    <span className="tabular-nums min-w-10 text-center text-2xl font-bold">{it.value}</span>
+                    <IconButton label={`${nameOf(i)}: ${t.add(s.step)}`} icon={<Plus aria-hidden />} variant="filled" onClick={() => bump(i, s.step)} />
+                    <IconButton label={`${t.remove}: ${nameOf(i)}`} icon={<Trash2 aria-hidden />} size="sm" onClick={() => removeItem(i)} className="text-fg-3" />
+                  </div>
+                  {marks && <TallyMarks count={it.value} size="sm" label={String(it.value)} className="relative px-2 pb-1 pt-1.5 text-fg" />}
                 </li>
               );
             })}
           </ul>
           <div className="flex flex-wrap items-center justify-between gap-2 px-1">
-            <Button variant="outline" onClick={addItem} disabled={s.items.length >= MAX_ITEMS}>
+            <Button variant="outlined" onClick={addItem} disabled={s.items.length >= MAX_ITEMS}>
               <Plus aria-hidden />
               {t.addCounter}
             </Button>
@@ -400,48 +381,13 @@ export default function Counter({ locale, preset: presetProp = "single" }: { loc
               )}
             </span>
           </div>
+          <div className="flex flex-wrap items-end gap-x-5 gap-y-3 pt-2">
+            {viewSwitch}
+            {stepSwitch}
+            <CopyButton value={resultText} label={t.copy} copiedLabel={t.copied} variant="ghost" compact className="mb-0.5" />
+          </div>
         </div>
       )}
-
-      <div className="flex flex-wrap items-end gap-x-5 gap-y-3">
-        <Field label={t.step}>
-          <Segmented label={t.step} value={String(s.step)} onChange={(v) => setS({ ...s, step: Number(v) })} options={STEPS.map((n) => ({ value: String(n), label: String(n) }))} />
-        </Field>
-        {single && (
-          <Field label={t.goal} htmlFor="counter-goal" className="w-32">
-            <Input
-              id="counter-goal"
-              type="number"
-              inputMode="numeric"
-              min={1}
-              max={1000000}
-              placeholder={t.goalPh}
-              value={s.goal ?? ""}
-              onChange={(e) => {
-                const n = Math.round(Number(e.target.value));
-                setS({ ...s, goal: e.target.value && n > 0 ? Math.min(1000000, n) : null });
-              }}
-            />
-          </Field>
-        )}
-        {single && preset === "beads" && (
-          <div className="flex gap-1.5 pb-1">
-            {[33, 99, 100, 108].map((g) => (
-              <button key={g} type="button" className="chip tabular-nums" aria-pressed={s.goal === g} onClick={() => setS({ ...s, goal: g })}>
-                {g}
-              </button>
-            ))}
-          </div>
-        )}
-        {single && s.goal ? <Switch label={t.loop} checked={s.loop} onChange={(e) => setS({ ...s, loop: e.target.checked })} className="pb-2" /> : null}
-        {single && (
-          <Button variant="ghost" onClick={addItem} className="pb-0.5">
-            <Plus aria-hidden />
-            {t.addCounter}
-          </Button>
-        )}
-        <CopyButton value={resultText} label={t.copy} copiedLabel={t.copied} variant="ghost" compact />
-      </div>
 
       <p className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-sm text-fg-3 pointer-coarse:hidden">
         <span>
@@ -468,30 +414,17 @@ export default function Counter({ locale, preset: presetProp = "single" }: { loc
         label={t.stage}
         closeLabel={t.close}
         dark
-        className="bg-[#0b0d10] text-white"
+        className="bg-[#0b0d10] text-white [--tally-cross:#ffcf24]"
         onClick={single ? () => bump(0, s.step) : undefined}
         bar={
           <>
-            <button
-              type="button"
-              onClick={() => bump(active, -s.step)}
-              aria-label={t.sub(s.step)}
-              title={t.sub(s.step)}
-              className="flex size-9 items-center justify-center rounded-full"
-            >
+            <button type="button" onClick={() => bump(active, -s.step)} aria-label={t.sub(s.step)} title={t.sub(s.step)} className="flex size-10 items-center justify-center rounded-full hover:bg-black/10">
               <Minus className="size-5" aria-hidden />
             </button>
-            <button
-              type="button"
-              onClick={undo}
-              disabled={past.length === 0}
-              aria-label={t.undo}
-              title={t.undo}
-              className="flex size-9 items-center justify-center rounded-full disabled:opacity-40"
-            >
+            <button type="button" onClick={undo} disabled={past.length === 0} aria-label={t.undo} title={t.undo} className="flex size-10 items-center justify-center rounded-full hover:bg-black/10 disabled:opacity-40">
               <Undo2 className="size-5" aria-hidden />
             </button>
-            <button type="button" onClick={reset} aria-label={t.reset} title={t.reset} className="flex size-9 items-center justify-center rounded-full">
+            <button type="button" onClick={reset} aria-label={t.reset} title={t.reset} className="flex size-10 items-center justify-center rounded-full hover:bg-black/10">
               <RotateCcw className="size-5" aria-hidden />
             </button>
           </>
@@ -499,9 +432,9 @@ export default function Counter({ locale, preset: presetProp = "single" }: { loc
       >
         {stage.open &&
           (single ? (
-            <div className="flex size-full cursor-pointer flex-col items-center justify-center gap-[3vmin] px-4">
+            <div className="flex size-full cursor-pointer flex-col items-center justify-center gap-[3vmin] px-4 pt-14">
               {s.title.trim() && <span className="max-w-full truncate text-center font-semibold text-white/80 [font-size:clamp(1.25rem,5vmin,4rem)]">{s.title.trim()}</span>}
-              {bigNumber("[font-size:calc(min(55vh,32vw)*var(--k))]")}
+              {view === "tally" ? tallyDisplay(true) : bigNumber("[font-size:calc(min(55vh,32vw)*var(--k))]")}
               {s.goal ? (
                 <span className="tabular-nums text-white/70 [font-size:clamp(1rem,4vmin,3rem)]">
                   {Math.min(value, s.goal)} / {s.goal}
@@ -512,7 +445,7 @@ export default function Counter({ locale, preset: presetProp = "single" }: { loc
                   {t.laps}: {s.laps}
                 </span>
               ) : null}
-              <span className="text-white/45 [font-size:clamp(0.875rem,2.5vmin,1.5rem)]">{t.tapHint}</span>
+              {value === 0 && <span className="text-white/45 [font-size:clamp(0.875rem,2.5vmin,1.5rem)]">{t.tapHint}</span>}
             </div>
           ) : (
             <div

@@ -1,13 +1,13 @@
 "use client";
 
-import { Search, X } from "lucide-react";
+import { Check, Search, X } from "lucide-react";
 import Link from "@/ui/link";
 import { useEffect, useId, useMemo, useRef, useState, type MouseEvent, type ReactNode } from "react";
 import { href, type Locale } from "@/i18n/config";
 import { copyText } from "@/lib/clipboard";
-import { cn } from "@/lib/cn";
-import { Button } from "@/ui/button";
+import { Button, IconButton } from "@/ui/button";
 import { Input } from "@/ui/field";
+import { ScrollRow } from "@/ui/scroll-row";
 import { CATEGORIES, CATEGORY_BY_SLUG, taggedFor } from "./data";
 import { KaomojiGrid } from "./ui/KaomojiGrid";
 import { searchKaomoji } from "./lib/search";
@@ -116,23 +116,32 @@ export default function KaomojiPicker({ locale, category }: KaomojiPickerProps) 
           onChange={(e) => setQuery(e.target.value)}
           className="pl-12! pr-12! font-normal! [&::-webkit-search-cancel-button]:hidden"
         />
-        {query && (
-          <Button variant="ghost" size="icon-sm" onClick={() => setQuery("")} aria-label={t.clearSearch} title={t.clearSearch} className="absolute right-2 top-1/2 -translate-y-1/2">
-            <X />
-          </Button>
-        )}
+        {query && <IconButton label={t.clearSearch} size="sm" onClick={() => setQuery("")} icon={<X aria-hidden />} className="absolute right-2 top-1/2 -translate-y-1/2" />}
       </div>
 
-      <div role="group" aria-label={t.categories} className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 scrollbar-thin sm:mx-0 sm:px-0">
-        <CategoryChip active={!hits && !cat} onClick={() => { setCat(""); setQuery(""); }}>
+      <ScrollRow role="radiogroup" label={t.categories}>
+        <CategoryChip
+          active={!hits && !cat}
+          onClick={() => {
+            setCat("");
+            setQuery("");
+          }}
+        >
           {t.all}
         </CategoryChip>
         {CATEGORIES.map((c) => (
-          <CategoryChip key={c.slug} active={!hits && cat === c.slug} onClick={() => { setCat(c.slug); setQuery(""); }}>
+          <CategoryChip
+            key={c.slug}
+            active={!hits && cat === c.slug}
+            onClick={() => {
+              setCat(c.slug);
+              setQuery("");
+            }}
+          >
             {c.name[locale]}
           </CategoryChip>
         ))}
-      </div>
+      </ScrollRow>
 
       {recent.length > 0 && (
         <section aria-labelledby={`${id}-recent`} className="flex flex-col gap-2">
@@ -140,7 +149,7 @@ export default function KaomojiPicker({ locale, category }: KaomojiPickerProps) 
             <h2 id={`${id}-recent`} className="text-sm font-medium text-fg-3">
               {t.recent}
             </h2>
-            <Button variant="ghost" size="sm" onClick={clearRecent} className="h-7! px-2! text-[0.8125rem]! text-fg-3">
+            <Button variant="text" size="sm" onClick={clearRecent}>
               {t.clearRecent}
             </Button>
           </div>
@@ -158,7 +167,7 @@ export default function KaomojiPicker({ locale, category }: KaomojiPickerProps) 
               {grid(hits.map((h) => h.k))}
             </section>
           ) : (
-            <p className="rounded-[0.75rem] bg-surface-2 px-4 py-6 text-center text-fg-2">{t.nothing}</p>
+            <p className="rounded-[1rem] bg-surface-2 px-4 py-6 text-center text-fg-2">{t.nothing}</p>
           )
         ) : current ? (
           <>
@@ -185,7 +194,10 @@ export default function KaomojiPicker({ locale, category }: KaomojiPickerProps) 
 
       <div role="status" aria-live="polite" className="pointer-events-none fixed inset-x-0 bottom-5 z-50 flex justify-center px-4">
         {status && (
-          <span className="max-w-md rounded-[1.125rem] bg-fg px-4 py-2 text-center text-sm font-medium [overflow-wrap:anywhere] text-bg shadow-[var(--shadow-overlay)]">{status}</span>
+          <span className="inline-flex max-w-md items-center gap-2 rounded-[1.125rem] bg-fg px-4 py-2.5 text-center text-sm font-medium [overflow-wrap:anywhere] text-bg shadow-[var(--shadow-overlay)] motion-safe:animate-[menu-in_180ms_ease-out]">
+            {copied && <Check className="size-4 shrink-0 text-ok" aria-hidden />}
+            {status}
+          </span>
         )}
       </div>
     </div>
@@ -194,7 +206,7 @@ export default function KaomojiPicker({ locale, category }: KaomojiPickerProps) 
 
 function CategoryChip({ active, onClick, children }: { active: boolean; onClick: () => void; children: ReactNode }) {
   return (
-    <button type="button" aria-pressed={active} onClick={onClick} className={cn("chip shrink-0 whitespace-nowrap", active && "border-accent bg-accent-soft text-accent")}>
+    <button type="button" role="radio" aria-checked={active} onClick={onClick} className="chip shrink-0 whitespace-nowrap">
       {children}
     </button>
   );

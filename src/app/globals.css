@@ -211,7 +211,8 @@ dialog:not([open]) {
   input.text-xs, input.text-sm, textarea.text-xs, textarea.text-sm, select.text-xs, select.text-sm,
   input[class*="text-[0.8"], input[class*="text-[0.75"], input[class*="text-[0.9"],
   textarea[class*="text-[0.8"], textarea[class*="text-[0.75"], textarea[class*="text-[0.9"],
-  select[class*="text-[0.8"], select[class*="text-[0.75"], select[class*="text-[0.9"] {
+  select[class*="text-[0.8"], select[class*="text-[0.75"], select[class*="text-[0.9"],
+  .select-sizer.text-sm, .select-sizer[class*="text-[0.9"] {
     font-size: 1rem;
   }
 }
@@ -645,7 +646,7 @@ dialog:not([open]) {
     display: flex;
   }
   .seg-fill:not([data-wrapped]) .seg {
-    flex: 1 1 0;
+    flex: 1 0 auto;
   }
 
   /* ── Select: the native <select> (menus, keyboard, phone pickers stay native) in a Material 3 field.
@@ -1406,6 +1407,21 @@ dialog:not([open]) {
     opacity: 1;
     transform: none;
   }
+}
+
+/* A result appearing (`.pop-in`): a short grow-and-fade, no colour change. */
+@keyframes pop-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+.pop-in {
+  animation: pop-in 260ms var(--ease-emph);
 }
 
 /* A short "pop" when a counter reaches its goal (Counter.tsx). */

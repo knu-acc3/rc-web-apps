@@ -5,8 +5,8 @@ import { useId, useMemo, useState } from "react";
 import { useBrowser12h } from "@/lib/clock-format";
 import { cn } from "@/lib/cn";
 import { parseYmd, ymdStr } from "@/tools/time/calendar/lib/dates";
-import { Button } from "@/ui/button";
-import { Slider } from "@/ui/field";
+import { Button, IconButton } from "@/ui/button";
+import { Input, Slider } from "@/ui/field";
 import { Panel } from "@/ui/panel";
 import { PlaceSearch } from "./ui/PlaceSearch";
 import { dayShift, diffShort, shortDate, placeParts } from "./lib/text";
@@ -117,10 +117,11 @@ export default function Converter({ locale, rows: initial, withLocal = false, pe
             <label htmlFor={`${id}-d`} className="text-sm text-fg-3">
               {t.date}
             </label>
-            <input
+            <Input
               id={`${id}-d`}
               type="date"
-              className="control h-9 w-40 text-sm"
+              size="sm"
+              className="w-40"
               value={firstParts ? ymdStr({ y: firstParts.y, m: firstParts.m, d: firstParts.d }) : ""}
               onChange={(e) => setDate(e.target.value)}
               disabled={!firstParts}
@@ -136,7 +137,7 @@ export default function Converter({ locale, rows: initial, withLocal = false, pe
             disabled={!firstParts}
             className="sm:flex-1"
           />
-          <Button variant={fixed === null ? "secondary" : "outline"} size="sm" onClick={() => setFixed(null)} disabled={fixed === null}>
+          <Button variant="tonal" size="sm" onClick={() => setFixed(null)} disabled={fixed === null}>
             <RotateCcw aria-hidden />
             {t.now}
           </Button>
@@ -165,7 +166,7 @@ export default function Converter({ locale, rows: initial, withLocal = false, pe
                       id={`${id}-t${i}`}
                       type="time"
                       step={60}
-                      className={cn("tabular rounded-[0.5rem] border border-transparent bg-transparent px-1 text-right font-semibold text-fg hover:border-line focus:border-accent focus:outline-none", h12 ? "w-[9.5rem] text-lg min-[400px]:text-xl sm:w-48 sm:text-2xl" : "w-[8.5rem] text-[1.375rem] min-[400px]:text-2xl sm:w-40 sm:text-3xl")}
+                      className={cn("tabular cursor-text rounded-[0.75rem] bg-surface-2 px-2 py-0.5 text-right font-semibold text-fg transition-colors outline-none hover:bg-accent-container hover:text-on-accent-container focus:bg-accent-container focus:text-on-accent-container focus:ring-2 focus:ring-accent disabled:opacity-60", h12 ? "w-[9.5rem] text-lg min-[400px]:text-xl sm:w-48 sm:text-2xl" : "w-[8.5rem] text-[1.375rem] min-[400px]:text-2xl sm:w-40 sm:text-3xl")}
                       value={p ? `${pad2(p.h)}:${pad2(p.mi)}` : ""}
                       onChange={(e) => setWall(r, e.target.value)}
                       disabled={!p}
@@ -177,14 +178,7 @@ export default function Converter({ locale, rows: initial, withLocal = false, pe
                     </div>
                   </div>
                   {editing && r.key !== "local" && (
-                    <button
-                      type="button"
-                      className="rounded-[0.375rem] p-1 text-fg-3 hover:bg-surface-2 hover:text-err"
-                      aria-label={`${t.remove}: ${r.name}`}
-                      onClick={() => setRows(rowsData.filter((x) => x.key !== r.key))}
-                    >
-                      <X className="size-4" aria-hidden />
-                    </button>
+                    <IconButton label={`${t.remove}: ${r.name}`} size="sm" variant="tonal" className="hover:text-err" onClick={() => setRows(rowsData.filter((x) => x.key !== r.key))} icon={<X aria-hidden />} />
                   )}
                 </div>
               </li>
@@ -194,7 +188,7 @@ export default function Converter({ locale, rows: initial, withLocal = false, pe
 
         <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center">
           <PlaceSearch locale={locale} label={t.add} className="sm:max-w-sm sm:flex-1" exclude={rows.map((r) => r.key)} onPick={(p) => setRows([...rowsData, p])} />
-          <Button variant="ghost" size="sm" onClick={() => setEditing(!editing)} aria-pressed={editing}>
+          <Button variant={editing ? "filled" : "tonal"} onClick={() => setEditing(!editing)} aria-pressed={editing}>
             {editing ? t.done : t.edit}
           </Button>
         </div>
@@ -206,7 +200,7 @@ export default function Converter({ locale, rows: initial, withLocal = false, pe
             {t.planner}
           </h2>
           <p className="mb-2 text-[0.8125rem] text-fg-3">{planner.some((c) => c.all) ? t.plannerHint : t.noOverlap}</p>
-          <div className="overflow-x-auto rounded-[0.75rem] border border-line bg-surface p-2 scrollbar-thin">
+          <div className="panel overflow-x-auto p-2 scrollbar-thin sm:p-3">
             <table className="w-full border-separate border-spacing-0.5 text-center text-[0.75rem]">
               <tbody>
                 {rows.map((r, i) => (

@@ -4,7 +4,7 @@ import { Check, Minus, Plus, RotateCw } from "lucide-react";
 import { useEffect, useId, useRef, useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { formatNumber } from "@/i18n/format";
-import { Button } from "@/ui/button";
+import { Button, IconButton } from "@/ui/button";
 import { Slider } from "@/ui/field";
 import { CARD, cssPpi, MAX_PX_PER_MM, MIN_PX_PER_MM, pxPerMmFromCard } from "../lib/calibration";
 
@@ -125,9 +125,7 @@ export function CardMatcher({
           </span>
         </label>
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="icon" onClick={() => change(px - 1)} aria-label={t.less} title={t.less}>
-            <Minus />
-          </Button>
+          <IconButton label={t.less} variant="tonal" onClick={() => change(px - 1)} icon={<Minus aria-hidden />} />
           <Slider
             id={`${id}-s`}
             min={MIN_PX}
@@ -138,22 +136,20 @@ export function CardMatcher({
             aria-valuetext={`${nf(px)} ${t.px}`}
             className="min-w-0 flex-1"
           />
-          <Button variant="outline" size="icon" onClick={() => change(px + 1)} aria-label={t.more} title={t.more}>
-            <Plus />
-          </Button>
+          <IconButton label={t.more} variant="tonal" onClick={() => change(px + 1)} icon={<Plus aria-hidden />} />
         </div>
       </div>
 
       <div className="flex flex-wrap items-center gap-2">
-        <Button variant="primary" onClick={save}>
+        <Button variant="filled" size="lg" onClick={save}>
           {saved ? <Check aria-hidden /> : null}
           {saved ? t.saved : t.save}
         </Button>
-        <Button variant="ghost" size="sm" onClick={() => setManualRotate(!portrait)}>
+        <Button variant="text" onClick={() => setManualRotate(!portrait)}>
           <RotateCw aria-hidden />
           {t.rotate}
         </Button>
-        <Button variant="ghost" size="sm" onClick={() => change((96 / 25.4) * CARD.w)}>
+        <Button variant="text" onClick={() => change((96 / 25.4) * CARD.w)}>
           {t.reset}
         </Button>
         <span className="sr-only" aria-live="polite">

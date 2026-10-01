@@ -1,10 +1,12 @@
 "use client";
 
+import { CalendarDays } from "lucide-react";
 import { useEffect, useId, useState } from "react";
 import { INTL_LOCALE, type Locale } from "@/i18n/config";
 import { Button } from "@/ui/button";
 import { CopyButton } from "@/ui/copy-button";
-import { Field, Input, Select, Switch } from "@/ui/field";
+import { Field, Input, Switch } from "@/ui/field";
+import { NumberInput } from "@/ui/number-input";
 import { Panel, PanelHeader } from "@/ui/panel";
 import { countWeekdays, dayToDate, isoToDay, randomDate, type RandomDate } from "./lib/dates";
 
@@ -25,7 +27,7 @@ const T = {
     generate: "Случайная дата",
     generateMany: "Случайные даты",
     result: "Результат",
-    idle: "Выберите диапазон и нажмите кнопку",
+    idle: "Нажмите кнопку",
     invalid: "Укажите обе даты; вторая не раньше первой",
     noWeekdays: "В этом диапазоне нет будних дней",
     copy: "Копировать",
@@ -41,7 +43,7 @@ const T = {
     generate: "Random date",
     generateMany: "Random dates",
     result: "Result",
-    idle: "Choose a range and press the button",
+    idle: "Press the button",
     invalid: "Enter both dates; the second must not be earlier",
     noWeekdays: "There are no weekdays in this range",
     copy: "Copy",
@@ -62,6 +64,7 @@ export default function DateGen({ locale, from: from0 = "", to: to0 = "" }: Date
   const [sorted, setSorted] = useState(true);
   const [dates, setDates] = useState<RandomDate[] | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [stamp, setStamp] = useState(0);
 
   // Default range = the current calendar year (the clock is read only in the browser).
   useEffect(() => {
@@ -90,12 +93,13 @@ export default function DateGen({ locale, from: from0 = "", to: to0 = "" }: Date
     const r = Array.from({ length: n }, () => randomDate(a, b, weekdays, withTime));
     if (sorted) r.sort((x, y) => x.day - y.day || x.minute - y.minute);
     setDates(r);
+    setStamp((x) => x + 1);
   }
 
   const text = dates ? dates.map(format).join("\n") : "";
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] lg:items-start">
       <Panel className="flex flex-col gap-4 p-4 sm:p-5">
         <div className="grid grid-cols-1 gap-3 min-[360px]:grid-cols-2">
           <Field label={t.from} htmlFor={`${id}-a`}>
@@ -105,21 +109,16 @@ export default function DateGen({ locale, from: from0 = "", to: to0 = "" }: Date
             <Input id={`${id}-b`} type="date" value={to} onChange={(e) => setTo(e.target.value)} aria-invalid={!!to && (b === null || (a !== null && b < a))} />
           </Field>
         </div>
-        <div className="flex flex-wrap items-end gap-x-6 gap-y-3">
-          <Field label={t.count} htmlFor={`${id}-n`} className="w-28">
-            <Select id={`${id}-n`} value={n} onChange={(e) => setN(Number(e.target.value))} size="sm">
-              {[1, 2, 3, 5, 10, 20, 50].map((k) => (
-                <option key={k} value={k}>
-                  {k}
-                </option>
-              ))}
-            </Select>
-          </Field>
-          <Switch label={t.weekdays} checked={weekdays} onChange={(e) => setWeekdays(e.target.checked)} className="pb-1.5" />
-          <Switch label={t.time} checked={withTime} onChange={(e) => setWithTime(e.target.checked)} className="pb-1.5" />
-          {n > 1 && <Switch label={t.sorted} checked={sorted} onChange={(e) => setSorted(e.target.checked)} className="pb-1.5" />}
+        <Field label={t.count} htmlFor={`${id}-n`} className="w-40">
+          <NumberInput id={`${id}-n`} locale={locale} min={1} max={100} value={n} onChange={(v) => v !== null && setN(v)} />
+        </Field>
+        <div className="flex flex-wrap gap-x-6 gap-y-1">
+          <Switch label={t.weekdays} checked={weekdays} onChange={(e) => setWeekdays(e.target.checked)} />
+          <Switch label={t.time} checked={withTime} onChange={(e) => setWithTime(e.target.checked)} />
+          {n > 1 && <Switch label={t.sorted} checked={sorted} onChange={(e) => setSorted(e.target.checked)} />}
         </div>
-        <Button variant="primary" size="lg" onClick={generate} disabled={!from || !to} className="w-full sm:w-auto sm:self-start sm:min-w-56">
+        <Button variant="filled" size="xl" onClick={generate} disabled={!from || !to} className="w-full">
+          <CalendarDays aria-hidden />
           {n > 1 ? t.generateMany : t.generate}
         </Button>
         {error && (
@@ -132,11 +131,12 @@ export default function DateGen({ locale, from: from0 = "", to: to0 = "" }: Date
       <Panel>
         <PanelHeader title={t.result} actions={dates && <CopyButton value={text} label={t.copy} copiedLabel={t.copied} variant="ghost" />} />
         <div className="px-4 py-4">
-          {!dates && <p className="text-sm text-fg-3">{t.idle}</p>}
+          {!dates && <p className="py-6 text-center text-sm text-fg-3">{t.idle}</p>}
           <div aria-live="polite">
+            <div key={stamp} className="motion-safe:animate-[menu-in_0.3s_ease-out]">
             {dates &&
               (dates.length === 1 ? (
-                <p className="text-center text-2xl font-semibold text-balance first-letter:uppercase text-fg sm:text-3xl">{format(dates[0])}</p>
+                <p className="py-6 text-center text-3xl font-bold text-balance first-letter:uppercase text-fg sm:text-4xl">{format(dates[0])}</p>
               ) : (
                 <ol className="flex flex-col gap-1 text-[1.0625rem] text-fg">
                   {dates.map((d, i) => (
@@ -147,6 +147,7 @@ export default function DateGen({ locale, from: from0 = "", to: to0 = "" }: Date
                   ))}
                 </ol>
               ))}
+            </div>
           </div>
         </div>
       </Panel>

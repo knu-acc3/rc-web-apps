@@ -4,7 +4,8 @@ import { useId, useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { formatNumber, parseNumber } from "@/i18n/format";
 import { CopyButton } from "@/ui/copy-button";
-import { Field, Input, Select } from "@/ui/field";
+import { Field, Select } from "@/ui/field";
+import { NumberInput } from "@/ui/number-input";
 import { Panel } from "@/ui/panel";
 import { Segmented } from "@/ui/segmented";
 import { QuietFacts, plainSpaces } from "../ui/kit";
@@ -77,7 +78,7 @@ export default function PaperSize({ locale, format = "a4", dpi: dpi0 = 300 }: { 
   return (
     <div className="flex flex-col gap-4">
       <Panel className="p-4 sm:p-6">
-        <div className="grid items-end gap-4 sm:grid-cols-[minmax(0,13rem)_minmax(0,1fr)] sm:gap-6">
+        <div className="grid items-end gap-4 sm:grid-cols-[auto_minmax(0,1fr)] sm:gap-8">
           <Field label={t.format} htmlFor={`${id}-f`}>
             <Select id={`${id}-f`} value={p.slug} onChange={(e) => setSlug(e.target.value)} size="lg">
               {GROUPS.map((g) => (
@@ -96,7 +97,7 @@ export default function PaperSize({ locale, format = "a4", dpi: dpi0 = 300 }: { 
               {p.name} · {mmText}
               {pw !== null && ph !== null && ` · ${n((pw * ph) / 1e6, 1)} ${t.mp}`}
             </div>
-            <div className="tabular text-3xl font-semibold tracking-tight text-fg sm:text-4xl">
+            <div className="tabular text-4xl font-semibold tracking-tight text-fg sm:text-5xl">
               {pxText ? (
                 <>
                   {pxText} <span className="text-lg font-medium text-fg-3">{t.px}</span>
@@ -122,7 +123,7 @@ export default function PaperSize({ locale, format = "a4", dpi: dpi0 = 300 }: { 
           <label htmlFor={`${id}-d`} className="sr-only">
             {t.dpi}
           </label>
-          <Select id={`${id}-d`} value={dpiSel} onChange={(e) => setDpiSel(e.target.value)} size="sm" className="w-32">
+          <Select id={`${id}-d`} value={dpiSel} onChange={(e) => setDpiSel(e.target.value)} size="sm">
             {COMMON_DPI.map((d) => (
               <option key={d} value={String(d)}>
                 {d} DPI
@@ -131,18 +132,21 @@ export default function PaperSize({ locale, format = "a4", dpi: dpi0 = 300 }: { 
             <option value="custom">{t.custom}</option>
           </Select>
           {dpiSel === "custom" && (
-            <Input
+            <NumberInput
               aria-label={t.customDpi}
-              inputMode="decimal"
-              autoComplete="off"
-              value={custom}
-              onChange={(e) => setCustom(e.target.value)}
-              aria-invalid={!dpiOk}
+              locale={locale}
+              value={parseNumber(custom)}
+              onChange={(v) => setCustom(v === null ? "" : String(v))}
+              min={1}
+              max={2400}
+              step={50}
+              invalid={!dpiOk}
               size="sm"
-              className="tabular w-20"
+              suffix="DPI"
+              className="w-40"
             />
           )}
-          {pxText && <CopyButton value={pxText} label={t.copy} copiedLabel={t.copied} variant="ghost" className="ml-auto" />}
+          {pxText && <CopyButton value={pxText} label={t.copy} copiedLabel={t.copied} variant="outline" className="ml-auto" />}
         </div>
       </Panel>
 

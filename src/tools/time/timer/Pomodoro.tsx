@@ -4,14 +4,16 @@ import { Maximize2, Minimize2, Pause, Play, RotateCcw, SkipForward } from "lucid
 import { useEffect, useId, useRef, useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { cn } from "@/lib/cn";
-import { Button } from "@/ui/button";
-import { Switch } from "@/ui/field";
+import { Button, IconButton } from "@/ui/button";
+import { Field, Switch } from "@/ui/field";
+import { NumberInput } from "@/ui/number-input";
+import { Panel } from "@/ui/panel";
 import { useStoredJson } from "@/tools/time/time/lib/storage";
 import { useFullscreen } from "@/ui/fullscreen";
 import { useWakeLock } from "@/ui/stage";
 import { TimerOptions, useAlertOptions } from "./ui/TimerOptions";
 import { schedule, unlockAudio, type Scheduled } from "./lib/audio";
-import { clampInt, clock } from "./lib/format";
+import { clock } from "./lib/format";
 import { useKeys } from "./lib/keys";
 import { nowMs } from "./lib/now";
 import { notify, useTicker, useTitle } from "./lib/notify";
@@ -80,7 +82,6 @@ export default function Pomodoro({ locale, work: w0 = 25, short: s0 = 5, long: l
   const t = T[locale];
   const id = useId();
   const [cfg, setCfg] = useState({ work: w0, short: s0, long: l0, cycles: c0 });
-  const [txt, setTxt] = useState({ work: String(w0), short: String(s0), long: String(l0), cycles: String(c0) });
   const [phase, setPhase] = useState<Phase>("work");
   const [count, setCount] = useState(0);
   const [status, setStatus] = useState<Status>("idle");
@@ -179,12 +180,9 @@ export default function Pomodoro({ locale, work: w0 = 25, short: s0 = 5, long: l
   useTitle(status === "idle" ? null : `${clock(left)} ${phase === "work" ? "🍅" : "☕"}`);
   useKeys({ " ": () => (status === "running" ? pause() : start()), r: reset });
 
-  function setField(k: keyof typeof cfg, text: string) {
-    const clean = text.replace(/\D/g, "").slice(0, 3);
-    setTxt((x) => ({ ...x, [k]: clean }));
-    const v = clampInt(clean, k === "cycles" ? 12 : 180);
-    if (v < 1) return;
-    const next = { ...cfg, [k]: v };
+  function setField(k: keyof typeof cfg, v: number | null) {
+    if (v === null || v < 1) return;
+    const next = { ...cfg, [k]: Math.min(v, k === "cycles" ? 12 : 180) };
     setCfg(next);
     if (status === "idle") setLeft(minutesOf(phase, next) * 60000);
   }
@@ -194,67 +192,59 @@ export default function Pomodoro({ locale, work: w0 = 25, short: s0 = 5, long: l
   const dots = Array.from({ length: cfg.cycles }, (_, i) => i < inCycle || (phase === "long" && inCycle === 0 && count > 0));
 
   return (
-    <div className="flex flex-col gap-4">
-      <div ref={ref} className={cn("flex flex-col items-center justify-center gap-5 rounded-[0.75rem] border border-line bg-surface px-3 py-8 sm:py-10", full && "min-h-screen rounded-none border-0", phase !== "work" && "bg-ok-soft")}>
-        <p className={cn("text-lg font-semibold", phase === "work" ? "text-accent" : "text-ok")}>{phaseLabel}</p>
-        <div className={cn("tabular font-semibold leading-none tracking-tight", full ? "text-[min(24vw,40vh)]" : "text-[min(20vw,8rem)]", status === "paused" ? "text-fg-2" : "text-fg")}>{clock(left)}</div>
+    <div className="grid gap-4 lg:grid-cols-[minmax(0,2fr)_minmax(18rem,1fr)] lg:items-start">
+      <Panel
+        ref={ref}
+        className={cn("flex flex-col items-center justify-center gap-5 px-3 py-8 transition-colors duration-500 sm:py-10", full && "min-h-screen rounded-none! shadow-none!", phase !== "work" && "bg-ok-soft")}
+      >
+        <p className={cn("rounded-full px-4 py-1 text-lg font-semibold", phase === "work" ? "bg-accent-container text-on-accent-container" : "bg-surface text-ok")}>{phaseLabel}</p>
+        <div className={cn("tabular font-semibold leading-none tracking-tight", full ? "text-[min(24vw,40vh)]" : "text-[min(20vw,8rem)] 2xl:text-[10rem]", status === "paused" ? "text-fg-2" : "text-fg")}>{clock(left)}</div>
         <div className="flex items-center gap-1.5" aria-label={t.done(count)} role="img">
           {dots.map((on, i) => (
-            <span key={i} className={cn("size-2.5 rounded-full", on ? "bg-accent" : "bg-line-strong")} />
+            <span key={i} className={cn("size-3 rounded-full transition-colors", on ? "bg-accent" : "bg-line-strong")} />
           ))}
         </div>
-        <div className="flex w-full max-w-md items-center justify-center gap-2">
+        <div className="flex w-full max-w-lg flex-wrap items-center justify-center gap-2 sm:gap-3">
           {status === "running" ? (
-            <Button variant="primary" size="lg" onClick={pause} className="min-w-0 flex-1 sm:max-w-52">
+            <Button variant="filled" size="xl" onClick={pause} className="min-w-40 flex-1 sm:max-w-60">
               <Pause aria-hidden />
               {t.pause}
             </Button>
           ) : (
-            <Button variant="primary" size="lg" onClick={start} className="min-w-0 flex-1 sm:max-w-52">
+            <Button variant="filled" size="xl" onClick={start} className="min-w-40 flex-1 sm:max-w-60">
               <Play aria-hidden />
               {status === "paused" ? t.resume : t.start}
             </Button>
           )}
-          <Button variant="secondary" size="lg" onClick={() => advance(nowMs(), true)} aria-label={t.skip} title={t.skip} className="w-12 px-0">
-            <SkipForward aria-hidden />
-          </Button>
-          <Button variant="ghost" size="lg" onClick={reset} aria-label={t.reset} title={t.reset} className="w-12 px-0">
-            <RotateCcw aria-hidden />
-          </Button>
-          <Button variant="ghost" size="lg" onClick={toggle} aria-label={t.full} title={t.full} className="w-12 px-0">
-            {full ? <Minimize2 aria-hidden /> : <Maximize2 aria-hidden />}
-          </Button>
+          <div className="flex items-center gap-2">
+            <IconButton label={t.skip} variant="tonal" size="lg" onClick={() => advance(nowMs(), true)} icon={<SkipForward aria-hidden />} />
+            <IconButton label={t.reset} size="lg" onClick={reset} icon={<RotateCcw aria-hidden />} />
+            <IconButton label={t.full} size="lg" onClick={toggle} icon={full ? <Minimize2 aria-hidden /> : <Maximize2 aria-hidden />} />
+          </div>
         </div>
         <p className="text-sm text-fg-3" aria-live="polite">
           {t.done(count)}
         </p>
-      </div>
+      </Panel>
 
-      <div className="flex flex-wrap items-end gap-3">
-        {(
-          [
-            ["work", t.workLabel],
-            ["short", t.shortLabel],
-            ["long", t.longLabel],
-            ["cycles", t.cyclesLabel],
-          ] as const
-        ).map(([k, label]) => (
-          <label key={k} htmlFor={`${id}-${k}`} className="flex flex-col gap-1 text-[0.8125rem] text-fg-3">
-            {label}
-            <input
-              id={`${id}-${k}`}
-              inputMode="numeric"
-              className="control h-9 w-20 text-sm"
-              value={txt[k]}
-              onChange={(e) => setField(k, e.target.value)}
-              onBlur={() => setTxt((x) => ({ ...x, [k]: String(cfg[k]) }))}
-              disabled={status === "running"}
-            />
-          </label>
-        ))}
-        <Switch label={t.auto} checked={auto} onChange={(e) => setAuto(e.target.checked)} className="mb-1.5" />
+      <div className="flex min-w-0 flex-col gap-4">
+        <Panel className="grid grid-cols-2 gap-x-3 gap-y-4 p-4 sm:grid-cols-4 sm:p-5 lg:grid-cols-2">
+          {(
+            [
+              ["work", t.workLabel],
+              ["short", t.shortLabel],
+              ["long", t.longLabel],
+              ["cycles", t.cyclesLabel],
+            ] as const
+          ).map(([k, label]) => (
+            <Field key={k} label={label} htmlFor={`${id}-${k}`} className="justify-end">
+              <NumberInput id={`${id}-${k}`} locale={locale} value={cfg[k]} onChange={(v) => setField(k, v)} min={1} max={k === "cycles" ? 12 : 180} disabled={status === "running"} />
+            </Field>
+          ))}
+          <Switch label={t.auto} checked={auto} onChange={(e) => setAuto(e.target.checked)} className="col-span-full" />
+        </Panel>
+        <TimerOptions locale={locale} options={opts} onChange={setOpts} />
       </div>
-      <TimerOptions locale={locale} options={opts} onChange={setOpts} />
     </div>
   );
 }

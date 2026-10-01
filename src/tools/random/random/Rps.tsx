@@ -28,7 +28,7 @@ const T = {
     losses: "Поражения",
     draws: "Ничьи",
     reset: "Сбросить счёт",
-    idle: "Выберите камень, ножницы или бумагу",
+    idle: "Ваш ход",
     history: "Раунды",
     clear: "Очистить",
     empty: "Здесь появятся сыгранные раунды",
@@ -45,7 +45,7 @@ const T = {
     losses: "Losses",
     draws: "Draws",
     reset: "Reset score",
-    idle: "Choose rock, paper or scissors",
+    idle: "Your move",
     history: "Rounds",
     clear: "Clear",
     empty: "Played rounds will appear here",
@@ -71,13 +71,17 @@ export default function Rps({ locale }: RpsProps) {
   }
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="grid gap-4 lg:grid-cols-[minmax(0,1.5fr)_minmax(17rem,1fr)] lg:items-start">
       <Panel className="flex flex-col items-center gap-5 p-4 sm:p-6">
         <div className="grid w-full grid-cols-[1fr_auto_1fr] items-center gap-3">
           {(["you", "cpu"] as const).map((who, i) => (
             <div key={who} className={cn("flex flex-col items-center gap-1", i === 1 && "col-start-3")}>
               <span className="text-[0.8125rem] font-medium text-fg-2">{t[who]}</span>
-              <span className="flex size-24 items-center justify-center rounded-full bg-surface-2 text-5xl sm:size-28 sm:text-6xl" aria-hidden>
+              <span
+                key={round ? `${who}${history[0]?.id}` : who}
+                className="flex size-24 items-center justify-center rounded-full bg-surface-2 text-5xl motion-safe:animate-[menu-in_0.3s_ease-out] sm:size-32 sm:text-6xl"
+                aria-hidden
+              >
                 {round ? GLYPH[round[who]] : "?"}
               </span>
               <span className="min-h-6 text-sm text-fg-2">{round ? t.moves[round[who]] : ""}</span>
@@ -86,36 +90,38 @@ export default function Rps({ locale }: RpsProps) {
           <span className="col-start-2 row-start-1 text-sm text-fg-3">{t.vs}</span>
         </div>
         <p aria-live="polite" className={cn("min-h-9 text-center text-2xl font-bold sm:text-3xl", round ? TONE[round.outcome] : "text-fg-3")}>
-          {round ? t.outcomes[round.outcome] : ""}
+          {round ? t.outcomes[round.outcome] : <span className="text-base font-normal">{t.idle}</span>}
         </p>
-        {!round && <p className="-mt-4 text-sm text-fg-3">{t.idle}</p>}
-        <div role="group" aria-label={t.choose} className="grid w-full max-w-md grid-cols-3 gap-2">
+        <div role="group" aria-label={t.choose} className="grid w-full max-w-lg grid-cols-3 gap-2 sm:gap-3">
           {([0, 1, 2] as Move[]).map((m) => (
-            <Button key={m} variant="primary" size="lg" onClick={() => play(m)} className="h-16! flex-col gap-0! px-2!">
-              <span className="text-2xl leading-none" aria-hidden>
+            <Button key={m} variant="filled" size="xl" onClick={() => play(m)} className="h-20! flex-col gap-0.5! px-2!">
+              <span className="text-3xl leading-none" aria-hidden>
                 {GLYPH[m]}
               </span>
               <span className="text-sm">{t.moves[m]}</span>
             </Button>
           ))}
         </div>
-        <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-1 text-sm text-fg-2">
-          <span className="tabular">
-            {t.wins}: <strong className="text-ok">{score.win}</strong>
-          </span>
-          <span className="tabular">
-            {t.losses}: <strong className="text-err">{score.lose}</strong>
-          </span>
-          <span className="tabular">
-            {t.draws}: <strong className="text-fg">{score.draw}</strong>
-          </span>
-          {score.win + score.lose + score.draw > 0 && (
-            <Button variant="ghost" size="sm" onClick={() => setScore({ win: 0, lose: 0, draw: 0 })}>
-              <RotateCcw aria-hidden />
-              {t.reset}
-            </Button>
-          )}
-        </div>
+        <dl className="grid w-full max-w-lg grid-cols-3 gap-2 text-center">
+          {(
+            [
+              [t.wins, score.win, "text-ok"],
+              [t.losses, score.lose, "text-err"],
+              [t.draws, score.draw, "text-fg"],
+            ] as const
+          ).map(([k, v, tone]) => (
+            <div key={k} className="rounded-[1rem] bg-surface-2 px-2 py-2">
+              <dt className="text-[0.8125rem] text-fg-3">{k}</dt>
+              <dd className={cn("tabular text-2xl font-bold", tone)}>{v}</dd>
+            </div>
+          ))}
+        </dl>
+        {score.win + score.lose + score.draw > 0 && (
+          <Button variant="text" size="sm" onClick={() => setScore({ win: 0, lose: 0, draw: 0 })} className="-mt-2">
+            <RotateCcw aria-hidden />
+            {t.reset}
+          </Button>
+        )}
       </Panel>
       <HistoryPanel title={t.history} items={history} onClear={() => setHistory([])} clearLabel={t.clear} emptyLabel={t.empty} />
     </div>

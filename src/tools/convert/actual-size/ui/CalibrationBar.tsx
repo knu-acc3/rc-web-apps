@@ -5,7 +5,7 @@ import Link from "@/ui/link";
 import { useState, type ReactNode } from "react";
 import { href, type Locale } from "@/i18n/config";
 import { formatNumber } from "@/i18n/format";
-import { Button } from "@/ui/button";
+import { Button, IconButton } from "@/ui/button";
 import { Panel } from "@/ui/panel";
 import { saveCalibration } from "../lib/calibration";
 import { CardMatcher } from "./CardMatcher";
@@ -61,10 +61,10 @@ export function CalibrationBar({ locale, state, hideLink = false }: { locale: Lo
 
   let bar: ReactNode;
   if (!state.ready) {
-    bar = <div className="min-h-[3.25rem] rounded-[0.625rem] bg-surface-2 px-4 py-3 text-sm text-fg-2">{t.pending}</div>;
+    bar = <div className="min-h-[3.25rem] rounded-[1rem] bg-surface-2 px-4 py-3 text-sm text-fg-2">{t.pending}</div>;
   } else if (!state.calibrated) {
     bar = (
-      <div className="flex flex-col gap-2 rounded-[0.625rem] bg-warn-soft px-4 py-3 text-sm text-warn sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-2 rounded-[1rem] bg-warn-soft px-4 py-3 text-sm text-warn sm:flex-row sm:items-center sm:justify-between">
         <div className="flex gap-2">
           <TriangleAlert className="mt-0.5 size-4 shrink-0" aria-hidden />
           <p>
@@ -72,7 +72,7 @@ export function CalibrationBar({ locale, state, hideLink = false }: { locale: Lo
           </p>
         </div>
         <div className="flex shrink-0 items-center gap-3">
-          <Button variant="primary" size="sm" onClick={() => setOpen((v) => !v)} aria-expanded={open}>
+          <Button variant="filled" onClick={() => setOpen((v) => !v)} aria-expanded={open}>
             {t.calibrate}
           </Button>
           {link}
@@ -83,7 +83,7 @@ export function CalibrationBar({ locale, state, hideLink = false }: { locale: Lo
     const method = state.cal?.method === "diagonal" ? t.diagonal : t.card;
     bar = (
       <div className="flex flex-col gap-2">
-        <div className="flex flex-col gap-2 rounded-[0.625rem] bg-surface-2 px-4 py-2.5 text-sm text-fg-2 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-2 rounded-[1rem] bg-surface-2 px-4 py-2.5 text-sm text-fg-2 sm:flex-row sm:items-center sm:justify-between">
           <p className="flex items-center gap-2">
             <CircleCheck className="size-4 shrink-0 text-ok" aria-hidden />
             <span>
@@ -91,14 +91,14 @@ export function CalibrationBar({ locale, state, hideLink = false }: { locale: Lo
             </span>
           </p>
           <div className="flex shrink-0 items-center gap-3">
-            <Button variant="outline" size="sm" onClick={() => setOpen((v) => !v)} aria-expanded={open}>
+            <Button variant="tonal" size="sm" onClick={() => setOpen((v) => !v)} aria-expanded={open}>
               {t.recalibrate}
             </Button>
             {link}
           </div>
         </div>
         {state.zoomChanged && state.dprAtCalibration && (
-          <p className="rounded-[0.625rem] bg-warn-soft px-4 py-2.5 text-sm text-warn">{t.zoom(nf(state.dprAtCalibration), nf(state.dpr))}</p>
+          <p className="rounded-[1rem] bg-warn-soft px-4 py-2.5 text-sm text-warn">{t.zoom(nf(state.dprAtCalibration), nf(state.dpr))}</p>
         )}
       </div>
     );
@@ -111,9 +111,7 @@ export function CalibrationBar({ locale, state, hideLink = false }: { locale: Lo
         <Panel className="p-4">
           <div className="mb-3 flex items-center justify-between gap-2">
             <h2 className="text-sm font-semibold text-fg">{t.title}</h2>
-            <Button variant="ghost" size="icon-sm" onClick={() => setOpen(false)} aria-label={t.close} title={t.close}>
-              <X />
-            </Button>
+            <IconButton label={t.close} size="sm" onClick={() => setOpen(false)} icon={<X aria-hidden />} />
           </div>
           <CardMatcher
             locale={locale}

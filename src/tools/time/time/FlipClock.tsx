@@ -107,7 +107,7 @@ export default function FlipClock({ locale }: NowProps) {
       }
     >
       <style>{CSS}</style>
-      <div role="img" aria-label={label} className={o.sec ? "flex items-center gap-[0.18em] text-[min(15vw,10.625rem)]" : "flex items-center gap-[0.22em] text-[min(22vw,14.375rem)]"}>
+      <div role="img" aria-label={label} className={o.sec ? "flex items-center gap-[0.18em] text-[min(15vw,10.625rem)] 2xl:text-[min(10vw,14rem)]" : "flex items-center gap-[0.22em] text-[min(22vw,14.375rem)] 2xl:text-[min(14vw,18rem)]"}>
         {p ? (
           <>
             <Pair text={pad2(h)} />

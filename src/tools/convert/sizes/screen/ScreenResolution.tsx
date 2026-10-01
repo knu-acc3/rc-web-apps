@@ -4,7 +4,8 @@ import { useId, useState, useSyncExternalStore } from "react";
 import type { Locale } from "@/i18n/config";
 import { formatNumber, parseNumber } from "@/i18n/format";
 import { Button } from "@/ui/button";
-import { Field, Input } from "@/ui/field";
+import { Field } from "@/ui/field";
+import { NumberInput } from "@/ui/number-input";
 import { Panel } from "@/ui/panel";
 import { QuietFacts, plainSpaces } from "../ui/kit";
 import { dotPitchMm, megapixels, physicalPixels, physicalSize, ppi, resolutionName } from "./engine";
@@ -104,16 +105,16 @@ export default function ScreenResolution({ locale, w = 1920, h = 1080, diag = 24
   return (
     <div className="flex flex-col gap-4">
       <Panel className="p-4 sm:p-6">
-        <div className="grid gap-5 md:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] md:items-end">
-          <div className="grid grid-cols-3 gap-3">
+        <div className="grid gap-6 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] md:items-center md:gap-8">
+          <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,0.8fr)] gap-3">
             <Field label={t.width} htmlFor={`${id}-w`}>
-              <Input id={`${id}-w`} inputMode="numeric" autoComplete="off" value={wText} onChange={(e) => setW(e.target.value)} aria-invalid={!ok(W)} size="lg" className="tabular" />
+              <NumberInput id={`${id}-w`} locale={locale} value={W} onChange={(v) => setW(v === null ? "" : String(v))} min={1} max={100_000} stepper={false} invalid={!ok(W)} size="lg" />
             </Field>
             <Field label={t.height} htmlFor={`${id}-h`}>
-              <Input id={`${id}-h`} inputMode="numeric" autoComplete="off" value={hText} onChange={(e) => setH(e.target.value)} aria-invalid={!ok(H)} size="lg" className="tabular" />
+              <NumberInput id={`${id}-h`} locale={locale} value={H} onChange={(v) => setH(v === null ? "" : String(v))} min={1} max={100_000} stepper={false} invalid={!ok(H)} size="lg" />
             </Field>
             <Field label={t.diag} htmlFor={`${id}-d`}>
-              <Input id={`${id}-d`} inputMode="decimal" autoComplete="off" placeholder={t.optional} value={dText} onChange={(e) => setD(e.target.value)} size="lg" className="tabular" />
+              <NumberInput id={`${id}-d`} locale={locale} value={D} onChange={(v) => setD(v === null ? "" : n(v, 2))} min={0} max={999} decimals={2} stepper={false} placeholder={t.optional} size="lg" />
             </Field>
           </div>
           <div className="min-w-0" aria-live="polite">
@@ -151,7 +152,7 @@ export default function ScreenResolution({ locale, w = 1920, h = 1080, diag = 24
         />
       )}
 
-      <section className="rounded-[0.75rem] border border-line px-4 py-3" aria-label={t.yours}>
+      <Panel className="px-4 py-3 sm:px-5" aria-label={t.yours} role="region">
         <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
           <div className="min-w-0 flex-1">
             <div className="text-[0.8125rem] text-fg-3">{t.yours}</div>
@@ -174,7 +175,7 @@ export default function ScreenResolution({ locale, w = 1920, h = 1080, diag = 24
           {yours && (
             <Button
               size="sm"
-              variant="ghost"
+              variant="tonal"
               onClick={() => {
                 setW(String(yours.pw));
                 setH(String(yours.ph));
@@ -185,7 +186,7 @@ export default function ScreenResolution({ locale, w = 1920, h = 1080, diag = 24
           )}
         </div>
         <p className="mt-1 text-[0.8125rem] text-fg-3">{t.zoom}</p>
-      </section>
+      </Panel>
     </div>
   );
 }

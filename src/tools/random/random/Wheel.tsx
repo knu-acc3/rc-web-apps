@@ -7,7 +7,7 @@ import { count } from "@/i18n/format";
 import { cn } from "@/lib/cn";
 import { usePersistentState } from "@/lib/persist";
 import { linkHere, listHash, readListHash, useQueryParam } from "@/lib/share-link";
-import { Button } from "@/ui/button";
+import { Button, IconButton } from "@/ui/button";
 import { Field, Switch, Textarea } from "@/ui/field";
 import { useFullscreen } from "@/ui/fullscreen";
 import { Panel } from "@/ui/panel";
@@ -53,8 +53,6 @@ const T = {
     history: "История",
     clear: "Очистить",
     empty: "Здесь появятся результаты вращений",
-    saved: "Список сохраняется в этом браузере.",
-    limit: `Не больше ${MAX_ENTRIES} вариантов`,
   },
   en: {
     spin: "Spin the wheel",
@@ -76,8 +74,6 @@ const T = {
     history: "History",
     clear: "Clear",
     empty: "Spin results will appear here",
-    saved: "The list is saved in this browser.",
-    limit: `Up to ${MAX_ENTRIES} entries`,
   },
 } as const;
 
@@ -295,18 +291,15 @@ export default function Wheel({ locale, preset, entries: presetEntries, colors }
   return (
     <div className="grid gap-4 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)]">
       <Panel ref={fsRef} className={cn("relative flex flex-col items-center gap-4 p-4 sm:p-5", full && "justify-center rounded-none border-0")}>
-        <Button
-          size="icon-sm"
-          variant="ghost"
+        <IconButton
+          variant="tonal"
           onClick={() => void toggleFull()}
-          aria-label={full ? t.exitFull : t.full}
-          title={full ? t.exitFull : t.full}
-          className="absolute right-2 top-2 z-10"
-        >
-          {full ? <Minimize aria-hidden /> : <Maximize aria-hidden />}
-        </Button>
-        <ToolTitle value={title} onChange={setTitle} locale={locale} full={full} className="mt-1 pr-8 pl-8" />
-        <div className={cn("relative aspect-square w-full", full ? "max-w-[min(70vh,92vw)]" : "max-w-[27.5rem]")}>
+          label={full ? t.exitFull : t.full}
+          icon={full ? <Minimize aria-hidden /> : <Maximize aria-hidden />}
+          className="absolute right-3 top-3 z-10"
+        />
+        <ToolTitle value={title} onChange={setTitle} locale={locale} full={full} className="mt-1 px-12" />
+        <div className={cn("relative aspect-square w-full", full ? "max-w-[min(70vh,92vw)]" : "max-w-[min(46rem,50vh)] min-[480px]:min-w-[18rem]")}>
           <WheelPointer />
           {/* The wheel surface is a mouse shortcut; the button below is the accessible control. */}
           {/* Clip the rotating square so its corners never create page overflow. */}
@@ -316,13 +309,13 @@ export default function Wheel({ locale, preset, entries: presetEntries, colors }
             </div>
           </div>
         </div>
-        <Button variant="primary" size="lg" onClick={spin} disabled={spinning || entries.length < 2} className="w-full sm:w-auto sm:min-w-60">
+        <Button variant="filled" size="xl" onClick={spin} disabled={spinning || entries.length < 2} className="w-full sm:w-auto sm:min-w-64">
           {spinning ? t.spinning : t.spin}
         </Button>
-        <div className={cn("flex min-h-[5.25rem] w-full flex-col items-center justify-center gap-1 rounded-[0.625rem] bg-surface-2 px-4 py-3 text-center", full && "max-w-xl")}>
+        <div className={cn("flex min-h-[5.25rem] w-full flex-col items-center justify-center gap-1 rounded-[1rem] bg-surface-2 px-4 py-3 text-center", full && "max-w-xl")}>
           <div className="text-[0.8125rem] font-medium text-fg-2">{t.result}</div>
-          <div aria-live="polite" className="min-h-8 text-2xl font-semibold break-words text-fg">
-            {result && !spinning ? result.label : ""}
+          <div aria-live="polite" className="min-h-8 max-w-full text-3xl font-bold break-words text-fg motion-safe:[&>span]:animate-[pop_0.45s_ease-out]">
+            {result && !spinning ? <span key={history[0]?.id} className="inline-block">{result.label}</span> : ""}
           </div>
           {!result && !spinning && !error && <div className="text-sm text-fg-3">{t.idle}</div>}
           {error && (
@@ -331,7 +324,7 @@ export default function Wheel({ locale, preset, entries: presetEntries, colors }
             </p>
           )}
           {winnerStillThere && !spinning && (
-            <Button variant="ghost" size="sm" onClick={removeWinner}>
+            <Button variant="tonal" size="sm" onClick={removeWinner}>
               {t.remove}
             </Button>
           )}
@@ -343,8 +336,7 @@ export default function Wheel({ locale, preset, entries: presetEntries, colors }
           <Field
             label={t.entries}
             htmlFor={`${id}-list`}
-            aside={<span className="tabular text-[0.8125rem] text-fg-3">{count(locale, entries.length, t.entryForms)}</span>}
-            hint={`${t.limit}. ${t.saved}`}
+            aside={<span className="tabular shrink-0 whitespace-nowrap text-[0.8125rem] text-fg-3">{count(locale, entries.length, t.entryForms)}</span>}
           >
             <Textarea
               id={`${id}-list`}

@@ -27,6 +27,7 @@ export function SliderField({
   error,
   ends,
   inputMode = "decimal",
+  placeholder,
   className,
 }: {
   id: string;
@@ -47,11 +48,13 @@ export function SliderField({
   /** Labels under the two ends of the track (default: min and max formatted). */
   ends?: [ReactNode, ReactNode];
   inputMode?: "decimal" | "numeric";
+  /** Shown while the value is empty (the handle then waits at the start, dimmed). */
+  placeholder?: string;
   className?: string;
 }) {
   const n = parse(value);
   const pos = toPos(n ?? min, min, max, scale);
-  const width = `${Math.max(2, value.length) + 0.75}ch`;
+  const width = `${Math.max(2, (value || placeholder || "").length) + 0.75}ch`;
   return (
     <div className={cn("flex min-w-0 flex-col", className)}>
       <div className="flex min-w-0 items-end justify-between gap-3">
@@ -64,12 +67,13 @@ export function SliderField({
             value={value}
             onChange={(e) => onChange(e.target.value)}
             onFocus={(e) => e.target.select()}
+            placeholder={placeholder}
             inputMode={inputMode}
             autoComplete="off"
             spellCheck={false}
             aria-invalid={!!error}
             style={{ width }}
-            className="tabular min-w-[2ch] max-w-[12ch] bg-transparent text-right text-xl font-bold tracking-tight text-fg outline-none sm:text-2xl"
+            className="tabular min-w-[2ch] max-w-[12ch] bg-transparent text-right text-xl font-bold tracking-tight text-fg outline-none placeholder:font-semibold placeholder:text-fg-3 sm:text-2xl"
           />
           {suffix && <span className="text-base font-semibold text-fg-2">{suffix}</span>}
         </div>
@@ -83,7 +87,7 @@ export function SliderField({
         value={pos}
         format={() => format(niceValue(fromPos(pos, min, max, scale), step, scale))}
         onChange={(e) => onChange(format(niceValue(fromPos(Number(e.target.value), min, max, scale), step, scale)))}
-        className="mt-1"
+        className={cn("mt-1", n === null && "opacity-50")}
       />
       <div className="flex justify-between text-xs text-fg-3">
         <span>{ends ? ends[0] : format(min)}</span>

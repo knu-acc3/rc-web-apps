@@ -1,14 +1,16 @@
 "use client";
 
+import { Dices } from "lucide-react";
 import { useId, useMemo, useRef, useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { Presentable } from "@/ui/fullscreen";
 import { formatNumber } from "@/i18n/format";
 import { cn } from "@/lib/cn";
 import { Button } from "@/ui/button";
-import { Field, Input, Select } from "@/ui/field";
+import { Field, Input } from "@/ui/field";
+import { NumberInput } from "@/ui/number-input";
+import { ScrollRow } from "@/ui/scroll-row";
 import { Panel } from "@/ui/panel";
-import { Segmented } from "@/ui/segmented";
 import { diceRange, diceStats, parseDice, rollDice, type DiceError, type DiceRoll } from "./lib/dice";
 import { HistoryPanel, pushHistory } from "./ui/shared";
 
@@ -24,7 +26,7 @@ const T = {
     die: "Кубик",
     count: "Сколько кубиков",
     formula: "Формула броска",
-    formulaHint: "Например: 2d6+3, 4d6, d20−1, 3d6+1d4. Можно писать «к» вместо «d».",
+    formulaHint: "Например: 2d6+3, d20−1, 3к6+1к4",
     roll: "Бросить",
     total: "Сумма",
     idle: "Нажмите «Бросить»",
@@ -47,7 +49,7 @@ const T = {
     die: "Die",
     count: "Number of dice",
     formula: "Dice formula",
-    formulaHint: "For example: 2d6+3, 4d6, d20-1, 3d6+1d4.",
+    formulaHint: "For example: 2d6+3, d20-1, 3d6+1d4",
     roll: "Roll",
     total: "Total",
     idle: "Press “Roll”",
@@ -72,7 +74,7 @@ const T = {
 const PIPS: Record<number, number[]> = { 1: [4], 2: [0, 8], 3: [0, 4, 8], 4: [0, 2, 6, 8], 5: [0, 2, 4, 6, 8], 6: [0, 2, 3, 5, 6, 8] };
 
 function DieFace({ value, sides, negative }: { value: number; sides: number; negative?: boolean }) {
-  const base = "flex size-14 shrink-0 items-center justify-center rounded-[0.625rem] border-2 sm:size-16";
+  const base = "flex size-14 shrink-0 items-center justify-center rounded-[0.75rem] border-2 shadow-elev-1 sm:size-16";
   if (sides === 6) {
     return (
       <span className={cn(base, "grid grid-cols-3 grid-rows-3 gap-0.5 p-2", negative ? "border-err bg-err-soft" : "border-line-strong bg-surface")} role="img" aria-label={String(value)}>
@@ -126,80 +128,77 @@ export default function Dice({ locale, notation: notation0 = "1d6" }: DiceProps)
   };
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] lg:items-start">
       <Panel className="flex flex-col gap-4 p-4 sm:p-5">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
-          <div className="flex min-w-0 flex-col gap-1.5">
-            <span className="text-sm font-medium text-fg-2">{t.die}</span>
-            <Segmented
-              label={t.die}
-              value={dieValue}
-              onChange={(v) => setSimple(single?.count ?? 1, v)}
-              options={DIE_TYPES.map((d) => ({ value: d, label: `d${d}` }))}
+        <div className="flex min-w-0 flex-col gap-1.5">
+          <span className="text-sm font-medium text-fg-2">{t.die}</span>
+          <ScrollRow label={t.die} rowClassName="gap-2">
+            {DIE_TYPES.map((d) => (
+              <button key={d} type="button" className="chip tabular shrink-0 px-4! text-base!" aria-pressed={dieValue === d} onClick={() => setSimple(single?.count ?? 1, d)}>
+                d{d}
+              </button>
+            ))}
+          </ScrollRow>
+        </div>
+        <div className="grid grid-cols-1 gap-3 min-[400px]:grid-cols-[minmax(0,11rem)_minmax(0,1fr)]">
+          <Field label={t.count} htmlFor={`${id}-n`}>
+            <NumberInput id={`${id}-n`} locale={locale} min={1} max={100} value={single ? single.count : null} placeholder="—" onChange={(v) => v !== null && setSimple(v, dieValue || "6")} />
+          </Field>
+          <Field label={t.formula} htmlFor={`${id}-f`} error={!parsed.ok && notation ? t.errors[parsed.error] : undefined}>
+            <Input
+              id={`${id}-f`}
+              value={notation}
+              onChange={(e) => {
+                setNotation(e.target.value);
+                setRoll(null);
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") doRoll();
+              }}
+              autoComplete="off"
+              spellCheck={false}
+              aria-invalid={!parsed.ok}
+              className="font-mono"
             />
-          </div>
-          <Field label={t.count} htmlFor={`${id}-n`} className="sm:w-40">
-            <Select id={`${id}-n`} value={single ? Math.min(single.count, 10) : ""} onChange={(e) => setSimple(Number(e.target.value), dieValue || "6")}>
-              {!single && <option value="">—</option>}
-              {Array.from({ length: 10 }, (_, i) => (
-                <option key={i + 1} value={i + 1}>
-                  {i + 1}
-                </option>
-              ))}
-            </Select>
           </Field>
         </div>
-        <Field label={t.formula} htmlFor={`${id}-f`} hint={parsed.ok || !notation ? t.formulaHint : undefined} error={!parsed.ok && notation ? t.errors[parsed.error] : undefined}>
-          <Input
-            id={`${id}-f`}
-            value={notation}
-            onChange={(e) => {
-              setNotation(e.target.value);
-              setRoll(null);
-            }}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") doRoll();
-            }}
-            autoComplete="off"
-            spellCheck={false}
-            aria-invalid={!parsed.ok}
-            className="font-mono"
-            size="lg"
-          />
-        </Field>
+        <p className="text-sm text-fg-3">{t.formulaHint}</p>
+        <Button variant="filled" size="xl" onClick={doRoll} disabled={!parsed.ok} className="w-full">
+          <Dices aria-hidden />
+          {t.roll} {parsed.ok ? parsed.expr.text : ""}
+        </Button>
         {info && (
-          <p className="tabular text-sm text-fg-2">
+          <p className="tabular -mt-1 text-center text-sm text-fg-3">
             {t.range}: {formatNumber(locale, info.min)}…{formatNumber(locale, info.max)} · {t.mean}: {formatNumber(locale, info.mean, { maximumFractionDigits: 2 })}
           </p>
         )}
-        <Button variant="primary" size="lg" onClick={doRoll} disabled={!parsed.ok} className="w-full sm:w-auto sm:self-start sm:min-w-48">
-          {t.roll} {parsed.ok ? parsed.expr.text : ""}
-        </Button>
       </Panel>
 
-      <Presentable locale={locale} className="rounded-[0.75rem] border border-line bg-surface flex flex-col items-center gap-4 p-4 sm:p-5">
-        {roll ? (
-          <div className="flex max-w-full flex-wrap justify-center gap-2" aria-hidden>
-            {roll.groups.flatMap((g, gi) => g.faces.map((f, i) => <DieFace key={`${gi}-${i}`} value={f} sides={g.sides} negative={g.sign < 0} />))}
-            {roll.modifier !== 0 && (
-              <span className="flex h-14 items-center rounded-[0.625rem] bg-surface-2 px-3 text-lg font-semibold text-fg-2 sm:h-16">
-                {roll.modifier > 0 ? `+${roll.modifier}` : `−${-roll.modifier}`}
-              </span>
-            )}
+      <div className="flex min-w-0 flex-col gap-4">
+        <Presentable locale={locale} className="panel flex min-h-60 flex-col items-center justify-center gap-4 p-4 pt-14 sm:p-5 sm:pt-14" fullClassName="rounded-none shadow-none">
+          {roll ? (
+            <div key={history[0]?.id} className="flex max-w-full flex-wrap justify-center gap-2 motion-safe:animate-[pop_0.4s_ease-out]" aria-hidden>
+              {roll.groups.flatMap((g, gi) => g.faces.map((f, i) => <DieFace key={`${gi}-${i}`} value={f} sides={g.sides} negative={g.sign < 0} />))}
+              {roll.modifier !== 0 && (
+                <span className="flex h-14 items-center rounded-[0.75rem] bg-surface-2 px-3 text-lg font-semibold text-fg-2 sm:h-16">
+                  {roll.modifier > 0 ? `+${roll.modifier}` : `−${-roll.modifier}`}
+                </span>
+              )}
+            </div>
+          ) : (
+            <p className="py-4 text-sm text-fg-3">{t.idle}</p>
+          )}
+          <div className={cn("text-center", !roll && "sr-only")}>
+            <div className="text-[0.8125rem] font-medium text-fg-2">{t.total}</div>
+            <div aria-live="polite" className="fs-big tabular min-h-12 text-6xl font-bold tracking-tight text-fg">
+              {roll ? formatNumber(locale, roll.total) : ""}
+            </div>
+            {roll?.detail && <div className="tabular mt-1 max-w-full text-sm break-words text-fg-3">{roll.detail}</div>}
           </div>
-        ) : (
-          <p className="py-4 text-sm text-fg-3">{t.idle}</p>
-        )}
-        <div className="text-center">
-          <div className="text-[0.8125rem] font-medium text-fg-2">{t.total}</div>
-          <div aria-live="polite" className="fs-big tabular min-h-12 text-5xl font-bold tracking-tight text-fg">
-            {roll ? formatNumber(locale, roll.total) : ""}
-          </div>
-          {roll?.detail && <div className="tabular mt-1 max-w-full text-sm break-words text-fg-3">{roll.detail}</div>}
-        </div>
-      </Presentable>
+        </Presentable>
 
-      <HistoryPanel title={t.history} items={history} onClear={() => setHistory([])} clearLabel={t.clear} emptyLabel={t.empty} />
+        <HistoryPanel title={t.history} items={history} onClear={() => setHistory([])} clearLabel={t.clear} emptyLabel={t.empty} />
+      </div>
     </div>
   );
 }

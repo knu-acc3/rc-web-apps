@@ -3,8 +3,10 @@
 import { useId, useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { formatNumber, parseNumber } from "@/i18n/format";
-import { Field, Input } from "@/ui/field";
+import { Field } from "@/ui/field";
+import { NumberInput } from "@/ui/number-input";
 import { Panel } from "@/ui/panel";
+import { SliderField } from "@/ui/slider-field";
 import { dotPitchMm, megapixels, physicalSize, ppi, retinaDistanceIn } from "../screen/engine";
 import { QuietFacts, plainSpaces } from "../ui/kit";
 
@@ -59,23 +61,23 @@ export default function PpiCalc({ locale, w = 1920, h = 1080, diag = 24 }: { loc
   return (
     <div className="flex flex-col gap-4">
       <Panel className="p-4 sm:p-6">
-        <div className="grid gap-5 md:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] md:items-end">
-          <div className="grid grid-cols-3 gap-3">
-            <Field label={t.width} htmlFor={`${id}-w`}>
-              <Input id={`${id}-w`} inputMode="numeric" autoComplete="off" value={wText} onChange={(e) => setW(e.target.value)} aria-invalid={!ok(W)} size="lg" className="tabular" />
-            </Field>
-            <Field label={t.height} htmlFor={`${id}-h`}>
-              <Input id={`${id}-h`} inputMode="numeric" autoComplete="off" value={hText} onChange={(e) => setH(e.target.value)} aria-invalid={!ok(H)} size="lg" className="tabular" />
-            </Field>
-            <Field label={t.diag} htmlFor={`${id}-d`}>
-              <Input id={`${id}-d`} inputMode="decimal" autoComplete="off" value={dText} onChange={(e) => setD(e.target.value)} size="lg" className="tabular" />
-            </Field>
+        <div className="grid gap-6 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] md:items-center md:gap-8">
+          <div className="flex min-w-0 flex-col gap-5">
+            <div className="grid grid-cols-2 gap-3">
+              <Field label={t.width} htmlFor={`${id}-w`}>
+                <NumberInput id={`${id}-w`} locale={locale} value={W} onChange={(v) => setW(v === null ? "" : String(v))} min={1} max={100_000} stepper={false} suffix="px" invalid={!ok(W)} size="lg" />
+              </Field>
+              <Field label={t.height} htmlFor={`${id}-h`}>
+                <NumberInput id={`${id}-h`} locale={locale} value={H} onChange={(v) => setH(v === null ? "" : String(v))} min={1} max={100_000} stepper={false} suffix="px" invalid={!ok(H)} size="lg" />
+              </Field>
+            </div>
+            <SliderField id={`${id}-d`} label={t.diag} value={dText} onChange={setD} parse={(x) => parseNumber(x)} format={(v) => n(v, 1)} min={4} max={100} step={0.1} scale="log" />
           </div>
           <div className="min-w-0" aria-live="polite">
             {p !== null ? (
               <>
                 <div className="text-sm text-fg-2">{t.density}</div>
-                <div className="tabular text-4xl font-semibold tracking-tight text-fg sm:text-5xl">
+                <div className="tabular text-5xl font-semibold tracking-tight text-fg sm:text-6xl">
                   {n(p, 2)} <span className="text-xl font-medium text-fg-3">PPI</span>
                 </div>
               </>

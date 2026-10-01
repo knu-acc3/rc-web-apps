@@ -1,11 +1,14 @@
 "use client";
 
-import { ArrowLeftRight, ChevronDown } from "lucide-react";
+import { ArrowLeftRight } from "lucide-react";
 import { useId, useMemo, useState, type ReactNode } from "react";
 import type { Locale } from "@/i18n/config";
 import { formatSmart, parseNumber, plural } from "@/i18n/format";
 import { cn } from "@/lib/cn";
+import { IconButton } from "@/ui/button";
 import { CopyButton } from "@/ui/copy-button";
+import { Select } from "@/ui/field";
+import { Fold } from "@/ui/fold";
 import { clean, convert, type ConvUnit } from "./lib/engine";
 
 export interface ClientUnit extends ConvUnit {
@@ -119,16 +122,14 @@ export default function UnitConverter({ locale, units, from: from0, to: to0, val
           onUnit={setFrom}
           options={options}
         />
-        <div className="relative z-10 -my-4 flex justify-center md:my-0 md:items-center">
-          <button
-            type="button"
+        <div className="relative z-10 -my-5 flex justify-center md:my-0 md:items-center">
+          <IconButton
+            label={t.swap}
+            variant="tonal"
             onClick={swap}
-            aria-label={t.swap}
-            title={t.swap}
-            className="grid size-10 place-items-center rounded-full border border-line bg-surface text-fg-2 transition-colors hover:border-accent hover:text-accent focus-visible:border-accent"
-          >
-            <ArrowLeftRight aria-hidden className="size-4 max-md:rotate-90" />
-          </button>
+            className="shadow-elev-1"
+            icon={<ArrowLeftRight aria-hidden className="max-md:rotate-90 motion-safe:transition-transform" />}
+          />
         </div>
         <UnitBox
           id={`${id}-b`}
@@ -155,13 +156,14 @@ export default function UnitConverter({ locale, units, from: from0, to: to0, val
       </div>
 
       {aNum !== null && units.length > 2 && (
-        <details className="group rounded-[0.75rem] border border-line bg-surface">
-          <summary className="flex cursor-pointer list-none items-center justify-between gap-3 rounded-[0.75rem] px-4 py-3 text-[0.9375rem] text-fg-2 hover:text-fg [&::-webkit-details-marker]:hidden">
-            <span className="tabular min-w-0 truncate">
+        <Fold
+          title={
+            <span className="tabular font-medium">
               {fmt(aNum)} {unitText(aNum, uFrom)} {t.all}
             </span>
-            <ChevronDown aria-hidden className="size-4 shrink-0 text-fg-3 transition-transform group-open:rotate-180" />
-          </summary>
+          }
+          bodyClassName="px-0! pb-1! pt-0!"
+        >
           <ul className="rows border-t border-line">
             {units
               .filter((u) => u.slug !== uFrom.slug)
@@ -169,15 +171,15 @@ export default function UnitConverter({ locale, units, from: from0, to: to0, val
                 const v = convert(aNum, uFrom, u);
                 return (
                   <li key={u.slug}>
-                    <span className="min-w-0 truncate text-sm text-fg-3">{u.label}</span>
-                    <span className="tabular shrink-0 text-right text-[0.9375rem] text-fg">
-                      {fmt(v)} <span className="text-fg-3">{unitText(v, u)}</span>
+                    <span className="min-w-0 text-sm text-fg-3">{u.label}</span>
+                    <span className="tabular ml-auto text-right text-[0.9375rem] font-medium text-fg">
+                      {fmt(v)} <span className="font-normal text-fg-3">{unitText(v, u)}</span>
                     </span>
                   </li>
                 );
               })}
           </ul>
-        </details>
+        </Fold>
       )}
     </div>
   );
@@ -209,23 +211,14 @@ function UnitBox({
   return (
     <div
       className={cn(
-        "min-w-0 rounded-[1rem] border px-4 pt-3 pb-3.5 transition-colors focus-within:border-accent sm:px-5",
-        primary ? "border-transparent bg-accent-soft" : "border-line bg-surface",
-        invalid && "border-err!",
+        "min-w-0 rounded-[1.25rem] px-3 pt-3 pb-4 ring-inset transition-shadow focus-within:ring-2 focus-within:ring-accent sm:px-4",
+        primary ? "bg-accent-soft" : "bg-surface shadow-card",
+        invalid && "ring-2 ring-err! focus-within:ring-err",
       )}
     >
-      <div className="relative -ml-1 inline-flex max-w-full">
-        <select
-          id={`${id}-u`}
-          aria-label={unitLabel}
-          value={unit}
-          onChange={(e) => onUnit(e.target.value)}
-          className="max-w-full cursor-pointer appearance-none truncate rounded-[0.375rem] bg-transparent py-1 pr-6 pl-1 text-[0.9375rem] font-medium text-fg-2 outline-none hover:text-fg focus-visible:ring-2 focus-visible:ring-accent/40"
-        >
-          {options}
-        </select>
-        <ChevronDown aria-hidden className="pointer-events-none absolute top-1/2 right-0.5 size-4 -translate-y-1/2 text-fg-3" />
-      </div>
+      <Select id={`${id}-u`} aria-label={unitLabel} value={unit} onChange={(e) => onUnit(e.target.value)} variant="tonal" fit="selected" size="lg" className="max-w-full">
+        {options}
+      </Select>
       <input
         id={`${id}-v`}
         aria-label={valueLabel}
@@ -236,7 +229,7 @@ function UnitBox({
         value={value}
         onChange={(e) => onValue(e.target.value)}
         className={cn(
-          "tabular mt-0.5 block w-full min-w-0 bg-transparent text-[2rem] leading-[1.2] font-semibold tracking-tight outline-none sm:text-[2.25rem]",
+          "tabular mt-1.5 block w-full min-w-0 bg-transparent px-1 text-[2.25rem] leading-[1.2] font-semibold tracking-tight outline-none sm:text-[2.75rem] 2xl:text-[3.25rem]",
           primary ? "text-accent" : "text-fg",
         )}
       />

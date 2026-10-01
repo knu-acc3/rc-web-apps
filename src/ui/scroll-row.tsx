@@ -7,7 +7,7 @@ import { cn } from "@/lib/cn";
 /**
  * A row of chips or tabs that may not fit: it scrolls sideways, the edge that hides more items fades out, and round
  * ‹ › buttons appear on that side (mouse and touch alike). The mouse wheel scrolls it sideways while it can move.
- * The current item (`aria-current`, `aria-selected`, `aria-checked`) is scrolled into view on mount.
+ * The current item (`aria-current`, `aria-selected`, `aria-checked`, `aria-pressed`) is scrolled into view on mount.
  */
 export function ScrollRow({
   children,
@@ -37,7 +37,7 @@ export function ScrollRow({
       const end = el.scrollLeft + el.clientWidth >= el.scrollWidth - 2;
       setEdges((e) => (e.start === start && e.end === end ? e : { start, end }));
     };
-    const cur = el.querySelector<HTMLElement>('[aria-current="page"],[aria-current="true"],[aria-selected="true"],[aria-checked="true"]');
+    const cur = el.querySelector<HTMLElement>('[aria-current="page"],[aria-current="true"],[aria-selected="true"],[aria-checked="true"],[aria-pressed="true"]');
     if (cur && el.scrollWidth > el.clientWidth) {
       const left = cur.offsetLeft - el.offsetLeft;
       if (left + cur.offsetWidth > el.clientWidth) el.scrollLeft = left - el.clientWidth / 2 + cur.offsetWidth / 2;

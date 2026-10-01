@@ -41,14 +41,14 @@ export function ClockShell({ locale, children, options }: { locale: Locale; chil
       <div
         ref={ref}
         className={cn(
-          "flex min-h-[46vh] flex-col items-center justify-center rounded-[0.75rem] border border-line bg-surface px-3 py-8",
-          active && "min-h-screen rounded-none border-0",
+          "panel flex min-h-[46vh] flex-col items-center justify-center px-3 py-8",
+          active && "min-h-screen rounded-none! shadow-none!",
         )}
         style={style}
       >
         {children}
         {active && (
-          <Button variant="ghost" size="sm" onClick={toggle} className="fixed right-4 top-4 opacity-40 hover:opacity-100">
+          <Button variant="tonal" size="sm" onClick={toggle} className="fixed right-4 top-4 opacity-50 transition-opacity hover:opacity-100 focus-visible:opacity-100">
             <Minimize2 aria-hidden />
             {t.exit}
           </Button>
@@ -70,7 +70,7 @@ export function ClockShell({ locale, children, options }: { locale: Locale; chil
                   title={t.themes[id]}
                   onClick={() => setTheme(id)}
                   className={cn(
-                    "grid size-7 place-items-center rounded-full border border-line-strong pointer-coarse:size-9",
+                    "grid size-8 place-items-center rounded-full border border-line-strong transition-transform hover:scale-110 active:scale-95 pointer-coarse:size-10",
                     theme === id && "ring-2 ring-accent ring-offset-2 ring-offset-bg",
                     !x && "bg-[linear-gradient(135deg,var(--surface)_50%,var(--fg)_50%)]",
                   )}
@@ -82,7 +82,7 @@ export function ClockShell({ locale, children, options }: { locale: Locale; chil
             })}
           </div>
         </div>
-        <Button variant="secondary" size="sm" onClick={toggle}>
+        <Button variant="tonal" onClick={toggle}>
           <Maximize2 aria-hidden />
           {t.full}
           <Kbd className="ml-1 hidden sm:inline-flex" aria-label={`${t.key} F`}>
