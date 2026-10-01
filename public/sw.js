@@ -6,7 +6,7 @@
  * - /vendor, /fonts, search index, icons: served from cache, refreshed in the background.
  * Nothing you type or open is stored here — only the site's own files. Other origins are never touched.
  */
-const VERSION = "v1";
+const VERSION = "v2";
 const PAGES = `pages-${VERSION}`;
 const STATIC = `static-${VERSION}`;
 const ASSETS = `assets-${VERSION}`;
@@ -106,6 +106,10 @@ self.addEventListener("fetch", (event) => {
   if (url.origin !== self.location.origin) return;
   // React Server Component payloads and range requests (media) go straight to the network.
   if (url.searchParams.has("_rsc") || request.headers.has("range")) return;
+  // Web Worker scripts too: a worker takes its address from the response, and a response from here loses the
+  // "#params=…" part that tells a bundled worker which chunks to load — the worker would start empty and every
+  // PDF, photo and video tool would fail. The browser's HTTP cache keeps them anyway (hashed, immutable).
+  if (request.destination === "worker" || request.destination === "sharedworker" || url.hash) return;
 
   if (request.mode === "navigate") {
     event.respondWith(page(request));
