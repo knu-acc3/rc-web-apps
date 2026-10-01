@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { timerSpecs } from "@/sections/timer/data/durations";
 import { nextOccurrence, timeline } from "@/sections/timer/lib/alarm";
-import { clampInt, clock, durationShort, durationText } from "@/sections/timer/lib/format";
+import { clampInt, clock, durationParam, durationShort, durationText, parseDurationParam } from "@/sections/timer/lib/format";
 
 describe("timer formatting", () => {
   it("countdowns round up, stopwatches round down", () => {
@@ -55,5 +55,22 @@ describe("alarm and interval timeline", () => {
     expect(t.filter((s) => s.kind === "work")).toHaveLength(8);
     expect(t.filter((s) => s.kind === "rest")).toHaveLength(7);
     expect(timeline(0, 60, 0, 10)).toHaveLength(10);
+  });
+});
+
+describe("timer link parameter", () => {
+  it("round-trips lengths", () => {
+    for (const s of [1, 59, 60, 95, 300, 3600, 5400, 99 * 3600 + 59 * 60 + 59]) expect(parseDurationParam(durationParam(s))).toBe(s);
+    expect(durationParam(300)).toBe("5m");
+    expect(durationParam(5400)).toBe("1h30m");
+  });
+  it("reads the common spellings", () => {
+    expect(parseDurationParam("90")).toBe(90);
+    expect(parseDurationParam("10:00")).toBe(600);
+    expect(parseDurationParam("1:30:00")).toBe(5400);
+    expect(parseDurationParam("25M")).toBe(1500);
+  });
+  it("rejects junk and out-of-range values", () => {
+    for (const s of ["", "0", "abc", "1:99", "100h", "-5", "5m5h", "9999999"]) expect(parseDurationParam(s)).toBeNull();
   });
 });

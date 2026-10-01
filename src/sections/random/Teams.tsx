@@ -6,7 +6,9 @@ import type { Locale } from "@/i18n/config";
 import { count } from "@/i18n/format";
 import { Button } from "@/ui/button";
 import { CopyButton } from "@/ui/copy-button";
+import { linkHere, listHash, useSharedList } from "@/lib/share-link";
 import { Field, Select, Switch, Textarea } from "@/ui/field";
+import { ShareLink } from "@/ui/share-link";
 import { Panel, PanelHeader } from "@/ui/panel";
 import { shuffle } from "./lib/rng";
 import { splitIntoTeams, type Team } from "./lib/teams";
@@ -78,6 +80,7 @@ export default function Teams({ locale, teams: teams0 = 2 }: TeamsProps) {
   const [error, setError] = useState<string | null>(null);
 
   const people = parseLines(text, MAX_PEOPLE);
+  useSharedList("p", MAX_PEOPLE, 200, (xs) => setText(xs.join("\n")));
 
   function split() {
     if (people.length < teamCount) {
@@ -133,9 +136,12 @@ export default function Teams({ locale, teams: teams0 = 2 }: TeamsProps) {
           </div>
         </div>
         {summary && <p className="tabular text-sm text-fg-2">{summary}</p>}
-        <Button variant="primary" size="lg" onClick={split} className="w-full sm:w-auto sm:self-start sm:min-w-56">
-          {t.split}
-        </Button>
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+          <Button variant="primary" size="lg" onClick={split} className="w-full sm:w-auto sm:min-w-56">
+            {t.split}
+          </Button>
+          <ShareLink locale={locale} url={() => linkHere({ hash: listHash("p", people) })} className="self-center sm:ml-auto" />
+        </div>
         {error && (
           <p className="text-sm text-err" role="alert">
             {error}

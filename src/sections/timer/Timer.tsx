@@ -4,12 +4,14 @@ import { Maximize2, Minimize2, Pause, Play, Plus, RotateCcw, Square } from "luci
 import { useEffect, useId, useRef, useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { cn } from "@/lib/cn";
+import { linkHere, useQueryParam } from "@/lib/share-link";
 import { Button } from "@/ui/button";
 import { useFullscreen } from "@/ui/fullscreen";
+import { ShareLink } from "@/ui/share-link";
 import { useWakeLock } from "@/ui/stage";
 import { TimerOptions, useAlertOptions } from "./ui/TimerOptions";
 import { hasPlayed, schedule, unlockAudio, type Scheduled } from "./lib/audio";
-import { clampInt, clock, durationShort, durationText, hms } from "./lib/format";
+import { clampInt, clock, durationParam, durationShort, durationText, hms, parseDurationParam } from "./lib/format";
 import { useKeys } from "./lib/keys";
 import { nowMs } from "./lib/now";
 import { notify, useTicker, useTitle } from "./lib/notify";
@@ -36,6 +38,8 @@ const T = {
     presets: "Быстрый выбор",
     full: "На весь экран",
     title: "Таймер",
+    name: "Название таймера",
+    namePh: "Например, пицца в духовке",
   },
   en: {
     start: "Start",
@@ -52,6 +56,8 @@ const T = {
     presets: "Quick picks",
     full: "Full screen",
     title: "Timer",
+    name: "Timer name",
+    namePh: "E.g. pizza in the oven",
   },
 } as const;
 
@@ -76,6 +82,24 @@ export default function Timer({ locale, seconds = 300 }: TimerProps) {
   useWakeLock(status === "running");
 
   const running = status === "running";
+
+  // A shared link (?t=10m) sets the length once the page is live; the server renders the page's own default.
+  const urlT = useQueryParam("t");
+  const urlName = useQueryParam("n");
+  const [name, setName] = useState("");
+  const urlKey = urlT === null && urlName === null ? null : `${urlT}|${urlName}`;
+  const [seenUrl, setSeenUrl] = useState<string | null>(null);
+  if (urlKey !== seenUrl) {
+    setSeenUrl(urlKey);
+    if (urlName) setName(urlName.slice(0, 60));
+    const sec = urlT ? parseDurationParam(urlT) : null;
+    if (sec && status === "idle") {
+      const x = hms(sec);
+      setDur(sec);
+      setFields({ h: String(x.h).padStart(2, "0"), m: String(x.m).padStart(2, "0"), s: String(x.s).padStart(2, "0") });
+      setLeft(sec * 1000);
+    }
+  }
 
   function cancelSound() {
     sound.current?.stop();
@@ -131,7 +155,7 @@ export default function Timer({ locale, seconds = 300 }: TimerProps) {
       cancelSound();
       sound.current = schedule(opts.sound, 0, 4);
     }
-    if (opts.notify) notify(t.done, t.doneFor(durationText(dur, locale)));
+    if (opts.notify) notify(name || t.done, t.doneFor(durationText(dur, locale)));
   }
 
   // Drift-free: remaining time is always endAt − now.
@@ -158,7 +182,7 @@ export default function Timer({ locale, seconds = 300 }: TimerProps) {
 
   useEffect(() => () => sound.current?.stop(), []);
 
-  useTitle(running || status === "paused" ? clock(left) : status === "done" ? t.done : null);
+  useTitle(running || status === "paused" ? `${clock(left)}${name ? ` · ${name}` : ""}` : status === "done" ? (name ? `${t.done} ${name}` : t.done) : null);
   useKeys({ " ": () => (running ? pause() : status === "done" ? reset() : start()), r: reset });
 
   function setDuration(sec: number) {
@@ -206,6 +230,18 @@ export default function Timer({ locale, seconds = 300 }: TimerProps) {
           status === "done" && "border-accent",
         )}
       >
+        <input
+          aria-label={t.name}
+          placeholder={t.namePh}
+          value={name}
+          maxLength={60}
+          onChange={(e) => setName(e.target.value)}
+          className={cn(
+            "w-full max-w-xl truncate rounded-[0.5rem] border border-transparent bg-transparent px-2 text-center font-semibold text-fg-2 outline-none placeholder:font-normal placeholder:text-fg-3 hover:border-line focus:border-accent",
+            full ? "text-[min(6vw,3rem)]" : "text-lg",
+            full && !name && "hidden",
+          )}
+        />
         {editable ? (
           <div className={cn("flex items-baseline leading-none tracking-tight", big)}>
             {field("h", t.h)}
@@ -258,6 +294,7 @@ export default function Timer({ locale, seconds = 300 }: TimerProps) {
             {durationShort(p, locale)}
           </button>
         ))}
+        <ShareLink locale={locale} url={() => linkHere({ query: { ...(dur > 0 ? { t: durationParam(dur) } : {}), ...(name.trim() ? { n: name.trim() } : {}) } })} className="ml-auto" />
       </div>
 
       <TimerOptions locale={locale} options={opts} onChange={setOpts} />

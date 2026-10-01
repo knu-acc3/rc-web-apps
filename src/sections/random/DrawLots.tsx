@@ -5,9 +5,11 @@ import { useEffect, useRef, useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { cn } from "@/lib/cn";
 import { usePersistentState } from "@/lib/persist";
+import { linkHere, listHash, useSharedList } from "@/lib/share-link";
 import { Button } from "@/ui/button";
 import { Field, Input, Switch, Textarea } from "@/ui/field";
 import { Notice } from "@/ui/panel";
+import { ShareLink } from "@/ui/share-link";
 import { Segmented } from "@/ui/segmented";
 import { buildLots, clampCount, defaultMafia, LOTS_MAX, LOTS_MODES, type Lot, type LotsMode } from "./lib/lots";
 import { shuffle } from "./lib/rng";
@@ -130,6 +132,10 @@ export default function DrawLots({ locale, mode: modeProp = "custom" }: { locale
   const [error, setError] = useState("");
   const hideRef = useRef<HTMLButtonElement>(null);
 
+  useSharedList("d", LOTS_MAX, 200, (xs) => {
+    setMode("custom");
+    setS((prev) => ({ ...prev, text: xs.join("\n") }));
+  });
   const lots = buildLots(mode, { lines: parseLines(s.text, LOTS_MAX), count: s.count, marked: s.marked, detective: s.detective, doctor: s.doctor }, locale);
   const secret = s.secret;
 
@@ -226,6 +232,7 @@ export default function DrawLots({ locale, mode: modeProp = "custom" }: { locale
           {deck ? t.again : t.deal}
         </Button>
         <Switch label={t.secret} checked={secret} onChange={(e) => setS({ ...s, secret: e.target.checked })} />
+        {mode === "custom" && <ShareLink locale={locale} url={() => linkHere({ hash: listHash("d", parseLines(s.text, LOTS_MAX)) })} className="ml-auto" />}
       </div>
       {mode === "mafia" && <p className="-mt-2 text-sm text-fg-3">{t.roles(mafiaCount, lots.length - mafiaCount)}</p>}
       {error && <Notice tone="err">{error}</Notice>}

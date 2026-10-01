@@ -6,7 +6,9 @@ import type { Locale } from "@/i18n/config";
 import { count } from "@/i18n/format";
 import { Button } from "@/ui/button";
 import { CopyButton } from "@/ui/copy-button";
+import { linkHere, listHash, useSharedList } from "@/lib/share-link";
 import { Field, Select, Switch, Textarea } from "@/ui/field";
+import { ShareLink } from "@/ui/share-link";
 import { Panel, PanelHeader } from "@/ui/panel";
 import { sample, shuffle } from "./lib/rng";
 import { HistoryPanel, parseLines, pushHistory } from "./ui/shared";
@@ -74,6 +76,7 @@ export default function ListPicker({ locale, items = DEFAULT }: ListPickerProps)
   const hid = useRef(0);
 
   const list = parseLines(text, MAX_ITEMS);
+  useSharedList("l", MAX_ITEMS, 200, (xs) => setText(xs.join("\n")));
   const maxPick = Math.max(1, Math.min(list.length, 50));
 
   function pick() {
@@ -135,6 +138,7 @@ export default function ListPicker({ locale, items = DEFAULT }: ListPickerProps)
             <Shuffle aria-hidden />
             {t.shuffle}
           </Button>
+          <ShareLink locale={locale} url={() => linkHere({ hash: listHash("l", list) })} className="sm:ml-auto sm:self-center" />
         </div>
       </Panel>
 

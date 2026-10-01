@@ -55,3 +55,27 @@ export function clampInt(text: string, max: number): number {
   if (!Number.isFinite(n)) return 0;
   return Math.max(0, Math.min(max, n));
 }
+
+const MAX_SEC = 99 * 3600 + 59 * 60 + 59;
+
+/** Timer length for a link: 300 → "5m", 5400 → "1h30m", 95 → "1m35s". */
+export function durationParam(totalSec: number): string {
+  const { h, m, s } = hms(totalSec);
+  return `${h ? `${h}h` : ""}${m ? `${m}m` : ""}${s || totalSec === 0 ? `${s}s` : ""}`;
+}
+
+/** Reads "5m", "1h30m", "90s", "90" (seconds), "10:00" or "1:30:00"; null for anything else or out of range. */
+export function parseDurationParam(raw: string): number | null {
+  const s = raw.trim().toLowerCase();
+  let sec: number | null = null;
+  if (/^\d{1,6}$/.test(s)) sec = Number(s);
+  else if (/^\d{1,2}(:\d{1,2}){1,2}$/.test(s)) {
+    const p = s.split(":").map(Number);
+    if (p.slice(1).some((x) => x > 59)) return null;
+    sec = p.length === 3 ? p[0] * 3600 + p[1] * 60 + p[2] : p[0] * 60 + p[1];
+  } else {
+    const m = /^(?:(\d{1,2})h)?(?:(\d{1,4})m)?(?:(\d{1,6})s)?$/.exec(s);
+    if (m && (m[1] || m[2] || m[3])) sec = Number(m[1] ?? 0) * 3600 + Number(m[2] ?? 0) * 60 + Number(m[3] ?? 0);
+  }
+  return sec !== null && sec > 0 && sec <= MAX_SEC ? sec : null;
+}

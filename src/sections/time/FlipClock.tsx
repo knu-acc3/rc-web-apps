@@ -41,7 +41,7 @@ function FlipDigit({ value }: { value: string }) {
   }
   const flipping = prev !== shown;
   return (
-    <span className="flip-card tabular bg-fg font-semibold text-bg" aria-hidden>
+    <span className="flip-card tabular bg-[var(--flip-bg,var(--fg))] font-semibold text-[var(--flip-fg,var(--bg))]" aria-hidden>
       <span className="flip-half flip-top">
         <span>{shown}</span>
       </span>
