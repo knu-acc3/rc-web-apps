@@ -14,7 +14,7 @@ function link(slug: string, locale: Locale): LinkItem | null {
 }
 
 /** "Таймер онлайн" → "Таймер": tabs only need the name. */
-const short = (label: string) => label.replace(/\s+(онлайн|online)$/i, "");
+export const shortLabel = (label: string) => label.replace(/\s+(онлайн|online)$/i, "");
 
 /**
  * Tabs to the neighbours of a tool ("Timer · Stopwatch · Alarm"), above the tool. Plain links in one scrollable row:
@@ -41,7 +41,7 @@ export function FamilyTabs({ slug, locale, className }: { slug: string; locale: 
                 )}
               >
                 <Icon name={l.icon} className="size-4" strokeWidth={1.75} />
-                {short(l.label)}
+                {shortLabel(l.label)}
               </a>
             </li>
           );

@@ -7,6 +7,7 @@ import { count, formatBytes, formatNumber } from "@/i18n/format";
 import { downloadBlob } from "@/lib/clipboard";
 import { sniffFile, type Detected } from "@/sections/file/lib/magic";
 import { Button } from "@/ui/button";
+import { cn } from "@/lib/cn";
 import { Dropzone } from "@/ui/dropzone";
 import { Checkbox, Field, Select } from "@/ui/field";
 import { Badge, Notice, Panel, PanelHeader } from "@/ui/panel";
@@ -313,7 +314,7 @@ function MediaConverterInner({ locale, kind, to, targets }: MediaConverterProps)
         </details>
       </div>
 
-      <Dropzone onFiles={addFiles} accept={accept} multiple title={u.chooseFiles} hint={`${inputs}. ${u.localNote}.`} compact={items.length > 0} />
+      <Dropzone onFiles={addFiles} accept={accept} multiple title={u.chooseFiles} hint={`${inputs}. ${u.localNote}.`} compact={items.length > 0} className={cn(!items.length && "max-sm:order-first")} />
 
       {webcodecs === false && <Notice tone="warn">{u.noWebCodecs}</Notice>}
       {needsFfmpeg && <Notice>{t.ffmpegNote}</Notice>}

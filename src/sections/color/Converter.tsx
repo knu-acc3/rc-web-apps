@@ -65,10 +65,10 @@ export default function ColorConverter({ locale, from, to, sample, reverse }: Co
           <div className="flex min-w-0 flex-col gap-1.5 md:mb-7">
             <div className="text-sm font-medium text-fg-2">{t.result(CONV_LABEL[to])}</div>
             <div className="flex min-h-12 items-center gap-2 rounded-[0.5rem] bg-surface-2 px-3">
-              <output className="min-w-0 flex-1 font-mono text-lg font-semibold break-all text-fg" aria-live="polite">
+              <output className="min-w-0 flex-1 font-mono text-lg font-semibold break-words text-fg [overflow-wrap:anywhere]" aria-live="polite">
                 {out || <span className="text-base font-normal text-fg-3">{t.empty}</span>}
               </output>
-              <CopyButton value={out} label={t.copy} copiedLabel={t.copied} size="sm" variant="ghost" />
+              <CopyButton value={out} label={t.copy} copiedLabel={t.copied} size="sm" variant="ghost" compact />
             </div>
           </div>
         </div>

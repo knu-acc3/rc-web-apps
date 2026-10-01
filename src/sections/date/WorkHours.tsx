@@ -102,10 +102,10 @@ export default function WorkHours({ locale }: { locale: Locale }) {
                   {days[i]}
                 </th>
                 <td className="px-2 py-1.5">
-                  <input aria-label={`${days[i]}: ${t.start}`} type="time" className="control h-9 w-28 text-sm" value={r.start} onChange={(e) => set(i, { start: e.target.value })} />
+                  <input aria-label={`${days[i]}: ${t.start}`} type="time" className="control h-9 w-auto min-w-24 text-sm" value={r.start} onChange={(e) => set(i, { start: e.target.value })} />
                 </td>
                 <td className="px-2 py-1.5">
-                  <input aria-label={`${days[i]}: ${t.end}`} type="time" className="control h-9 w-28 text-sm" value={r.end} onChange={(e) => set(i, { end: e.target.value })} />
+                  <input aria-label={`${days[i]}: ${t.end}`} type="time" className="control h-9 w-auto min-w-24 text-sm" value={r.end} onChange={(e) => set(i, { end: e.target.value })} />
                 </td>
                 <td className="px-2 py-1.5">
                   <input aria-label={`${days[i]}: ${t.brk}`} inputMode="numeric" className="control h-9 w-20 text-sm" value={r.brk} onChange={(e) => set(i, { brk: e.target.value.replace(/\D/g, "").slice(0, 3) })} />

@@ -53,9 +53,9 @@ export default function UserAgentInfo({ locale }: ToolProps) {
       <Panel className="px-5 py-5 sm:px-7 sm:py-6">
         <div className="flex items-start justify-between gap-3">
           <p className="pt-1 text-sm text-fg-3">{t.label}</p>
-          {u ? <CopyButton value={u.ua} label={c.copy} copiedLabel={c.copied} size="sm" variant="ghost" className="-mr-2 -mt-1" /> : null}
+          {u ? <CopyButton value={u.ua} label={c.copy} copiedLabel={c.copied} size="sm" variant="ghost" className="-mr-2 -mt-1" compact /> : null}
         </div>
-        <p aria-live="polite" className="mt-2 min-h-14 font-mono text-lg leading-relaxed break-all text-fg sm:text-xl">
+        <p aria-live="polite" className="mt-2 min-h-14 font-mono text-lg leading-relaxed break-words [overflow-wrap:anywhere] text-fg sm:text-xl">
           {u ? u.ua || "—" : <span className="font-sans text-fg-3">{c.detecting}</span>}
         </p>
         <noscript>

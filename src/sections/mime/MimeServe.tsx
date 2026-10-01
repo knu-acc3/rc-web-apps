@@ -79,7 +79,7 @@ export default function MimeServe(props: MimeServeProps) {
           {t.label} <span className="font-mono font-semibold text-fg">.{ext}</span>
         </div>
         <div className="mt-1 flex items-start justify-between gap-3">
-          <div aria-live="polite" className="min-w-0 font-mono text-xl font-semibold break-all text-fg sm:text-2xl">
+          <div aria-live="polite" className="min-w-0 font-mono text-xl font-semibold break-words [overflow-wrap:anywhere] text-fg sm:text-2xl">
             {type}
           </div>
           <CopyButton value={type} label={t.copy} copiedLabel={t.copied} />

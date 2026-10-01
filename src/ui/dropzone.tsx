@@ -6,11 +6,17 @@ import { cn } from "@/lib/cn";
 
 /** Phones can't drag files: "Перетащите файлы сюда или нажмите, чтобы выбрать" → "Нажмите, чтобы выбрать файлы". */
 export function touchTitle(title: string): string | null {
-  const ru = title.match(/^Перетащите (.+?)(?: сюда| в поле)?(?:, вставьте Ctrl\+V)? или нажмите(?:, чтобы выбрать)?(.*)$/);
+  const ru = title.match(/^Перетащите (.+?)(?: сюда| в поле)?(?:, вставьте Ctrl\+V)? или нажмите(?:, чтобы (?:выбрать|добавить))?(.*)$/);
   if (ru) return `Нажмите, чтобы выбрать ${ru[1]}${ru[2]}`;
-  const en = title.match(/^Drop (.+?)(?: here)?(?:, paste [^,]+?)?,? or click to (?:choose|select|browse)(.*)$/);
+  const en = title.match(/^Drop (.+?)(?: here)?(?:, paste [^,]+?)?,? or click to (?:choose|select|browse|add)(.*)$/);
   if (en) return `Tap to choose ${en[1]}${en[2]}`;
   return null;
+}
+
+/** Phones have no Ctrl+V: drop the sentences about pasting. */
+export function touchHint(hint: string): string | null {
+  if (!/(Ctrl|Cmd|⌘)\s*\+\s*V/i.test(hint)) return null;
+  return hint.replace(/[^.]*(Ctrl|Cmd|⌘)\s*\+\s*V[^.]*\.?\s*/gi, "").trim();
 }
 
 /**
@@ -121,7 +127,15 @@ export function Dropzone({
           title
         )}
       </span>
-      {hint && <span className="max-w-md text-sm text-fg-3">{hint}</span>}
+      {hint &&
+        (typeof hint === "string" && touchHint(hint) !== null ? (
+          <>
+            <span className="max-w-md text-sm text-fg-3 pointer-coarse:hidden">{hint}</span>
+            {touchHint(hint) && <span className="hidden max-w-md text-sm text-fg-3 pointer-coarse:inline">{touchHint(hint)}</span>}
+          </>
+        ) : (
+          <span className="max-w-md text-sm text-fg-3">{hint}</span>
+        ))}
       {children}
       {/* Hidden (not sr-only): the zone itself is the control; .click() still opens the picker. */}
       <input

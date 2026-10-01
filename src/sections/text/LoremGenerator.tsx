@@ -100,6 +100,7 @@ export default function LoremGenerator({ locale, lang: lang0 = "latin", unit: un
             setCountText(String(u === "words" ? 100 : u === "sentences" ? 5 : u === "list" ? 7 : 3));
           }}
           size="sm"
+          wrap
           options={(["paragraphs", "sentences", "words", "list"] as const).map((v) => ({ value: v, label: t[v] }))}
         />
         <label className="flex items-center gap-2">

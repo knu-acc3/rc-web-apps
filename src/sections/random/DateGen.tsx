@@ -97,7 +97,7 @@ export default function DateGen({ locale, from: from0 = "", to: to0 = "" }: Date
   return (
     <div className="flex flex-col gap-4">
       <Panel className="flex flex-col gap-4 p-4 sm:p-5">
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 gap-3 min-[360px]:grid-cols-2">
           <Field label={t.from} htmlFor={`${id}-a`}>
             <Input id={`${id}-a`} type="date" value={from} onChange={(e) => setFrom(e.target.value)} aria-invalid={!!from && a === null} />
           </Field>

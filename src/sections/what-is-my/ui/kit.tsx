@@ -91,7 +91,7 @@ export function Hero({
     <Panel className="px-5 py-5 sm:px-7 sm:py-6">
       <div className="flex items-start justify-between gap-3">
         <p className="pt-1 text-sm text-fg-3">{label}</p>
-        {copy ? <CopyButton value={copy} label={c.copy} copiedLabel={c.copied} size="sm" variant="ghost" className="-mr-2 -mt-1" /> : null}
+        {copy ? <CopyButton value={copy} label={c.copy} copiedLabel={c.copied} size="sm" variant="ghost" className="-mr-2 -mt-1" compact /> : null}
       </div>
       <div aria-live={live ? "polite" : undefined} className="mt-1.5 min-h-12">
         <div className="tabular text-[2rem] leading-[1.15] font-bold tracking-tight break-words text-fg sm:text-5xl">

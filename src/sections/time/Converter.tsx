@@ -2,6 +2,7 @@
 
 import { RotateCcw, X } from "lucide-react";
 import { useId, useMemo, useState } from "react";
+import { useBrowser12h } from "@/lib/clock-format";
 import { cn } from "@/lib/cn";
 import { parseYmd, ymdStr } from "@/sections/calendar/lib/dates";
 import { Button } from "@/ui/button";
@@ -52,6 +53,7 @@ const src = (p: Place) => p.tz ?? p.offset ?? 0;
 
 export default function Converter({ locale, rows: initial, withLocal = false, persist = false }: ConverterProps) {
   const t = T[locale];
+  const h12 = useBrowser12h();
   const id = useId();
   const now = useMinute();
   const localTz = useLocalZone();
@@ -163,7 +165,7 @@ export default function Converter({ locale, rows: initial, withLocal = false, pe
                       id={`${id}-t${i}`}
                       type="time"
                       step={60}
-                      className="tabular w-[7.5rem] rounded-[0.5rem] border border-transparent bg-transparent px-1 text-right text-2xl font-semibold text-fg hover:border-line focus:border-accent focus:outline-none sm:w-36 sm:text-3xl"
+                      className={cn("tabular rounded-[0.5rem] border border-transparent bg-transparent px-1 text-right font-semibold text-fg hover:border-line focus:border-accent focus:outline-none", h12 ? "w-[9.5rem] text-lg min-[400px]:text-xl sm:w-48 sm:text-2xl" : "w-[8.5rem] text-[1.375rem] min-[400px]:text-2xl sm:w-40 sm:text-3xl")}
                       value={p ? `${pad2(p.h)}:${pad2(p.mi)}` : ""}
                       onChange={(e) => setWall(r, e.target.value)}
                       disabled={!p}

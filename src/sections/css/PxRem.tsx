@@ -93,7 +93,7 @@ export default function PxRemConverter({ locale, from: from0 = "px", to: to0 = "
               </Select>
             </div>
             <div className="flex min-h-12 items-center justify-between gap-2 rounded-[0.5rem] bg-surface-2 px-3">
-              <output className="tabular min-w-0 font-mono text-2xl font-bold break-all text-fg" aria-live="polite">
+              <output className="tabular min-w-0 font-mono text-2xl font-bold break-words [overflow-wrap:anywhere] text-fg" aria-live="polite">
                 {main || <span className="text-base font-normal text-fg-3">{t.invalid}</span>}
               </output>
               <CopyButton value={main} label={t.copy} copiedLabel={t.copied} size="sm" variant="ghost" />

@@ -230,7 +230,7 @@ export default function Scientific({ locale }: ToolProps) {
           <div className="min-h-[4.75rem] rounded-[0.625rem] bg-accent-soft px-4 py-3">
             <div className="text-[0.8125rem] text-fg-2">{t.result}</div>
             <div className="flex items-center justify-between gap-2">
-              <output aria-live="polite" className="tabular min-w-0 break-all text-3xl font-bold tracking-tight text-fg">
+              <output aria-live="polite" className={cn("tabular min-w-0 break-words [overflow-wrap:anywhere] font-bold tracking-tight text-fg", (shown?.length ?? 0) > 16 ? "text-xl sm:text-2xl" : (shown?.length ?? 0) > 10 ? "text-2xl sm:text-3xl" : "text-3xl")}>
                 {shown ?? "—"}
               </output>
               {shown && <CopyButton value={shown.replace(/[  ]/g, " ")} label={t.copy} copiedLabel={t.copied} variant="ghost" size="icon-sm" />}

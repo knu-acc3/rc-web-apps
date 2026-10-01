@@ -3,6 +3,7 @@
 import { AlarmClock, AlarmClockOff, BellRing } from "lucide-react";
 import { useEffect, useId, useRef, useState } from "react";
 import type { Locale } from "@/i18n/config";
+import { useBrowser12h } from "@/lib/clock-format";
 import { cn } from "@/lib/cn";
 import { Button } from "@/ui/button";
 import { Switch } from "@/ui/field";
@@ -65,6 +66,7 @@ const p2 = (n: number) => String(n).padStart(2, "0");
 
 export default function Alarm({ locale, time = "07:00" }: AlarmProps) {
   const t = T[locale];
+  const h12 = useBrowser12h();
   const id = useId();
   const now = useNow();
   const [value, setValue] = useState(time);
@@ -144,7 +146,7 @@ export default function Alarm({ locale, time = "07:00" }: AlarmProps) {
             setValue(e.target.value);
             if (status === "armed" && /^\d{2}:\d{2}$/.test(e.target.value)) arm(nextOccurrence(e.target.value, nowMs()));
           }}
-          className="tabular w-full min-w-0 max-w-[26rem] rounded-[0.75rem] border border-transparent bg-transparent px-2 text-center text-[min(18vw,7rem)] leading-none font-semibold tracking-tight text-fg hover:border-line focus:border-accent focus:outline-none"
+          className={cn(h12 ? "text-[min(12vw,5rem)]" : "text-[min(18vw,7rem)]", "tabular w-full min-w-0 max-w-[26rem] rounded-[0.75rem] border border-transparent bg-transparent px-2 text-center leading-none font-semibold tracking-tight text-fg hover:border-line focus:border-accent focus:outline-none")}
         />
         <p className="min-h-7 text-lg text-fg-2" aria-live="polite">
           {status === "ringing" ? <span className="font-semibold text-accent">{t.ringing}</span> : info}

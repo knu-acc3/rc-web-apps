@@ -181,7 +181,8 @@ export function BatchWorkspace({
             {options}
           </OptionsBar>
         )}
-        <Dropzone onFiles={add} accept={accept} multiple={!single} title={single ? t.dropOne : t.dropMany} hint={dropHint ?? t.dropHint} />
+        {/* On a phone the file comes first: settings can wait until there is something to apply them to. */}
+        <Dropzone onFiles={add} accept={accept} multiple={!single} title={single ? t.dropOne : t.dropMany} hint={dropHint ?? t.dropHint} className="max-sm:order-first" />
       </div>
     );
   }

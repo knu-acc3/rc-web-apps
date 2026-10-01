@@ -138,7 +138,7 @@ export default function CheckDigitCalculator({ locale, kind: initial = "ean13" }
           <>
             <div className="text-sm text-fg-2">{verdict === "ok" ? t.ok : verdict === "bad" ? t.bad(calc.check) : t.result}</div>
             <div className="mt-1 flex flex-wrap items-center gap-3">
-              <span className="font-mono text-3xl font-semibold tracking-wider break-all text-fg sm:text-4xl">
+              <span className="font-mono text-3xl font-semibold tracking-wider break-words [overflow-wrap:anywhere] text-fg sm:text-4xl">
                 {calc.body}
                 <span className="text-accent">{calc.check}</span>
               </span>

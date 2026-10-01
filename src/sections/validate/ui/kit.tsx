@@ -45,7 +45,7 @@ export function Verdict({ tone, title, value, children }: { tone: Tone; title: R
         {tone !== "idle" && <Icon className="size-6 shrink-0" aria-hidden />}
         <span>{title}</span>
       </div>
-      {value && <div className="mt-2 font-mono text-xl font-semibold break-all text-fg sm:text-2xl">{value}</div>}
+      {value && <div className="mt-2 font-mono text-xl font-semibold break-words [overflow-wrap:anywhere] text-fg sm:text-2xl">{value}</div>}
       {children && <div className="mt-2 flex flex-col gap-1 text-[0.9375rem] text-fg-2">{children}</div>}
     </div>
   );
@@ -71,7 +71,7 @@ export function Details({ rows, locale, title }: { rows: Row[]; locale: Locale; 
         {rows.map((r) => (
           <div key={r.label} className="flex min-w-0 flex-col py-1.5">
             <dt className="text-[0.8125rem] text-fg-3">{r.label}</dt>
-            <dd className={cn("break-all text-fg select-all", r.mono ? "font-mono text-sm" : "text-[0.9375rem]")}>{r.value}</dd>
+            <dd className={cn("break-words [overflow-wrap:anywhere] text-fg select-all", r.mono ? "font-mono text-sm" : "text-[0.9375rem]")}>{r.value}</dd>
           </div>
         ))}
       </dl>

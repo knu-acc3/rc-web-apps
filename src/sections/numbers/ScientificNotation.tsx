@@ -120,7 +120,7 @@ export default function ScientificNotation({ locale, value = "0.000123" }: Scien
         ) : x ? (
           <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
             <div className="min-w-0">
-              <p className="tabular text-4xl leading-tight font-semibold break-all text-fg sm:text-5xl">{main}</p>
+              <p className="tabular text-4xl leading-tight font-semibold break-words [overflow-wrap:anywhere] text-fg sm:text-5xl">{main}</p>
               <p className="mt-1 text-sm text-fg-3">{t.order(magnitude(x), isZero(x) ? 1 : x.digits.length)}</p>
             </div>
             <CopyButton value={main} label={t.copy} copiedLabel={t.copied} className="shrink-0 self-start" />

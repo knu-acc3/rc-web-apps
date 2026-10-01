@@ -69,7 +69,7 @@ export default function ClampGenerator({ locale }: { locale: Locale }) {
           ))}
         </div>
         <div className="mt-4 flex min-h-14 items-center justify-between gap-2 rounded-[0.625rem] bg-surface-2 px-4 py-2">
-          <output className="min-w-0 font-mono text-lg font-semibold break-all text-fg sm:text-xl" aria-live="polite">
+          <output className="min-w-0 font-mono text-lg font-semibold break-words [overflow-wrap:anywhere] text-fg sm:text-xl" aria-live="polite">
             {result ? result.css : <span className="text-base font-normal text-fg-3">{t.invalid}</span>}
           </output>
           <CopyButton value={result?.css ?? ""} label={t.copy} copiedLabel={t.copied} size="sm" variant="ghost" />

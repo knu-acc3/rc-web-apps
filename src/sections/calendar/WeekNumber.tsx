@@ -36,11 +36,11 @@ export default function WeekNumber({ locale }: { locale: Locale }) {
         <p className="min-h-6 text-[0.9375rem] text-fg-3">{cur ? t.of(cur.year, isoWeeksInYear(cur.year)) : " "}</p>
       </Panel>
       <Panel className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5">
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
           <label htmlFor={`${id}-d`} className="text-[0.9375rem] font-medium text-fg-2">
             {t.date}
           </label>
-          <input id={`${id}-d`} type="date" className="control h-10 w-44" value={text} onChange={(e) => setText(e.target.value)} />
+          <input id={`${id}-d`} type="date" className="control h-10 w-44 max-w-full" value={text} onChange={(e) => setText(e.target.value)} />
         </div>
         <p className="min-h-7 text-lg text-fg" aria-live="polite">
           {pw && (

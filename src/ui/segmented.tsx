@@ -7,7 +7,8 @@ interface SegmentedOption<T extends string> {
   title?: string;
 }
 
-/** Single-choice pill group (radiogroup semantics). */
+/** Single-choice pill group (radiogroup semantics). Wraps onto a second line on narrow screens so no option hides
+ * off-screen; `wrap={false}` keeps one scrolling row. */
 export function Segmented<T extends string>({
   value,
   onChange,
@@ -15,7 +16,7 @@ export function Segmented<T extends string>({
   label,
   size = "md",
   className,
-  wrap = false,
+  wrap = true,
 }: {
   value: T;
   onChange: (value: T) => void;

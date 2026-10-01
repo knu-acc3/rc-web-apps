@@ -23,7 +23,7 @@ const L = {
 export function ResultCard({ value, sub, badge, className }: { value: ReactNode; sub?: ReactNode; badge?: ReactNode; className?: string }) {
   return (
     <div className={cn("rounded-[0.75rem] bg-surface-2 px-4 py-4 sm:px-5", className)}>
-      <div aria-live="polite" className="font-mono text-2xl font-semibold tracking-tight break-all text-fg sm:text-3xl">
+      <div aria-live="polite" className="font-mono text-2xl font-semibold tracking-tight break-words [overflow-wrap:anywhere] text-fg sm:text-3xl">
         {value}
       </div>
       {sub && <div className="mt-1.5 text-[0.9375rem] text-fg-2">{sub}</div>}
@@ -46,7 +46,7 @@ export function DetailList({ rows, locale, title, className }: { rows: ValueRow[
         {rows.map((r) => (
           <div key={r.label} className="flex min-w-0 flex-col py-1.5">
             <dt className="text-[0.8125rem] text-fg-3">{r.label}</dt>
-            <dd className={cn("break-all text-fg select-all", r.plain ? "text-[0.9375rem]" : "font-mono text-sm")}>{r.value}</dd>
+            <dd className={cn("break-words [overflow-wrap:anywhere] text-fg select-all", r.plain ? "text-[0.9375rem]" : "font-mono text-sm")}>{r.value}</dd>
           </div>
         ))}
       </dl>

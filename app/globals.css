@@ -196,6 +196,14 @@ dialog:not([open]) {
 
 /* ───────────── Base ───────────── */
 @layer base {
+  /* Chrome's clock button grows with the font and crowds big time fields on a phone. */
+  input[type="time"]::-webkit-calendar-picker-indicator {
+    width: clamp(0.75rem, 0.45em, 1.5rem);
+    height: clamp(0.75rem, 0.45em, 1.5rem);
+    margin-inline-start: 0.1em;
+    padding: 0;
+    opacity: 0.55;
+  }
   html {
     -webkit-text-size-adjust: 100%;
     text-size-adjust: 100%;

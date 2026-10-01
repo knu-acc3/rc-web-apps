@@ -15,7 +15,8 @@ import { ToolMount } from "./tool-mount";
 import { RecentTracker } from "./recent-tracker";
 import { PageActions } from "./page-actions";
 import { Icon } from "@/ui/icon";
-import { FamilyTabs } from "./family-tabs";
+import { FamilyTabs, shortLabel } from "./family-tabs";
+import { familyOf } from "@/registry/families";
 
 /**
  * Every page: a tinted "stage" in the section colour with the title and the tool (the one thing to look at),
@@ -27,8 +28,11 @@ export function PageView({ page, locale }: { page: PageModel; locale: Locale }) 
   const centred = layout === "file";
   const compactHead = page.compactHeader || layout === "screen";
   const narrow = !page.wide && layout !== "reference";
-  // The next thing people usually do: the first related tools, right under the result.
-  const next = page.tool ? (page.related ?? []).slice(0, 4) : [];
+  // The next thing people usually do: the first related tools, right under the result — minus the ones the family tabs
+  // above the tool already show.
+  const family = page.kind === "tool" || page.kind === "variant" ? familyOf(page.path[0]) : undefined;
+  const nextAll = page.tool ? (page.related ?? []).filter((r) => !(r.path.length === 1 && family?.includes(r.path[0]))) : [];
+  const next = nextAll.slice(0, 4);
 
   return (
     <div className="tone" style={toneVars(page.hue) as React.CSSProperties}>
@@ -63,7 +67,7 @@ export function PageView({ page, locale }: { page: PageModel; locale: Locale }) 
                   {next.map((r) => (
                     <a key={r.path.join("/")} href={href(locale, r.path)} className="chip">
                       {r.glyph ? <span className="text-base leading-none">{r.glyph}</span> : <Icon name={r.icon} className="size-4 text-accent" strokeWidth={1.75} />}
-                      {r.label}
+                      {shortLabel(r.label)}
                     </a>
                   ))}
                 </nav>
@@ -90,10 +94,10 @@ export function PageView({ page, locale }: { page: PageModel; locale: Locale }) 
         {page.howTo && page.howTo.length > 0 && <HowTo steps={page.howTo} title={t.howTo} />}
         {page.faq && page.faq.length > 0 && <Faq items={page.faq} title={t.faq} />}
         {page.blocks?.filter((b) => b.type === "text" && b.fold).map((b, i) => <BlockView key={`f${i}`} block={b} locale={locale} />)}
-        {page.related && page.related.length > next.length && (
+        {page.related && (page.tool ? nextAll.length > next.length : page.related.length > 0) && (
           <section>
             <SectionTitle icon={LayoutGrid}>{t.related}</SectionTitle>
-            <LinkCards items={page.related.slice(next.length, next.length + 6)} locale={locale} />
+            <LinkCards items={page.tool ? nextAll.slice(next.length, next.length + 6) : page.related.slice(0, 6)} locale={locale} />
           </section>
         )}
       </div>

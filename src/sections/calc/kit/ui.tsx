@@ -274,7 +274,11 @@ export function ResultMain({
       <div
         aria-live="polite"
         aria-atomic="true"
-        className={cn("tabular mt-1 break-words font-bold tracking-tight text-fg", size === "lg" ? "text-4xl sm:text-5xl" : "text-3xl sm:text-4xl")}
+        className={cn(
+          // Grouped numbers use no-break spaces: let a long one break anywhere instead of running out of the card.
+          "tabular mt-1 font-bold tracking-tight text-fg [overflow-wrap:anywhere]",
+          typeof value === "string" && value.length > 14 ? "text-2xl sm:text-4xl" : size === "lg" ? "text-4xl sm:text-5xl" : "text-3xl sm:text-4xl",
+        )}
       >
         {value}
       </div>

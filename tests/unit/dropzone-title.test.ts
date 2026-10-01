@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { touchTitle } from "@/ui/dropzone";
+import { touchHint, touchTitle } from "@/ui/dropzone";
 
 describe("dropzone title on touch screens", () => {
   it.each([
@@ -19,5 +19,16 @@ describe("dropzone title on touch screens", () => {
   it("leaves other titles alone", () => {
     expect(touchTitle("Перетащите фото или скриншот с кодом")).toBeNull();
     expect(touchTitle("Choose a video")).toBeNull();
+  });
+});
+
+describe("touchHint", () => {
+  it("drops the paste sentence and keeps the rest", () => {
+    expect(touchHint("Можно вставить файл из буфера: Ctrl+V. Файл обрабатывается на вашем устройстве.")).toBe("Файл обрабатывается на вашем устройстве.");
+    expect(touchHint("Можно вставить из буфера обмена: Ctrl+V")).toBe("");
+    expect(touchHint("Файл не покидает устройство")).toBeNull();
+  });
+  it("handles the 'add' titles", () => {
+    expect(touchTitle("Перетащите аудиофайлы сюда или нажмите, чтобы добавить (в порядке склейки)")).toBe("Нажмите, чтобы выбрать аудиофайлы (в порядке склейки)");
   });
 });
