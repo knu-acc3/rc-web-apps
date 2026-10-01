@@ -43,6 +43,7 @@ import { validateSection } from "./validate/section";
 import { networkSection } from "./network/section";
 import { seoSection } from "./seo/section";
 import { testSection } from "./test/section";
+import { screenSection } from "./screen/section";
 import { whatIsMySection } from "./what-is-my/section";
 
 /** All sections of the site. Order inside a home-page category is set by `order`. */
@@ -90,6 +91,7 @@ export const SECTIONS: SectionDef[] = [
   networkSection,
   seoSection,
   testSection,
+  screenSection,
   whatIsMySection,
   aboutSection,
 ];

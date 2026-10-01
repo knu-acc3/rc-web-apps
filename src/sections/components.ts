@@ -42,6 +42,7 @@ import { components as validate } from "./validate/components";
 import { components as network } from "./network/components";
 import { components as seo } from "./seo/components";
 import { components as test } from "./test/components";
+import { components as screen } from "./screen/components";
 import { components as whatIsMy } from "./what-is-my/components";
 
 /** Tool component loaders, merged from every section. */
@@ -89,5 +90,6 @@ export const COMPONENTS: ComponentMap = {
   ...network,
   ...seo,
   ...test,
+  ...screen,
   ...whatIsMy,
 };
