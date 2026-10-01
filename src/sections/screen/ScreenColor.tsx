@@ -4,6 +4,7 @@ import { ChevronLeft, ChevronRight, Maximize, Minus, Plus, Sun } from "lucide-re
 import { useEffect, useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { cn } from "@/lib/cn";
+import { usePersistentState } from "@/lib/persist";
 import { Slider } from "@/ui/field";
 import { Kbd } from "@/ui/panel";
 import { StageLayer, typingTarget, useStage } from "@/ui/stage";
@@ -67,33 +68,19 @@ const T = {
 } as const;
 
 const STORE = "screen-color:v1";
+const isLook = (v: unknown): v is { b: number; k: number } =>
+  !!v && typeof v === "object" && Number.isFinite((v as { b: number }).b) && Number.isFinite((v as { k: number }).k);
 
 export default function ScreenColor({ locale, color = "white" }: { locale: Locale; color?: string }) {
   const t = T[locale];
   const [hex, setHex] = useState(colorById(color)?.hex ?? "#ffffff");
-  const [brightness, setBrightness] = useState(100);
-  const [kelvin, setKelvin] = useState(6500);
-  const stage = useStage();
-
   // Brightness and white tone are remembered between visits; the colour comes from the page.
-  useEffect(() => {
-    try {
-      const saved = JSON.parse(localStorage.getItem(STORE) ?? "{}") as { b?: number; k?: number };
-      /* eslint-disable react-hooks/set-state-in-effect -- localStorage is only available after mount */
-      if (typeof saved.b === "number") setBrightness(Math.min(100, Math.max(5, saved.b)));
-      if (typeof saved.k === "number") setKelvin(Math.min(10000, Math.max(1900, saved.k)));
-      /* eslint-enable react-hooks/set-state-in-effect */
-    } catch {
-      // storage unavailable
-    }
-  }, []);
-  useEffect(() => {
-    try {
-      localStorage.setItem(STORE, JSON.stringify({ b: brightness, k: kelvin }));
-    } catch {
-      // storage unavailable
-    }
-  }, [brightness, kelvin]);
+  const [look, setLook] = usePersistentState(STORE, { b: 100, k: 6500 }, isLook);
+  const brightness = look.b;
+  const kelvin = look.k;
+  const setBrightness = (v: number | ((b: number) => number)) => setLook((l) => ({ ...l, b: Math.min(100, Math.max(5, typeof v === "function" ? v(l.b) : v)) }));
+  const setKelvin = (k: number) => setLook((l) => ({ ...l, k: Math.min(10000, Math.max(1900, k)) }));
+  const stage = useStage();
 
   const isWhite = hex.toLowerCase() === "#ffffff";
   const base: Rgb = isWhite ? whiteAt(kelvin) : hexToRgb(hex);
