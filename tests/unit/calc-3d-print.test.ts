@@ -283,8 +283,6 @@ describe("3D printing calculator engine", () => {
     expect(PRINTER_PROFILES.k2_plus).toBeDefined();
     expect(PRINTER_PROFILES.ender3).toBeDefined();
     expect(PRINTER_PROFILES.ender5).toBeDefined();
-    expect(PRINTER_PROFILES.mk4).toBeDefined();
-    expect(PRINTER_PROFILES.prusa_xl).toBeDefined();
     expect(PRINTER_PROFILES.kobra2).toBeDefined();
     expect(PRINTER_PROFILES.kobra3_combo).toBeDefined();
     expect(PRINTER_PROFILES.neptune4).toBeDefined();
@@ -292,14 +290,18 @@ describe("3D printing calculator engine", () => {
     expect(PRINTER_PROFILES.q1_pro).toBeDefined();
     expect(PRINTER_PROFILES.plus4).toBeDefined();
     expect(PRINTER_PROFILES.adventurer5m).toBeDefined();
+    expect(PRINTER_PROFILES.adventurer4).toBeDefined();
+    expect(PRINTER_PROFILES.creator_pro2).toBeDefined();
     expect(PRINTER_PROFILES.ghost6).toBeDefined();
     expect(PRINTER_PROFILES.klp1).toBeDefined();
-    expect(PRINTER_PROFILES.voron24).toBeDefined();
     expect(PRINTER_PROFILES.custom).toBeDefined();
 
-    // Verify redundant fake clones (p2s, a2l) are absent
+    // Verify removed brands/clones (prusa, voron, p2s, a2l, p1p) are absent
+    expect((PRINTER_PROFILES as Record<string, unknown>).mk4).toBeUndefined();
+    expect((PRINTER_PROFILES as Record<string, unknown>).voron24).toBeUndefined();
     expect((PRINTER_PROFILES as Record<string, unknown>).p2s).toBeUndefined();
     expect((PRINTER_PROFILES as Record<string, unknown>).a2l).toBeUndefined();
+    expect((PRINTER_PROFILES as Record<string, unknown>).p1p).toBeUndefined();
 
     for (const p of printers) {
       expect(p.depreciationPerHour).toBeGreaterThan(0);

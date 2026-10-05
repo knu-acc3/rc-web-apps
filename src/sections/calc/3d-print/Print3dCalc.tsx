@@ -596,19 +596,17 @@ export default function Print3dCalc({
               </div>
             </div>
 
-            {/* Brand Switcher Pills */}
-            <div className="flex flex-wrap gap-1 rounded-xl bg-neutral-100 p-1 dark:bg-neutral-800/60">
+            {/* Brand Switcher Pills (Horizontal scrollable bar, no ugly wrapping/clipping) */}
+            <div className="flex items-center gap-1 overflow-x-auto rounded-xl bg-neutral-100 p-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden dark:bg-neutral-800/60">
               {(
                 [
                   { id: "all", label: locale === "ru" ? "Все" : "All" },
                   { id: "bambu", label: "Bambu" },
                   { id: "creality", label: "Creality" },
-                  { id: "prusa", label: "Prusa" },
                   { id: "anycubic", label: "Anycubic" },
                   { id: "elegoo", label: "Elegoo" },
                   { id: "qidi", label: "QIDI" },
-                  { id: "sovol", label: "Sovol" },
-                  { id: "voron", label: "Voron" },
+                  { id: "flashforge", label: "Flashforge" },
                   { id: "custom", label: locale === "ru" ? "Свой" : "Custom" },
                 ] as const
               ).map((b) => (
@@ -624,7 +622,7 @@ export default function Print3dCalc({
                     }
                   }}
                   className={cn(
-                    "flex-1 min-w-12 rounded-lg py-1.5 text-xs font-bold transition text-center",
+                    "shrink-0 rounded-lg px-3 py-1.5 text-xs font-bold transition whitespace-nowrap",
                     q.v.brand === b.id
                       ? "bg-neutral-950 text-white shadow-xs dark:bg-white dark:text-neutral-950"
                       : "text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white",
@@ -684,15 +682,6 @@ export default function Print3dCalc({
                           </option>
                         ))}
                     </optgroup>
-                    <optgroup label="Prusa Research">
-                      {Object.values(PRINTER_PROFILES)
-                        .filter((p) => p.brand === "prusa")
-                        .map((p) => (
-                          <option key={p.id} value={p.id}>
-                            {p.name}
-                          </option>
-                        ))}
-                    </optgroup>
                     <optgroup label="QIDI Tech">
                       {Object.values(PRINTER_PROFILES)
                         .filter((p) => p.brand === "qidi")
@@ -702,36 +691,36 @@ export default function Print3dCalc({
                           </option>
                         ))}
                     </optgroup>
-                    <optgroup label="Flashforge / Flying Bear / Kingroon">
+                    <optgroup label="Flashforge">
                       {Object.values(PRINTER_PROFILES)
-                        .filter((p) => ["flashforge", "flyingbear", "kingroon"].includes(p.brand))
+                        .filter((p) => p.brand === "flashforge")
                         .map((p) => (
                           <option key={p.id} value={p.id}>
                             {p.name}
                           </option>
                         ))}
                     </optgroup>
-                    <optgroup label="Sovol / Artillery / Two Trees">
+                    <optgroup label="Flying Bear / Kingroon">
                       {Object.values(PRINTER_PROFILES)
-                        .filter((p) => ["sovol", "artillery", "twotrees"].includes(p.brand))
+                        .filter((p) => ["flyingbear", "kingroon"].includes(p.brand))
                         .map((p) => (
                           <option key={p.id} value={p.id}>
                             {p.name}
                           </option>
                         ))}
                     </optgroup>
-                    <optgroup label="Voron / RatRig (DIY CoreXY)">
+                    <optgroup label="Artillery / Two Trees">
                       {Object.values(PRINTER_PROFILES)
-                        .filter((p) => p.brand === "voron")
+                        .filter((p) => ["artillery", "twotrees"].includes(p.brand))
                         .map((p) => (
                           <option key={p.id} value={p.id}>
                             {p.name}
                           </option>
                         ))}
                     </optgroup>
-                    <optgroup label="Snapmaker / Formlabs / Промышленные">
+                    <optgroup label="Snapmaker / Промышленные (Raise3D / UltiMaker)">
                       {Object.values(PRINTER_PROFILES)
-                        .filter((p) => ["snapmaker", "formlabs", "raise3d"].includes(p.brand))
+                        .filter((p) => ["snapmaker", "raise3d"].includes(p.brand))
                         .map((p) => (
                           <option key={p.id} value={p.id}>
                             {p.name}
