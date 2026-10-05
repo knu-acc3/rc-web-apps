@@ -304,13 +304,21 @@ describe("3D printing calculator engine", () => {
     expect(PRINTER_PROFILES.p2s).toBeDefined();
 
     for (const p of printers) {
-      expect(p.depreciationPerHour).toBeGreaterThan(0);
+      expect(p.depreciationPerHour).toBe(Math.round(p.priceKzt / p.lifespanHours));
       expect(p.defaultPower).toBeGreaterThan(0);
+      expect(p.powerByMaterial.pla).toBeGreaterThan(0);
+      expect(p.powerByMaterial.petg).toBeGreaterThanOrEqual(p.powerByMaterial.pla);
+      expect(p.powerByMaterial.abs).toBeGreaterThanOrEqual(p.powerByMaterial.petg);
+      expect(p.powerByMaterial.pacf).toBeGreaterThanOrEqual(p.powerByMaterial.petg);
       expect(p.brand).toBeDefined();
     }
 
     const materials = Object.values(MATERIAL_PROFILES);
     expect(materials.length).toBeGreaterThanOrEqual(5);
+    for (const m of materials) {
+      expect(m.defaultPriceKg).toBeGreaterThan(0);
+      expect(m.density).toBeGreaterThan(0);
+    }
   });
 
   it("calculates supports and brim correctly", () => {
