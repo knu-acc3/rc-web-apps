@@ -171,6 +171,9 @@ export type PrinterBrand =
 
 export type PrinterId =
   // Bambu Lab
+  | "h2d"
+  | "h2c"
+  | "h2s"
   | "p2s"
   | "x1e"
   | "x1c"
@@ -268,7 +271,52 @@ export const SUPPORTS_OPTIONS: Record<SupportsType, SupportsOption> = {
 };
 
 export const PRINTER_PROFILES: Record<PrinterId, PrinterProfile> = {
-  // ── Bambu Lab (от новейших P2S / X1E / A1 / P1S к X1C) ──
+  // ── Bambu Lab (от новейших H2 Series / P2S к базовым) ──
+  h2d: {
+    id: "h2d",
+    brand: "bambu",
+    name: "Bambu Lab H2D (Dual-Nozzle IDEX, 350×320×325, 2025)",
+    shortName: "Bambu H2D",
+    enclosed: true,
+    powerByMaterial: { pla: 190, petg: 240, abs: 420, tpu: 190, pacf: 450 },
+    defaultPower: 380,
+    priceKzt: 1_250_000,
+    amsPriceKzt: 180_000,
+    lifespanHours: 10000,
+    depreciationPerHour: 125,
+    multiColorCapable: true,
+    multiColorSystem: "Dual-Nozzle IDEX + AMS (до 16 цветов)",
+  },
+  h2c: {
+    id: "h2c",
+    brand: "bambu",
+    name: "Bambu Lab H2C (Vortek Tool-Changer, без отходов, 2025)",
+    shortName: "Bambu H2C",
+    enclosed: true,
+    powerByMaterial: { pla: 180, petg: 230, abs: 400, tpu: 180, pacf: 440 },
+    defaultPower: 360,
+    priceKzt: 1_400_000,
+    amsPriceKzt: 180_000,
+    lifespanHours: 10000,
+    depreciationPerHour: 140,
+    multiColorCapable: true,
+    multiColorSystem: "Vortek Tool-Changer (многоцвет без сброса)",
+  },
+  h2s: {
+    id: "h2s",
+    brand: "bambu",
+    name: "Bambu Lab H2S (крупноформатный 340×320×340, 1000 мм/с, 2025)",
+    shortName: "Bambu H2S",
+    enclosed: true,
+    powerByMaterial: { pla: 170, petg: 220, abs: 380, tpu: 170, pacf: 400 },
+    defaultPower: 340,
+    priceKzt: 950_000,
+    amsPriceKzt: 180_000,
+    lifespanHours: 9000,
+    depreciationPerHour: 105,
+    multiColorCapable: true,
+    multiColorSystem: "Bambu AMS (до 16 цветов)",
+  },
   p2s: {
     id: "p2s",
     brand: "bambu",
