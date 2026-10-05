@@ -698,11 +698,12 @@ export default function Print3dCalc({
               <Select
                 id={`${id}-printer`}
                 value={q.v.pr}
+                size="lg"
+                selectClassName="font-bold text-base cursor-pointer"
                 onChange={(e) => {
                   const target = PRINTER_PROFILES[e.target.value as PrinterId];
                   q.set({ pr: e.target.value, brand: target ? target.brand : q.v.brand });
                 }}
-                className="h-13 rounded-2xl border-2 border-neutral-300 px-4 text-base font-bold dark:border-neutral-700 focus:border-neutral-900 dark:focus:border-white"
               >
                 {Object.values(PRINTER_PROFILES)
                   .filter((p) => {
@@ -790,8 +791,9 @@ export default function Print3dCalc({
                 <Select
                   id={`${id}-city`}
                   value={q.v.city}
+                  size="lg"
+                  selectClassName="font-bold text-sm cursor-pointer"
                   onChange={(e) => q.set({ city: e.target.value, tar: "" })}
-                  className="h-12 rounded-xl px-3 font-bold text-sm border-2 border-neutral-300 dark:border-neutral-700 focus:border-neutral-900 dark:focus:border-white"
                 >
                   {KZ_CITIES.map((c) => (
                     <option key={c.slug} value={c.slug}>
@@ -1250,8 +1252,8 @@ export default function Print3dCalc({
                   </div>
                   <Select
                     value={q.v.noz}
+                    selectClassName="font-medium cursor-pointer"
                     onChange={(e) => q.set({ noz: e.target.value })}
-                    className="h-10 rounded-xl font-medium"
                   >
                     {Object.values(NOZZLE_PROFILES).map((nz) => (
                       <option key={nz.id} value={nz.id}>
@@ -1290,8 +1292,8 @@ export default function Print3dCalc({
                   <label className="text-xs font-semibold text-neutral-800 dark:text-neutral-200">{t.taxRegime}</label>
                   <Select
                     value={q.v.tax}
+                    selectClassName="font-medium cursor-pointer"
                     onChange={(e) => q.set({ tax: e.target.value })}
-                    className="h-10 rounded-xl font-medium"
                   >
                     {Object.values(TAX_REGIMES).map((tr) => (
                       <option key={tr.id} value={tr.id}>

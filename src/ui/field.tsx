@@ -62,10 +62,16 @@ export function Textarea({ className, ...props }: ComponentProps<"textarea">) {
   );
 }
 
-export function Select({ className, children, size = "md", ...props }: Omit<ComponentProps<"select">, "size"> & { size?: CtlSize }) {
+export function Select({
+  className,
+  selectClassName,
+  children,
+  size = "md",
+  ...props
+}: Omit<ComponentProps<"select">, "size"> & { size?: CtlSize; selectClassName?: string }) {
   return (
     <div className={cn("relative", className)}>
-      <select className={cn("control appearance-none pr-9", ctlSize[size], size === "lg" && "text-base! font-medium!")} {...props}>
+      <select className={cn("control appearance-none pr-9", ctlSize[size], size === "lg" && "text-base! font-medium!", selectClassName)} {...props}>
         {children}
       </select>
       <svg
