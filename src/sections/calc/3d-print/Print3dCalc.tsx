@@ -33,13 +33,11 @@ import {
   KZ_CITIES,
   MATERIAL_PROFILES,
   NOZZLE_PROFILES,
-  PACKAGING_OPTIONS,
   PRINTER_PROFILES,
   SUPPORTS_OPTIONS,
   TAX_REGIMES,
   type MaterialId,
   type NozzleId,
-  type PackagingId,
   type PrinterId,
   type SupportsType,
   type TaxRegimeId,
@@ -330,8 +328,6 @@ export default function Print3dCalc({
         ams: ["0", "1"],
         dry: Object.keys(DRYER_PROFILES),
         noz: Object.keys(NOZZLE_PROFILES),
-        pack: Object.keys(PACKAGING_OPTIONS),
-        packb: ["0", "1"],
         tax: Object.keys(TAX_REGIMES),
       },
     },
@@ -418,7 +414,6 @@ export default function Print3dCalc({
   const selectedCity = KZ_CITIES.find((c) => c.slug === q.v.city) ?? KZ_CITIES[0];
   const isCommercial = q.v.comm === "1";
   const selectedNozzle = NOZZLE_PROFILES[q.v.noz as NozzleId] ?? NOZZLE_PROFILES.hardened;
-  const selectedPack = PACKAGING_OPTIONS[q.v.pack as PackagingId] ?? PACKAGING_OPTIONS.none;
 
   const defaultTariff = isCommercial ? selectedCity.commercialTariff : selectedCity.residentialTariff;
   const currentTariffText = q.v.tar ? q.v.tar : toInput(locale, defaultTariff);
@@ -483,9 +478,7 @@ export default function Print3dCalc({
     minOrderFeeKzt: MINFEE.value ?? 2000,
     modelingHours: MODH.value ?? 0,
     modelingHourlyRate: MODRATE.value ?? 5000,
-    packagingId: selectedPack.id,
-    customPackCost: PACKCOST.value ?? undefined,
-    packPerBatch: q.v.packb === "1",
+    packagingId: "none",
     markupPct: MARK.value ?? 40,
     taxRegime: q.v.tax as TaxRegimeId,
     isMultiColor: false,
@@ -1254,46 +1247,6 @@ export default function Print3dCalc({
                   </Select>
                 </div>
 
-                {/* Packaging: Preset + Custom cost */}
-                <div className="flex flex-col gap-2">
-                  <div className="flex items-center justify-between">
-                    <label className="text-xs font-semibold text-neutral-800 dark:text-neutral-200">{t.packaging}</label>
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-[11px] text-neutral-500">{t.packCustomCost}</span>
-                      <div className="relative w-24">
-                        <Input
-                          value={q.v.packcost}
-                          placeholder={String(selectedPack.costKzt)}
-                          onChange={(e) => q.set({ packcost: e.target.value })}
-                          inputMode="numeric"
-                          className="h-8 rounded-lg pr-5 text-right font-bold text-xs tabular-nums"
-                        />
-                        <span className="pointer-events-none absolute right-1.5 top-1/2 -translate-y-1/2 text-[10px] text-neutral-400">₸</span>
-                      </div>
-                    </div>
-                  </div>
-                  <Select
-                    value={q.v.pack}
-                    onChange={(e) => q.set({ pack: e.target.value })}
-                    className="h-10 rounded-xl font-medium"
-                  >
-                    {Object.values(PACKAGING_OPTIONS).map((pk) => (
-                      <option key={pk.id} value={pk.id}>
-                        {pk.name[locale]} ({pk.costKzt} ₸)
-                      </option>
-                    ))}
-                  </Select>
-                  <label className="flex cursor-pointer items-center gap-2 pt-1 text-xs text-neutral-600 dark:text-neutral-400">
-                    <input
-                      type="checkbox"
-                      checked={q.v.packb === "1"}
-                      onChange={(e) => q.set({ packb: e.target.checked ? "1" : "0" })}
-                      className="size-4 rounded-sm accent-neutral-900 dark:accent-neutral-100"
-                    />
-                    <span>{t.packPerBatch}</span>
-                  </label>
-                </div>
-
                 {/* Labor Rates */}
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                   <div className="flex flex-col gap-1.5">
@@ -1611,18 +1564,6 @@ export default function Print3dCalc({
                   {fmtMoney(locale, isBatch ? calc.physicalLaborCost * calc.quantity : calc.physicalLaborCost)}
                 </span>
               </div>
-
-              {calc.packagingCost > 0 && (
-                <div className="flex items-center justify-between text-xs">
-                  <div className="flex items-center gap-2 text-neutral-700 dark:text-neutral-300">
-                    <span className="size-2 rounded-full bg-neutral-400 dark:bg-neutral-600" />
-                    <span>{t.packCost}</span>
-                  </div>
-                  <span className="font-mono font-bold text-neutral-950 dark:text-white">
-                    {fmtMoney(locale, isBatch ? calc.packagingCost * calc.quantity : calc.packagingCost)}
-                  </span>
-                </div>
-              )}
 
               {calc.unitTax > 0 && (
                 <div className="flex items-center justify-between text-xs">
