@@ -1,10 +1,12 @@
 "use client";
 
-import { useEffect, useId, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import {
   BarChart3,
   Check,
   ChevronDown,
+  ChevronLeft,
+  ChevronRight,
   Copy,
   Layers,
   MapPin,
@@ -65,12 +67,12 @@ function GraphiteSlider({
   const pct = Math.max(0, Math.min(100, ((safeVal - min) / (max - min)) * 100));
 
   return (
-    <div className={cn("group relative flex w-full items-center py-2.5", className)}>
+    <div className={cn("group relative flex w-full items-center py-3.5 select-none", className)}>
       {/* Background track: dark graphite / subtle neutral */}
-      <div className="absolute inset-x-0 h-2 rounded-full bg-neutral-200 dark:bg-neutral-800" />
+      <div className="absolute inset-x-0 h-2.5 rounded-full bg-neutral-200 dark:bg-neutral-800" />
       {/* Active filled line: deep graphite / dark charcoal */}
       <div
-        className="pointer-events-none absolute left-0 h-2 rounded-full bg-neutral-800 transition-all dark:bg-neutral-300"
+        className="pointer-events-none absolute left-0 h-2.5 rounded-full bg-neutral-900 transition-all dark:bg-neutral-200"
         style={{ width: `${pct}%` }}
       />
       {/* Native range slider */}
@@ -82,28 +84,28 @@ function GraphiteSlider({
         value={safeVal}
         onChange={onChange}
         className={cn(
-          "relative z-10 h-2 w-full appearance-none bg-transparent cursor-pointer",
+          "relative z-10 h-7 w-full appearance-none bg-transparent cursor-pointer touch-pan-x",
           "focus:outline-hidden",
           "[&::-webkit-slider-runnable-track]:appearance-none [&::-webkit-slider-runnable-track]:bg-transparent",
           "[&::-moz-range-track]:bg-transparent",
           "[&::-webkit-slider-thumb]:appearance-none",
-          "[&::-webkit-slider-thumb]:size-5",
+          "[&::-webkit-slider-thumb]:size-7",
           "[&::-webkit-slider-thumb]:rounded-full",
-          "[&::-webkit-slider-thumb]:bg-neutral-800 dark:[&::-webkit-slider-thumb]:bg-neutral-100",
-          "[&::-webkit-slider-thumb]:border-2",
-          "[&::-webkit-slider-thumb]:border-neutral-900 dark:[&::-webkit-slider-thumb]:border-white",
-          "[&::-webkit-slider-thumb]:shadow-[0_2px_8px_rgba(0,0,0,0.35)]",
+          "[&::-webkit-slider-thumb]:bg-neutral-900 dark:[&::-webkit-slider-thumb]:bg-neutral-100",
+          "[&::-webkit-slider-thumb]:border-[3px]",
+          "[&::-webkit-slider-thumb]:border-neutral-950 dark:[&::-webkit-slider-thumb]:border-white",
+          "[&::-webkit-slider-thumb]:shadow-[0_2px_10px_rgba(0,0,0,0.4)]",
           "[&::-webkit-slider-thumb]:transition-transform",
-          "[&::-webkit-slider-thumb]:group-hover:scale-110",
+          "[&::-webkit-slider-thumb]:hover:scale-105",
           "[&::-webkit-slider-thumb]:active:scale-95",
-          "[&::-moz-range-thumb]:size-5",
+          "[&::-moz-range-thumb]:size-7",
           "[&::-moz-range-thumb]:rounded-full",
-          "[&::-moz-range-thumb]:bg-neutral-800 dark:[&::-moz-range-thumb]:bg-neutral-100",
-          "[&::-moz-range-thumb]:border-2",
-          "[&::-moz-range-thumb]:border-neutral-900 dark:[&::-moz-range-thumb]:border-white",
-          "[&::-moz-range-thumb]:shadow-[0_2px_8px_rgba(0,0,0,0.35)]",
+          "[&::-moz-range-thumb]:bg-neutral-900 dark:[&::-moz-range-thumb]:bg-neutral-100",
+          "[&::-moz-range-thumb]:border-[3px]",
+          "[&::-moz-range-thumb]:border-neutral-950 dark:[&::-moz-range-thumb]:border-white",
+          "[&::-moz-range-thumb]:shadow-[0_2px_10px_rgba(0,0,0,0.4)]",
           "[&::-moz-range-thumb]:transition-transform",
-          "[&::-moz-range-thumb]:group-hover:scale-110",
+          "[&::-moz-range-thumb]:hover:scale-105",
           "[&::-moz-range-thumb]:active:scale-95",
         )}
       />
@@ -334,6 +336,29 @@ export default function Print3dCalc({
   const [copiedQuote, setCopiedQuote] = useState(false);
   const [copiedLink, setCopiedLink] = useState(false);
   const [isAdvancedOpen, setIsAdvancedOpen] = useState(false);
+
+  const priceCardRef = useRef<HTMLDivElement>(null);
+  const [isPriceCardVisible, setIsPriceCardVisible] = useState(false);
+  const brandScrollRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const el = priceCardRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsPriceCardVisible(entry.isIntersecting);
+      },
+      { threshold: 0.1 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  const scrollBrands = (direction: -1 | 1) => {
+    if (brandScrollRef.current) {
+      brandScrollRef.current.scrollBy({ left: direction * 240, behavior: "smooth" });
+    }
+  };
 
   const q = useQueryState(
     {
@@ -584,8 +609,8 @@ export default function Print3dCalc({
           <div className="flex flex-col gap-4 rounded-2xl border border-neutral-200/80 bg-white p-5 shadow-xs dark:border-neutral-800 dark:bg-neutral-900 sm:p-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <div className="flex size-7 items-center justify-center rounded-lg bg-neutral-100 text-neutral-900 dark:bg-neutral-800 dark:text-white">
-                  <Printer className="size-3.5" />
+                <div className="flex size-8 items-center justify-center rounded-xl bg-neutral-100 text-neutral-900 dark:bg-neutral-800 dark:text-white">
+                  <Printer className="size-4" />
                 </div>
                 <span className="text-xs font-bold uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
                   {t.printer}
@@ -593,50 +618,83 @@ export default function Print3dCalc({
               </div>
             </div>
 
-            {/* Brand Switcher Pills (Horizontal scrollable bar, no ugly wrapping/clipping) */}
-            <div className="flex items-center gap-1 overflow-x-auto rounded-xl bg-neutral-100 p-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden dark:bg-neutral-800/60">
-              {(
-                [
-                  { id: "bambu", label: "Bambu" },
-                  { id: "creality", label: "Creality" },
-                  { id: "anycubic", label: "Anycubic" },
-                  { id: "elegoo", label: "Elegoo" },
-                  { id: "qidi", label: "QIDI" },
-                  { id: "flashforge", label: "Flashforge" },
-                  { id: "flyingbear", label: "Flying Bear" },
-                  { id: "kingroon", label: "Kingroon" },
-                  { id: "artillery", label: "Artillery" },
-                  { id: "twotrees", label: "Two Trees" },
-                  { id: "snapmaker", label: "Snapmaker" },
-                  { id: "raise3d", label: "Raise3D" },
-                  { id: "custom", label: locale === "ru" ? "Свой" : "Custom" },
-                ] as const
-              ).map((b) => {
-                const currentBrand = PRINTER_PROFILES[q.v.pr as PrinterId]?.brand ?? (q.v.brand === "all" ? "bambu" : q.v.brand);
-                const isActive = currentBrand === b.id;
-                return (
+            {/* Brand Switcher Header + Carousel with Navigation Arrows */}
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-semibold text-neutral-700 dark:text-neutral-300">
+                  {locale === "ru" ? "Бренд принтера" : "Printer Brand"}
+                </span>
+                <div className="flex items-center gap-1.5">
                   <button
-                    key={b.id}
                     type="button"
-                    onClick={() => {
-                      const firstOfBrand = Object.values(PRINTER_PROFILES).find((p) => p.brand === b.id);
-                      q.set({ brand: b.id, pr: firstOfBrand ? firstOfBrand.id : q.v.pr });
-                    }}
-                    className={cn(
-                      "shrink-0 rounded-lg px-3 py-1.5 text-xs font-bold transition whitespace-nowrap",
-                      isActive
-                        ? "bg-neutral-950 text-white shadow-xs dark:bg-white dark:text-neutral-950"
-                        : "text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white",
-                    )}
+                    onClick={() => scrollBrands(-1)}
+                    aria-label="Previous brands"
+                    className="flex size-8 items-center justify-center rounded-lg border border-neutral-200 bg-white text-neutral-700 shadow-xs hover:bg-neutral-100 active:scale-95 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-300"
                   >
-                    {b.label}
+                    <ChevronLeft className="size-4" />
                   </button>
-                );
-              })}
+                  <button
+                    type="button"
+                    onClick={() => scrollBrands(1)}
+                    aria-label="Next brands"
+                    className="flex size-8 items-center justify-center rounded-lg border border-neutral-200 bg-white text-neutral-700 shadow-xs hover:bg-neutral-100 active:scale-95 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-300"
+                  >
+                    <ChevronRight className="size-4" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Brand Switcher Carousel (Tactile, large, mobile-friendly) */}
+              <div
+                ref={brandScrollRef}
+                className="flex items-center gap-2 overflow-x-auto pb-1 scroll-smooth [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+              >
+                {(
+                  [
+                    { id: "bambu", label: "Bambu Lab" },
+                    { id: "creality", label: "Creality" },
+                    { id: "anycubic", label: "Anycubic" },
+                    { id: "elegoo", label: "Elegoo" },
+                    { id: "qidi", label: "QIDI" },
+                    { id: "flashforge", label: "Flashforge" },
+                    { id: "flyingbear", label: "Flying Bear" },
+                    { id: "kingroon", label: "Kingroon" },
+                    { id: "artillery", label: "Artillery" },
+                    { id: "twotrees", label: "Two Trees" },
+                    { id: "snapmaker", label: "Snapmaker" },
+                    { id: "raise3d", label: "Raise3D" },
+                    { id: "custom", label: locale === "ru" ? "Свой" : "Custom" },
+                  ] as const
+                ).map((b) => {
+                  const currentBrand = PRINTER_PROFILES[q.v.pr as PrinterId]?.brand ?? (q.v.brand === "all" ? "bambu" : q.v.brand);
+                  const isActive = currentBrand === b.id;
+                  return (
+                    <button
+                      key={b.id}
+                      type="button"
+                      onClick={() => {
+                        const firstOfBrand = Object.values(PRINTER_PROFILES).find((p) => p.brand === b.id);
+                        q.set({ brand: b.id, pr: firstOfBrand ? firstOfBrand.id : q.v.pr });
+                      }}
+                      className={cn(
+                        "h-11 shrink-0 rounded-xl px-4 text-sm font-bold transition whitespace-nowrap active:scale-95 border",
+                        isActive
+                          ? "bg-neutral-950 text-white border-neutral-950 shadow-sm dark:bg-white dark:text-neutral-950 dark:border-white"
+                          : "bg-white text-neutral-800 border-neutral-200 hover:bg-neutral-100 dark:bg-neutral-800 dark:text-neutral-200 dark:border-neutral-700 dark:hover:bg-neutral-700",
+                      )}
+                    >
+                      {b.label}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
 
-            {/* Printer Dropdown (только принтеры выбранного бренда) */}
-            <div className="flex flex-col gap-1.5">
+            {/* Printer Dropdown & Specs bar */}
+            <div className="flex flex-col gap-2 pt-1">
+              <label htmlFor={`${id}-printer`} className="text-xs font-semibold text-neutral-700 dark:text-neutral-300">
+                {locale === "ru" ? "Модель принтера" : "Printer Model"}
+              </label>
               <Select
                 id={`${id}-printer`}
                 value={q.v.pr}
@@ -644,7 +702,7 @@ export default function Print3dCalc({
                   const target = PRINTER_PROFILES[e.target.value as PrinterId];
                   q.set({ pr: e.target.value, brand: target ? target.brand : q.v.brand });
                 }}
-                className="h-11 rounded-2xl border-neutral-300 font-bold dark:border-neutral-700"
+                className="h-13 rounded-2xl border-2 border-neutral-300 px-4 text-base font-bold dark:border-neutral-700 focus:border-neutral-900 dark:focus:border-white"
               >
                 {Object.values(PRINTER_PROFILES)
                   .filter((p) => {
@@ -664,8 +722,8 @@ export default function Print3dCalc({
           <div className="flex flex-col gap-4 rounded-2xl border border-neutral-200/80 bg-white p-5 shadow-xs dark:border-neutral-800 dark:bg-neutral-900 sm:p-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <div className="flex size-7 items-center justify-center rounded-lg bg-neutral-100 text-neutral-900 dark:bg-neutral-800 dark:text-white">
-                  <Layers className="size-3.5" />
+                <div className="flex size-8 items-center justify-center rounded-xl bg-neutral-100 text-neutral-900 dark:bg-neutral-800 dark:text-white">
+                  <Layers className="size-4" />
                 </div>
                 <span className="text-xs font-bold uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
                   {t.material}
@@ -673,8 +731,8 @@ export default function Print3dCalc({
               </div>
             </div>
 
-            {/* Material Pills */}
-            <div className="flex flex-wrap gap-1.5">
+            {/* Material Pills (Large, tactile, easy to tap on mobile) */}
+            <div className="flex flex-wrap gap-2">
               {Object.values(MATERIAL_PROFILES).map((m) => {
                 const isSelected = m.id === selectedMaterial.id;
                 return (
@@ -688,10 +746,10 @@ export default function Print3dCalc({
                       });
                     }}
                     className={cn(
-                      "flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-bold transition active:scale-95",
+                      "h-11 flex items-center gap-2 rounded-xl px-4 text-sm font-bold transition active:scale-95 border",
                       isSelected
-                        ? "bg-neutral-950 text-white shadow-xs dark:bg-white dark:text-neutral-950"
-                        : "bg-neutral-100 text-neutral-700 hover:bg-neutral-200 dark:bg-neutral-800 dark:text-neutral-300",
+                        ? "bg-neutral-950 text-white border-neutral-950 shadow-sm dark:bg-white dark:text-neutral-950 dark:border-white"
+                        : "bg-white text-neutral-800 border-neutral-200 hover:bg-neutral-100 dark:bg-neutral-800 dark:text-neutral-200 dark:border-neutral-700 dark:hover:bg-neutral-700",
                     )}
                   >
                     <span>{m.name}</span>
@@ -702,18 +760,18 @@ export default function Print3dCalc({
 
             {/* Spool Price Direct Input */}
             <div className="flex items-center justify-between pt-1">
-              <label htmlFor={`${id}-sp`} className="text-xs font-semibold text-neutral-800 dark:text-neutral-200">
+              <label htmlFor={`${id}-sp`} className="text-sm font-bold text-neutral-800 dark:text-neutral-200">
                 {t.spoolPrice}
               </label>
-              <div className="relative w-36">
+              <div className="relative w-44">
                 <Input
                   id={`${id}-sp`}
                   value={q.v.sp}
                   onChange={(e) => q.set({ sp: e.target.value })}
                   inputMode="numeric"
-                  className="h-10 rounded-xl pr-7 text-right font-bold tabular-nums"
+                  className="h-12 rounded-xl pr-8 text-right text-base font-bold tabular-nums border-2 border-neutral-300 dark:border-neutral-700 focus:border-neutral-900 dark:focus:border-white"
                 />
-                <span className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-xs font-bold text-neutral-400">
+                <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-sm font-bold text-neutral-400">
                   ₸
                 </span>
               </div>
@@ -724,16 +782,16 @@ export default function Print3dCalc({
             {/* City & Electricity Tariff in Kazakhstan */}
             <div className="flex flex-col gap-3">
               <div className="flex items-center gap-2">
-                <MapPin className="size-3.5 text-neutral-600 dark:text-neutral-400" />
-                <span className="text-xs font-bold text-neutral-800 dark:text-neutral-200">{t.city}</span>
+                <MapPin className="size-4 text-neutral-600 dark:text-neutral-400" />
+                <span className="text-sm font-bold text-neutral-800 dark:text-neutral-200">{t.city}</span>
               </div>
 
-              <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 <Select
                   id={`${id}-city`}
                   value={q.v.city}
                   onChange={(e) => q.set({ city: e.target.value, tar: "" })}
-                  className="h-10 rounded-xl font-bold"
+                  className="h-12 rounded-xl px-3 font-bold text-sm border-2 border-neutral-300 dark:border-neutral-700 focus:border-neutral-900 dark:focus:border-white"
                 >
                   {KZ_CITIES.map((c) => (
                     <option key={c.slug} value={c.slug}>
@@ -743,12 +801,12 @@ export default function Print3dCalc({
                 </Select>
 
                 {/* Tariff Type Toggle */}
-                <div className="flex rounded-xl bg-neutral-100 p-1 dark:bg-neutral-800">
+                <div className="flex h-12 rounded-xl bg-neutral-100 p-1 dark:bg-neutral-800">
                   <button
                     type="button"
                     onClick={() => q.set({ comm: "0", tar: "" })}
                     className={cn(
-                      "flex-1 rounded-lg py-1 text-xs font-bold transition",
+                      "flex-1 rounded-lg text-xs font-bold transition flex items-center justify-center",
                       !isCommercial
                         ? "bg-white text-neutral-950 shadow-xs dark:bg-neutral-900 dark:text-white"
                         : "text-neutral-600 dark:text-neutral-400",
@@ -760,7 +818,7 @@ export default function Print3dCalc({
                     type="button"
                     onClick={() => q.set({ comm: "1", tar: "" })}
                     className={cn(
-                      "flex-1 rounded-lg py-1 text-xs font-bold transition",
+                      "flex-1 rounded-lg text-xs font-bold transition flex items-center justify-center",
                       isCommercial
                         ? "bg-white text-neutral-950 shadow-xs dark:bg-neutral-900 dark:text-white"
                         : "text-neutral-600 dark:text-neutral-400",
@@ -773,18 +831,18 @@ export default function Print3dCalc({
 
               {/* Exact Electricity Tariff Input */}
               <div className="flex items-center justify-between pt-1">
-                <span className="text-xs text-neutral-500 dark:text-neutral-400">
+                <span className="text-xs font-semibold text-neutral-600 dark:text-neutral-400">
                   {t.customTariff} (по счётчику):
                 </span>
-                <div className="relative w-32">
+                <div className="relative w-36">
                   <Input
                     value={currentTariffText}
                     onChange={(e) => q.set({ tar: e.target.value })}
                     inputMode="decimal"
                     placeholder={defaultTariff.toFixed(2)}
-                    className="h-9 rounded-xl pr-14 text-right font-bold tabular-nums text-xs"
+                    className="h-11 rounded-xl pr-14 text-right font-bold tabular-nums text-sm border-2 border-neutral-300 dark:border-neutral-700 focus:border-neutral-900 dark:focus:border-white"
                   />
-                  <span className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-[11px] font-bold text-neutral-400">
+                  <span className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-xs font-bold text-neutral-400">
                     ₸/кВт⋅ч
                   </span>
                 </div>
@@ -795,8 +853,8 @@ export default function Print3dCalc({
           {/* 4. Print Specifications: Weight, Time, Supports */}
           <div className="flex flex-col gap-4 rounded-2xl border border-neutral-200/80 bg-white p-5 shadow-xs dark:border-neutral-800 dark:bg-neutral-900 sm:p-6">
             <div className="flex items-center gap-2">
-              <div className="flex size-7 items-center justify-center rounded-lg bg-neutral-100 text-neutral-900 dark:bg-neutral-800 dark:text-white">
-                <Scale className="size-3.5" />
+              <div className="flex size-8 items-center justify-center rounded-xl bg-neutral-100 text-neutral-900 dark:bg-neutral-800 dark:text-white">
+                <Scale className="size-4" />
               </div>
               <span className="text-xs font-bold uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
                 {locale === "ru" ? "Параметры печати" : "Print Specifications"}
@@ -806,18 +864,18 @@ export default function Print3dCalc({
             {/* Part Weight */}
             <div className="flex flex-col gap-2">
               <div className="flex items-center justify-between">
-                <label htmlFor={`${id}-w`} className="text-xs font-semibold text-neutral-800 dark:text-neutral-200">
+                <label htmlFor={`${id}-w`} className="text-sm font-bold text-neutral-800 dark:text-neutral-200">
                   {t.weight}
                 </label>
-                <div className="relative w-32">
+                <div className="relative w-36">
                   <Input
                     id={`${id}-w`}
                     value={q.v.w}
                     onChange={(e) => q.set({ w: e.target.value })}
                     inputMode="decimal"
-                    className="h-10 rounded-xl pr-7 text-right font-bold tabular-nums"
+                    className="h-12 rounded-xl pr-8 text-right text-base font-bold tabular-nums border-2 border-neutral-300 dark:border-neutral-700 focus:border-neutral-900 dark:focus:border-white"
                   />
-                  <span className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-xs font-bold text-neutral-400">
+                  <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-sm font-bold text-neutral-400">
                     г
                   </span>
                 </div>
@@ -833,29 +891,29 @@ export default function Print3dCalc({
             </div>
 
             {/* Print Time Inputs & Slider */}
-            <div className="flex flex-col gap-2 pt-1 border-t border-neutral-100 dark:border-neutral-800">
+            <div className="flex flex-col gap-2 pt-2 border-t border-neutral-100 dark:border-neutral-800">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold text-neutral-800 dark:text-neutral-200">{t.printTime}</span>
-                <div className="flex items-center gap-1.5">
-                  <div className="relative w-20">
+                <span className="text-sm font-bold text-neutral-800 dark:text-neutral-200">{t.printTime}</span>
+                <div className="flex items-center gap-2">
+                  <div className="relative w-24">
                     <Input
                       id={`${id}-th`}
                       value={q.v.th}
                       onChange={(e) => q.set({ th: e.target.value })}
                       inputMode="numeric"
-                      className="h-9 rounded-xl pr-6 text-right font-bold tabular-nums text-xs"
+                      className="h-12 rounded-xl pr-7 text-right text-base font-bold tabular-nums border-2 border-neutral-300 dark:border-neutral-700 focus:border-neutral-900 dark:focus:border-white"
                     />
-                    <span className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-xs font-bold text-neutral-400">
+                    <span className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-xs font-bold text-neutral-400">
                       {t.hours}
                     </span>
                   </div>
-                  <div className="relative w-20">
+                  <div className="relative w-24">
                     <Input
                       id={`${id}-tm`}
                       value={q.v.tm}
                       onChange={(e) => q.set({ tm: e.target.value })}
                       inputMode="numeric"
-                      className="h-9 rounded-xl pr-8 text-right font-bold tabular-nums text-xs"
+                      className="h-12 rounded-xl pr-8 text-right text-base font-bold tabular-nums border-2 border-neutral-300 dark:border-neutral-700 focus:border-neutral-900 dark:focus:border-white"
                     />
                     <span className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-xs font-bold text-neutral-400">
                       {t.minutes}
@@ -888,17 +946,17 @@ export default function Print3dCalc({
                   {SUPPORTS_OPTIONS[q.v.sup as SupportsType]?.name[locale] ?? "Без поддержек"}
                 </span>
               </div>
-              <div className="flex flex-wrap gap-1.5">
+              <div className="flex flex-wrap gap-2">
                 {Object.values(SUPPORTS_OPTIONS).map((opt) => (
                   <button
                     key={opt.id}
                     type="button"
                     onClick={() => q.set({ sup: opt.id })}
                     className={cn(
-                      "rounded-full px-3 py-1 text-xs font-semibold transition active:scale-95",
+                      "h-10 rounded-xl px-3.5 text-xs font-bold transition active:scale-95 border",
                       q.v.sup === opt.id
-                        ? "bg-neutral-950 text-white dark:bg-white dark:text-neutral-950"
-                        : "bg-white text-neutral-700 hover:bg-neutral-200 dark:bg-neutral-800 dark:text-neutral-300",
+                        ? "bg-neutral-950 text-white border-neutral-950 dark:bg-white dark:text-neutral-950 dark:border-white"
+                        : "bg-white text-neutral-800 border-neutral-200 hover:bg-neutral-100 dark:bg-neutral-800 dark:text-neutral-200 dark:border-neutral-700 dark:hover:bg-neutral-700",
                     )}
                   >
                     {opt.name[locale]}
@@ -907,13 +965,13 @@ export default function Print3dCalc({
               </div>
               {q.v.sup === "custom" && (
                 <div className="flex items-center justify-between pt-1">
-                  <span className="text-xs text-neutral-600 dark:text-neutral-400">{t.customSupportsWeight}</span>
-                  <div className="relative w-28">
+                  <span className="text-xs font-medium text-neutral-600 dark:text-neutral-400">{t.customSupportsWeight}</span>
+                  <div className="relative w-32">
                     <Input
                       value={q.v.supw}
                       onChange={(e) => q.set({ supw: e.target.value })}
                       inputMode="decimal"
-                      className="h-9 rounded-xl pr-7 text-right font-bold tabular-nums"
+                      className="h-11 rounded-xl pr-7 text-right text-sm font-bold tabular-nums border-2 border-neutral-300 dark:border-neutral-700"
                     />
                     <span className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-xs font-bold text-neutral-400">
                       г
@@ -923,9 +981,9 @@ export default function Print3dCalc({
               )}
 
               {/* Brim Checkbox */}
-              <label className="flex cursor-pointer items-center justify-between pt-1 text-xs font-medium text-neutral-700 dark:text-neutral-300">
+              <label className="flex cursor-pointer items-center justify-between pt-2 border-t border-neutral-200/60 dark:border-neutral-700/60 text-xs font-medium text-neutral-700 dark:text-neutral-300">
                 <div className="flex flex-col">
-                  <span className="font-semibold text-neutral-800 dark:text-neutral-200">
+                  <span className="font-bold text-neutral-800 dark:text-neutral-200">
                     {t.brimCheck}
                   </span>
                   <span className="text-[11px] text-neutral-500">
@@ -936,7 +994,7 @@ export default function Print3dCalc({
                   type="checkbox"
                   checked={q.v.brim === "1"}
                   onChange={(e) => q.set({ brim: e.target.checked ? "1" : "0" })}
-                  className="size-4.5 rounded-sm accent-neutral-900 dark:accent-neutral-100"
+                  className="size-5 rounded-md accent-neutral-950 dark:accent-neutral-100 cursor-pointer"
                 />
               </label>
             </div>
@@ -946,76 +1004,78 @@ export default function Print3dCalc({
           <div className="flex flex-col gap-4 rounded-2xl border border-neutral-200/80 bg-white p-5 shadow-xs dark:border-neutral-800 dark:bg-neutral-900 sm:p-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <div className="flex size-7 items-center justify-center rounded-lg bg-neutral-100 text-neutral-900 dark:bg-neutral-800 dark:text-white">
-                  <Package className="size-3.5" />
+                <div className="flex size-8 items-center justify-center rounded-xl bg-neutral-100 text-neutral-900 dark:bg-neutral-800 dark:text-white">
+                  <Package className="size-4" />
                 </div>
                 <span className="text-xs font-bold uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
                   {locale === "ru" ? "Тираж и прибыль" : "Batch & Margin"}
                 </span>
               </div>
-              <div className="flex items-center gap-1.5">
+              <div className="flex items-center gap-2">
                 {calc.quantity > 1 && (
-                  <span className="rounded-full bg-neutral-100 px-2.5 py-0.5 text-[11px] font-bold text-neutral-900 dark:bg-neutral-800 dark:text-white">
+                  <span className="rounded-full bg-neutral-100 px-3 py-1 text-xs font-bold text-neutral-900 dark:bg-neutral-800 dark:text-white">
                     {calc.quantity} шт.
                   </span>
                 )}
-                <span className="rounded-full bg-neutral-100 px-2.5 py-0.5 text-[11px] font-bold text-neutral-900 dark:bg-neutral-800 dark:text-white">
+                <span className="rounded-full bg-neutral-100 px-3 py-1 text-xs font-bold text-neutral-900 dark:bg-neutral-800 dark:text-white">
                   +{MARK.value ?? 40}% наценка
                 </span>
               </div>
             </div>
 
-            {/* Quantity Stepper */}
-            <div className="flex items-center justify-between rounded-2xl bg-neutral-50/80 p-3.5 dark:bg-neutral-800/40">
+            {/* Quantity Stepper (Generous touch size: 48px buttons) */}
+            <div className="flex items-center justify-between rounded-2xl bg-neutral-50/80 p-4 dark:bg-neutral-800/40">
               <div className="flex flex-col">
-                <span className="text-xs font-semibold text-neutral-800 dark:text-neutral-200">{t.quantity}</span>
-                <span className="text-[11px] text-neutral-400">
-                  {locale === "ru" ? "Сколько одинаковых деталей нужно напечатать" : "Number of items in the batch"}
+                <span className="text-sm font-bold text-neutral-800 dark:text-neutral-200">{t.quantity}</span>
+                <span className="text-xs text-neutral-400">
+                  {locale === "ru" ? "Количество деталей в заказе" : "Number of items in the batch"}
                 </span>
               </div>
-              <div className="flex items-center gap-1.5">
+              <div className="flex items-center gap-2">
                 <button
                   type="button"
                   onClick={() => q.set({ q: String(Math.max(1, (Q.value ?? 1) - 1)) })}
-                  className="flex size-8 items-center justify-center rounded-lg bg-white text-neutral-800 shadow-xs hover:bg-neutral-100 active:scale-95 dark:bg-neutral-800 dark:text-neutral-200"
+                  aria-label="Decrease quantity"
+                  className="flex size-12 items-center justify-center rounded-xl border-2 border-neutral-300 bg-white text-neutral-900 shadow-xs hover:bg-neutral-100 active:scale-95 dark:border-neutral-700 dark:bg-neutral-800 dark:text-white cursor-pointer"
                 >
-                  <Minus className="size-3.5" />
+                  <Minus className="size-4.5" />
                 </button>
                 <Input
                   value={q.v.q}
                   onChange={(e) => q.set({ q: e.target.value })}
                   inputMode="numeric"
-                  className="h-8 w-16 rounded-lg text-center font-bold tabular-nums text-xs"
+                  className="h-12 w-20 rounded-xl border-2 border-neutral-300 text-center font-black text-lg tabular-nums dark:border-neutral-700 focus:border-neutral-900 dark:focus:border-white"
                 />
                 <button
                   type="button"
                   onClick={() => q.set({ q: String((Q.value ?? 1) + 1) })}
-                  className="flex size-8 items-center justify-center rounded-lg bg-white text-neutral-800 shadow-xs hover:bg-neutral-100 active:scale-95 dark:bg-neutral-800 dark:text-neutral-200"
+                  aria-label="Increase quantity"
+                  className="flex size-12 items-center justify-center rounded-xl border-2 border-neutral-300 bg-white text-neutral-900 shadow-xs hover:bg-neutral-100 active:scale-95 dark:border-neutral-700 dark:bg-neutral-800 dark:text-white cursor-pointer"
                 >
-                  <Plus className="size-3.5" />
+                  <Plus className="size-4.5" />
                 </button>
               </div>
             </div>
 
             {/* Interactive Profit Markup Slider */}
-            <div className="flex flex-col gap-2.5 rounded-2xl bg-neutral-50/80 p-3.5 dark:bg-neutral-800/40">
+            <div className="flex flex-col gap-3 rounded-2xl bg-neutral-50/80 p-4 dark:bg-neutral-800/40">
               <div className="flex items-center justify-between">
                 <div className="flex flex-col">
-                  <span className="text-xs font-semibold text-neutral-800 dark:text-neutral-200">
+                  <span className="text-sm font-bold text-neutral-800 dark:text-neutral-200">
                     {locale === "ru" ? "Наценка / желаемая прибыль" : "Profit Markup"}
                   </span>
-                  <span className="text-[11px] text-neutral-400">
+                  <span className="text-xs text-neutral-400">
                     {locale === "ru" ? "По умолчанию 40% (стандарт в КЗ)" : "Default 40%"}
                   </span>
                 </div>
-                <div className="relative w-24">
+                <div className="relative w-28">
                   <Input
                     value={q.v.mark}
                     onChange={(e) => q.set({ mark: e.target.value })}
                     inputMode="numeric"
-                    className="h-8 rounded-lg pr-6 text-right font-bold text-xs tabular-nums"
+                    className="h-11 rounded-xl pr-7 text-right font-bold text-sm tabular-nums border-2 border-neutral-300 dark:border-neutral-700 focus:border-neutral-900 dark:focus:border-white"
                   />
-                  <span className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-xs font-bold text-neutral-400">
+                  <span className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-xs font-bold text-neutral-400">
                     %
                   </span>
                 </div>
@@ -1029,9 +1089,9 @@ export default function Print3dCalc({
                 onChange={(e) => q.set({ mark: e.target.value })}
               />
 
-              <div className="flex justify-between text-[10px] text-neutral-400">
-                <span>0% (в ноль)</span>
-                <span className="font-bold text-neutral-700 dark:text-neutral-300">40% (норма)</span>
+              <div className="flex justify-between text-xs text-neutral-400 font-medium">
+                <span>0% (себестоимость)</span>
+                <span className="font-bold text-neutral-900 dark:text-neutral-100">40% (норма)</span>
                 <span>100%</span>
                 <span>200%</span>
               </div>
@@ -1261,7 +1321,7 @@ export default function Print3dCalc({
         {/* ═════════ RIGHT COLUMN: Obsidian Hero Card & Cost Structure ═════════ */}
         <div className="flex flex-col gap-5">
           {/* Obsidian Hero Card */}
-          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-neutral-900 via-neutral-950 to-black p-6 text-white shadow-xl dark:border dark:border-neutral-800 sm:p-7">
+          <div ref={priceCardRef} className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-neutral-900 via-neutral-950 to-black p-6 text-white shadow-xl dark:border dark:border-neutral-800 sm:p-7">
             {/* Background Texture Accents */}
             <div className="pointer-events-none absolute -right-12 -top-12 size-48 rounded-full bg-white/5 blur-3xl" />
             <div className="pointer-events-none absolute -bottom-12 -left-12 size-48 rounded-full bg-white/5 blur-3xl" />
@@ -1360,9 +1420,9 @@ export default function Print3dCalc({
               <button
                 type="button"
                 onClick={handleCopyPrice}
-                className="flex w-full items-center justify-center gap-2 rounded-xl bg-white py-3.5 text-sm font-bold text-neutral-950 transition active:scale-98 hover:bg-neutral-100 shadow-md"
+                className="flex w-full items-center justify-center gap-2.5 rounded-2xl bg-white py-4 text-base font-black text-neutral-950 transition active:scale-98 hover:bg-neutral-100 shadow-md cursor-pointer border border-neutral-950 dark:border-white"
               >
-                {copiedQuote ? <Check className="size-4 text-emerald-600" /> : <Copy className="size-4" />}
+                {copiedQuote ? <Check className="size-5 text-emerald-600" /> : <Copy className="size-5" />}
                 <span>
                   {copiedQuote
                     ? (locale === "ru" ? "Скопировано!" : "Copied!")
@@ -1596,6 +1656,69 @@ export default function Print3dCalc({
           Для предотвращения работы в убыток на мелких деталях (10–20 г) предусмотрен настраиваемый <strong>порог минимального заказа</strong> мастерской и <strong>плата за запуск стола</strong>.
         </p>
       </Explain>
+
+      {/* ── Floating Profit Bar (Sticky Island on mobile/desktop until user reaches Recommended Price Card) ── */}
+      <div
+        className={cn(
+          "fixed bottom-4 inset-x-3 z-40 mx-auto max-w-lg transition-all duration-300 pointer-events-none sm:bottom-6",
+          !isPriceCardVisible
+            ? "translate-y-0 opacity-100 pointer-events-auto"
+            : "translate-y-12 opacity-0 pointer-events-none"
+        )}
+      >
+        <div className="flex items-center justify-between gap-3 rounded-2xl border border-neutral-700/80 bg-neutral-950/95 p-3.5 shadow-2xl backdrop-blur-md text-white sm:px-5 sm:py-4">
+          {/* Left: Price and Net Profit */}
+          <div
+            onClick={() => priceCardRef.current?.scrollIntoView({ behavior: "smooth" })}
+            className="flex min-w-0 cursor-pointer flex-col"
+            title={locale === "ru" ? "Нажмите, чтобы перейти к сметe" : "Click to view full breakdown"}
+          >
+            <div className="flex items-baseline gap-2">
+              <span className="font-mono text-lg font-black tracking-tight sm:text-xl text-white">
+                {fmtMoney(locale, isBatch ? calc.batchPrice : calc.unitPrice, "KZT", 0)}
+              </span>
+              {isBatch && (
+                <span className="text-xs font-semibold text-neutral-400">
+                  ({calc.quantity} шт.)
+                </span>
+              )}
+            </div>
+            <div className="flex items-center gap-1.5 text-xs">
+              <span className="text-neutral-400">{t.profit}:</span>
+              <span className="font-bold text-white">
+                +{fmtMoney(locale, isBatch ? calc.batchProfit : calc.unitProfit, "KZT", 0)}
+              </span>
+              <span className="rounded-full bg-neutral-800 px-1.5 py-0.5 text-[10px] font-bold text-neutral-300">
+                {calc.marginPct.toFixed(0)}%
+              </span>
+            </div>
+          </div>
+
+          {/* Right: Actions */}
+          <div className="flex items-center gap-2 shrink-0">
+            <button
+              type="button"
+              onClick={() => priceCardRef.current?.scrollIntoView({ behavior: "smooth" })}
+              className="hidden sm:flex items-center gap-1 rounded-xl bg-neutral-800 hover:bg-neutral-700 px-3 py-2 text-xs font-bold text-neutral-200 transition active:scale-95 border border-neutral-700 cursor-pointer"
+            >
+              <span>{locale === "ru" ? "К сметe" : "View"}</span>
+              <ChevronDown className="size-3.5" />
+            </button>
+            <button
+              type="button"
+              onClick={handleCopyPrice}
+              className="flex items-center gap-1.5 rounded-xl bg-white hover:bg-neutral-100 text-neutral-950 px-3.5 py-2.5 text-xs font-black shadow-md transition active:scale-95 cursor-pointer"
+            >
+              {copiedQuote ? <Check className="size-3.5 text-emerald-600" /> : <Copy className="size-3.5" />}
+              <span>
+                {copiedQuote
+                  ? (locale === "ru" ? "Скопировано!" : "Copied!")
+                  : (locale === "ru" ? "Скопировать" : "Copy")}
+              </span>
+            </button>
+          </div>
+        </div>
+      </div>
     </Stack>
   );
 }

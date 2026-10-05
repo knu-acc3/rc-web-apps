@@ -160,6 +160,7 @@ export interface ToolDef {
   /** Component key in src/tools/index.ts */
   component: string;
   icon: string;
+  hue?: number;
   name: L10n;
   title: L10n;
   h1?: L10n;

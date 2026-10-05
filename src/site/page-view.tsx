@@ -19,7 +19,17 @@ export function PageView({ page, locale }: { page: PageModel; locale: Locale }) 
         <Breadcrumbs items={page.breadcrumbs} current={page.h1} locale={locale} />
 
         <header className={cn("mb-5 flex items-start gap-3.5", page.compactHeader && "mb-3")}>
-          {page.icon && !page.compactHeader && <IconTile name={page.icon} hue={page.hue} size="lg" className="hidden sm:inline-flex" />}
+          {page.icon && !page.compactHeader && (
+            <IconTile
+              name={page.icon}
+              hue={page.hue}
+              size="lg"
+              className={cn(
+                "hidden sm:inline-flex",
+                page.path[0] === "3d-printing-calculator" && "inline-flex size-10 sm:size-12 rounded-xl sm:rounded-2xl !bg-neutral-950 !text-white dark:!bg-white dark:!text-neutral-950 shadow-sm"
+              )}
+            />
+          )}
           <div className="min-w-0">
             <h1 className={cn("font-bold tracking-tight text-fg", page.compactHeader ? "text-xl sm:text-2xl" : "text-[26px] sm:text-[34px]")}>
               {page.h1}

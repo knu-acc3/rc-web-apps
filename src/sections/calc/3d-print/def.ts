@@ -45,6 +45,7 @@ export const print3dTool: ToolDef = {
   slug: "3d-printing-calculator",
   component: "calc/3d-print",
   icon: "Printer",
+  hue: 0,
   popular: true,
   name: {
     ru: "Калькулятор 3D-печати",

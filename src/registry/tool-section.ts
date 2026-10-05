@@ -148,7 +148,7 @@ export function defineToolSection(input: ToolSectionInput): SectionDef {
       label: tr(tool.name, locale),
       hint: tr(tool.lead ?? tool.description, locale),
       icon: tool.icon,
-      hue: input.hue,
+      hue: tool.hue ?? input.hue,
     };
   }
 
@@ -210,7 +210,7 @@ export function defineToolSection(input: ToolSectionInput): SectionDef {
       related: dedupe([...relatedLinks(tool, locale), ...siblingTools(tool, locale)]).slice(0, 8),
       schemaType: "WebApplication",
       icon: tool.icon,
-      hue: input.hue,
+      hue: tool.hue ?? input.hue,
       wide: tool.wide,
     };
   }
@@ -235,7 +235,7 @@ export function defineToolSection(input: ToolSectionInput): SectionDef {
       related: dedupe([toolLink(tool, locale), ...relatedLinks(tool, locale)]).slice(0, 8),
       schemaType: "WebApplication",
       icon: tool.icon,
-      hue: input.hue,
+      hue: tool.hue ?? input.hue,
       wide: tool.wide,
     };
   }
