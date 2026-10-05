@@ -16,4 +16,5 @@ export const components: ComponentMap = {
   "pdf/to-text": () => import("./ToTextTool"),
   "pdf/protect": () => import("./ProtectTool"),
   "pdf/unlock": () => import("./UnlockTool"),
+  "pdf/doc-to-pdf": () => import("./DocToPdfTool"),
 };

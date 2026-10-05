@@ -11,6 +11,7 @@ import {
   type NozzleId,
   type PackagingId,
   type PrinterId,
+  type SupportsType,
   type TaxRegimeId,
 } from "./data";
 
@@ -18,41 +19,78 @@ export interface Print3dInput {
   weightG: number;
   printHours: number;
   quantity?: number;
+  platesCount?: number; // Количество столов в проекте
   spoolPriceKg?: number;
-  purgeWastePct?: number; // extra waste (brim, supports)
+  purgeWastePct?: number; // % на отходы (брак, юбки)
   failureRatePct?: number;
+
+  // Поддержки и кайма
+  supportsType?: SupportsType;
+  customSupportsWeightG?: number;
+  hasBrim?: boolean; // Кайма для адгезии (+5 г, +3 мин)
+
+  // Принтер и амортизация
   printerId?: PrinterId;
+  printerPurchasePriceKzt?: number; // Цена покупки принтера
+  hasAmsCombo?: boolean; // Модуль AMS / CFS
+  amsPurchasePriceKzt?: number;
+  printerLifespanHours?: number; // Срок окупаемости в часах (по умолчанию 5000)
   customWatts?: number;
   customPrinterDepPerHour?: number;
+
+  // Материал и город
   materialId?: MaterialId;
   citySlug?: string;
   isCommercialTariff?: boolean;
   customTariffKwh?: number;
+
+  // Сушилка
   dryerId?: DryerId;
   dryingHours?: number;
+
+  // Сопло и расходники
   nozzleId?: NozzleId;
+  customNozzleWearPerHour?: number; // Ручной ввод износа сопла ₸/ч
   bedConsumableCost?: number;
+
+  // Работа мастера и запуск стола
+  setupFeeKzt?: number; // Плата за запуск стола (по умолчанию 0, настраивается)
   prepMinutes?: number;
   postProcessMinutes?: number;
   hourlyRate?: number;
+
+  // 3D-моделирование (CAD / исправление STL)
+  modelingHours?: number;
+  modelingHourlyRate?: number;
+
+  // Минимальный порог заказа
+  minOrderFeeKzt?: number; // Минимальный заказ мастерской (по умолчанию 0 или порог)
+
+  // Упаковка
   packagingId?: PackagingId;
-  customPackCost?: number;
+  customPackCost?: number; // Ручной ввод упаковки ₸/шт
   packPerBatch?: boolean;
+
+  // Наценка и налоги
   markupPct?: number;
   taxRegime?: TaxRegimeId;
 
-  // Multi-color print options
+  // Многоцветная печать
   isMultiColor?: boolean;
   colorCount?: number;
-  colorSwaps?: number; // total filament changes / retractions
-  purgePerSwapG?: number; // grams purged per swap (purge tower + poop)
-  swapTimeSec?: number; // seconds spent per tool change
+  colorSwaps?: number;
+  purgePerSwapG?: number;
+  swapTimeSec?: number;
+  multiColorPurgeG?: number; // Прямой вес сброса/башни из слайсера (г)
 }
 
 export interface Print3dResult {
   // Quantities
   quantity: number;
+  platesCount: number;
   weightG: number;
+  supportsWeightG: number;
+  brimWeightG: number;
   effectiveWeightG: number;
   printHours: number;
   effectivePrintHours: number;
@@ -65,8 +103,10 @@ export interface Print3dResult {
   multiColorPurgeCost: number;
   multiColorSwapHours: number;
 
-  // Single unit costs
+  // Breakdown costs
   materialCost: number;
+  supportsCost: number;
+  brimCost: number;
   failureCost: number;
   electricityCost: number;
   printerDepCost: number;
@@ -75,6 +115,9 @@ export interface Print3dResult {
   nozzleWearCost: number;
   bedConsumableCost: number;
   wearConsumablesCost: number;
+  physicalLaborCost: number;
+  setupFeeTotal: number;
+  modelingFeeTotal: number;
   laborCost: number;
   packagingCost: number;
   unitNetCost: number;
@@ -94,11 +137,15 @@ export interface Print3dResult {
   batchProfit: number;
   marginPct: number;
 
+  // Minimum Order Check
+  isMinOrderApplied: boolean;
+  minOrderFeeKzt: number;
+
   // Unit metrics
   pricePerGram: number;
   pricePerHour: number;
 
-  // Breakdown percentages of total unit price (summing to ~100)
+  // Shares for charts
   shares: {
     material: number;
     failure: number;
@@ -111,17 +158,23 @@ export interface Print3dResult {
     profit: number;
   };
 
-  // Resolved parameters used in calculation
+  // Resolved parameters
   effectiveTariffKwh: number;
   printerWatts: number;
   dryerWatts: number;
   cityName: { ru: string; en: string };
   printerName: string;
   materialName: string;
+  printerPurchasePriceKzt: number;
+  hasAmsCombo: boolean;
+  amsPurchasePriceKzt: number;
+  printerHourlyDepreciation: number;
+  resolvedNozzleWearPerHour: number;
 }
 
 export function calculatePrint3d(input: Print3dInput): Print3dResult {
   const qty = Math.max(1, Math.round(input.quantity ?? 1));
+  const plates = Math.max(1, Math.round(input.platesCount ?? 1));
   const weight = Math.max(0, input.weightG || 0);
   const printHours = Math.max(0, input.printHours || 0);
   const purgeWastePct = Math.max(0, input.purgeWastePct ?? 0);
@@ -145,36 +198,43 @@ export function calculatePrint3d(input: Print3dInput): Print3dResult {
   const nozzle = NOZZLE_PROFILES[input.nozzleId ?? "hardened"] ?? NOZZLE_PROFILES.hardened;
   const bedConsumableCost = Math.max(0, input.bedConsumableCost ?? 20);
 
-  const prepMinutes = Math.max(0, input.prepMinutes ?? 10);
-  const postProcessMinutes = Math.max(0, input.postProcessMinutes ?? 5);
-  const hourlyRate = Math.max(0, input.hourlyRate ?? 2500);
+  // Supports & Brim
+  const supportsType = input.supportsType ?? "none";
+  let supportsWeightG = 0;
+  if (supportsType === "light") supportsWeightG = weight * 0.10;
+  else if (supportsType === "medium") supportsWeightG = weight * 0.20;
+  else if (supportsType === "heavy") supportsWeightG = weight * 0.35;
+  else if (supportsType === "custom") supportsWeightG = Math.max(0, input.customSupportsWeightG ?? 0);
 
-  const packOption = PACKAGING_OPTIONS[input.packagingId ?? "none"] ?? PACKAGING_OPTIONS.none;
-  const basePackCost = input.customPackCost !== undefined && input.customPackCost >= 0 ? input.customPackCost : packOption.costKzt;
-  const packPerBatch = !!input.packPerBatch;
-  const packagingCostPerUnit = packPerBatch ? basePackCost / qty : basePackCost;
+  const hasBrim = !!input.hasBrim;
+  const brimWeightG = hasBrim ? 5 : 0;
+  const brimTimeHours = hasBrim ? (3 / 60) : 0;
 
-  const markupPct = Math.max(0, input.markupPct ?? 100);
-  const taxRegime = TAX_REGIMES[input.taxRegime ?? "none"] ?? TAX_REGIMES.none;
-
+  // Multi-color specifics
   const isMultiColor = !!input.isMultiColor;
   const colorCount = isMultiColor ? Math.max(2, Math.round(input.colorCount ?? 4)) : 1;
   const colorSwaps = isMultiColor ? Math.max(0, Math.round(input.colorSwaps ?? 250)) : 0;
   const purgePerSwapG = isMultiColor ? Math.max(0, input.purgePerSwapG ?? 0.35) : 0;
   const swapTimeSec = isMultiColor ? Math.max(0, input.swapTimeSec ?? 60) : 0;
 
-  const multiColorPurgeG = colorSwaps * purgePerSwapG;
-  const multiColorSwapHours = (colorSwaps * swapTimeSec) / 3600;
-  const multiColorPurgeCost = (multiColorPurgeG / 1000) * spoolPriceKg;
+  const multiColorPurgeG = isMultiColor
+    ? (input.multiColorPurgeG !== undefined ? Math.max(0, input.multiColorPurgeG) : (colorSwaps * purgePerSwapG))
+    : 0;
+  const multiColorSwapHours = isMultiColor ? (colorSwaps * swapTimeSec) / 3600 : 0;
 
-  const effectivePrintHours = printHours + multiColorSwapHours;
+  const effectivePrintHours = printHours + brimTimeHours + multiColorSwapHours;
 
   // 1. Material
-  const effectiveWeightG = (weight + multiColorPurgeG) * (1 + purgeWastePct / 100);
+  const netFilamentWeightG = weight + supportsWeightG + brimWeightG + multiColorPurgeG;
+  const effectiveWeightG = netFilamentWeightG * (1 + purgeWastePct / 100);
   const materialCost = (effectiveWeightG / 1000) * spoolPriceKg;
   const failureCost = materialCost * (failureRatePct / 100);
 
-  // 2. Power & Electricity (Base active power without peak spikes)
+  const supportsCost = (supportsWeightG / 1000) * spoolPriceKg;
+  const brimCost = (brimWeightG / 1000) * spoolPriceKg;
+  const multiColorPurgeCost = (multiColorPurgeG / 1000) * spoolPriceKg;
+
+  // 2. Power & Electricity (Base active wattage without spikes)
   const printerWatts = input.customWatts !== undefined && input.customWatts >= 0
     ? input.customWatts
     : printer.powerByMaterial[material.id] ?? printer.defaultPower;
@@ -185,24 +245,61 @@ export function calculatePrint3d(input: Print3dInput): Print3dResult {
   const electricityCost = unitElectricityKwh * effectiveTariffKwh;
 
   // 3. Equipment Depreciation
-  const printerDepPerHour = input.customPrinterDepPerHour !== undefined && input.customPrinterDepPerHour >= 0
+  const hasAmsCombo = input.hasAmsCombo !== undefined ? input.hasAmsCombo : (isMultiColor && printer.multiColorCapable);
+  const printerPurchasePrice = input.printerPurchasePriceKzt !== undefined && input.printerPurchasePriceKzt >= 0
+    ? input.printerPurchasePriceKzt
+    : printer.priceKzt;
+  const amsPurchasePrice = hasAmsCombo
+    ? (input.amsPurchasePriceKzt !== undefined && input.amsPurchasePriceKzt >= 0 ? input.amsPurchasePriceKzt : (printer.amsPriceKzt ?? 0))
+    : 0;
+  const totalMachineInvest = printerPurchasePrice + amsPurchasePrice;
+  const lifespanHours = Math.max(500, input.printerLifespanHours || printer.lifespanHours || 5000);
+  const printerHourlyDepreciation = input.customPrinterDepPerHour !== undefined && input.customPrinterDepPerHour >= 0
     ? input.customPrinterDepPerHour
+    : (input.printerPurchasePriceKzt !== undefined || input.hasAmsCombo !== undefined || input.printerLifespanHours !== undefined)
+    ? (totalMachineInvest / lifespanHours)
     : printer.depreciationPerHour;
-  const printerDepCost = printerDepPerHour * effectivePrintHours;
+
+  const printerDepCost = printerHourlyDepreciation * effectivePrintHours;
   const dryerDepCost = dryer.depreciationPerHour * dryingHours;
   const depreciationCost = printerDepCost + dryerDepCost;
 
   // 4. Wear & Consumables
-  const nozzleWearPerHour = material.abrasive ? nozzle.wearPerHourAbrasive : nozzle.wearPerHour;
-  const nozzleWearCost = nozzleWearPerHour * effectivePrintHours;
+  const defaultNozzleRate = material.abrasive ? nozzle.wearPerHourAbrasive : nozzle.wearPerHour;
+  const resolvedNozzleWearPerHour = input.customNozzleWearPerHour !== undefined && input.customNozzleWearPerHour >= 0
+    ? input.customNozzleWearPerHour
+    : defaultNozzleRate;
+  const nozzleWearCost = resolvedNozzleWearPerHour * effectivePrintHours;
   const wearConsumablesCost = nozzleWearCost + bedConsumableCost;
 
-  // 5. Labor
-  // File prep is divided across the whole batch, post-processing is per piece
-  const laborMinutesPerUnit = (prepMinutes / qty) + postProcessMinutes;
-  const laborCost = (laborMinutesPerUnit / 60) * hourlyRate;
+  // 5. Labor & Setup & Modeling
+  const prepMinutes = Math.max(0, input.prepMinutes ?? 10);
+  const postProcessMinutes = Math.max(0, input.postProcessMinutes ?? 5);
+  const hourlyRate = Math.max(0, input.hourlyRate ?? 2500);
 
-  // 6. Net Cost
+  // Setup fee: per plate, allocated across units
+  const setupFeePerPlate = Math.max(0, input.setupFeeKzt ?? 0);
+  const setupFeeTotal = setupFeePerPlate * plates;
+  const setupFeePerUnit = setupFeeTotal / qty;
+
+  // Modeling fee: total for order, allocated across units
+  const modelingHours = Math.max(0, input.modelingHours ?? 0);
+  const modelingHourlyRate = Math.max(0, input.modelingHourlyRate ?? 5000);
+  const modelingFeeTotal = modelingHours * modelingHourlyRate;
+  const modelingFeePerUnit = modelingFeeTotal / qty;
+
+  // Physical labor (file prep + post-processing)
+  const physicalLaborMinutesPerUnit = (prepMinutes / qty) + postProcessMinutes;
+  const physicalLaborCost = (physicalLaborMinutesPerUnit / 60) * hourlyRate;
+  const laborCost = physicalLaborCost + setupFeePerUnit + modelingFeePerUnit;
+
+  // 6. Packaging
+  const packOption = PACKAGING_OPTIONS[input.packagingId ?? "none"] ?? PACKAGING_OPTIONS.none;
+  const basePackCost = input.customPackCost !== undefined && input.customPackCost >= 0 ? input.customPackCost : packOption.costKzt;
+  const packPerBatch = !!input.packPerBatch;
+  const packagingCostPerUnit = packPerBatch ? basePackCost / qty : basePackCost;
+
+  // 7. Net Cost
   const unitNetCost =
     materialCost +
     failureCost +
@@ -213,37 +310,41 @@ export function calculatePrint3d(input: Print3dInput): Print3dResult {
     packagingCostPerUnit;
   const batchNetCost = unitNetCost * qty;
 
-  // 7. Commercial Pricing & Taxes
+  // 8. Commercial Pricing & Taxes
+  const markupPct = Math.max(0, input.markupPct ?? 40);
+  const taxRegime = TAX_REGIMES[input.taxRegime ?? "none"] ?? TAX_REGIMES.none;
+
   const unitPriceBeforeTax = unitNetCost * (1 + markupPct / 100);
 
-  let unitPrice = unitPriceBeforeTax;
+  let rawUnitPrice = unitPriceBeforeTax;
   let unitTax = 0;
 
   if (taxRegime.id === "simplified_3") {
-    // 3% turnover tax (Price = CostWithMarkup / (1 - 0.03))
-    unitPrice = unitPriceBeforeTax / (1 - 0.03);
-    unitTax = unitPrice * 0.03;
+    rawUnitPrice = unitPriceBeforeTax / (1 - 0.03);
+    unitTax = rawUnitPrice * 0.03;
   } else if (taxRegime.id === "retail_4") {
-    // 4% retail tax
-    unitPrice = unitPriceBeforeTax / (1 - 0.04);
-    unitTax = unitPrice * 0.04;
+    rawUnitPrice = unitPriceBeforeTax / (1 - 0.04);
+    unitTax = rawUnitPrice * 0.04;
   } else if (taxRegime.id === "vat_12") {
-    // 12% VAT added on top
-    unitPrice = unitPriceBeforeTax * 1.12;
+    rawUnitPrice = unitPriceBeforeTax * 1.12;
     unitTax = unitPriceBeforeTax * 0.12;
   }
 
-  const unitProfit = Math.max(0, unitPrice - unitNetCost - unitTax);
-  const batchPrice = unitPrice * qty;
+  const rawBatchPrice = rawUnitPrice * qty;
+  const minOrderFeeKzt = Math.max(0, input.minOrderFeeKzt ?? 0);
+  const isMinOrderApplied = minOrderFeeKzt > 0 && rawBatchPrice < minOrderFeeKzt;
+  const finalBatchPrice = isMinOrderApplied ? minOrderFeeKzt : rawBatchPrice;
+  const finalUnitPrice = finalBatchPrice / qty;
   const batchTax = unitTax * qty;
-  const batchProfit = unitProfit * qty;
-  const marginPct = batchPrice > 0 ? (batchProfit / batchPrice) * 100 : 0;
+  const batchProfit = Math.max(0, finalBatchPrice - batchNetCost - batchTax);
+  const unitProfit = batchProfit / qty;
+  const marginPct = finalBatchPrice > 0 ? (batchProfit / finalBatchPrice) * 100 : 0;
 
-  const pricePerGram = weight > 0 ? unitPrice / weight : 0;
-  const pricePerHour = effectivePrintHours > 0 ? unitPrice / effectivePrintHours : 0;
+  const pricePerGram = weight > 0 ? finalUnitPrice / weight : 0;
+  const pricePerHour = effectivePrintHours > 0 ? finalUnitPrice / effectivePrintHours : 0;
 
   // Cost shares
-  const safeTotal = unitPrice > 0 ? unitPrice : 1;
+  const safeTotal = finalUnitPrice > 0 ? finalUnitPrice : 1;
   const shares = {
     material: (materialCost / safeTotal) * 100,
     failure: (failureCost / safeTotal) * 100,
@@ -258,7 +359,10 @@ export function calculatePrint3d(input: Print3dInput): Print3dResult {
 
   return {
     quantity: qty,
+    platesCount: plates,
     weightG: weight,
+    supportsWeightG,
+    brimWeightG,
     effectiveWeightG,
     printHours,
     effectivePrintHours,
@@ -269,6 +373,8 @@ export function calculatePrint3d(input: Print3dInput): Print3dResult {
     multiColorPurgeCost,
     multiColorSwapHours,
     materialCost,
+    supportsCost,
+    brimCost,
     failureCost,
     electricityCost,
     printerDepCost,
@@ -277,6 +383,9 @@ export function calculatePrint3d(input: Print3dInput): Print3dResult {
     nozzleWearCost,
     bedConsumableCost,
     wearConsumablesCost,
+    physicalLaborCost,
+    setupFeeTotal,
+    modelingFeeTotal,
     laborCost,
     packagingCost: packagingCostPerUnit,
     unitNetCost,
@@ -285,12 +394,14 @@ export function calculatePrint3d(input: Print3dInput): Print3dResult {
     batchMaterialWeightG: effectiveWeightG * qty,
     unitPriceBeforeTax,
     unitTax,
-    unitPrice,
+    unitPrice: finalUnitPrice,
     unitProfit,
-    batchPrice,
+    batchPrice: finalBatchPrice,
     batchTax,
     batchProfit,
     marginPct,
+    isMinOrderApplied,
+    minOrderFeeKzt,
     pricePerGram,
     pricePerHour,
     shares,
@@ -298,7 +409,12 @@ export function calculatePrint3d(input: Print3dInput): Print3dResult {
     printerWatts,
     dryerWatts,
     cityName: city.name,
-    printerName: printer.name,
+    printerName: printer.shortName,
     materialName: material.name,
+    printerPurchasePriceKzt: printerPurchasePrice,
+    hasAmsCombo,
+    amsPurchasePriceKzt: amsPurchasePrice,
+    printerHourlyDepreciation,
+    resolvedNozzleWearPerHour,
   };
 }

@@ -1,5 +1,5 @@
 import { defineToolSection } from "@/registry/tool-section";
-import { heicToPdfTool, imageToPdfTool, jpgToPdfTool, pdfToImageTool, pdfToJpgTool, pdfToPngTool, pdfToWebpTool, pngToPdfTool, toTextTool, webpToPdfTool } from "./content/convert";
+import { docToPdfTool, heicToPdfTool, imageToPdfTool, jpgToPdfTool, pdfToImageTool, pdfToJpgTool, pdfToPngTool, pdfToWebpTool, pngToPdfTool, toTextTool, webpToPdfTool } from "./content/convert";
 import { compressTool, formTool, metadataTool, nupTool, pageNumbersTool, protectTool, signTool, unlockTool, watermarkTool } from "./content/edit";
 import { deleteTool, extractTool, mergeTool, organizeTool, rotateTool, splitTool } from "./content/pages";
 
@@ -22,6 +22,7 @@ export const pdfSection = defineToolSection({
   category: "files",
   order: 1,
   tools: [
+    docToPdfTool,
     mergeTool,
     splitTool,
     compressTool,

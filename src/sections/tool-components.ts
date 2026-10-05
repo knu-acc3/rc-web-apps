@@ -185,6 +185,7 @@ export const TOOL_COMPONENTS: Record<string, ComponentType<any>> = {
   "password/generator": dynamic(() => import("@/sections/password/PasswordGenerator")),
   "password/strength": dynamic(() => import("@/sections/password/StrengthChecker")),
   "pdf/compress": dynamic(() => import("@/sections/pdf/CompressTool")),
+  "pdf/doc-to-pdf": dynamic(() => import("@/sections/pdf/DocToPdfTool")),
   "pdf/form": dynamic(() => import("@/sections/pdf/FormTool")),
   "pdf/images-to-pdf": dynamic(() => import("@/sections/pdf/ImagesToPdfTool")),
   "pdf/merge": dynamic(() => import("@/sections/pdf/MergeTool")),

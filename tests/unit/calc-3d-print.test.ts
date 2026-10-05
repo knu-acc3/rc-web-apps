@@ -23,8 +23,8 @@ describe("3D printing calculator engine", () => {
     // Almaty residential tariff = 35.50 KZT/kWh.
     // Electricity cost = 0.42 * 35.5 = 14.91 KZT
     expect(res.electricityCost).toBeCloseTo(14.91, 1);
-    // Depreciation: P1S is 77 KZT/h * 4h = 308 KZT
-    expect(res.printerDepCost).toBeCloseTo(308, 1);
+    // Depreciation: P1S is 57 KZT/h * 4h = 228 KZT
+    expect(res.printerDepCost).toBeCloseTo(228, 1);
     // Consumables: bed = 20, nozzle = 5 KZT/h * 4h = 20 KZT -> wearConsumablesCost = 40 KZT
     expect(res.wearConsumablesCost).toBeCloseTo(40, 1);
     // Labor: default prep 10m + post 5m = 15m (0.25h) * 2500 KZT/h = 625 KZT
@@ -257,8 +257,8 @@ describe("3D printing calculator engine", () => {
     expect(multi.multiColorSwapHours).toBeCloseTo(3.333, 2);
     expect(multi.effectivePrintHours).toBeCloseTo(8.333, 2);
 
-    // Depreciation should scale with effectivePrintHours: 8.333h * 77 KZT/h = 641.67 KZT
-    expect(multi.printerDepCost).toBeCloseTo(8.333 * 77, 0);
+    // Depreciation should scale with effectivePrintHours: 8.333h * 57 KZT/h = 475 KZT
+    expect(multi.printerDepCost).toBeCloseTo(8.333 * 57, 0);
   });
 
   it("has valid database entries for all 18 Kazakhstan cities and all printers (Bambu, Creality, Anycubic)", () => {
@@ -273,24 +273,33 @@ describe("3D printing calculator engine", () => {
     const printers = Object.values(PRINTER_PROFILES);
     expect(printers.length).toBeGreaterThanOrEqual(12);
 
-    // Specific models requested by user
+    // Specific distinct models requested by user
+    expect(PRINTER_PROFILES.x1c).toBeDefined();
     expect(PRINTER_PROFILES.p1s).toBeDefined();
-    expect(PRINTER_PROFILES.p2s).toBeDefined();
     expect(PRINTER_PROFILES.a1).toBeDefined();
     expect(PRINTER_PROFILES.a1_mini).toBeDefined();
-    expect(PRINTER_PROFILES.a2l).toBeDefined();
+    expect(PRINTER_PROFILES.k1).toBeDefined();
+    expect(PRINTER_PROFILES.k1_max).toBeDefined();
+    expect(PRINTER_PROFILES.k2_plus).toBeDefined();
     expect(PRINTER_PROFILES.ender3).toBeDefined();
     expect(PRINTER_PROFILES.ender5).toBeDefined();
-    expect(PRINTER_PROFILES.k1).toBeDefined();
-    expect(PRINTER_PROFILES.k1c).toBeDefined();
-    expect(PRINTER_PROFILES.k1_max).toBeDefined();
+    expect(PRINTER_PROFILES.mk4).toBeDefined();
+    expect(PRINTER_PROFILES.prusa_xl).toBeDefined();
     expect(PRINTER_PROFILES.kobra2).toBeDefined();
     expect(PRINTER_PROFILES.kobra3_combo).toBeDefined();
+    expect(PRINTER_PROFILES.neptune4).toBeDefined();
+    expect(PRINTER_PROFILES.centauri).toBeDefined();
+    expect(PRINTER_PROFILES.q1_pro).toBeDefined();
+    expect(PRINTER_PROFILES.plus4).toBeDefined();
+    expect(PRINTER_PROFILES.adventurer5m).toBeDefined();
+    expect(PRINTER_PROFILES.ghost6).toBeDefined();
+    expect(PRINTER_PROFILES.klp1).toBeDefined();
+    expect(PRINTER_PROFILES.voron24).toBeDefined();
     expect(PRINTER_PROFILES.custom).toBeDefined();
 
-    // Verify x1c and p1p are removed
-    expect((PRINTER_PROFILES as Record<string, unknown>).x1c).toBeUndefined();
-    expect((PRINTER_PROFILES as Record<string, unknown>).p1p).toBeUndefined();
+    // Verify redundant fake clones (p2s, a2l) are absent
+    expect((PRINTER_PROFILES as Record<string, unknown>).p2s).toBeUndefined();
+    expect((PRINTER_PROFILES as Record<string, unknown>).a2l).toBeUndefined();
 
     for (const p of printers) {
       expect(p.depreciationPerHour).toBeGreaterThan(0);
@@ -300,5 +309,77 @@ describe("3D printing calculator engine", () => {
 
     const materials = Object.values(MATERIAL_PROFILES);
     expect(materials.length).toBeGreaterThanOrEqual(5);
+  });
+
+  it("calculates supports and brim correctly", () => {
+    // 100g base weight with medium supports (+20%) and brim (+5g)
+    const res = calculatePrint3d({
+      weightG: 100,
+      printHours: 4,
+      supportsType: "medium",
+      hasBrim: true,
+      spoolPriceKg: 6500,
+      printerId: "p1s",
+      materialId: "pla",
+    });
+
+    // Supports: 20g
+    expect(res.supportsWeightG).toBe(20);
+    // Brim: 5g
+    expect(res.brimWeightG).toBe(5);
+    // Total net filament: 100 + 20 + 5 = 125g
+    expect(res.effectiveWeightG).toBe(125);
+    // Filament cost: 125 * 6.5 = 812.5 KZT
+    expect(res.materialCost).toBeCloseTo(812.5, 1);
+  });
+
+  it("enforces minimum order threshold for small prints (e.g. 10g part)", () => {
+    const res = calculatePrint3d({
+      weightG: 10,
+      printHours: 0.5,
+      spoolPriceKg: 6500,
+      minOrderFeeKzt: 2000,
+      markupPct: 50,
+      printerId: "a1_mini",
+    });
+
+    // Raw calculated price would be ~300-500 KZT, but minimum order fee is 2000 KZT
+    expect(res.isMinOrderApplied).toBe(true);
+    expect(res.unitPrice).toBe(2000);
+    expect(res.batchPrice).toBe(2000);
+  });
+
+  it("calculates setup fee and 3D modeling charges", () => {
+    const res = calculatePrint3d({
+      weightG: 100,
+      printHours: 2,
+      platesCount: 3,
+      setupFeeKzt: 1000,
+      modelingHours: 2,
+      modelingHourlyRate: 7500,
+      quantity: 5,
+    });
+
+    // Setup fee total: 3 plates * 1000 KZT = 3000 KZT
+    expect(res.setupFeeTotal).toBe(3000);
+    // Modeling fee total: 2h * 7500 = 15000 KZT
+    expect(res.modelingFeeTotal).toBe(15000);
+  });
+
+  it("calculates custom machine investment including AMS module", () => {
+    const res = calculatePrint3d({
+      weightG: 100,
+      printHours: 10,
+      printerPurchasePriceKzt: 350000,
+      hasAmsCombo: true,
+      amsPurchasePriceKzt: 150000,
+      printerLifespanHours: 5000,
+    });
+
+    // Total machine: 350 000 + 150 000 = 500 000 KZT.
+    // Lifespan: 5000 h -> 100 KZT/h.
+    expect(res.printerHourlyDepreciation).toBe(100);
+    // 10h * 100 = 1000 KZT
+    expect(res.printerDepCost).toBe(1000);
   });
 });

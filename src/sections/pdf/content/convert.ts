@@ -508,3 +508,62 @@ export const toTextTool: ToolDef = {
   related: ["pdf-to-jpg", "split-pdf", "compress-pdf"],
   variants: { title: { ru: "Форматы", en: "Formats" }, list: textVariants },
 };
+
+export const docToPdfTool: ToolDef = {
+  slug: "doc-to-pdf",
+  component: "pdf/doc-to-pdf",
+  icon: "FileText",
+  popular: true,
+  name: { ru: "Документ в PDF", en: "Document to PDF" },
+  title: { ru: "Документ в PDF онлайн — Word, RTF, ODT, TXT в PDF", en: "Document to PDF online — convert Word, ODT, TXT to PDF" },
+  h1: { ru: "Конвертировать документ в PDF", en: "Convert Document to PDF" },
+  description: {
+    ru: "Быстрая конвертация любого документа в PDF прямо в браузере: Word (.docx, .doc), OpenOffice (.odt), RTF, Markdown, HTML, TXT. Поля, шрифты, A4 и нумерация страниц.",
+    en: "Fast conversion of any document to PDF in your browser: Word (.docx, .doc), OpenOffice (.odt), RTF, Markdown, HTML, TXT. Margins, fonts, A4 and page numbers.",
+  },
+  lead: { ru: "Переведите любой документ в готовый PDF файл за пару кликов.", en: "Convert any document into a print-ready PDF in seconds." },
+  keywords: {
+    ru: ["документ в pdf", "ворд в pdf", "docx в pdf", "odt в pdf", "rtf в pdf", "текст в pdf", "из любого дока в pdf", "сделать пдф из документа"],
+    en: ["doc to pdf", "word to pdf", "docx to pdf", "odt to pdf", "rtf to pdf", "txt to pdf", "markdown to pdf"],
+  },
+  howTo: {
+    ru: [
+      "Перетащите любой документ (Word, ODT, RTF, Markdown, TXT, HTML) или вставьте текст вручную.",
+      "Настройте формат страницы: A4 или Letter, ориентацию, поля и размер шрифта.",
+      "Нажмите «Конвертировать в PDF» и сразу скачайте готовый PDF файл.",
+    ],
+    en: [
+      "Drag and drop any document (Word, ODT, RTF, Markdown, TXT, HTML) or paste text.",
+      "Adjust page settings: A4 or Letter, orientation, margins and font size.",
+      "Click “Convert to PDF” and download your finished PDF immediately.",
+    ],
+  },
+  about: {
+    ru: [
+      "Конвертер разбирает структуру исходного документа прямо в браузере: заголовки, параграфы, списки, таблицы и блоки текста бережно верстаются на страницах PDF с соблюдением полей и отступов.",
+      "Файлы не отправляются на удалённые серверы — договоры, отчёты и личные документы остаются исключительно на вашем устройстве.",
+      PRIVACY.ru,
+    ],
+    en: [
+      "The converter parses document structure locally in your browser: headings, paragraphs, lists, tables and text blocks are cleanly typeset onto PDF pages.",
+      "Files are never uploaded to remote servers — your contracts, reports and personal documents stay strictly on your device.",
+      PRIVACY.en,
+    ],
+  },
+  faq: faq(
+    [
+      { q: "Какие форматы документов поддерживаются?", a: "Поддерживаются Microsoft Word (.docx, .doc), LibreOffice/OpenOffice (.odt), RTF, Markdown (.md), HTML, TXT, CSV, JSON, а также сканы и фото документов (JPG, PNG, WebP)." },
+      { q: "Будет ли читаться русский язык (кириллица)?", a: "Да, используется встроенный шрифт Noto Sans с полной поддержкой кириллицы, латиницы и спецсимволов. Текст не превращается в кракозябры или знаки вопроса." },
+      { q: "Безопасно ли конвертировать конфиденциальные документы?", a: "Абсолютно безопасно. Вся обработка происходит на вашем компьютере с помощью веб-технологий без передачи данных по сети." },
+      PRIVACY_QA.ru,
+    ],
+    [
+      { q: "What document formats are supported?", a: "Supports Microsoft Word (.docx, .doc), LibreOffice/OpenOffice (.odt), RTF, Markdown (.md), HTML, TXT, CSV, JSON, and document scans/photos (JPG, PNG, WebP)." },
+      { q: "Are non-Latin alphabets supported?", a: "Yes, uses embedded Noto Sans font with full Unicode and Cyrillic support. Characters render cleanly." },
+      { q: "Is it safe for private documents?", a: "Completely safe. All processing happens client-side in your browser with zero network uploads." },
+      PRIVACY_QA.en,
+    ],
+  ),
+  related: ["pdf-to-text", "image-to-pdf", "merge-pdf"],
+};
+
