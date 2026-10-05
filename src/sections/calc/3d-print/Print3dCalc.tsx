@@ -555,41 +555,11 @@ export default function Print3dCalc({
 
   const isBatch = calc.quantity > 1;
 
-  // Format client quotation for messengers
-  const handleCopyQuote = () => {
-    const tg = (val: number) => fmtMoney(locale, val, "KZT", 0);
-    const text = [
-      `📋 Смета 3D-печати (${selectedCity.name.ru})`,
-      "----------------------------------------",
-      `• Деталь: ${calc.weightG} г · ${calc.printHours.toFixed(1)} ч`,
-      calc.supportsWeightG > 0 ? `• Поддержки: +${calc.supportsWeightG.toFixed(0)} г` : "",
-      calc.brimWeightG > 0 ? `• Кайма (Brim): +${calc.brimWeightG} г` : "",
-      `• Филамент: ${selectedMaterial.name} (${calc.effectiveWeightG.toFixed(0)} г всего)`,
-      `• Принтер: ${selectedPrinter.name}`,
-      `• Количество: ${calc.quantity} шт.`,
-      "----------------------------------------",
-      `• Пластик: ${tg(calc.materialCost)}`,
-      `• Электроэнергия: ${tg(calc.electricityCost)} (${calc.effectiveTariffKwh.toFixed(1)} ₸/кВт⋅ч)`,
-      `• Амортизация: ${tg(calc.depreciationCost)}`,
-      `• Расходники и сопло: ${tg(calc.wearConsumablesCost)}`,
-      calc.setupFeeTotal > 0 ? `• Запуск стола: ${tg(calc.setupFeeTotal)}` : "",
-      calc.modelingFeeTotal > 0 ? `• 3D-моделирование: ${tg(calc.modelingFeeTotal)}` : "",
-      `• Работа мастера: ${tg(calc.physicalLaborCost)}`,
-      calc.packagingCost > 0 ? `• Упаковка: ${tg(calc.packagingCost * calc.quantity)}` : "",
-      calc.unitTax > 0 ? `• Налог: ${tg(calc.batchTax)}` : "",
-      "----------------------------------------",
-      `${t.netCost}: ${tg(isBatch ? calc.batchNetCost : calc.unitNetCost)}`,
-      `⭐ ${isBatch ? t.batchPrice : t.recommendedPrice}: ${tg(isBatch ? calc.batchPrice : calc.unitPrice)}`,
-      calc.isMinOrderApplied ? `(Применён минимальный заказ: ${tg(calc.minOrderFeeKzt)})` : "",
-      `💰 ${t.profit}: +${tg(isBatch ? calc.batchProfit : calc.unitProfit)} (${calc.marginPct.toFixed(0)}% ${t.margin})`,
-      "----------------------------------------",
-      `Расчёт выполнен на ${BRAND.domain}`,
-    ]
-      .filter(Boolean)
-      .join("\n");
-
+  // Copy just the final price with tenge
+  const handleCopyPrice = () => {
+    const formattedPrice = fmtMoney(locale, isBatch ? calc.batchPrice : calc.unitPrice, "KZT", 0);
     if (navigator.clipboard) {
-      navigator.clipboard.writeText(text);
+      navigator.clipboard.writeText(formattedPrice);
       setCopiedQuote(true);
       setTimeout(() => setCopiedQuote(false), 2000);
     }
@@ -610,7 +580,7 @@ export default function Print3dCalc({
         {/* ═════════ LEFT COLUMN: Tactile Monochrome Input Cards ═════════ */}
         <div className="flex flex-col gap-5">
           {/* 1. Printer Selector Card */}
-          <div className="flex flex-col gap-4 rounded-[26px] border border-neutral-200/80 bg-white p-5 shadow-xs dark:border-neutral-800 dark:bg-neutral-900 sm:p-6">
+          <div className="flex flex-col gap-4 rounded-2xl border border-neutral-200/80 bg-white p-5 shadow-xs dark:border-neutral-800 dark:bg-neutral-900 sm:p-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div className="flex size-7 items-center justify-center rounded-lg bg-neutral-100 text-neutral-900 dark:bg-neutral-800 dark:text-white">
@@ -684,7 +654,7 @@ export default function Print3dCalc({
           </div>
 
           {/* 3. Material & Kazakhstan Location Card */}
-          <div className="flex flex-col gap-4 rounded-[26px] border border-neutral-200/80 bg-white p-5 shadow-xs dark:border-neutral-800 dark:bg-neutral-900 sm:p-6">
+          <div className="flex flex-col gap-4 rounded-2xl border border-neutral-200/80 bg-white p-5 shadow-xs dark:border-neutral-800 dark:bg-neutral-900 sm:p-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div className="flex size-7 items-center justify-center rounded-lg bg-neutral-100 text-neutral-900 dark:bg-neutral-800 dark:text-white">
@@ -816,7 +786,7 @@ export default function Print3dCalc({
           </div>
 
           {/* 4. Print Specifications: Weight, Time, Supports */}
-          <div className="flex flex-col gap-4 rounded-[26px] border border-neutral-200/80 bg-white p-5 shadow-xs dark:border-neutral-800 dark:bg-neutral-900 sm:p-6">
+          <div className="flex flex-col gap-4 rounded-2xl border border-neutral-200/80 bg-white p-5 shadow-xs dark:border-neutral-800 dark:bg-neutral-900 sm:p-6">
             <div className="flex items-center gap-2">
               <div className="flex size-7 items-center justify-center rounded-lg bg-neutral-100 text-neutral-900 dark:bg-neutral-800 dark:text-white">
                 <Scale className="size-3.5" />
@@ -966,7 +936,7 @@ export default function Print3dCalc({
           </div>
 
           {/* 5. Batch & Profit Margin */}
-          <div className="flex flex-col gap-4 rounded-[26px] border border-neutral-200/80 bg-white p-5 shadow-xs dark:border-neutral-800 dark:bg-neutral-900 sm:p-6">
+          <div className="flex flex-col gap-4 rounded-2xl border border-neutral-200/80 bg-white p-5 shadow-xs dark:border-neutral-800 dark:bg-neutral-900 sm:p-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div className="flex size-7 items-center justify-center rounded-lg bg-neutral-100 text-neutral-900 dark:bg-neutral-800 dark:text-white">
@@ -1062,7 +1032,7 @@ export default function Print3dCalc({
           </div>
 
           {/* 7. Advanced Settings Accordion */}
-          <div className="flex flex-col rounded-[26px] border border-neutral-200/80 bg-white p-5 shadow-xs dark:border-neutral-800 dark:bg-neutral-900 sm:p-6">
+          <div className="flex flex-col rounded-2xl border border-neutral-200/80 bg-white p-5 shadow-xs dark:border-neutral-800 dark:bg-neutral-900 sm:p-6">
             <button
               type="button"
               onClick={() => setIsAdvancedOpen(!isAdvancedOpen)}
@@ -1248,36 +1218,20 @@ export default function Print3dCalc({
                   </div>
                 </div>
 
-                {/* Markup & Taxes */}
-                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-xs font-semibold text-neutral-800 dark:text-neutral-200">{t.markup}</label>
-                    <div className="relative">
-                      <Input
-                        value={q.v.mark}
-                        onChange={(e) => q.set({ mark: e.target.value })}
-                        inputMode="numeric"
-                        className="h-10 rounded-xl pr-7 font-bold tabular-nums"
-                      />
-                      <span className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-xs font-bold text-neutral-400">
-                        %
-                      </span>
-                    </div>
-                  </div>
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-xs font-semibold text-neutral-800 dark:text-neutral-200">{t.taxRegime}</label>
-                    <Select
-                      value={q.v.tax}
-                      onChange={(e) => q.set({ tax: e.target.value })}
-                      className="h-10 rounded-xl font-medium"
-                    >
-                      {Object.values(TAX_REGIMES).map((tr) => (
-                        <option key={tr.id} value={tr.id}>
-                          {tr.name[locale]}
-                        </option>
-                      ))}
-                    </Select>
-                  </div>
+                {/* Tax Regime */}
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-semibold text-neutral-800 dark:text-neutral-200">{t.taxRegime}</label>
+                  <Select
+                    value={q.v.tax}
+                    onChange={(e) => q.set({ tax: e.target.value })}
+                    className="h-10 rounded-xl font-medium"
+                  >
+                    {Object.values(TAX_REGIMES).map((tr) => (
+                      <option key={tr.id} value={tr.id}>
+                        {tr.name[locale]}
+                      </option>
+                    ))}
+                  </Select>
                 </div>
 
                 {/* Reset Button */}
@@ -1297,10 +1251,10 @@ export default function Print3dCalc({
           </div>
         </div>
 
-        {/* ═════════ RIGHT COLUMN: Obsidian Hero Card & Transparent Breakdown ═════════ */}
-        <div className="flex flex-col gap-5 lg:sticky lg:top-6">
+        {/* ═════════ RIGHT COLUMN: Obsidian Hero Card & Cost Structure ═════════ */}
+        <div className="flex flex-col gap-5">
           {/* Obsidian Hero Card */}
-          <div className="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-neutral-900 via-neutral-950 to-black p-6 text-white shadow-xl dark:border dark:border-neutral-800 sm:p-7">
+          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-neutral-900 via-neutral-950 to-black p-6 text-white shadow-xl dark:border dark:border-neutral-800 sm:p-7">
             {/* Background Texture Accents */}
             <div className="pointer-events-none absolute -right-12 -top-12 size-48 rounded-full bg-white/5 blur-3xl" />
             <div className="pointer-events-none absolute -bottom-12 -left-12 size-48 rounded-full bg-white/5 blur-3xl" />
@@ -1353,7 +1307,7 @@ export default function Print3dCalc({
               </div>
 
               {/* Net Cost & Profit Pills */}
-              <div className="grid grid-cols-2 gap-3 rounded-2xl bg-white/5 p-3.5 backdrop-blur-xs">
+              <div className="grid grid-cols-2 gap-3 rounded-xl bg-white/5 p-3.5 backdrop-blur-xs">
                 <div className="flex flex-col">
                   <span className="text-[11px] font-medium text-neutral-400">{t.netCost}</span>
                   <span className="font-mono text-base font-bold text-neutral-200">
@@ -1395,14 +1349,18 @@ export default function Print3dCalc({
                 </div>
               </div>
 
-              {/* Primary Action Button: Copy Quote */}
+              {/* Primary Action Button: Copy Price (копируется просто цена с TENGE) */}
               <button
                 type="button"
-                onClick={handleCopyQuote}
-                className="flex w-full items-center justify-center gap-2 rounded-2xl bg-white py-3.5 text-sm font-bold text-neutral-950 transition active:scale-98 hover:bg-neutral-100 shadow-lg"
+                onClick={handleCopyPrice}
+                className="flex w-full items-center justify-center gap-2 rounded-xl bg-white py-3.5 text-sm font-bold text-neutral-950 transition active:scale-98 hover:bg-neutral-100 shadow-md"
               >
                 {copiedQuote ? <Check className="size-4 text-emerald-600" /> : <Copy className="size-4" />}
-                <span>{copiedQuote ? t.quoteCopied : t.copyQuoteBtn}</span>
+                <span>
+                  {copiedQuote
+                    ? (locale === "ru" ? "Скопировано!" : "Copied!")
+                    : `${locale === "ru" ? "Скопировать" : "Copy"} ${fmtMoney(locale, isBatch ? calc.batchPrice : calc.unitPrice, "KZT", 0)}`}
+                </span>
               </button>
             </div>
           </div>
@@ -1461,7 +1419,7 @@ export default function Print3dCalc({
             ];
 
             return (
-              <div className="flex flex-col gap-5 rounded-[28px] border border-neutral-200/80 bg-white p-5 shadow-xs dark:border-neutral-800 dark:bg-neutral-900 sm:p-6">
+              <div className="flex flex-col gap-5 rounded-2xl border border-neutral-200/80 bg-white p-5 shadow-xs dark:border-neutral-800 dark:bg-neutral-900 sm:p-6">
                 {/* Header: Icon + Title + 100% Pill */}
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2.5">
@@ -1510,20 +1468,19 @@ export default function Print3dCalc({
                   })}
                 </div>
 
-                {/* Detailed Breakdown Rows */}
+                {/* Detailed Breakdown Rows (Clean typography, no dots) */}
                 <div className="flex flex-col gap-2 pt-3 border-t border-neutral-100 dark:border-neutral-800">
                   <div className="flex items-center justify-between text-xs">
-                    <div className="flex items-center gap-2 text-neutral-700 dark:text-neutral-300">
-                      <span className="size-2 rounded-full bg-neutral-950 dark:bg-white" />
-                      <span>{t.materialCost} ({calc.effectiveWeightG.toFixed(0)} г)</span>
-                    </div>
+                    <span className="text-neutral-700 dark:text-neutral-300">
+                      {locale === "ru" ? "Пластик" : "Material"} ({calc.effectiveWeightG.toFixed(0)} г)
+                    </span>
                     <span className="font-mono font-bold text-neutral-950 dark:text-white">
                       {fmtMoney(locale, isBatch ? plasticCost * calc.quantity : plasticCost)}
                     </span>
                   </div>
 
                   {calc.supportsCost > 0 && (
-                    <div className="flex items-center justify-between text-xs pl-4 text-neutral-500">
+                    <div className="flex items-center justify-between text-xs pl-3 text-neutral-500">
                       <span>↳ {t.supportsCost} ({calc.supportsWeightG.toFixed(0)} г)</span>
                       <span className="font-mono font-medium">
                         {fmtMoney(locale, isBatch ? calc.supportsCost * calc.quantity : calc.supportsCost)}
@@ -1532,7 +1489,7 @@ export default function Print3dCalc({
                   )}
 
                   {calc.brimCost > 0 && (
-                    <div className="flex items-center justify-between text-xs pl-4 text-neutral-500">
+                    <div className="flex items-center justify-between text-xs pl-3 text-neutral-500">
                       <span>↳ {t.brimCost} ({calc.brimWeightG} г)</span>
                       <span className="font-mono font-medium">
                         {fmtMoney(locale, isBatch ? calc.brimCost * calc.quantity : calc.brimCost)}
@@ -1541,44 +1498,49 @@ export default function Print3dCalc({
                   )}
 
                   <div className="flex items-center justify-between text-xs">
-                    <div className="flex items-center gap-2 text-neutral-700 dark:text-neutral-300">
-                      <span className="size-2 rounded-full bg-neutral-700 dark:bg-neutral-300" />
-                      <span>{t.elecCost} ({calc.effectiveTariffKwh.toFixed(1)} ₸/кВт⋅ч)</span>
-                    </div>
+                    <span className="text-neutral-700 dark:text-neutral-300">
+                      {locale === "ru" ? "Свет" : "Power"} ({calc.effectiveTariffKwh.toFixed(1)} ₸/кВт⋅ч)
+                    </span>
                     <span className="font-mono font-bold text-neutral-950 dark:text-white">
                       {fmtMoney(locale, isBatch ? lightCost * calc.quantity : lightCost)}
                     </span>
                   </div>
 
                   <div className="flex items-center justify-between text-xs">
-                    <div className="flex items-center gap-2 text-neutral-700 dark:text-neutral-300">
-                      <span className="size-2 rounded-full bg-neutral-500 dark:bg-neutral-500" />
-                      <span>{t.depCost} ({calc.printerHourlyDepreciation.toFixed(0)} ₸/ч)</span>
-                    </div>
+                    <span className="text-neutral-700 dark:text-neutral-300">
+                      {locale === "ru" ? "Станок (амортизация + сопло)" : "Machine"}
+                    </span>
                     <span className="font-mono font-bold text-neutral-950 dark:text-white">
                       {fmtMoney(locale, isBatch ? machineCost * calc.quantity : machineCost)}
                     </span>
                   </div>
 
                   <div className="flex items-center justify-between text-xs">
-                    <div className="flex items-center gap-2 text-neutral-700 dark:text-neutral-300">
-                      <span className="size-2 rounded-full bg-neutral-400 dark:bg-neutral-600" />
-                      <span>{t.laborCost}</span>
-                    </div>
+                    <span className="text-neutral-700 dark:text-neutral-300">
+                      {locale === "ru" ? "Работа мастера" : "Labor"}
+                    </span>
                     <span className="font-mono font-bold text-neutral-950 dark:text-white">
-                      {fmtMoney(locale, isBatch ? laborCost * calc.quantity : laborCost)}
+                      {fmtMoney(locale, isBatch ? (laborCost - calc.unitTax) * calc.quantity : (laborCost - calc.unitTax))}
                     </span>
                   </div>
+
+                  {calc.unitTax > 0 && (
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="text-neutral-700 dark:text-neutral-300">
+                        {t.taxCost}
+                      </span>
+                      <span className="font-mono font-bold text-neutral-950 dark:text-white">
+                        {fmtMoney(locale, isBatch ? calc.batchTax : calc.unitTax)}
+                      </span>
+                    </div>
+                  )}
 
                   <div className="my-1 border-t border-neutral-100 dark:border-neutral-800" />
 
                   <div className="flex items-center justify-between text-xs font-bold text-neutral-950 dark:text-white">
-                    <div className="flex items-center gap-2">
-                      <span className="size-2 rounded-full bg-neutral-950 dark:bg-white" />
-                      <span>{t.profit} ({pMargin}%)</span>
-                    </div>
+                    <span>{locale === "ru" ? "Маржа (чистая прибыль)" : "Margin (net profit)"} ({pMargin}%)</span>
                     <span className="font-mono">
-                      +{fmtMoney(locale, isBatch ? marginCost * calc.quantity : marginCost)}
+                      +{fmtMoney(locale, isBatch ? calc.batchProfit : calc.unitProfit)}
                     </span>
                   </div>
                 </div>
