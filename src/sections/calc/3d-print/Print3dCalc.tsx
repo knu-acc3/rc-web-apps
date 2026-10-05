@@ -413,7 +413,6 @@ export default function Print3dCalc({
     });
   };
 
-  const isMultiColor = q.v.mc === "1";
   const selectedPrinter = PRINTER_PROFILES[q.v.pr as PrinterId] ?? PRINTER_PROFILES.p1s;
   const selectedMaterial = MATERIAL_PROFILES[q.v.mat as MaterialId] ?? MATERIAL_PROFILES.pla;
   const selectedCity = KZ_CITIES.find((c) => c.slug === q.v.city) ?? KZ_CITIES[0];
@@ -489,9 +488,9 @@ export default function Print3dCalc({
     packPerBatch: q.v.packb === "1",
     markupPct: MARK.value ?? 40,
     taxRegime: q.v.tax as TaxRegimeId,
-    isMultiColor,
-    colorCount: CC.value ?? 4,
-    multiColorPurgeG: isMultiColor ? (WASTE.value ?? 0) : 0,
+    isMultiColor: false,
+    colorCount: 1,
+    multiColorPurgeG: 0,
     purgeWastePct: 0,
     failureRatePct: FAIL.value ?? 5,
   });
@@ -509,7 +508,6 @@ export default function Print3dCalc({
       calc.brimWeightG > 0 ? `• Кайма (Brim): +${calc.brimWeightG} г` : "",
       `• Филамент: ${selectedMaterial.name} (${calc.effectiveWeightG.toFixed(0)} г всего)`,
       `• Принтер: ${selectedPrinter.name}`,
-      calc.isMultiColor ? `• Смена цветов: ${calc.colorCount} цв. (${calc.colorSwaps} смен, +${calc.multiColorPurgeG.toFixed(0)} г)` : "",
       `• Количество: ${calc.quantity} шт.`,
       "----------------------------------------",
       `• Пластик: ${tg(calc.materialCost)}`,
@@ -553,37 +551,7 @@ export default function Print3dCalc({
       <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:gap-8">
         {/* ═════════ LEFT COLUMN: Tactile Monochrome Input Cards ═════════ */}
         <div className="flex flex-col gap-5">
-          {/* 1. Mode Switcher (Monochrome Rounded Pills) */}
-          <div className="flex rounded-2xl bg-neutral-200/70 p-1 dark:bg-neutral-800/80">
-            <button
-              type="button"
-              onClick={() => q.set({ mc: "0" })}
-              className={cn(
-                "flex flex-1 items-center justify-center gap-2 rounded-xl py-2.5 text-xs font-bold transition-all sm:text-sm",
-                !isMultiColor
-                  ? "bg-white text-neutral-950 shadow-xs dark:bg-neutral-900 dark:text-white"
-                  : "text-neutral-600 hover:text-neutral-950 dark:text-neutral-400 dark:hover:text-white",
-              )}
-            >
-              <Printer className="size-4" />
-              <span>{t.modeSingle}</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => q.set({ mc: "1" })}
-              className={cn(
-                "flex flex-1 items-center justify-center gap-2 rounded-xl py-2.5 text-xs font-bold transition-all sm:text-sm",
-                isMultiColor
-                  ? "bg-white text-neutral-950 shadow-xs dark:bg-neutral-900 dark:text-white"
-                  : "text-neutral-600 hover:text-neutral-950 dark:text-neutral-400 dark:hover:text-white",
-              )}
-            >
-              <Palette className="size-4" />
-              <span>{t.modeMulti}</span>
-            </button>
-          </div>
-
-          {/* 2. Printer Selector Card */}
+          {/* 1. Printer Selector Card */}
           <div className="flex flex-col gap-4 rounded-[26px] border border-neutral-200/80 bg-white p-5 shadow-xs dark:border-neutral-800 dark:bg-neutral-900 sm:p-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
@@ -600,7 +568,6 @@ export default function Print3dCalc({
             <div className="flex items-center gap-1 overflow-x-auto rounded-xl bg-neutral-100 p-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden dark:bg-neutral-800/60">
               {(
                 [
-                  { id: "all", label: locale === "ru" ? "Все" : "All" },
                   { id: "bambu", label: "Bambu" },
                   { id: "creality", label: "Creality" },
                   { id: "anycubic", label: "Anycubic" },
@@ -614,12 +581,8 @@ export default function Print3dCalc({
                   key={b.id}
                   type="button"
                   onClick={() => {
-                    if (b.id === "all") {
-                      q.set({ brand: "all" });
-                    } else {
-                      const firstOfBrand = Object.values(PRINTER_PROFILES).find((p) => p.brand === b.id);
-                      q.set({ brand: b.id, pr: firstOfBrand ? firstOfBrand.id : q.v.pr });
-                    }
+                    const firstOfBrand = Object.values(PRINTER_PROFILES).find((p) => p.brand === b.id);
+                    q.set({ brand: b.id, pr: firstOfBrand ? firstOfBrand.id : q.v.pr });
                   }}
                   className={cn(
                     "shrink-0 rounded-lg px-3 py-1.5 text-xs font-bold transition whitespace-nowrap",
@@ -1032,72 +995,7 @@ export default function Print3dCalc({
             </div>
           </div>
 
-          {/* 5. Multi-Color AMS / CFS (Clean and streamlined) */}
-          {isMultiColor && (
-            <div className="flex flex-col gap-4 rounded-[26px] border border-neutral-200/80 bg-white p-5 shadow-xs dark:border-neutral-800 dark:bg-neutral-900 sm:p-6">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="flex size-7 items-center justify-center rounded-lg bg-neutral-100 text-neutral-900 dark:bg-neutral-800 dark:text-white">
-                    <Palette className="size-3.5" />
-                  </div>
-                  <span className="text-xs font-bold uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
-                    {locale === "ru" ? "Многоцветная печать (AMS / CFS)" : "Multi-Color Printing"}
-                  </span>
-                </div>
-                <span className="rounded-full bg-neutral-100 px-2.5 py-0.5 text-[11px] font-bold text-neutral-900 dark:bg-neutral-800 dark:text-white">
-                  {CC.value ?? 4} цвета
-                </span>
-              </div>
-
-              <div className="flex flex-col gap-3">
-                <div className="flex items-center justify-between">
-                  <label className="text-xs font-semibold text-neutral-800 dark:text-neutral-200">{t.colorCount}</label>
-                  <div className="flex gap-1.5">
-                    {[2, 3, 4, 8].map((c) => (
-                      <button
-                        key={c}
-                        type="button"
-                        onClick={() => q.set({ cc: String(c) })}
-                        className={cn(
-                          "rounded-xl px-3 py-1.5 text-xs font-bold transition",
-                          (CC.value ?? 4) === c
-                            ? "bg-neutral-950 text-white dark:bg-white dark:text-neutral-950"
-                            : "bg-neutral-100 text-neutral-700 hover:bg-neutral-200 dark:bg-neutral-800 dark:text-neutral-300",
-                        )}
-                      >
-                        {c} цв.
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="flex items-center justify-between pt-1 border-t border-neutral-100 dark:border-neutral-800">
-                  <div className="flex flex-col">
-                    <span className="text-xs font-semibold text-neutral-800 dark:text-neutral-200">
-                      {locale === "ru" ? "Доп. сброс / башня продувки (г)" : "Purge / Flush Weight (g)"}
-                    </span>
-                    <span className="text-[11px] text-neutral-400">
-                      {locale === "ru" ? "Оставьте 0, если в слайсере вес уже общий" : "Leave 0 if slicer weight is total"}
-                    </span>
-                  </div>
-                  <div className="relative w-28">
-                    <Input
-                      value={q.v.waste}
-                      onChange={(e) => q.set({ waste: e.target.value })}
-                      inputMode="decimal"
-                      placeholder="0"
-                      className="h-9 rounded-xl pr-6 text-right font-bold tabular-nums text-xs"
-                    />
-                    <span className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-xs font-bold text-neutral-400">
-                      г
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* 6. Batch & Profit Margin */}
+          {/* 5. Batch & Profit Margin */}
           <div className="flex flex-col gap-4 rounded-[26px] border border-neutral-200/80 bg-white p-5 shadow-xs dark:border-neutral-800 dark:bg-neutral-900 sm:p-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
@@ -1252,39 +1150,6 @@ export default function Print3dCalc({
                       />
                     </div>
                   </div>
-
-                  {selectedPrinter.multiColorCapable && (
-                    <div className="flex flex-col gap-2 pt-1 border-t border-neutral-200/50 dark:border-neutral-700/50">
-                      <label className="flex cursor-pointer items-center justify-between text-xs font-medium text-neutral-700 dark:text-neutral-300">
-                        <div className="flex flex-col">
-                          <span className="font-semibold text-neutral-800 dark:text-neutral-200">{t.includeAmsDep}</span>
-                          <span className="text-[11px] text-neutral-500">
-                            {selectedPrinter.multiColorSystem}
-                          </span>
-                        </div>
-                        <input
-                          type="checkbox"
-                          checked={q.v.ams === "1"}
-                          onChange={(e) => q.set({ ams: e.target.checked ? "1" : "0" })}
-                          className="size-4.5 rounded-sm accent-neutral-900 dark:accent-neutral-100"
-                        />
-                      </label>
-                      {q.v.ams === "1" && (
-                        <div className="flex items-center justify-between">
-                          <span className="text-[11px] text-neutral-600 dark:text-neutral-400">{t.amsPrice}</span>
-                          <div className="w-32">
-                            <Input
-                              value={q.v.amsprice}
-                              placeholder={String(selectedPrinter.amsPriceKzt || 160_000)}
-                              onChange={(e) => q.set({ amsprice: e.target.value })}
-                              inputMode="numeric"
-                              className="h-8 rounded-xl font-bold text-right tabular-nums text-xs"
-                            />
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  )}
                 </div>
 
                 {/* Workshop Terms: Min Order Fee, Setup Fee, 3D CAD Modeling */}
@@ -1683,15 +1548,6 @@ export default function Print3dCalc({
                 </div>
               )}
 
-              {calc.isMultiColor && calc.multiColorPurgeCost > 0 && (
-                <div className="flex items-center justify-between text-xs pl-4 text-neutral-500">
-                  <span>↳ {t.multiPurgeCost} (+{calc.multiColorPurgeG.toFixed(0)} г)</span>
-                  <span className="font-mono font-medium">
-                    {fmtMoney(locale, isBatch ? calc.multiColorPurgeCost * calc.quantity : calc.multiColorPurgeCost)}
-                  </span>
-                </div>
-              )}
-
               <div className="flex items-center justify-between text-xs">
                 <div className="flex items-center gap-2 text-neutral-700 dark:text-neutral-300">
                   <span className="size-2 rounded-full bg-neutral-700 dark:bg-neutral-300" />
@@ -1812,7 +1668,7 @@ export default function Print3dCalc({
       <SubHeading>{t.printerPowerTable}</SubHeading>
       <DataTable
         caption={t.printerPowerTable}
-        head={[t.colPrinter, t.colBrand, t.colPla, t.colPetg, t.colAbs, t.colDep, t.colMultiSys]}
+        head={[t.colPrinter, t.colBrand, t.colPla, t.colPetg, t.colAbs, t.colDep]}
         rows={Object.values(PRINTER_PROFILES).map((p) => [
           p.name,
           p.brand.toUpperCase(),
@@ -1820,7 +1676,6 @@ export default function Print3dCalc({
           `${p.powerByMaterial.petg} Вт`,
           `${p.powerByMaterial.abs} Вт`,
           `${p.depreciationPerHour} ₸/ч`,
-          p.multiColorSystem,
         ])}
       />
 
