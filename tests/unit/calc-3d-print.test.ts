@@ -296,12 +296,12 @@ describe("3D printing calculator engine", () => {
     expect(PRINTER_PROFILES.klp1).toBeDefined();
     expect(PRINTER_PROFILES.custom).toBeDefined();
 
-    // Verify removed brands/clones (prusa, voron, p2s, a2l, p1p) are absent
+    // Verify removed brands/clones (prusa, voron, p1p) are absent
     expect((PRINTER_PROFILES as Record<string, unknown>).mk4).toBeUndefined();
     expect((PRINTER_PROFILES as Record<string, unknown>).voron24).toBeUndefined();
-    expect((PRINTER_PROFILES as Record<string, unknown>).p2s).toBeUndefined();
     expect((PRINTER_PROFILES as Record<string, unknown>).a2l).toBeUndefined();
     expect((PRINTER_PROFILES as Record<string, unknown>).p1p).toBeUndefined();
+    expect(PRINTER_PROFILES.p2s).toBeDefined();
 
     for (const p of printers) {
       expect(p.depreciationPerHour).toBeGreaterThan(0);

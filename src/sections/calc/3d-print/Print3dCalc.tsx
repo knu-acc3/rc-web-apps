@@ -600,108 +600,96 @@ export default function Print3dCalc({
                 }}
                 className="h-11 rounded-2xl border-neutral-300 font-bold dark:border-neutral-700"
               >
-                {q.v.brand === "all" ? (
-                  <>
-                    <optgroup label="Bambu Lab">
-                      {Object.values(PRINTER_PROFILES)
-                        .filter((p) => p.brand === "bambu")
-                        .map((p) => (
-                          <option key={p.id} value={p.id}>
-                            {p.name}
-                          </option>
-                        ))}
-                    </optgroup>
-                    <optgroup label="Creality">
-                      {Object.values(PRINTER_PROFILES)
-                        .filter((p) => p.brand === "creality")
-                        .map((p) => (
-                          <option key={p.id} value={p.id}>
-                            {p.name}
-                          </option>
-                        ))}
-                    </optgroup>
-                    <optgroup label="Anycubic">
-                      {Object.values(PRINTER_PROFILES)
-                        .filter((p) => p.brand === "anycubic")
-                        .map((p) => (
-                          <option key={p.id} value={p.id}>
-                            {p.name}
-                          </option>
-                        ))}
-                    </optgroup>
-                    <optgroup label="Elegoo">
-                      {Object.values(PRINTER_PROFILES)
-                        .filter((p) => p.brand === "elegoo")
-                        .map((p) => (
-                          <option key={p.id} value={p.id}>
-                            {p.name}
-                          </option>
-                        ))}
-                    </optgroup>
-                    <optgroup label="QIDI Tech">
-                      {Object.values(PRINTER_PROFILES)
-                        .filter((p) => p.brand === "qidi")
-                        .map((p) => (
-                          <option key={p.id} value={p.id}>
-                            {p.name}
-                          </option>
-                        ))}
-                    </optgroup>
-                    <optgroup label="Flashforge">
-                      {Object.values(PRINTER_PROFILES)
-                        .filter((p) => p.brand === "flashforge")
-                        .map((p) => (
-                          <option key={p.id} value={p.id}>
-                            {p.name}
-                          </option>
-                        ))}
-                    </optgroup>
-                    <optgroup label="Flying Bear / Kingroon">
-                      {Object.values(PRINTER_PROFILES)
-                        .filter((p) => ["flyingbear", "kingroon"].includes(p.brand))
-                        .map((p) => (
-                          <option key={p.id} value={p.id}>
-                            {p.name}
-                          </option>
-                        ))}
-                    </optgroup>
-                    <optgroup label="Artillery / Two Trees">
-                      {Object.values(PRINTER_PROFILES)
-                        .filter((p) => ["artillery", "twotrees"].includes(p.brand))
-                        .map((p) => (
-                          <option key={p.id} value={p.id}>
-                            {p.name}
-                          </option>
-                        ))}
-                    </optgroup>
-                    <optgroup label="Snapmaker / Промышленные (Raise3D / UltiMaker)">
-                      {Object.values(PRINTER_PROFILES)
-                        .filter((p) => ["snapmaker", "raise3d"].includes(p.brand))
-                        .map((p) => (
-                          <option key={p.id} value={p.id}>
-                            {p.name}
-                          </option>
-                        ))}
-                    </optgroup>
-                    <optgroup label="Свой принтер / Другой">
-                      {Object.values(PRINTER_PROFILES)
-                        .filter((p) => p.brand === "custom")
-                        .map((p) => (
-                          <option key={p.id} value={p.id}>
-                            {p.name}
-                          </option>
-                        ))}
-                    </optgroup>
-                  </>
-                ) : (
-                  Object.values(PRINTER_PROFILES)
-                    .filter((p) => p.brand === q.v.brand)
+                <optgroup label="Bambu Lab">
+                  {Object.values(PRINTER_PROFILES)
+                    .filter((p) => p.brand === "bambu")
                     .map((p) => (
                       <option key={p.id} value={p.id}>
                         {p.name}
                       </option>
-                    ))
-                )}
+                    ))}
+                </optgroup>
+                <optgroup label="Creality">
+                  {Object.values(PRINTER_PROFILES)
+                    .filter((p) => p.brand === "creality")
+                    .map((p) => (
+                      <option key={p.id} value={p.id}>
+                        {p.name}
+                      </option>
+                    ))}
+                </optgroup>
+                <optgroup label="Anycubic">
+                  {Object.values(PRINTER_PROFILES)
+                    .filter((p) => p.brand === "anycubic")
+                    .map((p) => (
+                      <option key={p.id} value={p.id}>
+                        {p.name}
+                      </option>
+                    ))}
+                </optgroup>
+                <optgroup label="Elegoo">
+                  {Object.values(PRINTER_PROFILES)
+                    .filter((p) => p.brand === "elegoo")
+                    .map((p) => (
+                      <option key={p.id} value={p.id}>
+                        {p.name}
+                      </option>
+                    ))}
+                </optgroup>
+                <optgroup label="QIDI Tech">
+                  {Object.values(PRINTER_PROFILES)
+                    .filter((p) => p.brand === "qidi")
+                    .map((p) => (
+                      <option key={p.id} value={p.id}>
+                        {p.name}
+                      </option>
+                    ))}
+                </optgroup>
+                <optgroup label="Flashforge">
+                  {Object.values(PRINTER_PROFILES)
+                    .filter((p) => p.brand === "flashforge")
+                    .map((p) => (
+                      <option key={p.id} value={p.id}>
+                        {p.name}
+                      </option>
+                    ))}
+                </optgroup>
+                <optgroup label="Flying Bear / Kingroon">
+                  {Object.values(PRINTER_PROFILES)
+                    .filter((p) => ["flyingbear", "kingroon"].includes(p.brand))
+                    .map((p) => (
+                      <option key={p.id} value={p.id}>
+                        {p.name}
+                      </option>
+                    ))}
+                </optgroup>
+                <optgroup label="Artillery / Two Trees">
+                  {Object.values(PRINTER_PROFILES)
+                    .filter((p) => ["artillery", "twotrees"].includes(p.brand))
+                    .map((p) => (
+                      <option key={p.id} value={p.id}>
+                        {p.name}
+                      </option>
+                    ))}
+                </optgroup>
+                <optgroup label="Snapmaker / Промышленные (Raise3D / UltiMaker)">
+                  {Object.values(PRINTER_PROFILES)
+                    .filter((p) => ["snapmaker", "raise3d"].includes(p.brand))
+                    .map((p) => (
+                      <option key={p.id} value={p.id}>
+                        {p.name}
+                      </option>
+                    ))}
+                </optgroup>
+                <optgroup label="Свой принтер / Другой">
+                  {Object.values(PRINTER_PROFILES)
+                    .filter((p) => p.brand === "custom")
+                    .map((p) => (
+                      <option key={p.id} value={p.id}>
+                        {p.name}
+                      </option>
+                    ))}
+                </optgroup>
               </Select>
             </div>
           </div>
