@@ -1,5 +1,6 @@
 "use client";
 
+import { useServerInsertedHTML } from "next/navigation";
 import { Moon, Sun, SunMoon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/cn";
@@ -10,6 +11,13 @@ const KEY = "theme";
 
 /** Inline script that applies the theme before first paint (no flash). ES5: runs in any browser. */
 export const THEME_SCRIPT = `(function(){try{var m=localStorage.getItem('${KEY}');var d=m==='dark'||((!m||m==='system')&&window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches);if(d)document.documentElement.className+=' dark'}catch(e){}})()`;
+
+export function ThemeScript() {
+  useServerInsertedHTML(() => (
+    <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
+  ));
+  return null;
+}
 
 function apply(mode: Mode) {
   const dark = mode === "dark" || (mode === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);

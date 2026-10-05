@@ -3,9 +3,10 @@ import * as algebra from "./content/group-algebra";
 import * as expr from "./content/group-expr";
 import * as numbers from "./content/group-numbers";
 import { percentTool } from "./percent/def";
+import { print3dTool } from "../3d-print/def";
 
 /** Navigation group only (no landing page): "Математика" is not a search query by itself. */
-const tools = [percentTool, ...expr.tools, ...algebra.tools, ...numbers.tools];
+const tools = [percentTool, print3dTool, ...expr.tools, ...algebra.tools, ...numbers.tools];
 
 export const calcSection = defineToolSection({
   id: "calc",

@@ -6,7 +6,7 @@ import { isLocale, LOCALES, type Locale } from "@/i18n/config";
 import { ui } from "@/i18n/ui";
 import { Footer } from "@/site/footer";
 import { Header } from "@/site/header";
-import { THEME_SCRIPT } from "@/site/theme";
+import { ThemeScript } from "@/site/theme";
 import { LEGACY_SCRIPT, SW_SCRIPT } from "@/site/legacy";
 import { RIPPLE_SCRIPT } from "@/site/ripple";
 import { Analytics } from "@/site/analytics";
@@ -58,7 +58,7 @@ export default async function LocaleLayout({ children, params }: { children: Rea
   return (
     <html lang={locale} suppressHydrationWarning>
       <head>
-        <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
+        <ThemeScript />
         <script dangerouslySetInnerHTML={{ __html: LEGACY_SCRIPT }} />
         <script dangerouslySetInnerHTML={{ __html: RIPPLE_SCRIPT }} />
         {process.env.NODE_ENV === "production" && <script dangerouslySetInnerHTML={{ __html: SW_SCRIPT }} />}

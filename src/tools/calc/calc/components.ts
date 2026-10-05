@@ -2,6 +2,7 @@ import type { ComponentMap } from "../../types";
 
 // Only dynamic imports here: this map is part of the client bundle of every page.
 export const components: ComponentMap = {
+  "calc/3d-print": () => import("../3d-print/Print3dCalc"),
   "calc/percent": () => import("./percent/Percent"),
   "calc/fractions": () => import("./fractions/Fractions"),
   "calc/equation": () => import("./equation/Equation"),

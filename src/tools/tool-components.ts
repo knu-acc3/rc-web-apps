@@ -22,6 +22,7 @@ export const TOOL_COMPONENTS: Record<string, ComponentType<any>> = {
   "audio/tone": dynamic(() => import("@/tools/files/audio/gen/ToneGenerator")),
   "audio/tuner": dynamic(() => import("@/tools/files/audio/gen/Tuner")),
   "audio/voice-recorder": dynamic(() => import("@/tools/files/video/Recorder")),
+  "calc/3d-print": dynamic(() => import("@/tools/calc/3d-print/Print3dCalc")),
   "calc/average": dynamic(() => import("@/tools/calc/calc/average/Average")),
   "calc/combinatorics": dynamic(() => import("@/tools/calc/calc/combinatorics/Combinatorics")),
   "calc/equation": dynamic(() => import("@/tools/calc/calc/equation/Equation")),
