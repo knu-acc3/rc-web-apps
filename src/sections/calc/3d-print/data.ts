@@ -235,6 +235,8 @@ export type PrinterId =
   | "neptune2s"
   | "neptune_x"
   // QIDI Tech (Newest -> Oldest)
+  | "q2"
+  | "q2c"
   | "max4"
   | "plus4"
   | "q1_pro"
@@ -1232,6 +1234,36 @@ export const PRINTER_PROFILES: Record<PrinterId, PrinterProfile> = {
   },
 
   // ── QIDI Tech (Newest -> Oldest) ──
+  q2: {
+    id: "q2",
+    brand: "qidi",
+    name: "QIDI Q2 (Active Heated Chamber 65°C, CoreXY 270×270×256 mm, 370°C)",
+    shortName: "QIDI Q2",
+    enclosed: true,
+    powerByMaterial: { pla: 150, petg: 190, abs: 350, tpu: 150, pacf: 400 },
+    defaultPower: 220,
+    priceKzt: 265_000,
+    amsPriceKzt: 85_000,
+    lifespanHours: 5000,
+    depreciationPerHour: 53,
+    multiColorCapable: true,
+    multiColorSystem: "QIDI Box (Multi-color)",
+  },
+  q2c: {
+    id: "q2c",
+    brand: "qidi",
+    name: "QIDI Q2C (CoreXY 270×270×256 mm)",
+    shortName: "QIDI Q2C",
+    enclosed: true,
+    powerByMaterial: { pla: 130, petg: 160, abs: 280, tpu: 130, pacf: 350 },
+    defaultPower: 160,
+    priceKzt: 195_000,
+    amsPriceKzt: 85_000,
+    lifespanHours: 5000,
+    depreciationPerHour: 39,
+    multiColorCapable: true,
+    multiColorSystem: "QIDI Box (Multi-color)",
+  },
   max4: {
     id: "max4",
     brand: "qidi",

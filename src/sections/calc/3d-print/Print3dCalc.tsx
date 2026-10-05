@@ -12,7 +12,6 @@ import {
   MapPin,
   Minus,
   Package,
-  Palette,
   Plus,
   Printer,
   RotateCcw,
@@ -22,7 +21,6 @@ import {
   Timer,
   Zap,
 } from "lucide-react";
-import { BRAND } from "@/config/brand";
 import { cn } from "@/lib/cn";
 import { Input, Select } from "@/ui/field";
 import type { ToolProps } from "../../types";
@@ -46,7 +44,7 @@ import {
 } from "./data";
 import { calculatePrint3d } from "./engine";
 
-const STORAGE_KEY = "rc_calc_3d_state_v4";
+const STORAGE_KEY = "rc_calc_3d_state_v5";
 
 function GraphiteSlider({
   min,
@@ -207,6 +205,22 @@ const T = {
     purgeHint: "Башня очистки + слив сопла",
     swapSecs: "Секунд на 1 смену",
     copyQuoteBtn: "Скопировать смету для клиента",
+    printerWatts: "Мощность принтера при печати, Вт",
+    printerWattsHint: "Потребление стола и сопла во время печати",
+    multiTierTariffHint: "💡 При 3-уровневом тарифе (Т1 день / Т2 ночь / Т3 пик) укажите среднюю ставку за фактические часы печати (для ночной печати выберите Т2).",
+    pricingMode: "Модель ценообразования",
+    pricingByCost: "По наценке на себестоимость",
+    pricingByMarket: "По рыночной ставке (₸ / г)",
+    marketRateLabel: "Рыночная ставка за 1 грамм",
+    marketRateHint: "Стандарт мастерских в Казахстане: 30–50 ₸/г",
+    marketBenchmarkTitle: "Рыночная цена в Казахстане",
+    marketStatusBelow: "Ниже рынка",
+    marketStatusMarket: "В рынке",
+    marketStatusAbove: "Выше рынка",
+    marketApplyRate: "💡 Применить рыночную ставку (35 ₸/г)",
+    maintReserve: "Резерв на ремонт и ТО станка",
+    maintReserveHint: "Защитный буфер на ремни, термисторы, экструдер и ремонт при поломках (15–30 ₸/ч)",
+    maintCost: "Резерв на ТО и поломки",
     quoteCopied: "Смета скопирована в буфер!",
     linkCopied: "Ссылка скопирована!",
     share: "Поделиться",
@@ -306,6 +320,22 @@ const T = {
     purgeHint: "Prime tower + poop chute",
     swapSecs: "Seconds per tool change",
     copyQuoteBtn: "Copy client quotation",
+    printerWatts: "Printer power draw, W",
+    printerWattsHint: "Operating power draw during printing",
+    multiTierTariffHint: "💡 For multi-rate tariffs (T1 day / T2 night / T3 peak), enter the weighted average rate for your printing schedule (e.g. night T2 rate).",
+    pricingMode: "Pricing model",
+    pricingByCost: "Cost-plus markup",
+    pricingByMarket: "Market rate (₸ / g)",
+    marketRateLabel: "Market rate per gram",
+    marketRateHint: "Kazakhstan workshop standard: 30–50 KZT/g",
+    marketBenchmarkTitle: "Kazakhstan Market Reference",
+    marketStatusBelow: "Below market",
+    marketStatusMarket: "Market rate",
+    marketStatusAbove: "Above market",
+    marketApplyRate: "💡 Apply standard market rate (35 KZT/g)",
+    maintReserve: "Machine maintenance & repair buffer",
+    maintReserveHint: "Safety buffer for spare parts (belts, sensors, hotends) and repairs (15–30 KZT/h)",
+    maintCost: "Maintenance & repairs",
     quoteCopied: "Quote copied to clipboard!",
     linkCopied: "Link copied!",
     share: "Share",
@@ -375,6 +405,10 @@ export default function Print3dCalc({
       city: city,
       comm: "0",
       tar: "",
+      pwatts: "",
+      pm: "cost",
+      mrate: "35",
+      maint: "20",
       sup: "none",
       supw: "20",
       brim: "0",
@@ -407,6 +441,7 @@ export default function Print3dCalc({
     },
     {
       enums: {
+        pm: ["cost", "market"],
         mc: ["0", "1"],
         brand: ["all", "bambu", "creality", "prusa", "anycubic", "elegoo", "qidi", "flashforge", "flyingbear", "kingroon", "voron", "custom"],
         pr: Object.keys(PRINTER_PROFILES),
@@ -467,6 +502,10 @@ export default function Print3dCalc({
       city: "almaty",
       comm: "0",
       tar: "",
+      pwatts: "",
+      pm: "cost",
+      mrate: "35",
+      maint: "20",
       sup: "none",
       supw: "20",
       brim: "0",
@@ -507,6 +546,8 @@ export default function Print3dCalc({
 
   const defaultTariff = isCommercial ? selectedCity.commercialTariff : selectedCity.residentialTariff;
   const currentTariffText = q.v.tar ? q.v.tar : toInput(locale, defaultTariff);
+  const defaultPrinterWatts = selectedPrinter.powerByMaterial[selectedMaterial.id] ?? selectedPrinter.defaultPower;
+  const currentWattsText = q.v.pwatts ? q.v.pwatts : String(defaultPrinterWatts);
 
   // Parse numeric fields
   const W = field(locale, q.v.w, { min: 0, max: 100_000 });
@@ -515,15 +556,15 @@ export default function Print3dCalc({
   const Q = field(locale, q.v.q, { min: 1, max: 50_000, int: true });
   const SP = field(locale, q.v.sp, { min: 0, max: 500_000 });
   const TAR = field(locale, currentTariffText, { min: 0, max: 500 });
+  const PWATTS = field(locale, currentWattsText, { min: 10, max: 3000 });
+  const MRATE = field(locale, q.v.mrate, { min: 1, max: 200 });
+  const MAINT = field(locale, q.v.maint, { min: 0, max: 1000 });
   const SUPW = field(locale, q.v.supw, { min: 0, max: 50_000 });
 
   const PPRICE = field(locale, q.v.pprice, { min: 0, max: 10_000_000 });
   const AMSPRICE = field(locale, q.v.amsprice, { min: 0, max: 5_000_000 });
   const LIFE = field(locale, q.v.life, { min: 100, max: 50_000, int: true });
 
-  const CC = field(locale, q.v.cc, { min: 2, max: 16, int: true });
-
-  const WASTE = field(locale, q.v.waste, { min: 0, max: 5000 });
   const FAIL = field(locale, q.v.fail, { min: 0, max: 100 });
   const PREP = field(locale, q.v.prep, { min: 0, max: 300 });
   const POST = field(locale, q.v.post, { min: 0, max: 300 });
@@ -535,7 +576,6 @@ export default function Print3dCalc({
   const MODRATE = field(locale, q.v.modrate, { min: 0, max: 50_000 });
 
   const NOZRATE = field(locale, q.v.nozrate, { min: 0, max: 1000 });
-  const PACKCOST = field(locale, q.v.packcost, { min: 0, max: 10_000 });
   const MARK = field(locale, q.v.mark, { min: 0, max: 1000 });
 
   const totalDecimalHours = (TH.value ?? 0) + (TM.value ?? 0) / 60;
@@ -555,12 +595,14 @@ export default function Print3dCalc({
     hasAmsCombo: q.v.ams === "1",
     amsPurchasePriceKzt: AMSPRICE.value ?? undefined,
     printerLifespanHours: LIFE.value ?? 5000,
+    customWatts: q.v.pwatts ? (PWATTS.value ?? undefined) : undefined,
     materialId: selectedMaterial.id,
     citySlug: selectedCity.slug,
     isCommercialTariff: isCommercial,
     customTariffKwh: q.v.tar ? (TAR.value ?? undefined) : undefined,
     nozzleId: selectedNozzle.id,
     customNozzleWearPerHour: NOZRATE.value ?? undefined,
+    maintenancePerHour: MAINT.value ?? 20,
     prepMinutes: PREP.value ?? 10,
     postProcessMinutes: POST.value ?? 5,
     hourlyRate: RATE.value ?? 2500,
@@ -569,6 +611,8 @@ export default function Print3dCalc({
     modelingHours: MODH.value ?? 0,
     modelingHourlyRate: MODRATE.value ?? 5000,
     packagingId: "none",
+    pricingMode: q.v.pm === "market" ? "market_rate" : "cost_plus",
+    marketRatePerGram: MRATE.value ?? 35,
     markupPct: MARK.value ?? 40,
     taxRegime: q.v.tax as TaxRegimeId,
     isMultiColor: false,
@@ -589,7 +633,6 @@ export default function Print3dCalc({
       setTimeout(() => setCopiedQuote(false), 2000);
     }
   };
-  const handleCopyQuote = handleCopyPrice;
 
   const handleShareLink = () => {
     if (navigator.clipboard) {
@@ -674,7 +717,7 @@ export default function Print3dCalc({
                       type="button"
                       onClick={() => {
                         const firstOfBrand = Object.values(PRINTER_PROFILES).find((p) => p.brand === b.id);
-                        q.set({ brand: b.id, pr: firstOfBrand ? firstOfBrand.id : q.v.pr });
+                        q.set({ brand: b.id, pr: firstOfBrand ? firstOfBrand.id : q.v.pr, pwatts: "" });
                       }}
                       className={cn(
                         "h-11 shrink-0 rounded-xl px-4 text-sm font-bold transition whitespace-nowrap active:scale-95 border",
@@ -702,7 +745,7 @@ export default function Print3dCalc({
                 selectClassName="font-bold text-base cursor-pointer"
                 onChange={(e) => {
                   const target = PRINTER_PROFILES[e.target.value as PrinterId];
-                  q.set({ pr: e.target.value, brand: target ? target.brand : q.v.brand });
+                  q.set({ pr: e.target.value, brand: target ? target.brand : q.v.brand, pwatts: "" });
                 }}
               >
                 {Object.values(PRINTER_PROFILES)
@@ -744,6 +787,7 @@ export default function Print3dCalc({
                       q.set({
                         mat: m.id,
                         sp: toInput(locale, m.defaultPriceKg),
+                        pwatts: "",
                       });
                     }}
                     className={cn(
@@ -847,6 +891,46 @@ export default function Print3dCalc({
                   <span className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-xs font-bold text-neutral-400">
                     ₸/кВт⋅ч
                   </span>
+                </div>
+              </div>
+
+              {/* Multi-rate tariff hint */}
+              <div className="rounded-xl bg-neutral-50 p-2.5 text-[11px] text-neutral-500 dark:bg-neutral-800/50 dark:text-neutral-400 border border-neutral-200/50 dark:border-neutral-700/50">
+                {t.multiTierTariffHint}
+              </div>
+
+              {/* Printer Power Consumption Direct Input */}
+              <div className="flex items-center justify-between pt-2 border-t border-neutral-100 dark:border-neutral-800">
+                <div className="flex flex-col">
+                  <span className="text-xs font-semibold text-neutral-700 dark:text-neutral-300">
+                    {t.printerWatts}:
+                  </span>
+                  <span className="text-[11px] text-neutral-400">
+                    {t.printerWattsHint} ({selectedPrinter.shortName}: {defaultPrinterWatts} {locale === "ru" ? "Вт" : "W"})
+                  </span>
+                </div>
+                <div className="flex flex-col items-end gap-1">
+                  <div className="relative w-36">
+                    <Input
+                      value={currentWattsText}
+                      onChange={(e) => q.set({ pwatts: e.target.value })}
+                      inputMode="numeric"
+                      placeholder={String(defaultPrinterWatts)}
+                      className="h-11 rounded-xl pr-10 text-right font-bold tabular-nums text-sm border-2 border-neutral-300 dark:border-neutral-700 focus:border-neutral-900 dark:focus:border-white"
+                    />
+                    <span className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-xs font-bold text-neutral-400">
+                      {locale === "ru" ? "Вт" : "W"}
+                    </span>
+                  </div>
+                  {q.v.pwatts && q.v.pwatts !== String(defaultPrinterWatts) && (
+                    <button
+                      type="button"
+                      onClick={() => q.set({ pwatts: "" })}
+                      className="text-[10px] text-neutral-500 hover:text-neutral-900 dark:hover:text-white underline cursor-pointer"
+                    >
+                      {locale === "ru" ? `Сбросить (${defaultPrinterWatts} Вт)` : `Reset (${defaultPrinterWatts} W)`}
+                    </button>
+                  )}
                 </div>
               </div>
             </div>
@@ -1020,7 +1104,9 @@ export default function Print3dCalc({
                   </span>
                 )}
                 <span className="rounded-full bg-neutral-100 px-3 py-1 text-xs font-bold text-neutral-900 dark:bg-neutral-800 dark:text-white">
-                  +{MARK.value ?? 40}% наценка
+                  {q.v.pm === "market"
+                    ? `${MRATE.value ?? 35} ₸/г по рынку`
+                    : `+${MARK.value ?? 40}% наценка`}
                 </span>
               </div>
             </div>
@@ -1059,45 +1145,137 @@ export default function Print3dCalc({
               </div>
             </div>
 
-            {/* Interactive Profit Markup Slider */}
-            <div className="flex flex-col gap-3 rounded-2xl bg-neutral-50/80 p-4 dark:bg-neutral-800/40">
-              <div className="flex items-center justify-between">
-                <div className="flex flex-col">
-                  <span className="text-sm font-bold text-neutral-800 dark:text-neutral-200">
-                    {locale === "ru" ? "Наценка / желаемая прибыль" : "Profit Markup"}
-                  </span>
-                  <span className="text-xs text-neutral-400">
-                    {locale === "ru" ? "По умолчанию 40% (стандарт в КЗ)" : "Default 40%"}
-                  </span>
-                </div>
-                <div className="relative w-28">
-                  <Input
-                    value={q.v.mark}
-                    onChange={(e) => q.set({ mark: e.target.value })}
-                    inputMode="numeric"
-                    className="h-11 rounded-xl pr-7 text-right font-bold text-sm tabular-nums border-2 border-neutral-300 dark:border-neutral-700 focus:border-neutral-900 dark:focus:border-white"
-                  />
-                  <span className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-xs font-bold text-neutral-400">
-                    %
-                  </span>
-                </div>
-              </div>
-
-              <GraphiteSlider
-                min={0}
-                max={200}
-                step={5}
-                value={Math.min(200, Math.max(0, MARK.value ?? 40))}
-                onChange={(e) => q.set({ mark: e.target.value })}
-              />
-
-              <div className="flex justify-between text-xs text-neutral-400 font-medium">
-                <span>0% (себестоимость)</span>
-                <span className="font-bold text-neutral-900 dark:text-neutral-100">40% (норма)</span>
-                <span>100%</span>
-                <span>200%</span>
+            {/* Pricing Model Switcher */}
+            <div className="flex flex-col gap-2">
+              <span className="text-xs font-semibold text-neutral-700 dark:text-neutral-300">
+                {t.pricingMode}
+              </span>
+              <div className="flex h-12 rounded-xl bg-neutral-100 p-1 dark:bg-neutral-800">
+                <button
+                  type="button"
+                  onClick={() => q.set({ pm: "cost" })}
+                  className={cn(
+                    "flex-1 rounded-lg text-xs font-bold transition flex items-center justify-center cursor-pointer",
+                    q.v.pm !== "market"
+                      ? "bg-white text-neutral-950 shadow-xs dark:bg-neutral-900 dark:text-white"
+                      : "text-neutral-600 dark:text-neutral-400",
+                  )}
+                >
+                  {t.pricingByCost}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => q.set({ pm: "market" })}
+                  className={cn(
+                    "flex-1 rounded-lg text-xs font-bold transition flex items-center justify-center cursor-pointer",
+                    q.v.pm === "market"
+                      ? "bg-white text-neutral-950 shadow-xs dark:bg-neutral-900 dark:text-white"
+                      : "text-neutral-600 dark:text-neutral-400",
+                  )}
+                >
+                  {t.pricingByMarket}
+                </button>
               </div>
             </div>
+
+            {q.v.pm === "market" ? (
+              /* Market Rate per Gram Section */
+              <div className="flex flex-col gap-3 rounded-2xl bg-neutral-50/80 p-4 dark:bg-neutral-800/40">
+                <div className="flex items-center justify-between">
+                  <div className="flex flex-col">
+                    <span className="text-sm font-bold text-neutral-800 dark:text-neutral-200">
+                      {t.marketRateLabel}
+                    </span>
+                    <span className="text-xs text-neutral-400">
+                      {t.marketRateHint}
+                    </span>
+                  </div>
+                  <div className="relative w-32">
+                    <Input
+                      value={q.v.mrate}
+                      onChange={(e) => q.set({ mrate: e.target.value })}
+                      inputMode="numeric"
+                      className="h-11 rounded-xl pr-12 text-right font-bold text-sm tabular-nums border-2 border-neutral-300 dark:border-neutral-700 focus:border-neutral-900 dark:focus:border-white"
+                    />
+                    <span className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-xs font-bold text-neutral-400">
+                      ₸ / г
+                    </span>
+                  </div>
+                </div>
+
+                <GraphiteSlider
+                  min={20}
+                  max={70}
+                  step={1}
+                  value={Math.min(70, Math.max(20, MRATE.value ?? 35))}
+                  onChange={(e) => q.set({ mrate: e.target.value })}
+                />
+
+                {/* Quick preset chips */}
+                <div className="flex flex-wrap gap-2 pt-1">
+                  {[
+                    { rate: 30, label: "30 ₸/г" },
+                    { rate: 35, label: "35 ₸/г (стандарт)" },
+                    { rate: 40, label: "40 ₸/г" },
+                    { rate: 50, label: "50 ₸/г (инженерный)" },
+                  ].map((chip) => (
+                    <button
+                      key={chip.rate}
+                      type="button"
+                      onClick={() => q.set({ mrate: String(chip.rate) })}
+                      className={cn(
+                        "h-8 rounded-lg px-2.5 text-xs font-bold transition active:scale-95 border cursor-pointer",
+                        (MRATE.value ?? 35) === chip.rate
+                          ? "bg-neutral-950 text-white border-neutral-950 dark:bg-white dark:text-neutral-950 dark:border-white"
+                          : "bg-white text-neutral-700 border-neutral-200 hover:bg-neutral-100 dark:bg-neutral-800 dark:text-neutral-300 dark:border-neutral-700 dark:hover:bg-neutral-700",
+                      )}
+                    >
+                      {chip.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              /* Interactive Profit Markup Slider */
+              <div className="flex flex-col gap-3 rounded-2xl bg-neutral-50/80 p-4 dark:bg-neutral-800/40">
+                <div className="flex items-center justify-between">
+                  <div className="flex flex-col">
+                    <span className="text-sm font-bold text-neutral-800 dark:text-neutral-200">
+                      {locale === "ru" ? "Наценка / желаемая прибыль" : "Profit Markup"}
+                    </span>
+                    <span className="text-xs text-neutral-400">
+                      {locale === "ru" ? "По умолчанию 40% (стандарт в КЗ)" : "Default 40%"}
+                    </span>
+                  </div>
+                  <div className="relative w-28">
+                    <Input
+                      value={q.v.mark}
+                      onChange={(e) => q.set({ mark: e.target.value })}
+                      inputMode="numeric"
+                      className="h-11 rounded-xl pr-7 text-right font-bold text-sm tabular-nums border-2 border-neutral-300 dark:border-neutral-700 focus:border-neutral-900 dark:focus:border-white"
+                    />
+                    <span className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-xs font-bold text-neutral-400">
+                      %
+                    </span>
+                  </div>
+                </div>
+
+                <GraphiteSlider
+                  min={0}
+                  max={200}
+                  step={5}
+                  value={Math.min(200, Math.max(0, MARK.value ?? 40))}
+                  onChange={(e) => q.set({ mark: e.target.value })}
+                />
+
+                <div className="flex justify-between text-xs text-neutral-400 font-medium">
+                  <span>0% (себестоимость)</span>
+                  <span className="font-bold text-neutral-900 dark:text-neutral-100">40% (норма)</span>
+                  <span>100%</span>
+                  <span>200%</span>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* 7. Advanced Settings Accordion */}
@@ -1157,6 +1335,22 @@ export default function Print3dCalc({
                         inputMode="numeric"
                         className="mt-1 h-9 rounded-xl font-bold tabular-nums"
                       />
+                    </div>
+                    <div className="sm:col-span-2 pt-2 border-t border-neutral-200/50 dark:border-neutral-700/50">
+                      <div className="flex items-center justify-between">
+                        <label className="text-[11px] font-semibold text-neutral-600 dark:text-neutral-400">
+                          {t.maintReserve}
+                        </label>
+                        <span className="text-[10px] text-neutral-400">₸ / час</span>
+                      </div>
+                      <Input
+                        value={q.v.maint}
+                        placeholder="20"
+                        onChange={(e) => q.set({ maint: e.target.value })}
+                        inputMode="numeric"
+                        className="mt-1 h-9 rounded-xl font-bold tabular-nums"
+                      />
+                      <span className="text-[10px] text-neutral-400">{t.maintReserveHint}</span>
                     </div>
                   </div>
                 </div>
@@ -1375,6 +1569,50 @@ export default function Print3dCalc({
                 )}
               </div>
 
+              {/* Kazakhstan Market Reference Benchmark */}
+              <div className="rounded-xl border border-white/10 bg-white/5 p-3.5 backdrop-blur-xs flex flex-col gap-1.5">
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-neutral-400">
+                    {t.marketBenchmarkTitle}
+                  </span>
+                  <span
+                    className={cn(
+                      "rounded-full px-2 py-0.5 text-[10px] font-extrabold uppercase",
+                      calc.marketComparison === "below"
+                        ? "bg-amber-500/20 text-amber-300 border border-amber-500/30"
+                        : calc.marketComparison === "market"
+                        ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30"
+                        : "bg-blue-500/20 text-blue-300 border border-blue-500/30",
+                    )}
+                  >
+                    {calc.marketComparison === "below"
+                      ? t.marketStatusBelow
+                      : calc.marketComparison === "market"
+                      ? t.marketStatusMarket
+                      : t.marketStatusAbove}
+                  </span>
+                </div>
+                <div className="flex items-baseline justify-between">
+                  <span className="font-mono text-base font-bold text-neutral-200">
+                    {fmtMoney(locale, calc.marketRefMin, "KZT", 0)} – {fmtMoney(locale, calc.marketRefMax, "KZT", 0)}
+                  </span>
+                  <span className="text-xs text-neutral-400">
+                    ({calc.marketRefMinRate}–{calc.marketRefMaxRate} ₸ / г)
+                  </span>
+                </div>
+                {calc.marketComparison === "below" && q.v.pm !== "market" && (
+                  <button
+                    type="button"
+                    onClick={() => q.set({ pm: "market", mrate: String(calc.marketRefMinRate) })}
+                    className="mt-1 text-left text-xs font-semibold text-amber-300 hover:text-amber-200 underline decoration-amber-400/50 underline-offset-2 transition cursor-pointer"
+                  >
+                    {locale === "ru"
+                      ? `💡 Применить рыночную ставку (${calc.marketRefMinRate} ₸/г)`
+                      : `💡 Apply market rate (${calc.marketRefMinRate} KZT/g)`}
+                  </button>
+                )}
+              </div>
+
               {/* Net Cost & Profit Pills */}
               <div className="grid grid-cols-2 gap-3 rounded-xl bg-white/5 p-3.5 backdrop-blur-xs">
                 <div className="flex flex-col">
@@ -1438,7 +1676,7 @@ export default function Print3dCalc({
           {(() => {
             const plasticCost = calc.materialCost + calc.failureCost;
             const lightCost = calc.electricityCost;
-            const machineCost = calc.depreciationCost + calc.wearConsumablesCost;
+            const machineCost = calc.depreciationCost + calc.wearConsumablesCost + calc.maintenanceCost;
             const laborCost = calc.physicalLaborCost + (calc.setupFeeTotal / calc.quantity) + (calc.modelingFeeTotal / calc.quantity) + calc.packagingCost;
             const marginCost = calc.unitProfit + calc.unitTax;
 
@@ -1589,7 +1827,7 @@ export default function Print3dCalc({
                       {locale === "ru" ? "Работа мастера" : "Labor"}
                     </span>
                     <span className="font-mono font-bold text-neutral-950 dark:text-white">
-                      {fmtMoney(locale, isBatch ? (laborCost - calc.unitTax) * calc.quantity : (laborCost - calc.unitTax))}
+                      {fmtMoney(locale, isBatch ? laborCost * calc.quantity : laborCost)}
                     </span>
                   </div>
 
@@ -1607,7 +1845,7 @@ export default function Print3dCalc({
                   <div className="my-1 border-t border-neutral-100 dark:border-neutral-800" />
 
                   <div className="flex items-center justify-between text-xs font-bold text-neutral-950 dark:text-white">
-                    <span>{locale === "ru" ? "Маржа (чистая прибыль)" : "Margin (net profit)"} ({pMargin}%)</span>
+                    <span>{locale === "ru" ? "Маржа (чистая прибыль)" : "Margin (net profit)"} ({calc.marginPct.toFixed(0)}%)</span>
                     <span className="font-mono">
                       +{fmtMoney(locale, isBatch ? calc.batchProfit : calc.unitProfit)}
                     </span>

@@ -60,12 +60,12 @@ export const print3dTool: ToolDef = {
     en: "3D Printing Cost Calculator",
   },
   description: {
-    ru: "Калькулятор 3D-печати для Казахстана: расчёт себестоимости по весу, времени, электроэнергии в РК, принтерам Creality и Bambu, соплам и тиражу.",
-    en: "Calculate 3D printing costs in Kazakhstan and worldwide: filament weight, Creality and Bambu power consumption, city tariffs, nozzle wear, batch profit.",
+    ru: "Калькулятор 3D-печати для Казахстана: расчёт себестоимости по весу, времени, мощности принтера (Вт), тарифам РК, моделям Bambu, Creality и QIDI Q2/Q2C.",
+    en: "Calculate 3D printing costs in Kazakhstan and worldwide: filament weight, printer wattage (W), Bambu, Creality, and QIDI Q2/Q2C profiles, city tariffs, market rates.",
   },
   lead: {
-    ru: "Точный расчёт себестоимости и продажной цены детали на 3D-принтере с учётом тарифов Казахстана, расхода пластика и износа.",
-    en: "Accurate 3D print pricing tool for calculating filament, electricity rates, equipment depreciation, nozzle wear, and profit margin.",
+    ru: "Точный расчёт себестоимости и продажной цены детали на 3D-принтере с учётом тарифов Казахстана, расхода пластика, мощности и износа.",
+    en: "Accurate 3D print pricing tool for calculating filament, electricity rates, machine wattage, equipment depreciation, nozzle wear, and market rates.",
   },
   keywords: {
     ru: [
@@ -75,6 +75,8 @@ export const print3dTool: ToolDef = {
       "расход пластика 3д печать",
       "расход электричества creality",
       "расход электричества bambu lab",
+      "qidi q2 3d печать",
+      "qidi q2c калькулятор",
       "цена 3д печати за грамм",
     ],
     en: [
@@ -82,6 +84,7 @@ export const print3dTool: ToolDef = {
       "3d print price calculator",
       "creality electricity cost",
       "bambu lab electricity cost",
+      "qidi q2 3d printer cost",
       "3d printing price per gram",
       "filament cost calculator",
     ],
@@ -95,18 +98,18 @@ export const print3dTool: ToolDef = {
   },
   howTo: {
     ru: [
-      "Выберите модель 3D-принтера (Bambu Lab P1S/P2S/A1, Creality K1/Ender, Anycubic Kobra) и пластик (PLA, PETG, ABS, TPU, PA-CF).",
-      "Укажите город Казахстана — калькулятор подставит официальный тариф на электроэнергию (с возможностью ручной правки).",
+      "Выберите модель 3D-принтера (Bambu Lab P1S/A1, Creality K1, QIDI Q2/Q2C/Q1) и пластик (PLA, PETG, ABS, TPU, PA-CF).",
+      "Укажите город Казахстана — калькулятор подставит официальный тариф на электроэнергию (с возможностью ручной правки мощности в Вт).",
       "Задайте чистый вес детали и время печати из слайсера (Bambu Studio, OrcaSlicer, Creality Print, PrusaSlicer).",
-      "Для многоцветной печати переключите режим и укажите число смен цвета (AMS / CFS / ACE Pro) и сброс на смену.",
-      "В расширенных настройках настройте сопло, сушилку, работу мастера, упаковку и налог для точной цены.",
+      "Выберите модель расчёта: по наценке на себестоимость или по рыночной ставке в Казахстане (30–50 ₸/г).",
+      "В расширенных настройках настройте резерв на ремонт, сопло, работу мастера и налог.",
     ],
     en: [
-      "Select your 3D printer (Bambu Lab P1S/P2S/A1, Creality K1/Ender, Anycubic Kobra) and filament material.",
-      "Choose a city in Kazakhstan — the calculator automatically fills in the electricity tariff (editable).",
+      "Select your 3D printer (Bambu Lab P1S/A1, Creality K1, QIDI Q2/Q2C/Q1) and filament material.",
+      "Choose a city in Kazakhstan — the calculator automatically fills in the electricity tariff (with manual wattage override).",
       "Enter the net part weight and printing time from your slicer (Bambu Studio, OrcaSlicer, Creality Print).",
-      "For multi-color printing, switch modes and specify tool changes (AMS / CFS / ACE Pro) and purge weight.",
-      "Review the detailed cost breakdown, recommended selling price, profit margin, and cost per gram.",
+      "Choose pricing model: cost-plus markup or Kazakhstan market rate (30–50 KZT/g).",
+      "Review the detailed cost breakdown, market reference range, profit margin, and cost per gram.",
     ],
   },
   about: {

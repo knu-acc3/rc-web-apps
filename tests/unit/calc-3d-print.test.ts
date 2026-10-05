@@ -288,6 +288,8 @@ describe("3D printing calculator engine", () => {
     expect(PRINTER_PROFILES.neptune4).toBeDefined();
     expect(PRINTER_PROFILES.centauri).toBeDefined();
     expect(PRINTER_PROFILES.q1_pro).toBeDefined();
+    expect(PRINTER_PROFILES.q2).toBeDefined();
+    expect(PRINTER_PROFILES.q2c).toBeDefined();
     expect(PRINTER_PROFILES.plus4).toBeDefined();
     expect(PRINTER_PROFILES.adventurer5m).toBeDefined();
     expect(PRINTER_PROFILES.adventurer4).toBeDefined();
@@ -407,5 +409,135 @@ describe("3D printing calculator engine", () => {
     expect(res.printerHourlyDepreciation).toBe(100);
     // 10h * 100 = 1000 KZT
     expect(res.printerDepCost).toBe(1000);
+  });
+
+  it("verifies Qidi Q2 and Qidi Q2C specifications and profiles", () => {
+    const q2 = PRINTER_PROFILES.q2;
+    expect(q2).toBeDefined();
+    expect(q2.brand).toBe("qidi");
+    expect(q2.name).toContain("Active Heated Chamber 65°C");
+    expect(q2.name).toContain("270×270×256 mm");
+    expect(q2.name).toContain("370°C");
+    expect(q2.powerByMaterial.pacf).toBe(400); // 400W peak
+    expect(q2.priceKzt).toBe(265_000);
+    expect(q2.lifespanHours).toBe(5000);
+    expect(q2.depreciationPerHour).toBe(53);
+    expect(q2.multiColorCapable).toBe(true);
+    expect(q2.multiColorSystem).toContain("QIDI Box");
+
+    const q2c = PRINTER_PROFILES.q2c;
+    expect(q2c).toBeDefined();
+    expect(q2c.brand).toBe("qidi");
+    expect(q2c.name).toContain("270×270×256 mm");
+    expect(q2c.powerByMaterial.pacf).toBe(350); // 350W peak
+    expect(q2c.priceKzt).toBe(195_000);
+    expect(q2c.lifespanHours).toBe(5000);
+    expect(q2c.depreciationPerHour).toBe(39);
+    expect(q2c.multiColorCapable).toBe(true);
+    expect(q2c.multiColorSystem).toContain("QIDI Box");
+  });
+
+  it("supports explicit custom printer power consumption (e.g. 500W peak/heavy heater)", () => {
+    // 2 hours at 500W in Almaty residential (35.5 KZT/kWh) -> 1 kWh = 35.5 KZT
+    const res = calculatePrint3d({
+      weightG: 100,
+      printHours: 2,
+      customWatts: 500,
+      citySlug: "almaty",
+      isCommercialTariff: false,
+    });
+
+    expect(res.printerWatts).toBe(500);
+    expect(res.batchElectricityKwh).toBeCloseTo(1.0, 2);
+    expect(res.electricityCost).toBeCloseTo(35.5, 2);
+  });
+
+  it("calculates commercially realistic pricing for 330g 9h print (Alik & FXM scenario)", () => {
+    // 330g, 9 hours: in standard cost-plus, raw cost might be ~4-5k KZT
+    const costPlusRes = calculatePrint3d({
+      weightG: 330,
+      printHours: 9,
+      spoolPriceKg: 7500,
+      markupPct: 40,
+      pricingMode: "cost_plus",
+    });
+
+    // Market reference range in Kazakhstan: ~30 to 45 KZT/g -> 9 900 to 14 850 KZT
+    expect(costPlusRes.marketRefMin).toBe(9900);
+    expect(costPlusRes.marketRefMax).toBe(14850);
+    expect(costPlusRes.marketRefAvg).toBe(12375);
+    expect(costPlusRes.marketRefMinRate).toBe(30);
+    expect(costPlusRes.marketRefMaxRate).toBe(45);
+    // Cost-plus price (~5k) is below market:
+    expect(costPlusRes.marketComparison).toBe("below");
+
+    // Switching to market rate (35 KZT/g) protects from selling at a loss:
+    const marketRes = calculatePrint3d({
+      weightG: 330,
+      printHours: 9,
+      spoolPriceKg: 7500,
+      pricingMode: "market_rate",
+      marketRatePerGram: 35,
+    });
+
+    // 330g * 35 KZT/g = 11 550 KZT
+    expect(marketRes.unitPrice).toBeCloseTo(11550, 0);
+    expect(marketRes.pricePerGram).toBeCloseTo(35, 1);
+    expect(marketRes.marketComparison).toBe("market");
+    expect(marketRes.unitProfit).toBeGreaterThan(costPlusRes.unitProfit);
+  });
+
+  it("includes supports and brim in market rate pricing and dynamic material rates", () => {
+    // 100g base + 20g medium supports + 5g brim = 125g total filament consumed
+    const resSupports = calculatePrint3d({
+      weightG: 100,
+      printHours: 3,
+      supportsType: "medium",
+      hasBrim: true,
+      pricingMode: "market_rate",
+      marketRatePerGram: 35,
+    });
+
+    // 125g * 35 KZT/g = 4375 KZT
+    expect(resSupports.effectiveWeightG).toBe(125);
+    expect(resSupports.unitPrice).toBeCloseTo(4375, 0);
+
+    // PA-CF engineering filament market benchmark: 50–70 KZT/g
+    const resPacf = calculatePrint3d({
+      weightG: 100,
+      printHours: 3,
+      materialId: "pacf",
+    });
+    expect(resPacf.marketRefMinRate).toBe(50);
+    expect(resPacf.marketRefMaxRate).toBe(70);
+    expect(resPacf.marketRefMin).toBe(5000);
+    expect(resPacf.marketRefMax).toBe(7000);
+
+    // TPU flexible filament market benchmark: 40–60 KZT/g
+    const resTpu = calculatePrint3d({
+      weightG: 100,
+      printHours: 3,
+      materialId: "tpu",
+    });
+    expect(resTpu.marketRefMinRate).toBe(40);
+    expect(resTpu.marketRefMaxRate).toBe(60);
+  });
+
+  it("accounts for machine maintenance and breakdown repair reserve", () => {
+    const withoutBuffer = calculatePrint3d({
+      weightG: 100,
+      printHours: 10,
+      maintenancePerHour: 0,
+    });
+
+    const withBuffer = calculatePrint3d({
+      weightG: 100,
+      printHours: 10,
+      maintenancePerHour: 25, // 25 KZT / hour reserve for repairs/belts/nozzles
+    });
+
+    expect(withoutBuffer.maintenanceCost).toBe(0);
+    expect(withBuffer.maintenanceCost).toBe(250);
+    expect(withBuffer.unitNetCost).toBe(withoutBuffer.unitNetCost + 250);
   });
 });

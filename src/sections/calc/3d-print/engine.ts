@@ -71,7 +71,10 @@ export interface Print3dInput {
   customPackCost?: number; // Ручной ввод упаковки ₸/шт
   packPerBatch?: boolean;
 
-  // Наценка и налоги
+  // Наценка, модель ценообразования и налоги
+  pricingMode?: "cost_plus" | "market_rate";
+  marketRatePerGram?: number; // ₸/г по рыночной ставке в РК (по умолчанию 35)
+  maintenancePerHour?: number; // Резерв на ремонт и ТО станка (₸/ч)
   markupPct?: number;
   taxRegime?: TaxRegimeId;
 
@@ -115,6 +118,7 @@ export interface Print3dResult {
   nozzleWearCost: number;
   bedConsumableCost: number;
   wearConsumablesCost: number;
+  maintenanceCost: number;
   physicalLaborCost: number;
   setupFeeTotal: number;
   modelingFeeTotal: number;
@@ -128,6 +132,8 @@ export interface Print3dResult {
   batchMaterialWeightG: number;
 
   // Pricing & Profit
+  pricingMode: "cost_plus" | "market_rate";
+  marketRatePerGram: number;
   unitPriceBeforeTax: number;
   unitTax: number;
   unitPrice: number;
@@ -136,6 +142,14 @@ export interface Print3dResult {
   batchTax: number;
   batchProfit: number;
   marginPct: number;
+
+  // Market Reference Benchmark in Kazakhstan
+  marketRefMin: number;
+  marketRefMax: number;
+  marketRefAvg: number;
+  marketRefMinRate: number;
+  marketRefMaxRate: number;
+  marketComparison: "below" | "market" | "above";
 
   // Minimum Order Check
   isMinOrderApplied: boolean;
@@ -152,6 +166,7 @@ export interface Print3dResult {
     electricity: number;
     depreciation: number;
     wear: number;
+    maintenance: number;
     labor: number;
     packaging: number;
     tax: number;
@@ -169,6 +184,7 @@ export interface Print3dResult {
   hasAmsCombo: boolean;
   amsPurchasePriceKzt: number;
   printerHourlyDepreciation: number;
+  maintenancePerHour: number;
   resolvedNozzleWearPerHour: number;
 }
 
@@ -264,13 +280,17 @@ export function calculatePrint3d(input: Print3dInput): Print3dResult {
   const dryerDepCost = dryer.depreciationPerHour * dryingHours;
   const depreciationCost = printerDepCost + dryerDepCost;
 
-  // 4. Wear & Consumables
+  // 4. Wear & Consumables & Maintenance Buffer (защита от поломок)
   const defaultNozzleRate = material.abrasive ? nozzle.wearPerHourAbrasive : nozzle.wearPerHour;
   const resolvedNozzleWearPerHour = input.customNozzleWearPerHour !== undefined && input.customNozzleWearPerHour >= 0
     ? input.customNozzleWearPerHour
     : defaultNozzleRate;
   const nozzleWearCost = resolvedNozzleWearPerHour * effectivePrintHours;
   const wearConsumablesCost = nozzleWearCost + bedConsumableCost;
+
+  // Резерв на ремонт и ТО станка (ремни, термисторы, экструдер, электроника)
+  const maintenancePerHour = Math.max(0, input.maintenancePerHour ?? 0);
+  const maintenanceCost = maintenancePerHour * effectivePrintHours;
 
   // 5. Labor & Setup & Modeling
   const prepMinutes = Math.max(0, input.prepMinutes ?? 10);
@@ -299,22 +319,36 @@ export function calculatePrint3d(input: Print3dInput): Print3dResult {
   const packPerBatch = !!input.packPerBatch;
   const packagingCostPerUnit = packPerBatch ? basePackCost / qty : basePackCost;
 
-  // 7. Net Cost
+  // 7. Net Cost (включая сырьё, свет, износ, ТО, работу мастера)
   const unitNetCost =
     materialCost +
     failureCost +
     electricityCost +
     depreciationCost +
     wearConsumablesCost +
+    maintenanceCost +
     laborCost +
     packagingCostPerUnit;
   const batchNetCost = unitNetCost * qty;
 
   // 8. Commercial Pricing & Taxes
+  const pricingMode = input.pricingMode ?? "cost_plus";
+  const marketRatePerGram = Math.max(1, input.marketRatePerGram ?? 35);
   const markupPct = Math.max(0, input.markupPct ?? 40);
   const taxRegime = TAX_REGIMES[input.taxRegime ?? "none"] ?? TAX_REGIMES.none;
 
-  const unitPriceBeforeTax = unitNetCost * (1 + markupPct / 100);
+  let unitPriceBeforeTax: number;
+  if (pricingMode === "market_rate") {
+    // Расчёт по рыночной ставке за грамм (Казахстан: 30–50 ₸/г)
+    // Базируется на фактически расходуемом филаменте (деталь + поддержки + кайма + сброс)
+    const baseG = netFilamentWeightG > 0 ? netFilamentWeightG : (weight > 0 ? weight : 1);
+    const marketUnitBase = baseG * marketRatePerGram + setupFeePerUnit + modelingFeePerUnit;
+    // Защита от продажи в ноль или убыток: гарантируем минимальную маржу 15% над себестоимостью
+    unitPriceBeforeTax = Math.max(unitNetCost * 1.15, marketUnitBase);
+  } else {
+    // Наценка на себестоимость
+    unitPriceBeforeTax = unitNetCost * (1 + markupPct / 100);
+  }
 
   let rawUnitPrice = unitPriceBeforeTax;
   let unitTax = 0;
@@ -343,6 +377,21 @@ export function calculatePrint3d(input: Print3dInput): Print3dResult {
   const pricePerGram = weight > 0 ? finalUnitPrice / weight : 0;
   const pricePerHour = effectivePrintHours > 0 ? finalUnitPrice / effectivePrintHours : 0;
 
+  // Рыночный бенчмарк в Казахстане (стандарт 30–45 ₸/г, спецпластики 40–70 ₸/г)
+  const minRatePerGram = material.id === "pacf" ? 50 : material.id === "tpu" ? 40 : 30;
+  const maxRatePerGram = material.id === "pacf" ? 70 : material.id === "tpu" ? 60 : 45;
+  const baseMarketWeight = weight > 0 ? weight : 1;
+  const marketRefMin = Math.round(baseMarketWeight * minRatePerGram * qty);
+  const marketRefMax = Math.round(baseMarketWeight * maxRatePerGram * qty);
+  const marketRefAvg = Math.round(baseMarketWeight * ((minRatePerGram + maxRatePerGram) / 2) * qty);
+
+  let marketComparison: "below" | "market" | "above" = "market";
+  if (pricePerGram < minRatePerGram * 0.95) {
+    marketComparison = "below";
+  } else if (pricePerGram > maxRatePerGram * 1.05) {
+    marketComparison = "above";
+  }
+
   // Cost shares
   const safeTotal = finalUnitPrice > 0 ? finalUnitPrice : 1;
   const shares = {
@@ -351,6 +400,7 @@ export function calculatePrint3d(input: Print3dInput): Print3dResult {
     electricity: (electricityCost / safeTotal) * 100,
     depreciation: (depreciationCost / safeTotal) * 100,
     wear: (wearConsumablesCost / safeTotal) * 100,
+    maintenance: (maintenanceCost / safeTotal) * 100,
     labor: (laborCost / safeTotal) * 100,
     packaging: (packagingCostPerUnit / safeTotal) * 100,
     tax: (unitTax / safeTotal) * 100,
@@ -383,6 +433,7 @@ export function calculatePrint3d(input: Print3dInput): Print3dResult {
     nozzleWearCost,
     bedConsumableCost,
     wearConsumablesCost,
+    maintenanceCost,
     physicalLaborCost,
     setupFeeTotal,
     modelingFeeTotal,
@@ -392,6 +443,8 @@ export function calculatePrint3d(input: Print3dInput): Print3dResult {
     batchNetCost,
     batchElectricityKwh: unitElectricityKwh * qty,
     batchMaterialWeightG: effectiveWeightG * qty,
+    pricingMode,
+    marketRatePerGram,
     unitPriceBeforeTax,
     unitTax,
     unitPrice: finalUnitPrice,
@@ -400,6 +453,12 @@ export function calculatePrint3d(input: Print3dInput): Print3dResult {
     batchTax,
     batchProfit,
     marginPct,
+    marketRefMin,
+    marketRefMax,
+    marketRefAvg,
+    marketRefMinRate: minRatePerGram,
+    marketRefMaxRate: maxRatePerGram,
+    marketComparison,
     isMinOrderApplied,
     minOrderFeeKzt,
     pricePerGram,
@@ -415,6 +474,7 @@ export function calculatePrint3d(input: Print3dInput): Print3dResult {
     hasAmsCombo,
     amsPurchasePriceKzt: amsPurchasePrice,
     printerHourlyDepreciation,
+    maintenancePerHour,
     resolvedNozzleWearPerHour,
   };
 }
