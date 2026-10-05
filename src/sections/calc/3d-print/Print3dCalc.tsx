@@ -22,7 +22,7 @@ import {
 } from "lucide-react";
 import { BRAND } from "@/config/brand";
 import { cn } from "@/lib/cn";
-import { Input, Select, Slider } from "@/ui/field";
+import { Input, Select } from "@/ui/field";
 import type { ToolProps } from "../../types";
 import { fmtMoney } from "../kit/fmt";
 import { field, toInput } from "../kit/num";
@@ -45,6 +45,71 @@ import {
 import { calculatePrint3d } from "./engine";
 
 const STORAGE_KEY = "rc_calc_3d_state_v4";
+
+function GraphiteSlider({
+  min,
+  max,
+  step = 1,
+  value,
+  onChange,
+  className,
+}: {
+  min: number;
+  max: number;
+  step?: number;
+  value: number;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  className?: string;
+}) {
+  const safeVal = Math.min(max, Math.max(min, value));
+  const pct = Math.max(0, Math.min(100, ((safeVal - min) / (max - min)) * 100));
+
+  return (
+    <div className={cn("group relative flex w-full items-center py-2.5", className)}>
+      {/* Background track: dark graphite / subtle neutral */}
+      <div className="absolute inset-x-0 h-2 rounded-full bg-neutral-200 dark:bg-neutral-800" />
+      {/* Active filled line: deep graphite / dark charcoal */}
+      <div
+        className="pointer-events-none absolute left-0 h-2 rounded-full bg-neutral-800 transition-all dark:bg-neutral-300"
+        style={{ width: `${pct}%` }}
+      />
+      {/* Native range slider */}
+      <input
+        type="range"
+        min={min}
+        max={max}
+        step={step}
+        value={safeVal}
+        onChange={onChange}
+        className={cn(
+          "relative z-10 h-2 w-full appearance-none bg-transparent cursor-pointer",
+          "focus:outline-hidden",
+          "[&::-webkit-slider-runnable-track]:appearance-none [&::-webkit-slider-runnable-track]:bg-transparent",
+          "[&::-moz-range-track]:bg-transparent",
+          "[&::-webkit-slider-thumb]:appearance-none",
+          "[&::-webkit-slider-thumb]:size-5",
+          "[&::-webkit-slider-thumb]:rounded-full",
+          "[&::-webkit-slider-thumb]:bg-neutral-800 dark:[&::-webkit-slider-thumb]:bg-neutral-100",
+          "[&::-webkit-slider-thumb]:border-2",
+          "[&::-webkit-slider-thumb]:border-neutral-900 dark:[&::-webkit-slider-thumb]:border-white",
+          "[&::-webkit-slider-thumb]:shadow-[0_2px_8px_rgba(0,0,0,0.35)]",
+          "[&::-webkit-slider-thumb]:transition-transform",
+          "[&::-webkit-slider-thumb]:group-hover:scale-110",
+          "[&::-webkit-slider-thumb]:active:scale-95",
+          "[&::-moz-range-thumb]:size-5",
+          "[&::-moz-range-thumb]:rounded-full",
+          "[&::-moz-range-thumb]:bg-neutral-800 dark:[&::-moz-range-thumb]:bg-neutral-100",
+          "[&::-moz-range-thumb]:border-2",
+          "[&::-moz-range-thumb]:border-neutral-900 dark:[&::-moz-range-thumb]:border-white",
+          "[&::-moz-range-thumb]:shadow-[0_2px_8px_rgba(0,0,0,0.35)]",
+          "[&::-moz-range-thumb]:transition-transform",
+          "[&::-moz-range-thumb]:group-hover:scale-110",
+          "[&::-moz-range-thumb]:active:scale-95",
+        )}
+      />
+    </div>
+  );
+}
 
 const T = {
   ru: {
@@ -781,7 +846,7 @@ export default function Print3dCalc({
                 </div>
               </div>
 
-              <Slider
+              <GraphiteSlider
                 min={5}
                 max={5000}
                 step={5}
@@ -822,7 +887,7 @@ export default function Print3dCalc({
                 </div>
               </div>
 
-              <Slider
+              <GraphiteSlider
                 min={0.5}
                 max={48}
                 step={0.5}
@@ -979,7 +1044,7 @@ export default function Print3dCalc({
                 </div>
               </div>
 
-              <Slider
+              <GraphiteSlider
                 min={0}
                 max={200}
                 step={5}
@@ -1342,166 +1407,184 @@ export default function Print3dCalc({
             </div>
           </div>
 
-          {/* Chunky States Distribution Chart */}
-          <div className="flex flex-col gap-4 rounded-[26px] border border-neutral-200/80 bg-white p-5 shadow-xs dark:border-neutral-800 dark:bg-neutral-900 sm:p-6">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <BarChart3 className="size-4 text-neutral-900 dark:text-white" />
-                <span className="text-xs font-bold uppercase tracking-wider text-neutral-800 dark:text-neutral-200">
-                  {t.breakdownTitle}
-                </span>
-              </div>
-              <span className="text-xs font-bold text-neutral-500">100%</span>
-            </div>
+          {/* ── Cost Structure Card (Vertical Capsule Bars matching reference screenshot) ── */}
+          {(() => {
+            const plasticCost = calc.materialCost + calc.failureCost;
+            const lightCost = calc.electricityCost;
+            const machineCost = calc.depreciationCost + calc.wearConsumablesCost;
+            const laborCost = calc.physicalLaborCost + (calc.setupFeeTotal / calc.quantity) + (calc.modelingFeeTotal / calc.quantity) + calc.packagingCost;
+            const marginCost = calc.unitProfit + calc.unitTax;
 
-            {/* Chunky Multi-Segment Bar */}
-            <div className="flex h-3 w-full overflow-hidden rounded-full bg-neutral-100 dark:bg-neutral-800">
-              <div
-                style={{ width: `${Math.max(2, calc.shares.material)}%` }}
-                className="bg-neutral-950 transition-all dark:bg-white"
-                title={`${t.materialCost}: ${calc.shares.material.toFixed(0)}%`}
-              />
-              <div
-                style={{ width: `${Math.max(2, calc.shares.electricity)}%` }}
-                className="bg-neutral-700 transition-all dark:bg-neutral-300"
-                title={`${t.elecCost}: ${calc.shares.electricity.toFixed(0)}%`}
-              />
-              <div
-                style={{ width: `${Math.max(2, calc.shares.depreciation)}%` }}
-                className="bg-neutral-500 transition-all dark:bg-neutral-500"
-                title={`${t.depCost}: ${calc.shares.depreciation.toFixed(0)}%`}
-              />
-              <div
-                style={{ width: `${Math.max(2, calc.shares.labor)}%` }}
-                className="bg-neutral-400 transition-all dark:bg-neutral-600"
-                title={`${t.laborCost}: ${calc.shares.labor.toFixed(0)}%`}
-              />
-              <div
-                style={{ width: `${Math.max(2, calc.shares.profit)}%` }}
-                className="bg-neutral-300 transition-all dark:bg-neutral-700"
-                title={`${t.profit}: ${calc.shares.profit.toFixed(0)}%`}
-              />
-            </div>
+            const safeTotal = calc.unitPrice > 0 ? calc.unitPrice : 1;
+            const rawPlastic = (plasticCost / safeTotal) * 100;
+            const rawLight = (lightCost / safeTotal) * 100;
+            const rawMachine = (machineCost / safeTotal) * 100;
+            const rawLabor = (laborCost / safeTotal) * 100;
 
-            {/* Line-by-Line Breakdown Rows */}
-            <div className="flex flex-col gap-2 pt-1">
-              <div className="flex items-center justify-between text-xs">
-                <div className="flex items-center gap-2 text-neutral-700 dark:text-neutral-300">
-                  <span className="size-2 rounded-full bg-neutral-950 dark:bg-white" />
-                  <span>{t.materialCost} ({calc.effectiveWeightG.toFixed(0)} г)</span>
-                </div>
-                <span className="font-mono font-bold text-neutral-950 dark:text-white">
-                  {fmtMoney(locale, isBatch ? calc.materialCost * calc.quantity : calc.materialCost)}
-                </span>
-              </div>
+            const pPlastic = Math.round(rawPlastic);
+            const pLight = Math.round(rawLight);
+            const pMachine = Math.round(rawMachine);
+            const pLabor = Math.round(rawLabor);
+            const pMargin = Math.max(0, 100 - (pPlastic + pLight + pMachine + pLabor));
 
-              {calc.supportsCost > 0 && (
-                <div className="flex items-center justify-between text-xs pl-4 text-neutral-500">
-                  <span>↳ {t.supportsCost} ({calc.supportsWeightG.toFixed(0)} г)</span>
-                  <span className="font-mono font-medium">
-                    {fmtMoney(locale, isBatch ? calc.supportsCost * calc.quantity : calc.supportsCost)}
-                  </span>
-                </div>
-              )}
+            const pillars = [
+              {
+                id: "plastic",
+                name: locale === "ru" ? "Пластик" : "Plastic",
+                pct: pPlastic,
+                cost: isBatch ? plasticCost * calc.quantity : plasticCost,
+              },
+              {
+                id: "light",
+                name: locale === "ru" ? "Свет" : "Power",
+                pct: pLight,
+                cost: isBatch ? lightCost * calc.quantity : lightCost,
+              },
+              {
+                id: "machine",
+                name: locale === "ru" ? "Станок" : "Machine",
+                pct: pMachine,
+                cost: isBatch ? machineCost * calc.quantity : machineCost,
+              },
+              {
+                id: "labor",
+                name: locale === "ru" ? "Работа" : "Labor",
+                pct: pLabor,
+                cost: isBatch ? laborCost * calc.quantity : laborCost,
+              },
+              {
+                id: "margin",
+                name: locale === "ru" ? "Маржа" : "Margin",
+                pct: pMargin,
+                cost: isBatch ? marginCost * calc.quantity : marginCost,
+              },
+            ];
 
-              {calc.brimCost > 0 && (
-                <div className="flex items-center justify-between text-xs pl-4 text-neutral-500">
-                  <span>↳ {t.brimCost} ({calc.brimWeightG} г)</span>
-                  <span className="font-mono font-medium">
-                    {fmtMoney(locale, isBatch ? calc.brimCost * calc.quantity : calc.brimCost)}
-                  </span>
-                </div>
-              )}
-
-              <div className="flex items-center justify-between text-xs">
-                <div className="flex items-center gap-2 text-neutral-700 dark:text-neutral-300">
-                  <span className="size-2 rounded-full bg-neutral-700 dark:bg-neutral-300" />
-                  <span>{t.elecCost} ({calc.effectiveTariffKwh.toFixed(1)} ₸/кВт⋅ч)</span>
-                </div>
-                <span className="font-mono font-bold text-neutral-950 dark:text-white">
-                  {fmtMoney(locale, isBatch ? calc.electricityCost * calc.quantity : calc.electricityCost)}
-                </span>
-              </div>
-
-              <div className="flex items-center justify-between text-xs">
-                <div className="flex items-center gap-2 text-neutral-700 dark:text-neutral-300">
-                  <span className="size-2 rounded-full bg-neutral-500 dark:bg-neutral-500" />
-                  <span>{t.depCost} ({calc.printerHourlyDepreciation.toFixed(0)} ₸/ч)</span>
-                </div>
-                <span className="font-mono font-bold text-neutral-950 dark:text-white">
-                  {fmtMoney(locale, isBatch ? calc.depreciationCost * calc.quantity : calc.depreciationCost)}
-                </span>
-              </div>
-
-              <div className="flex items-center justify-between text-xs">
-                <div className="flex items-center gap-2 text-neutral-700 dark:text-neutral-300">
-                  <span className="size-2 rounded-full bg-neutral-400 dark:bg-neutral-600" />
-                  <span>{t.wearCost}</span>
-                </div>
-                <span className="font-mono font-bold text-neutral-950 dark:text-white">
-                  {fmtMoney(locale, isBatch ? calc.wearConsumablesCost * calc.quantity : calc.wearConsumablesCost)}
-                </span>
-              </div>
-
-              {calc.setupFeeTotal > 0 && (
-                <div className="flex items-center justify-between text-xs">
-                  <div className="flex items-center gap-2 text-neutral-700 dark:text-neutral-300">
-                    <span className="size-2 rounded-full bg-neutral-400 dark:bg-neutral-500" />
-                    <span>{t.setupCost}</span>
+            return (
+              <div className="flex flex-col gap-5 rounded-[28px] border border-neutral-200/80 bg-white p-5 shadow-xs dark:border-neutral-800 dark:bg-neutral-900 sm:p-6">
+                {/* Header: Icon + Title + 100% Pill */}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2.5">
+                    <div className="flex size-9 items-center justify-center rounded-xl bg-neutral-100 text-neutral-900 dark:bg-neutral-800 dark:text-white">
+                      <BarChart3 className="size-4.5" />
+                    </div>
+                    <span className="text-base font-bold text-neutral-950 dark:text-white">
+                      {locale === "ru" ? "Структура расходов" : "Cost Breakdown"}
+                    </span>
                   </div>
-                  <span className="font-mono font-bold text-neutral-950 dark:text-white">
-                    {fmtMoney(locale, calc.setupFeeTotal)}
+                  <span className="rounded-full bg-neutral-100 px-3.5 py-1 text-xs font-bold text-neutral-900 dark:bg-neutral-800 dark:text-white">
+                    100%
                   </span>
                 </div>
-              )}
 
-              {calc.modelingFeeTotal > 0 && (
-                <div className="flex items-center justify-between text-xs">
-                  <div className="flex items-center gap-2 text-neutral-700 dark:text-neutral-300">
-                    <span className="size-2 rounded-full bg-neutral-400 dark:bg-neutral-500" />
-                    <span>{t.modelingCost}</span>
+                {/* 5 Vertical Capsule Bars matching the reference visual */}
+                <div className="grid grid-cols-5 items-end gap-2 pt-6 pb-2 sm:gap-4">
+                  {pillars.map((p) => {
+                    const minH = 18;
+                    const maxH = 86;
+                    const barHeight = Math.max(
+                      minH,
+                      Math.min(maxH, Math.round(minH + (p.pct / 100) * (maxH - minH) * 1.5))
+                    );
+
+                    return (
+                      <div key={p.id} className="flex flex-col items-center justify-end gap-2.5">
+                        {/* Percentage on top */}
+                        <span className="text-xs font-bold tabular-nums text-neutral-900 dark:text-white sm:text-sm">
+                          {p.pct}%
+                        </span>
+
+                        {/* Solid Rounded Capsule */}
+                        <div
+                          style={{ height: `${barHeight}px` }}
+                          className="w-10 sm:w-12 rounded-full bg-neutral-950 transition-all duration-300 dark:bg-white"
+                          title={`${p.name}: ${p.pct}% (${fmtMoney(locale, p.cost)})`}
+                        />
+
+                        {/* Label on bottom */}
+                        <span className="text-xs font-semibold text-neutral-600 dark:text-neutral-400 text-center tracking-tight truncate w-full">
+                          {p.name}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Detailed Breakdown Rows */}
+                <div className="flex flex-col gap-2 pt-3 border-t border-neutral-100 dark:border-neutral-800">
+                  <div className="flex items-center justify-between text-xs">
+                    <div className="flex items-center gap-2 text-neutral-700 dark:text-neutral-300">
+                      <span className="size-2 rounded-full bg-neutral-950 dark:bg-white" />
+                      <span>{t.materialCost} ({calc.effectiveWeightG.toFixed(0)} г)</span>
+                    </div>
+                    <span className="font-mono font-bold text-neutral-950 dark:text-white">
+                      {fmtMoney(locale, isBatch ? plasticCost * calc.quantity : plasticCost)}
+                    </span>
                   </div>
-                  <span className="font-mono font-bold text-neutral-950 dark:text-white">
-                    {fmtMoney(locale, calc.modelingFeeTotal)}
-                  </span>
-                </div>
-              )}
 
-              <div className="flex items-center justify-between text-xs">
-                <div className="flex items-center gap-2 text-neutral-700 dark:text-neutral-300">
-                  <span className="size-2 rounded-full bg-neutral-400 dark:bg-neutral-600" />
-                  <span>{t.laborCost}</span>
-                </div>
-                <span className="font-mono font-bold text-neutral-950 dark:text-white">
-                  {fmtMoney(locale, isBatch ? calc.physicalLaborCost * calc.quantity : calc.physicalLaborCost)}
-                </span>
-              </div>
+                  {calc.supportsCost > 0 && (
+                    <div className="flex items-center justify-between text-xs pl-4 text-neutral-500">
+                      <span>↳ {t.supportsCost} ({calc.supportsWeightG.toFixed(0)} г)</span>
+                      <span className="font-mono font-medium">
+                        {fmtMoney(locale, isBatch ? calc.supportsCost * calc.quantity : calc.supportsCost)}
+                      </span>
+                    </div>
+                  )}
 
-              {calc.unitTax > 0 && (
-                <div className="flex items-center justify-between text-xs">
-                  <div className="flex items-center gap-2 text-neutral-700 dark:text-neutral-300">
-                    <span className="size-2 rounded-full bg-neutral-400 dark:bg-neutral-600" />
-                    <span>{t.taxCost}</span>
+                  {calc.brimCost > 0 && (
+                    <div className="flex items-center justify-between text-xs pl-4 text-neutral-500">
+                      <span>↳ {t.brimCost} ({calc.brimWeightG} г)</span>
+                      <span className="font-mono font-medium">
+                        {fmtMoney(locale, isBatch ? calc.brimCost * calc.quantity : calc.brimCost)}
+                      </span>
+                    </div>
+                  )}
+
+                  <div className="flex items-center justify-between text-xs">
+                    <div className="flex items-center gap-2 text-neutral-700 dark:text-neutral-300">
+                      <span className="size-2 rounded-full bg-neutral-700 dark:bg-neutral-300" />
+                      <span>{t.elecCost} ({calc.effectiveTariffKwh.toFixed(1)} ₸/кВт⋅ч)</span>
+                    </div>
+                    <span className="font-mono font-bold text-neutral-950 dark:text-white">
+                      {fmtMoney(locale, isBatch ? lightCost * calc.quantity : lightCost)}
+                    </span>
                   </div>
-                  <span className="font-mono font-bold text-neutral-950 dark:text-white">
-                    {fmtMoney(locale, isBatch ? calc.batchTax : calc.unitTax)}
-                  </span>
-                </div>
-              )}
 
-              <div className="my-1 border-t border-neutral-100 dark:border-neutral-800" />
+                  <div className="flex items-center justify-between text-xs">
+                    <div className="flex items-center gap-2 text-neutral-700 dark:text-neutral-300">
+                      <span className="size-2 rounded-full bg-neutral-500 dark:bg-neutral-500" />
+                      <span>{t.depCost} ({calc.printerHourlyDepreciation.toFixed(0)} ₸/ч)</span>
+                    </div>
+                    <span className="font-mono font-bold text-neutral-950 dark:text-white">
+                      {fmtMoney(locale, isBatch ? machineCost * calc.quantity : machineCost)}
+                    </span>
+                  </div>
 
-              <div className="flex items-center justify-between text-xs font-bold text-neutral-950 dark:text-white">
-                <div className="flex items-center gap-2">
-                  <span className="size-2 rounded-full bg-neutral-300 dark:bg-neutral-700" />
-                  <span>{t.profit}</span>
+                  <div className="flex items-center justify-between text-xs">
+                    <div className="flex items-center gap-2 text-neutral-700 dark:text-neutral-300">
+                      <span className="size-2 rounded-full bg-neutral-400 dark:bg-neutral-600" />
+                      <span>{t.laborCost}</span>
+                    </div>
+                    <span className="font-mono font-bold text-neutral-950 dark:text-white">
+                      {fmtMoney(locale, isBatch ? laborCost * calc.quantity : laborCost)}
+                    </span>
+                  </div>
+
+                  <div className="my-1 border-t border-neutral-100 dark:border-neutral-800" />
+
+                  <div className="flex items-center justify-between text-xs font-bold text-neutral-950 dark:text-white">
+                    <div className="flex items-center gap-2">
+                      <span className="size-2 rounded-full bg-neutral-950 dark:bg-white" />
+                      <span>{t.profit} ({pMargin}%)</span>
+                    </div>
+                    <span className="font-mono">
+                      +{fmtMoney(locale, isBatch ? marginCost * calc.quantity : marginCost)}
+                    </span>
+                  </div>
                 </div>
-                <span className="font-mono">
-                  +{fmtMoney(locale, isBatch ? calc.batchProfit : calc.unitProfit)}
-                </span>
               </div>
-            </div>
-          </div>
+            );
+          })()}
         </div>
       </div>
 
