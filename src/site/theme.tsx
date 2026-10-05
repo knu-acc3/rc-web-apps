@@ -1,5 +1,6 @@
 "use client";
 
+import { useServerInsertedHTML } from "next/navigation";
 import { Laptop, Moon, Sun } from "lucide-react";
 import { useEffect, useState } from "react";
 import { buttonClass } from "@/ui/button";
@@ -9,6 +10,13 @@ const KEY = "theme";
 
 /** Inline script that applies the theme before first paint (no flash). */
 export const THEME_SCRIPT = `(function(){try{var m=localStorage.getItem('${KEY}');var d=m==='dark'||((!m||m==='system')&&matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.classList.toggle('dark',d)}catch(e){}})()`;
+
+export function ThemeScript() {
+  useServerInsertedHTML(() => (
+    <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
+  ));
+  return null;
+}
 
 function apply(mode: Mode) {
   const dark = mode === "dark" || (mode === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);

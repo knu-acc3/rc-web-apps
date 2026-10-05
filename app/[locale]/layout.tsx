@@ -6,7 +6,7 @@ import { isLocale, LOCALES, type Locale } from "@/i18n/config";
 import { ui } from "@/i18n/ui";
 import { Footer } from "@/site/footer";
 import { Header } from "@/site/header";
-import { THEME_SCRIPT } from "@/site/theme";
+import { ThemeScript } from "@/site/theme";
 import { Analytics } from "@/site/analytics";
 
 
@@ -56,7 +56,7 @@ export default async function LocaleLayout({ children, params }: { children: Rea
   return (
     <html lang={locale} suppressHydrationWarning>
       <head>
-        <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
+        <ThemeScript />
         <link rel="preload" href="/fonts/onest-latin.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
         {locale === "ru" && <link rel="preload" href="/fonts/onest-cyrillic.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />}
       </head>

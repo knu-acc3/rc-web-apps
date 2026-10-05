@@ -54,7 +54,7 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
       <JsonLd
         data={[
           { "@context": "https://schema.org", "@type": "WebSite", name: BRAND.name, url: SITE_URL + href(locale), inLanguage: locale, description: HOME[locale].description },
-          { "@context": "https://schema.org", "@type": "Organization", name: BRAND.name, url: SITE_URL, email: BRAND.email, logo: `${SITE_URL}/web-app-manifest-512x512.png` },
+          { "@context": "https://schema.org", "@type": "Organization", name: BRAND.name, url: SITE_URL, ...(BRAND.email ? { email: BRAND.email } : {}), logo: `${SITE_URL}/web-app-manifest-512x512.png` },
         ]}
       />
       <section className="mx-auto max-w-3xl py-10 text-center sm:py-14">

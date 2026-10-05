@@ -3,10 +3,10 @@
  * Rename the site by editing `name` (and `shortName` / `domain` if needed).
  */
 export const BRAND = {
-  name: "RC Web App",
-  shortName: "RC",
-  domain: "rcwebapp.com",
-  email: "hello@rcwebapp.com",
+  name: "ulti-tools",
+  shortName: "UT",
+  domain: "ulti-tools.com",
+  email: "",
   tagline: {
     ru: "Онлайн-инструменты, которые работают прямо в браузере",
     en: "Online tools that work right in your browser",
