@@ -170,72 +170,124 @@ export type PrinterBrand =
   | "custom";
 
 export type PrinterId =
-  // Bambu Lab
+  // Bambu Lab (Newest -> Oldest)
   | "h2d"
   | "h2c"
   | "h2s"
   | "p2s"
   | "x1e"
-  | "x1c"
   | "p1s"
   | "a1"
   | "a1_mini"
-  // Creality
+  | "x1c"
+  // Creality (Newest -> Oldest)
+  | "ender3_v4"
+  | "creality_hi"
   | "k2_plus"
+  | "k1c"
   | "k1_max"
   | "k1"
   | "ender3_v3"
-  | "ender3_v3_ke"
   | "ender3_v3_plus"
-  | "ender3"
+  | "ender3_v3_ke"
+  | "ender3_v3_se"
+  | "cr10_se"
+  | "cr_m4"
+  | "sermoon_d3"
+  | "ender5_s1"
+  | "sermoon_v1"
+  | "ender3_s1_pro"
+  | "ender3_v2_neo"
+  | "sermoon_d1"
+  | "cr6_se"
   | "ender5"
   | "cr10"
-  | "cr_m4"
-  // Anycubic
+  | "ender3_v2"
+  | "ender3"
+  // Anycubic (Newest -> Oldest)
   | "kobra_s1_max"
   | "kobra3_combo"
   | "kobra2_max"
   | "kobra2_plus"
   | "kobra2_pro"
-  | "kobra2_neo"
   | "kobra2"
+  | "kobra2_neo"
   | "kobra_plus_max"
-  // Elegoo
+  | "kobra_neo"
+  | "anycubic_vyper"
+  | "anycubic_4max_pro2"
+  | "anycubic_mega_x"
+  | "anycubic_mega_s"
+  | "anycubic_mega_zero"
+  | "anycubic_chiron"
+  | "anycubic_predator"
+  // Elegoo (Newest -> Oldest)
   | "centauri_2"
   | "centauri"
   | "neptune4_max"
   | "neptune4_plus"
   | "neptune4_pro"
   | "neptune4"
+  | "neptune3_max"
+  | "neptune3_plus"
   | "neptune3_pro"
-  // QIDI Tech
+  | "neptune3"
+  | "neptune2s"
+  | "neptune_x"
+  // QIDI Tech (Newest -> Oldest)
   | "max4"
   | "plus4"
   | "q1_pro"
   | "x_max3"
+  | "x_plus3"
   | "x_smart3"
-  // Flashforge
+  | "x_cf_pro"
+  | "i_fast"
+  | "i_mate_s"
+  | "x_max_2"
+  // Flashforge (Newest -> Oldest)
   | "ad5x"
+  | "adventurer5m_pro"
   | "adventurer5m"
-  | "creator5"
+  | "guider3_ultra"
   | "guider3"
   | "creator4"
-  | "creator3"
   | "adventurer4"
-  | "guider2s"
+  | "artemis"
+  | "finder3"
+  | "creator3"
   | "creator_pro2"
+  | "guider2s"
   | "adventurer3"
-  // Flying Bear & Kingroon
+  | "creator_pro"
+  // Flying Bear (Newest -> Oldest)
   | "reborn2"
   | "ghost6"
+  | "ghost5"
+  // Kingroon (Newest -> Oldest)
   | "klp1"
+  | "kp3s_pro_v2"
   | "kp3s_pro"
-  // Others
+  | "kp3s"
+  // Artillery (Newest -> Oldest)
+  | "sidewinder_x4_plus"
   | "sidewinder_x4"
+  | "sidewinder_x2"
+  | "genius_pro"
+  // Two Trees (Newest -> Oldest)
   | "sk1"
+  | "bluer_plus"
+  | "sapphire_plus"
+  // Snapmaker (Newest -> Oldest)
+  | "snapmaker_u1"
   | "snapmaker_j1"
+  | "snapmaker_2"
+  // Raise3D & UltiMaker (Newest -> Oldest)
+  | "raise3d_pro3_plus"
   | "raise3d_pro3"
+  | "ultimaker_s7"
   | "ultimaker_s5"
+  // Custom
   | "custom";
 
 export interface PrinterProfile {
@@ -271,7 +323,7 @@ export const SUPPORTS_OPTIONS: Record<SupportsType, SupportsOption> = {
 };
 
 export const PRINTER_PROFILES: Record<PrinterId, PrinterProfile> = {
-  // ── Bambu Lab ──
+  // ── Bambu Lab (Newest -> Oldest) ──
   h2d: {
     id: "h2d",
     brand: "bambu",
@@ -347,6 +399,21 @@ export const PRINTER_PROFILES: Record<PrinterId, PrinterProfile> = {
     multiColorCapable: true,
     multiColorSystem: "Bambu AMS",
   },
+  p1s: {
+    id: "p1s",
+    brand: "bambu",
+    name: "Bambu Lab P1S / P1P",
+    shortName: "Bambu P1S",
+    enclosed: true,
+    powerByMaterial: { pla: 105, petg: 135, abs: 190, tpu: 105, pacf: 190 },
+    defaultPower: 130,
+    priceKzt: 340_000,
+    amsPriceKzt: 180_000,
+    lifespanHours: 6000,
+    depreciationPerHour: 57,
+    multiColorCapable: true,
+    multiColorSystem: "Bambu AMS",
+  },
   a1: {
     id: "a1",
     brand: "bambu",
@@ -377,21 +444,6 @@ export const PRINTER_PROFILES: Record<PrinterId, PrinterProfile> = {
     multiColorCapable: true,
     multiColorSystem: "Bambu AMS lite",
   },
-  p1s: {
-    id: "p1s",
-    brand: "bambu",
-    name: "Bambu Lab P1S / P1P",
-    shortName: "Bambu P1S/P1P",
-    enclosed: true,
-    powerByMaterial: { pla: 105, petg: 135, abs: 190, tpu: 105, pacf: 190 },
-    defaultPower: 130,
-    priceKzt: 340_000,
-    amsPriceKzt: 180_000,
-    lifespanHours: 6000,
-    depreciationPerHour: 57,
-    multiColorCapable: true,
-    multiColorSystem: "Bambu AMS",
-  },
   x1c: {
     id: "x1c",
     brand: "bambu",
@@ -408,7 +460,37 @@ export const PRINTER_PROFILES: Record<PrinterId, PrinterProfile> = {
     multiColorSystem: "Bambu AMS",
   },
 
-  // ── Creality ──
+  // ── Creality (Newest -> Oldest) ──
+  ender3_v4: {
+    id: "ender3_v4",
+    brand: "creality",
+    name: "Creality Ender-3 V4 Combo / V4",
+    shortName: "Ender-3 V4",
+    enclosed: false,
+    powerByMaterial: { pla: 120, petg: 145, abs: 185, tpu: 120, pacf: 185 },
+    defaultPower: 135,
+    priceKzt: 225_000,
+    amsPriceKzt: 140_000,
+    lifespanHours: 4500,
+    depreciationPerHour: 50,
+    multiColorCapable: true,
+    multiColorSystem: "Creality CFS",
+  },
+  creality_hi: {
+    id: "creality_hi",
+    brand: "creality",
+    name: "Creality Hi Combo / Hi",
+    shortName: "Creality Hi",
+    enclosed: false,
+    powerByMaterial: { pla: 130, petg: 155, abs: 195, tpu: 130, pacf: 195 },
+    defaultPower: 145,
+    priceKzt: 260_000,
+    amsPriceKzt: 140_000,
+    lifespanHours: 5000,
+    depreciationPerHour: 52,
+    multiColorCapable: true,
+    multiColorSystem: "Creality CFS",
+  },
   k2_plus: {
     id: "k2_plus",
     brand: "creality",
@@ -421,6 +503,21 @@ export const PRINTER_PROFILES: Record<PrinterId, PrinterProfile> = {
     amsPriceKzt: 180_000,
     lifespanHours: 6000,
     depreciationPerHour: 97,
+    multiColorCapable: true,
+    multiColorSystem: "Creality CFS",
+  },
+  k1c: {
+    id: "k1c",
+    brand: "creality",
+    name: "Creality K1C",
+    shortName: "Creality K1C",
+    enclosed: true,
+    powerByMaterial: { pla: 130, petg: 160, abs: 210, tpu: 130, pacf: 220 },
+    defaultPower: 150,
+    priceKzt: 310_000,
+    amsPriceKzt: 160_000,
+    lifespanHours: 5000,
+    depreciationPerHour: 62,
     multiColorCapable: true,
     multiColorSystem: "Creality CFS",
   },
@@ -442,7 +539,7 @@ export const PRINTER_PROFILES: Record<PrinterId, PrinterProfile> = {
   k1: {
     id: "k1",
     brand: "creality",
-    name: "Creality K1 / K1C",
+    name: "Creality K1",
     shortName: "Creality K1",
     enclosed: true,
     powerByMaterial: { pla: 125, petg: 155, abs: 195, tpu: 125, pacf: 195 },
@@ -457,7 +554,7 @@ export const PRINTER_PROFILES: Record<PrinterId, PrinterProfile> = {
   ender3_v3: {
     id: "ender3_v3",
     brand: "creality",
-    name: "Creality Ender-3 V3",
+    name: "Creality Ender-3 V3 (CoreXZ)",
     shortName: "Ender-3 V3",
     enclosed: false,
     powerByMaterial: { pla: 120, petg: 145, abs: 185, tpu: 120, pacf: 185 },
@@ -465,21 +562,6 @@ export const PRINTER_PROFILES: Record<PrinterId, PrinterProfile> = {
     priceKzt: 165_000,
     amsPriceKzt: 0,
     lifespanHours: 4000,
-    depreciationPerHour: 41,
-    multiColorCapable: false,
-    multiColorSystem: "Ручная смена",
-  },
-  ender3_v3_ke: {
-    id: "ender3_v3_ke",
-    brand: "creality",
-    name: "Creality Ender-3 V3 KE",
-    shortName: "Ender-3 V3 KE",
-    enclosed: false,
-    powerByMaterial: { pla: 110, petg: 135, abs: 175, tpu: 110, pacf: 175 },
-    defaultPower: 125,
-    priceKzt: 145_000,
-    amsPriceKzt: 0,
-    lifespanHours: 3500,
     depreciationPerHour: 41,
     multiColorCapable: false,
     multiColorSystem: "Ручная смена",
@@ -499,25 +581,55 @@ export const PRINTER_PROFILES: Record<PrinterId, PrinterProfile> = {
     multiColorCapable: false,
     multiColorSystem: "Ручная смена",
   },
-  cr10: {
-    id: "cr10",
+  ender3_v3_ke: {
+    id: "ender3_v3_ke",
     brand: "creality",
-    name: "Creality CR-10 SE / Smart Pro",
+    name: "Creality Ender-3 V3 KE",
+    shortName: "Ender-3 V3 KE",
+    enclosed: false,
+    powerByMaterial: { pla: 110, petg: 135, abs: 175, tpu: 110, pacf: 175 },
+    defaultPower: 125,
+    priceKzt: 145_000,
+    amsPriceKzt: 0,
+    lifespanHours: 3500,
+    depreciationPerHour: 41,
+    multiColorCapable: false,
+    multiColorSystem: "Ручная смена",
+  },
+  ender3_v3_se: {
+    id: "ender3_v3_se",
+    brand: "creality",
+    name: "Creality Ender-3 V3 SE",
+    shortName: "Ender-3 V3 SE",
+    enclosed: false,
+    powerByMaterial: { pla: 95, petg: 115, abs: 150, tpu: 95, pacf: 150 },
+    defaultPower: 105,
+    priceKzt: 105_000,
+    amsPriceKzt: 0,
+    lifespanHours: 3500,
+    depreciationPerHour: 30,
+    multiColorCapable: false,
+    multiColorSystem: "Ручная смена",
+  },
+  cr10_se: {
+    id: "cr10_se",
+    brand: "creality",
+    name: "Creality CR-10 SE",
     shortName: "CR-10 SE",
     enclosed: false,
-    powerByMaterial: { pla: 140, petg: 165, abs: 210, tpu: 140, pacf: 210 },
-    defaultPower: 155,
-    priceKzt: 230_000,
+    powerByMaterial: { pla: 135, petg: 160, abs: 200, tpu: 135, pacf: 200 },
+    defaultPower: 145,
+    priceKzt: 195_000,
     amsPriceKzt: 0,
     lifespanHours: 4500,
-    depreciationPerHour: 51,
+    depreciationPerHour: 43,
     multiColorCapable: false,
     multiColorSystem: "Ручная смена",
   },
   cr_m4: {
     id: "cr_m4",
     brand: "creality",
-    name: "Creality CR-M4",
+    name: "Creality CR-M4 (450×450)",
     shortName: "CR-M4",
     enclosed: false,
     powerByMaterial: { pla: 350, petg: 420, abs: 550, tpu: 350, pacf: 550 },
@@ -529,14 +641,44 @@ export const PRINTER_PROFILES: Record<PrinterId, PrinterProfile> = {
     multiColorCapable: false,
     multiColorSystem: "Ручная смена",
   },
-  ender5: {
-    id: "ender5",
+  sermoon_d3: {
+    id: "sermoon_d3",
     brand: "creality",
-    name: "Creality Ender-5 S1 / Pro",
-    shortName: "Ender-5",
+    name: "Creality Sermoon D3 / D3 Pro",
+    shortName: "Sermoon D3",
+    enclosed: true,
+    powerByMaterial: { pla: 220, petg: 270, abs: 380, tpu: 220, pacf: 400 },
+    defaultPower: 320,
+    priceKzt: 490_000,
+    amsPriceKzt: 0,
+    lifespanHours: 7000,
+    depreciationPerHour: 70,
+    multiColorCapable: false,
+    multiColorSystem: "Ручная смена",
+  },
+  ender5_s1: {
+    id: "ender5_s1",
+    brand: "creality",
+    name: "Creality Ender-5 S1",
+    shortName: "Ender-5 S1",
     enclosed: false,
-    powerByMaterial: { pla: 115, petg: 135, abs: 175, tpu: 115, pacf: 175 },
-    defaultPower: 125,
+    powerByMaterial: { pla: 120, petg: 145, abs: 185, tpu: 120, pacf: 185 },
+    defaultPower: 135,
+    priceKzt: 210_000,
+    amsPriceKzt: 0,
+    lifespanHours: 4500,
+    depreciationPerHour: 47,
+    multiColorCapable: false,
+    multiColorSystem: "Ручная смена",
+  },
+  sermoon_v1: {
+    id: "sermoon_v1",
+    brand: "creality",
+    name: "Creality Sermoon V1 / V1 Pro",
+    shortName: "Sermoon V1 Pro",
+    enclosed: true,
+    powerByMaterial: { pla: 100, petg: 125, abs: 165, tpu: 100, pacf: 165 },
+    defaultPower: 115,
     priceKzt: 190_000,
     amsPriceKzt: 0,
     lifespanHours: 4000,
@@ -544,23 +686,128 @@ export const PRINTER_PROFILES: Record<PrinterId, PrinterProfile> = {
     multiColorCapable: false,
     multiColorSystem: "Ручная смена",
   },
-  ender3: {
-    id: "ender3",
+  ender3_s1_pro: {
+    id: "ender3_s1_pro",
     brand: "creality",
-    name: "Creality Ender-3",
-    shortName: "Ender-3",
+    name: "Creality Ender-3 S1 Pro / Plus",
+    shortName: "Ender-3 S1 Pro",
     enclosed: false,
-    powerByMaterial: { pla: 100, petg: 120, abs: 160, tpu: 100, pacf: 160 },
-    defaultPower: 110,
-    priceKzt: 120_000,
+    powerByMaterial: { pla: 110, petg: 135, abs: 175, tpu: 110, pacf: 175 },
+    defaultPower: 125,
+    priceKzt: 175_000,
     amsPriceKzt: 0,
-    lifespanHours: 3000,
+    lifespanHours: 4000,
+    depreciationPerHour: 44,
+    multiColorCapable: false,
+    multiColorSystem: "Ручная смена",
+  },
+  ender3_v2_neo: {
+    id: "ender3_v2_neo",
+    brand: "creality",
+    name: "Creality Ender-3 V2 Neo / Max Neo",
+    shortName: "Ender-3 V2 Neo",
+    enclosed: false,
+    powerByMaterial: { pla: 105, petg: 125, abs: 165, tpu: 105, pacf: 165 },
+    defaultPower: 115,
+    priceKzt: 125_000,
+    amsPriceKzt: 0,
+    lifespanHours: 3500,
+    depreciationPerHour: 36,
+    multiColorCapable: false,
+    multiColorSystem: "Ручная смена",
+  },
+  sermoon_d1: {
+    id: "sermoon_d1",
+    brand: "creality",
+    name: "Creality Sermoon D1",
+    shortName: "Sermoon D1",
+    enclosed: true,
+    powerByMaterial: { pla: 130, petg: 155, abs: 200, tpu: 130, pacf: 200 },
+    defaultPower: 145,
+    priceKzt: 260_000,
+    amsPriceKzt: 0,
+    lifespanHours: 4500,
+    depreciationPerHour: 58,
+    multiColorCapable: false,
+    multiColorSystem: "Ручная смена",
+  },
+  cr6_se: {
+    id: "cr6_se",
+    brand: "creality",
+    name: "Creality CR-6 SE / Max",
+    shortName: "CR-6 SE",
+    enclosed: false,
+    powerByMaterial: { pla: 110, petg: 130, abs: 170, tpu: 110, pacf: 170 },
+    defaultPower: 120,
+    priceKzt: 140_000,
+    amsPriceKzt: 0,
+    lifespanHours: 3500,
     depreciationPerHour: 40,
     multiColorCapable: false,
     multiColorSystem: "Ручная смена",
   },
+  ender5: {
+    id: "ender5",
+    brand: "creality",
+    name: "Creality Ender-5 Pro / Plus",
+    shortName: "Ender-5 Pro",
+    enclosed: false,
+    powerByMaterial: { pla: 115, petg: 135, abs: 175, tpu: 115, pacf: 175 },
+    defaultPower: 125,
+    priceKzt: 160_000,
+    amsPriceKzt: 0,
+    lifespanHours: 4000,
+    depreciationPerHour: 40,
+    multiColorCapable: false,
+    multiColorSystem: "Ручная смена",
+  },
+  cr10: {
+    id: "cr10",
+    brand: "creality",
+    name: "Creality CR-10 Smart Pro / V3",
+    shortName: "CR-10 Smart",
+    enclosed: false,
+    powerByMaterial: { pla: 140, petg: 165, abs: 210, tpu: 140, pacf: 210 },
+    defaultPower: 155,
+    priceKzt: 210_000,
+    amsPriceKzt: 0,
+    lifespanHours: 4500,
+    depreciationPerHour: 47,
+    multiColorCapable: false,
+    multiColorSystem: "Ручная смена",
+  },
+  ender3_v2: {
+    id: "ender3_v2",
+    brand: "creality",
+    name: "Creality Ender-3 V2",
+    shortName: "Ender-3 V2",
+    enclosed: false,
+    powerByMaterial: { pla: 100, petg: 120, abs: 160, tpu: 100, pacf: 160 },
+    defaultPower: 110,
+    priceKzt: 110_000,
+    amsPriceKzt: 0,
+    lifespanHours: 3000,
+    depreciationPerHour: 37,
+    multiColorCapable: false,
+    multiColorSystem: "Ручная смена",
+  },
+  ender3: {
+    id: "ender3",
+    brand: "creality",
+    name: "Creality Ender-3 / Pro",
+    shortName: "Ender-3",
+    enclosed: false,
+    powerByMaterial: { pla: 95, petg: 115, abs: 155, tpu: 95, pacf: 155 },
+    defaultPower: 105,
+    priceKzt: 85_000,
+    amsPriceKzt: 0,
+    lifespanHours: 3000,
+    depreciationPerHour: 28,
+    multiColorCapable: false,
+    multiColorSystem: "Ручная смена",
+  },
 
-  // ── Anycubic ──
+  // ── Anycubic (Newest -> Oldest) ──
   kobra_s1_max: {
     id: "kobra_s1_max",
     brand: "anycubic",
@@ -579,7 +826,7 @@ export const PRINTER_PROFILES: Record<PrinterId, PrinterProfile> = {
   kobra3_combo: {
     id: "kobra3_combo",
     brand: "anycubic",
-    name: "Anycubic Kobra 3 Combo",
+    name: "Anycubic Kobra 3 Combo / Kobra 3",
     shortName: "Kobra 3 Combo",
     enclosed: false,
     powerByMaterial: { pla: 140, petg: 170, abs: 210, tpu: 140, pacf: 210 },
@@ -636,21 +883,6 @@ export const PRINTER_PROFILES: Record<PrinterId, PrinterProfile> = {
     multiColorCapable: false,
     multiColorSystem: "Ручная смена",
   },
-  kobra2_neo: {
-    id: "kobra2_neo",
-    brand: "anycubic",
-    name: "Anycubic Kobra 2 Neo",
-    shortName: "Kobra 2 Neo",
-    enclosed: false,
-    powerByMaterial: { pla: 95, petg: 115, abs: 150, tpu: 95, pacf: 150 },
-    defaultPower: 105,
-    priceKzt: 95_000,
-    amsPriceKzt: 0,
-    lifespanHours: 3000,
-    depreciationPerHour: 32,
-    multiColorCapable: false,
-    multiColorSystem: "Ручная смена",
-  },
   kobra2: {
     id: "kobra2",
     brand: "anycubic",
@@ -663,6 +895,21 @@ export const PRINTER_PROFILES: Record<PrinterId, PrinterProfile> = {
     amsPriceKzt: 0,
     lifespanHours: 3500,
     depreciationPerHour: 36,
+    multiColorCapable: false,
+    multiColorSystem: "Ручная смена",
+  },
+  kobra2_neo: {
+    id: "kobra2_neo",
+    brand: "anycubic",
+    name: "Anycubic Kobra 2 Neo",
+    shortName: "Kobra 2 Neo",
+    enclosed: false,
+    powerByMaterial: { pla: 95, petg: 115, abs: 150, tpu: 95, pacf: 150 },
+    defaultPower: 105,
+    priceKzt: 95_000,
+    amsPriceKzt: 0,
+    lifespanHours: 3000,
+    depreciationPerHour: 32,
     multiColorCapable: false,
     multiColorSystem: "Ручная смена",
   },
@@ -681,8 +928,128 @@ export const PRINTER_PROFILES: Record<PrinterId, PrinterProfile> = {
     multiColorCapable: false,
     multiColorSystem: "Ручная смена",
   },
+  kobra_neo: {
+    id: "kobra_neo",
+    brand: "anycubic",
+    name: "Anycubic Kobra / Kobra Neo",
+    shortName: "Kobra Neo",
+    enclosed: false,
+    powerByMaterial: { pla: 100, petg: 120, abs: 160, tpu: 100, pacf: 160 },
+    defaultPower: 110,
+    priceKzt: 105_000,
+    amsPriceKzt: 0,
+    lifespanHours: 3000,
+    depreciationPerHour: 35,
+    multiColorCapable: false,
+    multiColorSystem: "Ручная смена",
+  },
+  anycubic_vyper: {
+    id: "anycubic_vyper",
+    brand: "anycubic",
+    name: "Anycubic Vyper",
+    shortName: "Vyper",
+    enclosed: false,
+    powerByMaterial: { pla: 115, petg: 140, abs: 180, tpu: 115, pacf: 180 },
+    defaultPower: 130,
+    priceKzt: 130_000,
+    amsPriceKzt: 0,
+    lifespanHours: 3500,
+    depreciationPerHour: 37,
+    multiColorCapable: false,
+    multiColorSystem: "Ручная смена",
+  },
+  anycubic_4max_pro2: {
+    id: "anycubic_4max_pro2",
+    brand: "anycubic",
+    name: "Anycubic 4Max Pro 2.0",
+    shortName: "4Max Pro 2.0",
+    enclosed: true,
+    powerByMaterial: { pla: 125, petg: 155, abs: 210, tpu: 125, pacf: 220 },
+    defaultPower: 145,
+    priceKzt: 180_000,
+    amsPriceKzt: 0,
+    lifespanHours: 4500,
+    depreciationPerHour: 40,
+    multiColorCapable: false,
+    multiColorSystem: "Ручная смена",
+  },
+  anycubic_mega_x: {
+    id: "anycubic_mega_x",
+    brand: "anycubic",
+    name: "Anycubic Mega X (300×300)",
+    shortName: "Mega X",
+    enclosed: false,
+    powerByMaterial: { pla: 150, petg: 185, abs: 240, tpu: 150, pacf: 240 },
+    defaultPower: 170,
+    priceKzt: 145_000,
+    amsPriceKzt: 0,
+    lifespanHours: 4000,
+    depreciationPerHour: 36,
+    multiColorCapable: false,
+    multiColorSystem: "Ручная смена",
+  },
+  anycubic_mega_s: {
+    id: "anycubic_mega_s",
+    brand: "anycubic",
+    name: "Anycubic Mega S / Mega Pro",
+    shortName: "Mega S",
+    enclosed: false,
+    powerByMaterial: { pla: 95, petg: 115, abs: 150, tpu: 95, pacf: 150 },
+    defaultPower: 105,
+    priceKzt: 105_000,
+    amsPriceKzt: 0,
+    lifespanHours: 3500,
+    depreciationPerHour: 30,
+    multiColorCapable: false,
+    multiColorSystem: "Ручная смена",
+  },
+  anycubic_mega_zero: {
+    id: "anycubic_mega_zero",
+    brand: "anycubic",
+    name: "Anycubic Mega Zero 2.0",
+    shortName: "Mega Zero",
+    enclosed: false,
+    powerByMaterial: { pla: 80, petg: 100, abs: 130, tpu: 80, pacf: 130 },
+    defaultPower: 90,
+    priceKzt: 75_000,
+    amsPriceKzt: 0,
+    lifespanHours: 2500,
+    depreciationPerHour: 30,
+    multiColorCapable: false,
+    multiColorSystem: "Ручная смена",
+  },
+  anycubic_chiron: {
+    id: "anycubic_chiron",
+    brand: "anycubic",
+    name: "Anycubic Chiron (400×400)",
+    shortName: "Chiron",
+    enclosed: false,
+    powerByMaterial: { pla: 270, petg: 330, abs: 420, tpu: 270, pacf: 420 },
+    defaultPower: 300,
+    priceKzt: 190_000,
+    amsPriceKzt: 0,
+    lifespanHours: 4000,
+    depreciationPerHour: 48,
+    multiColorCapable: false,
+    multiColorSystem: "Ручная смена",
+  },
+  anycubic_predator: {
+    id: "anycubic_predator",
+    brand: "anycubic",
+    name: "Anycubic Predator Delta",
+    shortName: "Predator Delta",
+    enclosed: false,
+    powerByMaterial: { pla: 220, petg: 270, abs: 350, tpu: 220, pacf: 350 },
+    defaultPower: 250,
+    priceKzt: 210_000,
+    amsPriceKzt: 0,
+    lifespanHours: 4000,
+    depreciationPerHour: 53,
+    multiColorCapable: false,
+    multiColorSystem: "Ручная смена",
+  },
 
-  // ── Elegoo ──
+  // ── Elegoo (Newest -> Oldest) ──
   centauri_2: {
     id: "centauri_2",
     brand: "elegoo",
@@ -716,7 +1083,7 @@ export const PRINTER_PROFILES: Record<PrinterId, PrinterProfile> = {
   neptune4_max: {
     id: "neptune4_max",
     brand: "elegoo",
-    name: "Elegoo Neptune 4 Max",
+    name: "Elegoo Neptune 4 Max (420×420)",
     shortName: "Neptune 4 Max",
     enclosed: false,
     powerByMaterial: { pla: 270, petg: 330, abs: 410, tpu: 270, pacf: 410 },
@@ -773,6 +1140,36 @@ export const PRINTER_PROFILES: Record<PrinterId, PrinterProfile> = {
     multiColorCapable: false,
     multiColorSystem: "Ручная смена",
   },
+  neptune3_max: {
+    id: "neptune3_max",
+    brand: "elegoo",
+    name: "Elegoo Neptune 3 Max",
+    shortName: "Neptune 3 Max",
+    enclosed: false,
+    powerByMaterial: { pla: 260, petg: 310, abs: 390, tpu: 260, pacf: 390 },
+    defaultPower: 280,
+    priceKzt: 220_000,
+    amsPriceKzt: 0,
+    lifespanHours: 4000,
+    depreciationPerHour: 55,
+    multiColorCapable: false,
+    multiColorSystem: "Ручная смена",
+  },
+  neptune3_plus: {
+    id: "neptune3_plus",
+    brand: "elegoo",
+    name: "Elegoo Neptune 3 Plus",
+    shortName: "Neptune 3 Plus",
+    enclosed: false,
+    powerByMaterial: { pla: 180, petg: 220, abs: 280, tpu: 180, pacf: 280 },
+    defaultPower: 200,
+    priceKzt: 170_000,
+    amsPriceKzt: 0,
+    lifespanHours: 4000,
+    depreciationPerHour: 43,
+    multiColorCapable: false,
+    multiColorSystem: "Ручная смена",
+  },
   neptune3_pro: {
     id: "neptune3_pro",
     brand: "elegoo",
@@ -788,8 +1185,53 @@ export const PRINTER_PROFILES: Record<PrinterId, PrinterProfile> = {
     multiColorCapable: false,
     multiColorSystem: "Ручная смена",
   },
+  neptune3: {
+    id: "neptune3",
+    brand: "elegoo",
+    name: "Elegoo Neptune 3",
+    shortName: "Neptune 3",
+    enclosed: false,
+    powerByMaterial: { pla: 95, petg: 115, abs: 155, tpu: 95, pacf: 155 },
+    defaultPower: 105,
+    priceKzt: 105_000,
+    amsPriceKzt: 0,
+    lifespanHours: 3000,
+    depreciationPerHour: 35,
+    multiColorCapable: false,
+    multiColorSystem: "Ручная смена",
+  },
+  neptune2s: {
+    id: "neptune2s",
+    brand: "elegoo",
+    name: "Elegoo Neptune 2S / 2",
+    shortName: "Neptune 2S",
+    enclosed: false,
+    powerByMaterial: { pla: 90, petg: 110, abs: 150, tpu: 90, pacf: 150 },
+    defaultPower: 100,
+    priceKzt: 85_000,
+    amsPriceKzt: 0,
+    lifespanHours: 3000,
+    depreciationPerHour: 28,
+    multiColorCapable: false,
+    multiColorSystem: "Ручная смена",
+  },
+  neptune_x: {
+    id: "neptune_x",
+    brand: "elegoo",
+    name: "Elegoo Neptune X",
+    shortName: "Neptune X",
+    enclosed: false,
+    powerByMaterial: { pla: 105, petg: 125, abs: 165, tpu: 105, pacf: 165 },
+    defaultPower: 115,
+    priceKzt: 110_000,
+    amsPriceKzt: 0,
+    lifespanHours: 3000,
+    depreciationPerHour: 37,
+    multiColorCapable: false,
+    multiColorSystem: "Ручная смена",
+  },
 
-  // ── QIDI Tech ──
+  // ── QIDI Tech (Newest -> Oldest) ──
   max4: {
     id: "max4",
     brand: "qidi",
@@ -823,7 +1265,7 @@ export const PRINTER_PROFILES: Record<PrinterId, PrinterProfile> = {
   q1_pro: {
     id: "q1_pro",
     brand: "qidi",
-    name: "QIDI Q1 Pro",
+    name: "QIDI Q1 Pro (Active Chamber 60°C)",
     shortName: "QIDI Q1 Pro",
     enclosed: true,
     powerByMaterial: { pla: 140, petg: 170, abs: 290, tpu: 140, pacf: 320 },
@@ -838,7 +1280,7 @@ export const PRINTER_PROFILES: Record<PrinterId, PrinterProfile> = {
   x_max3: {
     id: "x_max3",
     brand: "qidi",
-    name: "QIDI X-Max 3",
+    name: "QIDI X-Max 3 (325×325)",
     shortName: "QIDI X-Max 3",
     enclosed: true,
     powerByMaterial: { pla: 210, petg: 260, abs: 420, tpu: 210, pacf: 450 },
@@ -847,6 +1289,21 @@ export const PRINTER_PROFILES: Record<PrinterId, PrinterProfile> = {
     amsPriceKzt: 0,
     lifespanHours: 6500,
     depreciationPerHour: 75,
+    multiColorCapable: false,
+    multiColorSystem: "Ручная смена",
+  },
+  x_plus3: {
+    id: "x_plus3",
+    brand: "qidi",
+    name: "QIDI X-Plus 3",
+    shortName: "QIDI X-Plus 3",
+    enclosed: true,
+    powerByMaterial: { pla: 170, petg: 210, abs: 330, tpu: 170, pacf: 350 },
+    defaultPower: 240,
+    priceKzt: 360_000,
+    amsPriceKzt: 0,
+    lifespanHours: 5500,
+    depreciationPerHour: 65,
     multiColorCapable: false,
     multiColorSystem: "Ручная смена",
   },
@@ -865,13 +1322,73 @@ export const PRINTER_PROFILES: Record<PrinterId, PrinterProfile> = {
     multiColorCapable: false,
     multiColorSystem: "Ручная смена",
   },
+  x_cf_pro: {
+    id: "x_cf_pro",
+    brand: "qidi",
+    name: "QIDI X-CF Pro (Carbon Fiber 350°C)",
+    shortName: "QIDI X-CF Pro",
+    enclosed: true,
+    powerByMaterial: { pla: 180, petg: 220, abs: 340, tpu: 180, pacf: 370 },
+    defaultPower: 250,
+    priceKzt: 380_000,
+    amsPriceKzt: 0,
+    lifespanHours: 5500,
+    depreciationPerHour: 69,
+    multiColorCapable: false,
+    multiColorSystem: "Ручная смена",
+  },
+  i_fast: {
+    id: "i_fast",
+    brand: "qidi",
+    name: "QIDI i-Fast Dual Extruder",
+    shortName: "QIDI i-Fast",
+    enclosed: true,
+    powerByMaterial: { pla: 220, petg: 270, abs: 380, tpu: 220, pacf: 400 },
+    defaultPower: 300,
+    priceKzt: 550_000,
+    amsPriceKzt: 0,
+    lifespanHours: 6000,
+    depreciationPerHour: 92,
+    multiColorCapable: true,
+    multiColorSystem: "Dual Extruder",
+  },
+  i_mate_s: {
+    id: "i_mate_s",
+    brand: "qidi",
+    name: "QIDI i-Mate / i-Mate S",
+    shortName: "QIDI i-Mate",
+    enclosed: true,
+    powerByMaterial: { pla: 115, petg: 135, abs: 175, tpu: 115, pacf: 175 },
+    defaultPower: 125,
+    priceKzt: 190_000,
+    amsPriceKzt: 0,
+    lifespanHours: 4000,
+    depreciationPerHour: 48,
+    multiColorCapable: false,
+    multiColorSystem: "Ручная смена",
+  },
+  x_max_2: {
+    id: "x_max_2",
+    brand: "qidi",
+    name: "QIDI X-Max / X-Plus (Classic)",
+    shortName: "QIDI X-Max",
+    enclosed: true,
+    powerByMaterial: { pla: 140, petg: 165, abs: 220, tpu: 140, pacf: 220 },
+    defaultPower: 160,
+    priceKzt: 250_000,
+    amsPriceKzt: 0,
+    lifespanHours: 4500,
+    depreciationPerHour: 56,
+    multiColorCapable: false,
+    multiColorSystem: "Ручная смена",
+  },
 
-  // ── Flashforge ──
+  // ── Flashforge (Newest -> Oldest) ──
   ad5x: {
     id: "ad5x",
     brand: "flashforge",
-    name: "Flashforge AD5X",
-    shortName: "Flashforge AD5X",
+    name: "Flashforge AD5X (IFS Multi-Color)",
+    shortName: "AD5X",
     enclosed: true,
     powerByMaterial: { pla: 130, petg: 160, abs: 210, tpu: 130, pacf: 210 },
     defaultPower: 150,
@@ -882,35 +1399,50 @@ export const PRINTER_PROFILES: Record<PrinterId, PrinterProfile> = {
     multiColorCapable: true,
     multiColorSystem: "IFS (4 цвета)",
   },
-  adventurer5m: {
-    id: "adventurer5m",
+  adventurer5m_pro: {
+    id: "adventurer5m_pro",
     brand: "flashforge",
-    name: "Flashforge Adventurer 5M / 5M Pro",
-    shortName: "Adventurer 5M",
+    name: "Flashforge Adventurer 5M Pro",
+    shortName: "Adventurer 5M Pro",
     enclosed: true,
-    powerByMaterial: { pla: 125, petg: 150, abs: 190, tpu: 125, pacf: 190 },
-    defaultPower: 140,
-    priceKzt: 210_000,
+    powerByMaterial: { pla: 135, petg: 160, abs: 200, tpu: 135, pacf: 200 },
+    defaultPower: 150,
+    priceKzt: 240_000,
     amsPriceKzt: 0,
-    lifespanHours: 4500,
-    depreciationPerHour: 47,
+    lifespanHours: 5000,
+    depreciationPerHour: 48,
     multiColorCapable: false,
     multiColorSystem: "Ручная смена",
   },
-  creator5: {
-    id: "creator5",
+  adventurer5m: {
+    id: "adventurer5m",
     brand: "flashforge",
-    name: "Flashforge Creator 5 Pro",
-    shortName: "Creator 5 Pro",
+    name: "Flashforge Adventurer 5M",
+    shortName: "Adventurer 5M",
+    enclosed: false,
+    powerByMaterial: { pla: 120, petg: 145, abs: 185, tpu: 120, pacf: 185 },
+    defaultPower: 135,
+    priceKzt: 190_000,
+    amsPriceKzt: 0,
+    lifespanHours: 4500,
+    depreciationPerHour: 42,
+    multiColorCapable: false,
+    multiColorSystem: "Ручная смена",
+  },
+  guider3_ultra: {
+    id: "guider3_ultra",
+    brand: "flashforge",
+    name: "Flashforge Guider 3 Ultra (Dual)",
+    shortName: "Guider 3 Ultra",
     enclosed: true,
-    powerByMaterial: { pla: 320, petg: 380, abs: 520, tpu: 320, pacf: 580 },
-    defaultPower: 480,
-    priceKzt: 1_800_000,
+    powerByMaterial: { pla: 320, petg: 380, abs: 520, tpu: 320, pacf: 550 },
+    defaultPower: 450,
+    priceKzt: 1_400_000,
     amsPriceKzt: 0,
     lifespanHours: 9000,
-    depreciationPerHour: 200,
+    depreciationPerHour: 156,
     multiColorCapable: true,
-    multiColorSystem: "4 Independent Toolheads",
+    multiColorSystem: "Dual Extruder",
   },
   guider3: {
     id: "guider3",
@@ -930,7 +1462,7 @@ export const PRINTER_PROFILES: Record<PrinterId, PrinterProfile> = {
   creator4: {
     id: "creator4",
     brand: "flashforge",
-    name: "Flashforge Creator 4",
+    name: "Flashforge Creator 4 (IDEX Industrial)",
     shortName: "Creator 4",
     enclosed: true,
     powerByMaterial: { pla: 300, petg: 360, abs: 500, tpu: 300, pacf: 550 },
@@ -939,21 +1471,6 @@ export const PRINTER_PROFILES: Record<PrinterId, PrinterProfile> = {
     amsPriceKzt: 0,
     lifespanHours: 9000,
     depreciationPerHour: 178,
-    multiColorCapable: true,
-    multiColorSystem: "IDEX",
-  },
-  creator3: {
-    id: "creator3",
-    brand: "flashforge",
-    name: "Flashforge Creator 3 Pro",
-    shortName: "Creator 3 Pro",
-    enclosed: true,
-    powerByMaterial: { pla: 260, petg: 310, abs: 420, tpu: 260, pacf: 450 },
-    defaultPower: 350,
-    priceKzt: 1_100_000,
-    amsPriceKzt: 0,
-    lifespanHours: 8000,
-    depreciationPerHour: 138,
     multiColorCapable: true,
     multiColorSystem: "IDEX",
   },
@@ -972,25 +1489,55 @@ export const PRINTER_PROFILES: Record<PrinterId, PrinterProfile> = {
     multiColorCapable: false,
     multiColorSystem: "Ручная смена",
   },
-  guider2s: {
-    id: "guider2s",
+  artemis: {
+    id: "artemis",
     brand: "flashforge",
-    name: "Flashforge Guider IIs",
-    shortName: "Guider IIs",
-    enclosed: true,
-    powerByMaterial: { pla: 180, petg: 220, abs: 300, tpu: 180, pacf: 320 },
-    defaultPower: 220,
-    priceKzt: 550_000,
+    name: "Flashforge Artemis",
+    shortName: "Artemis",
+    enclosed: false,
+    powerByMaterial: { pla: 110, petg: 135, abs: 175, tpu: 110, pacf: 175 },
+    defaultPower: 125,
+    priceKzt: 185_000,
     amsPriceKzt: 0,
-    lifespanHours: 6500,
-    depreciationPerHour: 85,
+    lifespanHours: 4000,
+    depreciationPerHour: 46,
     multiColorCapable: false,
     multiColorSystem: "Ручная смена",
+  },
+  finder3: {
+    id: "finder3",
+    brand: "flashforge",
+    name: "Flashforge Finder 3",
+    shortName: "Finder 3",
+    enclosed: false,
+    powerByMaterial: { pla: 95, petg: 115, abs: 150, tpu: 95, pacf: 150 },
+    defaultPower: 105,
+    priceKzt: 150_000,
+    amsPriceKzt: 0,
+    lifespanHours: 3500,
+    depreciationPerHour: 43,
+    multiColorCapable: false,
+    multiColorSystem: "Ручная смена",
+  },
+  creator3: {
+    id: "creator3",
+    brand: "flashforge",
+    name: "Flashforge Creator 3 Pro (IDEX)",
+    shortName: "Creator 3 Pro",
+    enclosed: true,
+    powerByMaterial: { pla: 260, petg: 310, abs: 420, tpu: 260, pacf: 450 },
+    defaultPower: 350,
+    priceKzt: 1_100_000,
+    amsPriceKzt: 0,
+    lifespanHours: 8000,
+    depreciationPerHour: 138,
+    multiColorCapable: true,
+    multiColorSystem: "IDEX",
   },
   creator_pro2: {
     id: "creator_pro2",
     brand: "flashforge",
-    name: "Flashforge Creator Pro 2",
+    name: "Flashforge Creator Pro 2 (IDEX)",
     shortName: "Creator Pro 2",
     enclosed: true,
     powerByMaterial: { pla: 160, petg: 190, abs: 260, tpu: 160, pacf: 280 },
@@ -1001,6 +1548,21 @@ export const PRINTER_PROFILES: Record<PrinterId, PrinterProfile> = {
     depreciationPerHour: 68,
     multiColorCapable: true,
     multiColorSystem: "IDEX",
+  },
+  guider2s: {
+    id: "guider2s",
+    brand: "flashforge",
+    name: "Flashforge Guider IIs / Guider II",
+    shortName: "Guider IIs",
+    enclosed: true,
+    powerByMaterial: { pla: 180, petg: 220, abs: 300, tpu: 180, pacf: 320 },
+    defaultPower: 220,
+    priceKzt: 550_000,
+    amsPriceKzt: 0,
+    lifespanHours: 6500,
+    depreciationPerHour: 85,
+    multiColorCapable: false,
+    multiColorSystem: "Ручная смена",
   },
   adventurer3: {
     id: "adventurer3",
@@ -1017,8 +1579,23 @@ export const PRINTER_PROFILES: Record<PrinterId, PrinterProfile> = {
     multiColorCapable: false,
     multiColorSystem: "Ручная смена",
   },
+  creator_pro: {
+    id: "creator_pro",
+    brand: "flashforge",
+    name: "Flashforge Creator Pro",
+    shortName: "Creator Pro",
+    enclosed: true,
+    powerByMaterial: { pla: 150, petg: 180, abs: 240, tpu: 150, pacf: 250 },
+    defaultPower: 170,
+    priceKzt: 220_000,
+    amsPriceKzt: 0,
+    lifespanHours: 4000,
+    depreciationPerHour: 55,
+    multiColorCapable: true,
+    multiColorSystem: "Dual Extruder",
+  },
 
-  // ── Flying Bear ──
+  // ── Flying Bear (Newest -> Oldest) ──
   reborn2: {
     id: "reborn2",
     brand: "flyingbear",
@@ -1049,13 +1626,28 @@ export const PRINTER_PROFILES: Record<PrinterId, PrinterProfile> = {
     multiColorCapable: false,
     multiColorSystem: "Ручная смена",
   },
+  ghost5: {
+    id: "ghost5",
+    brand: "flyingbear",
+    name: "Flying Bear Ghost 5",
+    shortName: "Ghost 5",
+    enclosed: false,
+    powerByMaterial: { pla: 100, petg: 120, abs: 160, tpu: 100, pacf: 160 },
+    defaultPower: 115,
+    priceKzt: 130_000,
+    amsPriceKzt: 0,
+    lifespanHours: 3500,
+    depreciationPerHour: 37,
+    multiColorCapable: false,
+    multiColorSystem: "Ручная смена",
+  },
 
-  // ── Kingroon ──
+  // ── Kingroon (Newest -> Oldest) ──
   klp1: {
     id: "klp1",
     brand: "kingroon",
-    name: "Kingroon KLP1",
-    shortName: "Kingroon KLP1",
+    name: "Kingroon KLP1 (CoreXY Klipper)",
+    shortName: "KLP1",
     enclosed: true,
     powerByMaterial: { pla: 100, petg: 120, abs: 160, tpu: 100, pacf: 160 },
     defaultPower: 110,
@@ -1066,10 +1658,25 @@ export const PRINTER_PROFILES: Record<PrinterId, PrinterProfile> = {
     multiColorCapable: false,
     multiColorSystem: "Ручная смена",
   },
+  kp3s_pro_v2: {
+    id: "kp3s_pro_v2",
+    brand: "kingroon",
+    name: "Kingroon KP3S Pro V2",
+    shortName: "KP3S Pro V2",
+    enclosed: false,
+    powerByMaterial: { pla: 95, petg: 115, abs: 150, tpu: 95, pacf: 150 },
+    defaultPower: 105,
+    priceKzt: 110_000,
+    amsPriceKzt: 0,
+    lifespanHours: 3000,
+    depreciationPerHour: 37,
+    multiColorCapable: false,
+    multiColorSystem: "Ручная смена",
+  },
   kp3s_pro: {
     id: "kp3s_pro",
     brand: "kingroon",
-    name: "Kingroon KP3S Pro / V2",
+    name: "Kingroon KP3S Pro",
     shortName: "KP3S Pro",
     enclosed: false,
     powerByMaterial: { pla: 90, petg: 110, abs: 140, tpu: 90, pacf: 140 },
@@ -1081,8 +1688,38 @@ export const PRINTER_PROFILES: Record<PrinterId, PrinterProfile> = {
     multiColorCapable: false,
     multiColorSystem: "Ручная смена",
   },
+  kp3s: {
+    id: "kp3s",
+    brand: "kingroon",
+    name: "Kingroon KP3S 3.0",
+    shortName: "KP3S",
+    enclosed: false,
+    powerByMaterial: { pla: 80, petg: 100, abs: 130, tpu: 80, pacf: 130 },
+    defaultPower: 90,
+    priceKzt: 75_000,
+    amsPriceKzt: 0,
+    lifespanHours: 2500,
+    depreciationPerHour: 30,
+    multiColorCapable: false,
+    multiColorSystem: "Ручная смена",
+  },
 
-  // ── Artillery & Two Trees ──
+  // ── Artillery (Newest -> Oldest) ──
+  sidewinder_x4_plus: {
+    id: "sidewinder_x4_plus",
+    brand: "artillery",
+    name: "Artillery Sidewinder X4 Plus / Pro",
+    shortName: "Sidewinder X4 Plus",
+    enclosed: false,
+    powerByMaterial: { pla: 140, petg: 170, abs: 215, tpu: 140, pacf: 215 },
+    defaultPower: 155,
+    priceKzt: 195_000,
+    amsPriceKzt: 0,
+    lifespanHours: 4000,
+    depreciationPerHour: 49,
+    multiColorCapable: false,
+    multiColorSystem: "Ручная смена",
+  },
   sidewinder_x4: {
     id: "sidewinder_x4",
     brand: "artillery",
@@ -1098,10 +1735,42 @@ export const PRINTER_PROFILES: Record<PrinterId, PrinterProfile> = {
     multiColorCapable: false,
     multiColorSystem: "Ручная смена",
   },
+  sidewinder_x2: {
+    id: "sidewinder_x2",
+    brand: "artillery",
+    name: "Artillery Sidewinder X2 (300×300)",
+    shortName: "Sidewinder X2",
+    enclosed: false,
+    powerByMaterial: { pla: 130, petg: 155, abs: 200, tpu: 130, pacf: 200 },
+    defaultPower: 145,
+    priceKzt: 160_000,
+    amsPriceKzt: 0,
+    lifespanHours: 4000,
+    depreciationPerHour: 40,
+    multiColorCapable: false,
+    multiColorSystem: "Ручная смена",
+  },
+  genius_pro: {
+    id: "genius_pro",
+    brand: "artillery",
+    name: "Artillery Genius Pro",
+    shortName: "Genius Pro",
+    enclosed: false,
+    powerByMaterial: { pla: 100, petg: 120, abs: 160, tpu: 100, pacf: 160 },
+    defaultPower: 110,
+    priceKzt: 130_000,
+    amsPriceKzt: 0,
+    lifespanHours: 3500,
+    depreciationPerHour: 37,
+    multiColorCapable: false,
+    multiColorSystem: "Ручная смена",
+  },
+
+  // ── Two Trees (Newest -> Oldest) ──
   sk1: {
     id: "sk1",
     brand: "twotrees",
-    name: "Two Trees SK1",
+    name: "Two Trees SK1 (CoreXY 700mm/s)",
     shortName: "Two Trees SK1",
     enclosed: false,
     powerByMaterial: { pla: 135, petg: 165, abs: 210, tpu: 135, pacf: 210 },
@@ -1113,12 +1782,57 @@ export const PRINTER_PROFILES: Record<PrinterId, PrinterProfile> = {
     multiColorCapable: false,
     multiColorSystem: "Ручная смена",
   },
+  bluer_plus: {
+    id: "bluer_plus",
+    brand: "twotrees",
+    name: "Two Trees Bluer Plus (300×300)",
+    shortName: "Bluer Plus",
+    enclosed: false,
+    powerByMaterial: { pla: 125, petg: 150, abs: 195, tpu: 125, pacf: 195 },
+    defaultPower: 140,
+    priceKzt: 150_000,
+    amsPriceKzt: 0,
+    lifespanHours: 3500,
+    depreciationPerHour: 43,
+    multiColorCapable: false,
+    multiColorSystem: "Ручная смена",
+  },
+  sapphire_plus: {
+    id: "sapphire_plus",
+    brand: "twotrees",
+    name: "Two Trees Sapphire Plus",
+    shortName: "Sapphire Plus",
+    enclosed: false,
+    powerByMaterial: { pla: 130, petg: 155, abs: 200, tpu: 130, pacf: 200 },
+    defaultPower: 145,
+    priceKzt: 180_000,
+    amsPriceKzt: 0,
+    lifespanHours: 4000,
+    depreciationPerHour: 45,
+    multiColorCapable: false,
+    multiColorSystem: "Ручная смена",
+  },
 
-  // ── Snapmaker, Formlabs & Industrial ──
+  // ── Snapmaker (Newest -> Oldest) ──
+  snapmaker_u1: {
+    id: "snapmaker_u1",
+    brand: "snapmaker",
+    name: "Snapmaker Artisan / J1s",
+    shortName: "Snapmaker Artisan",
+    enclosed: true,
+    powerByMaterial: { pla: 180, petg: 220, abs: 300, tpu: 180, pacf: 320 },
+    defaultPower: 220,
+    priceKzt: 650_000,
+    amsPriceKzt: 0,
+    lifespanHours: 7000,
+    depreciationPerHour: 93,
+    multiColorCapable: true,
+    multiColorSystem: "IDEX Dual",
+  },
   snapmaker_j1: {
     id: "snapmaker_j1",
     brand: "snapmaker",
-    name: "Snapmaker J1 / J1s",
+    name: "Snapmaker J1 (IDEX)",
     shortName: "Snapmaker J1",
     enclosed: true,
     powerByMaterial: { pla: 150, petg: 180, abs: 240, tpu: 150, pacf: 260 },
@@ -1129,6 +1843,38 @@ export const PRINTER_PROFILES: Record<PrinterId, PrinterProfile> = {
     depreciationPerHour: 80,
     multiColorCapable: true,
     multiColorSystem: "IDEX",
+  },
+  snapmaker_2: {
+    id: "snapmaker_2",
+    brand: "snapmaker",
+    name: "Snapmaker 2.0 A350T",
+    shortName: "Snapmaker A350T",
+    enclosed: true,
+    powerByMaterial: { pla: 160, petg: 195, abs: 260, tpu: 160, pacf: 280 },
+    defaultPower: 200,
+    priceKzt: 590_000,
+    amsPriceKzt: 0,
+    lifespanHours: 6500,
+    depreciationPerHour: 91,
+    multiColorCapable: false,
+    multiColorSystem: "Ручная смена",
+  },
+
+  // ── Raise3D & UltiMaker (Newest -> Oldest) ──
+  raise3d_pro3_plus: {
+    id: "raise3d_pro3_plus",
+    brand: "raise3d",
+    name: "Raise3D Pro3 Plus (300×300×605)",
+    shortName: "Raise3D Pro3+",
+    enclosed: true,
+    powerByMaterial: { pla: 300, petg: 360, abs: 500, tpu: 300, pacf: 530 },
+    defaultPower: 400,
+    priceKzt: 3_600_000,
+    amsPriceKzt: 0,
+    lifespanHours: 12000,
+    depreciationPerHour: 300,
+    multiColorCapable: true,
+    multiColorSystem: "Dual Extruder",
   },
   raise3d_pro3: {
     id: "raise3d_pro3",
@@ -1145,10 +1891,25 @@ export const PRINTER_PROFILES: Record<PrinterId, PrinterProfile> = {
     multiColorCapable: true,
     multiColorSystem: "Dual Extruder",
   },
+  ultimaker_s7: {
+    id: "ultimaker_s7",
+    brand: "raise3d",
+    name: "UltiMaker S7",
+    shortName: "UltiMaker S7",
+    enclosed: true,
+    powerByMaterial: { pla: 240, petg: 290, abs: 400, tpu: 240, pacf: 420 },
+    defaultPower: 320,
+    priceKzt: 3_700_000,
+    amsPriceKzt: 0,
+    lifespanHours: 12000,
+    depreciationPerHour: 308,
+    multiColorCapable: true,
+    multiColorSystem: "Dual Print Core",
+  },
   ultimaker_s5: {
     id: "ultimaker_s5",
     brand: "raise3d",
-    name: "UltiMaker S5 / S7",
+    name: "UltiMaker S5",
     shortName: "UltiMaker S5",
     enclosed: true,
     powerByMaterial: { pla: 220, petg: 270, abs: 380, tpu: 220, pacf: 400 },

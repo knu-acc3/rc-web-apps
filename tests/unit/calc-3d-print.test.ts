@@ -303,6 +303,17 @@ describe("3D printing calculator engine", () => {
     expect((PRINTER_PROFILES as Record<string, unknown>).p1p).toBeUndefined();
     expect(PRINTER_PROFILES.p2s).toBeDefined();
 
+    // Verify 2025/2026 newly added flagship models
+    expect(PRINTER_PROFILES.ender3_v4).toBeDefined();
+    expect(PRINTER_PROFILES.ender3_v4.brand).toBe("creality");
+    expect(PRINTER_PROFILES.creality_hi).toBeDefined();
+    expect(PRINTER_PROFILES.creality_hi.brand).toBe("creality");
+    expect(PRINTER_PROFILES.anycubic_vyper).toBeDefined();
+    expect(PRINTER_PROFILES.anycubic_vyper.brand).toBe("anycubic");
+    expect(PRINTER_PROFILES.anycubic_chiron).toBeDefined();
+    expect(PRINTER_PROFILES.anycubic_mega_s).toBeDefined();
+    expect(PRINTER_PROFILES.anycubic_mega_x).toBeDefined();
+
     for (const p of printers) {
       expect(p.depreciationPerHour).toBe(Math.round(p.priceKzt / p.lifespanHours));
       expect(p.defaultPower).toBeGreaterThan(0);
@@ -311,6 +322,11 @@ describe("3D printing calculator engine", () => {
       expect(p.powerByMaterial.abs).toBeGreaterThanOrEqual(p.powerByMaterial.petg);
       expect(p.powerByMaterial.pacf).toBeGreaterThanOrEqual(p.powerByMaterial.petg);
       expect(p.brand).toBeDefined();
+      // Strict FDM check: no photopolymer/resin printers
+      expect(p.name.toLowerCase()).not.toContain("photon");
+      expect(p.name.toLowerCase()).not.toContain("mars");
+      expect(p.name.toLowerCase()).not.toContain("saturn");
+      expect(p.name.toLowerCase()).not.toContain("halot");
     }
 
     const materials = Object.values(MATERIAL_PROFILES);

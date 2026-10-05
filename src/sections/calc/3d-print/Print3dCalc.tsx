@@ -602,6 +602,12 @@ export default function Print3dCalc({
                   { id: "elegoo", label: "Elegoo" },
                   { id: "qidi", label: "QIDI" },
                   { id: "flashforge", label: "Flashforge" },
+                  { id: "flyingbear", label: "Flying Bear" },
+                  { id: "kingroon", label: "Kingroon" },
+                  { id: "artillery", label: "Artillery" },
+                  { id: "twotrees", label: "Two Trees" },
+                  { id: "snapmaker", label: "Snapmaker" },
+                  { id: "raise3d", label: "Raise3D" },
                   { id: "custom", label: locale === "ru" ? "Свой" : "Custom" },
                 ] as const
               ).map((b) => {
