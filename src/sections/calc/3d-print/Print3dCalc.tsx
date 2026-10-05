@@ -564,6 +564,7 @@ export default function Print3dCalc({
       setTimeout(() => setCopiedQuote(false), 2000);
     }
   };
+  const handleCopyQuote = handleCopyPrice;
 
   const handleShareLink = () => {
     if (navigator.clipboard) {
