@@ -569,27 +569,31 @@ export default function Print3dCalc({
                   { id: "flashforge", label: "Flashforge" },
                   { id: "custom", label: locale === "ru" ? "Свой" : "Custom" },
                 ] as const
-              ).map((b) => (
-                <button
-                  key={b.id}
-                  type="button"
-                  onClick={() => {
-                    const firstOfBrand = Object.values(PRINTER_PROFILES).find((p) => p.brand === b.id);
-                    q.set({ brand: b.id, pr: firstOfBrand ? firstOfBrand.id : q.v.pr });
-                  }}
-                  className={cn(
-                    "shrink-0 rounded-lg px-3 py-1.5 text-xs font-bold transition whitespace-nowrap",
-                    q.v.brand === b.id
-                      ? "bg-neutral-950 text-white shadow-xs dark:bg-white dark:text-neutral-950"
-                      : "text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white",
-                  )}
-                >
-                  {b.label}
-                </button>
-              ))}
+              ).map((b) => {
+                const currentBrand = PRINTER_PROFILES[q.v.pr as PrinterId]?.brand ?? (q.v.brand === "all" ? "bambu" : q.v.brand);
+                const isActive = currentBrand === b.id;
+                return (
+                  <button
+                    key={b.id}
+                    type="button"
+                    onClick={() => {
+                      const firstOfBrand = Object.values(PRINTER_PROFILES).find((p) => p.brand === b.id);
+                      q.set({ brand: b.id, pr: firstOfBrand ? firstOfBrand.id : q.v.pr });
+                    }}
+                    className={cn(
+                      "shrink-0 rounded-lg px-3 py-1.5 text-xs font-bold transition whitespace-nowrap",
+                      isActive
+                        ? "bg-neutral-950 text-white shadow-xs dark:bg-white dark:text-neutral-950"
+                        : "text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white",
+                    )}
+                  >
+                    {b.label}
+                  </button>
+                );
+              })}
             </div>
 
-            {/* Printer Dropdown */}
+            {/* Printer Dropdown (только принтеры выбранного бренда) */}
             <div className="flex flex-col gap-1.5">
               <Select
                 id={`${id}-printer`}
@@ -600,96 +604,16 @@ export default function Print3dCalc({
                 }}
                 className="h-11 rounded-2xl border-neutral-300 font-bold dark:border-neutral-700"
               >
-                <optgroup label="Bambu Lab">
-                  {Object.values(PRINTER_PROFILES)
-                    .filter((p) => p.brand === "bambu")
-                    .map((p) => (
-                      <option key={p.id} value={p.id}>
-                        {p.name}
-                      </option>
-                    ))}
-                </optgroup>
-                <optgroup label="Creality">
-                  {Object.values(PRINTER_PROFILES)
-                    .filter((p) => p.brand === "creality")
-                    .map((p) => (
-                      <option key={p.id} value={p.id}>
-                        {p.name}
-                      </option>
-                    ))}
-                </optgroup>
-                <optgroup label="Anycubic">
-                  {Object.values(PRINTER_PROFILES)
-                    .filter((p) => p.brand === "anycubic")
-                    .map((p) => (
-                      <option key={p.id} value={p.id}>
-                        {p.name}
-                      </option>
-                    ))}
-                </optgroup>
-                <optgroup label="Elegoo">
-                  {Object.values(PRINTER_PROFILES)
-                    .filter((p) => p.brand === "elegoo")
-                    .map((p) => (
-                      <option key={p.id} value={p.id}>
-                        {p.name}
-                      </option>
-                    ))}
-                </optgroup>
-                <optgroup label="QIDI Tech">
-                  {Object.values(PRINTER_PROFILES)
-                    .filter((p) => p.brand === "qidi")
-                    .map((p) => (
-                      <option key={p.id} value={p.id}>
-                        {p.name}
-                      </option>
-                    ))}
-                </optgroup>
-                <optgroup label="Flashforge">
-                  {Object.values(PRINTER_PROFILES)
-                    .filter((p) => p.brand === "flashforge")
-                    .map((p) => (
-                      <option key={p.id} value={p.id}>
-                        {p.name}
-                      </option>
-                    ))}
-                </optgroup>
-                <optgroup label="Flying Bear / Kingroon">
-                  {Object.values(PRINTER_PROFILES)
-                    .filter((p) => ["flyingbear", "kingroon"].includes(p.brand))
-                    .map((p) => (
-                      <option key={p.id} value={p.id}>
-                        {p.name}
-                      </option>
-                    ))}
-                </optgroup>
-                <optgroup label="Artillery / Two Trees">
-                  {Object.values(PRINTER_PROFILES)
-                    .filter((p) => ["artillery", "twotrees"].includes(p.brand))
-                    .map((p) => (
-                      <option key={p.id} value={p.id}>
-                        {p.name}
-                      </option>
-                    ))}
-                </optgroup>
-                <optgroup label="Snapmaker / Промышленные (Raise3D / UltiMaker)">
-                  {Object.values(PRINTER_PROFILES)
-                    .filter((p) => ["snapmaker", "raise3d"].includes(p.brand))
-                    .map((p) => (
-                      <option key={p.id} value={p.id}>
-                        {p.name}
-                      </option>
-                    ))}
-                </optgroup>
-                <optgroup label="Свой принтер / Другой">
-                  {Object.values(PRINTER_PROFILES)
-                    .filter((p) => p.brand === "custom")
-                    .map((p) => (
-                      <option key={p.id} value={p.id}>
-                        {p.name}
-                      </option>
-                    ))}
-                </optgroup>
+                {Object.values(PRINTER_PROFILES)
+                  .filter((p) => {
+                    const currentBrand = PRINTER_PROFILES[q.v.pr as PrinterId]?.brand ?? (q.v.brand === "all" ? "bambu" : q.v.brand);
+                    return p.brand === currentBrand;
+                  })
+                  .map((p) => (
+                    <option key={p.id} value={p.id}>
+                      {p.name}
+                    </option>
+                  ))}
               </Select>
             </div>
           </div>
