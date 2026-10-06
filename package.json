@@ -3,7 +3,7 @@
   "version": "2.0.0",
   "private": true,
   "engines": {
-    "node": ">=22.12.0"
+    "node": "24.x"
   },
   "scripts": {
     "dev": "next dev -p 3000",
@@ -13,7 +13,6 @@
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "test:e2e": "playwright test",
     "data": "node scripts/data/build.mjs",
     "vendor": "node scripts/vendor.mjs",
     "verify": "npm run lint && npm run typecheck && npm test && npm run build"
@@ -62,10 +61,8 @@
     "zxing-wasm": "^3.1.4"
   },
   "devDependencies": {
-    "@axe-core/playwright": "^4.13.0",
     "@fontsource-variable/onest": "^5.3.1",
     "@fontsource/onest": "^5.3.1",
-    "@playwright/test": "^1.63.0",
     "@tailwindcss/postcss": "^4.3.3",
     "@types/diff": "^7.0.2",
     "@types/js-yaml": "^4.0.9",

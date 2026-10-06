@@ -17,7 +17,7 @@ const DESC = {
 };
 
 /** Cities prebuilt at build time (the rest render on first request and are cached). */
-const PREBUILD_CITIES = 320;
+const PREBUILD_CITIES = 80;
 
 export const timeSection: SectionDef = {
   id: "time",

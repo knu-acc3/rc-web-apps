@@ -44,7 +44,7 @@ import {
 } from "./data";
 import { calculatePrint3d } from "./engine";
 
-const STORAGE_KEY = "rc_calc_3d_state_v5";
+const STORAGE_KEY = "rc_calc_3d_state_v6";
 
 function GraphiteSlider({
   min,
@@ -406,7 +406,7 @@ export default function Print3dCalc({
       comm: "0",
       tar: "",
       pwatts: "",
-      pm: "cost",
+      pm: "market",
       mrate: "35",
       maint: "20",
       sup: "none",
@@ -503,7 +503,7 @@ export default function Print3dCalc({
       comm: "0",
       tar: "",
       pwatts: "",
-      pm: "cost",
+      pm: "market",
       mrate: "35",
       maint: "20",
       sup: "none",
@@ -784,10 +784,12 @@ export default function Print3dCalc({
                     key={m.id}
                     type="button"
                     onClick={() => {
+                      const defaultRate = m.id === "pacf" ? "60" : m.id === "tpu" ? "50" : m.id === "abs" ? "40" : "35";
                       q.set({
                         mat: m.id,
                         sp: toInput(locale, m.defaultPriceKg),
                         pwatts: "",
+                        mrate: defaultRate,
                       });
                     }}
                     className={cn(

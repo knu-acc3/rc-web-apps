@@ -32,6 +32,14 @@ const base = defineToolSection({
 
 const ROMAN = romanTool.slug;
 const WORDS = inWordsTool.slug;
+const PREBUILD_ROMAN = new Set([
+  ...Array.from({ length: 20 }, (_, i) => i + 1),
+  40, 50, 90, 100, 400, 500, 900, 1000, 1999, 2000, 2024, 2025, 2026, 3000, 3999,
+]);
+const PREBUILD_WORDS = new Set([
+  ...Array.from({ length: 25 }, (_, i) => i + 1),
+  30, 40, 50, 100, 101, 1000, 2024, 2025, 2026, 5000, 10_000, 100_000, 1_000_000, 1_000_000_000,
+]);
 
 function romanLink(n: number, locale: Locale): LinkItem {
   return { path: [ROMAN, String(n)], label: num(n, locale), hint: toRoman(n) };
@@ -64,6 +72,14 @@ function adjust(page: PageModel, locale: Locale, segs: string[]): PageModel {
 
 export const numbersSection: SectionDef = {
   ...base,
+  prebuild() {
+    return base.paths().filter(([tool, variant]) => {
+      if (!variant) return true;
+      if (tool === ROMAN) return PREBUILD_ROMAN.has(Number(variant));
+      if (tool === WORDS) return PREBUILD_WORDS.has(Number(variant));
+      return true;
+    });
+  },
   resolve(locale, segs) {
     const page = base.resolve(locale, segs);
     return page ? adjust(page, locale, segs) : null;

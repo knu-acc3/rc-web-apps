@@ -332,8 +332,9 @@ export function calculatePrint3d(input: Print3dInput): Print3dResult {
   const batchNetCost = unitNetCost * qty;
 
   // 8. Commercial Pricing & Taxes
-  const pricingMode = input.pricingMode ?? "cost_plus";
-  const marketRatePerGram = Math.max(1, input.marketRatePerGram ?? 35);
+  const pricingMode = input.pricingMode ?? "market_rate";
+  const defaultRateForMat = material.id === "pacf" ? 60 : material.id === "tpu" ? 50 : material.id === "abs" ? 40 : 35;
+  const marketRatePerGram = Math.max(1, input.marketRatePerGram ?? defaultRateForMat);
   const markupPct = Math.max(0, input.markupPct ?? 40);
   const taxRegime = TAX_REGIMES[input.taxRegime ?? "none"] ?? TAX_REGIMES.none;
 

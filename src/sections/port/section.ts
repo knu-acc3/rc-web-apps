@@ -296,6 +296,9 @@ export const portSection: SectionDef = {
   paths() {
     return [[], ...CATS.map((c) => [c.id]), ...PORTS.map((p) => [String(p.port)])];
   },
+  prebuild() {
+    return [[], ...CATS.map((c) => [c.id]), ...POPULAR.filter((port) => PORT_BY_NUM.has(port)).map((port) => [String(port)])];
+  },
   resolve(locale, rest) {
     if (rest.length === 0) return hubPage(locale);
     if (rest.length !== 1) return null;

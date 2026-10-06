@@ -464,6 +464,10 @@ function catalogueBlocks(locale: Locale): Block[] {
 
 export const actualSizeSection: SectionDef = {
   ...base,
+  prebuild() {
+    const popular = new Set(POPULAR.map((o) => o.slug));
+    return base.paths().filter((path) => path.length === 1 || (path[0] === ID && popular.has(path[1])));
+  },
   resolve(locale, segs) {
     const page: PageModel | null = base.resolve(locale, segs);
     if (!page || page.path[0] !== ID) return page;

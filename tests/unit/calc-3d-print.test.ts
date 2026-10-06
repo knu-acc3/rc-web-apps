@@ -12,6 +12,7 @@ describe("3D printing calculator engine", () => {
       materialId: "pla",
       citySlug: "almaty",
       isCommercialTariff: false,
+      pricingMode: "cost_plus",
       markupPct: 100,
     });
 
@@ -485,6 +486,16 @@ describe("3D printing calculator engine", () => {
     expect(marketRes.pricePerGram).toBeCloseTo(35, 1);
     expect(marketRes.marketComparison).toBe("market");
     expect(marketRes.unitProfit).toBeGreaterThan(costPlusRes.unitProfit);
+
+    // Default call with no pricingMode specified defaults to market_rate
+    const defaultRes = calculatePrint3d({
+      weightG: 330,
+      printHours: 9,
+      spoolPriceKg: 7500,
+    });
+    expect(defaultRes.pricingMode).toBe("market_rate");
+    expect(defaultRes.unitPrice).toBeCloseTo(11550, 0);
+    expect(defaultRes.marketComparison).toBe("market");
   });
 
   it("includes supports and brim in market rate pricing and dynamic material rates", () => {

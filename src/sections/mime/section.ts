@@ -356,6 +356,9 @@ export const mimeSection: SectionDef = {
   paths() {
     return [[], [DETECT], ...CATS.map((c) => [c.slug]), ...ENTRIES.map((e) => [e.ext])];
   },
+  prebuild() {
+    return [[], [DETECT], ...CATS.map((c) => [c.slug]), ...POPULAR.map((ext) => [ext])];
+  },
   resolve(locale, rest) {
     if (rest.length === 0) return hubPage(locale);
     if (rest.length !== 1) return null;
